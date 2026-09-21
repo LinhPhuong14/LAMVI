@@ -1,4 +1,18 @@
-export default function Lantern({ size = 220, lit = true, className = '' }) {
+import { useId } from 'react'
+
+const TONES = {
+  amber: ['#fff3d6', '#f0be6f', '#c47f3a'],
+  dawn: ['#ffe9dd', '#f2a68f', '#c15a3a'],
+  dusk: ['#ffe6b8', '#e8935a', '#8a3d2a'],
+  moss: ['#f6f1d8', '#c9a75a', '#6b5a2a'],
+}
+
+export default function Lantern({ size = 220, lit = true, tone = 'amber', className = '' }) {
+  const uid = useId()
+  const glowId = `lanternGlow-${uid}`
+  const capId = `capGrad-${uid}`
+  const [c1, c2, c3] = TONES[tone] || TONES.amber
+
   return (
     <svg
       viewBox="0 0 200 260"
@@ -9,12 +23,12 @@ export default function Lantern({ size = 220, lit = true, className = '' }) {
       aria-hidden="true"
     >
       <defs>
-        <radialGradient id="lanternGlow" cx="50%" cy="46%" r="60%">
-          <stop offset="0%" stopColor="#fff3d6" />
-          <stop offset="55%" stopColor="#f0be6f" />
-          <stop offset="100%" stopColor="#c47f3a" />
+        <radialGradient id={glowId} cx="50%" cy="46%" r="60%">
+          <stop offset="0%" stopColor={c1} />
+          <stop offset="55%" stopColor={c2} />
+          <stop offset="100%" stopColor={c3} />
         </radialGradient>
-        <linearGradient id="capGrad" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={capId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#6b4226" />
           <stop offset="100%" stopColor="#4a2c18" />
         </linearGradient>
@@ -22,11 +36,11 @@ export default function Lantern({ size = 220, lit = true, className = '' }) {
 
       <line x1="100" y1="6" x2="100" y2="34" stroke="#6b4226" strokeWidth="2" />
 
-      <path d="M78 34 L122 34 L128 50 L72 50 Z" fill="url(#capGrad)" />
+      <path d="M78 34 L122 34 L128 50 L72 50 Z" fill={`url(#${capId})`} />
 
       <path
         d="M72 50 C48 90 48 170 72 210 C84 232 116 232 128 210 C152 170 152 90 128 50 Z"
-        fill="url(#lanternGlow)"
+        fill={`url(#${glowId})`}
         stroke="#8a5a34"
         strokeWidth="1.5"
       />
@@ -50,7 +64,7 @@ export default function Lantern({ size = 220, lit = true, className = '' }) {
         />
       ))}
 
-      <path d="M72 210 L128 210 L122 226 L78 226 Z" fill="url(#capGrad)" />
+      <path d="M72 210 L128 210 L122 226 L78 226 Z" fill={`url(#${capId})`} />
       <ellipse cx="100" cy="230" rx="14" ry="5" fill="#4a2c18" />
     </svg>
   )

@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Lantern from './components/Lantern'
+import ScrollProgress from './components/ScrollProgress'
+import Marquee from './components/Marquee'
+import Particles from './components/Particles'
+import Faq from './components/Faq'
 import './App.css'
 
 const fadeUp = {
@@ -18,16 +22,22 @@ const products = [
     name: 'Đèn Nguyệt',
     desc: 'Dáng tròn đầy, ánh sáng dịu như trăng rằm',
     price: '890.000₫',
+    tone: 'amber',
+    badge: null,
   },
   {
     name: 'Đèn Vọng',
     desc: 'Thân thon cao, gợi nhớ mái đình làng cổ',
     price: '1.050.000₫',
+    tone: 'dusk',
+    badge: 'Bán chạy',
   },
   {
     name: 'Đèn Sum Vầy',
     desc: 'Bộ ba kích cỡ, dành tặng cả gia đình',
     price: '1.680.000₫',
+    tone: 'dawn',
+    badge: null,
   },
 ]
 
@@ -38,18 +48,61 @@ const steps = [
   { label: 'Đóng gói & khắc QR', note: 'Gắn mã riêng lưu câu chuyện của bạn' },
 ]
 
+const lookbook = [
+  { tone: 'amber', label: 'Hổ phách', size: 'tall' },
+  { tone: 'dusk', label: 'Hoàng hôn', size: 'short' },
+  { tone: 'dawn', label: 'Bình minh', size: 'short' },
+  { tone: 'moss', label: 'Trầm mộc', size: 'tall' },
+  { tone: 'dusk', label: 'Lửa ấm', size: 'short' },
+]
+
+const testimonials = [
+  {
+    name: 'Thu Hà',
+    context: 'Tặng mẹ nhân ngày 20/10',
+    quote:
+      '“Mẹ mình xem video làm đèn xong thì khóc luôn. Chưa món quà nào làm mẹ xúc động đến vậy.”',
+  },
+  {
+    name: 'Minh Quân',
+    context: 'Mua cho phòng khách nhà mình',
+    quote:
+      '“Ánh sáng ấm mà không chói, để bàn trà nhìn sang trọng hẳn. Video quy trình làm cũng rất chill để xem.”',
+  },
+  {
+    name: 'Bảo Trân',
+    context: 'Tặng bạn thân dịp tân gia',
+    quote:
+      '“Bạn mình quét mã xong nhắn lại ngay, bảo cảm động vì thấy cả quá trình đèn được làm cho riêng mình.”',
+  },
+]
+
+function Initials({ name }) {
+  const letters = name
+    .split(' ')
+    .map((w) => w[0])
+    .slice(-2)
+    .join('')
+  return <span className="avatar-initials">{letters}</span>
+}
+
 function App() {
   const [intent, setIntent] = useState('gift')
 
   return (
     <div className="page">
+      <div className="grain" aria-hidden="true" />
+      <ScrollProgress />
+
       <header className="nav">
         <span className="nav-mark">MỘC</span>
         <nav className="nav-links">
           <a href="#story">Câu chuyện</a>
+          <a href="#artisan">Nghệ nhân</a>
           <a href="#products">Sản phẩm</a>
-          <a href="#process">Quy trình</a>
+          <a href="#lookbook">Lookbook</a>
           <a href="#qr">Trải nghiệm QR</a>
+          <a href="#faq">Hỏi đáp</a>
         </nav>
         <a href="#products" className="nav-cta">
           Đặt đèn
@@ -57,6 +110,7 @@ function App() {
       </header>
 
       <section className="hero">
+        <Particles />
         <motion.div
           className="hero-copy"
           initial="hidden"
@@ -103,9 +157,36 @@ function App() {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
         >
           <div className="hero-glow" />
+          <motion.div
+            className="hero-art-satellite satellite-a"
+            animate={{ y: [0, -14, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <Lantern size={70} tone="dusk" />
+          </motion.div>
+          <motion.div
+            className="hero-art-satellite satellite-b"
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+          >
+            <Lantern size={54} tone="dawn" />
+          </motion.div>
           <Lantern size={260} />
         </motion.div>
+
+        <motion.div
+          className="scroll-cue"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <span>Cuộn xuống</span>
+          <svg width="14" height="20" viewBox="0 0 14 20" fill="none">
+            <path d="M1 1L7 19L13 1" stroke="currentColor" strokeWidth="1.4" />
+          </svg>
+        </motion.div>
       </section>
+
+      <Marquee />
 
       <motion.section
         id="story"
@@ -119,7 +200,7 @@ function App() {
           Di sản
         </motion.span>
         <motion.h2 variants={fadeUp}>Từ làng nghề giấy dó trăm năm</motion.h2>
-        <motion.p className="story-text" variants={fadeUp}>
+        <motion.p className="story-text drop-cap" variants={fadeUp}>
           Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ, lưu giữ ký ức của
           bao thế hệ. Chúng tôi mang chất liệu ấy trở lại trong hình hài một
           chiếc đèn — để câu chuyện của gia đình bạn cũng được lưu giữ theo
@@ -137,6 +218,55 @@ function App() {
           <div>
             <strong>1</strong>
             <span>câu chuyện riêng mỗi đèn</span>
+          </div>
+        </motion.div>
+      </motion.section>
+
+      <motion.section
+        id="artisan"
+        className="artisan"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.4 }}
+        variants={stagger}
+      >
+        <motion.div className="artisan-portrait" variants={fadeUp}>
+          <div className="portrait-frame">
+            <div className="portrait-ring" />
+            <svg viewBox="0 0 200 200" className="portrait-figure" aria-hidden="true">
+              <circle cx="100" cy="76" r="38" fill="#8a5a34" opacity="0.9" />
+              <path
+                d="M40 190 C40 130 70 108 100 108 C130 108 160 130 160 190 Z"
+                fill="#6b4226"
+                opacity="0.9"
+              />
+            </svg>
+            <span className="portrait-quote-mark">”</span>
+          </div>
+        </motion.div>
+        <motion.div className="artisan-copy" variants={fadeUp}>
+          <span className="eyebrow">Người giữ lửa nghề</span>
+          <h2>Bàn tay tạo nên ánh sáng</h2>
+          <p className="artisan-quote">
+            “Mỗi tờ giấy dó đều có tính khí riêng — ẩm quá thì rách, khô quá
+            thì giòn. Phải quen tay hàng chục năm mới lên khung được một
+            chiếc đèn tròn đều.”
+          </p>
+          <div className="artisan-meta">
+            <div>
+              <strong>Nghệ nhân Nguyễn Văn Tài</strong>
+              <span>Làng Yên Thái, Hà Nội</span>
+            </div>
+            <div className="artisan-stats">
+              <div>
+                <strong>32</strong>
+                <span>năm trong nghề</span>
+              </div>
+              <div>
+                <strong>4.000+</strong>
+                <span>chiếc đèn đã ra lò</span>
+              </div>
+            </div>
           </div>
         </motion.div>
       </motion.section>
@@ -181,8 +311,9 @@ function App() {
         >
           {products.map((p) => (
             <motion.article className="product-card" key={p.name} variants={fadeUp}>
+              {p.badge && <span className="product-badge">{p.badge}</span>}
               <div className="product-art">
-                <Lantern size={120} />
+                <Lantern size={120} tone={p.tone} />
               </div>
               <h3>{p.name}</h3>
               <p className="product-desc">{p.desc}</p>
@@ -193,6 +324,32 @@ function App() {
                 </button>
               </div>
             </motion.article>
+          ))}
+        </motion.div>
+      </section>
+
+      <section id="lookbook" className="lookbook">
+        <div className="section-head">
+          <span className="eyebrow">Lookbook</span>
+          <h2>Sắc màu của ánh sáng thủ công</h2>
+        </div>
+        <motion.div
+          className="lookbook-grid"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={stagger}
+        >
+          {lookbook.map((item, i) => (
+            <motion.div
+              className={`lookbook-card size-${item.size}`}
+              key={`${item.tone}-${i}`}
+              variants={fadeUp}
+              whileHover={{ y: -6 }}
+            >
+              <Lantern size={item.size === 'tall' ? 150 : 110} tone={item.tone} />
+              <span className="lookbook-caption">{item.label}</span>
+            </motion.div>
           ))}
         </motion.div>
       </section>
@@ -276,9 +433,96 @@ function App() {
         </motion.div>
       </section>
 
+      <motion.section
+        className="testimonials"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={stagger}
+      >
+        <div className="section-head">
+          <span className="eyebrow">Người đã thắp đèn</span>
+          <h2>Những câu chuyện được kể lại</h2>
+        </div>
+        <div className="testimonial-grid">
+          {testimonials.map((t) => (
+            <motion.figure className="testimonial-card" key={t.name} variants={fadeUp}>
+              <div className="stars">★★★★★</div>
+              <blockquote>{t.quote}</blockquote>
+              <figcaption>
+                <span className="avatar">
+                  <Initials name={t.name} />
+                </span>
+                <span>
+                  <strong>{t.name}</strong>
+                  <span className="testimonial-context">{t.context}</span>
+                </span>
+              </figcaption>
+            </motion.figure>
+          ))}
+        </div>
+      </motion.section>
+
+      <motion.section
+        id="faq"
+        className="faq"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={stagger}
+      >
+        <motion.div className="section-head" variants={fadeUp}>
+          <span className="eyebrow">Giải đáp</span>
+          <h2>Những điều bạn có thể thắc mắc</h2>
+        </motion.div>
+        <motion.div variants={fadeUp}>
+          <Faq />
+        </motion.div>
+      </motion.section>
+
       <footer className="footer">
-        <span className="nav-mark">MỘC</span>
-        <p>Đèn giấy dó thủ công — giữ lửa ký ức, thắp sáng yêu thương.</p>
+        <div className="footer-grid">
+          <div className="footer-brand">
+            <span className="nav-mark">MỘC</span>
+            <p>Đèn giấy dó thủ công — giữ lửa ký ức, thắp sáng yêu thương.</p>
+            <div className="social-links">
+              <a href="#" aria-label="Facebook">
+                Facebook
+              </a>
+              <a href="#" aria-label="Instagram">
+                Instagram
+              </a>
+              <a href="#" aria-label="TikTok">
+                TikTok
+              </a>
+            </div>
+          </div>
+          <div className="footer-col">
+            <h3>Sản phẩm</h3>
+            <a href="#products">Đèn Nguyệt</a>
+            <a href="#products">Đèn Vọng</a>
+            <a href="#products">Đèn Sum Vầy</a>
+          </div>
+          <div className="footer-col">
+            <h3>Hỗ trợ</h3>
+            <a href="#faq">Câu hỏi thường gặp</a>
+            <a href="#">Chính sách đổi trả</a>
+            <a href="#">Theo dõi đơn hàng</a>
+          </div>
+          <div className="footer-col footer-news">
+            <h3>Nhận tin tức</h3>
+            <p>Câu chuyện làng nghề và ưu đãi mới, gửi mỗi tháng một lần.</p>
+            <form className="news-form" onSubmit={(e) => e.preventDefault()}>
+              <input type="email" placeholder="Email của bạn" required />
+              <button type="submit" className="btn btn-small">
+                Đăng ký
+              </button>
+            </form>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <span>© 2026 Mộc — Đèn giấy dó thủ công.</span>
+        </div>
       </footer>
     </div>
   )
