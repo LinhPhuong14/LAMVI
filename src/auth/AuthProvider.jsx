@@ -27,14 +27,18 @@ export default function AuthProvider({ children }) {
   // Gộp các lần refresh đồng thời thành một
   const refresh = useCallback(() => {
     const current = sessionRef.current
-    if (!current?.refreshToken) return Promise.reject(new ApiError(401, 'UNAUTHORIZED'))
+    if (!current?.refreshToken) {
+      if (current) update(null)
+      return Promise.reject(new ApiError(401, 'UNAUTHORIZED'))
+    }
     refreshing.current ??= api('/auth/refresh', { method: 'POST', body: { refreshToken: current.refreshToken } })
       .then((s) => {
         update(pickSession(s))
         return s
       })
       .catch((err) => {
-        update(null)
+        // Chỉ xoá phiên khi refresh token bị từ chối; lỗi mạng/5xx giữ phiên để thử lại sau
+        if (err.status === 400 || err.status === 401) update(null)
         throw err
       })
       .finally(() => {

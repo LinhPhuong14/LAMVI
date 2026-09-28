@@ -6,7 +6,7 @@ import { useNoIndex } from '../hooks/useNoIndex.js'
 import { useAuth } from '../auth/context.js'
 import { useSubmit } from '../auth/useForm.js'
 
-function ProfileForm({ profile, onSaved }) {
+function ProfileForm({ profile, onSaved, initiallySaved = false }) {
   const { t } = useI18n()
   const { authedApi } = useAuth()
   const [form, setForm] = useState({
@@ -14,7 +14,7 @@ function ProfileForm({ profile, onSaved }) {
     phone: profile.phone ?? '',
     preferredLocale: profile.preferredLocale,
   })
-  const [saved, setSaved] = useState(false)
+  const [saved, setSaved] = useState(initiallySaved)
   const { pending, error, fields, run } = useSubmit()
   const set = (k) => (e) => {
     setSaved(false)
@@ -101,7 +101,13 @@ export default function AccountPage() {
           </p>
         )}
         {state.status === 'ok' && (
-          <ProfileForm profile={state.profile} onSaved={(profile) => setState({ status: 'ok', profile })} />
+          <ProfileForm
+            // Đổi key sau khi lưu để form hiển thị giá trị server đã chuẩn hoá (vd SĐT)
+            key={`${state.profile.fullName}|${state.profile.phone}|${state.profile.preferredLocale}`}
+            profile={state.profile}
+            onSaved={(profile) => setState({ status: 'ok', profile, saved: true })}
+            initiallySaved={state.saved}
+          />
         )}
       </div>
       <div className="account-card">

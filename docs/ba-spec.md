@@ -133,12 +133,14 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 
 - Đăng nhập bằng email + mật khẩu (D-42). SĐT không dùng để đăng nhập; chỉ lưu trong hồ sơ, không bắt buộc (D-42).
 - Hồ sơ gồm: họ tên (bắt buộc, ≤100 ký tự), SĐT, ngôn ngữ ưa thích (vi/en/zh), vai trò (D-38).
-- Mật khẩu 8–72 ký tự `[ASSUMPTION]`.
+- Mật khẩu 8–72 ký tự và không quá 72 byte UTF-8 (giới hạn của Supabase) `[ASSUMPTION]`.
 - SĐT hồ sơ phải là số di động Việt Nam (0/+84, đầu số 3/5/7/8/9), lưu dạng `0xxxxxxxxx` `[ASSUMPTION]`.
 - Ngôn ngữ ưa thích mặc định = ngôn ngữ giao diện lúc đăng ký `[ASSUMPTION]`.
 - Nếu cấu hình Supabase bật xác nhận email, khách phải xác nhận email trước khi đăng nhập `[ASSUMPTION]`.
-- "Quên mật khẩu" luôn trả cùng một thông báo, không tiết lộ email có đăng ký hay không `[DERIVED]` (NFR-SEC).
-- Đăng xuất vô hiệu phiên của tài khoản; đặt lại mật khẩu xong phải đăng nhập lại `[ASSUMPTION]`.
+- "Quên mật khẩu" luôn trả cùng một thông báo, không tiết lộ email có đăng ký hay không, kể cả khi Supabase giới hạn gửi thư `[DERIVED]` (NFR-SEC).
+- Đăng ký bằng email đã tồn tại → báo "Email này đã được đăng ký" `[ASSUMPTION]` — chờ Q-34. Đăng ký lại email chưa xác nhận không ghi đè hồ sơ đã có `[DERIVED]`.
+- Lỗi mạng khi làm mới phiên không đăng xuất khách; chỉ đăng xuất khi phiên bị máy chủ từ chối `[DERIVED]`.
+- Đăng xuất vô hiệu mọi phiên của tài khoản trên mọi thiết bị; đặt lại mật khẩu xong phải đăng nhập lại `[ASSUMPTION]`.
 - Trang đăng nhập/đăng ký/quên mật khẩu/tài khoản đặt `noindex` `[DERIVED]` BR-SEO-001.
 
 ### 5.3 Giỏ hàng & checkout
@@ -932,6 +934,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Q-32 | `[LEGAL]` Banner đồng ý cookie/GA |
 | Q-33 | Có cần lớp bảo vệ thêm (PIN) cho trang lời chúc? |
 | I-15 | `[LEGAL]` Quyền xóa lịch sử chat |
+| Q-34 | Đăng ký bằng email đã tồn tại hiện "Email này đã được đăng ký" (tiện cho khách nhưng cho phép dò email có tài khoản), hay luôn báo "kiểm tra email" giống quên mật khẩu? Hiện code báo "đã đăng ký" `[ASSUMPTION]` |
 
 ### P2 — có thể quyết định sau
 | ID | Câu hỏi |
@@ -982,6 +985,9 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-15 | SEO đa ngôn ngữ | Chưa có `hreflang`, sitemap, meta description theo trang/ngôn ngữ | Missing | **Mới** |
 | G-16 | Cấu hình Supabase Auth | Cần thêm Redirect URLs (`/login`, `/reset-password` × 3 ngôn ngữ) và chọn có bật xác nhận email | Cấu hình | **Mới** — xem `docs/knowledge/architecture.md` |
 | G-17 | Lưu phiên đăng nhập | Token ở `localStorage` (T-10) — rủi ro XSS | Technical debt | **Mới** — xem lại trước go-live |
+| G-18 | Đặt lại mật khẩu | `POST /api/auth/reset-password` nhận mọi access token hợp lệ, không riêng token khôi phục; chưa có chức năng đổi mật khẩu (có hỏi mật khẩu cũ) | Security | **Mới** — cần kiểm tra token khôi phục trước go-live |
+| G-19 | Khoá tài khoản | §7 có trạng thái User "bị khóa" nhưng chưa có cơ chế khoá | Missing | **Mới** — làm cùng admin (G-06) |
+| G-20 | Chống dò/spam đăng nhập, đăng ký, quên mật khẩu | Chỉ dựa vào giới hạn của Supabase; chưa có giới hạn theo IP ở tầng app | Security | **Mới** |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
 

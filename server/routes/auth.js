@@ -18,7 +18,10 @@ const STATUS = {
   UNAUTHORIZED: 401,
   RATE_LIMITED: 429,
   PASSWORD_TOO_SHORT: 400,
+  INVALID_EMAIL: 400,
 }
+
+const FIELD_ERRORS = { PASSWORD_TOO_SHORT: 'password', INVALID_EMAIL: 'email' }
 
 // Chuyển AuthError của adapter sang HttpError; lỗi khác để errorHandler trả 500
 async function call(fn) {
@@ -26,8 +29,9 @@ async function call(fn) {
     return await fn()
   } catch (err) {
     if (err instanceof AuthError && STATUS[err.code]) {
-      const fields = err.code === 'PASSWORD_TOO_SHORT' ? { password: 'PASSWORD_TOO_SHORT' } : undefined
-      throw new HttpError(STATUS[err.code], err.code === 'PASSWORD_TOO_SHORT' ? 'VALIDATION_ERROR' : err.code, err.code, fields)
+      const field = FIELD_ERRORS[err.code]
+      if (field) throw new HttpError(400, 'VALIDATION_ERROR', err.code, { [field]: err.code })
+      throw new HttpError(STATUS[err.code], err.code, err.code)
     }
     throw err
   }
@@ -62,7 +66,9 @@ export function authRouter({ repo, auth, config }) {
     const result = await call(() =>
       auth.signUp({ email, password: b.password, redirectTo: siteUrl(lang, '/login') }),
     )
-    await repo.upsertProfile({
+    // Email đã đăng ký nhưng chưa xác nhận: Supabase có thể trả lại user cũ — không ghi đè hồ sơ của chủ email
+    const existing = await repo.getProfile(result.user.id)
+    if (!existing) await repo.upsertProfile({
       id: result.user.id,
       fullName: values.fullName,
       phone: values.phone ?? null,

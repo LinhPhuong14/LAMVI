@@ -177,3 +177,20 @@ describe('Quên / đặt lại mật khẩu', () => {
     expect(res.body.error.fields.password).toBe('PASSWORD_TOO_SHORT')
   })
 })
+
+describe('Hồi quy sau kiểm thử độc lập', () => {
+  it('đăng ký lại email đã có hồ sơ (chưa xác nhận) không ghi đè hồ sơ', async () => {
+    const res = await request(app).post('/api/auth/register').send(valid)
+    const id = res.body.user.id
+    // Giả lập Supabase trả lại user cũ
+    auth.signUp = async () => ({ user: { id, email: 'an@example.com' }, needsConfirmation: true })
+    await request(app).post('/api/auth/register').send({ ...valid, fullName: 'Kẻ Mạo Danh', phone: '0987654321' }).expect(201)
+    expect((await repo.getProfile(id)).fullName).toBe('Nguyễn An')
+  })
+
+  it('mật khẩu quá 72 byte (ký tự có dấu) → PASSWORD_TOO_LONG', async () => {
+    const res = await request(app).post('/api/auth/register').send({ ...valid, password: 'ệ'.repeat(30) })
+    expect(res.status).toBe(400)
+    expect(res.body.error.fields.password).toBe('PASSWORD_TOO_LONG')
+  })
+})

@@ -127,3 +127,13 @@ describe('Đặt lại mật khẩu', () => {
     expect(window.location.hash).toBe('')
   })
 })
+
+describe('Hồi quy phiên', () => {
+  it('phiên thiếu refreshToken + 401 → xoá phiên, về đăng nhập', async () => {
+    localStorage.setItem('moc.session', JSON.stringify({ ...session, refreshToken: undefined }))
+    mockApi({ ...base, 'GET /me': () => ({ status: 401, body: {} }) })
+    renderAt('/account')
+    expect(await screen.findByRole('heading', { name: 'Đăng nhập' })).toBeInTheDocument()
+    expect(localStorage.getItem('moc.session')).toBeNull()
+  })
+})

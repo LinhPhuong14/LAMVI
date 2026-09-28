@@ -11,6 +11,7 @@ function mapError(error) {
   if (code === 'invalid_credentials') return new AuthError('INVALID_CREDENTIALS')
   if (code === 'email_not_confirmed') return new AuthError('EMAIL_NOT_CONFIRMED')
   if (code === 'weak_password') return new AuthError('PASSWORD_TOO_SHORT')
+  if (code === 'email_address_invalid') return new AuthError('INVALID_EMAIL')
   if (code === 'refresh_token_not_found' || code === 'refresh_token_already_used' || code === 'session_not_found') {
     return new AuthError('UNAUTHORIZED')
   }
@@ -60,18 +61,16 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
     },
 
     async signOut(accessToken) {
-      const { error } = await admin.auth.admin.signOut(accessToken, 'local')
+      // 'global': thu hồi mọi phiên của tài khoản (khớp adapter bộ nhớ; cần sau khi đặt lại mật khẩu)
+      const { error } = await admin.auth.admin.signOut(accessToken, 'global')
       if (error && error.status !== 401 && error.status !== 404) throw mapError(error)
     },
 
     async sendPasswordReset(email, redirectTo) {
       const { error } = await makePublicClient().auth.resetPasswordForEmail(email, { redirectTo })
-      if (error) {
-        const mapped = mapError(error)
-        if (mapped instanceof AuthError && mapped.code === 'RATE_LIMITED') throw mapped
-        // Lỗi khác không tiết lộ ra ngoài (không cho biết email có tồn tại)
-        console.error('[auth] resetPasswordForEmail', error.message)
-      }
+      // Không ném lỗi nào (kể cả 429 theo từng user của Supabase) — nếu không, gửi hai lần
+      // liên tiếp sẽ dò được email có tồn tại hay không
+      if (error) console.error('[auth] resetPasswordForEmail', error.code ?? error.message)
     },
 
     async updatePassword(userId, password) {

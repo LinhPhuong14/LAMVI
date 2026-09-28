@@ -29,7 +29,8 @@ export function validateEmail(email) {
 export function validatePassword(pw) {
   if (typeof pw !== 'string' || pw.length === 0) return 'REQUIRED'
   if (pw.length < PASSWORD_MIN) return 'PASSWORD_TOO_SHORT'
-  if (pw.length > PASSWORD_MAX) return 'PASSWORD_TOO_LONG'
+  // Supabase (bcrypt) giới hạn 72 byte — ký tự có dấu chiếm nhiều byte
+  if (pw.length > PASSWORD_MAX || Buffer.byteLength(pw, 'utf8') > PASSWORD_MAX) return 'PASSWORD_TOO_LONG'
   return null
 }
 
