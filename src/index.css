@@ -1,25 +1,57 @@
+/*
+ * Bảng màu "Đông Hồ đã ngả màu thời gian": màu tự nhiên của tranh dân gian, phai như bản in cũ.
+ * giấy điệp ố vàng (nền) · mực than tre ngả nâu · đỏ son phai · vàng hoè đất · xanh chàm bạc.
+ */
 :root {
-  --paper: #f7f0e4;
-  --paper-deep: #efe3d0;
-  --cream: #fbf6ec;
-  --ink: #3a2c22;
-  --ink-soft: #6b5847;
-  --brown: #8a5a34;
-  --brown-deep: #6b4226;
-  --brown-line: #d8c4a8;
-  --ember: #d98a3d;
-  --gold: #c99a4b;
-  --white: #ffffff;
+  --diep: #f0e3c6;
+  --diep-deep: #e4d0a8;
+  --diep-light: #f8efd9;
+  --than: #2b2119;
+  --than-soft: #5d4a38;
+  --son: #a83a2a;
+  --son-deep: #82291d;
+  --hoe: #d69c34;
+  --hoe-light: #ecca86;
+  --cham: #273a50;
+  --cham-deep: #1b2a3c;
+  --la: #52704b;
+  --sepia: #8b6a45;
+  --line: #d3bd92;
 
-  --serif: 'Cormorant Garamond', 'Times New Roman', serif;
+  /* Bí danh cho các trang khác (tài khoản, lô, admin, IT) vẫn dùng tên biến cũ */
+  --paper: var(--diep);
+  --paper-deep: var(--diep-deep);
+  --cream: var(--diep-light);
+  --ink: var(--than);
+  --ink-soft: var(--than-soft);
+  --brown: var(--sepia);
+  --brown-deep: var(--son-deep);
+  --brown-line: var(--line);
+  --ember: var(--son);
+  --gold: var(--hoe);
+  --white: #fffaf0;
+  --shadow-soft: 4px 4px 0 var(--than);
+  --shadow-glow: 0 0 70px 10px rgba(214, 156, 52, 0.35);
+
+  --serif: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
   --sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  --shadow-soft: 0 20px 45px -20px rgba(107, 66, 38, 0.35);
-  --shadow-glow: 0 0 70px 10px rgba(217, 138, 61, 0.35);
+  /* Bóng in lệch khuôn của tranh khắc gỗ: đổ cứng, không nhoè */
+  --print: 4px 4px 0 var(--than);
+  --print-lg: 7px 7px 0 var(--than);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
-  font: 17px/1.6 var(--sans);
-  color: var(--ink);
-  background: var(--paper);
+  /* Vân giấy dó: sợi dó ngắn uốn cong nhiều hướng + lấm tấm bột giấy */
+  --tex-fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cg fill='none' stroke='%237a5530' stroke-linecap='round'%3E%3Cpath d='M145 179Q147 196 148 211' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M152 196Q148 203 154 209' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M314 309Q305 314 305 332' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M11 281Q-0 290 -7 297' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M75 94Q81 94 83 96' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M81 243Q93 238 103 245' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M124 307Q135 312 154 307' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M314 127Q316 128 310 136' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M106 309Q116 308 132 319' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M255 57Q253 71 259 79' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M206 37Q210 50 221 49' stroke-opacity='0.16' stroke-width='0.6'/%3E%3Cpath d='M67 126Q55 147 54 153' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M83 247Q82 248 93 261' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M192 119Q182 121 173 121' stroke-opacity='0.2' stroke-width='0.6'/%3E%3Cpath d='M201 99Q202 101 196 113' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M304 282Q301 287 310 305' stroke-opacity='0.16' stroke-width='0.6'/%3E%3Cpath d='M237 125Q228 128 219 131' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M73 179Q65 199 62 207' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M5 86Q10 86 25 90' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M116 285Q111 301 100 315' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M11 6Q8 12 -7 31' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M22 100Q26 99 33 102' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M236 41Q238 56 252 70' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M302 10Q315 8 323 11' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M23 29Q26 31 31 37' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M148 173Q145 178 147 195' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M306 36Q299 54 293 61' stroke-opacity='0.16' stroke-width='0.8'/%3E%3Cpath d='M46 196Q36 209 30 211' stroke-opacity='0.2' stroke-width='0.6'/%3E%3Cpath d='M105 213Q110 225 107 226' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M70 295Q74 303 83 300' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M21 314Q34 325 48 324' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M200 158Q200 161 186 166' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M89 194Q95 206 105 214' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M43 146Q36 143 36 150' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M37 35Q30 39 28 55' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M264 82Q255 85 245 100' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M249 173Q256 184 249 205' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M131 286Q129 300 134 304' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M176 209Q165 212 158 220' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M231 262Q219 277 215 281' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M172 253Q169 253 156 258' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M141 176Q135 194 142 204' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M256 55Q244 56 243 66' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M185 221Q189 239 191 248' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M165 290Q167 302 157 303' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M272 310Q266 321 267 331' stroke-opacity='0.1' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --tex-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.28 0 0 0 0 0.14 0 0 0 0.11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* Vết ố (foxing) của giấy để lâu năm */
+  --tex-foxing: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='9'/%3E%3C/filter%3E%3Cg fill='%23a0682c' filter='url(%23b)'%3E%3Ccircle cx='120' cy='160' r='30' opacity='.07'/%3E%3Ccircle cx='700' cy='520' r='46' opacity='.05'/%3E%3Ccircle cx='330' cy='720' r='22' opacity='.07'/%3E%3C/g%3E%3Cg fill='%238b5a2b'%3E%3Ccircle cx='470' cy='360' r='1.6' opacity='.25'/%3E%3Ccircle cx='190' cy='520' r='1.2' opacity='.3'/%3E%3Ccircle cx='820' cy='140' r='1.4' opacity='.25'/%3E%3C/g%3E%3C/svg%3E");
+  /* Mực in mòn: đốm giấy lộ ra trên mảng màu đặc */
+  --tex-worn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.97 0 0 0 0 0.93 0 0 0 0 0.84 0 0 0 -22 8.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E");
+
+  font: 17px/1.65 var(--sans);
+  color: var(--than);
+  background: var(--diep);
   color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -31,10 +63,17 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+}
+
 body {
   margin: 0;
-  background: var(--paper);
   overflow-x: hidden;
+  /* Nền giấy vẽ một lần, cuộn cùng trang — không dùng lớp phủ cố định để tránh vẽ lại khi cuộn */
+  background-color: var(--diep);
+  background-image: var(--tex-foxing), var(--tex-fiber), var(--tex-grain);
 }
 
 #root {
@@ -45,24 +84,34 @@ h1,
 h2,
 h3 {
   font-family: var(--serif);
-  font-weight: 500;
-  color: var(--ink);
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 600;
+  color: var(--than);
   margin: 0;
+  text-wrap: balance;
+}
+
+/* Lệch khuôn in: bóng son mờ lệch sau nét chữ */
+h1,
+h2 {
+  text-shadow: 2px 2px 0 rgba(168, 58, 42, 0.16);
 }
 
 h1 {
-  font-size: clamp(2.6rem, 5vw, 4.6rem);
-  line-height: 1.08;
-  letter-spacing: -0.01em;
+  font-size: clamp(2.5rem, 4.6vw, 4.3rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  font-weight: 700;
 }
 
 h2 {
-  font-size: clamp(2rem, 3.4vw, 2.8rem);
-  line-height: 1.15;
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  line-height: 1.14;
+  letter-spacing: -0.01em;
 }
 
 h3 {
-  font-size: 1.4rem;
+  font-size: 1.45rem;
 }
 
 p {
@@ -75,4 +124,20 @@ a {
 
 button {
   font-family: var(--sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--son);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--hoe-light);
+  color: var(--than);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

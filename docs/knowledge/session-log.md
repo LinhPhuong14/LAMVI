@@ -4,6 +4,30 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-28 (phiên 5) — Giao diện dân gian cổ + motion (nhánh `feat/folk-art-redesign`)
+
+**Quyết định từ người dùng**
+
+- Web phải "thật nghệ thuật dân gian", thêm cảm giác cổ xưa hoài niệm; motion tốt cả khi xuất hiện và biến mất; hiệu năng tốt; màu tốt hơn.
+- Làm trên nhánh mới từ `master` (bản thiết kế đầu tiên ở nhánh `claude/folk-art-web-design-v3ice8` dựa trên master cũ, không gộp).
+
+**Đã làm**
+
+1. Bảng màu Đông Hồ đã ngả màu thời gian + bí danh biến cũ cho `pages.css` (T-23); texture sợi dó, vết ố, mực mòn, viền tối kiểu ảnh cũ.
+2. Hoạ tiết SVG (`Motifs.jsx`): trống đồng, mây, sen, con dấu son (logo), dấu bưu điện, ảnh cũ viền răng cưa; đèn vẽ lại theo lối khắc gỗ có tua rua.
+3. Motion (T-22): `useViewState` + `Reveal` — xuất hiện khi cuộn tới, biến mất theo hướng cuộn; `CountUp`; đèn lookbook thắp/lịm; hero cuộn đi thì đèn bay lên; header ẩn/hiện theo hướng cuộn; FAQ mở như cuộn thư; `LazyMotion strict`.
+4. Hiệu năng (T-21): font tự host + preload, bỏ Google Fonts. Đo local: LCP ~1,55 s → ~0,45 s, CLS 0.
+5. Test `src/components/Motion.test.jsx`. Test phát hiện: `useReducedMotion` bỏ qua `MotionConfig` → đổi sang `useReducedMotionConfig`.
+6. Spec v0.6: §31.4, G-29, G-30, `[ASSUMPTION]` ngưỡng NFR-PERF-001.
+
+**Còn lại / cần người dùng**
+
+- Subagent kiểm thử độc lập (T-11) đang chạy khi commit lần đầu — kết quả xử lý ở commit sau.
+- PO chốt NFR-PERF-001; thống nhất thương hiệu MỘC ↔ "LÂM VỊ" (nhánh `docs/branding-guideline`) trước khi gộp.
+- Thay minh hoạ bằng ảnh thật khi có (G-23, G-29).
+
+---
+
 ## 2026-09-28 (phiên 4) — Vai trò IT + dashboard IT (nhánh `feat/it-dashboard`), gộp vào `master`
 
 **Quyết định từ người dùng**

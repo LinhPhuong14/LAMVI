@@ -49,11 +49,13 @@ src/
   auth/                    AuthProvider.jsx, context.js (useAuth, phiên), useForm.js
   hooks/useNoIndex.js      meta robots noindex (BR-SEO-001, D-44)
   components/              SiteHeader, SiteFooter, LocaleLayout, Price, Field, Faq, Marquee, Lantern…
+                           Reveal.jsx (Reveal, CountUp — motion xuất hiện/biến mất), Motifs.jsx (hoạ tiết SVG: trống đồng, mây, sen, con dấu, dấu bưu điện, ảnh cũ)
   pages/                   HomePage, ProductPage, BatchPage, AccountPage, NotFoundPage, auth/*
   admin/                   AdminLayout, ProductsPage, FaqPage, BatchesPage, I18nInput, strings.js (D-48)
   it/                      ItDashboard.jsx, strings.js (D-51)
   lib/money.js             formatVnd
-  styles/                  App.css (landing), pages.css (trang mới)
+  lib/motion.js            useViewState (below/in/above), biến thể rise/ink/stamp/group (T-22)
+  styles/                  App.css (landing), pages.css (trang mới); token màu + texture ở index.css (T-23)
   test/                    renderApp.jsx (mockApi, renderAt), fixtures.js
 scripts/gen-seed-sql.js
 docs/ba-spec.md, docs/knowledge/

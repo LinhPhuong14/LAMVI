@@ -24,6 +24,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-19 | 2026-09-28 | Nhãn route chụp lúc `writeHead` (còn `req.route`/`req.baseUrl`); lỗi từ errorHandler dùng `req.route` còn sót + tiền tố `/api` | Hiệu lực |
 | T-20 | 2026-09-28 | Phân quyền theo vai trò bằng `requireRole(auth, repo, roles)`; `ADMIN_ROLES = ['admin','it']`, `IT_ROLES = ['it']` | Hiệu lực |
 | T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
+| T-21 | 2026-09-28 | Font tự host bằng `@fontsource` (Fraunces Variable soft + italic, Be Vietnam Pro 400/500/600), preload 6 file woff2 chính trong `index.html`; bỏ Google Fonts | Hiệu lực |
+| T-22 | 2026-09-28 | Motion: `LazyMotion features={domAnimation} strict` ở `LocaleLayout` → chỉ dùng `m.*`; xuất hiện/biến mất theo `useViewState` (IntersectionObserver, `below`/`in`/`above`); animation lặp (đung đưa, marquee, hạt lửa) bằng CSS | Hiệu lực |
+| T-23 | 2026-09-28 | Giao diện "Đông Hồ cổ": token màu ở `src/index.css` (giữ bí danh tên cũ cho `pages.css`); texture giấy/mực là SVG nội tuyến, vẽ trên nền tĩnh — không dùng lớp phủ cố định có `mix-blend-mode`/`backdrop-filter` | Hiệu lực |
 
 ---
 
@@ -70,3 +73,14 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - Dashboard đọc dữ liệu đã lưu + phần chưa flush, nên số liệu thấy ngay.
 - Flush lỗi → bỏ lô đó và ghi log (tránh bộ nhớ phình) — chấp nhận mất tối đa 1 phút số liệu.
 - Thêm route mới không cần làm gì thêm: nhãn tự lấy từ mẫu route Express.
+
+### T-21 / T-22 / T-23 — Giao diện dân gian cổ + motion
+- **Bối cảnh**: khách hàng yêu cầu web "nghệ thuật dân gian, cổ xưa, hoài niệm", motion tốt (cả xuất hiện và biến mất), hiệu năng tốt. Google Fonts chặn render và làm LCP chậm (~1,5 s đo local).
+- **Quyết định**:
+  - T-21: `src/main.jsx` import CSS của `@fontsource`; `index.html` preload font tiêu đề (Fraunces latin + vietnamese, thường + nghiêng) và thân bài (Be Vietnam Pro 400) qua đường dẫn `/node_modules/...` — Vite đổi sang file có hash khi build. Bỏ preload → chữ nhảy khi đổi font (CLS ~0,04).
+  - T-22: `src/lib/motion.js#useViewState(ref, margin)` trả `'below' | 'in' | 'above'`; `<Reveal>` truyền trạng thái cho con `m.*` cùng tên biến thể. Biến mất đi theo hướng cuộn (trên → lui lên, dưới → lui xuống). Không có IntersectionObserver → `'in'`. `CountUp` render giá trị thật khi SSR, chỉ đếm ở client; dùng `useReducedMotionConfig` (theo `MotionConfig`), không dùng `useReducedMotion` (chỉ đọc thiết bị một lần).
+  - T-23: texture (sợi dó, vết ố, mực mòn) là data-URI SVG trong biến CSS `--tex-*`; viền tối quanh khung nhìn là một gradient tĩnh `position: fixed` không blend.
+- **Hệ quả / quy tắc**:
+  - Component dưới `LocaleLayout` dùng `m.div`… — `motion.div` sẽ throw vì `strict`.
+  - Thêm khối cần hiệu ứng: bọc `<Reveal variants={group}>`, con dùng `variants={rise|ink|stamp}`. Hiệu ứng lặp mới: viết bằng CSS keyframes transform/opacity; `pages.css` đã tắt mọi animation CSS khi `prefers-reduced-motion`.
+  - Nội dung trong `Reveal` có `opacity: 0` trong HTML SSR tới khi JS chạy (như trước khi đổi giao diện) — xem G-30.
