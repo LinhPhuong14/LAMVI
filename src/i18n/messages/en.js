@@ -207,6 +207,7 @@ export default {
     REQUIRED: 'This field is required.',
     INVALID_PHONE: 'Invalid Vietnamese phone number.',
     TOO_LONG: 'Too long.',
+    MAINTENANCE: 'The system is under maintenance. Please try again in a few minutes.',
     INVALID_LOCALE: 'Invalid language.',
     FORBIDDEN: 'You do not have permission to do this.',
     INVALID: 'Invalid value.',
@@ -226,6 +227,10 @@ export default {
     INVALID_DATE: 'Invalid date.',
     PAYLOAD_TOO_LARGE: 'The data is too large.',
     BAD_REQUEST: 'Invalid request.',
+  },
+  maintenance: {
+    title: 'Mộc is under maintenance',
+    text: 'We are upgrading our system. Please come back in a few minutes.',
   },
   notFound: {
     title: 'Page not found',

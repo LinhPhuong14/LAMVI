@@ -27,6 +27,12 @@ const toSession = (session, user) => ({
 
 export function createSupabaseAuth({ admin, makePublicClient }) {
   return {
+    // Kiểm tra kết nối Auth (dashboard IT)
+    async ping() {
+      const { error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1 })
+      if (error) throw error
+    },
+
     async signUp({ email, password, redirectTo }) {
       const { data, error } = await makePublicClient().auth.signUp({
         email,

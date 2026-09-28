@@ -194,6 +194,7 @@ export default {
     REQUIRED: '请填写此项。',
     INVALID_PHONE: '越南电话号码无效。',
     TOO_LONG: '内容过长。',
+    MAINTENANCE: '系统正在维护，请几分钟后再试。',
     INVALID_LOCALE: '语言无效。',
     FORBIDDEN: '您没有执行此操作的权限。',
     INVALID: '值无效。',
@@ -213,6 +214,10 @@ export default {
     INVALID_DATE: '日期无效。',
     PAYLOAD_TOO_LARGE: '数据过大。',
     BAD_REQUEST: '请求无效。',
+  },
+  maintenance: {
+    title: 'Mộc 正在维护',
+    text: '我们正在升级系统，请几分钟后再来。',
   },
   notFound: {
     title: '页面未找到',

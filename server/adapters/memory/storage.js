@@ -25,6 +25,10 @@ export function createMemoryStorage({ maxBytes = 500 * 1024 * 1024 } = {}) {
     router,
     objects,
 
+    async ping() {
+      return true
+    },
+
     async createVideoUpload({ path, contentType }) {
       const token = randomBytes(16).toString('hex')
       tokens.set(token, { path, contentType })

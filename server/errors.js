@@ -10,6 +10,9 @@ export class HttpError extends Error {
 export const notFound = () => new HttpError(404, 'NOT_FOUND', 'Không tìm thấy')
 
 export function errorHandler(err, req, res, _next) {
+  // Cho số liệu API (dashboard IT, D-52) — chỉ lưu phía server
+  res.locals.errorCode = err?.code
+  res.locals.errorMessage = err?.message
   if (err instanceof HttpError) {
     const body = { code: err.code, message: err.message }
     if (err.fields) body.fields = err.fields
@@ -26,6 +29,7 @@ export function errorHandler(err, req, res, _next) {
   if (Number.isInteger(status) && status >= 400 && status < 500) {
     return res.status(status).json({ error: { code: 'BAD_REQUEST', message: 'Yêu cầu không hợp lệ' } })
   }
+  res.locals.errorCode = 'INTERNAL_ERROR'
   console.error(err)
   res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Lỗi hệ thống' } })
 }

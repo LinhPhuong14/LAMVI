@@ -1,7 +1,7 @@
 // D-48: giao diện admin chỉ tiếng Việt. Nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh.
 export const S = {
   title: 'Quản trị MỘC',
-  nav: { products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', site: '← Về trang web' },
+  nav: { products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', it: 'Dashboard IT →', site: '← Về trang web' },
   common: {
     loading: 'Đang tải…',
     save: 'Lưu',
@@ -15,7 +15,7 @@ export const S = {
     sortOrder: 'Thứ tự hiển thị',
     empty: 'Chưa có dữ liệu.',
     forbiddenTitle: 'Không có quyền truy cập',
-    forbiddenText: 'Tài khoản này không phải admin. Admin được cấp quyền trong Supabase (bảng profiles, cột role).',
+    forbiddenText: 'Tài khoản này không phải admin/IT. Quyền được cấp trong Supabase (bảng profiles, cột role).',
     langs: { vi: 'Tiếng Việt', en: 'English', zh: '简体中文' },
     viRequiredHint: 'Tiếng Việt bắt buộc; thiếu bản en/zh thì web hiện tiếng Việt (D-40).',
   },

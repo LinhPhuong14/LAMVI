@@ -84,6 +84,48 @@ export function createSupabaseRepo(client) {
   const del = async (table, id) => unwrap(await client.from(table).delete().eq('id', id).select('id')).length > 0
 
   return {
+    // --- Giám sát (D-52, D-53)
+    async ping() {
+      unwrap(await client.from('products').select('id').limit(1))
+      return true
+    },
+    async recordApiMetrics(rows) {
+      // Cộng dồn nguyên tử trong DB (nhiều server cùng ghi một phút)
+      unwrap(await client.rpc('record_api_metrics', { rows }))
+    },
+    async listApiMetrics({ since }) {
+      return unwrap(await client.from('api_metrics').select('*').gte('bucket', since)).map((r) => ({
+        ...r,
+        bucket: new Date(r.bucket).toISOString(),
+      }))
+    },
+    async deleteApiMetricsBefore(before) {
+      unwrap(await client.from('api_metrics').delete().lt('bucket', before))
+      unwrap(await client.from('api_errors').delete().lt('at', before))
+    },
+    async recordApiErrors(rows) {
+      if (rows.length) unwrap(await client.from('api_errors').insert(rows))
+    },
+    async listApiErrors({ since, limit = 50 }) {
+      return unwrap(
+        await client.from('api_errors').select('*').gte('at', since).order('at', { ascending: false }).limit(limit),
+      ).map((r) => ({ ...r, at: new Date(r.at).toISOString() }))
+    },
+    async getSetting(key) {
+      const r = unwrap(await client.from('app_settings').select('*').eq('key', key).maybeSingle())
+      return r ? { key: r.key, value: r.value, updatedBy: r.updated_by, updatedAt: r.updated_at } : null
+    },
+    async setSetting(key, value, userId) {
+      const r = unwrap(
+        await client
+          .from('app_settings')
+          .upsert({ key, value, updated_by: userId ?? null, updated_at: new Date().toISOString() })
+          .select('*')
+          .single(),
+      )
+      return { key: r.key, value: r.value, updatedBy: r.updated_by, updatedAt: r.updated_at }
+    },
+
     getProductById: (id) => one('products', id, toProduct),
     createProduct: (p) => insert('products', toRow(p, PRODUCT_COLS), toProduct),
     updateProduct: (id, p) => patch('products', id, toRow(p, PRODUCT_COLS), toProduct),

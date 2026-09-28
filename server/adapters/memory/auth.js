@@ -25,6 +25,10 @@ export function createMemoryAuth({ requireEmailConfirmation = false, accessTtlMs
   return {
     outbox,
 
+    async ping() {
+      return true
+    },
+
     async signUp({ email, password, redirectTo }) {
       if (users.has(email)) throw new AuthError('EMAIL_TAKEN')
       const salt = randomBytes(16)

@@ -222,6 +222,7 @@ export default {
     REQUIRED: 'Vui lòng nhập trường này.',
     INVALID_PHONE: 'Số điện thoại Việt Nam không hợp lệ.',
     TOO_LONG: 'Nội dung quá dài.',
+    MAINTENANCE: 'Hệ thống đang bảo trì. Vui lòng thử lại sau ít phút.',
     INVALID_LOCALE: 'Ngôn ngữ không hợp lệ.',
     FORBIDDEN: 'Bạn không có quyền thực hiện thao tác này.',
     INVALID: 'Giá trị không hợp lệ.',
@@ -241,6 +242,10 @@ export default {
     INVALID_DATE: 'Ngày không hợp lệ.',
     PAYLOAD_TOO_LARGE: 'Dữ liệu quá lớn.',
     BAD_REQUEST: 'Yêu cầu không hợp lệ.',
+  },
+  maintenance: {
+    title: 'Mộc đang bảo trì',
+    text: 'Chúng tôi đang nâng cấp hệ thống. Vui lòng quay lại sau ít phút.',
   },
   notFound: {
     title: 'Không tìm thấy trang',

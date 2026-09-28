@@ -6,6 +6,11 @@ export function createSupabaseStorage(admin, bucket = BATCH_VIDEO_BUCKET) {
   const files = () => admin.storage.from(bucket)
 
   return {
+    async ping() {
+      const { error } = await admin.storage.getBucket(bucket)
+      if (error) throw error
+    },
+
     async createVideoUpload({ path, contentType }) {
       const { data, error } = await files().createSignedUploadUrl(path)
       if (error) throw error

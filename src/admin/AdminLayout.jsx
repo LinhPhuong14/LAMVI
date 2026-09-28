@@ -16,7 +16,8 @@ function Gate() {
     let alive = true
     // Chỉ để hiển thị; quyền thật do server kiểm tra ở mọi API /admin (D-38)
     authedApi('/me')
-      .then((res) => alive && setState({ status: res.profile.role === 'admin' ? 'ok' : 'forbidden' }))
+      // D-51: IT có cả quyền admin
+      .then((res) => alive && setState({ status: ['admin', 'it'].includes(res.profile.role) ? 'ok' : 'forbidden', role: res.profile.role }))
       .catch((error) => alive && setState({ status: 'error', error }))
     return () => {
       alive = false
@@ -56,6 +57,7 @@ function Gate() {
           <NavLink to="/admin/faq">{S.nav.faq}</NavLink>
           <NavLink to="/admin/batches">{S.nav.batches}</NavLink>
         </nav>
+        {state.role === 'it' && <NavLink to="/it">{S.nav.it}</NavLink>}
         <a href="/" className="admin-back">
           {S.nav.site}
         </a>

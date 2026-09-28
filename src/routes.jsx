@@ -13,6 +13,7 @@ import AdminLayout from './admin/AdminLayout'
 import ProductsPage from './admin/ProductsPage'
 import FaqPage from './admin/FaqPage'
 import BatchesPage from './admin/BatchesPage'
+import ItDashboard from './it/ItDashboard'
 
 // Các trang con dùng chung cho mọi ngôn ngữ
 function localeChildren() {
@@ -35,6 +36,8 @@ function localeChildren() {
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* D-51: dashboard IT */}
+      <Route path="/it" element={<ItDashboard />} />
       {/* D-48: admin chỉ tiếng Việt */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="products" replace />} />

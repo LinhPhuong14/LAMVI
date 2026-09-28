@@ -13,7 +13,8 @@ const seg = (s) => {
 }
 
 export function classifyPath(pathname) {
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) return { kind: 'private', lang: 'vi' }
+  // D-48, D-51: admin và IT chỉ tiếng Việt, không có tiền tố ngôn ngữ
+  if (/^\/(admin|it)(\/|$)/.test(pathname)) return { kind: 'private', lang: 'vi' }
   const { lang, rest } = splitLocale(pathname)
   const path = rest.length > 1 ? rest.replace(/\/+$/, '') : rest
   if (PRIVATE.includes(path)) return { kind: 'private', lang }

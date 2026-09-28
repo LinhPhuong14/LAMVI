@@ -368,6 +368,7 @@
 
 .btn-danger {
   background: #9b3b22;
+  color: var(--white);
 }
 
 .i18n-input {
@@ -423,6 +424,146 @@
     grid-template-columns: 1fr;
   }
   .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dashboard IT (D-51) */
+.it-main {
+  max-width: 1280px;
+}
+
+.it-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.it-wide {
+  grid-column: 1 / -1;
+}
+
+.it-card h2 {
+  margin-bottom: 8px;
+}
+
+.it-card h3 {
+  font-size: 1.1rem;
+  margin: 16px 0 8px;
+}
+
+.it-overall {
+  font-weight: 600;
+}
+
+.it-overall.it-ok {
+  color: #3d5220;
+}
+
+.it-overall.it-degraded {
+  color: #9b3b22;
+}
+
+.it-checks {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.it-check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--brown-line);
+}
+
+.it-check strong {
+  min-width: 170px;
+}
+
+.status-ok {
+  background: #e8efd9;
+  color: #3d5220;
+}
+
+.status-error {
+  background: #f6dcd2;
+  color: #7a2e1a;
+}
+
+.it-system {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 16px;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.it-system dt {
+  color: var(--ink-soft);
+}
+
+.it-system dd {
+  margin: 0;
+}
+
+.it-maintenance-on {
+  outline: 2px solid #9b3b22;
+}
+
+.it-ranges {
+  display: flex;
+  gap: 6px;
+}
+
+.it-ranges .btn[aria-pressed='false'] {
+  background: transparent;
+  color: var(--brown-deep);
+  border: 1px solid var(--brown-line);
+}
+
+.it-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.it-kpis div {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.it-kpis span {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.it-kpis strong {
+  font-size: 1.4rem;
+  font-family: var(--serif);
+}
+
+.it-table-wrap {
+  overflow-x: auto;
+}
+
+.it-row-error td {
+  background: #fbeee8;
+}
+
+@media (max-width: 960px) {
+  .it-grid,
+  .it-kpis {
     grid-template-columns: 1fr;
   }
 }

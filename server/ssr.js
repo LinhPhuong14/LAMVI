@@ -30,6 +30,36 @@ async function loadData(repo, route) {
   return out
 }
 
+const escHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+
+// Trang bảo trì tĩnh (không hydrate)
+export function maintenancePage(lang) {
+  const t = (k) => escHtml(translate(lang, k))
+  return `<!doctype html>
+<html lang="${HTML_LANG[lang]}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>${t('maintenance.title')}</title>
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f7f0e4; color: #3a2c22;
+        font: 17px/1.6 'Be Vietnam Pro', system-ui, sans-serif; text-align: center; padding: 24px; }
+      h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 2.4rem; margin: 0 0 12px; }
+      .mark { letter-spacing: 0.08em; color: #6b4226; font-family: Georgia, serif; font-size: 1.4rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="mark">MỘC</p>
+      <h1>${t('maintenance.title')}</h1>
+      <p>${t('maintenance.text')}</p>
+    </main>
+  </body>
+</html>
+`
+}
+
 function fill(template, { lang, head, html, data }) {
   // Dùng hàm thay thế: chuỗi thay thế sẽ diễn giải $&, $`, $' có trong nội dung DB
   return template
@@ -43,9 +73,14 @@ function fill(template, { lang, head, html, data }) {
  * Render một trang thành HTML đầy đủ. Trả { status, noindex, html }.
  * Tách riêng để test không cần Vite/dist.
  */
-export async function renderPage({ repo, config, template, render, url, pathname }) {
+export async function renderPage({ repo, config, template, render, url, pathname, maintenance }) {
   const route = classifyPath(pathname)
   const siteUrl = config.publicSiteUrl
+
+  // D-54: bảo trì → trang công khai trả 503 (trang tĩnh, không tải app); /login, /admin, /it vẫn vào được
+  if (route.kind !== 'private' && maintenance && (await maintenance.get()).enabled) {
+    return { status: 503, noindex: true, retryAfter: 600, html: maintenancePage(route.lang) }
+  }
 
   if (route.kind === 'private') {
     // Không SSR: nội dung phụ thuộc phiên đăng nhập ở trình duyệt
@@ -70,7 +105,7 @@ export async function renderPage({ repo, config, template, render, url, pathname
  * D-49: SSR trong Express cho trang công khai (§23.2). Trang riêng tư trả khung HTML + noindex.
  * dev: dùng Vite middleware (HMR); prod: dist/client + dist/server/entry-server.js.
  */
-export async function createWeb({ repo, config, dev }) {
+export async function createWeb({ repo, config, dev, maintenance }) {
   const router = express.Router()
   // URL percent-encoding hỏng → 400, không để Vite/React ném 500
   router.use((req, res, next) => {
@@ -104,9 +139,10 @@ export async function createWeb({ repo, config, dev }) {
         template = await vite.transformIndexHtml(req.originalUrl, readFileSync(`${root}/index.html`, 'utf8'))
         render = (await vite.ssrLoadModule('/src/entry-server.jsx')).render
       }
-      const page = await renderPage({ repo, config, template, render, url: req.originalUrl, pathname: req.path })
+      const page = await renderPage({ repo, config, template, render, url: req.originalUrl, pathname: req.path, maintenance })
       res.set('Content-Type', 'text/html; charset=utf-8')
       if (page.noindex) res.set('X-Robots-Tag', 'noindex')
+      if (page.retryAfter) res.set('Retry-After', String(page.retryAfter))
       res.status(page.status).send(page.html)
     } catch (err) {
       vite?.ssrFixStacktrace(err)

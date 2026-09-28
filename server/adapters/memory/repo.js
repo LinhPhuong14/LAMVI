@@ -11,6 +11,9 @@ export function createMemoryRepo(data = {}) {
     faqEntries: clone(data.faqEntries ?? faqEntries),
     batches: clone(data.batches ?? demoBatches),
     profiles: new Map(),
+    apiMetrics: new Map(), // `${bucket}|${method}|${route}|${status}` → row
+    apiErrors: [],
+    settings: new Map(),
   }
 
   const now = () => new Date().toISOString()
@@ -38,7 +41,55 @@ export function createMemoryRepo(data = {}) {
     return clone(full)
   }
 
+  const HIST = ['le_50', 'le_100', 'le_250', 'le_500', 'le_1000', 'le_2500', 'gt_2500']
+
   return {
+    // --- Giám sát (D-52, D-53)
+    async ping() {
+      return true
+    },
+    async recordApiMetrics(rows) {
+      for (const r of rows) {
+        const k = `${r.bucket}|${r.method}|${r.route}|${r.status}`
+        const cur = state.apiMetrics.get(k)
+        if (!cur) {
+          state.apiMetrics.set(k, { ...r })
+          continue
+        }
+        cur.count += r.count
+        cur.total_ms += r.total_ms
+        cur.max_ms = Math.max(cur.max_ms, r.max_ms)
+        for (const h of HIST) cur[h] += r[h]
+      }
+    },
+    async listApiMetrics({ since }) {
+      return clone([...state.apiMetrics.values()].filter((r) => r.bucket >= since))
+    },
+    async deleteApiMetricsBefore(before) {
+      for (const [k, r] of state.apiMetrics) if (r.bucket < before) state.apiMetrics.delete(k)
+      state.apiErrors = state.apiErrors.filter((e) => e.at >= before)
+    },
+    async recordApiErrors(rows) {
+      state.apiErrors.push(...clone(rows))
+    },
+    async listApiErrors({ since, limit = 50 }) {
+      return clone(
+        state.apiErrors
+          .filter((e) => e.at >= since)
+          .sort((a, b) => b.at.localeCompare(a.at))
+          .slice(0, limit),
+      )
+    },
+    async getSetting(key) {
+      const s = state.settings.get(key)
+      return s ? clone(s) : null
+    },
+    async setSetting(key, value, userId) {
+      const s = { key, value, updatedBy: userId ?? null, updatedAt: now() }
+      state.settings.set(key, s)
+      return clone(s)
+    },
+
     // --- Sản phẩm (FR-CAT-004)
     async getProductById(id) {
       const p = byId(state.products, id)
