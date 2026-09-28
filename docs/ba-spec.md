@@ -2,9 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.2 (bản nháp) |
-| Ngày | 2026-09-28 (v0.2: sửa câu chữ web theo §31.3) |
-| Trạng thái | Chờ PO duyệt các mục `[BA DECISION REQUIRED]` |
+| Phiên bản | v0.5 (bản nháp) |
+| Ngày | 2026-09-28 |
+| Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì) |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -13,8 +14,8 @@
 |---|---|
 | `[CONFIRMED]` | Khách hàng/PO đã xác nhận (có mã quyết định D-xx ở Phụ lục A) |
 | `[DERIVED]` | Suy ra trực tiếp từ yêu cầu đã xác nhận |
-| `[ASSUMPTION]` | Giả định của BA để tiếp tục phân tích — cần PO duyệt |
-| `[PROPOSAL]` | Đề xuất của BA theo yêu cầu của PO (ví dụ D-31) |
+| `[ASSUMPTION]` | Giả định phát sinh (BA hoặc khi code) — cần PO duyệt. Mọi giả định của v0.1 đã được duyệt ở D-41 |
+| `[PROPOSAL]` | Đề xuất của BA theo yêu cầu của PO (ví dụ D-31). Mọi đề xuất của v0.1 đã được duyệt ở D-41 |
 | `[BA DECISION REQUIRED]` | Chưa có quyết định — không được tự hiện thực theo cách hiểu riêng |
 | `[LEGAL]` | Cần pháp chế/kế toán xác nhận |
 
@@ -30,7 +31,7 @@ MỘC là web **B2C** bán đèn giấy dó thủ công tại Việt Nam, địn
 
 Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý coupon. Thanh toán qua **payOS** hoặc **COD**. **Bắt buộc có tài khoản để đặt hàng.** Chỉ giao trong nước, tiền tệ VND.
 
-**Hiện trạng repo**: chỉ có landing page tĩnh (React + Vite), chưa có backend, giỏ hàng, checkout, tài khoản hay trang QR. Nội dung trang đang chứa một số cam kết sai so với quyết định mới (xem §31).
+**Hiện trạng repo (v0.5)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap), vai trò IT + dashboard IT. Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây, admin đơn/coupon/Mây/đổi trả, GA (xem §31).
 
 ---
 
@@ -53,7 +54,7 @@ Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý
 | Nội dung | Lý do |
 |---|---|
 | Quy trình sản xuất, công suất xưởng, quay/dựng video lô | D-34 — vận hành |
-| Tích hợp API hãng vận chuyển, in vận đơn | D-34 — admin cập nhật trạng thái thủ công `[ASSUMPTION]` |
+| Tích hợp API hãng vận chuyển, in vận đơn | D-34 — admin cập nhật trạng thái thủ công `[CONFIRMED]` D-41 |
 | Bán/giao quốc tế, đa tiền tệ | D-32 |
 | Đánh giá sản phẩm do khách viết | Chưa được yêu cầu |
 | Marketplace/nhiều người bán | D-33 (B2C) |
@@ -70,12 +71,13 @@ Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý
 | Khách hàng (người mua) | Đặt hàng, soạn lời chúc, theo dõi đơn | **Có** (D-36) |
 | Người nhận | Người quét QR thiệp để xem lời chúc; có thể trùng người mua | Không `[DERIVED]` từ C-09 (không cần cài app) |
 | Người xem QR đèn | Bất kỳ ai quét QR khắc trên đèn | Không |
-| Admin | Quản trị toàn hệ thống | Có |
+| Admin | Quản trị nội dung (sản phẩm, FAQ, lô…) tại `/admin` | Có |
+| IT | Vận hành kỹ thuật: sức khoẻ hệ thống, số liệu API, chế độ bảo trì tại `/it`; có cả quyền Admin (D-51) | Có |
 | Mây (hệ thống AI) | Actor hệ thống, chỉ đọc | — |
 | payOS | Cổng thanh toán bên ngoài | — |
 | OpenAI | Dịch vụ AI bên ngoài | — |
 
-`[BA DECISION REQUIRED]` Có tách vai trò admin (ví dụ: nhân viên xử lý đơn không được sửa coupon) không? Bản này giả định **một vai trò Admin duy nhất** `[ASSUMPTION]`.
+Vai trò lưu ở hồ sơ: `customer` / `admin` / `it` (D-38, sửa bởi D-51). Một vai trò Admin duy nhất cho nội dung (D-38); vai trò IT có cả quyền Admin và thêm dashboard IT; Admin không vào được dashboard IT (D-51). Khách không tự đổi được vai trò; vai trò cấp bằng tay trong Supabase `[DERIVED]`.
 
 ### 3.2 Ma trận quyền
 
@@ -90,6 +92,9 @@ Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý
 | Người nhận | Lời chúc (qua token QR) | – | ✓ | – | – |
 | Admin | Sản phẩm, lô, FAQ, coupon | ✓ | ✓ | ✓ | ✓ |
 | Admin | Đơn hàng | – | ✓ | Trạng thái | Hủy |
+| IT | Mọi quyền của Admin | ✓ | ✓ | ✓ | ✓ |
+| IT | Sức khoẻ hệ thống, số liệu API, lỗi 5xx | – | ✓ | – | – |
+| IT | Chế độ bảo trì | – | ✓ | Bật/tắt | – |
 | Admin | Lời chúc của khách | – | `[BA DECISION REQUIRED]` Q-14 | – | – |
 | Mây | Sản phẩm, FAQ, chính sách | – | ✓ | – | – |
 | Mây | Đơn hàng | – | Chỉ đơn đã xác thực (BR-AI-002) | – | – |
@@ -123,10 +128,42 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 ### 5.2 Tài khoản
 | ID | Yêu cầu | Nguồn |
 |---|---|---|
-| FR-ACC-001 | Đăng ký, đăng nhập, đăng xuất, quên mật khẩu | D-36 |
+| FR-ACC-001 | Đăng ký, đăng nhập, đăng xuất, quên mật khẩu — bằng **email + mật khẩu** | D-36, D-42 |
 | FR-ACC-002 | Xem danh sách và chi tiết đơn của mình, gồm công đoạn hiện tại | C-11 |
 | FR-ACC-003 | Soạn, sửa lời chúc của đơn trong dashboard | C-08, D-13 |
 | FR-ACC-004 | Xem lịch sử chat với Mây | D-19 |
+
+**Quy tắc tài khoản (v0.2)**
+
+- Đăng nhập bằng email + mật khẩu (D-42). SĐT không dùng để đăng nhập; chỉ lưu trong hồ sơ, không bắt buộc (D-42).
+- Hồ sơ gồm: họ tên (bắt buộc, ≤100 ký tự), SĐT, ngôn ngữ ưa thích (vi/en/zh), vai trò (D-38).
+- Mật khẩu 8–72 ký tự và không quá 72 byte UTF-8 (giới hạn của Supabase) `[ASSUMPTION]`.
+- SĐT hồ sơ phải là số di động Việt Nam (0/+84, đầu số 3/5/7/8/9), lưu dạng `0xxxxxxxxx` `[ASSUMPTION]`.
+- Ngôn ngữ ưa thích mặc định = ngôn ngữ giao diện lúc đăng ký `[ASSUMPTION]`.
+- Nếu cấu hình Supabase bật xác nhận email, khách phải xác nhận email trước khi đăng nhập `[ASSUMPTION]`.
+- "Quên mật khẩu" luôn trả cùng một thông báo, không tiết lộ email có đăng ký hay không, kể cả khi Supabase giới hạn gửi thư `[DERIVED]` (NFR-SEC).
+- Đăng ký bằng email đã tồn tại → báo "Email này đã được đăng ký" `[ASSUMPTION]` — chờ Q-35. Đăng ký lại email chưa xác nhận không ghi đè hồ sơ đã có `[DERIVED]`.
+- Lỗi mạng khi làm mới phiên không đăng xuất khách; chỉ đăng xuất khi phiên bị máy chủ từ chối `[DERIVED]`.
+- Đăng xuất vô hiệu mọi phiên của tài khoản trên mọi thiết bị; đặt lại mật khẩu xong phải đăng nhập lại `[ASSUMPTION]`.
+- Trang đăng nhập/đăng ký/quên mật khẩu/tài khoản đặt `noindex` `[DERIVED]` BR-SEO-001.
+
+### 5.2a Dashboard IT (v0.5)
+
+| ID | Yêu cầu | Nguồn |
+|---|---|---|
+| FR-IT-001 | Vai trò IT truy cập `/it`; có cả quyền Admin | D-51 |
+| FR-IT-002 | Sức khoẻ hệ thống: DB, Auth, Storage (kết nối được không, độ trễ); payOS, OpenAI (đã cấu hình chưa — không hiển thị khoá); thông tin máy chủ (phiên bản, uptime, bộ nhớ) | D-52 |
+| FR-IT-003 | Số liệu API theo endpoint trong 1 giờ / 24 giờ / 7 ngày: số request, 4xx, 5xx, tỷ lệ lỗi 5xx, độ trễ p50/p95/max; lỗi 5xx gần đây | D-52 |
+| FR-IT-004 | Bật/tắt chế độ bảo trì | D-52, D-54 |
+
+**Quy tắc (v0.5)**
+
+- Số liệu API lưu ở Supabase (D-53), gộp theo phút × method × endpoint × mã HTTP; endpoint ghi theo mẫu (vd `/api/products/:slug`), không ghi query string, body, token `[DERIVED]` NFR-PRV. Giữ 30 ngày `[ASSUMPTION]`. p50/p95 là ước lượng theo mốc 50/100/250/500/1000/2500 ms `[ASSUMPTION]`.
+- Lỗi 5xx gần đây lưu thời điểm, endpoint, đường dẫn, mã, mã lỗi, thông điệp nội bộ (cắt 300 ký tự) — chỉ IT xem `[ASSUMPTION]`. Thông điệp nội bộ có thể chứa chi tiết DB; cần rà soát nếu `[LEGAL]` yêu cầu (G-28).
+- Đường dẫn API không thuộc nhóm đã biết được gộp chung một nhãn `/api/*` để không lưu giá trị tuỳ ý từ URL `[DERIVED]`.
+- Ghi số liệu vào DB lỗi → bỏ số liệu của lượt đó (mất tối đa 1 phút), không ảnh hưởng request của khách `[ASSUMPTION]`.
+- Dashboard tự làm mới mỗi 30 giây; giao diện chỉ tiếng Việt (như admin, D-48) `[ASSUMPTION]`.
+- Chế độ bảo trì (D-54): trang công khai trả HTTP 503 + trang bảo trì (3 ngôn ngữ) + `Retry-After`; API ghi (POST/PUT/PATCH/DELETE) trả 503 `MAINTENANCE`, trừ đăng nhập/làm mới phiên/đăng xuất và API IT; API đọc vẫn chạy; `/login`, `/admin`, `/it` vẫn vào được `[ASSUMPTION]` (để IT vào tắt bảo trì). Không đọc được cài đặt → coi như tắt (không chặn web), kể cả khi trước đó đang bật `[ASSUMPTION]`. Nhiều server đồng bộ trạng thái trong ≤15 giây `[ASSUMPTION]`.
 
 ### 5.3 Giỏ hàng & checkout
 | ID | Yêu cầu | Nguồn |
@@ -157,7 +194,7 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 | FR-MSG-001 | Lời chúc gồm chữ và/hoặc giọng nói và/hoặc video | C-06 |
 | FR-QR-001 | Mỗi đơn có thiệp cảm ơn in Anh–Việt kèm QR đơn hàng | D-28 |
 | FR-QR-002 | Trang QR lời chúc private, truy cập bằng token | D-09, I-01 |
-| FR-QR-003 | Người nhận bấm "Tôi đã nhận được quà" trước khi xem lời chúc | D-26, I-19 `[PROPOSAL]` |
+| FR-QR-003 | Người nhận bấm "Tôi đã nhận được quà" trước khi xem lời chúc | D-26, I-19 `[CONFIRMED]` D-41 |
 | FR-QR-004 | Nút "Tải về" cho giọng nói/video trước khi bị xóa | D-09 |
 | FR-QR-005 | Nút "Dịch tự động" cho lời chúc chữ | D-27 |
 | FR-QR-006 | Trang QR đèn hiển thị video của lô, lưu vĩnh viễn | D-01, D-10 |
@@ -203,10 +240,10 @@ Không có chỉ số định lượng nào được cung cấp; các ô "Mục 
 | NFR-PRV-003 | Riêng tư | Xóa giọng nói/video là xóa thật, gồm bản sao lưu và cache CDN | Thời gian xóa khỏi backup `[BA DECISION REQUIRED]` |
 | NFR-AUD-001 | Kiểm toán | Ghi log thay đổi trạng thái đơn, coupon, hoàn tiền (ai, khi nào, giá trị cũ/mới) | — |
 | NFR-A11Y-001 | Tiếp cận | Tour Mây tắt được; tôn trọng `prefers-reduced-motion` | — |
-| NFR-L10N-001 | Bản địa hóa | Thiếu bản dịch thì hiển thị tiếng Việt `[ASSUMPTION]` | — |
+| NFR-L10N-001 | Bản địa hóa | Thiếu bản dịch thì hiển thị tiếng Việt `[CONFIRMED]` D-41 | — |
 | NFR-PERF-001 | Hiệu năng | Thời gian tải trang, thời gian phản hồi Mây | `[BA DECISION REQUIRED]` |
 | NFR-AVL-001 | Sẵn sàng | Mây lỗi không được chặn duyệt web, giỏ hàng, checkout | — |
-| NFR-OBS-001 | Quan sát | Theo dõi lỗi webhook, lỗi OpenAI, chi phí OpenAI theo ngày | — |
+| NFR-OBS-001 | Quan sát | Theo dõi lỗi webhook, lỗi OpenAI, chi phí OpenAI theo ngày. v0.5: dashboard IT có số liệu API (request, lỗi, độ trễ theo endpoint) và lỗi 5xx gần đây; webhook/OpenAI chưa có vì chưa tích hợp (G-26) | — |
 
 ---
 
@@ -215,7 +252,7 @@ Không có chỉ số định lượng nào được cung cấp; các ô "Mục 
 | Thực thể | Mục đích | Thuộc tính chính | Quan hệ | Vòng đời |
 |---|---|---|---|---|
 | User | Tài khoản khách/admin | email/SĐT, vai trò, ngôn ngữ ưa thích | 1-n Order, 1-n ChatSession | Active / bị khóa |
-| Product | Mẫu đèn hoặc bộ | tên, mô tả (×3 ngôn ngữ), giá chưa VAT, trạng thái hiển thị, loại (đơn lẻ / bộ) | Bộ gồm n Product thành phần | Draft → Published → Hidden `[ASSUMPTION]` |
+| Product | Mẫu đèn hoặc bộ | tên, mô tả (×3 ngôn ngữ), giá chưa VAT, trạng thái hiển thị, loại (đơn lẻ / bộ) | Bộ gồm n Product thành phần | Draft → Published → Hidden `[CONFIRMED]` D-41 |
 | Cart / CartItem | Giỏ của user | product, số lượng | 1 User – 1 Cart | — |
 | Order | Đơn hàng | mã đơn, loại đơn (tặng/tự mua), người nhận, địa chỉ, SĐT, ngôn ngữ QR, phương thức TT, snapshot giá, coupon, trạng thái, công đoạn | 1-n OrderItem, 0-1 GiftMessage, 1-n Payment, 0-n ReturnRequest | §16 |
 | OrderItem | Dòng hàng | product, SL, đơn giá snapshot, giảm giá phân bổ, batch | n-1 Batch | — |
@@ -252,23 +289,27 @@ Không có chỉ số định lượng nào được cung cấp; các ô "Mục 
   - `[BA DECISION REQUIRED]` Q-05: ba đèn trong bộ là sản phẩm riêng nào, giá lẻ từng đèn bao nhiêu?
   - `[BA DECISION REQUIRED]` Q-06: trả lại một đèn trong bộ thì hoàn bao nhiêu (giá lẻ hay giá phân bổ từ giá bộ)?
 - Nội dung sản phẩm (tên, mô tả, ảnh alt) có ở 3 ngôn ngữ.
-- Trạng thái hiển thị: `[ASSUMPTION]` Draft / Published / Hidden. Sản phẩm Hidden không bán được, không được Mây giới thiệu.
+- Trạng thái hiển thị: Draft / Published / Hidden `[CONFIRMED]` D-39. Chỉ Published được hiển thị và bán; Draft/Hidden trả "không tìm thấy" với khách và không được Mây giới thiệu.
+- Admin tạo/sửa/ẩn/xoá sản phẩm tại `/admin` (FR-CAT-004). Sản phẩm mới mặc định là Draft `[ASSUMPTION]`. Tên tiếng Việt bắt buộc; slug gồm chữ thường không dấu, số, gạch nối; giá là số nguyên VND ≥ 0 `[ASSUMPTION]`.
+- Xoá sản phẩm được phép (§3.2). Khi đã có đơn hàng, sản phẩm đã bán phải chuyển Hidden thay vì xoá `[ASSUMPTION]`.
+- Tài khoản admin do người quản trị hệ thống cấp bằng cách đặt `role = 'admin'` trong bảng `profiles` của Supabase; web chưa có màn hình cấp quyền `[ASSUMPTION]`.
+- Trong lúc chưa có giỏ hàng (Q-13), nút trên thẻ sản phẩm dẫn tới trang chi tiết ("Xem chi tiết"); trang chi tiết báo "Đặt hàng trực tuyến sẽ sớm ra mắt" `[ASSUMPTION]`.
 
 ## 10. Tồn kho
 
 Vận hành xưởng ngoài phạm vi (D-34). Ở tầng web chỉ cần một quyết định:
 
-- `[BA DECISION REQUIRED]` Q-07: web có giới hạn số lượng đặt hoặc có trạng thái "tạm hết hàng" không? Nếu **không**, web coi mọi sản phẩm Published là luôn đặt được `[ASSUMPTION]`, và admin tạm ẩn sản phẩm khi cần.
+- `[BA DECISION REQUIRED]` Q-07: web có giới hạn số lượng đặt hoặc có trạng thái "tạm hết hàng" không? Nếu **không**, web coi mọi sản phẩm Published là luôn đặt được `[CONFIRMED]` D-41, và admin tạm ẩn sản phẩm khi cần.
 
 ## 11. Giỏ hàng
 
 | Chủ đề | Quy tắc |
 |---|---|
 | Ai có giỏ | `[BA DECISION REQUIRED]` Q-13: khách vãng lai có thêm vào giỏ được không (lưu trình duyệt, gộp khi đăng nhập), hay bấm "Thêm vào giỏ" là bắt đăng nhập? |
-| Giá trong giỏ | Luôn hiển thị **giá hiện hành**; giá được chốt (snapshot) tại thời điểm tạo đơn `[ASSUMPTION]` |
-| Sản phẩm bị ẩn khi đang trong giỏ | Hiện cảnh báo, không cho checkout dòng đó `[ASSUMPTION]` |
+| Giá trong giỏ | Luôn hiển thị **giá hiện hành**; giá được chốt (snapshot) tại thời điểm tạo đơn `[CONFIRMED]` D-41 |
+| Sản phẩm bị ẩn khi đang trong giỏ | Hiện cảnh báo, không cho checkout dòng đó `[CONFIRMED]` D-41 |
 | Số lượng tối đa mỗi dòng | `[BA DECISION REQUIRED]` |
-| Lưu giỏ | Giỏ của user đã đăng nhập lưu trên server, đồng bộ giữa các thiết bị `[ASSUMPTION]` |
+| Lưu giỏ | Giỏ của user đã đăng nhập lưu trên server, đồng bộ giữa các thiết bị `[CONFIRMED]` D-41 |
 
 ## 12. Checkout
 
@@ -291,11 +332,11 @@ Giỏ hàng
 | Đăng nhập | Phiên | Có phiên hợp lệ | Chuyển tới đăng nhập, quay lại checkout |
 | Loại đơn | tặng / tự mua, cờ lời chúc | — | — |
 | Người nhận | tên, SĐT, địa chỉ VN | SĐT hợp lệ định dạng VN; địa chỉ trong VN (D-32) | Báo lỗi tại trường |
-| Ngôn ngữ QR | vi/en/zh-Hans | Chỉ hiện khi đơn có lời chúc `[ASSUMPTION]` | — |
+| Ngôn ngữ QR | vi/en/zh-Hans | Chỉ hiện khi đơn có lời chúc `[CONFIRMED]` D-41 | — |
 | Coupon | mã | BR-CPN-* | Báo lý do không hợp lệ |
 | Tính giá | giỏ, coupon, người nhận | Tính lại phía server; không tin giá từ trình duyệt | — |
 | Thanh toán | payOS / COD | BR-PAY-004 (COD và đơn giao người khác) | — |
-| Tạo đơn | toàn bộ trên | Kiểm tra lại giá, coupon, trạng thái sản phẩm ngay lúc tạo | Nếu giá/coupon đổi: hiện bảng giá mới, yêu cầu xác nhận lại `[ASSUMPTION]` |
+| Tạo đơn | toàn bộ trên | Kiểm tra lại giá, coupon, trạng thái sản phẩm ngay lúc tạo | Nếu giá/coupon đổi: hiện bảng giá mới, yêu cầu xác nhận lại `[CONFIRMED]` D-41 |
 
 **Thời điểm soạn lời chúc** `[BA DECISION REQUIRED]` Q-08: bắt buộc soạn trong checkout, hay cho soạn sau trong dashboard (đến hạn khóa BR-MSG-001/008)? Nếu đến lúc khóa mà chưa soạn thì sao?
 
@@ -339,18 +380,18 @@ Các thuộc tính sau cần PO chốt trước khi thiết kế data model:
 | C-1 | Loại: giảm %, giảm số tiền, miễn phí ship? | `[BA DECISION REQUIRED]` |
 | C-2 | Giảm trước VAT hay sau VAT? | `[BA DECISION REQUIRED]` + `[LEGAL]` |
 | C-3 | Phạm vi: toàn đơn / sản phẩm cụ thể / có áp vào phí ship? | `[BA DECISION REQUIRED]` |
-| C-4 | Mỗi đơn dùng tối đa mấy coupon? | `[BA DECISION REQUIRED]` — đề xuất **1** `[PROPOSAL]` |
+| C-4 | Mỗi đơn dùng tối đa mấy coupon? | **1** `[CONFIRMED]` D-41 |
 | C-5 | Giới hạn tổng và giới hạn mỗi user? | `[BA DECISION REQUIRED]` (vì bắt buộc tài khoản, đếm theo user là khả thi) |
 | C-6 | Có mức giảm tối đa (cho loại %)? | `[BA DECISION REQUIRED]` |
 | C-8 | Hủy đơn có trả lại lượt dùng? Đổi trả một phần thì phân bổ giảm giá thế nào? | `[BA DECISION REQUIRED]` |
-| C-9 | Sửa/tắt coupon đang chạy ảnh hưởng đơn đang checkout thế nào? | Đề xuất: kiểm tra lại lúc tạo đơn (BR-CPN-002) `[PROPOSAL]` |
-| C-10 | Mây có được nhắc tới coupon không? | Đề xuất: **không** `[PROPOSAL]` (BR-AI-005) |
+| C-9 | Sửa/tắt coupon đang chạy ảnh hưởng đơn đang checkout thế nào? | Đề xuất: kiểm tra lại lúc tạo đơn (BR-CPN-002) `[CONFIRMED]` D-41 |
+| C-10 | Mây có được nhắc tới coupon không? | Đề xuất: **không** `[CONFIRMED]` D-41 (BR-AI-005) |
 
-**Thời điểm tính là đã dùng coupon** `[ASSUMPTION]`: khi đơn được tạo thành công. Đơn payOS hết hạn thanh toán thì trả lại lượt dùng.
+**Thời điểm tính là đã dùng coupon** `[CONFIRMED]` D-41: khi đơn được tạo thành công. Đơn payOS hết hạn thanh toán thì trả lại lượt dùng.
 
 ## 15. Thanh toán
 
-Phương thức: **payOS** hoặc **COD** (D-35). `[ASSUMPTION]` khách được chọn một trong hai ở mỗi đơn.
+Phương thức: **payOS** hoặc **COD** (D-35). `[CONFIRMED]` D-41 khách được chọn một trong hai ở mỗi đơn.
 
 ### 15.1 payOS
 
@@ -365,10 +406,10 @@ PAID → REFUND_PENDING → REFUNDED
 |---|---|
 | Nguồn sự thật | **Webhook payOS (đã xác minh chữ ký)** là nguồn duy nhất để chuyển đơn sang CONFIRMED. Trang return URL chỉ để hiển thị, không cập nhật trạng thái. |
 | Webhook trùng | Xử lý idempotent theo mã giao dịch; lần hai không đổi gì |
-| Webhook đến chậm | Trang cảm ơn hiện "Đang chờ xác nhận thanh toán"; backend chủ động hỏi trạng thái payOS nếu quá thời gian `[ASSUMPTION]` |
+| Webhook đến chậm | Trang cảm ơn hiện "Đang chờ xác nhận thanh toán"; backend chủ động hỏi trạng thái payOS nếu quá thời gian `[CONFIRMED]` D-41 |
 | Hạn link thanh toán | `[BA DECISION REQUIRED]` Q-15 (ví dụ 15 phút?). Hết hạn → đơn CANCELLED, trả lượt coupon |
-| Thanh toán sau khi đơn đã hết hạn/hủy | Ghi nhận PAID, gắn cờ cho admin **hoàn tiền thủ công** `[ASSUMPTION]` |
-| Số tiền nhận khác số tiền đơn | Không xác nhận đơn, gắn cờ cho admin `[ASSUMPTION]` |
+| Thanh toán sau khi đơn đã hết hạn/hủy | Ghi nhận PAID, gắn cờ cho admin **hoàn tiền thủ công** `[CONFIRMED]` D-41 |
+| Số tiền nhận khác số tiền đơn | Không xác nhận đơn, gắn cờ cho admin `[CONFIRMED]` D-41 |
 | Hoàn tiền | `[BA DECISION REQUIRED]` Q-16: hoàn tự động qua payOS hay admin chuyển khoản thủ công rồi ghi nhận trên web? |
 
 Chi tiết API (tên trạng thái, cơ chế chữ ký, hạn link) theo tài liệu payOS — tech lead xác nhận.
@@ -377,15 +418,15 @@ Chi tiết API (tên trạng thái, cơ chế chữ ký, hạn link) theo tài l
 
 | Chủ đề | Quy tắc |
 |---|---|
-| Xác nhận đơn | Đơn COD chuyển CONFIRMED ngay khi tạo `[ASSUMPTION]` |
+| Xác nhận đơn | Đơn COD chuyển CONFIRMED ngay khi tạo `[CONFIRMED]` D-41 |
 | Ghi nhận thu tiền | Admin đánh dấu "Đã thu COD" khi giao thành công |
-| Giao thất bại / từ chối nhận | Admin chuyển đơn sang DELIVERY_FAILED `[ASSUMPTION]` — xử lý tiếp là vận hành |
-| COD + giao cho người khác (quà) | **Người nhận sẽ phải trả tiền cho quà của mình.** `[BA DECISION REQUIRED]` Q-17: chặn COD khi người nhận là người khác (đề xuất) hay cho phép kèm cảnh báo? |
+| Giao thất bại / từ chối nhận | Admin chuyển đơn sang DELIVERY_FAILED `[CONFIRMED]` D-41 — xử lý tiếp là vận hành |
+| COD + giao cho người khác (quà) | **Chặn COD** khi người nhận là người khác (BR-PAY-004) `[CONFIRMED]` D-41 |
 | Giới hạn giá trị COD | `[BA DECISION REQUIRED]` |
 
 ## 16. Vòng đời đơn hàng
 
-Trạng thái đề xuất `[PROPOSAL]`, suy ra từ C-11 (4 công đoạn), D-06, D-13, I-10:
+Trạng thái đề xuất `[CONFIRMED]` D-41, suy ra từ C-11 (4 công đoạn), D-06, D-13, I-10:
 
 ```text
 PENDING_PAYMENT ──(webhook PAID)──▶ CONFIRMED
@@ -410,21 +451,21 @@ PENDING_PAYMENT ──(webhook PAID)──▶ CONFIRMED
 | PENDING_PAYMENT | Đơn payOS chờ thanh toán | Hệ thống | Giữ lượt coupon |
 | CONFIRMED | Đã thanh toán (payOS) hoặc đơn COD đã tạo | Webhook / Hệ thống | Thông báo khách |
 | IN_PRODUCTION | Đang làm; kèm công đoạn 1–4 | Admin | Khách thấy công đoạn |
-| PACKED | Đã đóng gói, thiệp đã viết | Admin | Khóa phần chữ lời chúc (BR-MSG-008, đề xuất) |
+| PACKED | Đã đóng gói, thiệp đã viết | Admin | Khóa phần chữ lời chúc (BR-MSG-008, D-41) |
 | SHIPPED | Đã giao cho hãng vận chuyển | Admin | **Khóa toàn bộ lời chúc** (D-13); **hết quyền hủy** (D-06) |
-| DELIVERED | Giao thành công | Admin `[ASSUMPTION]` | Mốc bắt đầu thời hạn đổi trả? (Q-19) |
+| DELIVERED | Giao thành công | Admin `[CONFIRMED]` D-41 | Mốc bắt đầu thời hạn đổi trả? (Q-19) |
 | DELIVERY_FAILED | Giao thất bại | Admin | — |
 | CANCELLED | Đã hủy | Khách (trước SHIPPED) / Admin / Hệ thống | Hoàn tiền nếu đã trả (payOS); trả lượt coupon (C-8) |
 
-Lưu ý: **nút "Tôi đã nhận được quà" trên trang QR không đổi trạng thái đơn** `[PROPOSAL]` — tránh hai nguồn sự thật cho DELIVERED (xem I-19a, Q-18).
+Lưu ý: **nút "Tôi đã nhận được quà" trên trang QR không đổi trạng thái đơn** `[CONFIRMED]` D-41 — tránh hai nguồn sự thật cho DELIVERED (xem I-19a, Q-18).
 
 `[BA DECISION REQUIRED]` Q-20: hủy đơn đã thanh toán ở IN_PRODUCTION/PACKED có hoàn 100% không?
 
 ## 17. Vận chuyển (phần web)
 
-- Chỉ giao trong Việt Nam (D-32). Form địa chỉ theo cấu trúc tỉnh/quận/phường VN `[ASSUMPTION]`.
+- Chỉ giao trong Việt Nam (D-32). Form địa chỉ theo cấu trúc tỉnh/quận/phường VN `[CONFIRMED]` D-41.
 - Người nhận = bản thân hoặc người khác (D-02). Đơn giao người khác: **không in giá trong kiện** `[BA DECISION REQUIRED]` Q-21 — việc in là vận hành, nhưng web có thể cần tạo phiếu không giá.
-- Mã vận đơn: admin nhập tay, khách xem trong dashboard `[ASSUMPTION]`.
+- Mã vận đơn: admin nhập tay, khách xem trong dashboard `[CONFIRMED]` D-41.
 - Phí ship: Q-11.
 
 ## 18. Đổi trả & hoàn tiền
@@ -440,8 +481,8 @@ Khách gửi yêu cầu (dashboard) + video khui hàng
 | Chủ đề | Quy tắc |
 |---|---|
 | Điều kiện bắt buộc | Video quay liên tục từ lúc khui hàng (D-07) |
-| Ai gửi yêu cầu | Người mua, qua dashboard (vì đơn gắn với tài khoản) `[ASSUMPTION]`. Người nhận quà (không có tài khoản) nhờ người mua gửi. |
-| Hướng dẫn quay video | Phải hiện ở trang QR và thiệp cảm ơn `[PROPOSAL]` I-05 — người nhận quà mới là người khui hàng |
+| Ai gửi yêu cầu | Người mua, qua dashboard (vì đơn gắn với tài khoản) `[CONFIRMED]` D-41. Người nhận quà (không có tài khoản) nhờ người mua gửi. |
+| Hướng dẫn quay video | Phải hiện ở trang QR và thiệp cảm ơn `[CONFIRMED]` D-41 I-05 — người nhận quà mới là người khui hàng |
 | Thời hạn gửi yêu cầu | `[BA DECISION REQUIRED]` Q-19 (bao nhiêu ngày, tính từ DELIVERED?) |
 | Lý do chấp nhận | `[BA DECISION REQUIRED]` Q-22 (vỡ, sai hàng, lỗi; có nhận đổi ý với hàng cá nhân hóa?) |
 | Kết quả | `[BA DECISION REQUIRED]` Q-22: hoàn tiền / làm lại |
@@ -463,10 +504,10 @@ Ngoài phạm vi. **Lưu ý**: phần testimonial trên trang chủ (`src/App.js
 | Đơn đã gửi (kèm mã vận đơn) | Người mua | Q-24 | Ngay |
 | Đơn bị hủy / hoàn tiền | Người mua | Q-24 | Ngay |
 | Kết quả đổi trả | Người mua | Q-24 | Ngay |
-| Media lời chúc sắp bị xóa | Người nhận? | Người nhận không có tài khoản/liên hệ → **chỉ hiện đếm ngược trên trang QR** `[PROPOSAL]` | — |
+| Media lời chúc sắp bị xóa | Người nhận? | Người nhận không có tài khoản/liên hệ → **chỉ hiện đếm ngược trên trang QR** `[CONFIRMED]` D-41 | — |
 | Cảnh báo ngân sách Mây 80% / 100% | Admin | Q-24 | Ngay |
 
-Ngôn ngữ thông báo = ngôn ngữ ưa thích của tài khoản người mua `[ASSUMPTION]`.
+Ngôn ngữ thông báo = ngôn ngữ ưa thích của tài khoản người mua `[CONFIRMED]` D-41.
 
 ---
 
@@ -477,18 +518,18 @@ Ngôn ngữ thông báo = ngôn ngữ ưa thích của tài khoản người mua
 | | QR đơn hàng (trên thiệp cảm ơn in) | QR khắc trên đèn |
 |---|---|---|
 | Nội dung | Trang lời chúc của đơn | Video quá trình làm của **lô** |
-| Truy cập | Private — token ngẫu nhiên (D-29, I-01) | Public `[ASSUMPTION]` |
+| Truy cập | Private — token ngẫu nhiên (D-29, I-01) | Public `[CONFIRMED]` D-41 |
 | Lưu trữ | Chữ: vĩnh viễn (D-12). Giọng nói/video: 30 ngày từ lúc xác nhận nhận quà (D-26) | Vĩnh viễn (D-10) |
-| Có trong | Mọi đơn (D-28) `[ASSUMPTION]` | Mọi đèn |
-| SEO | `noindex` | `[BA DECISION REQUIRED]` cho phép index? |
+| Có trong | Mọi đơn (D-28) `[CONFIRMED]` D-41 | Mọi đèn |
+| SEO | `noindex` | `noindex` `[CONFIRMED]` D-44 |
 
 ### 21.2 Hai loại thiệp (D-28)
 
 | | Thiệp viết tay | Thiệp cảm ơn in |
 |---|---|---|
 | Ngôn ngữ | Tiếng Việt (D-25) | Anh–Việt (D-25) |
-| Nội dung | Lời chúc dạng chữ của người mua `[ASSUMPTION]` I-10 | Lời cảm ơn cố định + QR đơn hàng + hướng dẫn quay video khui hàng `[PROPOSAL]` |
-| Có trong | Đơn có lời chúc `[ASSUMPTION]` | Mọi đơn `[ASSUMPTION]` |
+| Nội dung | Lời chúc dạng chữ của người mua `[CONFIRMED]` D-41 I-10 | Lời cảm ơn cố định + QR đơn hàng + hướng dẫn quay video khui hàng `[CONFIRMED]` D-41 |
+| Có trong | Đơn có lời chúc `[CONFIRMED]` D-41 | Mọi đơn `[CONFIRMED]` D-41 |
 
 `[BA DECISION REQUIRED]` Q-25: đơn **Tự mua không tích "Thêm lời chúc"** thì QR trên thiệp cảm ơn dẫn tới đâu (trang theo dõi đơn / trang cảm ơn / không có QR)?
 
@@ -506,7 +547,7 @@ EMPTY ──(soạn)──▶ DRAFT ──(PACKED)──▶ TEXT_LOCKED ──(S
                                                     MEDIA_EXPIRED (chỉ còn chữ)
 ```
 
-`TEXT_LOCKED` phụ thuộc đề xuất BR-MSG-008 (I-10).
+`TEXT_LOCKED` theo BR-MSG-008 (I-10, đã duyệt ở D-41).
 
 ### 21.4 Trang QR lời chúc — hành vi
 
@@ -514,9 +555,9 @@ EMPTY ──(soạn)──▶ DRAFT ──(PACKED)──▶ TEXT_LOCKED ──(S
 2. Bấm nút → ghi `confirmed_at` (chỉ lần đầu) → hiện lời chúc: chữ (bản gốc) + giọng nói/video + nút "Dịch tự động" + nút "Tải về" + đếm ngược ngày xóa media.
 3. Các lần sau: vào thẳng nội dung.
 4. Sau 30 ngày: media bị xóa; trang hiện chữ + thông báo media đã hết hạn.
-5. Ngôn ngữ giao diện trang = ngôn ngữ người mua chọn (D-24); người xem có thể đổi ngôn ngữ giao diện `[ASSUMPTION]`.
-6. Nút "Dịch tự động" chỉ dịch **chữ**; không dịch giọng nói/video. Đích dịch = ngôn ngữ giao diện đang hiển thị `[ASSUMPTION]`. Bản dịch được cache.
-7. Trước khi đơn SHIPPED, quét QR hiện "Món quà đang được chuẩn bị" `[ASSUMPTION]`, không cho bấm xác nhận.
+5. Ngôn ngữ giao diện trang = ngôn ngữ người mua chọn (D-24); người xem có thể đổi ngôn ngữ giao diện `[CONFIRMED]` D-41.
+6. Nút "Dịch tự động" chỉ dịch **chữ**; không dịch giọng nói/video. Đích dịch = ngôn ngữ giao diện đang hiển thị `[CONFIRMED]` D-41. Bản dịch được cache.
+7. Trước khi đơn SHIPPED, quét QR hiện "Món quà đang được chuẩn bị" `[CONFIRMED]` D-41, không cho bấm xác nhận.
 
 `[BA DECISION REQUIRED]`:
 - **Q-26 (I-19c)**: nếu không ai bấm xác nhận, media lưu bao lâu? Đề xuất: tự coi là đã xác nhận sau X ngày kể từ DELIVERED.
@@ -535,9 +576,20 @@ EMPTY ──(soạn)──▶ DRAFT ──(PACKED)──▶ TEXT_LOCKED ──(S
 
 ### 21.6 QR đèn & lô
 
-- Mỗi đèn trong đơn được gán một lô; QR khắc trên đèn trỏ tới trang lô `[ASSUMPTION]`.
-- `[BA DECISION REQUIRED]` Q-30: QR đèn là mã riêng mỗi đèn hay mã chung của lô? (Ảnh hưởng: nếu mã riêng, web cần lưu serial từng đèn.)
-- Đơn chỉ được chuyển SHIPPED khi video lô của mọi dòng hàng đã xuất bản (BR-FUL-001) `[PROPOSAL]`.
+- Mỗi đèn trong đơn được gán một lô; QR khắc trên đèn trỏ tới trang lô `[CONFIRMED]` D-41.
+- QR đèn là **mã chung của lô**, không lưu serial từng đèn `[CONFIRMED]` D-43. URL: `/lo/<mã lô>` (thêm tiền tố `/en`, `/zh` khi xem ngôn ngữ khác).
+- Trang lô chỉ công khai khi lô đã xuất bản video (trạng thái `video_published` và có link video); lô chưa có video hoặc mã không tồn tại hiện cùng một trang "không tìm thấy" `[ASSUMPTION]`.
+- Mã lô khớp chính xác, phân biệt hoa thường `[ASSUMPTION]`.
+- Trang lô ghi rõ video là của cả lô (D-01), `noindex` (D-44).
+
+**Quản trị lô (FR-QR-007, v0.3)**
+
+- Admin tạo lô (mã, ngày làm, tiêu đề, câu chuyện ×3 ngôn ngữ), tải video lên Supabase Storage (D-46), rồi bấm "Xuất bản". Chỉ xuất bản được khi lô đã có video.
+- Mã lô chỉ gồm chữ in hoa, số, gạch nối, tối đa 40 ký tự `[ASSUMPTION]`.
+- Video nhận MP4/WebM/MOV, tối đa `MAX_VIDEO_MB` (mặc định 500 MB) `[ASSUMPTION]`.
+- Sau khi xuất bản: được thay video; không gỡ xuất bản, không xoá, không đổi mã (D-47). Video cũ khi bị thay vẫn giữ trong Storage, không xoá `[ASSUMPTION]` (D-10).
+- Lô chưa xuất bản thì sửa mã và xoá được `[ASSUMPTION]`.
+- Đơn chỉ được chuyển SHIPPED khi video lô của mọi dòng hàng đã xuất bản (BR-FUL-001) `[CONFIRMED]` D-41.
 
 ---
 
@@ -553,24 +605,24 @@ EMPTY ──(soạn)──▶ DRAFT ──(PACKED)──▶ TEXT_LOCKED ──(S
 | Tra đơn bằng mã đơn + SĐT/email | ✓ | ✓ |
 | Tra đơn của chính mình không cần nhập mã | – | ✓ |
 | Thêm giỏ hàng, sửa/hủy đơn, sửa tài khoản | ✗ | ✗ (D-30, BR-AI-006) |
-| Nhắc tới / tạo coupon | ✗ | ✗ `[PROPOSAL]` |
-| Lưu lịch sử chat | Không `[PROPOSAL]` | Vĩnh viễn (D-19) |
+| Nhắc tới / tạo coupon | ✗ | ✗ `[CONFIRMED]` D-41 |
+| Lưu lịch sử chat | Không `[CONFIRMED]` D-41 | Vĩnh viễn (D-19) |
 
 ### 22.2 Kiến trúc nghiệp vụ (bắt buộc)
 
 - Mây chỉ lấy dữ liệu qua **danh sách hàm backend đã khai báo**, ví dụ `getProducts`, `getFaq`, `getPolicy`, `getMyOrders`, `lookupOrder(code, phoneOrEmail)`. Không truy vấn DB trực tiếp (D-29).
 - Backend kiểm tra quyền theo phiên, không theo nội dung prompt.
 - Chỉ trả về cho OpenAI các trường cần: mã đơn, trạng thái, công đoạn, ngày cập nhật, mã vận đơn. **Không** trả địa chỉ, SĐT, nội dung lời chúc (NFR-PRV-001).
-- `lookupOrder` cần chống dò: giới hạn số lần thử sai `[PROPOSAL]`.
+- `lookupOrder` cần chống dò: giới hạn số lần thử sai `[CONFIRMED]` D-41.
 
 ### 22.3 Tour
 
-- Tự bật ở lần truy cập đầu (D-30); đóng được; nhớ lựa chọn. Mở lại qua nút Mây `[PROPOSAL]` I-21.
-- Không tự bật tại: trang QR, giỏ hàng, checkout, dashboard `[PROPOSAL]`.
+- Tự bật ở lần truy cập đầu (D-30); đóng được; nhớ lựa chọn. Mở lại qua nút Mây `[CONFIRMED]` D-41 I-21.
+- Không tự bật tại: trang QR, giỏ hàng, checkout, dashboard `[CONFIRMED]` D-41.
 - Hành động được phép: cuộn tới mục, làm nổi bật phần tử, mở trang công khai. Không thao tác dữ liệu.
 - Nội dung tour có ở 3 ngôn ngữ.
 
-### 22.4 Hạn mức & lỗi (D-31 — `[PROPOSAL]`, admin chỉnh được)
+### 22.4 Hạn mức & lỗi (D-31 — `[CONFIRMED]` D-41, admin chỉnh được)
 
 | Hạng mục | Vãng lai | Đã đăng nhập |
 |---|---|---|
@@ -585,7 +637,7 @@ EMPTY ──(soạn)──▶ DRAFT ──(PACKED)──▶ TEXT_LOCKED ──(S
 | Ngân sách tháng 100% | Chuyển chế độ FAQ offline (không gọi API) | "Mây đang nghỉ ngơi, bạn xem thử mấy câu hỏi thường gặp nè" |
 | Không có dữ liệu để trả lời | Nói không biết, gợi ý liên hệ | "Cái này Mây chưa biết, bạn liên hệ [kênh hỗ trợ] giúp Mây nha" |
 
-Các câu thông báo có đủ vi/en/zh-Hans; admin sửa được. Nút "Dịch tự động" ở trang QR dùng chung ngân sách, không dùng chung hạn mức tin nhắn `[PROPOSAL]`.
+Các câu thông báo có đủ vi/en/zh-Hans; admin sửa được. Nút "Dịch tự động" ở trang QR dùng chung ngân sách, không dùng chung hạn mức tin nhắn `[CONFIRMED]` D-41.
 
 `[BA DECISION REQUIRED]` Q-31: kênh hỗ trợ người thật (Zalo, hotline, email) để Mây chuyển tiếp.
 
@@ -593,8 +645,8 @@ Các câu thông báo có đủ vi/en/zh-Hans; admin sửa được. Nút "Dịc
 
 - Mọi giá, trạng thái đơn, ngày, chính sách Mây nêu phải có trong kết quả hàm backend của **chính lượt trả lời đó**.
 - Không hứa ngày giao, không cam kết đổi trả/hoàn tiền, không đưa coupon.
-- Mây trả lời bằng ngôn ngữ giao diện đang chọn `[ASSUMPTION]`.
-- Hiển thị rõ Mây là trợ lý AI `[PROPOSAL]`.
+- Mây trả lời bằng ngôn ngữ giao diện đang chọn `[CONFIRMED]` D-41.
+- Hiển thị rõ Mây là trợ lý AI `[CONFIRMED]` D-41.
 
 ### 22.6 Lịch sử chat
 
@@ -611,22 +663,39 @@ Các câu thông báo có đủ vi/en/zh-Hans; admin sửa được. Nút "Dịc
 | Chủ đề | Quy tắc |
 |---|---|
 | Ngôn ngữ | vi (mặc định), en, zh-Hans (D-23) |
-| Phạm vi dịch | Giao diện, sản phẩm, FAQ, chính sách, tour Mây, câu lỗi Mây, trang QR, thông báo `[ASSUMPTION]` |
+| Phạm vi dịch | Giao diện, sản phẩm, FAQ, chính sách, tour Mây, câu lỗi Mây, trang QR, thông báo `[CONFIRMED]` D-41 |
 | Không dịch | Nội dung lời chúc (chỉ dịch khi bấm nút, D-27); thiệp giấy (D-25) |
 | Văn bản pháp lý | Bản tiếng Việt có giá trị ưu tiên khi có mâu thuẫn `[LEGAL]` R-11 |
-| Chọn ngôn ngữ | Nằm trên URL (`/`, `/en/`, `/zh/`) `[PROPOSAL]` — cần cho SEO |
-| Thiếu bản dịch | Hiển thị tiếng Việt `[ASSUMPTION]` |
+| Chọn ngôn ngữ | Nằm trên URL (`/`, `/en/`, `/zh/`) `[CONFIRMED]` D-37. Mã `zh` trên URL tương ứng zh-Hans (thuộc tính `lang="zh-Hans"`) |
+| Thiếu bản dịch | Hiển thị tiếng Việt `[CONFIRMED]` D-40 |
+| Bản dịch hiện có | Bản en/zh của giao diện, sản phẩm, FAQ do đội dev soạn — chờ PO duyệt `[ASSUMPTION]` (G-14) |
 
 ### 23.2 SEO
 
-- Trang công khai phải render sẵn HTML (pre-render hoặc SSR) — hiện tại là SPA chỉ render phía trình duyệt, không đạt (gap G-12).
+- Trang công khai phải render sẵn HTML (pre-render hoặc SSR). **SSR trong Express** — một server Node phục vụ cả web và API, mỗi request render với dữ liệu mới nhất từ DB `[CONFIRMED]` D-49.
 - URL riêng mỗi ngôn ngữ + `hreflang` + sitemap + meta title/description theo trang và ngôn ngữ.
-- Structured data sản phẩm phải khớp cách hiển thị giá (I-04).
-- `noindex`: trang QR lời chúc, dashboard, giỏ hàng, checkout, admin.
+- Structured data sản phẩm phải khớp cách hiển thị giá (I-04): JSON-LD `Product` có `Offer` giá **chưa VAT** kèm `valueAddedTaxIncluded: false` `[CONFIRMED]` D-50 — `[LEGAL]` I-04 vẫn chờ pháp chế; nếu kết luận khác phải sửa cùng lúc cách hiển thị giá và JSON-LD.
+- `noindex`: trang QR lời chúc, dashboard, giỏ hàng, checkout, admin, trang lô (D-44), trang đăng nhập/đăng ký/quên & đặt lại mật khẩu, trang 404.
+
+**Hiện thực (v0.4)**
+
+| Trang | SSR | Index | Ghi chú |
+|---|---|---|---|
+| Trang chủ `/`, `/en`, `/zh` | Có | Có | title/description theo ngôn ngữ, canonical + hreflang (vi, en, zh-Hans, x-default = vi) |
+| Chi tiết sản phẩm | Có | Có (chỉ Published) | title "{tên} — Mộc…", JSON-LD Product (D-50); Draft/Hidden/không có → 404 |
+| Trang QR lô `/lo/:code` | Có | Không (D-44) | Không có trong sitemap |
+| Đăng nhập, đăng ký, quên/đặt lại mật khẩu, tài khoản, admin | Không — chỉ khung HTML `[DERIVED]` (nội dung phụ thuộc phiên ở trình duyệt) | Không | Header `X-Robots-Tag: noindex` |
+| Đường dẫn không tồn tại | Có | Không | HTTP 404 |
+
+- `sitemap.xml`: trang chủ + sản phẩm Published × 3 ngôn ngữ, kèm `xhtml:link` hreflang và `lastmod` `[DERIVED]`.
+- `robots.txt`: chỉ `Disallow` `/api/` và `/admin`; các trang riêng tư dùng `noindex` (để bot đọc được noindex) `[ASSUMPTION]`.
+- Open Graph: `og:title`, `og:description`, `og:url`, `og:type`, `og:locale`. Chưa có ảnh chia sẻ (`og:image`) vì chưa có ảnh sản phẩm thật `[ASSUMPTION]` (G-23).
+- Câu meta description trang chủ và mẫu tiêu đề sản phẩm do đội dev soạn — chờ Marketing duyệt `[ASSUMPTION]` (G-14).
+- URL gốc trong canonical/sitemap lấy từ biến môi trường `PUBLIC_SITE_URL` `[DERIVED]`.
 
 ### 23.3 Google Analytics
 
-- Sự kiện đề xuất `[PROPOSAL]`: `view_item`, `add_to_cart`, `begin_checkout`, `purchase`, `cancel_order`, `open_qr_gift`, `confirm_gift_received`, `open_qr_batch`, `mascot_open`, `mascot_tour_complete`, `mascot_error`.
+- Sự kiện đề xuất `[CONFIRMED]` D-41: `view_item`, `add_to_cart`, `begin_checkout`, `purchase`, `cancel_order`, `open_qr_gift`, `confirm_gift_received`, `open_qr_batch`, `mascot_open`, `mascot_tour_complete`, `mascot_error`.
 - Không gửi token QR (URL trang QR phải được làm sạch trước khi gửi), không gửi dữ liệu cá nhân (NFR-PRV-002).
 - `[LEGAL]` Q-32: có cần banner xin đồng ý cookie/theo dõi không?
 
@@ -638,21 +707,21 @@ Các câu thông báo có đủ vi/en/zh-Hans; admin sửa được. Nút "Dịc
 |---|---|---|
 | BR-ACC-001 | Chỉ người dùng đã đăng nhập mới tạo được đơn hàng. | D-36 |
 | BR-PRC-001 | Tổng = Σ(giá chưa VAT × SL) − giảm giá + phí ship + VAT; tính phía server. | D-03 |
-| BR-PRC-002 | Giá dòng hàng được chốt tại thời điểm tạo đơn; thay đổi giá sau đó không ảnh hưởng đơn. | `[ASSUMPTION]` |
+| BR-PRC-002 | Giá dòng hàng được chốt tại thời điểm tạo đơn; thay đổi giá sau đó không ảnh hưởng đơn. | `[CONFIRMED]` D-41 |
 | BR-PRC-003 | Mọi nơi hiển thị giá phải có chú thích "chưa gồm VAT". | D-03, `[LEGAL]` |
 | BR-CPN-001 | Coupon chỉ áp được khi thỏa điều kiện hợp lệ ở §14. | D-21 |
-| BR-CPN-002 | Coupon được kiểm tra lại ngay lúc tạo đơn; không hợp lệ thì không tạo đơn và báo khách. | `[PROPOSAL]` |
-| BR-CPN-003 | Mỗi đơn dùng tối đa 1 coupon. | `[PROPOSAL]` C-4 |
+| BR-CPN-002 | Coupon được kiểm tra lại ngay lúc tạo đơn; không hợp lệ thì không tạo đơn và báo khách. | `[CONFIRMED]` D-41 |
+| BR-CPN-003 | Mỗi đơn dùng tối đa 1 coupon. | `[CONFIRMED]` D-41 C-4 |
 | BR-PAY-001 | Đơn payOS chỉ chuyển CONFIRMED khi nhận webhook PAID đã xác minh chữ ký và số tiền khớp. | D-35 |
 | BR-PAY-002 | Webhook trùng mã giao dịch không làm thay đổi trạng thái lần hai. | `[DERIVED]` |
-| BR-PAY-003 | Đơn payOS quá hạn thanh toán chuyển CANCELLED và trả lượt coupon. | `[ASSUMPTION]` |
-| BR-PAY-004 | Đơn có người nhận là người khác không được chọn COD. | `[PROPOSAL]` Q-17 |
+| BR-PAY-003 | Đơn payOS quá hạn thanh toán chuyển CANCELLED và trả lượt coupon. | `[CONFIRMED]` D-41 |
+| BR-PAY-004 | Đơn có người nhận là người khác không được chọn COD. | `[CONFIRMED]` D-41 |
 | BR-ORD-001 | Người mua hủy được đơn khi trạng thái trước SHIPPED. | D-06 |
-| BR-ORD-002 | Đơn chỉ chuyển SHIPPED khi video lô của mọi dòng hàng đã xuất bản. | `[PROPOSAL]` BR-FUL-001 |
+| BR-ORD-002 | Đơn chỉ chuyển SHIPPED khi video lô của mọi dòng hàng đã xuất bản. | `[CONFIRMED]` D-41 BR-FUL-001 |
 | BR-SHP-001 | Người mua chọn người nhận = bản thân / người khác; địa chỉ + SĐT theo lựa chọn. | D-02 |
 | BR-SHP-002 | Chỉ giao trong Việt Nam; tiền tệ VND. | D-32 |
 | BR-MSG-001 | Lời chúc không sửa được khi đơn đã SHIPPED. | D-13 |
-| BR-MSG-008 | Phần chữ của lời chúc không sửa được khi đơn đã PACKED. | `[PROPOSAL]` I-10 |
+| BR-MSG-008 | Phần chữ của lời chúc không sửa được khi đơn đã PACKED. | `[CONFIRMED]` D-41 I-10 |
 | BR-MSG-002 | Đơn Tự mua chỉ có lời chúc khi người mua tích "Thêm lời chúc". | D-14 |
 | BR-MSG-003 | Lời chúc dạng chữ lưu vô thời hạn. | D-12 |
 | BR-MSG-004 | Giọng nói/video bị xóa sau 30 ngày kể từ lúc người nhận bấm "Tôi đã nhận được quà" lần đầu. | D-26 |
@@ -661,19 +730,19 @@ Các câu thông báo có đủ vi/en/zh-Hans; admin sửa được. Nút "Dịc
 | BR-MSG-007 | Lượt mở trang QR trước khi bấm xác nhận không bắt đầu đếm ngược. | D-26 |
 | BR-QR-001 | QR đơn hàng chỉ chứa token ngẫu nhiên; không chứa dữ liệu cá nhân dạng đọc được. | D-29, I-01 |
 | BR-QR-002 | QR đèn trỏ tới video lô; video lô không bị xóa. | D-10 |
-| BR-CARD-001 | Mọi đơn có thiệp cảm ơn in Anh–Việt kèm QR đơn hàng. | D-28 `[ASSUMPTION]` |
-| BR-CARD-002 | Thiệp viết tay tiếng Việt chỉ có trong đơn có lời chúc. | D-28 `[ASSUMPTION]` |
+| BR-CARD-001 | Mọi đơn có thiệp cảm ơn in Anh–Việt kèm QR đơn hàng. | D-28 `[CONFIRMED]` D-41 |
+| BR-CARD-002 | Thiệp viết tay tiếng Việt chỉ có trong đơn có lời chúc. | D-28 `[CONFIRMED]` D-41 |
 | BR-RET-001 | Yêu cầu đổi trả bắt buộc kèm video quay liên tục từ lúc khui hàng. | D-07 |
 | BR-AI-001 | Mây chỉ truy cập dữ liệu qua hàm backend được khai báo. | D-29 |
 | BR-AI-002 | Mây chỉ trả thông tin đơn khi backend xác thực người hỏi là chủ đơn (phiên đăng nhập, hoặc mã đơn + SĐT/email khớp). | D-29 |
 | BR-AI-003 | Mọi số liệu Mây nêu phải lấy từ kết quả hàm backend trong cùng lượt trả lời. | D-16 |
 | BR-AI-004 | Khi OpenAI lỗi, hết lượt, hết ngân sách: hiện câu thông báo tương ứng bằng ngôn ngữ đang chọn. | D-20, D-31 |
-| BR-AI-005 | Mây không đưa ra coupon, không cam kết ngày giao/đổi trả/hoàn tiền. | `[PROPOSAL]` |
+| BR-AI-005 | Mây không đưa ra coupon, không cam kết ngày giao/đổi trả/hoàn tiền. | `[CONFIRMED]` D-41 |
 | BR-AI-006 | Mây không thực hiện thao tác thay đổi dữ liệu. | D-30 |
-| BR-AI-007 | Tour tự bật ở lần truy cập đầu; không tự bật tại trang QR, giỏ hàng, checkout, dashboard. | D-30 + `[PROPOSAL]` |
-| BR-AI-008 | Lịch sử chat người đã đăng nhập lưu vô thời hạn; chat vãng lai không lưu. | D-19 + `[PROPOSAL]` |
-| BR-SEO-001 | Trang QR lời chúc, dashboard, giỏ, checkout, admin đặt `noindex`. | `[PROPOSAL]` |
-| BR-GA-001 | Không gửi token QR và dữ liệu cá nhân tới Google Analytics. | `[PROPOSAL]` |
+| BR-AI-007 | Tour tự bật ở lần truy cập đầu; không tự bật tại trang QR, giỏ hàng, checkout, dashboard. | D-30 + `[CONFIRMED]` D-41 |
+| BR-AI-008 | Lịch sử chat người đã đăng nhập lưu vô thời hạn; chat vãng lai không lưu. | D-19 + `[CONFIRMED]` D-41 |
+| BR-SEO-001 | Trang QR lời chúc, dashboard, giỏ, checkout, admin đặt `noindex`. | `[CONFIRMED]` D-41 |
+| BR-GA-001 | Không gửi token QR và dữ liệu cá nhân tới Google Analytics. | `[CONFIRMED]` D-41 |
 
 ---
 
@@ -682,7 +751,7 @@ Các câu thông báo có đủ vi/en/zh-Hans; admin sửa được. Nút "Dịc
 **US-001 — Đặt quà giao tận tay người nhận**
 Là người mua, tôi muốn đặt đèn làm quà và giao thẳng tới người nhận, để tặng mà không phải tự đi giao.
 - AC-001: Given đã đăng nhập và giỏ có hàng, When chọn "Mua tặng" và "Người nhận là người khác", Then form yêu cầu tên, SĐT, địa chỉ người nhận.
-- AC-002: Given người nhận là người khác, When tới bước thanh toán, Then không hiển thị COD (nếu BR-PAY-004 được duyệt).
+- AC-002: Given người nhận là người khác, When tới bước thanh toán, Then không hiển thị COD (BR-PAY-004).
 - AC-003: Given chưa đăng nhập, When bấm "Thanh toán", Then chuyển tới đăng nhập và quay lại checkout với giỏ còn nguyên.
 
 **US-002 — Thanh toán payOS**
@@ -695,7 +764,7 @@ Là người mua, tôi muốn thanh toán qua payOS để đơn được xác nh
 **US-003 — Soạn lời chúc**
 Là người mua, tôi muốn ghi lời chúc bằng chữ, giọng nói hoặc video để người nhận xem khi quét QR.
 - AC-001: Given đơn chưa SHIPPED, When lưu lời chúc, Then lời chúc được cập nhật.
-- AC-002: Given đơn đã PACKED, When sửa phần chữ, Then hệ thống từ chối (nếu BR-MSG-008 được duyệt).
+- AC-002: Given đơn đã PACKED, When sửa phần chữ, Then hệ thống từ chối (BR-MSG-008).
 - AC-003: Given đơn đã SHIPPED, When sửa bất kỳ phần nào, Then hệ thống từ chối và giải thích lý do.
 
 **US-004 — Người nhận xem lời chúc**
@@ -800,34 +869,34 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 
 | Nhóm | Tình huống | Hành vi mong đợi | Quyết định |
 |---|---|---|---|
-| Giỏ | Sản phẩm bị ẩn khi đang trong giỏ | Cảnh báo, chặn checkout dòng đó | `[ASSUMPTION]` |
-| Giỏ | Giá đổi sau khi thêm vào giỏ | Hiện giá mới; chốt giá lúc tạo đơn | `[ASSUMPTION]` BR-PRC-002 |
-| Checkout | Coupon hết hạn/hết lượt giữa lúc checkout | Kiểm tra lại lúc tạo đơn, báo khách | `[PROPOSAL]` BR-CPN-002 |
+| Giỏ | Sản phẩm bị ẩn khi đang trong giỏ | Cảnh báo, chặn checkout dòng đó | `[CONFIRMED]` D-41 |
+| Giỏ | Giá đổi sau khi thêm vào giỏ | Hiện giá mới; chốt giá lúc tạo đơn | `[CONFIRMED]` D-41 BR-PRC-002 |
+| Checkout | Coupon hết hạn/hết lượt giữa lúc checkout | Kiểm tra lại lúc tạo đơn, báo khách | `[CONFIRMED]` D-41 BR-CPN-002 |
 | Checkout | Khách bấm "Đặt hàng" hai lần | Chỉ tạo một đơn (khóa trùng theo phiên checkout) | `[DERIVED]` |
-| Thanh toán | Webhook payOS đến chậm | Trang chờ + backend hỏi lại payOS | `[ASSUMPTION]` |
+| Thanh toán | Webhook payOS đến chậm | Trang chờ + backend hỏi lại payOS | `[CONFIRMED]` D-41 |
 | Thanh toán | Webhook trùng | Idempotent | BR-PAY-002 |
-| Thanh toán | Thanh toán thành công sau khi đơn hết hạn | Gắn cờ hoàn tiền thủ công | `[ASSUMPTION]` |
-| Thanh toán | Số tiền nhận khác đơn | Không xác nhận, gắn cờ admin | `[ASSUMPTION]` |
+| Thanh toán | Thanh toán thành công sau khi đơn hết hạn | Gắn cờ hoàn tiền thủ công | `[CONFIRMED]` D-41 |
+| Thanh toán | Số tiền nhận khác đơn | Không xác nhận, gắn cờ admin | `[CONFIRMED]` D-41 |
 | Thanh toán | Khách thanh toán thành công nhưng tạo đơn lỗi | Không xảy ra theo thiết kế: đơn được tạo **trước** khi tạo link payOS | `[DERIVED]` |
-| Thanh toán | COD, người nhận là người khác | Chặn COD | Q-17 |
+| Thanh toán | COD, người nhận là người khác | Chặn COD | BR-PAY-004, D-41 |
 | Đơn | Khách hủy cùng lúc admin chuyển SHIPPED | Thao tác đến sau bị từ chối | `[DERIVED]` |
 | Đơn | Hủy đơn đã PAID đang IN_PRODUCTION | Hoàn bao nhiêu? | Q-20 |
 | Lời chúc | Chưa soạn lời chúc khi đơn tới PACKED/SHIPPED | ? | Q-08 |
-| Lời chúc | Sửa chữ sau khi thiệp đã viết | Chặn từ PACKED | `[PROPOSAL]` BR-MSG-008 |
+| Lời chúc | Sửa chữ sau khi thiệp đã viết | Chặn từ PACKED | `[CONFIRMED]` D-41 BR-MSG-008 |
 | QR | Nhân viên/người mua quét thử | Không bắt đầu đếm ngược (chưa bấm xác nhận) | D-26 |
 | QR | App chat tự mở link để tạo preview | Không bắt đầu đếm ngược (cần bấm nút) | D-26 |
 | QR | Người nhận không bao giờ bấm xác nhận | ? | Q-26 |
-| QR | Quét trước khi đơn SHIPPED | "Món quà đang được chuẩn bị" | `[ASSUMPTION]` |
-| QR | Đơn bị hủy, thiệp chưa gửi | Token vô hiệu | `[ASSUMPTION]` |
+| QR | Quét trước khi đơn SHIPPED | "Món quà đang được chuẩn bị" | `[CONFIRMED]` D-41 |
+| QR | Đơn bị hủy, thiệp chưa gửi | Token vô hiệu | `[CONFIRMED]` D-41 |
 | QR | Mất thiệp / người lạ nhặt được thiệp | Người lạ xem được lời chúc | Rủi ro chấp nhận? Q-33 |
-| QR | Quét QR đèn khi video lô chưa xuất bản | Không xảy ra nếu BR-ORD-002 được duyệt | `[PROPOSAL]` |
+| QR | Quét QR đèn khi video lô chưa xuất bản | Không xảy ra với đèn đã giao (BR-ORD-002); nếu vẫn quét được thì hiện trang "không tìm thấy" chung | `[CONFIRMED]` D-41 + `[ASSUMPTION]` |
 | Đổi trả | Người nhận quà khui hàng không quay video | Không đủ điều kiện đổi trả | D-07 — giảm thiểu bằng hướng dẫn trên thiệp |
 | Mây | Khách yêu cầu xem đơn người khác | Từ chối | BR-AI-002 |
-| Mây | Khách hỏi giảm giá | Không đưa coupon | `[PROPOSAL]` BR-AI-005 |
+| Mây | Khách hỏi giảm giá | Không đưa coupon | `[CONFIRMED]` D-41 BR-AI-005 |
 | Mây | OpenAI lỗi | Câu "ốm" | D-20 |
-| Mây | Hết ngân sách | FAQ offline | `[PROPOSAL]` |
-| Mây | Dò mã đơn + SĐT hàng loạt | Giới hạn thử sai | `[PROPOSAL]` |
-| i18n | Thiếu bản dịch | Hiện tiếng Việt | `[ASSUMPTION]` |
+| Mây | Hết ngân sách | FAQ offline | `[CONFIRMED]` D-41 |
+| Mây | Dò mã đơn + SĐT hàng loạt | Giới hạn thử sai | `[CONFIRMED]` D-41 |
+| i18n | Thiếu bản dịch | Hiện tiếng Việt | `[CONFIRMED]` D-41 |
 | i18n | Khách viết lời chúc bằng tiếng Trung | Thiệp viết tay xử lý thế nào? | Q-29 |
 
 ---
@@ -849,7 +918,11 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | D-30 tour | FR-AI-002 | BR-AI-006/007 | US-010 | — |
 | D-21 coupon | FR-CPN-001/002 | BR-CPN-001…003 | US-011 | UC-01 |
 | D-23 i18n | FR-I18N-001 | — | US-012 | — |
-| D-05 SEO/GA | FR-SEO-001, FR-GA-001 | BR-SEO-001, BR-GA-001 | — | — |
+| D-05, D-49, D-50 SEO/GA | FR-SEO-001, FR-GA-001 | BR-SEO-001, BR-GA-001 | — | — |
+| D-37, D-40 URL ngôn ngữ, dự phòng vi | FR-I18N-001 | — | US-012 | — |
+| D-39 trạng thái sản phẩm | FR-CAT-001, FR-CAT-004 | — | — | — |
+| D-42 đăng nhập email | FR-ACC-001 | BR-ACC-001 | — | — |
+| D-43, D-44 QR lô | FR-QR-006 | BR-QR-002 | US-005 | — |
 
 **Yêu cầu mồ côi (chưa có US/UC)**: FR-CAT-004, FR-AI-006, FR-QR-007 (admin lô), FR-SEO-001, FR-GA-001 — cần bổ sung US ở bản sau.
 **Yêu cầu trùng**: không phát hiện.
@@ -885,13 +958,11 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Q-05 | Ba đèn trong bộ Sum Vầy là sản phẩm nào, giá lẻ bao nhiêu? | Catalog, data model |
 | Q-09 | Thuế suất VAT? VAT có tính trên phí ship? | Tính giá |
 | Q-11 | Công thức phí ship? | Checkout |
-| Q-10, C-1…C-5 | Thiết kế coupon | Data model, tính giá |
-| Q-17 | Chặn COD khi người nhận là người khác? | Checkout |
+| Q-10, C-1…C-3, C-5 | Thiết kế coupon (C-4 đã chốt: 1 coupon/đơn, D-41) | Data model, tính giá |
 | Q-15 | Hạn link thanh toán payOS? | Vòng đời đơn |
 | Q-16 | Hoàn tiền payOS: tự động hay thủ công? | Thanh toán |
 | Q-08 | Soạn lời chúc lúc nào; chưa soạn khi tới hạn khóa thì sao? | Checkout, lời chúc |
 | Q-26 | Media lưu bao lâu nếu không ai xác nhận? | Lưu trữ |
-| I-10 | Duyệt BR-MSG-008 (khóa chữ khi PACKED)? | Lời chúc |
 | Q-13 | Vãng lai có giỏ hàng không? | Giỏ hàng |
 | I-04, I-14 | `[LEGAL]` niêm yết giá chưa VAT; chuyển dữ liệu sang OpenAI | Pháp lý |
 
@@ -901,7 +972,6 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Q-06 | Hoàn tiền khi trả một đèn trong bộ |
 | Q-12 | Thiệp/lời chúc có tính phí? |
 | Q-14 | Admin có xem/kiểm duyệt lời chúc? |
-| Q-18 | Nút "Tôi đã nhận được quà" có đổi trạng thái đơn? (đề xuất: không) |
 | Q-19 | Thời hạn đổi trả, tính từ mốc nào |
 | Q-20 | Hoàn bao nhiêu khi hủy đơn đã PAID ở IN_PRODUCTION/PACKED |
 | Q-22 | Lý do đổi trả hợp lệ; hoàn tiền hay làm lại |
@@ -909,20 +979,19 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Q-25 | QR của đơn tự mua không có lời chúc dẫn tới đâu |
 | Q-27 | Người mua xem trước trang QR? |
 | Q-29 | Lời chúc không phải tiếng Việt → thiệp viết tay xử lý thế nào |
-| Q-30 | QR đèn: mã riêng từng đèn hay chung lô |
 | Q-31 | Kênh hỗ trợ người thật để Mây chuyển tiếp |
 | Q-32 | `[LEGAL]` Banner đồng ý cookie/GA |
 | Q-33 | Có cần lớp bảo vệ thêm (PIN) cho trang lời chúc? |
 | I-15 | `[LEGAL]` Quyền xóa lịch sử chat |
+| Q-35 | Đăng ký bằng email đã tồn tại hiện "Email này đã được đăng ký" (tiện cho khách nhưng cho phép dò email có tài khoản), hay luôn báo "kiểm tra email" giống quên mật khẩu? Hiện code báo "đã đăng ký" `[ASSUMPTION]` |
 
 ### P2 — có thể quyết định sau
 | ID | Câu hỏi |
 |---|---|
 | Q-07 | Giới hạn số lượng / "tạm hết hàng" |
 | Q-21 | Phiếu giao hàng không in giá |
-| Q-23 | Testimonial thật hay placeholder (gồm câu "làm cho riêng mình" ở `src/App.jsx:76`) |
-| Q-34 | Số liệu "câu chuyện riêng mỗi đèn" (`src/App.jsx:220`) và chú thích mock "Hành trình chiếc đèn của bạn" đổi thành gì |
-| — | Phân vai admin; KPI; chỉ số hiệu năng; giữ hay bỏ form newsletter |
+| Q-23 | Testimonial thật hay placeholder (gồm câu "…quá trình đèn được làm cho riêng mình" — `testimonials.items[2]` trong `src/i18n/messages/*`) |
+| — | KPI; chỉ số hiệu năng; giữ hay bỏ form newsletter (G-11) |
 
 ---
 
@@ -933,7 +1002,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Tiêu chí | Kết quả |
 |---|---|
 | Đầy đủ | Thiếu: công thức phí ship, VAT, coupon, giá lẻ Sum Vầy — đều là P0 |
-| Nhất quán | D-04 ↔ D-21 (coupon) đã giải quyết bằng D-21. D-22 ↔ D-32 (quốc tế) đã giải quyết bằng D-32. Còn mâu thuẫn: D-13 (sửa đến SHIPPED) ↔ thiệp viết tay lúc PACKED → I-10 |
+| Nhất quán | D-04 ↔ D-21 (coupon) đã giải quyết bằng D-21. D-22 ↔ D-32 (quốc tế) đã giải quyết bằng D-32. Mâu thuẫn D-13 (sửa đến SHIPPED) ↔ thiệp viết tay lúc PACKED đã giải quyết bằng BR-MSG-008 (D-41) |
 | Mơ hồ | "Chỉ đọc thông tin thật" đã được cụ thể hóa thành BR-AI-001…003. "Private" đã cụ thể hóa thành token (BR-QR-001) |
 | Kiểm thử được | Các BR có nhãn `[BA DECISION REQUIRED]` chưa kiểm thử được |
 | Khả thi | Không phát hiện yêu cầu bất khả thi sau D-01 (video theo lô) |
@@ -944,50 +1013,59 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 
 ### 31.2 Khoảng trống so với code hiện tại
 
-| ID | Yêu cầu | Hiện trạng | Loại |
-|---|---|---|---|
-| G-01 | Catalog từ DB, giá dạng số | Chuỗi cố định `'890.000₫'` (`src/App.jsx:20-42`) | Missing / Technical debt |
-| G-02 | Giỏ hàng | Nút không có handler (`src/App.jsx:322`) | Missing |
-| G-03 | Tài khoản, checkout, thanh toán, đơn | Không có backend, không có routing | Missing |
-| G-04 | Trang QR lời chúc, QR đèn | Chỉ có ảnh mock điện thoại | Missing |
-| G-05 | AI Mây | Không có | Missing |
-| G-06 | Admin (sản phẩm, đơn, lô, coupon, FAQ, Mây) | Không có | Missing |
-| G-07 | FAQ từ DB (để Mây đọc) | Cố định trong `src/components/Faq.jsx:4-25` | Missing |
-| G-08 | Đa ngôn ngữ | Chỉ tiếng Việt, chữ viết thẳng trong component | Missing |
-| G-09 | Chú thích "chưa gồm VAT" | Đã có ở thẻ sản phẩm trang chủ (v0.2); chưa có giỏ hàng/checkout nên chưa áp dụng ở đó | Partially implemented |
-| G-10 | Theo dõi đơn, chính sách đổi trả | `href="#"` (`src/App.jsx:509-510`) | Missing |
-| G-11 | Newsletter | `e.preventDefault()`, email bị bỏ (`src/App.jsx:515`) | Incorrect — khách tưởng đã đăng ký |
-| G-12 | SEO | SPA chỉ render phía trình duyệt | Missing |
-| G-13 | Google Analytics | Không có | Missing |
+Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn thiếu**.
+
+| ID | Yêu cầu | Hiện trạng | Loại | Trạng thái |
+|---|---|---|---|---|
+| G-01 | Catalog từ DB, giá dạng số | Bảng `products`, giá số nguyên VND; `GET /api/products` (`server/routes/catalog.js`) | — | **Đã xử lý** (v0.2) |
+| G-02 | Giỏ hàng | Chưa có; nút trên thẻ sản phẩm tạm dẫn tới trang chi tiết (§9) | Missing | **Còn thiếu** — chờ Q-13 |
+| G-03 | Tài khoản, checkout, thanh toán, đơn | Đã có backend Express + Supabase, routing, tài khoản (FR-ACC-001). Chưa có checkout, thanh toán, đơn | Missing | **Một phần** |
+| G-04 | Trang QR lời chúc, QR đèn | Trang QR lô đèn `/lo/:code` (FR-QR-006) đã có. Trang QR lời chúc chưa có | Missing | **Một phần** |
+| G-05 | AI Mây | Không có | Missing | **Còn thiếu** |
+| G-06 | Admin (sản phẩm, đơn, lô, coupon, FAQ, Mây) | `/admin` + `/api/admin/*` (v0.3): sản phẩm, FAQ, lô & video lô. Chưa có: đơn, coupon, cấu hình Mây, đổi trả (chưa có nghiệp vụ tương ứng); tài khoản admin cấp bằng tay trong Supabase (`profiles.role`) | Missing | **Một phần** (v0.3) |
+| G-07 | FAQ từ DB (để Mây đọc) | Bảng `faq_entries`, `GET /api/faq` | — | **Đã xử lý** (v0.2) |
+| G-08 | Đa ngôn ngữ | vi/en/zh cho giao diện, sản phẩm, FAQ, trang lô; URL `/`, `/en`, `/zh` (D-37) | — | **Đã xử lý** (v0.2) — bản dịch chờ duyệt (G-14) |
+| G-09 | Chú thích "chưa gồm VAT" | Component `Price` luôn kèm chú thích (BR-PRC-003) | — | **Đã xử lý** (v0.2) — vẫn chờ `[LEGAL]` I-04 |
+| G-10 | Theo dõi đơn, chính sách đổi trả | Link footer vẫn `href="#"` (`src/components/SiteFooter.jsx`) | Missing | **Còn thiếu** — chưa có đơn và nội dung chính sách |
+| G-11 | Newsletter | Form vẫn bỏ email (`src/components/SiteFooter.jsx`) | Incorrect | **Còn thiếu** — chờ PO giữ/bỏ (§30 P2) |
+| G-12 | SEO | SSR trong Express (D-49): trang công khai có HTML đầy đủ, `lang` và title đúng ngôn ngữ (`server/ssr.js`, `src/entry-server.jsx`) | — | **Đã xử lý** (v0.4) |
+| G-13 | Google Analytics | Không có | Missing | **Còn thiếu** |
+| G-14 | Bản dịch en/zh | Do đội dev soạn (`src/i18n/messages/*`, `server/data/seed.js`) | Chưa duyệt | **Mới** — chờ PO duyệt `[ASSUMPTION]` |
+| G-15 | SEO đa ngôn ngữ | `hreflang`, canonical, meta description theo trang/ngôn ngữ (`src/seo/*`), `/sitemap.xml`, `/robots.txt` | — | **Đã xử lý** (v0.4) |
+| G-16 | Cấu hình Supabase Auth | Cần thêm Redirect URLs (`/login`, `/reset-password` × 3 ngôn ngữ) và chọn có bật xác nhận email | Cấu hình | **Mới** — xem `docs/knowledge/architecture.md` |
+| G-17 | Lưu phiên đăng nhập | Token ở `localStorage` (T-10) — rủi ro XSS | Technical debt | **Mới** — xem lại trước go-live |
+| G-18 | Đặt lại mật khẩu | `POST /api/auth/reset-password` nhận mọi access token hợp lệ, không riêng token khôi phục; chưa có chức năng đổi mật khẩu (có hỏi mật khẩu cũ) | Security | **Mới** — cần kiểm tra token khôi phục trước go-live |
+| G-19 | Khoá tài khoản | §7 có trạng thái User "bị khóa" nhưng chưa có cơ chế khoá | Missing | **Mới** — làm cùng admin (G-06) |
+| G-20 | Chống dò/spam đăng nhập, đăng ký, quên mật khẩu | Chỉ dựa vào giới hạn của Supabase; chưa có giới hạn theo IP ở tầng app | Security | **Mới** |
+| G-21 | Nhật ký thay đổi của admin | Sửa sản phẩm/FAQ/lô chưa ghi log (NFR-AUD-001 chỉ bắt buộc cho đơn, coupon, hoàn tiền) | Missing | **Mới** (v0.3) — bắt buộc khi làm coupon/đơn |
+| G-23 | Ảnh chia sẻ mạng xã hội / ảnh sản phẩm | Chưa có ảnh sản phẩm thật (thẻ sản phẩm dùng hình đèn SVG) nên chưa có `og:image`, JSON-LD không có `image` (Google khuyến nghị có) | Missing | **Mới** (v0.4) |
+| G-24 | Dashboard IT | `/it` + `/api/it/*` (FR-IT-001…004) | — | **Đã xử lý** (v0.5) |
+| G-25 | Cảnh báo chủ động | Dashboard chỉ xem; chưa gửi cảnh báo khi lỗi 5xx tăng hay tích hợp lỗi (kênh thông báo chờ Q-24) | Missing | **Mới** (v0.5) |
+| G-26 | Giám sát payOS webhook, chi phí OpenAI (NFR-OBS-001) | Chưa có vì chưa tích hợp payOS/OpenAI; dashboard chỉ báo đã cấu hình biến môi trường chưa | Missing | **Mới** (v0.5) |
+| G-27 | Nhật ký bật/tắt bảo trì | Chỉ lưu người/thời điểm đổi lần cuối (`app_settings`) + log server; chưa có lịch sử đầy đủ | Missing | **Mới** (v0.5) |
+| G-28 | Nội dung lỗi 5xx lưu cho IT | Lưu thông điệp lỗi nội bộ (có thể chứa chi tiết DB); chưa lọc dữ liệu cá nhân | Privacy | **Mới** (v0.5) |
+| G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
 
-Đợt sửa 1 (v0.2, nhánh `fix/web-copy-ba-spec`) — vị trí dòng tính theo code **trước** khi sửa:
+Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.js` (giao diện) và `server/data/seed.js` (FAQ). Câu chữ tiếng Việt lấy theo đợt sửa 1 do BA soạn (nhánh `fix/web-copy-ba-spec`, đã gộp master), trừ các dòng ghi chú khác. Bản en/zh dịch theo bản vi (G-14). Marketing có thể chỉnh văn phong nhưng không đổi ý nghĩa ở cột "Căn cứ".
 
-| Vị trí | Trước | Sau | Căn cứ | Trạng thái |
+| Vị trí cũ | Trước | Sau (key i18n / dữ liệu) | Căn cứ | Trạng thái |
 |---|---|---|---|---|
-| `src/components/Faq.jsx:7` | "Vĩnh viễn…không giới hạn thời gian xem lại" | Chữ + video lô: vĩnh viễn; giọng nói/video: 30 ngày từ khi người nhận xác nhận, có nút "Tải về" | D-10, D-12, D-26 | ✅ Đã sửa |
-| `src/components/Faq.jsx:11` | "sửa…trong dashboard cho đến khi đèn được đóng gói" | "…trong trang tài khoản cho đến khi đơn hàng được gửi đi" | D-13 | ✅ Đã sửa — xem ghi chú (1) |
-| `src/App.jsx:394-396` | "Mỗi chiếc đèn mang một mã QR riêng…được lưu giữ lâu dài" | Tách rõ QR thiệp cảm ơn (lời chúc) và QR khắc trên đèn (video mẻ đèn); không cần cài ứng dụng | D-01, D-26, D-28 | ✅ Đã sửa |
-| `src/App.jsx:399` | "Video quá trình làm đèn của chính chiếc đèn này" | "Video quá trình làm ra mẻ đèn, xem lại bất cứ lúc nào" | D-01, D-10 | ✅ Đã sửa |
-| `src/App.jsx:401` | "Lưu lại vĩnh viễn trong sổ lưu niệm" | Chữ lưu mãi; giọng nói/video lưu 30 ngày từ khi xác nhận, tải về được | D-12, D-26 | ✅ Đã sửa |
-| `src/App.jsx:48` | "Gắn mã riêng lưu câu chuyện của bạn" | "Khắc mã mở video hành trình của mẻ đèn" | D-01 (không khẳng định mã riêng/chung — Q-30) | ✅ Đã sửa |
-| `src/App.jsx:300-301` | Thiệp + QR chỉ nhắc cho đơn Mua tặng; đơn tự mua "lưu lại câu chuyện làm ra đèn cho riêng bạn" | Mua tặng: thêm "thiệp cảm ơn có mã QR". Mua cho mình: quét mã trên đèn xem mẻ đèn + ô "Thêm lời chúc" | D-01, D-14, D-28 | ✅ Đã sửa |
-| `src/App.jsx:360` | "Theo dõi đèn của bạn từng bước" | "Theo dõi đơn của bạn qua từng công đoạn" | D-01, C-11 | ✅ Đã sửa |
-| `src/components/Marquee.jsx:5` | "LƯU GIỮ KÝ ỨC VĨNH VIỄN" | "MỖI LỜI CHÚC, MỘT KỶ NIỆM" | D-26 | ✅ Đã sửa |
-| `src/App.jsx:20-42` (hiển thị ở thẻ sản phẩm) | Giá không có chú thích VAT | Thêm dòng "Chưa gồm VAT" dưới giá | D-03, BR-PRC-003 | ✅ Đã sửa trên trang chủ — vẫn chờ `[LEGAL]` I-04 |
-
-Ghi chú:
-1. `[ASSUMPTION]` FAQ dùng mốc D-13 (khóa khi SHIPPED) vì BR-MSG-008 (khóa phần chữ khi PACKED) mới là đề xuất. Nếu BR-MSG-008 được duyệt, phải sửa lại câu trả lời này.
-2. Câu chữ mới do BA soạn theo yêu cầu của PO; Marketing có thể chỉnh văn phong, nhưng không được đổi ý nghĩa ở cột "Căn cứ".
-
-**Còn phải sửa** — phát hiện trong đợt 1, chưa sửa vì cần PO quyết:
-
-| Vị trí (code sau đợt 1) | Hiện tại | Mâu thuẫn với | Việc cần làm |
-|---|---|---|---|
-| `src/App.jsx:220` | Số liệu "1 — câu chuyện riêng mỗi đèn" | D-01 (video theo lô); lời chúc gắn theo đơn, không theo đèn (bộ Sum Vầy 3 đèn chỉ có 1 QR đơn) | `[BA DECISION REQUIRED]` Q-34: đổi thành gì (ví dụ "1 lời chúc riêng mỗi món quà")? |
-| `src/App.jsx:426` | Chú thích mock điện thoại "Hành trình chiếc đèn của bạn" | D-01 | Đổi thành "Hành trình mẻ đèn của bạn" — chờ PO duyệt cùng Q-34 |
-| `src/App.jsx:76` | Testimonial: "thấy cả quá trình đèn được làm cho riêng mình" | D-01 | Gộp vào Q-23: nếu là đánh giá thật thì không được sửa lời khách; nếu là placeholder thì thay |
+| `src/components/Faq.jsx:7` | "Vĩnh viễn…không giới hạn thời gian xem lại" | FAQ 1: chữ + video lô vĩnh viễn; giọng nói/video 30 ngày từ khi người nhận xác nhận, bấm "Tải về" để giữ | D-10, D-12, D-26 | ✅ Đã sửa |
+| `src/components/Faq.jsx:11` | "sửa…cho đến khi đèn được đóng gói" | FAQ 2: phần chữ khóa khi đơn đã đóng gói; giọng nói/video sửa được đến khi đơn gửi đi | D-13, BR-MSG-008 (D-41) | ✅ Đã sửa — khác đợt 1 vì BR-MSG-008 đã được duyệt (ghi chú 1 của đợt 1) |
+| `src/App.jsx:394-396` | "Mỗi chiếc đèn mang một mã QR riêng…được lưu giữ lâu dài" | `qr.text`: tách QR thiệp cảm ơn (lời chúc) và QR khắc trên đèn (video mẻ đèn); không cần cài ứng dụng | D-01, D-26, D-28 | ✅ Đã sửa |
+| `src/App.jsx:399` | "Video quá trình làm đèn của chính chiếc đèn này" | `qr.points[0]`: "Video quá trình làm ra mẻ đèn, xem lại bất cứ lúc nào" | D-01, D-10 | ✅ Đã sửa |
+| `src/App.jsx:401` | "Lưu lại vĩnh viễn trong sổ lưu niệm" | `qr.points[2]`: chữ lưu mãi; giọng nói/video lưu 30 ngày từ khi xác nhận, tải về được | D-12, D-26 | ✅ Đã sửa |
+| `src/App.jsx:48` | "Gắn mã riêng lưu câu chuyện của bạn" | `process.steps[3].note`: "Khắc mã mở video hành trình của mẻ đèn" | D-01, D-43 | ✅ Đã sửa |
+| `src/App.jsx:300-301` | Thiệp + QR chỉ nhắc cho đơn Mua tặng | `products.giftCopy` / `products.selfCopy`: thêm thiệp cảm ơn có mã QR; đơn tự mua quét mã trên đèn + ô "Thêm lời chúc" | D-01, D-14, D-28 | ✅ Đã sửa |
+| `src/App.jsx:360` | "Theo dõi đèn của bạn từng bước" | `process.title`: "Theo dõi đơn của bạn qua từng công đoạn" | D-01, C-11 | ✅ Đã sửa |
+| `src/components/Marquee.jsx:5` | "LƯU GIỮ KÝ ỨC VĨNH VIỄN" | `marquee[3]`: "MỖI LỜI CHÚC, MỘT KỶ NIỆM" | D-26 | ✅ Đã sửa |
+| `src/App.jsx:20-42` | Giá không có chú thích VAT | Component `Price` + "chưa gồm VAT" ở mọi nơi hiển thị giá | D-03, BR-PRC-003 | ✅ Đã sửa — vẫn chờ `[LEGAL]` I-04 |
+| `src/App.jsx:220` | "1 — câu chuyện riêng mỗi đèn" | `story.statStory`: "lời chúc riêng cho mỗi món quà" | D-01, D-45 | ✅ Đã sửa |
+| `src/App.jsx:426` | Mock điện thoại "Hành trình chiếc đèn của bạn" | `qr.phoneCaption`: "Hành trình mẻ đèn của bạn" | D-01, D-45 | ✅ Đã sửa |
+| `src/App.jsx:209-212` | "…câu chuyện của gia đình bạn cũng được lưu giữ theo cách bền bỉ như vậy" | `story.text`: "…được thắp lên từ chính chất liệu bền bỉ ấy" | D-26 | ✅ Đã sửa (phát hiện ở v0.2) — câu do dev soạn `[ASSUMPTION]`, chờ Marketing |
+| `testimonials.items[2]` | "…thấy cả quá trình đèn được làm cho riêng mình" | — | D-01 | ⬜ Chưa sửa — chờ Q-23 |
 
 ---
 
@@ -1025,9 +1103,27 @@ Ghi chú:
 | D-28 | Có cả 2 thiệp; thiệp in là thiệp cảm ơn kèm QR đơn hàng | Hiệu lực |
 | D-29 | Mây dùng hàm backend; backend kiểm quyền; vãng lai tra đơn bằng mã + SĐT/email | Hiệu lực |
 | D-30 | Mây tự bật tour; không thêm giỏ hàng | Hiệu lực |
-| D-31 | BA đề xuất hạn mức Mây | Hiệu lực — số liệu ở §22.4 chờ PO duyệt |
+| D-31 | BA đề xuất hạn mức Mây | Hiệu lực — số liệu ở §22.4 đã duyệt (D-41) |
 | D-32 | Tạm chưa bán quốc tế | Hiệu lực |
 | D-33 | Mô hình B2C | Hiệu lực |
 | D-34 | Không phân tích vận hành; chỉ tập trung web | Hiệu lực |
 | D-35 | Thanh toán payOS hoặc COD | Hiệu lực |
 | D-36 | Phải có tài khoản mới đặt hàng | Hiệu lực |
+| D-37 | Ngôn ngữ nằm trên URL: `/` (vi), `/en/…`, `/zh/…` | Hiệu lực (v0.2) |
+| D-38 | Một vai trò Admin duy nhất | Hiệu lực (v0.2) — bổ sung bởi D-51 |
+| D-39 | Sản phẩm có trạng thái Draft / Published / Hidden; chỉ Published hiển thị và bán | Hiệu lực (v0.2) |
+| D-40 | Thiếu bản dịch thì hiển thị tiếng Việt | Hiệu lực (v0.2) |
+| D-41 | PO duyệt toàn bộ mục `[PROPOSAL]` và `[ASSUMPTION]` của v0.1 (gồm BR-PAY-004 chặn COD khi giao người khác — Q-17; BR-MSG-008 khóa chữ khi PACKED — I-10; nút "Tôi đã nhận được quà" không đổi trạng thái đơn — Q-18; 1 coupon/đơn — C-4; C-9; C-10; hạn mức Mây §22.4) | Hiệu lực (v0.2) |
+| D-42 | Đăng nhập bằng email + mật khẩu; SĐT chỉ lưu trong hồ sơ | Hiệu lực (v0.2) |
+| D-43 | QR khắc trên đèn là mã chung của lô (Q-30) | Hiệu lực (v0.2) |
+| D-44 | Trang QR lô đèn đặt `noindex` | Hiệu lực (v0.2) |
+| D-45 | Câu chữ: số liệu "lời chúc riêng cho mỗi món quà"; mock điện thoại "Hành trình mẻ đèn của bạn" (Q-34 của nhánh `fix/web-copy-ba-spec`) | Hiệu lực (v0.3) |
+| D-46 | Video lô: admin tải file lên Supabase Storage (không dán link ngoài) | Hiệu lực (v0.3) |
+| D-47 | Lô đã xuất bản video: được thay video; không được gỡ xuất bản, xoá lô, đổi mã lô | Hiệu lực (v0.3) |
+| D-48 | Giao diện admin chỉ tiếng Việt (`/admin`); nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh | Hiệu lực (v0.3) |
+| D-49 | SEO: SSR trong Express — một server Node phục vụ web + API (không dùng hosting tĩnh) | Hiệu lực (v0.4) |
+| D-50 | JSON-LD sản phẩm có giá chưa VAT, ghi `valueAddedTaxIncluded: false` (PO chọn; `[LEGAL]` I-04 vẫn chờ pháp chế) | Hiệu lực (v0.4) |
+| D-51 | Thêm vai trò IT: dashboard riêng `/it`; IT có cả quyền Admin; Admin không vào `/it` | Hiệu lực (v0.5) |
+| D-52 | Dashboard IT gồm: số liệu API, trạng thái tích hợp, bật/tắt chế độ bảo trì | Hiệu lực (v0.5) |
+| D-53 | Số liệu API lưu Supabase | Hiệu lực (v0.5) |
+| D-54 | Chế độ bảo trì: web hiện trang bảo trì, API ghi trả 503 | Hiệu lực (v0.5) |

@@ -1,13 +1,8 @@
-const ITEMS = [
-  'GIẤY DÓ THỦ CÔNG',
-  'KỂ CHUYỆN BẰNG ÁNH SÁNG',
-  'LÀM QUÀ TẶNG Ý NGHĨA',
-  'MỖI LỜI CHÚC, MỘT KỶ NIỆM',
-  'LÀNG NGHỀ TRĂM NĂM',
-]
+import { useI18n } from '../i18n/index.js'
 
 export default function Marquee() {
-  const line = ITEMS.join('  ✦  ') + '  ✦  '
+  const { t } = useI18n()
+  const line = t('marquee').join('  ✦  ') + '  ✦  '
   return (
     <div className="marquee">
       <div className="marquee-track">

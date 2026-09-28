@@ -1,44 +1,29 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-
-const FAQ_ITEMS = [
-  {
-    q: 'Video và lời chúc lưu giữ được bao lâu?',
-    a: 'Lời chúc dạng chữ và video hành trình làm đèn (quét mã khắc trên đèn) được lưu giữ vĩnh viễn. Lời chúc bằng giọng nói hoặc video được lưu 30 ngày kể từ khi người nhận xác nhận đã nhận quà — hãy bấm “Tải về” để giữ lại lâu dài.',
-  },
-  {
-    q: 'Tôi có thể chỉnh sửa lời chúc sau khi đặt hàng không?',
-    a: 'Có. Bạn có thể ghi lại hoặc chỉnh sửa lời chúc trong trang tài khoản cho đến khi đơn hàng được gửi đi.',
-  },
-  {
-    q: 'Người nhận có cần tải ứng dụng để xem không?',
-    a: 'Không cần. Chỉ cần quét mã bằng camera điện thoại, nội dung mở ngay trên trình duyệt.',
-  },
-  {
-    q: 'Đèn giấy dó có dễ vỡ khi vận chuyển không?',
-    a: 'Khung tre và giấy dó được gia cố, đóng gói trong hộp có lớp đệm chuyên dụng cho hàng thủ công dễ vỡ.',
-  },
-  {
-    q: 'Thời gian hoàn thành một chiếc đèn đặt riêng là bao lâu?',
-    a: 'Trung bình 5–7 ngày làm việc, tuỳ theo mẫu và khối lượng đơn tại xưởng vào thời điểm đặt hàng.',
-  },
-]
+import { useI18n } from '../i18n/index.js'
+import { useApi } from '../api/useApi.js'
 
 export default function Faq() {
   const [open, setOpen] = useState(0)
+  const { t, lang } = useI18n()
+  // G-07: FAQ lấy từ DB (Mây dùng cùng nguồn)
+  const faq = useApi('/faq', lang)
+
+  if (faq.status === 'loading') return <p className="faq-status">{t('faq.loading')}</p>
+  if (faq.status === 'error') return <p className="faq-status" role="alert">{t('faq.error')}</p>
 
   return (
     <div className="faq-list">
-      {FAQ_ITEMS.map((item, i) => {
+      {faq.data.items.map((item, i) => {
         const isOpen = open === i
         return (
-          <div className={`faq-item ${isOpen ? 'is-open' : ''}`} key={item.q}>
+          <div className={`faq-item ${isOpen ? 'is-open' : ''}`} key={item.id}>
             <button
               className="faq-question"
               onClick={() => setOpen(isOpen ? -1 : i)}
               aria-expanded={isOpen}
             >
-              <span>{item.q}</span>
+              <span>{item.question}</span>
               <span className="faq-icon">{isOpen ? '−' : '+'}</span>
             </button>
             <AnimatePresence initial={false}>
@@ -50,7 +35,7 @@ export default function Faq() {
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <p>{item.a}</p>
+                  <p>{item.answer}</p>
                 </motion.div>
               )}
             </AnimatePresence>

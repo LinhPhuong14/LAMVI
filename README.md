@@ -1,16 +1,26 @@
-# React + Vite
+# MỘC — Web bán đèn giấy dó
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React + Vite (frontend), Express (API), Supabase (Postgres + Auth).
 
-Currently, two official plugins are available:
+- Yêu cầu nghiệp vụ: [`docs/ba-spec.md`](docs/ba-spec.md)
+- Knowledge base cho các phiên code: [`docs/knowledge/README.md`](docs/knowledge/README.md)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Chạy
 
-## React Compiler
+```bash
+npm install
+cp .env.example .env   # điền SUPABASE_*; để trống thì API dùng dữ liệu bộ nhớ
+npm run dev            # web (SSR) + API tại http://localhost:5173
+npm test
+npm run lint
+npm run build          # dist/client + dist/server (SSR)
+npm start              # chạy bản build (NODE_ENV=production)
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Triển khai cần một server Node (SSR — D-49). Đặt `PUBLIC_SITE_URL` là tên miền thật (dùng cho canonical, hreflang, sitemap).
 
-## Expanding the Oxlint configuration
+## Supabase
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+1. Chạy `supabase/migrations/*.sql` rồi `supabase/seed.sql` (SQL editor hoặc `supabase db push`).
+2. Authentication → URL Configuration: thêm `PUBLIC_SITE_URL` + `/login`, `/reset-password`, `/en/reset-password`, `/zh/reset-password` vào Redirect URLs.
+3. Sửa `server/data/seed.js` thì chạy `npm run db:seed-sql` để sinh lại `supabase/seed.sql`.
