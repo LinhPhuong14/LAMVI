@@ -176,7 +176,7 @@ export default function BatchesPage() {
       {editing && (
         <>
           <BatchForm key={`${editing.id ?? 'new'}-${editing.status}`} initial={editing} onSaved={update} onCancel={() => setEditing(null)} />
-          {editing.id && <VideoPanel batch={editing} onChange={update} />}
+          {editing.id && <VideoPanel key={editing.id} batch={editing} onChange={update} />}
         </>
       )}
       {actionError && (

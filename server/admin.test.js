@@ -228,3 +228,25 @@ describe('Lô & video lô (FR-QR-007, D-46, D-47)', () => {
     await request(app).put(up.body.uploadUrl).set('Content-Type', 'video/mp4').send(Buffer.from('xxxxx')).expect(403)
   })
 })
+
+describe('Hồi quy sau kiểm thử độc lập (admin)', () => {
+  it('gắn video: file thật không phải video (Content-Type khác lúc PUT) → 400', async () => {
+    const b = (await request(app).post('/api/admin/batches').set('Authorization', admin).send({ code: 'L-X' })).body.item
+    const up = await request(app)
+      .post(`/api/admin/batches/${b.id}/video-upload`)
+      .set('Authorization', admin)
+      .send({ contentType: 'video/mp4', size: 5 })
+    await request(app).put(up.body.uploadUrl).set('Content-Type', 'text/html').send('<b>x</b>').expect(200)
+    const res = await request(app).post(`/api/admin/batches/${b.id}/video`).set('Authorization', admin).send({ path: up.body.path })
+    expect(res.status).toBe(400)
+    expect(res.body.error.fields).toEqual({ contentType: 'INVALID_VIDEO_TYPE' })
+  })
+
+  it('PATCH không có trường hợp lệ → trả bản ghi hiện có, không ghi', async () => {
+    const { body } = await request(app).get('/api/admin/products').set('Authorization', admin)
+    const p = body.items[0]
+    const res = await request(app).patch(`/api/admin/products/${p.id}`).set('Authorization', admin).send({ id: 'x' })
+    expect(res.status).toBe(200)
+    expect(res.body.item).toEqual(p)
+  })
+})

@@ -18,7 +18,7 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 **Đã làm**
 
 1. Gộp `origin/master` (nhánh `fix/web-copy-ba-spec` — sửa câu chữ §31.3 đợt 1) vào `feat/foundation-web`: dùng câu chữ đợt 1 trong i18n, hợp nhất §31.2/§31.3; đổi Q-34 (409 đăng ký) của phiên trước thành Q-35 vì trùng mã với Q-34 trên master. Sửa dòng "Trạng thái" đầu spec bị thay nhãn nhầm ở phiên trước.
-2. Admin: `/api/admin/*` + `/admin` (sản phẩm, FAQ, lô, tải video bằng signed URL, xuất bản). Subagent kiểm thử độc lập (T-11).
+2. Admin: `/api/admin/*` + `/admin` (sản phẩm, FAQ, lô, tải video bằng signed URL, xuất bản). Subagent kiểm thử độc lập (T-11). Subagent phát hiện: `VIDEO_TYPES[contentType]` nhận cả `toString`/`__proto__` → đã sửa. Rủi ro đã xử lý: kiểm lại kiểu file thật khi gắn video, bucket chỉ nhận video, PATCH rỗng không gọi update, trigger chặn xoá video của lô đã xuất bản.
 3. Spec v0.3: D-45…D-48, G-06 một phần, G-21, G-22, giả định mới.
 
 **Còn lại / cần người dùng**

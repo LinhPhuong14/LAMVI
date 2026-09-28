@@ -3,7 +3,7 @@ import { Router } from 'express'
 import { HttpError, notFound } from '../errors.js'
 import { RepoError } from '../adapters/repoErrors.js'
 import { requireAdmin } from '../middleware/auth.js'
-import { VIDEO_TYPES, validateBatch, validateFaq, validateProduct, validateVideoUpload } from '../domain/admin.js'
+import { VIDEO_TYPES, isVideoType, validateBatch, validateFaq, validateProduct, validateVideoUpload } from '../domain/admin.js'
 
 const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {})
 
@@ -52,6 +52,7 @@ export function adminRouter({ repo, auth, storage, config }) {
   r.patch('/admin/products/:id', async (req, res) => {
     const { errors, values } = validateProduct(body(req), { partial: true })
     assertValid(errors)
+    if (!Object.keys(values).length) return res.json({ item: found(await repo.getProductById(req.params.id)) })
     res.json({ item: found(await write(() => repo.updateProduct(req.params.id, values))) })
   })
   // §3.2: admin được xoá sản phẩm. Khi có đơn hàng, sản phẩm đã bán phải ẩn thay vì xoá [ASSUMPTION]
@@ -72,6 +73,7 @@ export function adminRouter({ repo, auth, storage, config }) {
   r.patch('/admin/faq/:id', async (req, res) => {
     const { errors, values } = validateFaq(body(req), { partial: true })
     assertValid(errors)
+    if (!Object.keys(values).length) return res.json({ item: found(await repo.getFaq(req.params.id)) })
     res.json({ item: found(await repo.updateFaq(req.params.id, values)) })
   })
   r.delete('/admin/faq/:id', async (req, res) => {
@@ -99,6 +101,7 @@ export function adminRouter({ repo, auth, storage, config }) {
     if (isPublished(batch) && values.code !== undefined && values.code !== batch.code) {
       throw new HttpError(409, 'BATCH_CODE_LOCKED', 'Không đổi mã lô đã xuất bản', { code: 'BATCH_CODE_LOCKED' })
     }
+    if (!Object.keys(values).length) return res.json({ item: batch })
     res.json({ item: found(await write(() => repo.updateBatch(batch.id, values))) })
   })
   // D-47: lô đã xuất bản không được xoá
@@ -130,6 +133,10 @@ export function adminRouter({ repo, auth, storage, config }) {
     const obj = await storage.statObject(path)
     if (!obj) throw new HttpError(400, 'VALIDATION_ERROR', 'Chưa có file', { path: 'VIDEO_NOT_UPLOADED' })
     if (obj.size > maxVideoBytes) throw new HttpError(400, 'VALIDATION_ERROR', 'File quá lớn', { size: 'VIDEO_TOO_LARGE' })
+    // Kiểm lại kiểu file thật (người tải có thể gửi Content-Type khác lúc PUT)
+    if (!isVideoType(obj.contentType)) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Không phải video', { contentType: 'INVALID_VIDEO_TYPE' })
+    }
     const item = await repo.updateBatch(batch.id, { videoPath: path, videoUrl: storage.publicUrl(path) })
     res.json({ item })
   })

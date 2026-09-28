@@ -19,6 +19,9 @@ begin
   if old.status = 'video_published' and new.code <> old.code then
     raise exception 'batch_published_code_locked';
   end if;
+  if old.status = 'video_published' and coalesce(new.video_url, '') = '' then
+    raise exception 'batch_published_video_required';
+  end if;
   return new;
 end;
 $$;
@@ -28,6 +31,8 @@ create trigger batches_guard_published
   for each row execute function public.batches_guard_published();
 
 -- Bucket công khai cho video lô (đọc công khai; ghi chỉ qua signed upload URL do server cấp)
-insert into storage.buckets (id, name, public)
-values ('batch-videos', 'batch-videos', true)
+-- Chỉ nhận video (khớp VIDEO_TYPES ở server/domain/admin.js). Giới hạn dung lượng file đặt trong
+-- Dashboard theo gói Supabase, phải ≥ MAX_VIDEO_MB (G-22).
+insert into storage.buckets (id, name, public, allowed_mime_types)
+values ('batch-videos', 'batch-videos', true, array['video/mp4', 'video/webm', 'video/quicktime'])
 on conflict (id) do nothing;

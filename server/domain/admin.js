@@ -6,6 +6,8 @@ export const PRODUCT_KINDS = ['single', 'set']
 export const PRODUCT_STATUSES = ['draft', 'published', 'hidden'] // D-39
 export const TONES = ['amber', 'dusk', 'dawn', 'moss'] // màu minh hoạ đèn (src/components/Lantern.jsx)
 export const VIDEO_TYPES = { 'video/mp4': 'mp4', 'video/webm': 'webm', 'video/quicktime': 'mov' }
+// Chỉ khoá riêng của VIDEO_TYPES (tránh '__proto__', 'toString'…)
+export const isVideoType = (t) => typeof t === 'string' && Object.hasOwn(VIDEO_TYPES, t)
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 // Mã lô in trên QR khắc đèn: chữ in hoa, số, gạch nối [ASSUMPTION]
@@ -104,7 +106,7 @@ export function validateBatch(body, { partial = false } = {}) {
 
 export function validateVideoUpload(body, maxBytes) {
   const errors = {}
-  if (!VIDEO_TYPES[body.contentType]) errors.contentType = 'INVALID_VIDEO_TYPE'
+  if (!isVideoType(body.contentType)) errors.contentType = 'INVALID_VIDEO_TYPE'
   if (!Number.isInteger(body.size) || body.size <= 0) errors.size = 'INVALID'
   else if (body.size > maxBytes) errors.size = 'VIDEO_TOO_LARGE'
   return errors
