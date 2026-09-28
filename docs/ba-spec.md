@@ -650,6 +650,9 @@ Kênh hỗ trợ người thật (Q-31): admin nhập tại cấu hình Mây (3 
 - Tối đa 4 vòng gọi hàm mỗi lượt; hết vòng mà chưa có câu trả lời → câu "chưa biết" `[ASSUMPTION]`.
 - **Kiểm tra số liệu ở server (BR-AI-003)**: mọi số từ 4 chữ số trở lên trong câu trả lời (giá, năm, mã…) phải có trong kết quả hàm của lượt đó; nếu không → thay bằng câu "chưa biết" `[DERIVED]`.
 - **Không gửi SĐT, email sang OpenAI** — server thay bằng `[phone]`, `[email]` trong tin nhắn và lịch sử trước khi gửi `[DERIVED]` NFR-PRV-001.
+- **Chặn nhắc giảm giá ở server (BR-AI-005)**: câu trả lời có từ khoá giảm giá/khuyến mãi/coupon/voucher/%, hoặc số tiền viết tắt (799k, 1,05 triệu, 万) → thay bằng câu "chưa biết" `[ASSUMPTION]` (danh sách từ khoá do dev đặt, BA/PO bổ sung được).
+- Lịch sử gửi kèm cho OpenAI: tối đa 10 lượt, mỗi lượt cắt theo độ dài tối đa tin nhắn (500 ký tự) `[ASSUMPTION]`.
+- Không đọc được chi phí tháng → coi như hết ngân sách (FAQ offline); ghi chi phí hoặc lưu lịch sử lỗi → vẫn trả câu trả lời cho khách, ghi log `[ASSUMPTION]` NFR-AVL-001.
 - Hạn mức theo phiên của khách vãng lai dùng mã phiên do trình duyệt tạo; hạn mức theo IP dùng IP đã băm, không lưu IP thô `[ASSUMPTION]`. Hạn mức theo ngày tính theo giờ Việt Nam `[ASSUMPTION]`.
 - Khách vãng lai: lịch sử chỉ giữ trong tab trình duyệt (sessionStorage), gửi kèm tối đa 10 lượt gần nhất làm ngữ cảnh `[ASSUMPTION]`; server không lưu (BR-AI-008).
 - Người đã đăng nhập: lưu cả câu hỏi gốc và câu trả lời; xem ở trang tài khoản (FR-ACC-004). Quyền xoá lịch sử chờ `[LEGAL]` I-15.

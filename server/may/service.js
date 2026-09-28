@@ -1,13 +1,33 @@
 import { createHash } from 'node:crypto'
 import { MAY_TOOLS, runTool } from './tools.js'
 import { loadMayConfig } from './config.js'
-import { matchFaq, redactPii, unverifiedNumbers } from './guard.js'
+import { forbiddenContent, matchFaq, redactPii, unverifiedNumbers } from './guard.js'
 import { listPublicFaq } from '../services/catalog.js'
 import { HttpError } from '../errors.js'
 
 const LANG_NAME = { vi: 'Vietnamese', en: 'English', zh: 'Simplified Chinese' }
 const MAX_ROUNDS = 4
 const HISTORY_TURNS = 10
+
+// Chạy một thao tác phụ (ghi chi phí, lưu lịch sử…): lỗi chỉ ghi log, không làm hỏng câu trả lời (NFR-AVL-001)
+async function soft(name, fn, fallback) {
+  try {
+    return await fn()
+  } catch (err) {
+    console.error(`[may] ${name}`, err?.message ?? err)
+    return fallback
+  }
+}
+
+// Huỷ theo signal cả khi tác vụ (vd truy vấn DB của tool) không hỗ trợ signal
+function withSignal(promise, signal) {
+  return new Promise((resolve, reject) => {
+    const onAbort = () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' }))
+    if (signal.aborted) return onAbort()
+    signal.addEventListener('abort', onAbort, { once: true })
+    promise.then(resolve, reject).finally(() => signal.removeEventListener('abort', onAbort))
+  })
+}
 
 // Ngày/tháng theo giờ Việt Nam (hạn mức theo ngày, ngân sách theo tháng)
 const vnDate = (t) => new Date(t + 7 * 3600_000).toISOString()
@@ -16,6 +36,11 @@ export const vnMonth = (t) => vnDate(t).slice(0, 7)
 
 const hash = (s, salt) => createHash('sha256').update(`${salt}:${s}`).digest('hex').slice(0, 32)
 const pick = (list, rnd) => list[Math.floor(rnd() * list.length)] ?? list[0]
+
+// Lịch sử client gửi: tối đa 10 lượt, mỗi lượt ≤ maxChars (tránh đẩy chi phí bằng lịch sử dài)
+function capHistory(history, maxChars) {
+  return history.slice(-HISTORY_TURNS).map((h) => ({ role: h.role, content: h.content.slice(0, maxChars) }))
+}
 
 function systemPrompt(lang, channel) {
   return [
@@ -73,7 +98,10 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
     const timer = setTimeout(() => ctrl.abort(), timeoutMs)
     try {
       for (let round = 0; round < MAX_ROUNDS; round++) {
-        const { message: msg, usage: u } = await openai.complete({ messages, tools: MAY_TOOLS, signal: ctrl.signal })
+        const { message: msg, usage: u } = await withSignal(
+          openai.complete({ messages, tools: MAY_TOOLS, signal: ctrl.signal }),
+          ctrl.signal,
+        )
         usage.promptTokens += u.promptTokens
         usage.completionTokens += u.completionTokens
         const calls = msg.tool_calls ?? []
@@ -86,7 +114,7 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
           } catch {
             args = {}
           }
-          const out = await runTool(call.function?.name, args, { repo, lang })
+          const out = await withSignal(runTool(call.function?.name, args, { repo, lang }), ctrl.signal)
           toolOutputs.push(out)
           messages.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(out) })
         }
@@ -124,16 +152,21 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
       } else if (!config.openaiEnabled || !openai) {
         // D-55: chưa bật OpenAI (chờ I-14) hoặc thiếu khoá → FAQ offline
         reply = await offline(config, lang, message)
-      } else if ((await repo.getMayUsage(vnMonth(now()))).costUsd >= config.monthlyBudgetUsd) {
+      } else if (
+        // Không đọc được chi phí → coi như hết ngân sách (không gọi OpenAI khi không kiểm soát được chi phí)
+        (await soft('usage', () => repo.getMayUsage(vnMonth(now())), { costUsd: Infinity })).costUsd >= config.monthlyBudgetUsd
+      ) {
         // US-009 AC-002: hết ngân sách → FAQ offline, không gọi OpenAI
         reply = await offline(config, lang, message)
       } else {
         try {
-          const r = await online(config, lang, message, history.slice(-HISTORY_TURNS))
-          await recordUsage(config, r.usage)
+          const r = await online(config, lang, message, capHistory(history, config.limits.maxChars))
+          await soft('record usage', () => recordUsage(config, r.usage))
           const bad = unverifiedNumbers(r.text, r.toolOutputs)
-          if (!r.text || bad.length) {
+          const forbidden = forbiddenContent(r.text)
+          if (!r.text || bad.length || forbidden) {
             if (bad.length) console.warn('[may] Chặn câu trả lời có số không có trong dữ liệu (BR-AI-003):', bad)
+            if (forbidden) console.warn('[may] Chặn câu trả lời nhắc giảm giá/số tiền viết tắt (BR-AI-005)')
             reply = { kind: 'unknown', text: unknownReply(config, lang) }
           } else {
             reply = { kind: 'answer', text: r.text }
@@ -147,10 +180,12 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
 
       // D-19, BR-AI-008: chỉ lưu lịch sử cho người đã đăng nhập
       if (user) {
-        await repo.appendChatMessages([
+        await soft('save history', () =>
+          repo.appendChatMessages([
           { userId: user.id, sessionId, role: 'user', kind: 'message', content: message, lang },
           { userId: user.id, sessionId, role: 'assistant', kind: reply.kind, content: reply.text, lang },
-        ])
+          ]),
+        )
       }
       return reply
     },
@@ -158,12 +193,13 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
     async usage() {
       const config = await loadMayConfig(repo)
       const u = await repo.getMayUsage(vnMonth(now()))
-      const pct = config.monthlyBudgetUsd > 0 ? u.costUsd / config.monthlyBudgetUsd : null
+      // Ngân sách 0 → Mây luôn offline → báo như đã hết
+      const pct = config.monthlyBudgetUsd > 0 ? u.costUsd / config.monthlyBudgetUsd : 1
       return {
         ...u,
         budgetUsd: config.monthlyBudgetUsd,
         budgetPct: pct,
-        alert: pct == null ? null : pct >= 1 ? 'exhausted' : pct >= 0.8 ? 'warning' : null,
+        alert: pct >= 1 ? 'exhausted' : pct >= 0.8 ? 'warning' : null,
         openaiEnabled: config.openaiEnabled,
         openaiConfigured: Boolean(openai),
       }

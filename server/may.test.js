@@ -260,3 +260,30 @@ describe('guard', () => {
     expect(matchFaq('祝福', [{ question: '祝福保存多久？', answer: '永久' }, { question: '运输', answer: '安全' }])[0].question).toBe('祝福保存多久？')
   })
 })
+
+describe('Hồi quy sau kiểm thử độc lập (Mây)', () => {
+  it('che SĐT dạng (+84) 912 345 678, +84 (0) …, nhiều khoảng trắng', () => {
+    expect(redactPii('(+84) 912 345 678 / +84 (0) 912 345 678 / 0901  234 567')).toBe('[phone] / [phone] / [phone]')
+  })
+
+  it('BR-AI-005: chặn câu trả lời nhắc giảm giá hoặc số tiền viết tắt dù số liệu khớp', async () => {
+    await enable()
+    for (const text of ['Đèn Vọng 1.050.000 ₫, đang giảm giá nhé', 'Chỉ 799k thôi', 'Giảm 10% hôm nay', 'Khoảng 1,05 triệu']) {
+      build([callTool('get_products'), say(text)])
+      expect((await chat({ message: 'giá?' })).body.reply.kind, text).toBe('unknown')
+    }
+  })
+
+  it('tool treo (repo không hỗ trợ signal) vẫn bị cắt bởi timeout', async () => {
+    await enable()
+    repo.listProducts = () => new Promise(() => {})
+    build([callTool('get_products'), say('không tới đây')], { timeoutMs: 30 })
+    expect((await chat({ message: 'giá?' })).body.reply.kind).toBe('sick')
+  })
+
+  it('ngân sách 0 → dashboard báo đã hết', async () => {
+    await repo.setSetting(MAY_SETTING_KEY, { monthlyBudgetUsd: 0 }, null)
+    const u = await request(app).get('/api/admin/may/usage').set('Authorization', tokens.admin.bearer)
+    expect(u.body).toMatchObject({ budgetPct: 1, alert: 'exhausted' })
+  })
+})

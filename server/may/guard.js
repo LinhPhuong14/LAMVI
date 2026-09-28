@@ -2,7 +2,8 @@
 
 // NFR-PRV-001: không gửi SĐT, email sang OpenAI (khách có thể tự gõ vào chat)
 const EMAIL = /[^\s@]+@[^\s@]+\.[^\s@]+/g
-const VN_PHONE = /(?:\+?84|0)(?:[\s.-]?\d){9,10}\b/g
+// Cho phép ngoặc, nhiều khoảng trắng: (+84) 912 345 678, +84 (0) 912…, 0901  234 567
+const VN_PHONE = /\(?\+?84\)?(?:[\s.()-]*\d){9,10}\b|\b0(?:[\s.-]*\d){9,10}\b/g
 
 export function redactPii(text) {
   return String(text).replace(EMAIL, '[email]').replace(VN_PHONE, '[phone]')
@@ -10,7 +11,7 @@ export function redactPii(text) {
 
 // BR-AI-003: mọi con số (giá, năm, mã…) từ 4 chữ số trở lên trong câu trả lời phải xuất hiện
 // trong kết quả hàm backend của chính lượt đó
-const NUMBER = /\d{1,3}(?:[.,  ]\d{3})+|\d{4,}/g
+const NUMBER = /\d{1,3}(?:[.,\u00a0\u202f ]\d{3})+|\d{4,}/g
 const digits = (s) => s.replace(/\D/g, '')
 
 export function unverifiedNumbers(reply, toolOutputs) {
@@ -21,6 +22,19 @@ export function unverifiedNumbers(reply, toolOutputs) {
     for (const m of text.match(NUMBER) ?? []) allowed.add(digits(m))
   }
   return (String(reply).match(NUMBER) ?? []).map(digits).filter((n) => !allowed.has(n))
+}
+
+// BR-AI-005: Mây không đưa giảm giá/coupon; số tiền viết tắt (799k, 1,05 triệu) không có trong dữ liệu
+// hàm nên không kiểm được → coi là không hợp lệ
+const FORBIDDEN = [
+  /giảm\s*giá|khuyến\s*mãi|mã\s*giảm|coupon|voucher|discount|promo(?:tion)?\s*code|sale\s*off|优惠|折扣|打折|优惠券/i,
+  /\d+(?:[.,]\d+)?\s*(?:k|nghìn|ngàn|ngan|nghin|triệu|trieu|tr)(?![\p{L}])/iu,
+  /\d+(?:[.,]\d+)?\s*(?:万|千)/,
+  /\d+\s*%/,
+]
+
+export function forbiddenContent(reply) {
+  return FORBIDDEN.some((re) => re.test(String(reply)))
 }
 
 // Bỏ dấu tiếng Việt để khớp từ khoá (FAQ offline)
