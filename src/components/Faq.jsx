@@ -4,11 +4,11 @@ import { AnimatePresence, motion } from 'framer-motion'
 const FAQ_ITEMS = [
   {
     q: 'Video và lời chúc lưu giữ được bao lâu?',
-    a: 'Vĩnh viễn. Mỗi mã QR gắn với một kho lưu trữ riêng, không giới hạn thời gian xem lại.',
+    a: 'Lời chúc dạng chữ và video hành trình làm đèn (quét mã khắc trên đèn) được lưu giữ vĩnh viễn. Lời chúc bằng giọng nói hoặc video được lưu 30 ngày kể từ khi người nhận xác nhận đã nhận quà — hãy bấm “Tải về” để giữ lại lâu dài.',
   },
   {
     q: 'Tôi có thể chỉnh sửa lời chúc sau khi đặt hàng không?',
-    a: 'Có. Bạn có thể ghi lại hoặc chỉnh sửa lời chúc/video trong dashboard cho đến khi đèn được đóng gói.',
+    a: 'Có. Bạn có thể ghi lại hoặc chỉnh sửa lời chúc trong trang tài khoản cho đến khi đơn hàng được gửi đi.',
   },
   {
     q: 'Người nhận có cần tải ứng dụng để xem không?',
