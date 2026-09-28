@@ -32,7 +32,7 @@ export default {
     'KỂ CHUYỆN BẰNG ÁNH SÁNG',
     'LÀM QUÀ TẶNG Ý NGHĨA',
     // §31.3: thay "LƯU GIỮ KÝ ỨC VĨNH VIỄN" (D-26)
-    'LỜI CHÚC TRAO QUA MÃ QR',
+    'MỖI LỜI CHÚC, MỘT KỶ NIỆM',
     'LÀNG NGHỀ TRĂM NĂM',
   ],
   story: {
@@ -42,7 +42,7 @@ export default {
     text: 'Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ, lưu giữ ký ức của bao thế hệ. Chúng tôi mang chất liệu ấy trở lại trong hình hài một chiếc đèn — để câu chuyện của gia đình bạn được thắp lên từ chính chất liệu bền bỉ ấy.',
     statYears: 'năm nghề giấy dó',
     statArtisans: 'nghệ nhân đồng hành',
-    // §31.3 (mới phát hiện): thay "câu chuyện riêng mỗi đèn" (D-01)
+    // §31.3: thay "câu chuyện riêng mỗi đèn" (D-01, D-45)
     statStory: 'lời chúc riêng cho mỗi món quà',
   },
   artisan: {
@@ -61,10 +61,10 @@ export default {
     gift: 'Mua tặng',
     self: 'Mua cho mình',
     giftCopy:
-      'Kèm thiệp viết tay, hộp quà vải bố và mã QR để người nhận xem lời chúc riêng của bạn.',
+      'Kèm thiệp viết tay, hộp quà vải bố và thiệp cảm ơn có mã QR để người nhận xem lời chúc riêng của bạn.',
     // §31.3: đơn tự mua cũng có thiệp cảm ơn + QR và có thể thêm lời chúc (D-14, D-28)
     selfCopy:
-      'Một góc ánh sáng ấm cho không gian sống — kèm thiệp cảm ơn có mã QR, và bạn có thể thêm lời chúc nếu muốn.',
+      'Một góc ánh sáng ấm cho không gian sống — quét mã trên đèn để xem mẻ đèn được làm ra. Muốn gửi lời nhắn cho chính mình? Chỉ cần tích “Thêm lời chúc”.',
     viewDetail: 'Xem chi tiết',
     loading: 'Đang tải sản phẩm…',
     error: 'Không tải được sản phẩm. Vui lòng thử lại sau.',
@@ -86,28 +86,29 @@ export default {
   process: {
     eyebrow: 'Hành trình thủ công',
     // §31.3: thay "Theo dõi đèn của bạn từng bước" (D-01)
-    title: 'Theo dõi đơn đèn của bạn qua từng công đoạn',
+    title: 'Theo dõi đơn của bạn qua từng công đoạn',
     steps: [
       { label: 'Chọn giấy dó', note: 'Lọc từng tấm giấy dệt tay không tì vết' },
       { label: 'Lên khung tre', note: 'Vót nan, uốn khung theo dáng cổ truyền' },
       { label: 'Phơi nắng', note: 'Đợi nắng tự nhiên làm săn từng lớp giấy' },
       // §31.3: thay "Gắn mã riêng lưu câu chuyện của bạn" (D-01, D-43)
-      { label: 'Đóng gói & khắc QR', note: 'Khắc mã QR của lô để bạn xem hành trình làm đèn' },
+      { label: 'Đóng gói & khắc QR', note: 'Khắc mã mở video hành trình của mẻ đèn' },
     ],
   },
   qr: {
     eyebrow: 'Khoảnh khắc mở quà',
     title: 'Quét mã, thấy cả một câu chuyện',
     // §31.3: thay "Mỗi chiếc đèn mang một mã QR riêng … được lưu giữ lâu dài" (D-01, D-26, D-28)
-    text: 'Mỗi món quà có hai mã QR: mã trên thiệp cảm ơn mở lời chúc riêng của bạn, mã khắc trên đèn mở video hành trình làm ra lô đèn ấy.',
+    text: 'Mã QR trên thiệp cảm ơn mở ra lời chúc của bạn, còn mã khắc trên đèn mở ra video hành trình mẻ đèn được làm ra. Người nhận chỉ cần đưa điện thoại lên, không cần cài ứng dụng.',
     points: [
       // §31.3: thay "Video quá trình làm đèn của chính chiếc đèn này" (D-01)
-      'Video quá trình làm lô đèn, lưu giữ vĩnh viễn',
+      'Video quá trình làm ra mẻ đèn, xem lại bất cứ lúc nào',
       'Lời chúc bằng chữ, giọng nói hoặc video của người tặng',
       // §31.3: thay "Lưu lại vĩnh viễn trong sổ lưu niệm cá nhân" (D-12, D-26)
-      'Lời chúc bằng chữ lưu vĩnh viễn; giọng nói và video lưu 30 ngày sau khi người nhận mở quà — hãy tải về để giữ lại',
+      'Lời chúc chữ được lưu mãi; giọng nói và video lưu 30 ngày kể từ khi người nhận xác nhận đã nhận quà, có thể tải về để giữ lâu dài',
     ],
-    phoneCaption: 'Hành trình lô đèn của bạn',
+    // D-45
+    phoneCaption: 'Hành trình mẻ đèn của bạn',
     phoneFrom: 'Lời chúc từ Minh Anh',
     phoneMessage: '“Chúc chị luôn ấm áp như ánh đèn này. Em thương chị rất nhiều.”',
   },

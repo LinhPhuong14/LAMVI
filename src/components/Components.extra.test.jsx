@@ -36,11 +36,14 @@ const BANNED = [
 const PERMANENT = /vĩnh viễn|forever|permanent|永久|lâu dài|long-term|长期/i
 const GIFT_VOICE = /giọng nói|voice|语音/i
 const VIDEO = /video|视频/i
-const BATCH = /\blô\b|lô đèn|batch|批次/i
+const BATCH = /\blô\b|lô đèn|mẻ đèn|batch|批次|这批灯/i
+// "tải về để giữ lâu dài" là khách tự lưu bản sao, không phải web hứa lưu (câu đợt 1 do BA soạn)
+const SELF_DOWNLOAD = /tải về để giữ (lại )?lâu dài|下载长期保留|downloaded? to keep/gi
 
 // D-26: giọng nói/video lời chúc chỉ lưu 30 ngày → câu nào nhắc giọng nói hoặc video (không phải video lô) không được kèm "vĩnh viễn"
 function mediaPermanenceViolations(text) {
   return text
+    .replace(SELF_DOWNLOAD, '')
     .split(/[.;。；\n]/)
     .filter((seg) => PERMANENT.test(seg) && (GIFT_VOICE.test(seg) || (VIDEO.test(seg) && !BATCH.test(seg))))
 }

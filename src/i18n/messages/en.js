@@ -30,7 +30,7 @@ export default {
     'HANDMADE DÓ PAPER',
     'STORIES TOLD IN LIGHT',
     'MEANINGFUL GIFTS',
-    'MESSAGES SHARED BY QR',
+    'EVERY MESSAGE, A MEMORY',
     'A CENTURY-OLD CRAFT',
   ],
   story: {
@@ -57,9 +57,9 @@ export default {
     gift: 'As a gift',
     self: 'For myself',
     giftCopy:
-      'With a handwritten card, a burlap gift box and a QR code for the recipient to see your personal message.',
+      'With a handwritten card, a burlap gift box and a thank-you card with a QR code for the recipient to see your personal message.',
     selfCopy:
-      'A warm corner of light for your home — with a thank-you card and QR code, and you can add a message if you like.',
+      'A warm corner of light for your home — scan the code on the lantern to watch its batch being made. Want to leave a note for yourself? Just tick “Add a message”.',
     viewDetail: 'View details',
     loading: 'Loading products…',
     error: 'Could not load products. Please try again later.',
@@ -79,22 +79,22 @@ export default {
   },
   process: {
     eyebrow: 'The handmade journey',
-    title: 'Follow your lantern order through each stage',
+    title: 'Follow your order through each stage',
     steps: [
       { label: 'Choosing dó paper', note: 'Each hand-made sheet is checked for flaws' },
       { label: 'Bamboo framing', note: 'Splitting and bending bamboo into traditional shapes' },
       { label: 'Sun drying', note: 'Natural sunlight tightens every layer of paper' },
-      { label: 'Packing & QR engraving', note: 'The batch QR code lets you watch how it was made' },
+      { label: 'Packing & QR engraving', note: 'An engraved code opens the video of the batch’s journey' },
     ],
   },
   qr: {
     eyebrow: 'The unwrapping moment',
     title: 'Scan a code, discover a whole story',
-    text: 'Each gift has two QR codes: the one on the thank-you card opens your personal message, the one engraved on the lantern opens the video of how its batch was made.',
+    text: 'The QR code on the thank-you card opens your message, while the code engraved on the lantern opens the video of how its batch was made. The recipient just points a phone at it — no app needed.',
     points: [
-      'Video of how the lantern batch was made, kept forever',
+      'Video of how the lantern batch was made, to watch any time',
       'A text, voice or video message from the giver',
-      'Text messages are kept forever; voice and video are kept for 30 days after the recipient opens the gift — download them to keep a copy',
+      'Text messages are kept forever; voice and video are kept for 30 days after the recipient confirms receiving the gift, and can be downloaded to keep',
     ],
     phoneCaption: 'The journey of your lantern batch',
     phoneFrom: 'A message from Minh Anh',

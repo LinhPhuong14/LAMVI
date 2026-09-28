@@ -4,8 +4,8 @@
 |---|---|
 | Phiên bản | v0.2 (bản nháp) |
 | Ngày | 2026-09-28 |
-| Trạng thái | PO đã duyệt toàn bộ `[CONFIRMED]` D-41/`[CONFIRMED]` D-41 của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định mới của v0.2 gắn `[CONFIRMED]` D-41 |
-| Thay đổi v0.2 | Quyết định D-37…D-44; hiện thực nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô) — xem §31.2, §31.3 |
+| Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -138,7 +138,7 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 - Ngôn ngữ ưa thích mặc định = ngôn ngữ giao diện lúc đăng ký `[ASSUMPTION]`.
 - Nếu cấu hình Supabase bật xác nhận email, khách phải xác nhận email trước khi đăng nhập `[ASSUMPTION]`.
 - "Quên mật khẩu" luôn trả cùng một thông báo, không tiết lộ email có đăng ký hay không, kể cả khi Supabase giới hạn gửi thư `[DERIVED]` (NFR-SEC).
-- Đăng ký bằng email đã tồn tại → báo "Email này đã được đăng ký" `[ASSUMPTION]` — chờ Q-34. Đăng ký lại email chưa xác nhận không ghi đè hồ sơ đã có `[DERIVED]`.
+- Đăng ký bằng email đã tồn tại → báo "Email này đã được đăng ký" `[ASSUMPTION]` — chờ Q-35. Đăng ký lại email chưa xác nhận không ghi đè hồ sơ đã có `[DERIVED]`.
 - Lỗi mạng khi làm mới phiên không đăng xuất khách; chỉ đăng xuất khi phiên bị máy chủ từ chối `[DERIVED]`.
 - Đăng xuất vô hiệu mọi phiên của tài khoản trên mọi thiết bị; đặt lại mật khẩu xong phải đăng nhập lại `[ASSUMPTION]`.
 - Trang đăng nhập/đăng ký/quên mật khẩu/tài khoản đặt `noindex` `[DERIVED]` BR-SEO-001.
@@ -875,7 +875,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | D-42 đăng nhập email | FR-ACC-001 | BR-ACC-001 | — | — |
 | D-43, D-44 QR lô | FR-QR-006 | BR-QR-002 | US-005 | — |
 
-**Yêu cầu mồ côi (chưa có US/UC)**: FR-CAT-004, FR-AI-006, FR-QR-007 (admin lô), FR-SEO-001, FR-GA-001 — cần bổ sung US ở v0.2.
+**Yêu cầu mồ côi (chưa có US/UC)**: FR-CAT-004, FR-AI-006, FR-QR-007 (admin lô), FR-SEO-001, FR-GA-001 — cần bổ sung US ở bản sau.
 **Yêu cầu trùng**: không phát hiện.
 
 ---
@@ -934,14 +934,14 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Q-32 | `[LEGAL]` Banner đồng ý cookie/GA |
 | Q-33 | Có cần lớp bảo vệ thêm (PIN) cho trang lời chúc? |
 | I-15 | `[LEGAL]` Quyền xóa lịch sử chat |
-| Q-34 | Đăng ký bằng email đã tồn tại hiện "Email này đã được đăng ký" (tiện cho khách nhưng cho phép dò email có tài khoản), hay luôn báo "kiểm tra email" giống quên mật khẩu? Hiện code báo "đã đăng ký" `[ASSUMPTION]` |
+| Q-35 | Đăng ký bằng email đã tồn tại hiện "Email này đã được đăng ký" (tiện cho khách nhưng cho phép dò email có tài khoản), hay luôn báo "kiểm tra email" giống quên mật khẩu? Hiện code báo "đã đăng ký" `[ASSUMPTION]` |
 
 ### P2 — có thể quyết định sau
 | ID | Câu hỏi |
 |---|---|
 | Q-07 | Giới hạn số lượng / "tạm hết hàng" |
 | Q-21 | Phiếu giao hàng không in giá |
-| Q-23 | Testimonial thật hay placeholder |
+| Q-23 | Testimonial thật hay placeholder (gồm câu "…quá trình đèn được làm cho riêng mình" — `testimonials.items[2]` trong `src/i18n/messages/*`) |
 | — | KPI; chỉ số hiệu năng; giữ hay bỏ form newsletter (G-11) |
 
 ---
@@ -991,26 +991,24 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
 
-Cập nhật v0.2. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.js` và `server/data/seed.js` (FAQ). Câu thay thế do đội dev đề xuất `[ASSUMPTION]` — **chờ PO/Marketing duyệt**.
+Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.js` (giao diện) và `server/data/seed.js` (FAQ). Câu chữ tiếng Việt lấy theo đợt sửa 1 do BA soạn (nhánh `fix/web-copy-ba-spec`, đã gộp master), trừ các dòng ghi chú khác. Bản en/zh dịch theo bản vi (G-14). Marketing có thể chỉnh văn phong nhưng không đổi ý nghĩa ở cột "Căn cứ".
 
-| Vị trí cũ | Hiện tại (cũ) | Mâu thuẫn với | Câu thay thế (vi) | Trạng thái |
+| Vị trí cũ | Trước | Sau (key i18n / dữ liệu) | Căn cứ | Trạng thái |
 |---|---|---|---|---|
-| `src/components/Faq.jsx:7` | "Vĩnh viễn…không giới hạn thời gian xem lại" | D-26 | FAQ 1 (`server/data/seed.js`): chữ vĩnh viễn; giọng nói/video 30 ngày từ khi người nhận xác nhận, nên tải về; video lô vĩnh viễn | **Đã sửa** |
-| `src/components/Faq.jsx:11` | "sửa…cho đến khi đèn được đóng gói" | D-13 / BR-MSG-008 | FAQ 2: chữ khóa khi đơn đóng gói; giọng nói/video sửa đến khi gửi hàng | **Đã sửa** |
-| `src/App.jsx:396` | "được lưu giữ lâu dài" | D-26 | `qr.text`: "Mỗi món quà có hai mã QR: mã trên thiệp cảm ơn mở lời chúc riêng của bạn, mã khắc trên đèn mở video hành trình làm ra lô đèn ấy." | **Đã sửa** |
-| `src/App.jsx:399` | "Video quá trình làm đèn của chính chiếc đèn này" | D-01 | `qr.points[0]`: "Video quá trình làm lô đèn, lưu giữ vĩnh viễn" | **Đã sửa** |
-| `src/App.jsx:401` | "Lưu lại vĩnh viễn trong sổ lưu niệm" | D-26 | `qr.points[2]`: "Lời chúc bằng chữ lưu vĩnh viễn; giọng nói và video lưu 30 ngày sau khi người nhận mở quà — hãy tải về để giữ lại" | **Đã sửa** |
-| `src/App.jsx:48` | "Gắn mã riêng lưu câu chuyện của bạn" | D-01, D-43 | `process.steps[3].note`: "Khắc mã QR của lô để bạn xem hành trình làm đèn" | **Đã sửa** |
-| `src/App.jsx:300` | Thiệp + QR chỉ nhắc cho đơn Mua tặng | D-14, D-28 | `products.selfCopy`: "…kèm thiệp cảm ơn có mã QR, và bạn có thể thêm lời chúc nếu muốn." | **Đã sửa** |
-| `src/App.jsx:360` | "Theo dõi đèn của bạn từng bước" | D-01 | `process.title`: "Theo dõi đơn đèn của bạn qua từng công đoạn" | **Đã sửa** |
-| `src/components/Marquee.jsx:5` | "LƯU GIỮ KÝ ỨC VĨNH VIỄN" | D-26 | `marquee[3]`: "LỜI CHÚC TRAO QUA MÃ QR" | **Đã sửa** |
-| `src/App.jsx:20-42` | Giá không có chú thích VAT | D-03 | Component `Price` + "chưa gồm VAT" | **Đã sửa** |
-| `src/App.jsx` (story stats) | "câu chuyện riêng mỗi đèn" | D-01 | `story.statStory`: "lời chúc riêng cho mỗi món quà" | **Đã sửa** (mới phát hiện v0.2) |
-| `src/App.jsx` (story text) | "…câu chuyện của gia đình bạn cũng được lưu giữ theo cách bền bỉ như vậy" | D-26 | `story.text`: "…được thắp lên từ chính chất liệu bền bỉ ấy" | **Đã sửa** (mới phát hiện v0.2) |
-| `src/App.jsx` (phone mock) | "Hành trình chiếc đèn của bạn" | D-01 | `qr.phoneCaption`: "Hành trình lô đèn của bạn" | **Đã sửa** (mới phát hiện v0.2) |
-| `testimonials.items[2]` (`src/i18n/messages/*`) | "…thấy cả quá trình đèn được làm cho riêng mình" | D-01 | — | **Chưa sửa** — chờ Q-23 (đánh giá thật hay placeholder) |
-
-Câu chữ thay thế do PO/Marketing duyệt.
+| `src/components/Faq.jsx:7` | "Vĩnh viễn…không giới hạn thời gian xem lại" | FAQ 1: chữ + video lô vĩnh viễn; giọng nói/video 30 ngày từ khi người nhận xác nhận, bấm "Tải về" để giữ | D-10, D-12, D-26 | ✅ Đã sửa |
+| `src/components/Faq.jsx:11` | "sửa…cho đến khi đèn được đóng gói" | FAQ 2: phần chữ khóa khi đơn đã đóng gói; giọng nói/video sửa được đến khi đơn gửi đi | D-13, BR-MSG-008 (D-41) | ✅ Đã sửa — khác đợt 1 vì BR-MSG-008 đã được duyệt (ghi chú 1 của đợt 1) |
+| `src/App.jsx:394-396` | "Mỗi chiếc đèn mang một mã QR riêng…được lưu giữ lâu dài" | `qr.text`: tách QR thiệp cảm ơn (lời chúc) và QR khắc trên đèn (video mẻ đèn); không cần cài ứng dụng | D-01, D-26, D-28 | ✅ Đã sửa |
+| `src/App.jsx:399` | "Video quá trình làm đèn của chính chiếc đèn này" | `qr.points[0]`: "Video quá trình làm ra mẻ đèn, xem lại bất cứ lúc nào" | D-01, D-10 | ✅ Đã sửa |
+| `src/App.jsx:401` | "Lưu lại vĩnh viễn trong sổ lưu niệm" | `qr.points[2]`: chữ lưu mãi; giọng nói/video lưu 30 ngày từ khi xác nhận, tải về được | D-12, D-26 | ✅ Đã sửa |
+| `src/App.jsx:48` | "Gắn mã riêng lưu câu chuyện của bạn" | `process.steps[3].note`: "Khắc mã mở video hành trình của mẻ đèn" | D-01, D-43 | ✅ Đã sửa |
+| `src/App.jsx:300-301` | Thiệp + QR chỉ nhắc cho đơn Mua tặng | `products.giftCopy` / `products.selfCopy`: thêm thiệp cảm ơn có mã QR; đơn tự mua quét mã trên đèn + ô "Thêm lời chúc" | D-01, D-14, D-28 | ✅ Đã sửa |
+| `src/App.jsx:360` | "Theo dõi đèn của bạn từng bước" | `process.title`: "Theo dõi đơn của bạn qua từng công đoạn" | D-01, C-11 | ✅ Đã sửa |
+| `src/components/Marquee.jsx:5` | "LƯU GIỮ KÝ ỨC VĨNH VIỄN" | `marquee[3]`: "MỖI LỜI CHÚC, MỘT KỶ NIỆM" | D-26 | ✅ Đã sửa |
+| `src/App.jsx:20-42` | Giá không có chú thích VAT | Component `Price` + "chưa gồm VAT" ở mọi nơi hiển thị giá | D-03, BR-PRC-003 | ✅ Đã sửa — vẫn chờ `[LEGAL]` I-04 |
+| `src/App.jsx:220` | "1 — câu chuyện riêng mỗi đèn" | `story.statStory`: "lời chúc riêng cho mỗi món quà" | D-01, D-45 | ✅ Đã sửa |
+| `src/App.jsx:426` | Mock điện thoại "Hành trình chiếc đèn của bạn" | `qr.phoneCaption`: "Hành trình mẻ đèn của bạn" | D-01, D-45 | ✅ Đã sửa |
+| `src/App.jsx:209-212` | "…câu chuyện của gia đình bạn cũng được lưu giữ theo cách bền bỉ như vậy" | `story.text`: "…được thắp lên từ chính chất liệu bền bỉ ấy" | D-26 | ✅ Đã sửa (phát hiện ở v0.2) — câu do dev soạn `[ASSUMPTION]`, chờ Marketing |
+| `testimonials.items[2]` | "…thấy cả quá trình đèn được làm cho riêng mình" | — | D-01 | ⬜ Chưa sửa — chờ Q-23 |
 
 ---
 
