@@ -4,6 +4,28 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-28 (phiên 4) — Vai trò IT + dashboard IT (nhánh `feat/it-dashboard`), gộp vào `master`
+
+**Quyết định từ người dùng**
+
+- D-51: vai trò IT, dashboard riêng `/it`; IT có cả quyền admin.
+- D-52: dashboard gồm số liệu API, trạng thái tích hợp, chế độ bảo trì.
+- D-53: số liệu lưu Supabase. D-54: bảo trì = trang bảo trì + API ghi 503.
+- Gộp chuỗi nhánh foundation → admin → seo → it-dashboard thẳng vào `master`.
+
+**Đã làm**
+
+1. Hoàn tất kiểm thử SEO còn dở (phiên 3): hai subagent (client + server) → sửa 5 lỗi (xem commit "Bổ sung test độc lập SEO phía server").
+2. Vai trò IT, `/api/it/*`, `server/monitoring/*`, `/it`, migration `20260928000003_it.sql`. Lỗi tự phát hiện: nhãn route đọc ở sự kiện `finish` bị mất `req.route` → chụp lúc `writeHead` (T-19).
+3. Spec v0.5: FR-IT-001…004, D-51…D-54, G-24…G-27.
+
+**Còn lại / cần người dùng**
+
+- Chạy migration `20260928000003_it.sql`; cấp vai trò `it` trong Supabase.
+- Cảnh báo chủ động (G-25) chờ kênh thông báo Q-24.
+
+---
+
 ## 2026-09-28 (phiên 3) — SEO (nhánh `feat/seo`, tách từ `feat/admin`)
 
 **Quyết định từ người dùng**

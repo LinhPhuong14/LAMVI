@@ -20,6 +20,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-14 | 2026-09-28 | Chuỗi giao diện admin ở `src/admin/strings.js` (chỉ vi, D-48); mã lỗi vẫn ở `src/i18n/messages/*` | Hiệu lực |
 | T-15 | 2026-09-28 | SSR (D-49): một Express phục vụ web + API; dev dùng Vite middleware (cổng 5173), prod dùng `dist/client` + `dist/server/entry-server.js` | Hiệu lực |
 | T-16 | 2026-09-28 | Head/SEO khai báo bằng `<Seo>`; SSR thu thập qua `HeadContext`, client thay thẻ `[data-seo]`; meta robots chỉ do `useNoIndex` (client) và server (SSR) chèn | Hiệu lực |
+| T-18 | 2026-09-28 | Giám sát: middleware đếm mọi request, gộp theo phút trong bộ nhớ, flush 60 giây vào `api_metrics` qua RPC `record_api_metrics` (cộng dồn nguyên tử) | Hiệu lực |
+| T-19 | 2026-09-28 | Nhãn route chụp lúc `writeHead` (còn `req.route`/`req.baseUrl`); lỗi từ errorHandler dùng `req.route` còn sót + tiền tố `/api` | Hiệu lực |
+| T-20 | 2026-09-28 | Phân quyền theo vai trò bằng `requireRole(auth, repo, roles)`; `ADMIN_ROLES = ['admin','it']`, `IT_ROLES = ['it']` | Hiệu lực |
 | T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
 
 ---
@@ -61,3 +64,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
   - Trang riêng tư mới: thêm vào `PRIVATE` trong `src/seo/routes.js`, render `<Seo noindex>`.
   - Không đọc `window`/`localStorage` trong lúc render của trang công khai (chỉ trong effect).
   - Không dùng `import … from 'react-router'` trong code chạy SSR — dùng `react-router-dom` để cùng một context.
+
+### T-18 / T-19 — Số liệu API
+- `server/monitoring/metrics.js`: `createMetrics({ repo, classify })` → `middleware`, `flush`, `summary(range)`, `recentErrors(range)`, `start/stop`. `server/index.js` gọi `start()` và `stop()` (flush) khi SIGTERM/SIGINT.
+- Dashboard đọc dữ liệu đã lưu + phần chưa flush, nên số liệu thấy ngay.
+- Flush lỗi → bỏ lô đó và ghi log (tránh bộ nhớ phình) — chấp nhận mất tối đa 1 phút số liệu.
+- Thêm route mới không cần làm gì thêm: nhãn tự lấy từ mẫu route Express.

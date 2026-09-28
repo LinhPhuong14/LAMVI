@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.4 (bản nháp) |
+| Phiên bản | v0.5 (bản nháp) |
 | Ngày | 2026-09-28 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD) |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì) |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -31,7 +31,7 @@ MỘC là web **B2C** bán đèn giấy dó thủ công tại Việt Nam, địn
 
 Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý coupon. Thanh toán qua **payOS** hoặc **COD**. **Bắt buộc có tài khoản để đặt hàng.** Chỉ giao trong nước, tiền tệ VND.
 
-**Hiện trạng repo (v0.4)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap). Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây, admin đơn/coupon/Mây/đổi trả, GA (xem §31).
+**Hiện trạng repo (v0.5)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap), vai trò IT + dashboard IT. Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây, admin đơn/coupon/Mây/đổi trả, GA (xem §31).
 
 ---
 
@@ -71,12 +71,13 @@ Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý
 | Khách hàng (người mua) | Đặt hàng, soạn lời chúc, theo dõi đơn | **Có** (D-36) |
 | Người nhận | Người quét QR thiệp để xem lời chúc; có thể trùng người mua | Không `[DERIVED]` từ C-09 (không cần cài app) |
 | Người xem QR đèn | Bất kỳ ai quét QR khắc trên đèn | Không |
-| Admin | Quản trị toàn hệ thống | Có |
+| Admin | Quản trị nội dung (sản phẩm, FAQ, lô…) tại `/admin` | Có |
+| IT | Vận hành kỹ thuật: sức khoẻ hệ thống, số liệu API, chế độ bảo trì tại `/it`; có cả quyền Admin (D-51) | Có |
 | Mây (hệ thống AI) | Actor hệ thống, chỉ đọc | — |
 | payOS | Cổng thanh toán bên ngoài | — |
 | OpenAI | Dịch vụ AI bên ngoài | — |
 
-**Một vai trò Admin duy nhất** `[CONFIRMED]` D-38. Vai trò lưu ở hồ sơ (`customer` / `admin`); khách không tự đổi được vai trò `[DERIVED]`.
+Vai trò lưu ở hồ sơ: `customer` / `admin` / `it` (D-38, sửa bởi D-51). Một vai trò Admin duy nhất cho nội dung (D-38); vai trò IT có cả quyền Admin và thêm dashboard IT; Admin không vào được dashboard IT (D-51). Khách không tự đổi được vai trò; vai trò cấp bằng tay trong Supabase `[DERIVED]`.
 
 ### 3.2 Ma trận quyền
 
@@ -91,6 +92,9 @@ Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý
 | Người nhận | Lời chúc (qua token QR) | – | ✓ | – | – |
 | Admin | Sản phẩm, lô, FAQ, coupon | ✓ | ✓ | ✓ | ✓ |
 | Admin | Đơn hàng | – | ✓ | Trạng thái | Hủy |
+| IT | Mọi quyền của Admin | ✓ | ✓ | ✓ | ✓ |
+| IT | Sức khoẻ hệ thống, số liệu API, lỗi 5xx | – | ✓ | – | – |
+| IT | Chế độ bảo trì | – | ✓ | Bật/tắt | – |
 | Admin | Lời chúc của khách | – | `[BA DECISION REQUIRED]` Q-14 | – | – |
 | Mây | Sản phẩm, FAQ, chính sách | – | ✓ | – | – |
 | Mây | Đơn hàng | – | Chỉ đơn đã xác thực (BR-AI-002) | – | – |
@@ -142,6 +146,22 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 - Lỗi mạng khi làm mới phiên không đăng xuất khách; chỉ đăng xuất khi phiên bị máy chủ từ chối `[DERIVED]`.
 - Đăng xuất vô hiệu mọi phiên của tài khoản trên mọi thiết bị; đặt lại mật khẩu xong phải đăng nhập lại `[ASSUMPTION]`.
 - Trang đăng nhập/đăng ký/quên mật khẩu/tài khoản đặt `noindex` `[DERIVED]` BR-SEO-001.
+
+### 5.2a Dashboard IT (v0.5)
+
+| ID | Yêu cầu | Nguồn |
+|---|---|---|
+| FR-IT-001 | Vai trò IT truy cập `/it`; có cả quyền Admin | D-51 |
+| FR-IT-002 | Sức khoẻ hệ thống: DB, Auth, Storage (kết nối được không, độ trễ); payOS, OpenAI (đã cấu hình chưa — không hiển thị khoá); thông tin máy chủ (phiên bản, uptime, bộ nhớ) | D-52 |
+| FR-IT-003 | Số liệu API theo endpoint trong 1 giờ / 24 giờ / 7 ngày: số request, 4xx, 5xx, tỷ lệ lỗi 5xx, độ trễ p50/p95/max; lỗi 5xx gần đây | D-52 |
+| FR-IT-004 | Bật/tắt chế độ bảo trì | D-52, D-54 |
+
+**Quy tắc (v0.5)**
+
+- Số liệu API lưu ở Supabase (D-53), gộp theo phút × method × endpoint × mã HTTP; endpoint ghi theo mẫu (vd `/api/products/:slug`), không ghi query string, body, token `[DERIVED]` NFR-PRV. Giữ 30 ngày `[ASSUMPTION]`. p50/p95 là ước lượng theo mốc 50/100/250/500/1000/2500 ms `[ASSUMPTION]`.
+- Lỗi 5xx gần đây lưu thời điểm, endpoint, đường dẫn, mã, mã lỗi, thông điệp nội bộ (cắt 300 ký tự) — chỉ IT xem `[ASSUMPTION]`.
+- Dashboard tự làm mới mỗi 30 giây; giao diện chỉ tiếng Việt (như admin, D-48) `[ASSUMPTION]`.
+- Chế độ bảo trì (D-54): trang công khai trả HTTP 503 + trang bảo trì (3 ngôn ngữ) + `Retry-After`; API ghi (POST/PUT/PATCH/DELETE) trả 503 `MAINTENANCE`, trừ đăng nhập/làm mới phiên/đăng xuất và API IT; API đọc vẫn chạy; `/login`, `/admin`, `/it` vẫn vào được `[ASSUMPTION]` (để IT vào tắt bảo trì). Không đọc được cài đặt → coi như tắt (không chặn web) `[ASSUMPTION]`. Nhiều server đồng bộ trạng thái trong ≤15 giây `[ASSUMPTION]`.
 
 ### 5.3 Giỏ hàng & checkout
 | ID | Yêu cầu | Nguồn |
@@ -221,7 +241,7 @@ Không có chỉ số định lượng nào được cung cấp; các ô "Mục 
 | NFR-L10N-001 | Bản địa hóa | Thiếu bản dịch thì hiển thị tiếng Việt `[CONFIRMED]` D-41 | — |
 | NFR-PERF-001 | Hiệu năng | Thời gian tải trang, thời gian phản hồi Mây | `[BA DECISION REQUIRED]` |
 | NFR-AVL-001 | Sẵn sàng | Mây lỗi không được chặn duyệt web, giỏ hàng, checkout | — |
-| NFR-OBS-001 | Quan sát | Theo dõi lỗi webhook, lỗi OpenAI, chi phí OpenAI theo ngày | — |
+| NFR-OBS-001 | Quan sát | Theo dõi lỗi webhook, lỗi OpenAI, chi phí OpenAI theo ngày. v0.5: dashboard IT có số liệu API (request, lỗi, độ trễ theo endpoint) và lỗi 5xx gần đây; webhook/OpenAI chưa có vì chưa tích hợp (G-26) | — |
 
 ---
 
@@ -1017,6 +1037,10 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-20 | Chống dò/spam đăng nhập, đăng ký, quên mật khẩu | Chỉ dựa vào giới hạn của Supabase; chưa có giới hạn theo IP ở tầng app | Security | **Mới** |
 | G-21 | Nhật ký thay đổi của admin | Sửa sản phẩm/FAQ/lô chưa ghi log (NFR-AUD-001 chỉ bắt buộc cho đơn, coupon, hoàn tiền) | Missing | **Mới** (v0.3) — bắt buộc khi làm coupon/đơn |
 | G-23 | Ảnh chia sẻ mạng xã hội / ảnh sản phẩm | Chưa có ảnh sản phẩm thật (thẻ sản phẩm dùng hình đèn SVG) nên chưa có `og:image`, JSON-LD không có `image` (Google khuyến nghị có) | Missing | **Mới** (v0.4) |
+| G-24 | Dashboard IT | `/it` + `/api/it/*` (FR-IT-001…004) | — | **Đã xử lý** (v0.5) |
+| G-25 | Cảnh báo chủ động | Dashboard chỉ xem; chưa gửi cảnh báo khi lỗi 5xx tăng hay tích hợp lỗi (kênh thông báo chờ Q-24) | Missing | **Mới** (v0.5) |
+| G-26 | Giám sát payOS webhook, chi phí OpenAI (NFR-OBS-001) | Chưa có vì chưa tích hợp payOS/OpenAI; dashboard chỉ báo đã cấu hình biến môi trường chưa | Missing | **Mới** (v0.5) |
+| G-27 | Nhật ký bật/tắt bảo trì | Chỉ lưu người/thời điểm đổi lần cuối (`app_settings`) + log server; chưa có lịch sử đầy đủ | Missing | **Mới** (v0.5) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
@@ -1083,7 +1107,7 @@ Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.j
 | D-35 | Thanh toán payOS hoặc COD | Hiệu lực |
 | D-36 | Phải có tài khoản mới đặt hàng | Hiệu lực |
 | D-37 | Ngôn ngữ nằm trên URL: `/` (vi), `/en/…`, `/zh/…` | Hiệu lực (v0.2) |
-| D-38 | Một vai trò Admin duy nhất | Hiệu lực (v0.2) |
+| D-38 | Một vai trò Admin duy nhất | Hiệu lực (v0.2) — bổ sung bởi D-51 |
 | D-39 | Sản phẩm có trạng thái Draft / Published / Hidden; chỉ Published hiển thị và bán | Hiệu lực (v0.2) |
 | D-40 | Thiếu bản dịch thì hiển thị tiếng Việt | Hiệu lực (v0.2) |
 | D-41 | PO duyệt toàn bộ mục `[PROPOSAL]` và `[ASSUMPTION]` của v0.1 (gồm BR-PAY-004 chặn COD khi giao người khác — Q-17; BR-MSG-008 khóa chữ khi PACKED — I-10; nút "Tôi đã nhận được quà" không đổi trạng thái đơn — Q-18; 1 coupon/đơn — C-4; C-9; C-10; hạn mức Mây §22.4) | Hiệu lực (v0.2) |
@@ -1096,3 +1120,7 @@ Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.j
 | D-48 | Giao diện admin chỉ tiếng Việt (`/admin`); nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh | Hiệu lực (v0.3) |
 | D-49 | SEO: SSR trong Express — một server Node phục vụ web + API (không dùng hosting tĩnh) | Hiệu lực (v0.4) |
 | D-50 | JSON-LD sản phẩm có giá chưa VAT, ghi `valueAddedTaxIncluded: false` (PO chọn; `[LEGAL]` I-04 vẫn chờ pháp chế) | Hiệu lực (v0.4) |
+| D-51 | Thêm vai trò IT: dashboard riêng `/it`; IT có cả quyền Admin; Admin không vào `/it` | Hiệu lực (v0.5) |
+| D-52 | Dashboard IT gồm: số liệu API, trạng thái tích hợp, bật/tắt chế độ bảo trì | Hiệu lực (v0.5) |
+| D-53 | Số liệu API lưu Supabase | Hiệu lực (v0.5) |
+| D-54 | Chế độ bảo trì: web hiện trang bảo trì, API ghi trả 503 | Hiệu lực (v0.5) |

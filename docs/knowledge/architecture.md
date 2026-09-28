@@ -20,13 +20,14 @@ server/
   index.js                 Khởi động: đọc env, chọn adapter Supabase/bộ nhớ, gắn SSR
   ssr.js                   createWeb (Vite middleware / dist) + renderPage (SSR)
   services/catalog.js      Truy vấn công khai dùng chung API + SSR
+  monitoring/              metrics.js (số liệu API), maintenance.js (bảo trì), health.js (kiểm tra tích hợp)
   app.js                   createApp({ repo, auth, config }) — dùng trong test
   config.js                Đọc biến môi trường
   errors.js                HttpError + errorHandler (định dạng lỗi thống nhất)
   i18n.js                  normalizeLang, pick (D-40), localePath (D-37)
   domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
-  routes/                  catalog.js, auth.js, admin.js, seo.js (sitemap, robots)
+  routes/                  catalog.js, auth.js, admin.js, it.js, seo.js (sitemap, robots)
   domain/admin.js          Kiểm tra dữ liệu admin (sản phẩm, FAQ, lô, video)
   adapters/
     authErrors.js          AuthError (mã lỗi chuẩn hoá)
@@ -50,6 +51,7 @@ src/
   components/              SiteHeader, SiteFooter, LocaleLayout, Price, Field, Faq, Marquee, Lantern…
   pages/                   HomePage, ProductPage, BatchPage, AccountPage, NotFoundPage, auth/*
   admin/                   AdminLayout, ProductsPage, FaqPage, BatchesPage, I18nInput, strings.js (D-48)
+  it/                      ItDashboard.jsx, strings.js (D-51)
   lib/money.js             formatVnd
   styles/                  App.css (landing), pages.css (trang mới)
   test/                    renderApp.jsx (mockApi, renderAt), fixtures.js
@@ -74,6 +76,17 @@ Thêm phương thức → thêm ở **cả** `memory` và `supabase` + test.
 | `getProductById`, `createProduct`, `updateProduct(id, patch)`, `deleteProduct` | Admin; trùng slug → `RepoError CONFLICT` |
 | `getFaq`, `createFaq`, `updateFaq`, `deleteFaq` | Admin |
 | `listBatches`, `getBatchById`, `createBatch`, `updateBatch`, `deleteBatch` | Admin; trùng mã → `RepoError CONFLICT` |
+
+### Giám sát (repository)
+
+| Phương thức | Ghi chú |
+|---|---|
+| `ping()` | Kiểm tra DB |
+| `recordApiMetrics(rows)`, `listApiMetrics({ since })`, `deleteApiMetricsBefore(iso)` | Số liệu (D-53) |
+| `recordApiErrors(rows)`, `listApiErrors({ since, limit })` | Lỗi 5xx |
+| `getSetting(key)`, `setSetting(key, value, userId)` | Cài đặt (bảo trì) |
+
+Auth provider và storage có thêm `ping()`.
 
 ### Storage
 
@@ -105,7 +118,10 @@ Lỗi chung: `RATE_LIMITED`.
 | `faq_entries` | `question/answer` jsonb, `is_published`, `sort_order` | G-07 |
 | `batches` | `code` unique, `status` created/video_published, `video_url`, `video_path`, `title/story` jsonb | D-10, D-43; `video_published` bắt buộc có `video_url`; trigger chặn gỡ xuất bản/xoá/đổi mã khi đã xuất bản (D-47) |
 | `storage.buckets: batch-videos` | Bucket công khai chứa video lô | D-46 |
-| `profiles` | `id` → `auth.users`, `full_name`, `phone`, `preferred_locale`, `role` customer/admin | D-38, D-42 |
+| `profiles` | `id` → `auth.users`, `full_name`, `phone`, `preferred_locale`, `role` customer/admin/it | D-38, D-42, D-51 |
+| `api_metrics` | PK (`bucket` phút, `method`, `route`, `status`); `count`, `total_ms`, `max_ms`, histogram `le_50…gt_2500` | D-53; ghi qua RPC `record_api_metrics` |
+| `api_errors` | `at`, `method`, `route`, `path`, `status`, `code`, `message` | Lỗi 5xx |
+| `app_settings` | `key`, `value` jsonb, `updated_by`, `updated_at` | `maintenance` (D-54) |
 
 RLS bật, không có policy (chỉ service role của server truy cập).
 
@@ -137,8 +153,14 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | POST | `/api/admin/batches/:id/video` | Admin | `{ path }` → gắn video (thay được sau xuất bản) |
 | POST | `/api/admin/batches/:id/publish` | Admin | 409 `VIDEO_REQUIRED` |
 | PUT/GET | `/api/dev-storage/upload/:token`, `/api/dev-storage/o/*` | Token | Chỉ khi chạy adapter bộ nhớ |
+| GET | `/api/it/health` | IT | Kiểm tra tích hợp + máy chủ + trạng thái bảo trì |
+| GET | `/api/it/metrics?range=1h\|24h\|7d` | IT | Tổng hợp theo endpoint |
+| GET | `/api/it/errors?range=` | IT | Lỗi 5xx gần đây |
+| PUT | `/api/it/maintenance` | IT | `{ enabled }` |
 
-Quyền admin: `requireAdmin` đọc `profiles.role` ở server mỗi request (D-38). Cấp admin: `update public.profiles set role = 'admin' where id = '<uuid>';`
+Quyền: `requireRole` đọc `profiles.role` ở server mỗi request. `/api/admin/*`: admin, it; `/api/it/*`: it (D-51). Cấp quyền: `update public.profiles set role = 'admin' /* hoặc 'it' */ where id = '<uuid>';`
+
+Bảo trì (D-54): `maintenance.apiGuard` chặn API ghi; `renderPage` trả trang bảo trì 503 cho trang công khai.
 
 ## Luồng đặt lại mật khẩu (Supabase)
 
@@ -152,5 +174,6 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 
 - Route: `LocaleLayout` bọc mọi trang, cấp ngôn ngữ qua `LocaleProvider`, đặt `<html lang>` và `document.title`.
 - Admin: `/admin/{products,faq,batches}` — chỉ tiếng Việt, ngoài `LocaleLayout` (D-48).
+- IT: `/it` — chỉ tiếng Việt (D-51).
 - Trang con: `/` · `/products/:slug` · `/lo/:code` · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
 - `AuthProvider`: phiên trong `localStorage` (`moc.session`), `authedApi` tự refresh một lần khi gặp 401.

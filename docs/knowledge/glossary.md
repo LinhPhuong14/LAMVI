@@ -11,7 +11,9 @@ Dùng đúng tên trong cột "Code" cho biến, bảng, endpoint.
 | Câu hỏi thường gặp | FAQ entry | `faq_entries` | Mây đọc từ đây |
 | Lô sản xuất | Batch | `batch`, bảng `batches`, URL `/lo/:code` | QR khắc trên đèn là mã chung của lô (D-43) |
 | Video lô | Batch video | `video_url` | Lưu vĩnh viễn (D-10) |
-| Tài khoản / hồ sơ | Profile | bảng `profiles` (1-1 `auth.users`) | Vai trò `customer` / `admin` (D-38) |
+| Tài khoản / hồ sơ | Profile | bảng `profiles` (1-1 `auth.users`) | Vai trò `customer` / `admin` / `it` (D-38, D-51) |
+| Chế độ bảo trì | Maintenance mode | `app_settings.key = 'maintenance'` | D-54 |
+| Số liệu API | API metrics | bảng `api_metrics`, `server/monitoring/metrics.js` | D-53 |
 | Ngôn ngữ ưa thích | Preferred locale | `preferred_locale` | `vi` / `en` / `zh` |
 | Đơn hàng | Order | `order` | Chưa làm |
 | Lời chúc | Gift message | `gift_message` | Chưa làm |
