@@ -36,7 +36,7 @@ export default {
   story: {
     eyebrow: 'Heritage',
     title: 'From a century-old dó paper village',
-    text: 'Dó paper once recorded history, carried Đông Hồ paintings and kept the memories of generations. We bring that material back in the form of a lantern — so your family’s story can be kept just as enduringly.',
+    text: 'Dó paper once recorded history, carried Đông Hồ paintings and kept the memories of generations. We bring that material back in the form of a lantern — so your family’s story can be lit by that same enduring material.',
     statYears: 'years of dó papermaking',
     statArtisans: 'partner artisans',
     statStory: 'personal message for every gift',

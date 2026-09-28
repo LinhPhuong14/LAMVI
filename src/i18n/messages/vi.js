@@ -38,7 +38,8 @@ export default {
   story: {
     eyebrow: 'Di sản',
     title: 'Từ làng nghề giấy dó trăm năm',
-    text: 'Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ, lưu giữ ký ức của bao thế hệ. Chúng tôi mang chất liệu ấy trở lại trong hình hài một chiếc đèn — để câu chuyện của gia đình bạn cũng được lưu giữ theo cách bền bỉ như vậy.',
+    // §31.3 (mới phát hiện): bỏ ý "được lưu giữ theo cách bền bỉ" (D-26)
+    text: 'Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ, lưu giữ ký ức của bao thế hệ. Chúng tôi mang chất liệu ấy trở lại trong hình hài một chiếc đèn — để câu chuyện của gia đình bạn được thắp lên từ chính chất liệu bền bỉ ấy.',
     statYears: 'năm nghề giấy dó',
     statArtisans: 'nghệ nhân đồng hành',
     // §31.3 (mới phát hiện): thay "câu chuyện riêng mỗi đèn" (D-01)

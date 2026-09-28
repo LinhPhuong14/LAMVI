@@ -28,10 +28,10 @@
 
 - Trang ở `src/pages/`, thành phần dùng lại ở `src/components/`, gọi API ở `src/api/`, i18n ở `src/i18n/`.
 - Không viết chuỗi hiển thị trực tiếp trong JSX — dùng `t('key')`. Thêm key thì thêm cho **cả** `vi`, `en`, `zh`; thiếu → hiện `vi` (D-40).
-- Link nội bộ dùng `useLocalePath()` để giữ tiền tố ngôn ngữ (D-37).
+- Link nội bộ dùng `useI18n().path('/…')` để giữ tiền tố ngôn ngữ (D-37).
 - Giá hiển thị qua `<Price />` — luôn kèm chú thích "chưa gồm VAT" (BR-PRC-003).
 - Trang không được index (trang QR, tài khoản, giỏ, checkout, admin — BR-SEO-001, D-44) dùng `useNoIndex()`.
-- Tôn trọng `prefers-reduced-motion` (NFR-A11Y-001) khi thêm hiệu ứng mới.
+- Tôn trọng `prefers-reduced-motion` (NFR-A11Y-001): CSS có media query trong `pages.css`; framer-motion được bọc `MotionConfig reducedMotion="user"` ở `LocaleLayout`.
 
 ## Test
 

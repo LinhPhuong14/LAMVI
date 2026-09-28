@@ -24,9 +24,11 @@ export async function api(path, { method = 'GET', body, token, lang } = {}) {
     throw new ApiError(0, 'NETWORK_ERROR')
   }
   if (res.status === 204) return null
-  const data = await res.json().catch(() => null)
+  const data = await res.json().catch(() => undefined)
   if (!res.ok) {
     throw new ApiError(res.status, data?.error?.code || 'INTERNAL_ERROR', data?.error?.fields)
   }
+  // Phản hồi thành công nhưng không phải JSON (vd proxy trả HTML) → coi là lỗi
+  if (data === undefined) throw new ApiError(res.status, 'INTERNAL_ERROR')
   return data
 }
