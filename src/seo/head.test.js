@@ -33,7 +33,8 @@ describe('phân loại đường dẫn SSR', () => {
     ['/en/login', { kind: 'private', lang: 'en' }],
     ['/account/', { kind: 'private', lang: 'vi' }],
     ['/admin', { kind: 'private', lang: 'vi' }],
-    ['/products/%E0%A4%A', { kind: 'other', lang: 'vi' }],
+    ['/products/%E0%A4%A', { kind: 'invalid', lang: 'vi' }],
+    ['/en/lo/%zz', { kind: 'invalid', lang: 'en' }],
     ['/abc', { kind: 'other', lang: 'vi' }],
   ])('%s', (path, expected) => {
     expect(classifyPath(path)).toEqual(expected)

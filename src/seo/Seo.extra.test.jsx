@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act } from '@testing-library/react'
 import { hydrateRoot, createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import request from 'supertest'
 import AppShell from '../AppShell.jsx'
 import { createDataStore } from './context.js'
 import { render as ssrRender } from '../entry-server.jsx'
@@ -13,12 +12,10 @@ import { classifyPath, dataKeysFor } from './routes.js'
 import { buildHeadTags, renderHeadTags, safeJson } from './head.js'
 import { HTML_LANG, translate } from '../i18n/core.js'
 import { getPublicBatch, getPublicProduct, listPublicFaq, listPublicProducts } from '../../server/services/catalog.js'
-import { createApp } from '../../server/app.js'
 import { createMemoryRepo } from '../../server/adapters/memory/repo.js'
 import { products } from '../../server/data/seed.js'
 
 const SITE = 'http://localhost:3000'
-const config = { publicSiteUrl: SITE }
 const template = readFileSync(`${process.cwd()}/index.html`, 'utf8')
 
 // server/ssr.js dùng fileURLToPath(import.meta.url) — không nạp được trong môi trường jsdom của Vitest.
@@ -52,12 +49,27 @@ async function renderPage({ repo, url, pathname }) {
   return { status: head.status, noindex: head.noindex, html: fill(renderHeadTags(head.tags, { noindex: head.noindex }), html, data) }
 }
 
-// fetch trên client đi qua API thật (adapter bộ nhớ) để dữ liệu khớp SSR
+// fetch trên client gọi thẳng service công khai (cùng hàm routes/catalog.js dùng) để dữ liệu khớp SSR.
+// Không nạp server/app.js: module server dùng import.meta.url dạng file, không chạy được trong jsdom.
 function stubFetchTo(repo) {
-  const app = createApp({ repo, config })
   const fetchMock = vi.fn(async (input) => {
-    const res = await request(app).get(String(input))
-    return new Response(JSON.stringify(res.body), { status: res.status, headers: { 'Content-Type': 'application/json' } })
+    const u = new URL(String(input), 'http://localhost')
+    const lang = u.searchParams.get('lang') ?? 'vi'
+    const path = u.pathname.replace(/^\/api/, '')
+    let body
+    let status = 200
+    try {
+      let m
+      if (path === '/products') body = await listPublicProducts(repo, lang)
+      else if (path === '/faq') body = await listPublicFaq(repo, lang)
+      else if ((m = path.match(/^\/products\/([^/]+)$/))) body = await getPublicProduct(repo, decodeURIComponent(m[1]), lang)
+      else if ((m = path.match(/^\/batches\/([^/]+)$/))) body = await getPublicBatch(repo, decodeURIComponent(m[1]), lang)
+      else throw Object.assign(new Error('nf'), { status: 404, code: 'NOT_FOUND' })
+    } catch (err) {
+      status = err.status ?? 500
+      body = { error: { code: err.code ?? 'INTERNAL_ERROR' } }
+    }
+    return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
   })
   vi.stubGlobal('fetch', fetchMock)
   return fetchMock

@@ -19,9 +19,9 @@ export function classifyPath(pathname) {
   if (PRIVATE.includes(path)) return { kind: 'private', lang }
   if (path === '/') return { kind: 'home', lang }
   let m = path.match(/^\/products\/([^/]+)$/)
-  if (m && seg(m[1]) !== null) return { kind: 'product', lang, slug: seg(m[1]) }
+  if (m) return seg(m[1]) === null ? { kind: 'invalid', lang } : { kind: 'product', lang, slug: seg(m[1]) }
   m = path.match(/^\/lo\/([^/]+)$/)
-  if (m && seg(m[1]) !== null) return { kind: 'batch', lang, code: seg(m[1]) }
+  if (m) return seg(m[1]) === null ? { kind: 'invalid', lang } : { kind: 'batch', lang, code: seg(m[1]) }
   return { kind: 'other', lang }
 }
 

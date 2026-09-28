@@ -22,7 +22,7 @@ export function seoRouter({ repo, config }) {
         return [
           '  <url>',
           `    <loc>${xml(site() + localePath(lang, path))}</loc>`,
-          ...(lastmod ? [`    <lastmod>${xml(new Date(lastmod).toISOString())}</lastmod>`] : []),
+          ...(lastmod && !Number.isNaN(Date.parse(lastmod)) ? [`    <lastmod>${xml(new Date(lastmod).toISOString())}</lastmod>`] : []),
           ...alternates,
           '  </url>',
         ].join('\n')
@@ -35,7 +35,8 @@ export function seoRouter({ repo, config }) {
 
   r.get('/robots.txt', (req, res) => {
     // Trang riêng tư dùng noindex (không Disallow để bot đọc được noindex); chỉ chặn API và admin
-    res.type('text/plain').send(`User-agent: *\nDisallow: /api/\nDisallow: /admin\n\nSitemap: ${site()}/sitemap.xml\n`)
+    // /admin$ + /admin/ để không chặn nhầm đường dẫn khác bắt đầu bằng "/admin"
+    res.type('text/plain').send(`User-agent: *\nDisallow: /api/\nDisallow: /admin$\nDisallow: /admin/\n\nSitemap: ${site()}/sitemap.xml\n`)
   })
 
   return r

@@ -17,6 +17,7 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 2. SSR: `server/ssr.js`, `src/entry-server.jsx`, `src/AppShell.jsx`, hydrate có dữ liệu nạp sẵn. Lỗi tự phát hiện khi chạy trình duyệt thật: trang chủ lệch hydrate vì trang chủ và footer dùng chung key `/products` mà key bị xoá sau lần đọc đầu → sửa bằng store xoá sau khi hydrate xong.
 3. `<Seo>` cho mọi trang; canonical, hreflang, Open Graph, JSON-LD; 404 thật; `sitemap.xml`, `robots.txt`.
 4. Spec v0.4: D-49, D-50, G-12/G-15 đã xử lý, G-23 mới.
+5. Subagent kiểm thử SEO (client + server) phát hiện: `fill()` dùng chuỗi thay thế nên `$'`/`` $` ``/`$&` trong DB làm vỡ HTML; slug mã hoá hỏng trả 200 trang "đang tải"; dev server 500 với URL `%` hỏng; sitemap 500 khi `updatedAt` hỏng; robots `Disallow: /admin` chặn nhầm tiền tố → đã sửa. Còn mở: trang chủ khi DB lỗi vẫn trả 200 (chưa có yêu cầu).
 
 **Còn lại / cần người dùng**
 

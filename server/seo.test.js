@@ -104,3 +104,12 @@ describe('SSR (D-49, G-12)', () => {
     expect(r.html).toContain('\\u003c/script>')
   })
 })
+
+describe('Hồi quy sau kiểm thử độc lập (SEO)', () => {
+  it('sitemap bỏ lastmod không hợp lệ thay vì trả 500', async () => {
+    const data = { products: [{ ...products[0], updatedAt: 'khong-phai-ngay' }] }
+    const res = await request(createApp({ repo: createMemoryRepo(data), config })).get('/sitemap.xml')
+    expect(res.status).toBe(200)
+    expect(res.text).not.toContain('<lastmod>')
+  })
+})

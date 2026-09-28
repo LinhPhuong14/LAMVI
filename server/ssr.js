@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import express from 'express'
-import { HTML_LANG, translate } from '../src/i18n/core.js'
+import { HTML_LANG, localePath, translate } from '../src/i18n/core.js'
 import { classifyPath, dataKeysFor } from '../src/seo/routes.js'
 import { buildHeadTags, renderHeadTags, safeJson } from '../src/seo/head.js'
 import { HttpError } from './errors.js'
@@ -31,11 +31,12 @@ async function loadData(repo, route) {
 }
 
 function fill(template, { lang, head, html, data }) {
+  // Dùng hàm thay thế: chuỗi thay thế sẽ diễn giải $&, $`, $' có trong nội dung DB
   return template
-    .replace('<html lang="vi">', `<html lang="${HTML_LANG[lang]}">`)
-    .replace('<!--app-head-->', head)
-    .replace('<!--app-html-->', html)
-    .replace('<!--app-data-->', data ? `<script>window.__INITIAL_DATA__=${safeJson(data)}</script>` : '')
+    .replace('<html lang="vi">', () => `<html lang="${HTML_LANG[lang]}">`)
+    .replace('<!--app-head-->', () => head)
+    .replace('<!--app-html-->', () => html)
+    .replace('<!--app-data-->', () => (data ? `<script>window.__INITIAL_DATA__=${safeJson(data)}</script>` : ''))
 }
 
 /**
@@ -53,8 +54,10 @@ export async function renderPage({ repo, config, template, render, url, pathname
     return { status: 200, noindex: true, html: fill(template, { lang: route.lang, head, html: '', data: null }) }
   }
 
-  const initialData = await loadData(repo, route)
-  const { html, head: meta } = render(url, { initialData, siteUrl })
+  // Đường dẫn sản phẩm/lô có mã hoá hỏng → render trang 404 thay vì trang "đang tải"
+  const renderUrl = route.kind === 'invalid' ? localePath(route.lang, '/__not-found') : url
+  const initialData = route.kind === 'invalid' ? {} : await loadData(repo, route)
+  const { html, head: meta } = render(renderUrl, { initialData, siteUrl })
   const head = renderHeadTags(meta.tags, { noindex: meta.noindex })
   return {
     status: meta.status,
@@ -69,6 +72,16 @@ export async function renderPage({ repo, config, template, render, url, pathname
  */
 export async function createWeb({ repo, config, dev }) {
   const router = express.Router()
+  // URL percent-encoding hỏng → 400, không để Vite/React ném 500
+  router.use((req, res, next) => {
+    try {
+      decodeURIComponent(req.path)
+      next()
+    } catch {
+      res.status(400).type('text/plain').send('Bad Request')
+    }
+  })
+
   let vite
   let prodTemplate
   let prodRender
@@ -83,7 +96,7 @@ export async function createWeb({ repo, config, dev }) {
     router.use(express.static(`${root}/dist/client`, { index: false, maxAge: '1y', immutable: true }))
   }
 
-  router.get(/.*/, async (req, res, next) => {
+  router.get(/.*/, async (req, res) => {
     try {
       let template = prodTemplate
       let render = prodRender
@@ -97,7 +110,9 @@ export async function createWeb({ repo, config, dev }) {
       res.status(page.status).send(page.html)
     } catch (err) {
       vite?.ssrFixStacktrace(err)
-      next(err)
+      console.error('[ssr]', err)
+      // Trang HTML ngắn thay vì JSON thô; không lộ chi tiết lỗi
+      res.status(500).type('html').send('<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>500</title><p>Có lỗi xảy ra. Vui lòng thử lại sau. / Something went wrong.</p>')
     }
   })
 
