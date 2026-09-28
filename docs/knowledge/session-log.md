@@ -4,6 +4,30 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-28 (phiên 2) — Admin (nhánh `feat/admin`, tách từ `feat/foundation-web`)
+
+**Mục tiêu**: admin sản phẩm, FAQ, lô & video lô.
+
+**Quyết định từ người dùng**
+
+- D-45: chốt câu "lời chúc riêng cho mỗi món quà", "Hành trình mẻ đèn của bạn".
+- D-46: video lô tải file lên Supabase Storage.
+- D-47: lô đã xuất bản được thay video, không gỡ/xoá/đổi mã.
+- D-48: giao diện admin chỉ tiếng Việt.
+
+**Đã làm**
+
+1. Gộp `origin/master` (nhánh `fix/web-copy-ba-spec` — sửa câu chữ §31.3 đợt 1) vào `feat/foundation-web`: dùng câu chữ đợt 1 trong i18n, hợp nhất §31.2/§31.3; đổi Q-34 (409 đăng ký) của phiên trước thành Q-35 vì trùng mã với Q-34 trên master. Sửa dòng "Trạng thái" đầu spec bị thay nhãn nhầm ở phiên trước.
+2. Admin: `/api/admin/*` + `/admin` (sản phẩm, FAQ, lô, tải video bằng signed URL, xuất bản). Subagent kiểm thử độc lập (T-11).
+3. Spec v0.3: D-45…D-48, G-06 một phần, G-21, G-22, giả định mới.
+
+**Còn lại / cần người dùng**
+
+- Chạy migration `20260928000002_admin.sql`; cấp admin bằng `update public.profiles set role = 'admin' …`; thử tải video với Supabase thật (G-22).
+- Nhánh khác trên origin (`docs/branding-guideline`, `feat/landing-page`) đổi thương hiệu sang "LÂM VỊ" + Tailwind — chưa gộp master; cần thống nhất trước khi gộp.
+
+---
+
 ## 2026-09-28 — Nền tảng web (nhánh `feat/foundation-web`)
 
 **Mục tiêu**: hiện thực phần của `ba-spec.md` không bị chặn bởi `[BA DECISION REQUIRED]`; lập knowledge base.

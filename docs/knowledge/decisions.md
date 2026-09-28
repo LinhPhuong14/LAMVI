@@ -15,6 +15,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-09 | 2026-09-28 | Tiền: số nguyên VND, không dùng số thực; định dạng bằng `Intl.NumberFormat('vi-VN')` | Hiệu lực |
 | T-10 | 2026-09-28 | Token phiên lưu ở `localStorage` phía trình duyệt, gửi qua header `Authorization: Bearer` | Hiệu lực |
 | T-11 | 2026-09-28 | Mỗi tính năng phải có subagent kiểm thử độc lập trước khi commit | Hiệu lực |
+| T-12 | 2026-09-28 | Video lô: server cấp signed upload URL của Supabase Storage, trình duyệt PUT thẳng (không đi qua Express) | Hiệu lực |
+| T-13 | 2026-09-28 | Adapter storage (Supabase + bộ nhớ); bộ nhớ tự phục vụ `/api/dev-storage/*` cho dev/test | Hiệu lực |
+| T-14 | 2026-09-28 | Chuỗi giao diện admin ở `src/admin/strings.js` (chỉ vi, D-48); mã lỗi vẫn ở `src/i18n/messages/*` | Hiệu lực |
 
 ---
 
@@ -38,3 +41,8 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 
 ### T-10 — Lưu token
 - Đơn giản, đủ cho giai đoạn nền tảng. Cần xem lại (cookie httpOnly) trước go-live — rủi ro XSS.
+
+### T-12 — Tải video lô bằng signed upload URL
+- **Bối cảnh**: video có thể vài trăm MB; đi qua Express tốn bộ nhớ/thời gian và vướng giới hạn body. T-05 cấm đưa key Supabase vào frontend.
+- **Quyết định**: `POST /api/admin/batches/:id/video-upload` → server gọi `createSignedUploadUrl(path)` → trình duyệt `PUT` file lên URL đó (XHR để có %). Sau đó `POST /api/admin/batches/:id/video { path }` → server `info(path)` kiểm tra file có thật, đúng dung lượng rồi mới gắn `video_url`.
+- **Hệ quả**: mỗi lần tải là một đường dẫn mới `<batchId>/<timestamp>-<rand>.<ext>`; video cũ không bị ghi đè (D-10). Chưa thử với Supabase thật (G-22). Bucket `batch-videos` tạo bằng migration, đặt giới hạn file ≥ `MAX_VIDEO_MB`.

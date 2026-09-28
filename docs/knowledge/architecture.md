@@ -21,11 +21,13 @@ server/
   i18n.js                  normalizeLang, pick (D-40), localePath (D-37)
   domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
-  routes/                  catalog.js, auth.js
+  routes/                  catalog.js, auth.js, admin.js
+  domain/admin.js          Kiểm tra dữ liệu admin (sản phẩm, FAQ, lô, video)
   adapters/
     authErrors.js          AuthError (mã lỗi chuẩn hoá)
-    memory/{repo,auth}.js  Adapter bộ nhớ
-    supabase/{repo,auth}.js Adapter Supabase
+    repoErrors.js          RepoError('CONFLICT', field) — trùng slug/mã lô
+    memory/{repo,auth,storage}.js   Adapter bộ nhớ
+    supabase/{repo,auth,storage}.js Adapter Supabase
   data/seed.js             Dữ liệu khởi tạo (nguồn cho supabase/seed.sql)
 supabase/
   migrations/*.sql         Schema
@@ -38,6 +40,8 @@ src/
   hooks/useNoIndex.js      meta robots noindex (BR-SEO-001, D-44)
   components/              SiteHeader, SiteFooter, LocaleLayout, Price, Field, Faq, Marquee, Lantern…
   pages/                   HomePage, ProductPage, BatchPage, AccountPage, NotFoundPage, auth/*
+  admin/                   AdminLayout, ProductsPage, FaqPage, BatchesPage, I18nInput, strings.js (D-48)
+  lib/money.js             formatVnd
   styles/                  App.css (landing), pages.css (trang mới)
   test/                    renderApp.jsx (mockApi, renderAt), fixtures.js
 scripts/gen-seed-sql.js
@@ -58,6 +62,17 @@ Thêm phương thức → thêm ở **cả** `memory` và `supabase` + test.
 | `getBatchByCode(code)` | `Batch \| null` |
 | `getProfile(userId)` | `Profile \| null` |
 | `upsertProfile({ id, fullName?, phone?, preferredLocale? })` | `Profile` (role mặc định `customer`, không đổi role qua đây) |
+| `getProductById`, `createProduct`, `updateProduct(id, patch)`, `deleteProduct` | Admin; trùng slug → `RepoError CONFLICT` |
+| `getFaq`, `createFaq`, `updateFaq`, `deleteFaq` | Admin |
+| `listBatches`, `getBatchById`, `createBatch`, `updateBatch`, `deleteBatch` | Admin; trùng mã → `RepoError CONFLICT` |
+
+### Storage
+
+| Phương thức | Ghi chú |
+|---|---|
+| `createVideoUpload({ path, contentType })` | `{ uploadUrl, headers }` — URL tải lên dùng một lần (T-12) |
+| `statObject(path)` | `{ size, contentType } \| null` |
+| `publicUrl(path)` | Link công khai của file |
 
 ### Auth provider
 
@@ -79,7 +94,8 @@ Lỗi chung: `RATE_LIMITED`.
 |---|---|---|
 | `products` | `slug` unique, `kind` single/set, `status` draft/published/hidden, `price_excl_vat` int, `name/description/badge` jsonb | D-03, D-39 |
 | `faq_entries` | `question/answer` jsonb, `is_published`, `sort_order` | G-07 |
-| `batches` | `code` unique, `status` created/video_published, `video_url`, `title/story` jsonb | D-10, D-43; `video_published` bắt buộc có `video_url` |
+| `batches` | `code` unique, `status` created/video_published, `video_url`, `video_path`, `title/story` jsonb | D-10, D-43; `video_published` bắt buộc có `video_url`; trigger chặn gỡ xuất bản/xoá/đổi mã khi đã xuất bản (D-47) |
+| `storage.buckets: batch-videos` | Bucket công khai chứa video lô | D-46 |
 | `profiles` | `id` → `auth.users`, `full_name`, `phone`, `preferred_locale`, `role` customer/admin | D-38, D-42 |
 
 RLS bật, không có policy (chỉ service role của server truy cập).
@@ -101,6 +117,18 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | POST | `/api/auth/reset-password` | Bearer (token khôi phục) | `{ password }` → 204, vô hiệu token |
 | GET | `/api/me` | Bearer | Hồ sơ |
 | PATCH | `/api/me` | Bearer | `{ fullName?, phone?, preferredLocale? }` |
+| GET/POST | `/api/admin/products` | Admin | Danh sách mọi trạng thái / tạo (mặc định draft) |
+| GET/PATCH/DELETE | `/api/admin/products/:id` | Admin | 409 `SLUG_TAKEN` |
+| GET/POST | `/api/admin/faq` | Admin | |
+| PATCH/DELETE | `/api/admin/faq/:id` | Admin | |
+| GET/POST | `/api/admin/batches` | Admin | 409 `BATCH_CODE_TAKEN` |
+| GET/PATCH/DELETE | `/api/admin/batches/:id` | Admin | Đã xuất bản: 409 `BATCH_CODE_LOCKED` (đổi mã), `BATCH_PUBLISHED` (xoá) |
+| POST | `/api/admin/batches/:id/video-upload` | Admin | `{ contentType, size }` → `{ path, uploadUrl, headers }` |
+| POST | `/api/admin/batches/:id/video` | Admin | `{ path }` → gắn video (thay được sau xuất bản) |
+| POST | `/api/admin/batches/:id/publish` | Admin | 409 `VIDEO_REQUIRED` |
+| PUT/GET | `/api/dev-storage/upload/:token`, `/api/dev-storage/o/*` | Token | Chỉ khi chạy adapter bộ nhớ |
+
+Quyền admin: `requireAdmin` đọc `profiles.role` ở server mỗi request (D-38). Cấp admin: `update public.profiles set role = 'admin' where id = '<uuid>';`
 
 ## Luồng đặt lại mật khẩu (Supabase)
 
@@ -113,5 +141,6 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 ## Frontend
 
 - Route: `LocaleLayout` bọc mọi trang, cấp ngôn ngữ qua `LocaleProvider`, đặt `<html lang>` và `document.title`.
+- Admin: `/admin/{products,faq,batches}` — chỉ tiếng Việt, ngoài `LocaleLayout` (D-48).
 - Trang con: `/` · `/products/:slug` · `/lo/:code` · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
 - `AuthProvider`: phiên trong `localStorage` (`moc.session`), `authedApi` tự refresh một lần khi gặp 401.

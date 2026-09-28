@@ -2,7 +2,7 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.2 (bản nháp) |
+| Phiên bản | v0.3 (bản nháp) |
 | Ngày | 2026-09-28 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
 | Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô |
@@ -31,7 +31,7 @@ MỘC là web **B2C** bán đèn giấy dó thủ công tại Việt Nam, địn
 
 Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý coupon. Thanh toán qua **payOS** hoặc **COD**. **Bắt buộc có tài khoản để đặt hàng.** Chỉ giao trong nước, tiền tệ VND.
 
-**Hiện trạng repo (v0.2)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn. Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây, admin, SEO/GA (xem §31).
+**Hiện trạng repo (v0.3)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô. Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây, admin đơn/coupon/Mây/đổi trả, SEO/GA (xem §31).
 
 ---
 
@@ -268,6 +268,9 @@ Không có chỉ số định lượng nào được cung cấp; các ô "Mục 
   - `[BA DECISION REQUIRED]` Q-06: trả lại một đèn trong bộ thì hoàn bao nhiêu (giá lẻ hay giá phân bổ từ giá bộ)?
 - Nội dung sản phẩm (tên, mô tả, ảnh alt) có ở 3 ngôn ngữ.
 - Trạng thái hiển thị: Draft / Published / Hidden `[CONFIRMED]` D-39. Chỉ Published được hiển thị và bán; Draft/Hidden trả "không tìm thấy" với khách và không được Mây giới thiệu.
+- Admin tạo/sửa/ẩn/xoá sản phẩm tại `/admin` (FR-CAT-004). Sản phẩm mới mặc định là Draft `[ASSUMPTION]`. Tên tiếng Việt bắt buộc; slug gồm chữ thường không dấu, số, gạch nối; giá là số nguyên VND ≥ 0 `[ASSUMPTION]`.
+- Xoá sản phẩm được phép (§3.2). Khi đã có đơn hàng, sản phẩm đã bán phải chuyển Hidden thay vì xoá `[ASSUMPTION]`.
+- Tài khoản admin do người quản trị hệ thống cấp bằng cách đặt `role = 'admin'` trong bảng `profiles` của Supabase; web chưa có màn hình cấp quyền `[ASSUMPTION]`.
 - Trong lúc chưa có giỏ hàng (Q-13), nút trên thẻ sản phẩm dẫn tới trang chi tiết ("Xem chi tiết"); trang chi tiết báo "Đặt hàng trực tuyến sẽ sớm ra mắt" `[ASSUMPTION]`.
 
 ## 10. Tồn kho
@@ -556,6 +559,14 @@ EMPTY ──(soạn)──▶ DRAFT ──(PACKED)──▶ TEXT_LOCKED ──(S
 - Trang lô chỉ công khai khi lô đã xuất bản video (trạng thái `video_published` và có link video); lô chưa có video hoặc mã không tồn tại hiện cùng một trang "không tìm thấy" `[ASSUMPTION]`.
 - Mã lô khớp chính xác, phân biệt hoa thường `[ASSUMPTION]`.
 - Trang lô ghi rõ video là của cả lô (D-01), `noindex` (D-44).
+
+**Quản trị lô (FR-QR-007, v0.3)**
+
+- Admin tạo lô (mã, ngày làm, tiêu đề, câu chuyện ×3 ngôn ngữ), tải video lên Supabase Storage (D-46), rồi bấm "Xuất bản". Chỉ xuất bản được khi lô đã có video.
+- Mã lô chỉ gồm chữ in hoa, số, gạch nối, tối đa 40 ký tự `[ASSUMPTION]`.
+- Video nhận MP4/WebM/MOV, tối đa `MAX_VIDEO_MB` (mặc định 500 MB) `[ASSUMPTION]`.
+- Sau khi xuất bản: được thay video; không gỡ xuất bản, không xoá, không đổi mã (D-47). Video cũ khi bị thay vẫn giữ trong Storage, không xoá `[ASSUMPTION]` (D-10).
+- Lô chưa xuất bản thì sửa mã và xoá được `[ASSUMPTION]`.
 - Đơn chỉ được chuyển SHIPPED khi video lô của mọi dòng hàng đã xuất bản (BR-FUL-001) `[CONFIRMED]` D-41.
 
 ---
@@ -973,7 +984,7 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-03 | Tài khoản, checkout, thanh toán, đơn | Đã có backend Express + Supabase, routing, tài khoản (FR-ACC-001). Chưa có checkout, thanh toán, đơn | Missing | **Một phần** |
 | G-04 | Trang QR lời chúc, QR đèn | Trang QR lô đèn `/lo/:code` (FR-QR-006) đã có. Trang QR lời chúc chưa có | Missing | **Một phần** |
 | G-05 | AI Mây | Không có | Missing | **Còn thiếu** |
-| G-06 | Admin (sản phẩm, đơn, lô, coupon, FAQ, Mây) | Có vai trò `admin` trong hồ sơ (D-38) nhưng chưa có giao diện/API admin; dữ liệu nhập qua Supabase | Missing | **Còn thiếu** |
+| G-06 | Admin (sản phẩm, đơn, lô, coupon, FAQ, Mây) | `/admin` + `/api/admin/*` (v0.3): sản phẩm, FAQ, lô & video lô. Chưa có: đơn, coupon, cấu hình Mây, đổi trả (chưa có nghiệp vụ tương ứng); tài khoản admin cấp bằng tay trong Supabase (`profiles.role`) | Missing | **Một phần** (v0.3) |
 | G-07 | FAQ từ DB (để Mây đọc) | Bảng `faq_entries`, `GET /api/faq` | — | **Đã xử lý** (v0.2) |
 | G-08 | Đa ngôn ngữ | vi/en/zh cho giao diện, sản phẩm, FAQ, trang lô; URL `/`, `/en`, `/zh` (D-37) | — | **Đã xử lý** (v0.2) — bản dịch chờ duyệt (G-14) |
 | G-09 | Chú thích "chưa gồm VAT" | Component `Price` luôn kèm chú thích (BR-PRC-003) | — | **Đã xử lý** (v0.2) — vẫn chờ `[LEGAL]` I-04 |
@@ -988,6 +999,8 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-18 | Đặt lại mật khẩu | `POST /api/auth/reset-password` nhận mọi access token hợp lệ, không riêng token khôi phục; chưa có chức năng đổi mật khẩu (có hỏi mật khẩu cũ) | Security | **Mới** — cần kiểm tra token khôi phục trước go-live |
 | G-19 | Khoá tài khoản | §7 có trạng thái User "bị khóa" nhưng chưa có cơ chế khoá | Missing | **Mới** — làm cùng admin (G-06) |
 | G-20 | Chống dò/spam đăng nhập, đăng ký, quên mật khẩu | Chỉ dựa vào giới hạn của Supabase; chưa có giới hạn theo IP ở tầng app | Security | **Mới** |
+| G-21 | Nhật ký thay đổi của admin | Sửa sản phẩm/FAQ/lô chưa ghi log (NFR-AUD-001 chỉ bắt buộc cho đơn, coupon, hoàn tiền) | Missing | **Mới** (v0.3) — bắt buộc khi làm coupon/đơn |
+| G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật (header cần gửi, giới hạn file của bucket) | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
 
@@ -1060,3 +1073,7 @@ Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.j
 | D-42 | Đăng nhập bằng email + mật khẩu; SĐT chỉ lưu trong hồ sơ | Hiệu lực (v0.2) |
 | D-43 | QR khắc trên đèn là mã chung của lô (Q-30) | Hiệu lực (v0.2) |
 | D-44 | Trang QR lô đèn đặt `noindex` | Hiệu lực (v0.2) |
+| D-45 | Câu chữ: số liệu "lời chúc riêng cho mỗi món quà"; mock điện thoại "Hành trình mẻ đèn của bạn" (Q-34 của nhánh `fix/web-copy-ba-spec`) | Hiệu lực (v0.3) |
+| D-46 | Video lô: admin tải file lên Supabase Storage (không dán link ngoài) | Hiệu lực (v0.3) |
+| D-47 | Lô đã xuất bản video: được thay video; không được gỡ xuất bản, xoá lô, đổi mã lô | Hiệu lực (v0.3) |
+| D-48 | Giao diện admin chỉ tiếng Việt (`/admin`); nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh | Hiệu lực (v0.3) |
