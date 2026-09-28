@@ -1,25 +1,33 @@
+/*
+ * Bảng màu "Đông Hồ": lấy từ chất liệu màu tự nhiên của tranh dân gian.
+ * giấy điệp (nền) · đen than tre (nét) · đỏ son · vàng hoè · xanh chàm · xanh lá.
+ */
 :root {
-  --paper: #f7f0e4;
-  --paper-deep: #efe3d0;
-  --cream: #fbf6ec;
-  --ink: #3a2c22;
-  --ink-soft: #6b5847;
-  --brown: #8a5a34;
-  --brown-deep: #6b4226;
-  --brown-line: #d8c4a8;
-  --ember: #d98a3d;
-  --gold: #c99a4b;
-  --white: #ffffff;
+  --diep: #f5ecd7;
+  --diep-deep: #ecdfc2;
+  --diep-light: #fbf6ea;
+  --than: #1d1712;
+  --than-soft: #54463a;
+  --son: #b8322a;
+  --son-deep: #8e2019;
+  --hoe: #e6a623;
+  --hoe-light: #f6d27a;
+  --cham: #1e3553;
+  --cham-deep: #142540;
+  --la: #3f6b4a;
+  --line: #d9c7a3;
 
-  --serif: 'Cormorant Garamond', 'Times New Roman', serif;
+  --serif: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
   --sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  --shadow-soft: 0 20px 45px -20px rgba(107, 66, 38, 0.35);
-  --shadow-glow: 0 0 70px 10px rgba(217, 138, 61, 0.35);
+  /* Bóng in lệch khuôn của tranh khắc gỗ: đổ cứng, không nhoè */
+  --print: 4px 4px 0 var(--than);
+  --print-lg: 7px 7px 0 var(--than);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
-  font: 17px/1.6 var(--sans);
-  color: var(--ink);
-  background: var(--paper);
+  font: 17px/1.65 var(--sans);
+  color: var(--than);
+  background: var(--diep);
   color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -31,10 +39,17 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+}
+
 body {
   margin: 0;
-  background: var(--paper);
   overflow-x: hidden;
+  /* Vân giấy dó: vẽ một lần, cuộn cùng trang, không dùng lớp phủ cố định */
+  background-color: var(--diep);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.33 0 0 0 0 0.18 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 #root {
@@ -45,24 +60,28 @@ h1,
 h2,
 h3 {
   font-family: var(--serif);
-  font-weight: 500;
-  color: var(--ink);
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 600;
+  color: var(--than);
   margin: 0;
+  text-wrap: balance;
 }
 
 h1 {
-  font-size: clamp(2.6rem, 5vw, 4.6rem);
-  line-height: 1.08;
-  letter-spacing: -0.01em;
+  font-size: clamp(2.5rem, 4.6vw, 4.3rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  font-weight: 700;
 }
 
 h2 {
-  font-size: clamp(2rem, 3.4vw, 2.8rem);
-  line-height: 1.15;
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
 }
 
 h3 {
-  font-size: 1.4rem;
+  font-size: 1.45rem;
 }
 
 p {
@@ -75,4 +94,27 @@ a {
 
 button {
   font-family: var(--sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--son);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--hoe-light);
+  color: var(--than);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

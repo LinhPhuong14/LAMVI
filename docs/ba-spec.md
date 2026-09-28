@@ -2,8 +2,8 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.2 (bản nháp) |
-| Ngày | 2026-09-28 (v0.2: sửa câu chữ web theo §31.3) |
+| Phiên bản | v0.3 (bản nháp) |
+| Ngày | 2026-09-28 (v0.2: sửa câu chữ web theo §31.3; v0.3: làm lại giao diện theo phong cách dân gian, không đổi câu chữ — §31.4) |
 | Trạng thái | Chờ PO duyệt các mục `[BA DECISION REQUIRED]` |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
@@ -202,9 +202,9 @@ Không có chỉ số định lượng nào được cung cấp; các ô "Mục 
 | NFR-PRV-002 | Riêng tư | Token QR và dữ liệu cá nhân không được gửi tới Google Analytics | — |
 | NFR-PRV-003 | Riêng tư | Xóa giọng nói/video là xóa thật, gồm bản sao lưu và cache CDN | Thời gian xóa khỏi backup `[BA DECISION REQUIRED]` |
 | NFR-AUD-001 | Kiểm toán | Ghi log thay đổi trạng thái đơn, coupon, hoàn tiền (ai, khi nào, giá trị cũ/mới) | — |
-| NFR-A11Y-001 | Tiếp cận | Tour Mây tắt được; tôn trọng `prefers-reduced-motion` | — |
+| NFR-A11Y-001 | Tiếp cận | Tour Mây tắt được; tôn trọng `prefers-reduced-motion` | — (landing page đã áp dụng từ v0.3, xem §31.4) |
 | NFR-L10N-001 | Bản địa hóa | Thiếu bản dịch thì hiển thị tiếng Việt `[ASSUMPTION]` | — |
-| NFR-PERF-001 | Hiệu năng | Thời gian tải trang, thời gian phản hồi Mây | `[BA DECISION REQUIRED]` |
+| NFR-PERF-001 | Hiệu năng | Thời gian tải trang, thời gian phản hồi Mây | `[BA DECISION REQUIRED]` — tạm dùng ngưỡng nội bộ ở §31.4 `[ASSUMPTION]` |
 | NFR-AVL-001 | Sẵn sàng | Mây lỗi không được chặn duyệt web, giỏ hàng, checkout | — |
 | NFR-OBS-001 | Quan sát | Theo dõi lỗi webhook, lỗi OpenAI, chi phí OpenAI theo ngày | — |
 
@@ -946,8 +946,8 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 
 | ID | Yêu cầu | Hiện trạng | Loại |
 |---|---|---|---|
-| G-01 | Catalog từ DB, giá dạng số | Chuỗi cố định `'890.000₫'` (`src/App.jsx:20-42`) | Missing / Technical debt |
-| G-02 | Giỏ hàng | Nút không có handler (`src/App.jsx:322`) | Missing |
+| G-01 | Catalog từ DB, giá dạng số | Chuỗi cố định `'890.000₫'` (`src/App.jsx:41-63`) | Missing / Technical debt |
+| G-02 | Giỏ hàng | Nút không có handler (`src/App.jsx:379`) | Missing |
 | G-03 | Tài khoản, checkout, thanh toán, đơn | Không có backend, không có routing | Missing |
 | G-04 | Trang QR lời chúc, QR đèn | Chỉ có ảnh mock điện thoại | Missing |
 | G-05 | AI Mây | Không có | Missing |
@@ -955,8 +955,8 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | G-07 | FAQ từ DB (để Mây đọc) | Cố định trong `src/components/Faq.jsx:4-25` | Missing |
 | G-08 | Đa ngôn ngữ | Chỉ tiếng Việt, chữ viết thẳng trong component | Missing |
 | G-09 | Chú thích "chưa gồm VAT" | Đã có ở thẻ sản phẩm trang chủ (v0.2); chưa có giỏ hàng/checkout nên chưa áp dụng ở đó | Partially implemented |
-| G-10 | Theo dõi đơn, chính sách đổi trả | `href="#"` (`src/App.jsx:509-510`) | Missing |
-| G-11 | Newsletter | `e.preventDefault()`, email bị bỏ (`src/App.jsx:515`) | Incorrect — khách tưởng đã đăng ký |
+| G-10 | Theo dõi đơn, chính sách đổi trả | `href="#"` (`src/App.jsx:577-578`) | Missing |
+| G-11 | Newsletter | `e.preventDefault()`, email bị bỏ (`src/App.jsx:583`) | Incorrect — khách tưởng đã đăng ký |
 | G-12 | SEO | SPA chỉ render phía trình duyệt | Missing |
 | G-13 | Google Analytics | Không có | Missing |
 
@@ -981,13 +981,30 @@ Ghi chú:
 1. `[ASSUMPTION]` FAQ dùng mốc D-13 (khóa khi SHIPPED) vì BR-MSG-008 (khóa phần chữ khi PACKED) mới là đề xuất. Nếu BR-MSG-008 được duyệt, phải sửa lại câu trả lời này.
 2. Câu chữ mới do BA soạn theo yêu cầu của PO; Marketing có thể chỉnh văn phong, nhưng không được đổi ý nghĩa ở cột "Căn cứ".
 
-**Còn phải sửa** — phát hiện trong đợt 1, chưa sửa vì cần PO quyết:
+**Còn phải sửa** — phát hiện trong đợt 1, chưa sửa vì cần PO quyết (vị trí dòng cập nhật theo code v0.3):
 
 | Vị trí (code sau đợt 1) | Hiện tại | Mâu thuẫn với | Việc cần làm |
 |---|---|---|---|
-| `src/App.jsx:220` | Số liệu "1 — câu chuyện riêng mỗi đèn" | D-01 (video theo lô); lời chúc gắn theo đơn, không theo đèn (bộ Sum Vầy 3 đèn chỉ có 1 QR đơn) | `[BA DECISION REQUIRED]` Q-34: đổi thành gì (ví dụ "1 lời chúc riêng mỗi món quà")? |
-| `src/App.jsx:426` | Chú thích mock điện thoại "Hành trình chiếc đèn của bạn" | D-01 | Đổi thành "Hành trình mẻ đèn của bạn" — chờ PO duyệt cùng Q-34 |
-| `src/App.jsx:76` | Testimonial: "thấy cả quá trình đèn được làm cho riêng mình" | D-01 | Gộp vào Q-23: nếu là đánh giá thật thì không được sửa lời khách; nếu là placeholder thì thay |
+| `src/App.jsx:251` | Số liệu "1 — câu chuyện riêng mỗi đèn" | D-01 (video theo lô); lời chúc gắn theo đơn, không theo đèn (bộ Sum Vầy 3 đèn chỉ có 1 QR đơn) | `[BA DECISION REQUIRED]` Q-34: đổi thành gì (ví dụ "1 lời chúc riêng mỗi món quà")? |
+| `src/App.jsx:483` | Chú thích mock điện thoại "Hành trình chiếc đèn của bạn" | D-01 | Đổi thành "Hành trình mẻ đèn của bạn" — chờ PO duyệt cùng Q-34 |
+| `src/App.jsx:97` | Testimonial: "thấy cả quá trình đèn được làm cho riêng mình" | D-01 | Gộp vào Q-23: nếu là đánh giá thật thì không được sửa lời khách; nếu là placeholder thì thay |
+
+
+### 31.4 Giao diện dân gian (v0.3)
+
+Đợt làm lại giao diện theo yêu cầu khách hàng: "nghệ thuật dân gian, motion tốt, hiệu năng tốt, màu sắc tốt hơn". **Không đổi câu chữ, giá, cam kết hay luồng nghiệp vụ** nên không ảnh hưởng mục nào ở §31.3.
+
+| Hạng mục | Đã làm |
+|---|---|
+| Màu | Bảng màu lấy từ chất liệu tranh Đông Hồ: giấy điệp, đen than tre, đỏ son, vàng hoè, xanh chàm, xanh lá (`src/index.css`) |
+| Hoạ tiết | Logo dạng con dấu son; mặt trống đồng, mây cuộn, sóng nước, hoa sen; đèn vẽ lại theo lối tranh khắc gỗ (`src/components/Motifs.jsx`, `Lantern.jsx`) |
+| Motion | Đèn đung đưa và tua rua lay, ánh lửa chập chờn, thẻ "đóng dấu" khi cuộn tới, parallax nhẹ ở hero |
+| NFR-A11Y-001 | `MotionConfig reducedMotion="user"` và CSS `prefers-reduced-motion` tắt mọi animation lặp (đã kiểm: 0 animation chạy khi bật reduce) |
+| Hiệu năng | `LazyMotion` (JS gzip 120 → 108 kB); hạt lửa, đung đưa, marquee chạy bằng CSS transform/opacity; bỏ lớp grain `mix-blend-mode` cố định và `backdrop-filter`; font tự host (bỏ Google Fonts) |
+
+- `[ASSUMPTION]` Ngưỡng hiệu năng nội bộ cho landing page, chờ PO chốt NFR-PERF-001: LCP ≤ 2,5 s và CLS ≤ 0,1 trên desktop. Đo bản build local (không giới hạn mạng): LCP ≈ 1,1 s, CLS ≈ 0,001.
+- `[ASSUMPTION]` Hình đèn, chân dung nghệ nhân và hoạ tiết là **minh hoạ trang trí**, không phải ảnh sản phẩm. Khi có ảnh thật, phần ảnh sản phẩm (§9, "ảnh alt") phải dùng ảnh thật để tránh mô tả sai hàng.
+- Khoảng trống mới: không phát sinh.
 
 ---
 

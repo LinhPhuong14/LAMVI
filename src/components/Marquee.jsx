@@ -1,3 +1,5 @@
+import { Lotus } from './Motifs'
+
 const ITEMS = [
   'GIẤY DÓ THỦ CÔNG',
   'KỂ CHUYỆN BẰNG ÁNH SÁNG',
@@ -6,13 +8,25 @@ const ITEMS = [
   'LÀNG NGHỀ TRĂM NĂM',
 ]
 
+function Line({ hidden }) {
+  return (
+    <span className="marquee-line" aria-hidden={hidden || undefined}>
+      {ITEMS.map((item) => (
+        <span className="marquee-item" key={item}>
+          {item}
+          <Lotus />
+        </span>
+      ))}
+    </span>
+  )
+}
+
 export default function Marquee() {
-  const line = ITEMS.join('  ✦  ') + '  ✦  '
   return (
     <div className="marquee">
       <div className="marquee-track">
-        <span>{line}</span>
-        <span aria-hidden="true">{line}</span>
+        <Line />
+        <Line hidden />
       </div>
     </div>
   )

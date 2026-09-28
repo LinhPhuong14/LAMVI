@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion'
-
+// Đốm lửa bay lên — chỉ dùng CSS keyframes (transform/opacity) để chạy trên compositor.
 const EMBERS = [
   { left: '12%', size: 6, delay: 0, duration: 7 },
   { left: '22%', size: 4, delay: 1.2, duration: 9 },
@@ -14,20 +13,15 @@ export default function Particles() {
   return (
     <div className="particles" aria-hidden="true">
       {EMBERS.map((e, i) => (
-        <motion.span
+        <span
           key={i}
-          className="ember"
-          style={{ left: e.left, width: e.size, height: e.size }}
-          animate={{
-            y: [0, -180, -360],
-            opacity: [0, 0.9, 0],
-            x: [0, i % 2 === 0 ? 14 : -14, 0],
-          }}
-          transition={{
-            duration: e.duration,
-            delay: e.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
+          className={`ember ${i % 2 === 0 ? 'drift-r' : 'drift-l'}`}
+          style={{
+            left: e.left,
+            width: e.size,
+            height: e.size,
+            animationDuration: `${e.duration}s`,
+            animationDelay: `${e.delay}s`,
           }}
         />
       ))}
