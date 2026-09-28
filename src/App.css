@@ -558,6 +558,13 @@
   color: var(--brown-deep);
 }
 
+.price-note {
+  display: block;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
 /* Process */
 .process {
   padding: 100px 56px;

@@ -45,7 +45,7 @@ const steps = [
   { label: 'Chọn giấy dó', note: 'Lọc từng tấm giấy dệt tay không tì vết' },
   { label: 'Lên khung tre', note: 'Vót nan, uốn khung theo dáng cổ truyền' },
   { label: 'Phơi nắng', note: 'Đợi nắng tự nhiên làm săn từng lớp giấy' },
-  { label: 'Đóng gói & khắc QR', note: 'Gắn mã riêng lưu câu chuyện của bạn' },
+  { label: 'Đóng gói & khắc QR', note: 'Khắc mã mở video hành trình của mẻ đèn' },
 ]
 
 const lookbook = [
@@ -297,8 +297,8 @@ function App() {
             transition={{ duration: 0.4 }}
           >
             {intent === 'gift'
-              ? 'Kèm thiệp viết tay, hộp quà vải bố và mã QR để người nhận xem lời chúc riêng của bạn.'
-              : 'Một góc ánh sáng ấm cho không gian sống — vẫn lưu lại câu chuyện làm ra đèn cho riêng bạn.'}
+              ? 'Kèm thiệp viết tay, hộp quà vải bố và thiệp cảm ơn có mã QR để người nhận xem lời chúc riêng của bạn.'
+              : 'Một góc ánh sáng ấm cho không gian sống — quét mã trên đèn để xem mẻ đèn được làm ra. Muốn gửi lời nhắn cho chính mình? Chỉ cần tích “Thêm lời chúc”.'}
           </motion.p>
         </div>
 
@@ -318,7 +318,10 @@ function App() {
               <h3>{p.name}</h3>
               <p className="product-desc">{p.desc}</p>
               <div className="product-foot">
-                <span className="product-price">{p.price}</span>
+                <span className="product-price">
+                  {p.price}
+                  <small className="price-note">Chưa gồm VAT</small>
+                </span>
                 <button className="btn btn-small">
                   {intent === 'gift' ? 'Tặng ngay' : 'Thêm vào giỏ'}
                 </button>
@@ -357,7 +360,7 @@ function App() {
       <section id="process" className="process">
         <div className="section-head">
           <span className="eyebrow">Hành trình thủ công</span>
-          <h2>Theo dõi đèn của bạn từng bước</h2>
+          <h2>Theo dõi đơn của bạn qua từng công đoạn</h2>
         </div>
         <motion.ol
           className="timeline"
@@ -391,14 +394,14 @@ function App() {
             Quét mã, thấy cả một câu chuyện
           </motion.h2>
           <motion.p className="story-text" variants={fadeUp}>
-            Mỗi chiếc đèn mang một mã QR riêng. Người nhận chỉ cần đưa điện
-            thoại lên — video hành trình đèn được làm ra và lời chúc của bạn
-            sẽ hiện lên, được lưu giữ lâu dài.
+            Mã QR trên thiệp cảm ơn mở ra lời chúc của bạn, còn mã khắc trên
+            đèn mở ra video hành trình mẻ đèn được làm ra. Người nhận chỉ cần
+            đưa điện thoại lên, không cần cài ứng dụng.
           </motion.p>
           <motion.ul className="qr-points" variants={fadeUp}>
-            <li>Video quá trình làm đèn của chính chiếc đèn này</li>
+            <li>Video quá trình làm ra mẻ đèn, xem lại bất cứ lúc nào</li>
             <li>Lời chúc bằng giọng nói hoặc video của người tặng</li>
-            <li>Lưu lại vĩnh viễn trong “sổ lưu niệm” cá nhân</li>
+            <li>Lời chúc chữ được lưu mãi; giọng nói và video lưu 30 ngày kể từ khi người nhận xác nhận đã nhận quà, có thể tải về để giữ lâu dài</li>
           </motion.ul>
         </motion.div>
 

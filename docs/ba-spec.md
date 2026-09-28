@@ -2,8 +2,8 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.1 (bản nháp) |
-| Ngày | 2026-09-28 |
+| Phiên bản | v0.2 (bản nháp) |
+| Ngày | 2026-09-28 (v0.2: sửa câu chữ web theo §31.3) |
 | Trạng thái | Chờ PO duyệt các mục `[BA DECISION REQUIRED]` |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
@@ -851,7 +851,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | D-23 i18n | FR-I18N-001 | — | US-012 | — |
 | D-05 SEO/GA | FR-SEO-001, FR-GA-001 | BR-SEO-001, BR-GA-001 | — | — |
 
-**Yêu cầu mồ côi (chưa có US/UC)**: FR-CAT-004, FR-AI-006, FR-QR-007 (admin lô), FR-SEO-001, FR-GA-001 — cần bổ sung US ở v0.2.
+**Yêu cầu mồ côi (chưa có US/UC)**: FR-CAT-004, FR-AI-006, FR-QR-007 (admin lô), FR-SEO-001, FR-GA-001 — cần bổ sung US ở bản sau.
 **Yêu cầu trùng**: không phát hiện.
 
 ---
@@ -920,7 +920,8 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 |---|---|
 | Q-07 | Giới hạn số lượng / "tạm hết hàng" |
 | Q-21 | Phiếu giao hàng không in giá |
-| Q-23 | Testimonial thật hay placeholder |
+| Q-23 | Testimonial thật hay placeholder (gồm câu "làm cho riêng mình" ở `src/App.jsx:76`) |
+| Q-34 | Số liệu "câu chuyện riêng mỗi đèn" (`src/App.jsx:220`) và chú thích mock "Hành trình chiếc đèn của bạn" đổi thành gì |
 | — | Phân vai admin; KPI; chỉ số hiệu năng; giữ hay bỏ form newsletter |
 
 ---
@@ -953,7 +954,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | G-06 | Admin (sản phẩm, đơn, lô, coupon, FAQ, Mây) | Không có | Missing |
 | G-07 | FAQ từ DB (để Mây đọc) | Cố định trong `src/components/Faq.jsx:4-25` | Missing |
 | G-08 | Đa ngôn ngữ | Chỉ tiếng Việt, chữ viết thẳng trong component | Missing |
-| G-09 | Chú thích "chưa gồm VAT" | Không có | Missing |
+| G-09 | Chú thích "chưa gồm VAT" | Đã có ở thẻ sản phẩm trang chủ (v0.2); chưa có giỏ hàng/checkout nên chưa áp dụng ở đó | Partially implemented |
 | G-10 | Theo dõi đơn, chính sách đổi trả | `href="#"` (`src/App.jsx:509-510`) | Missing |
 | G-11 | Newsletter | `e.preventDefault()`, email bị bỏ (`src/App.jsx:515`) | Incorrect — khách tưởng đã đăng ký |
 | G-12 | SEO | SPA chỉ render phía trình duyệt | Missing |
@@ -961,20 +962,32 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
 
-| Vị trí | Hiện tại | Mâu thuẫn với |
-|---|---|---|
-| `src/components/Faq.jsx:7` | "Vĩnh viễn…không giới hạn thời gian xem lại" | D-26 (media 30 ngày) |
-| `src/components/Faq.jsx:11` | "sửa…cho đến khi đèn được đóng gói" | D-13 (đến SHIPPED) / BR-MSG-008 |
-| `src/App.jsx:396` | "được lưu giữ lâu dài" | D-26 |
-| `src/App.jsx:399` | "Video quá trình làm đèn của chính chiếc đèn này" | D-01 (theo lô) |
-| `src/App.jsx:401` | "Lưu lại vĩnh viễn trong sổ lưu niệm" | D-26 |
-| `src/App.jsx:48` | "Gắn mã riêng lưu câu chuyện của bạn" | D-01, Q-30 |
-| `src/App.jsx:300` | Thiệp + QR chỉ nhắc cho đơn Mua tặng | D-14, D-28 |
-| `src/App.jsx:360` | "Theo dõi đèn của bạn từng bước" | D-01 (công đoạn theo lô/đơn, không theo từng đèn) |
-| `src/components/Marquee.jsx:5` | "LƯU GIỮ KÝ ỨC VĨNH VIỄN" | D-26 (chỉ chữ + video lô là vĩnh viễn) |
-| `src/App.jsx:20-42` | Giá không có chú thích VAT | D-03 |
+Đợt sửa 1 (v0.2, nhánh `fix/web-copy-ba-spec`) — vị trí dòng tính theo code **trước** khi sửa:
 
-Câu chữ thay thế do PO/Marketing duyệt.
+| Vị trí | Trước | Sau | Căn cứ | Trạng thái |
+|---|---|---|---|---|
+| `src/components/Faq.jsx:7` | "Vĩnh viễn…không giới hạn thời gian xem lại" | Chữ + video lô: vĩnh viễn; giọng nói/video: 30 ngày từ khi người nhận xác nhận, có nút "Tải về" | D-10, D-12, D-26 | ✅ Đã sửa |
+| `src/components/Faq.jsx:11` | "sửa…trong dashboard cho đến khi đèn được đóng gói" | "…trong trang tài khoản cho đến khi đơn hàng được gửi đi" | D-13 | ✅ Đã sửa — xem ghi chú (1) |
+| `src/App.jsx:394-396` | "Mỗi chiếc đèn mang một mã QR riêng…được lưu giữ lâu dài" | Tách rõ QR thiệp cảm ơn (lời chúc) và QR khắc trên đèn (video mẻ đèn); không cần cài ứng dụng | D-01, D-26, D-28 | ✅ Đã sửa |
+| `src/App.jsx:399` | "Video quá trình làm đèn của chính chiếc đèn này" | "Video quá trình làm ra mẻ đèn, xem lại bất cứ lúc nào" | D-01, D-10 | ✅ Đã sửa |
+| `src/App.jsx:401` | "Lưu lại vĩnh viễn trong sổ lưu niệm" | Chữ lưu mãi; giọng nói/video lưu 30 ngày từ khi xác nhận, tải về được | D-12, D-26 | ✅ Đã sửa |
+| `src/App.jsx:48` | "Gắn mã riêng lưu câu chuyện của bạn" | "Khắc mã mở video hành trình của mẻ đèn" | D-01 (không khẳng định mã riêng/chung — Q-30) | ✅ Đã sửa |
+| `src/App.jsx:300-301` | Thiệp + QR chỉ nhắc cho đơn Mua tặng; đơn tự mua "lưu lại câu chuyện làm ra đèn cho riêng bạn" | Mua tặng: thêm "thiệp cảm ơn có mã QR". Mua cho mình: quét mã trên đèn xem mẻ đèn + ô "Thêm lời chúc" | D-01, D-14, D-28 | ✅ Đã sửa |
+| `src/App.jsx:360` | "Theo dõi đèn của bạn từng bước" | "Theo dõi đơn của bạn qua từng công đoạn" | D-01, C-11 | ✅ Đã sửa |
+| `src/components/Marquee.jsx:5` | "LƯU GIỮ KÝ ỨC VĨNH VIỄN" | "MỖI LỜI CHÚC, MỘT KỶ NIỆM" | D-26 | ✅ Đã sửa |
+| `src/App.jsx:20-42` (hiển thị ở thẻ sản phẩm) | Giá không có chú thích VAT | Thêm dòng "Chưa gồm VAT" dưới giá | D-03, BR-PRC-003 | ✅ Đã sửa trên trang chủ — vẫn chờ `[LEGAL]` I-04 |
+
+Ghi chú:
+1. `[ASSUMPTION]` FAQ dùng mốc D-13 (khóa khi SHIPPED) vì BR-MSG-008 (khóa phần chữ khi PACKED) mới là đề xuất. Nếu BR-MSG-008 được duyệt, phải sửa lại câu trả lời này.
+2. Câu chữ mới do BA soạn theo yêu cầu của PO; Marketing có thể chỉnh văn phong, nhưng không được đổi ý nghĩa ở cột "Căn cứ".
+
+**Còn phải sửa** — phát hiện trong đợt 1, chưa sửa vì cần PO quyết:
+
+| Vị trí (code sau đợt 1) | Hiện tại | Mâu thuẫn với | Việc cần làm |
+|---|---|---|---|
+| `src/App.jsx:220` | Số liệu "1 — câu chuyện riêng mỗi đèn" | D-01 (video theo lô); lời chúc gắn theo đơn, không theo đèn (bộ Sum Vầy 3 đèn chỉ có 1 QR đơn) | `[BA DECISION REQUIRED]` Q-34: đổi thành gì (ví dụ "1 lời chúc riêng mỗi món quà")? |
+| `src/App.jsx:426` | Chú thích mock điện thoại "Hành trình chiếc đèn của bạn" | D-01 | Đổi thành "Hành trình mẻ đèn của bạn" — chờ PO duyệt cùng Q-34 |
+| `src/App.jsx:76` | Testimonial: "thấy cả quá trình đèn được làm cho riêng mình" | D-01 | Gộp vào Q-23: nếu là đánh giá thật thì không được sửa lời khách; nếu là placeholder thì thay |
 
 ---
 

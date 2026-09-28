@@ -2,7 +2,7 @@ const ITEMS = [
   'GIẤY DÓ THỦ CÔNG',
   'KỂ CHUYỆN BẰNG ÁNH SÁNG',
   'LÀM QUÀ TẶNG Ý NGHĨA',
-  'LƯU GIỮ KÝ ỨC VĨNH VIỄN',
+  'MỖI LỜI CHÚC, MỘT KỶ NIỆM',
   'LÀNG NGHỀ TRĂM NĂM',
 ]
 
