@@ -18,6 +18,6 @@ Dùng đúng tên trong cột "Code" cho biến, bảng, endpoint.
 | Đơn hàng | Order | `order` | Chưa làm |
 | Lời chúc | Gift message | `gift_message` | Chưa làm |
 | Thiệp cảm ơn in | Thank-you card | `thank_you_card` | Chưa làm |
-| Mây | May (mascot) | `may` | Chưa làm |
+| Mây | May (mascot) | `may`, `server/may/*`, `src/may/*` | Loại câu trả lời `kind`: answer / resting / tired / sick / unknown |
 | Người mua / người nhận | Buyer / recipient | `buyer`, `recipient` | |
 | Mua tặng / Mua cho mình | Gift / Self | `order_type`: `gift` / `self` | |

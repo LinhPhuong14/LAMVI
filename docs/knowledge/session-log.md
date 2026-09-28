@@ -4,6 +4,27 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-28 (phiên 5) — AI Mây (nhánh `feat/may`, từ `master`)
+
+**Quyết định từ người dùng**
+
+- D-55: code đủ OpenAI nhưng tắt bằng cờ (mặc định tắt) tới khi pháp chế duyệt I-14.
+- D-56: kênh hỗ trợ (Q-31) do admin nhập. D-57: timeout 15 giây. D-58: ngân sách 20 USD/tháng.
+
+**Đã làm**
+
+1. Server: `server/may/*`, `/api/may/chat`, `/api/may/history`, `/api/admin/may/*`, migration `20260928000004_may.sql`; dashboard IT hiện trạng thái OpenAI + % ngân sách.
+2. Frontend: mascot, khung chat, tour trang chủ, lịch sử trên trang tài khoản, `/admin/may`.
+3. Spec v0.6: D-55…D-58, gỡ Q-31, G-05 một phần, G-29…G-31.
+
+**Còn lại / cần người dùng**
+
+- Pháp chế duyệt I-14 → admin bật OpenAI ở `/admin/may` (cần `OPENAI_API_KEY` trên server).
+- Nhập kênh hỗ trợ ở `/admin/may`. Duyệt nội dung tour + câu thông báo en/zh.
+- Tra đơn (G-29) làm cùng đơn hàng.
+
+---
+
 ## 2026-09-28 (phiên 4) — Vai trò IT + dashboard IT (nhánh `feat/it-dashboard`), gộp vào `master`
 
 **Quyết định từ người dùng**
