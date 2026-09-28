@@ -3,6 +3,8 @@
 export const BOUNDS = [50, 100, 250, 500, 1000, 2500]
 export const HIST_KEYS = ['le_50', 'le_100', 'le_250', 'le_500', 'le_1000', 'le_2500', 'gt_2500']
 export const RANGES = { '1h': 3600_000, '24h': 86400_000, '7d': 7 * 86400_000 }
+// Nhóm API đã biết — đường dẫn lạ gộp chung '/api/*' để nhãn không chứa giá trị tuỳ ý (uuid, chuỗi bot quét)
+const KNOWN_API_SEGMENTS = ['products', 'faq', 'batches', 'auth', 'me', 'admin', 'it', 'health', 'dev-storage']
 
 const histKey = (ms) => HIST_KEYS[BOUNDS.findIndex((b) => ms <= b)] ?? 'gt_2500'
 const bucketOf = (t) => new Date(Math.floor(t / 60000) * 60000).toISOString()
@@ -25,7 +27,7 @@ export function routeLabel(req, res, classify) {
     // Lỗi ném từ handler được errorHandler (cấp app) ghi header: baseUrl đã reset nhưng req.route còn
     if (req.route?.path) return `${req.baseUrl.startsWith('/api') ? req.baseUrl : '/api'}${String(req.route.path)}`
     const seg = path.split('/')[2]
-    return seg ? `/api/${seg}/*` : '/api'
+    return KNOWN_API_SEGMENTS.includes(seg) ? `/api/${seg}/*` : '/api/*'
   }
   if (path === '/sitemap.xml' || path === '/robots.txt') return path
   if (String(res.get('Content-Type') ?? '').startsWith('text/html')) return `page:${classify(path).kind}`
@@ -95,16 +97,22 @@ export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flus
     const errs = errors
     buffer = new Map()
     errors = []
-    try {
-      if (rows.length) await repo.recordApiMetrics(rows)
-      if (errs.length) await repo.recordApiErrors(errs)
-      // Giữ 30 ngày [ASSUMPTION]; dọn tối đa mỗi giờ một lần
-      if (now() - lastCleanup > 3600_000) {
-        lastCleanup = now()
-        await repo.deleteApiMetricsBefore(new Date(now() - retentionDays * 86400_000).toISOString())
+    // Mỗi bước độc lập: bước này lỗi không chặn bước sau. Lỗi → bỏ lô đó (mất tối đa 1 phút số liệu) [ASSUMPTION]
+    const step = async (name, fn) => {
+      try {
+        await fn()
+      } catch (err) {
+        console.error(`[metrics] ${name}`, err?.message ?? err)
       }
-    } catch (err) {
-      console.error('[metrics] flush', err?.message ?? err)
+    }
+    if (rows.length) await step('metrics', () => repo.recordApiMetrics(rows))
+    if (errs.length) await step('errors', () => repo.recordApiErrors(errs))
+    // Giữ 30 ngày [ASSUMPTION]; dọn tối đa mỗi giờ một lần, chỉ đánh dấu khi dọn thành công
+    if (now() - lastCleanup > 3600_000) {
+      await step('cleanup', async () => {
+        await repo.deleteApiMetricsBefore(new Date(now() - retentionDays * 86400_000).toISOString())
+        lastCleanup = now()
+      })
     }
   }
 

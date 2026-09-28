@@ -92,7 +92,8 @@ describe('Số liệu API (D-52, D-53)', () => {
     const route = before.body.routes.find((r) => r.route === '/api/products/:slug')
     expect(route).toMatchObject({ method: 'GET', count: 3, s2xx: 2, s4xx: 1, s5xx: 0 })
     expect(route.p95Ms).not.toBeNull()
-    expect(before.body.routes.some((r) => r.route === '/api/khong-co-route/*')).toBe(true)
+    // Đường dẫn lạ gộp chung, không lưu đoạn URL tuỳ ý
+    expect(before.body.routes.some((r) => r.route === '/api/*')).toBe(true)
 
     await metrics.flush()
     const stored = await repo.listApiMetrics({ since: '2026-09-28T00:00:00Z' })

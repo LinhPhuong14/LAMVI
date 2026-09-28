@@ -17,7 +17,8 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 1. Hoàn tất kiểm thử SEO còn dở (phiên 3): hai subagent (client + server) → sửa 5 lỗi (xem commit "Bổ sung test độc lập SEO phía server").
 2. Vai trò IT, `/api/it/*`, `server/monitoring/*`, `/it`, migration `20260928000003_it.sql`. Lỗi tự phát hiện: nhãn route đọc ở sự kiện `finish` bị mất `req.route` → chụp lúc `writeHead` (T-19).
-3. Spec v0.5: FR-IT-001…004, D-51…D-54, G-24…G-27.
+3. Spec v0.5: FR-IT-001…004, D-51…D-54, G-24…G-28.
+4. Subagent kiểm thử IT phát hiện: route API lạ đưa nguyên đoạn URL vào nhãn (uuid/chuỗi tuỳ ý, bảng phình) → gộp `/api/*`. Rủi ro đã xử lý: bảo trì fail-open cả khi trước đó đang bật; flush từng bước độc lập, dọn dữ liệu chỉ đánh dấu khi thành công; revoke execute `record_api_metrics`; allowlist bảo trì không phân biệt hoa thường và chấp nhận `/` cuối.
 
 **Còn lại / cần người dùng**
 

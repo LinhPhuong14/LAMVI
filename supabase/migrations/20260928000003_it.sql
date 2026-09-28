@@ -68,6 +68,9 @@ language sql as $$
     gt_2500 = m.gt_2500 + excluded.gt_2500;
 $$;
 
+-- Chỉ server (service role) gọi hàm này
+revoke execute on function public.record_api_metrics(jsonb) from public, anon, authenticated;
+
 alter table public.api_metrics enable row level security;
 alter table public.api_errors enable row level security;
 alter table public.app_settings enable row level security;

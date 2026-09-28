@@ -159,9 +159,11 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 **Quy tắc (v0.5)**
 
 - Số liệu API lưu ở Supabase (D-53), gộp theo phút × method × endpoint × mã HTTP; endpoint ghi theo mẫu (vd `/api/products/:slug`), không ghi query string, body, token `[DERIVED]` NFR-PRV. Giữ 30 ngày `[ASSUMPTION]`. p50/p95 là ước lượng theo mốc 50/100/250/500/1000/2500 ms `[ASSUMPTION]`.
-- Lỗi 5xx gần đây lưu thời điểm, endpoint, đường dẫn, mã, mã lỗi, thông điệp nội bộ (cắt 300 ký tự) — chỉ IT xem `[ASSUMPTION]`.
+- Lỗi 5xx gần đây lưu thời điểm, endpoint, đường dẫn, mã, mã lỗi, thông điệp nội bộ (cắt 300 ký tự) — chỉ IT xem `[ASSUMPTION]`. Thông điệp nội bộ có thể chứa chi tiết DB; cần rà soát nếu `[LEGAL]` yêu cầu (G-28).
+- Đường dẫn API không thuộc nhóm đã biết được gộp chung một nhãn `/api/*` để không lưu giá trị tuỳ ý từ URL `[DERIVED]`.
+- Ghi số liệu vào DB lỗi → bỏ số liệu của lượt đó (mất tối đa 1 phút), không ảnh hưởng request của khách `[ASSUMPTION]`.
 - Dashboard tự làm mới mỗi 30 giây; giao diện chỉ tiếng Việt (như admin, D-48) `[ASSUMPTION]`.
-- Chế độ bảo trì (D-54): trang công khai trả HTTP 503 + trang bảo trì (3 ngôn ngữ) + `Retry-After`; API ghi (POST/PUT/PATCH/DELETE) trả 503 `MAINTENANCE`, trừ đăng nhập/làm mới phiên/đăng xuất và API IT; API đọc vẫn chạy; `/login`, `/admin`, `/it` vẫn vào được `[ASSUMPTION]` (để IT vào tắt bảo trì). Không đọc được cài đặt → coi như tắt (không chặn web) `[ASSUMPTION]`. Nhiều server đồng bộ trạng thái trong ≤15 giây `[ASSUMPTION]`.
+- Chế độ bảo trì (D-54): trang công khai trả HTTP 503 + trang bảo trì (3 ngôn ngữ) + `Retry-After`; API ghi (POST/PUT/PATCH/DELETE) trả 503 `MAINTENANCE`, trừ đăng nhập/làm mới phiên/đăng xuất và API IT; API đọc vẫn chạy; `/login`, `/admin`, `/it` vẫn vào được `[ASSUMPTION]` (để IT vào tắt bảo trì). Không đọc được cài đặt → coi như tắt (không chặn web), kể cả khi trước đó đang bật `[ASSUMPTION]`. Nhiều server đồng bộ trạng thái trong ≤15 giây `[ASSUMPTION]`.
 
 ### 5.3 Giỏ hàng & checkout
 | ID | Yêu cầu | Nguồn |
@@ -1041,6 +1043,7 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-25 | Cảnh báo chủ động | Dashboard chỉ xem; chưa gửi cảnh báo khi lỗi 5xx tăng hay tích hợp lỗi (kênh thông báo chờ Q-24) | Missing | **Mới** (v0.5) |
 | G-26 | Giám sát payOS webhook, chi phí OpenAI (NFR-OBS-001) | Chưa có vì chưa tích hợp payOS/OpenAI; dashboard chỉ báo đã cấu hình biến môi trường chưa | Missing | **Mới** (v0.5) |
 | G-27 | Nhật ký bật/tắt bảo trì | Chỉ lưu người/thời điểm đổi lần cuối (`app_settings`) + log server; chưa có lịch sử đầy đủ | Missing | **Mới** (v0.5) |
+| G-28 | Nội dung lỗi 5xx lưu cho IT | Lưu thông điệp lỗi nội bộ (có thể chứa chi tiết DB); chưa lọc dữ liệu cá nhân | Privacy | **Mới** (v0.5) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)

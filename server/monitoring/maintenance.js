@@ -2,7 +2,7 @@
 const KEY = 'maintenance'
 const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 // Vẫn cho phép khi bảo trì: đăng nhập (để IT vào tắt) và API IT [ASSUMPTION]
-const ALLOWED = [/^\/api\/it(\/|$)/, /^\/api\/auth\/(login|refresh|logout)$/]
+const ALLOWED = [/^\/api\/it(\/|$)/i, /^\/api\/auth\/(login|refresh|logout)\/?$/i]
 
 export function createMaintenance({ repo, ttlMs = 15_000, now = () => Date.now() }) {
   let cache = null
@@ -13,13 +13,13 @@ export function createMaintenance({ repo, ttlMs = 15_000, now = () => Date.now()
     try {
       const s = await repo.getSetting(KEY)
       cache = { enabled: Boolean(s?.value?.enabled), updatedAt: s?.updatedAt ?? null, updatedBy: s?.updatedBy ?? null }
+      fetchedAt = now()
+      return cache
     } catch (err) {
-      // Không đọc được cài đặt → không chặn web (fail-open), ghi log
+      // D-54: không đọc được cài đặt → coi như tắt (không chặn web), kể cả khi trước đó đang bật; ghi log
       console.error('[maintenance] get', err?.message ?? err)
-      cache ??= { enabled: false, updatedAt: null, updatedBy: null }
+      return { enabled: false, updatedAt: null, updatedBy: null, error: true }
     }
-    fetchedAt = now()
-    return cache
   }
 
   async function set(enabled, userId) {
