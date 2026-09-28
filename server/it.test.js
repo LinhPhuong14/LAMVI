@@ -65,7 +65,8 @@ describe('Sức khoẻ (D-52)', () => {
     const byName = Object.fromEntries(res.body.checks.map((c) => [c.name, c]))
     expect(byName.database).toMatchObject({ status: 'ok', provider: 'memory' })
     expect(byName.payos).toMatchObject({ status: 'not_integrated', configured: false })
-    expect(byName.openai.status).toBe('not_integrated')
+    // D-55: chưa có khoá OpenAI
+    expect(byName.openai).toMatchObject({ status: 'not_configured', configured: false })
     expect(res.body.system).toMatchObject({ dataMode: 'memory', node: process.version })
     expect(res.body.maintenance).toMatchObject({ enabled: false })
     expect(JSON.stringify(res.body)).not.toMatch(/key|secret|password/i)

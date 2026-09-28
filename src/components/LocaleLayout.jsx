@@ -3,6 +3,7 @@ import { MotionConfig } from 'framer-motion'
 import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import SiteHeader from './SiteHeader'
 import SiteFooter from './SiteFooter'
+import May from '../may/May.jsx'
 
 export default function LocaleLayout({ lang }) {
   return (
@@ -16,6 +17,7 @@ export default function LocaleLayout({ lang }) {
             <Outlet />
           </main>
           <SiteFooter />
+          <May />
         </div>
       </MotionConfig>
     </LocaleProvider>

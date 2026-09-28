@@ -10,6 +10,16 @@ export function loadConfig(env = process.env) {
     publicSiteUrl: env.PUBLIC_SITE_URL || 'http://localhost:5173',
     // Giới hạn dung lượng video lô [ASSUMPTION]; phải ≤ giới hạn file của bucket Supabase
     maxVideoMb: Number(env.MAX_VIDEO_MB) || 500,
+    // Số proxy phía trước (vd 1 khi sau load balancer); không đặt → không tin X-Forwarded-For
+    trustProxy: env.TRUST_PROXY === undefined ? undefined : Number(env.TRUST_PROXY) || env.TRUST_PROXY,
+    // AI Mây (D-17, D-55…D-58). Khoá chỉ ở server.
+    openai: {
+      apiKey: env.OPENAI_API_KEY || null,
+      model: env.OPENAI_MODEL || 'gpt-4o-mini',
+      priceInPer1M: Number(env.OPENAI_PRICE_INPUT_PER_1M) || 0.15,
+      priceOutPer1M: Number(env.OPENAI_PRICE_OUTPUT_PER_1M) || 0.6,
+    },
+    mayHashSalt: env.MAY_HASH_SALT || env.SUPABASE_URL || 'moc-dev',
     supabase,
     useSupabase: Boolean(supabase.url && supabase.anonKey && supabase.serviceRoleKey),
   }

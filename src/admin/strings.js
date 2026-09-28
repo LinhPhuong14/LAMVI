@@ -1,7 +1,7 @@
 // D-48: giao diện admin chỉ tiếng Việt. Nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh.
 export const S = {
   title: 'Quản trị MỘC',
-  nav: { products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', it: 'Dashboard IT →', site: '← Về trang web' },
+  nav: { products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', may: 'Mây (AI)', it: 'Dashboard IT →', site: '← Về trang web' },
   common: {
     loading: 'Đang tải…',
     save: 'Lưu',
@@ -48,6 +48,34 @@ export const S = {
     colPublished: 'Hiển thị',
     yes: 'Có',
     no: 'Không',
+  },
+  may: {
+    title: 'Cấu hình Mây',
+    usageTitle: 'Chi phí OpenAI tháng này',
+    usage: '{cost} / {budget} USD ({pct}%) — {requests} lượt gọi',
+    alertWarning: 'Đã dùng trên 80% ngân sách tháng.',
+    alertExhausted: 'Đã hết ngân sách tháng — Mây đang ở chế độ FAQ offline.',
+    notConfigured: 'Server chưa có khoá OpenAI (OPENAI_API_KEY) — Mây luôn chạy chế độ FAQ offline.',
+    openai: 'Bật trả lời bằng OpenAI',
+    openaiHint:
+      'D-55: chỉ bật khi pháp chế đã duyệt việc gửi nội dung chat sang OpenAI (I-14). Khi tắt, Mây trả lời bằng FAQ offline. Mây không bao giờ gửi SĐT/email sang OpenAI.',
+    budget: 'Ngân sách tháng (USD)',
+    budgetHint: '80% → cảnh báo; 100% → chuyển FAQ offline (§22.4).',
+    channel: 'Kênh hỗ trợ người thật (Q-31, D-56)',
+    channelHint: 'Ví dụ "Zalo 0900 000 000" hoặc "hotro@moc.vn". Để trống thì Mây không gợi ý kênh.',
+    limits: 'Hạn mức tin nhắn (§22.4)',
+    guestPerSession: 'Vãng lai — tin / phiên',
+    guestPerDayIp: 'Vãng lai — tin / ngày / IP',
+    userPerDay: 'Đã đăng nhập — tin / ngày',
+    maxChars: 'Độ dài tối đa (ký tự)',
+    messages: 'Câu thông báo (mỗi dòng một câu, chọn ngẫu nhiên)',
+    groups: {
+      sick: 'OpenAI lỗi / quá 15 giây ("ốm")',
+      tired: 'Hết lượt ("mệt")',
+      resting: 'FAQ offline ("nghỉ ngơi")',
+      unknown: 'Không biết — có kênh hỗ trợ (dùng {channel})',
+      unknownNoChannel: 'Không biết — chưa có kênh hỗ trợ',
+    },
   },
   batches: {
     title: 'Lô đèn & video lô',
