@@ -5,7 +5,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | ID | Ngày | Quyết định | Trạng thái |
 |---|---|---|---|
 | T-01 | 2026-09-28 | Frontend: React 19 + Vite, định tuyến bằng `react-router-dom` | Hiệu lực |
-| T-02 | 2026-09-28 | Backend: Node + Express 5 trong cùng repo (`server/`), API dưới `/api` | Hiệu lực |
+| T-02 | 2026-09-28 | Backend: Node + Express 5 trong cùng repo (`server/`), API dưới `/api` | Hiệu lực (từ T-15: cùng server với web) |
 | T-03 | 2026-09-28 | Dữ liệu và xác thực: Supabase (Postgres + Supabase Auth) | Hiệu lực |
 | T-04 | 2026-09-28 | Truy cập dữ liệu qua adapter (repository + auth provider); có bản Supabase và bản bộ nhớ | Hiệu lực |
 | T-05 | 2026-09-28 | Frontend chỉ gọi API Express, không gọi Supabase trực tiếp | Hiệu lực |
@@ -18,6 +18,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-12 | 2026-09-28 | Video lô: server cấp signed upload URL của Supabase Storage, trình duyệt PUT thẳng (không đi qua Express) | Hiệu lực |
 | T-13 | 2026-09-28 | Adapter storage (Supabase + bộ nhớ); bộ nhớ tự phục vụ `/api/dev-storage/*` cho dev/test | Hiệu lực |
 | T-14 | 2026-09-28 | Chuỗi giao diện admin ở `src/admin/strings.js` (chỉ vi, D-48); mã lỗi vẫn ở `src/i18n/messages/*` | Hiệu lực |
+| T-15 | 2026-09-28 | SSR (D-49): một Express phục vụ web + API; dev dùng Vite middleware (cổng 5173), prod dùng `dist/client` + `dist/server/entry-server.js` | Hiệu lực |
+| T-16 | 2026-09-28 | Head/SEO khai báo bằng `<Seo>`; SSR thu thập qua `HeadContext`, client thay thẻ `[data-seo]`; meta robots chỉ do `useNoIndex` (client) và server (SSR) chèn | Hiệu lực |
+| T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
 
 ---
 
@@ -46,3 +49,15 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Bối cảnh**: video có thể vài trăm MB; đi qua Express tốn bộ nhớ/thời gian và vướng giới hạn body. T-05 cấm đưa key Supabase vào frontend.
 - **Quyết định**: `POST /api/admin/batches/:id/video-upload` → server gọi `createSignedUploadUrl(path)` → trình duyệt `PUT` file lên URL đó (XHR để có %). Sau đó `POST /api/admin/batches/:id/video { path }` → server `info(path)` kiểm tra file có thật, đúng dung lượng rồi mới gắn `video_url`.
 - **Hệ quả**: mỗi lần tải là một đường dẫn mới `<batchId>/<timestamp>-<rand>.<ext>`; video cũ không bị ghi đè (D-10). Chưa thử với Supabase thật (G-22). Bucket `batch-videos` tạo bằng migration, đặt giới hạn file ≥ `MAX_VIDEO_MB`.
+
+### T-15 / T-16 / T-17 — SSR
+- **Bối cảnh**: §23.2 yêu cầu HTML render sẵn; D-49 chọn SSR trong Express để dữ liệu admin sửa hiện ngay.
+- **Quyết định**:
+  - `server/ssr.js#renderPage` phân loại đường dẫn (`src/seo/routes.js`): trang công khai → nạp dữ liệu bằng `server/services/catalog.js` (cùng hàm với API) → `render()` của `src/entry-server.jsx` → chèn vào `index.html` (`<!--app-head-->`, `<!--app-html-->`, `<!--app-data-->`). Trang riêng tư → khung HTML rỗng + noindex.
+  - `src/main.jsx`: `#root` có nội dung → `hydrateRoot`, rỗng → `createRoot`.
+  - Mỗi trang render `<Seo>`; trang con thắng. `status` trong `<Seo>` thành mã HTTP khi SSR.
+- **Hệ quả / quy tắc khi thêm trang**:
+  - Trang công khai mới: thêm vào `classifyPath` + `dataKeysFor` (mọi `useApi` của trang phải có key tương ứng, nếu không sẽ lệch hydrate), render `<Seo path=…>`.
+  - Trang riêng tư mới: thêm vào `PRIVATE` trong `src/seo/routes.js`, render `<Seo noindex>`.
+  - Không đọc `window`/`localStorage` trong lúc render của trang công khai (chỉ trong effect).
+  - Không dùng `import … from 'react-router'` trong code chạy SSR — dùng `react-router-dom` để cùng một context.

@@ -24,10 +24,9 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 | AI Mây | FR-AI-001…007 | ⬜ | — | — | Q-31 (kênh hỗ trợ), `[LEGAL]` I-14 |
 | Coupon | FR-CPN-001/002 | ⛔ | — | — | C-1…C-3, C-5, C-6, C-8 |
 | Nền tảng | FR-I18N-001 | ✅ | `src/i18n/*`, `server/i18n.js` | `src/i18n/core.test.js`, `src/pages/Routing.extra.test.jsx` | Duyệt bản dịch (G-14) |
-| Nền tảng | FR-SEO-001 | 🟡 | `useNoIndex` cho trang riêng tư | Có | Pre-render/SSR, hreflang (G-12, G-15) |
+| Nền tảng | FR-SEO-001 | ✅ | `server/ssr.js`, `server/routes/seo.js`, `src/seo/*`, `src/entry-server.jsx` | `server/seo*.test.js`, `server/ssr*.test.js`, `src/seo/*.test.js*` | Ảnh og:image (G-23); `[LEGAL]` I-04 cho giá JSON-LD |
 | Nền tảng | FR-GA-001 | ⬜ | — | — | `[LEGAL]` Q-32 (cookie) |
 
 ## Việc có thể làm tiếp mà không bị chặn
 
-1. SEO: pre-render trang công khai, `hreflang`, sitemap, meta theo ngôn ngữ (G-12, G-15).
-2. Mây phần không cần đơn: tour + FAQ từ DB (FR-AI-001…003, FR-AI-005) — cần OpenAI key; I-14 là `[LEGAL]`.
+1. Mây phần không cần đơn: tour + FAQ từ DB (FR-AI-001…003, FR-AI-005) — cần OpenAI key; I-14 là `[LEGAL]`.

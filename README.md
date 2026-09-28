@@ -10,11 +10,14 @@ React + Vite (frontend), Express (API), Supabase (Postgres + Auth).
 ```bash
 npm install
 cp .env.example .env   # điền SUPABASE_*; để trống thì API dùng dữ liệu bộ nhớ
-npm run dev            # web http://localhost:5173, API http://localhost:8787
+npm run dev            # web (SSR) + API tại http://localhost:5173
 npm test
 npm run lint
-npm run build
+npm run build          # dist/client + dist/server (SSR)
+npm start              # chạy bản build (NODE_ENV=production)
 ```
+
+Triển khai cần một server Node (SSR — D-49). Đặt `PUBLIC_SITE_URL` là tên miền thật (dùng cho canonical, hreflang, sitemap).
 
 ## Supabase
 

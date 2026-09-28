@@ -30,7 +30,8 @@
 - Không viết chuỗi hiển thị trực tiếp trong JSX — dùng `t('key')`. Thêm key thì thêm cho **cả** `vi`, `en`, `zh`; thiếu → hiện `vi` (D-40).
 - Link nội bộ dùng `useI18n().path('/…')` để giữ tiền tố ngôn ngữ (D-37).
 - Giá hiển thị qua `<Price />` — luôn kèm chú thích "chưa gồm VAT" (BR-PRC-003).
-- Trang không được index (trang QR, tài khoản, giỏ, checkout, admin — BR-SEO-001, D-44) dùng `useNoIndex()`.
+- Mỗi trang render `<Seo>` (T-16): trang công khai truyền `title`, `description`, `path` (không có tiền tố ngôn ngữ); trang không được index (QR, tài khoản, giỏ, checkout, admin — BR-SEO-001, D-44) truyền `noindex`; trang lỗi truyền `status`. Không gọi `useNoIndex()` trực tiếp khi đã có `<Seo noindex>`.
+- Trang công khai phải render được trên server (T-15): không đọc `window`/`localStorage` khi render; khai báo key dữ liệu trong `src/seo/routes.js`.
 - Tôn trọng `prefers-reduced-motion` (NFR-A11Y-001): CSS có media query trong `pages.css`; framer-motion được bọc `MotionConfig reducedMotion="user"` ở `LocaleLayout`.
 
 ## Test

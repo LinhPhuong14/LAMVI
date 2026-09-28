@@ -3,25 +3,30 @@
 ## Tổng quan
 
 ```text
-Trình duyệt ──► Vite SPA (src/) ──fetch /api──► Express (server/) ──► Adapter ──► Supabase (Postgres + Auth)
-                                                                      └─────► Bộ nhớ (dev/test, T-04)
+Trình duyệt ──GET trang──► Express (server/) ──SSR (server/ssr.js + src/entry-server.jsx)──► HTML + __INITIAL_DATA__
+     │                         │
+     └──fetch /api────────────►├─► routes/* ──► services/domain ──► Adapter ──► Supabase (Postgres + Auth + Storage)
+                               │                                              └► Bộ nhớ (dev/test, T-04)
+                               └─► /sitemap.xml, /robots.txt (routes/seo.js)
 ```
 
-- Dev: `npm run dev` chạy Vite (5173) và API (8787); Vite proxy `/api` → 8787.
+- Một server (T-15, D-49). Dev: `npm run dev` → Express + Vite middleware (HMR) ở cổng 5173. Prod: `npm run build` rồi `npm start`. `npm run dev:api` chạy chỉ API.
 - Frontend **không** giữ key Supabase (T-05). Mọi quyền truy cập kiểm tra ở server.
 
 ## Thư mục
 
 ```text
 server/
-  index.js                 Khởi động: đọc env, chọn adapter Supabase/bộ nhớ
+  index.js                 Khởi động: đọc env, chọn adapter Supabase/bộ nhớ, gắn SSR
+  ssr.js                   createWeb (Vite middleware / dist) + renderPage (SSR)
+  services/catalog.js      Truy vấn công khai dùng chung API + SSR
   app.js                   createApp({ repo, auth, config }) — dùng trong test
   config.js                Đọc biến môi trường
   errors.js                HttpError + errorHandler (định dạng lỗi thống nhất)
   i18n.js                  normalizeLang, pick (D-40), localePath (D-37)
   domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
-  routes/                  catalog.js, auth.js, admin.js
+  routes/                  catalog.js, auth.js, admin.js, seo.js (sitemap, robots)
   domain/admin.js          Kiểm tra dữ liệu admin (sản phẩm, FAQ, lô, video)
   adapters/
     authErrors.js          AuthError (mã lỗi chuẩn hoá)
@@ -33,7 +38,11 @@ supabase/
   migrations/*.sql         Schema
   seed.sql                 Sinh từ server/data/seed.js (npm run db:seed-sql)
 src/
-  main.jsx, routes.jsx     Router: /, /en, /zh (D-37)
+  main.jsx                 Client: hydrateRoot / createRoot
+  entry-server.jsx         SSR render(url, { initialData, siteUrl })
+  AppShell.jsx             Provider chung (HeadContext, DataContext, Router, Auth)
+  routes.jsx               Router: /, /en, /zh (D-37), /admin
+  seo/                     head.js (thẻ head, JSON-LD), Seo.jsx, context.js, routes.js (phân loại SSR)
   i18n/                    core.js (translate, localePath), index.js (useI18n), LocaleProvider.jsx, messages/{vi,en,zh}.js
   api/                     client.js (api, ApiError), useApi.js
   auth/                    AuthProvider.jsx, context.js (useAuth, phiên), useForm.js
@@ -104,6 +113,7 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 
 | Method | Path | Auth | Mô tả |
 |---|---|---|---|
+| GET | `/sitemap.xml`, `/robots.txt` | – | §23.2 |
 | GET | `/api/health` | – | |
 | GET | `/api/products?lang=` | – | Sản phẩm `published` |
 | GET | `/api/products/:slug?lang=` | – | 404 nếu không `published` |

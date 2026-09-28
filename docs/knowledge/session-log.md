@@ -4,6 +4,27 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-28 (phiên 3) — SEO (nhánh `feat/seo`, tách từ `feat/admin`)
+
+**Quyết định từ người dùng**
+
+- D-49: SSR trong Express (một server Node cho web + API).
+- D-50: JSON-LD sản phẩm có giá chưa VAT, `valueAddedTaxIncluded: false` (I-04 vẫn chờ pháp chế).
+
+**Đã làm**
+
+1. Hoàn tất kiểm thử admin còn dở từ phiên 2: subagent phát hiện `contentType` `toString`/`__proto__` lọt kiểm tra → đã sửa; thêm các bản sửa rủi ro (xem commit trên `feat/admin`).
+2. SSR: `server/ssr.js`, `src/entry-server.jsx`, `src/AppShell.jsx`, hydrate có dữ liệu nạp sẵn. Lỗi tự phát hiện khi chạy trình duyệt thật: trang chủ lệch hydrate vì trang chủ và footer dùng chung key `/products` mà key bị xoá sau lần đọc đầu → sửa bằng store xoá sau khi hydrate xong.
+3. `<Seo>` cho mọi trang; canonical, hreflang, Open Graph, JSON-LD; 404 thật; `sitemap.xml`, `robots.txt`.
+4. Spec v0.4: D-49, D-50, G-12/G-15 đã xử lý, G-23 mới.
+
+**Còn lại / cần người dùng**
+
+- Triển khai giờ cần server Node (không còn hosting tĩnh): `npm run build && npm start`, đặt `PUBLIC_SITE_URL` đúng tên miền.
+- Ảnh sản phẩm/og:image (G-23). Google Analytics chờ `[LEGAL]` Q-32.
+
+---
+
 ## 2026-09-28 (phiên 2) — Admin (nhánh `feat/admin`, tách từ `feat/foundation-web`)
 
 **Mục tiêu**: admin sản phẩm, FAQ, lô & video lô.

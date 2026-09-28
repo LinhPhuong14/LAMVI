@@ -44,10 +44,12 @@ Quyết định nghiệp vụ (`D-xx`) **chỉ** ghi ở Phụ lục A của `ba
 
 ```bash
 npm install
-npm run dev          # Vite (5173) + API (8787) cùng lúc
+npm run dev          # Express: web SSR + API, cổng 5173 (T-15)
+npm run dev:api      # chỉ API
 npm test             # Vitest: test server + frontend
 npm run lint         # oxlint
-npm run build
+npm run build        # client + SSR
+npm start            # chạy bản build
 ```
 
 Biến môi trường: xem [`../../.env.example`](../../.env.example). Không có biến Supabase → server chạy adapter bộ nhớ với dữ liệu seed (T-04).

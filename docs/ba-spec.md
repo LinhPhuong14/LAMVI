@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.3 (bản nháp) |
+| Phiên bản | v0.4 (bản nháp) |
 | Ngày | 2026-09-28 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD) |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -31,7 +31,7 @@ MỘC là web **B2C** bán đèn giấy dó thủ công tại Việt Nam, địn
 
 Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý coupon. Thanh toán qua **payOS** hoặc **COD**. **Bắt buộc có tài khoản để đặt hàng.** Chỉ giao trong nước, tiền tệ VND.
 
-**Hiện trạng repo (v0.3)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô. Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây, admin đơn/coupon/Mây/đổi trả, SEO/GA (xem §31).
+**Hiện trạng repo (v0.4)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap). Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây, admin đơn/coupon/Mây/đổi trả, GA (xem §31).
 
 ---
 
@@ -650,10 +650,26 @@ Các câu thông báo có đủ vi/en/zh-Hans; admin sửa được. Nút "Dịc
 
 ### 23.2 SEO
 
-- Trang công khai phải render sẵn HTML (pre-render hoặc SSR) — hiện tại là SPA chỉ render phía trình duyệt, không đạt (gap G-12).
+- Trang công khai phải render sẵn HTML (pre-render hoặc SSR). **SSR trong Express** — một server Node phục vụ cả web và API, mỗi request render với dữ liệu mới nhất từ DB `[CONFIRMED]` D-49.
 - URL riêng mỗi ngôn ngữ + `hreflang` + sitemap + meta title/description theo trang và ngôn ngữ.
-- Structured data sản phẩm phải khớp cách hiển thị giá (I-04).
-- `noindex`: trang QR lời chúc, dashboard, giỏ hàng, checkout, admin.
+- Structured data sản phẩm phải khớp cách hiển thị giá (I-04): JSON-LD `Product` có `Offer` giá **chưa VAT** kèm `valueAddedTaxIncluded: false` `[CONFIRMED]` D-50 — `[LEGAL]` I-04 vẫn chờ pháp chế; nếu kết luận khác phải sửa cùng lúc cách hiển thị giá và JSON-LD.
+- `noindex`: trang QR lời chúc, dashboard, giỏ hàng, checkout, admin, trang lô (D-44), trang đăng nhập/đăng ký/quên & đặt lại mật khẩu, trang 404.
+
+**Hiện thực (v0.4)**
+
+| Trang | SSR | Index | Ghi chú |
+|---|---|---|---|
+| Trang chủ `/`, `/en`, `/zh` | Có | Có | title/description theo ngôn ngữ, canonical + hreflang (vi, en, zh-Hans, x-default = vi) |
+| Chi tiết sản phẩm | Có | Có (chỉ Published) | title "{tên} — Mộc…", JSON-LD Product (D-50); Draft/Hidden/không có → 404 |
+| Trang QR lô `/lo/:code` | Có | Không (D-44) | Không có trong sitemap |
+| Đăng nhập, đăng ký, quên/đặt lại mật khẩu, tài khoản, admin | Không — chỉ khung HTML `[DERIVED]` (nội dung phụ thuộc phiên ở trình duyệt) | Không | Header `X-Robots-Tag: noindex` |
+| Đường dẫn không tồn tại | Có | Không | HTTP 404 |
+
+- `sitemap.xml`: trang chủ + sản phẩm Published × 3 ngôn ngữ, kèm `xhtml:link` hreflang và `lastmod` `[DERIVED]`.
+- `robots.txt`: chỉ `Disallow` `/api/` và `/admin`; các trang riêng tư dùng `noindex` (để bot đọc được noindex) `[ASSUMPTION]`.
+- Open Graph: `og:title`, `og:description`, `og:url`, `og:type`, `og:locale`. Chưa có ảnh chia sẻ (`og:image`) vì chưa có ảnh sản phẩm thật `[ASSUMPTION]` (G-23).
+- Câu meta description trang chủ và mẫu tiêu đề sản phẩm do đội dev soạn — chờ Marketing duyệt `[ASSUMPTION]` (G-14).
+- URL gốc trong canonical/sitemap lấy từ biến môi trường `PUBLIC_SITE_URL` `[DERIVED]`.
 
 ### 23.3 Google Analytics
 
@@ -880,7 +896,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | D-30 tour | FR-AI-002 | BR-AI-006/007 | US-010 | — |
 | D-21 coupon | FR-CPN-001/002 | BR-CPN-001…003 | US-011 | UC-01 |
 | D-23 i18n | FR-I18N-001 | — | US-012 | — |
-| D-05 SEO/GA | FR-SEO-001, FR-GA-001 | BR-SEO-001, BR-GA-001 | — | — |
+| D-05, D-49, D-50 SEO/GA | FR-SEO-001, FR-GA-001 | BR-SEO-001, BR-GA-001 | — | — |
 | D-37, D-40 URL ngôn ngữ, dự phòng vi | FR-I18N-001 | — | US-012 | — |
 | D-39 trạng thái sản phẩm | FR-CAT-001, FR-CAT-004 | — | — | — |
 | D-42 đăng nhập email | FR-ACC-001 | BR-ACC-001 | — | — |
@@ -990,16 +1006,17 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-09 | Chú thích "chưa gồm VAT" | Component `Price` luôn kèm chú thích (BR-PRC-003) | — | **Đã xử lý** (v0.2) — vẫn chờ `[LEGAL]` I-04 |
 | G-10 | Theo dõi đơn, chính sách đổi trả | Link footer vẫn `href="#"` (`src/components/SiteFooter.jsx`) | Missing | **Còn thiếu** — chưa có đơn và nội dung chính sách |
 | G-11 | Newsletter | Form vẫn bỏ email (`src/components/SiteFooter.jsx`) | Incorrect | **Còn thiếu** — chờ PO giữ/bỏ (§30 P2) |
-| G-12 | SEO | Vẫn là SPA; `index.html` cố định `lang="vi"` và title tiếng Việt trước khi JS chạy | Missing | **Còn thiếu** |
+| G-12 | SEO | SSR trong Express (D-49): trang công khai có HTML đầy đủ, `lang` và title đúng ngôn ngữ (`server/ssr.js`, `src/entry-server.jsx`) | — | **Đã xử lý** (v0.4) |
 | G-13 | Google Analytics | Không có | Missing | **Còn thiếu** |
 | G-14 | Bản dịch en/zh | Do đội dev soạn (`src/i18n/messages/*`, `server/data/seed.js`) | Chưa duyệt | **Mới** — chờ PO duyệt `[ASSUMPTION]` |
-| G-15 | SEO đa ngôn ngữ | Chưa có `hreflang`, sitemap, meta description theo trang/ngôn ngữ | Missing | **Mới** |
+| G-15 | SEO đa ngôn ngữ | `hreflang`, canonical, meta description theo trang/ngôn ngữ (`src/seo/*`), `/sitemap.xml`, `/robots.txt` | — | **Đã xử lý** (v0.4) |
 | G-16 | Cấu hình Supabase Auth | Cần thêm Redirect URLs (`/login`, `/reset-password` × 3 ngôn ngữ) và chọn có bật xác nhận email | Cấu hình | **Mới** — xem `docs/knowledge/architecture.md` |
 | G-17 | Lưu phiên đăng nhập | Token ở `localStorage` (T-10) — rủi ro XSS | Technical debt | **Mới** — xem lại trước go-live |
 | G-18 | Đặt lại mật khẩu | `POST /api/auth/reset-password` nhận mọi access token hợp lệ, không riêng token khôi phục; chưa có chức năng đổi mật khẩu (có hỏi mật khẩu cũ) | Security | **Mới** — cần kiểm tra token khôi phục trước go-live |
 | G-19 | Khoá tài khoản | §7 có trạng thái User "bị khóa" nhưng chưa có cơ chế khoá | Missing | **Mới** — làm cùng admin (G-06) |
 | G-20 | Chống dò/spam đăng nhập, đăng ký, quên mật khẩu | Chỉ dựa vào giới hạn của Supabase; chưa có giới hạn theo IP ở tầng app | Security | **Mới** |
 | G-21 | Nhật ký thay đổi của admin | Sửa sản phẩm/FAQ/lô chưa ghi log (NFR-AUD-001 chỉ bắt buộc cho đơn, coupon, hoàn tiền) | Missing | **Mới** (v0.3) — bắt buộc khi làm coupon/đơn |
+| G-23 | Ảnh chia sẻ mạng xã hội / ảnh sản phẩm | Chưa có ảnh sản phẩm thật (thẻ sản phẩm dùng hình đèn SVG) nên chưa có `og:image`, JSON-LD không có `image` (Google khuyến nghị có) | Missing | **Mới** (v0.4) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
@@ -1077,3 +1094,5 @@ Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.j
 | D-46 | Video lô: admin tải file lên Supabase Storage (không dán link ngoài) | Hiệu lực (v0.3) |
 | D-47 | Lô đã xuất bản video: được thay video; không được gỡ xuất bản, xoá lô, đổi mã lô | Hiệu lực (v0.3) |
 | D-48 | Giao diện admin chỉ tiếng Việt (`/admin`); nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh | Hiệu lực (v0.3) |
+| D-49 | SEO: SSR trong Express — một server Node phục vụ web + API (không dùng hosting tĩnh) | Hiệu lực (v0.4) |
+| D-50 | JSON-LD sản phẩm có giá chưa VAT, ghi `valueAddedTaxIncluded: false` (PO chọn; `[LEGAL]` I-04 vẫn chờ pháp chế) | Hiệu lực (v0.4) |
