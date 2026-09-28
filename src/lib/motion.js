@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 
 export const EASE_OUT = [0.22, 1, 0.36, 1]
 export const EASE_IN = [0.55, 0, 0.75, 0.2]
@@ -77,3 +77,47 @@ export const parseStat = (text) => {
 
 // Nhóm hàng nghìn bằng dấu chấm như cách viết số liệu hiện có ("4.000+")
 export const group3 = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+
+/**
+ * Thiết bị có chuột/bút chính xác và rê được (desktop). Hiệu ứng theo con trỏ chỉ bật khi true.
+ * Mặc định false (SSR và lần render đầu) để không lệch khi hydrate.
+ */
+const FINE_QUERY = '(hover: hover) and (pointer: fine)'
+const fineMq = () => (typeof window !== 'undefined' && window.matchMedia ? window.matchMedia(FINE_QUERY) : null)
+const subscribeFine = (cb) => {
+  const mq = fineMq()
+  mq?.addEventListener?.('change', cb)
+  return () => mq?.removeEventListener?.('change', cb)
+}
+
+export function useFinePointer() {
+  return useSyncExternalStore(
+    subscribeFine,
+    () => fineMq()?.matches ?? false,
+    () => false,
+  )
+}
+
+// Chữ hiện dần từng từ như mực thấm (ý tưởng "Text Generate Effect")
+export const wordGroup = {
+  below: { transition: { staggerChildren: 0.01, staggerDirection: -1 } },
+  in: { transition: { staggerChildren: 0.035, delayChildren: 0.15 } },
+  above: { transition: { staggerChildren: 0.01, staggerDirection: -1 } },
+}
+export const inkWord = {
+  below: { opacity: 0.08, filter: 'blur(5px)', transition: { duration: 0.3 } },
+  in: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.55, ease: EASE_OUT } },
+  above: { opacity: 0.08, filter: 'blur(4px)', transition: { duration: 0.3 } },
+}
+
+// Luồng sáng của đèn treo (ý tưởng "Lamp Effect"): nón sáng mở rộng từ đèn xuống tiêu đề
+export const lampBeam = {
+  below: { opacity: 0, scaleX: 0.35, transition: { duration: 0.5, ease: EASE_IN } },
+  in: { opacity: 1, scaleX: 1, transition: { duration: 1.2, ease: EASE_OUT, delay: 0.25 } },
+  above: { opacity: 0, scaleX: 0.5, transition: { duration: 0.5, ease: EASE_IN } },
+}
+export const lampOrb = {
+  below: { opacity: 0, scale: 0.5, transition: { duration: 0.5 } },
+  in: { opacity: [0, 1, 0.55, 1], scale: 1, transition: { duration: 1.1, times: [0, 0.3, 0.45, 1] } },
+  above: { opacity: 0, scale: 0.6, transition: { duration: 0.5 } },
+}

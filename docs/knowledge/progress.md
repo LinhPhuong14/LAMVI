@@ -26,7 +26,7 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 | Nền tảng | FR-I18N-001 | ✅ | `src/i18n/*`, `server/i18n.js` | `src/i18n/core.test.js`, `src/pages/Routing.extra.test.jsx` | Duyệt bản dịch (G-14) |
 | Nền tảng | FR-SEO-001 | ✅ | `server/ssr.js`, `server/routes/seo.js`, `src/seo/*`, `src/entry-server.jsx` | `server/seo*.test.js`, `server/ssr*.test.js`, `src/seo/*.test.js*` | Ảnh og:image (G-23); `[LEGAL]` I-04 cho giá JSON-LD |
 | Nền tảng | FR-GA-001 | ⬜ | — | — | `[LEGAL]` Q-32 (cookie) |
-| Giao diện | NFR-A11Y-001 (giảm chuyển động), giao diện dân gian cổ + motion (T-21…T-23) | ✅ | `src/index.css`, `src/styles/App.css`, `src/pages/HomePage.jsx`, `src/components/{Reveal,Motifs,Lantern,SiteHeader}.jsx`, `src/lib/motion.js` | `src/components/Motion*.test.jsx` | NFR-PERF-001 chưa có mục tiêu (dùng tạm `[ASSUMPTION]` §31.4) |
+| Giao diện | NFR-A11Y-001 (giảm chuyển động), giao diện dân gian cổ + motion (T-21…T-23) | ✅ | `src/index.css`, `src/styles/App.css`, `src/pages/HomePage.jsx`, `src/components/{Reveal,Motifs,Effects,Lantern,SiteHeader}.jsx`, `src/lib/motion.js` | `src/components/{Motion,Effects}*.test.jsx`, `server/ssr.design.extra.test.js` | NFR-PERF-001 chưa có mục tiêu (dùng tạm `[ASSUMPTION]` §31.4) |
 | Vận hành | FR-IT-001…004 (dashboard IT) | ✅ | `server/routes/it.js`, `server/monitoring/*`, `src/it/*` | `server/it*.test.js`, `src/it/It*.test.jsx` | Cảnh báo chủ động (G-25) chờ Q-24 |
 
 ## Việc có thể làm tiếp mà không bị chặn

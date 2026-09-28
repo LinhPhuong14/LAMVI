@@ -61,7 +61,7 @@ export default function SiteHeader() {
         <Link to={path('/account')} className="nav-account">
           {t('nav.account')}
         </Link>
-        <Link to={{ pathname: path('/'), hash: '#products' }} className="nav-cta">
+        <Link to={{ pathname: path('/'), hash: '#products' }} className="nav-cta thread">
           {t('nav.cta')}
         </Link>
       </div>

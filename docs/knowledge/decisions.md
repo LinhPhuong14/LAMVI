@@ -26,6 +26,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
 | T-21 | 2026-09-28 | Font tự host bằng `@fontsource` (Fraunces Variable soft + italic, Be Vietnam Pro 400/500/600), preload 6 file woff2 chính trong `index.html`; bỏ Google Fonts | Hiệu lực |
 | T-22 | 2026-09-28 | Motion: `LazyMotion features={domAnimation} strict` ở `LocaleLayout` → chỉ dùng `m.*`; xuất hiện/biến mất theo `useViewState` (IntersectionObserver, `below`/`in`/`above`); animation lặp (đung đưa, marquee, hạt lửa) bằng CSS | Hiệu lực |
+| T-24 | 2026-09-28 | Hiệu ứng lấy ý tưởng từ Aceternity UI nhưng tự viết lại (không chép code — trang của họ ghi "All Rights Reserved"; không dùng Tailwind). Hiệu ứng theo con trỏ chỉ bật khi `useFinePointer()` và không giảm chuyển động | Hiệu lực |
 | T-23 | 2026-09-28 | Giao diện "Đông Hồ cổ": token màu ở `src/index.css` (giữ bí danh tên cũ cho `pages.css`); texture giấy/mực là SVG nội tuyến, vẽ trên nền tĩnh — không dùng lớp phủ cố định có `mix-blend-mode`/`backdrop-filter` | Hiệu lực |
 
 ---
@@ -84,3 +85,25 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
   - Component dưới `LocaleLayout` dùng `m.div`… — `motion.div` sẽ throw vì `strict`.
   - Thêm khối cần hiệu ứng: bọc `<Reveal variants={group}>`, con dùng `variants={rise|ink|stamp}`. Hiệu ứng lặp mới: viết bằng CSS keyframes transform/opacity; `pages.css` đã tắt mọi animation CSS khi `prefers-reduced-motion`.
   - Nội dung trong `Reveal` có `opacity: 0` trong HTML SSR tới khi JS chạy (như trước khi đổi giao diện) — xem G-30.
+
+### T-24 — Hiệu ứng tham khảo Aceternity UI
+- **Bối cảnh**: người dùng yêu cầu tham khảo Aceternity UI (ui.aceternity.com). Bộ đó là component copy-paste dựa trên Tailwind + framer-motion, bản quyền "All Rights Reserved" của Aceternity Labs.
+- **Quyết định**: chỉ lấy ý tưởng, tự viết bằng CSS thuần + `m.*`, ở `src/components/Effects.jsx` và `HomePage.jsx`:
+
+  | Ý tưởng Aceternity | Ở MỘC |
+  |---|---|
+  | Lamp Effect | `LampHead` — đèn treo rọi nón sáng xuống tiêu đề lookbook |
+  | Spotlight / Following Pointer | `PointerGlow` — quầng đèn theo con trỏ ở hero |
+  | 3D Card + Card Spotlight | `TiltCard` — thẻ sản phẩm |
+  | Text Generate Effect | `InkWords` — lời nghệ nhân |
+  | Tracing Beam / Timeline | `ProcessTimeline` — sợi chỉ đỏ theo cuộn, bước đã qua có `is-lit` |
+  | Moving Border | class `.thread` — nút chính |
+  | Focus Cards | CSS `:has()` trong lookbook |
+  | Sparkles / Shooting Stars | `SkyLanterns` — đèn trời |
+  | Text Hover Effect | `BrandHover` — chữ MỘC ở footer |
+
+- **Hệ quả**:
+  - Hiệu ứng theo con trỏ không gắn handler trên thiết bị cảm ứng hoặc khi giảm chuyển động; cập nhật qua motion value, không re-render.
+  - Thẻ có `TiltCard` không được `overflow: hidden` (làm phẳng lớp 3D).
+  - `.thread` cần `@property` (Chrome/Edge, Safari 16.4+, Firefox 128+); trình duyệt cũ thấy viền đứng yên.
+  - Màn hình đầu dùng animation CSS thay framer để chữ tiêu đề không bị `opacity: 0` trong HTML SSR (giảm G-30).

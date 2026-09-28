@@ -1,6 +1,14 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { AnimatePresence, m, useReducedMotionConfig, useScroll, useTransform } from 'framer-motion'
+import {
+  AnimatePresence,
+  m,
+  useMotionValueEvent,
+  useReducedMotionConfig,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion'
 import Lantern from '../components/Lantern'
 import ScrollProgress from '../components/ScrollProgress'
 import Marquee from '../components/Marquee'
@@ -8,8 +16,20 @@ import Particles from '../components/Particles'
 import Faq from '../components/Faq'
 import Price from '../components/Price'
 import { CountUp, Reveal } from '../components/Reveal'
+import { PointerGlow, TiltCard } from '../components/Effects'
 import { Cloud, DrumSun, Lotus, OldPhoto, Postmark, Seal } from '../components/Motifs'
-import { EASE_IN, EASE_OUT, group, ink, rise, stamp } from '../lib/motion.js'
+import {
+  EASE_IN,
+  EASE_OUT,
+  group,
+  ink,
+  inkWord,
+  lampBeam,
+  lampOrb,
+  rise,
+  stamp,
+  wordGroup,
+} from '../lib/motion.js'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
 import Seo from '../seo/Seo.jsx'
@@ -17,17 +37,9 @@ import Seo from '../seo/Seo.jsx'
 const TONES = ['amber', 'dusk', 'dawn', 'moss', 'dusk']
 const SIZES = ['tall', 'short', 'short', 'tall', 'short']
 
-// Màn hình đầu: chạy một lần khi tải trang (không phụ thuộc cuộn)
-const heroGroup = { hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } }
-const heroRise = {
-  hidden: { opacity: 0, y: 28 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE_OUT } },
-}
-const heroWord = {
-  hidden: { opacity: 0, y: '0.35em', filter: 'blur(10px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.9, ease: EASE_OUT } },
-}
-const heroWords = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } }
+// Màn hình đầu chạy bằng CSS (class `intro`, `word`): hiện ngay khi HTML server tới trình duyệt,
+// không chờ JS hydrate → chữ tiêu đề (LCP) không bị ẩn khi JS chậm hoặc lỗi (G-30)
+const introDelay = (i) => ({ animationDelay: `${0.1 + i * 0.1}s` })
 
 // Đèn lookbook: tắt khi chưa tới, bập bùng rồi sáng hẳn khi cuộn tới, lịm dần khi cuộn qua
 const lampHalo = {
@@ -43,13 +55,6 @@ const lampBody = {
   below: { filter: 'brightness(0.45) saturate(0.3)', transition: { duration: 0.5 } },
   in: { filter: 'brightness(1) saturate(1)', transition: { duration: 1.1, delay: 0.1, ease: EASE_OUT } },
   above: { filter: 'brightness(0.45) saturate(0.3)', transition: { duration: 0.6 } },
-}
-
-// Đường chấm nối các công đoạn: vẽ dần từ trái sang, thu lại khi rời đi
-const drawLine = {
-  below: { scaleX: 0, transition: { duration: 0.4 } },
-  in: { scaleX: 1, transition: { duration: 1.4, ease: EASE_OUT, delay: 0.2 } },
-  above: { scaleX: 0, transition: { duration: 0.4 } },
 }
 
 const phone = {
@@ -103,16 +108,114 @@ function SectionHead({ eyebrow, title, children }) {
 }
 
 // Tách từ để chữ hiện lần lượt như mực thấm; khoảng trắng nằm ngoài span để không bị nuốt
-function Words({ text }) {
+function Words({ text, start = 0 }) {
   const words = text.split(' ')
   return words.map((w, i) => (
     <Fragment key={i}>
-      <m.span className="word" variants={heroWord}>
+      <span className="word" style={{ animationDelay: `${0.25 + (start + i) * 0.06}s` }}>
+        {w}
+      </span>
+      {i < words.length - 1 ? ' ' : null}
+    </Fragment>
+  ))
+}
+
+// Lời trích hiện từng từ như mực thấm; đặt trong Reveal
+function InkWords({ text }) {
+  const words = text.split(' ')
+  return words.map((w, i) => (
+    <Fragment key={i}>
+      <m.span className="word" variants={inkWord}>
         {w}
       </m.span>
       {i < words.length - 1 ? ' ' : null}
     </Fragment>
   ))
+}
+
+// Đèn trời bay lên trên nền đêm của lookbook — chỉ trang trí, chạy bằng CSS
+const SKY_LANTERNS = [
+  { left: '6%', delay: 0, duration: 22, size: 12 },
+  { left: '17%', delay: 7, duration: 26, size: 9 },
+  { left: '31%', delay: 3, duration: 24, size: 7 },
+  { left: '48%', delay: 11, duration: 28, size: 10 },
+  { left: '63%', delay: 5, duration: 23, size: 8 },
+  { left: '76%', delay: 14, duration: 27, size: 12 },
+  { left: '88%', delay: 9, duration: 25, size: 9 },
+  { left: '95%', delay: 2, duration: 30, size: 7 },
+]
+
+function SkyLanterns() {
+  return (
+    <div className="sky-lanterns" aria-hidden="true">
+      {SKY_LANTERNS.map((l, i) => (
+        <span
+          key={i}
+          className="sky-lantern"
+          style={{
+            left: l.left,
+            width: l.size,
+            height: l.size * 1.3,
+            animationDuration: `${l.duration}s`,
+            animationDelay: `-${l.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Đèn treo rọi luồng sáng xuống tiêu đề; mở khi cuộn tới, thu lại khi rời đi (ý tưởng "Lamp Effect")
+function LampHead({ eyebrow, title }) {
+  return (
+    <Reveal className="lamp" variants={group}>
+      <div className="lamp-light" aria-hidden="true">
+        <m.span className="lamp-beam" variants={lampBeam} />
+        <m.span className="lamp-orb" variants={lampOrb} />
+        <div className="lamp-lantern">
+          <Lantern size={46} tone="amber" swing flicker />
+        </div>
+      </div>
+      <SectionHead eyebrow={eyebrow} title={title} />
+    </Reveal>
+  )
+}
+
+// Sợi chỉ đỏ chạy theo tiến độ cuộn; qua bước nào thì bước đó "thắp" lên (ý tưởng "Tracing Beam")
+function ProcessTimeline({ steps }) {
+  const ref = useRef(null)
+  const reduce = useReducedMotionConfig()
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 85%', 'end 50%'] })
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24, restDelta: 0.001 })
+  const sparkX = useTransform(progress, (v) => `${v * 100}%`)
+  const [lit, setLit] = useState(0)
+  useMotionValueEvent(progress, 'change', (v) => {
+    const next = v <= 0.02 ? 0 : Math.min(steps.length, 1 + Math.floor(v * (steps.length - 1) + 0.02))
+    if (next !== lit) setLit(next)
+  })
+  const litCount = reduce ? steps.length : lit
+
+  return (
+    <div className="timeline-wrap" ref={ref}>
+      <div className="timeline-track" aria-hidden="true">
+        <m.span className="timeline-beam" style={{ scaleX: reduce ? 1 : progress }} />
+        {!reduce && (
+          <m.span className="timeline-spark-rail" style={{ x: sparkX }}>
+            <span className="timeline-spark" />
+          </m.span>
+        )}
+      </div>
+      <Reveal as="ol" className="timeline" variants={group}>
+        {steps.map((s, i) => (
+          <m.li key={s.label} variants={stamp} custom={i} className={i < litCount ? 'is-lit' : undefined}>
+            <span className="timeline-index">{String(i + 1).padStart(2, '0')}</span>
+            <span className="timeline-label">{s.label}</span>
+            <span className="timeline-note">{s.note}</span>
+          </m.li>
+        ))}
+      </Reveal>
+    </div>
+  )
 }
 
 function Hero() {
@@ -129,32 +232,37 @@ function Hero() {
 
   return (
     <section className="hero aged">
+      <PointerGlow />
       <Particles />
       <Cloud className="hero-cloud cloud-a" />
       <Cloud className="hero-cloud cloud-b" />
 
       <m.div className="hero-copy" style={{ opacity: copyOpacity, y: copyY }}>
-        <m.div initial="hidden" animate="show" variants={heroGroup}>
-          <Eyebrow variants={heroRise}>{t('hero.eyebrow')}</Eyebrow>
-          <m.h1 variants={heroWords}>
+        <div>
+          <span className="eyebrow intro" style={introDelay(0)}>
+            <Lotus />
+            {t('hero.eyebrow')}
+            <Lotus />
+          </span>
+          <h1>
             <Words text={t('hero.title1')} />
             <br />
             <span className="h1-accent">
-              <Words text={t('hero.title2')} />
+              <Words text={t('hero.title2')} start={t('hero.title1').split(' ').length} />
             </span>
-          </m.h1>
-          <m.p className="hero-sub" variants={heroRise}>
+          </h1>
+          <p className="hero-sub intro" style={introDelay(5)}>
             {t('hero.sub')}
-          </m.p>
-          <m.div className="hero-actions" variants={heroRise}>
-            <a href="#products" className="btn btn-primary">
+          </p>
+          <div className="hero-actions intro" style={introDelay(6)}>
+            <a href="#products" className="btn btn-primary thread">
               {t('hero.explore')}
             </a>
             <a href="#story" className="btn btn-ghost">
               {t('hero.story')}
             </a>
-          </m.div>
-        </m.div>
+          </div>
+        </div>
       </m.div>
 
       <div className="hero-art">
@@ -230,10 +338,12 @@ function ProductGrid({ intent }) {
   return (
     <Reveal className="product-grid" variants={group} margin="-8% 0px -8% 0px">
       {res.data.items.map((p, i) => (
-        <m.article className={`product-card tone-${p.tone}`} key={p.slug} variants={stamp} custom={i}>
-          {p.badge && <Seal className="product-badge">{p.badge}</Seal>}
+        <TiltCard className={`product-card tone-${p.tone}`} key={p.slug} variants={stamp} custom={i}>
+          {p.badge && <Seal className="product-badge lift">{p.badge}</Seal>}
           <div className="product-art worn">
-            <Lantern size={112} tone={p.tone} swing />
+            <div className="lift">
+              <Lantern size={112} tone={p.tone} swing />
+            </div>
           </div>
           <div className="product-body">
             <h3>
@@ -253,7 +363,7 @@ function ProductGrid({ intent }) {
               </Link>
             </div>
           </div>
-        </m.article>
+        </TiltCard>
       ))}
     </Reveal>
   )
@@ -324,8 +434,8 @@ export default function HomePage() {
         <m.div className="artisan-copy" variants={group}>
           <Eyebrow>{t('artisan.eyebrow')}</Eyebrow>
           <m.h2 variants={ink}>{t('artisan.title')}</m.h2>
-          <m.p className="artisan-quote" variants={rise}>
-            {t('artisan.quote')}
+          <m.p className="artisan-quote" variants={wordGroup}>
+            <InkWords text={t('artisan.quote')} />
           </m.p>
           <m.div className="artisan-meta" variants={rise}>
             <div>
@@ -383,10 +493,9 @@ export default function HomePage() {
       </section>
 
       <section id="lookbook" className="lookbook">
+        <SkyLanterns />
         <div className="lookbook-inner">
-          <Reveal variants={group}>
-            <SectionHead eyebrow={t('lookbook.eyebrow')} title={t('lookbook.title')} />
-          </Reveal>
+          <LampHead eyebrow={t('lookbook.eyebrow')} title={t('lookbook.title')} />
           <Reveal className="lookbook-grid" variants={group} margin="-10% 0px -10% 0px">
             {t('lookbook.items').map((label, i) => (
               <m.div
@@ -409,16 +518,7 @@ export default function HomePage() {
         <Reveal variants={group}>
           <SectionHead eyebrow={t('process.eyebrow')} title={t('process.title')} />
         </Reveal>
-        <Reveal as="ol" className="timeline" variants={group}>
-          <m.li className="timeline-line" aria-hidden="true" variants={drawLine} />
-          {t('process.steps').map((s, i) => (
-            <m.li key={s.label} variants={stamp} custom={i}>
-              <span className="timeline-index">{String(i + 1).padStart(2, '0')}</span>
-              <span className="timeline-label">{s.label}</span>
-              <span className="timeline-note">{s.note}</span>
-            </m.li>
-          ))}
-        </Reveal>
+        <ProcessTimeline steps={t('process.steps')} />
       </section>
 
       <section id="qr" className="qr-experience">

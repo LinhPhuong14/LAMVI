@@ -1045,7 +1045,7 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-27 | Nhật ký bật/tắt bảo trì | Chỉ lưu người/thời điểm đổi lần cuối (`app_settings`) + log server; chưa có lịch sử đầy đủ | Missing | **Mới** (v0.5) |
 | G-28 | Nội dung lỗi 5xx lưu cho IT | Lưu thông điệp lỗi nội bộ (có thể chứa chi tiết DB); chưa lọc dữ liệu cá nhân | Privacy | **Mới** (v0.5) |
 | G-29 | Hình minh hoạ thay cho ảnh thật | Đèn, chân dung nghệ nhân (khung "ảnh cũ"), hoạ tiết đều là SVG minh hoạ; chân dung không phải ảnh thật của nghệ nhân. Khi có ảnh thật phải thay, và không trình bày minh hoạ như ảnh tư liệu | Content | **Mới** (v0.6) — liên quan G-23 |
-| G-30 | Nội dung khi chưa chạy JS | Các khối có hiệu ứng xuất hiện nằm trong HTML SSR (máy tìm kiếm đọc được) nhưng `opacity: 0` tới khi JS chạy; trình duyệt tắt JS không thấy phần dưới màn hình đầu. Có từ trước v0.6 (hiệu ứng cũ cũng vậy) | Technical debt | **Mới** (v0.6) |
+| G-30 | Nội dung khi chưa chạy JS | Các khối có hiệu ứng xuất hiện nằm trong HTML SSR (máy tìm kiếm đọc được) nhưng `opacity: 0` tới khi JS chạy. Đã giảm: màn hình đầu (tiêu đề, LCP) chạy bằng CSS nên hiện ngay; trình duyệt tắt JS được CSS `@media (scripting: none)` ép hiện. Còn lại: JS tải chậm thì các khối dưới màn hình đầu chờ hydrate mới hiện | Technical debt | 🟡 Một phần (v0.6) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
@@ -1079,7 +1079,8 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 | Chất cổ | Vân sợi giấy dó, vết ố, viền tối như ảnh cũ, mực in mòn trên mảng màu, chữ lệch khuôn in, số kiểu cổ; logo con dấu son, dấu bưu điện, ảnh cũ viền răng cưa có góc dán album |
 | Motion | Mỗi khối hiện ra khi cuộn tới và tan đi theo hướng cuộn khi rời màn hình; tiêu đề hiện như mực loang; thẻ "đóng dấu"; số liệu đếm lên; đèn lookbook thắp sáng khi tới, lịm khi qua; đèn hero bay lên như thả đèn trời khi cuộn đi; header ẩn khi cuộn xuống, hiện khi cuộn lên; FAQ mở như trải cuộn thư |
 | NFR-A11Y-001 | Giảm chuyển động → không animation lặp, không dịch chuyển, số liệu hiện giá trị thật ngay (đã kiểm: 0 animation chạy). Trình đọc màn hình luôn đọc giá trị số thật; hoạ tiết `aria-hidden` |
-| Hiệu năng | Font tự host + preload; `LazyMotion`; animation lặp bằng CSS; texture vẽ trên nền tĩnh. Đo bản build local (không giới hạn mạng, desktop 1440×900): LCP ~1,55 s → ~0,45 s; CLS 0 → 0; JS 156,2 → 150,7 kB gzip |
+| Hiệu ứng tương tác (tham khảo ý tưởng Aceternity UI, tự viết lại — T-24) | Đèn treo rọi sáng tiêu đề lookbook; quầng đèn theo con trỏ ở hero; thẻ sản phẩm nghiêng 3D; lời nghệ nhân hiện từng chữ; sợi chỉ đỏ theo tiến độ cuộn ở công đoạn; viền chỉ vàng chạy quanh nút chính; lookbook làm mờ đèn không được chọn; đèn trời bay trên nền đêm; chữ MỘC ở footer loang màu son theo con trỏ. Hiệu ứng theo con trỏ chỉ có trên máy có chuột |
+| Hiệu năng | Font tự host + preload; `LazyMotion`; animation lặp bằng CSS; texture vẽ trên nền tĩnh. Đo bản build local (không giới hạn mạng, desktop 1440×900): LCP ~1,55 s → ~0,45–0,58 s; CLS 0 → 0; JS 156,2 → 152,5 kB gzip (đã gồm hiệu ứng T-24) |
 
 - `[ASSUMPTION]` Ngưỡng hiệu năng nội bộ cho trang công khai, chờ PO chốt NFR-PERF-001: LCP ≤ 2,5 s, CLS ≤ 0,1 (mức "tốt" của Core Web Vitals).
 - `[ASSUMPTION]` Motion "biến mất" áp dụng khi khối rời khỏi màn hình (cuộn qua), không áp dụng khi chuyển trang (tránh chặn điều hướng và SSR).

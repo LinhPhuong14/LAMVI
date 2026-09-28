@@ -49,7 +49,7 @@ src/
   auth/                    AuthProvider.jsx, context.js (useAuth, phiên), useForm.js
   hooks/useNoIndex.js      meta robots noindex (BR-SEO-001, D-44)
   components/              SiteHeader, SiteFooter, LocaleLayout, Price, Field, Faq, Marquee, Lantern…
-                           Reveal.jsx (Reveal, CountUp — motion xuất hiện/biến mất), Motifs.jsx (hoạ tiết SVG: trống đồng, mây, sen, con dấu, dấu bưu điện, ảnh cũ)
+                           Reveal.jsx (Reveal, CountUp — motion xuất hiện/biến mất), Effects.jsx (TiltCard, PointerGlow, BrandHover — T-24), Motifs.jsx (hoạ tiết SVG: trống đồng, mây, sen, con dấu, dấu bưu điện, ảnh cũ)
   pages/                   HomePage, ProductPage, BatchPage, AccountPage, NotFoundPage, auth/*
   admin/                   AdminLayout, ProductsPage, FaqPage, BatchesPage, I18nInput, strings.js (D-48)
   it/                      ItDashboard.jsx, strings.js (D-51)

@@ -18,11 +18,13 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 3. Motion (T-22): `useViewState` + `Reveal` — xuất hiện khi cuộn tới, biến mất theo hướng cuộn; `CountUp`; đèn lookbook thắp/lịm; hero cuộn đi thì đèn bay lên; header ẩn/hiện theo hướng cuộn; FAQ mở như cuộn thư; `LazyMotion strict`.
 4. Hiệu năng (T-21): font tự host + preload, bỏ Google Fonts. Đo local: LCP ~1,55 s → ~0,45 s, CLS 0.
 5. Test `src/components/Motion.test.jsx`. Test phát hiện: `useReducedMotion` bỏ qua `MotionConfig` → đổi sang `useReducedMotionConfig`.
+5a. Subagent kiểm thử độc lập (T-11): `Motion.extra.test.jsx`, `server/ssr.design.extra.test.js` — không có lỗi; lưu ý HTML SSR có 68 phần tử `opacity:0` (G-30) và cảnh báo lint `set-state-in-effect` → đã sửa: màn hình đầu chạy bằng CSS, `@media (scripting: none)`, `useFinePointer` dùng `useSyncExternalStore`.
+5b. Theo yêu cầu "tham khảo Aceternity UI": 9 hiệu ứng tự viết lại (T-24) — Lamp, Spotlight, 3D Card, Text Generate, Tracing Beam, Moving Border, Focus Cards, Sparkles (đèn trời), Text Hover.
+5c. Subagent kiểm thử độc lập lần 2 (T-11): `Effects.extra.test.jsx`, `server/ssr.effects.extra.test.js` (31 test) — không có lỗi; rủi ro id gradient `brandInk` viết cứng (trùng nếu tái dùng) → đã sửa bằng `useId()`.
 6. Spec v0.6: §31.4, G-29, G-30, `[ASSUMPTION]` ngưỡng NFR-PERF-001.
 
 **Còn lại / cần người dùng**
 
-- Subagent kiểm thử độc lập (T-11) đang chạy khi commit lần đầu — kết quả xử lý ở commit sau.
 - PO chốt NFR-PERF-001; thống nhất thương hiệu MỘC ↔ "LÂM VỊ" (nhánh `docs/branding-guideline`) trước khi gộp.
 - Thay minh hoạ bằng ảnh thật khi có (G-23, G-29).
 

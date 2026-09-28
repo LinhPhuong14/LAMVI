@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
 import { Seal } from './Motifs'
+import { Reveal } from './Reveal'
+import { BrandHover } from './Effects'
+import { group } from '../lib/motion.js'
 
 export default function SiteFooter() {
   const { t, lang, path } = useI18n()
@@ -59,6 +62,9 @@ export default function SiteFooter() {
           </form>
         </div>
       </div>
+      <Reveal className="footer-brandmark" variants={group} margin="0px">
+        <BrandHover text="MỘC" />
+      </Reveal>
       <div className="footer-bottom">
         <span>{t('footer.copyright')}</span>
       </div>

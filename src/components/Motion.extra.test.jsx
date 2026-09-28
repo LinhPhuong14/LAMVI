@@ -91,7 +91,10 @@ describe('Header — logo con dấu và tự ẩn khi cuộn', () => {
     expect(mark.querySelector('.seal')).not.toBeNull()
   })
 
+  // jsdom không có document.scrollingElement → framer useScroll() không gắn listener (noop).
+  // Giả lập bằng documentElement để mô phỏng cuộn trang.
   it('cuộn xuống quá 240px → is-hidden; cuộn lên → hiện lại', async () => {
+    Object.defineProperty(document, 'scrollingElement', { value: document.documentElement, configurable: true })
     mockApi(handlers)
     const { container } = renderAt('/')
     const header = container.querySelector('header.nav')
@@ -114,6 +117,7 @@ describe('Header — logo con dấu và tự ẩn khi cuộn', () => {
     await waitFor(() => expect(header).not.toHaveClass('is-hidden'))
     await scrollTo(0)
     await waitFor(() => expect(header).not.toHaveClass('is-scrolled'))
+    delete document.scrollingElement
   })
 
   it('CSS: header có :focus-within để luôn hiện khi dùng bàn phím', () => {
