@@ -1,0 +1,261 @@
+/* Header: ngôn ngữ + tài khoản */
+.nav-mark {
+  text-decoration: none;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.lang-switch {
+  display: flex;
+  gap: 4px;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+
+.lang-switch a {
+  text-decoration: none;
+  color: var(--ink-soft);
+  padding: 4px 7px;
+  border-radius: 6px;
+}
+
+.lang-switch a.active {
+  color: var(--brown-deep);
+  background: var(--paper-deep);
+  font-weight: 600;
+}
+
+.nav-account {
+  text-decoration: none;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.nav-account:hover {
+  color: var(--brown-deep);
+}
+
+/* Giá + chú thích VAT (BR-PRC-003) */
+.price {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.price-note {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+
+.product-price.large {
+  font-size: 2rem;
+}
+
+.product-link {
+  text-decoration: none;
+}
+
+.product-link:hover {
+  color: var(--brown);
+}
+
+.products-status,
+.faq-status {
+  text-align: center;
+  color: var(--ink-soft);
+  padding: 32px 0;
+}
+
+/* Trang nội dung chung */
+.page-section {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 64px 32px 96px;
+  min-height: 60vh;
+}
+
+.page-section.narrow {
+  max-width: 480px;
+}
+
+.page-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin: 12px 0 20px;
+}
+
+.back-link {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.notice {
+  margin-top: 24px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--paper-deep);
+  color: var(--ink-soft);
+}
+
+.notice.success {
+  background: #e8efd9;
+  color: #3d5220;
+}
+
+.notice.error {
+  background: #f6dcd2;
+  color: #7a2e1a;
+}
+
+/* Chi tiết sản phẩm */
+.product-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.product-detail-art {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  border-radius: 24px;
+  background: var(--cream);
+  box-shadow: var(--shadow-soft);
+}
+
+.product-detail-desc {
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+
+.product-badge.static {
+  position: static;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+/* Form tài khoản */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.92rem;
+}
+
+.field input,
+.field select {
+  font: inherit;
+  padding: 11px 14px;
+  border: 1px solid var(--brown-line);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.field input:focus,
+.field select:focus {
+  outline: 2px solid var(--ember);
+  outline-offset: 1px;
+}
+
+.field-error {
+  color: #9b3b22;
+  font-size: 0.82rem;
+}
+
+.field-hint {
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+.form-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.form-links a {
+  color: var(--brown);
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.account-card {
+  padding: 28px;
+  border-radius: 18px;
+  background: var(--cream);
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 28px;
+}
+
+.account-card h2 {
+  font-size: 1.6rem;
+  margin-bottom: 12px;
+}
+
+/* Trang QR lô đèn */
+.batch-video {
+  width: 100%;
+  border-radius: 18px;
+  background: #1c140e;
+  aspect-ratio: 16 / 9;
+  margin: 12px 0 20px;
+}
+
+.batch-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 960px) {
+  .product-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .nav-account {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-section {
+    padding: 40px 16px 72px;
+  }
+  .nav-cta {
+    display: none;
+  }
+}
+
+/* NFR-A11Y-001 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
