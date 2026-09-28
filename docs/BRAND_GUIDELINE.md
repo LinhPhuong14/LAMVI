@@ -545,7 +545,7 @@ Khi chuyển sang dự án React/Vite, sao chép nguyên khối `theme.extend` s
 
 ## Phụ lục B — Các điểm lệch chuẩn trong landing page hiện tại
 
-Những điểm sau trong code gốc vi phạm guideline và cần sửa khi triển khai:
+Những điểm sau trong code HTML gốc vi phạm guideline. Bản React tại `src/landing/` đã xử lý toàn bộ; riêng mục 6 được xử lý bằng cách **ẩn** nút VN/EN và nút đổi giao diện cho đến khi có bản dịch và dark mode đầy đủ.
 
 | # | Vấn đề | Cách sửa |
 |---|---|---|
