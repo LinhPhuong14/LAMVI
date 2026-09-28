@@ -12,3 +12,8 @@ export function pick(text, lang) {
   if (typeof text === 'string') return text
   return text[lang] || text[DEFAULT_LOCALE] || null
 }
+
+// D-37: đường dẫn web theo ngôn ngữ (dùng cho link trong email)
+export function localePath(lang, path) {
+  return lang === DEFAULT_LOCALE ? path : `/${lang}${path}`
+}

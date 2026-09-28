@@ -147,6 +147,7 @@ export default {
     eyebrow: 'How your lantern was made',
     loading: 'Loading video…',
     notFoundTitle: 'Lantern batch not found',
+    errorTitle: 'Could not load the video',
     notFoundText: 'This QR code has no video yet or does not exist. Please try again later.',
     producedOn: 'Made on: {date}',
     code: 'Batch code: {code}',

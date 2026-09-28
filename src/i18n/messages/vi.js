@@ -159,6 +159,7 @@ export default {
     eyebrow: 'Hành trình làm đèn',
     loading: 'Đang tải video…',
     notFoundTitle: 'Không tìm thấy lô đèn',
+    errorTitle: 'Chưa tải được video',
     notFoundText: 'Mã QR này chưa có video hoặc không tồn tại. Vui lòng thử lại sau.',
     producedOn: 'Ngày làm: {date}',
     code: 'Mã lô: {code}',

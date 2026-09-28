@@ -10,6 +10,10 @@ Chỉ dùng các tiền tố sau khi tạo nhánh mới:
 
 Không dùng tiền tố `claude/...`.
 
+## Knowledge base
+
+Đầu mỗi phiên đọc `docs/knowledge/README.md` (quy trình phiên, quyết định kỹ thuật `T-xx`, kiến trúc, quy ước, tiến độ, nhật ký). Mỗi tính năng phải có subagent kiểm thử độc lập trước khi commit (T-11). Cuối phiên cập nhật `progress.md` và `session-log.md`.
+
 ## Đặc tả nghiệp vụ (BA)
 
 Nguồn yêu cầu nghiệp vụ duy nhất: `docs/ba-spec.md`.

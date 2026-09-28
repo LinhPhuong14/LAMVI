@@ -1,0 +1,117 @@
+# Kiến trúc
+
+## Tổng quan
+
+```text
+Trình duyệt ──► Vite SPA (src/) ──fetch /api──► Express (server/) ──► Adapter ──► Supabase (Postgres + Auth)
+                                                                      └─────► Bộ nhớ (dev/test, T-04)
+```
+
+- Dev: `npm run dev` chạy Vite (5173) và API (8787); Vite proxy `/api` → 8787.
+- Frontend **không** giữ key Supabase (T-05). Mọi quyền truy cập kiểm tra ở server.
+
+## Thư mục
+
+```text
+server/
+  index.js                 Khởi động: đọc env, chọn adapter Supabase/bộ nhớ
+  app.js                   createApp({ repo, auth, config }) — dùng trong test
+  config.js                Đọc biến môi trường
+  errors.js                HttpError + errorHandler (định dạng lỗi thống nhất)
+  i18n.js                  normalizeLang, pick (D-40), localePath (D-37)
+  domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js)
+  middleware/auth.js       requireAuth (Bearer token → req.user)
+  routes/                  catalog.js, auth.js
+  adapters/
+    authErrors.js          AuthError (mã lỗi chuẩn hoá)
+    memory/{repo,auth}.js  Adapter bộ nhớ
+    supabase/{repo,auth}.js Adapter Supabase
+  data/seed.js             Dữ liệu khởi tạo (nguồn cho supabase/seed.sql)
+supabase/
+  migrations/*.sql         Schema
+  seed.sql                 Sinh từ server/data/seed.js (npm run db:seed-sql)
+src/
+  main.jsx, routes.jsx     Router: /, /en, /zh (D-37)
+  i18n/                    core.js (translate, localePath), index.js (useI18n), LocaleProvider.jsx, messages/{vi,en,zh}.js
+  api/                     client.js (api, ApiError), useApi.js
+  auth/                    AuthProvider.jsx, context.js (useAuth, phiên), useForm.js
+  hooks/useNoIndex.js      meta robots noindex (BR-SEO-001, D-44)
+  components/              SiteHeader, SiteFooter, LocaleLayout, Price, Field, Faq, Marquee, Lantern…
+  pages/                   HomePage, ProductPage, BatchPage, AccountPage, NotFoundPage, auth/*
+  styles/                  App.css (landing), pages.css (trang mới)
+  test/                    renderApp.jsx (mockApi, renderAt), fixtures.js
+scripts/gen-seed-sql.js
+docs/ba-spec.md, docs/knowledge/
+```
+
+## Interface adapter
+
+Thêm phương thức → thêm ở **cả** `memory` và `supabase` + test.
+
+### Repository
+
+| Phương thức | Trả về |
+|---|---|
+| `listProducts({ statuses })` | `Product[]` theo `sortOrder` |
+| `getProductBySlug(slug)` | `Product \| null` |
+| `listFaq({ publishedOnly })` | `FaqEntry[]` |
+| `getBatchByCode(code)` | `Batch \| null` |
+| `getProfile(userId)` | `Profile \| null` |
+| `upsertProfile({ id, fullName?, phone?, preferredLocale? })` | `Profile` (role mặc định `customer`, không đổi role qua đây) |
+
+### Auth provider
+
+| Phương thức | Ghi chú |
+|---|---|
+| `signUp({ email, password, redirectTo })` | `{ user, needsConfirmation }`; lỗi `EMAIL_TAKEN` |
+| `signIn({ email, password })` | Phiên `{ accessToken, refreshToken, expiresAt, user }`; lỗi `INVALID_CREDENTIALS`, `EMAIL_NOT_CONFIRMED` |
+| `refresh(refreshToken)` | Phiên mới; lỗi `UNAUTHORIZED` |
+| `getUser(accessToken)` | `{ id, email } \| null` |
+| `signOut(accessToken)` | |
+| `sendPasswordReset(email, redirectTo)` | Không báo email có tồn tại hay không |
+| `updatePassword(userId, password)` | |
+
+Lỗi chung: `RATE_LIMITED`.
+
+## Schema (Supabase)
+
+| Bảng | Cột chính | Ghi chú |
+|---|---|---|
+| `products` | `slug` unique, `kind` single/set, `status` draft/published/hidden, `price_excl_vat` int, `name/description/badge` jsonb | D-03, D-39 |
+| `faq_entries` | `question/answer` jsonb, `is_published`, `sort_order` | G-07 |
+| `batches` | `code` unique, `status` created/video_published, `video_url`, `title/story` jsonb | D-10, D-43; `video_published` bắt buộc có `video_url` |
+| `profiles` | `id` → `auth.users`, `full_name`, `phone`, `preferred_locale`, `role` customer/admin | D-38, D-42 |
+
+RLS bật, không có policy (chỉ service role của server truy cập).
+
+## API
+
+| Method | Path | Auth | Mô tả |
+|---|---|---|---|
+| GET | `/api/health` | – | |
+| GET | `/api/products?lang=` | – | Sản phẩm `published` |
+| GET | `/api/products/:slug?lang=` | – | 404 nếu không `published` |
+| GET | `/api/faq?lang=` | – | FAQ `is_published` |
+| GET | `/api/batches/:code?lang=` | – | 404 nếu chưa có video |
+| POST | `/api/auth/register?lang=` | – | `{ email, password, fullName, phone?, preferredLocale? }` → 201 |
+| POST | `/api/auth/login` | – | → phiên |
+| POST | `/api/auth/refresh` | – | `{ refreshToken }` → phiên mới |
+| POST | `/api/auth/logout` | Bearer | 204 |
+| POST | `/api/auth/forgot-password?lang=` | – | Luôn 202 |
+| POST | `/api/auth/reset-password` | Bearer (token khôi phục) | `{ password }` → 204, vô hiệu token |
+| GET | `/api/me` | Bearer | Hồ sơ |
+| PATCH | `/api/me` | Bearer | `{ fullName?, phone?, preferredLocale? }` |
+
+## Luồng đặt lại mật khẩu (Supabase)
+
+1. `POST /api/auth/forgot-password` → Supabase gửi email, link về `PUBLIC_SITE_URL/[lang/]reset-password#access_token=…&type=recovery`.
+2. `ResetPasswordPage` đọc token trong hash, xoá khỏi URL, gửi `POST /api/auth/reset-password` với `Authorization: Bearer <token>`.
+3. Server `getUser(token)` → `updatePassword` → `signOut(token)`.
+
+Cần cấu hình trong Supabase Dashboard → Authentication → URL Configuration: thêm `PUBLIC_SITE_URL/reset-password`, `/en/reset-password`, `/zh/reset-password`, `/login`… vào Redirect URLs.
+
+## Frontend
+
+- Route: `LocaleLayout` bọc mọi trang, cấp ngôn ngữ qua `LocaleProvider`, đặt `<html lang>` và `document.title`.
+- Trang con: `/` · `/products/:slug` · `/lo/:code` · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
+- `AuthProvider`: phiên trong `localStorage` (`moc.session`), `authedApi` tự refresh một lần khi gặp 401.

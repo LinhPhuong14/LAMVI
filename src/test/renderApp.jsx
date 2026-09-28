@@ -2,6 +2,7 @@ import { render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { vi } from 'vitest'
 import AppRoutes from '../routes.jsx'
+import AuthProvider from '../auth/AuthProvider.jsx'
 
 // Giả lập fetch cho /api/*; handlers: { 'GET /products': (url, init) => ({ status, body }) }
 export function mockApi(handlers) {
@@ -23,7 +24,9 @@ export function mockApi(handlers) {
 export function renderAt(path) {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <AppRoutes />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </MemoryRouter>,
   )
 }

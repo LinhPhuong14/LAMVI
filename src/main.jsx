@@ -5,11 +5,14 @@ import './index.css'
 import './styles/App.css'
 import './styles/pages.css'
 import AppRoutes from './routes.jsx'
+import AuthProvider from './auth/AuthProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <AppRoutes />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 )

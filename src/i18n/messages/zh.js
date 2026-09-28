@@ -134,6 +134,7 @@ export default {
     eyebrow: '您的灯是如何制作的',
     loading: '正在加载视频…',
     notFoundTitle: '未找到该批次',
+    errorTitle: '视频加载失败',
     notFoundText: '该二维码暂无视频或不存在，请稍后再试。',
     producedOn: '制作日期：{date}',
     code: '批次编号：{code}',
