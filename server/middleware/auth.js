@@ -19,3 +19,14 @@ export function requireAuth(auth) {
     next()
   }
 }
+
+// D-38: một vai trò admin duy nhất; vai trò đọc từ hồ sơ ở server, không tin client
+export function requireAdmin(auth, repo) {
+  const authed = requireAuth(auth)
+  return async (req, res, next) => {
+    await authed(req, res, () => {})
+    const profile = await repo.getProfile(req.user.id)
+    if (profile?.role !== 'admin') throw new HttpError(403, 'FORBIDDEN', 'Không có quyền')
+    next()
+  }
+}

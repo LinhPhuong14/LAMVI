@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import LocaleLayout from './components/LocaleLayout'
 import HomePage from './pages/HomePage'
 import ProductPage from './pages/ProductPage'
@@ -9,6 +9,10 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
+import AdminLayout from './admin/AdminLayout'
+import ProductsPage from './admin/ProductsPage'
+import FaqPage from './admin/FaqPage'
+import BatchesPage from './admin/BatchesPage'
 
 // Các trang con dùng chung cho mọi ngôn ngữ
 function localeChildren() {
@@ -31,6 +35,13 @@ function localeChildren() {
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* D-48: admin chỉ tiếng Việt */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Navigate to="products" replace />} />
+        <Route path="products" element={<ProductsPage />} />
+        <Route path="faq" element={<FaqPage />} />
+        <Route path="batches" element={<BatchesPage />} />
+      </Route>
       <Route path="/en" element={<LocaleLayout lang="en" />}>
         {localeChildren()}
       </Route>

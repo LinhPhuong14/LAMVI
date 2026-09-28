@@ -46,7 +46,7 @@ const productRow = (over) => ({
 })
 
 describe('createSupabaseRepo — mapping snake_case → camelCase', () => {
-  it('listProducts map đủ trường, bỏ created_at/updated_at', async () => {
+  it('listProducts map đủ trường (updatedAt cho admin), bỏ created_at', async () => {
     const repo = createSupabaseRepo(fakeClient({ products: [productRow()] }))
     const [p] = await repo.listProducts()
     expect(p).toEqual({
@@ -60,7 +60,9 @@ describe('createSupabaseRepo — mapping snake_case → camelCase', () => {
       name: { vi: 'Đèn Nguyệt' },
       description: null,
       badge: null,
+      updatedAt: expect.anything(),
     })
+    expect(p).not.toHaveProperty('createdAt')
   })
 
   it('listProducts({statuses}) lọc bằng in(status) và order(sort_order)', async () => {

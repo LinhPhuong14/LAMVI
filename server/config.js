@@ -7,6 +7,8 @@ export function loadConfig(env = process.env) {
   return {
     port: Number(env.PORT) || 8787,
     publicSiteUrl: env.PUBLIC_SITE_URL || 'http://localhost:5173',
+    // Giới hạn dung lượng video lô [ASSUMPTION]; phải ≤ giới hạn file của bucket Supabase
+    maxVideoMb: Number(env.MAX_VIDEO_MB) || 500,
     supabase,
     useSupabase: Boolean(supabase.url && supabase.anonKey && supabase.serviceRoleKey),
   }
