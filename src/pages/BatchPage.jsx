@@ -1,23 +1,28 @@
 import { Link, useParams } from 'react-router-dom'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
-import { useNoIndex } from '../hooks/useNoIndex.js'
+import Seo from '../seo/Seo.jsx'
 
 // FR-QR-006, US-005: trang QR khắc trên đèn — public, video của lô (D-01, D-10, D-43), noindex (D-44)
 export default function BatchPage() {
-  useNoIndex()
   const { code } = useParams()
   const { t, lang, path } = useI18n()
   const res = useApi(`/batches/${encodeURIComponent(code)}`, lang)
 
   if (res.status === 'loading') {
-    return <section className="page-section">{t('batch.loading')}</section>
+    return (
+      <section className="page-section">
+        <Seo title={t('batch.eyebrow')} noindex />
+        {t('batch.loading')}
+      </section>
+    )
   }
 
   if (res.status === 'error') {
     const notFound = res.error.status === 404
     return (
       <section className="page-section narrow">
+        <Seo title={notFound ? t('batch.notFoundTitle') : t('batch.errorTitle')} noindex status={notFound ? 404 : 500} />
         <h1 className="page-title">{notFound ? t('batch.notFoundTitle') : t('batch.errorTitle')}</h1>
         <p>{notFound ? t('batch.notFoundText') : t(`errors.${res.error.code}`)}</p>
         <Link to={path('/')} className="btn btn-primary" style={{ marginTop: 24 }}>
@@ -37,6 +42,8 @@ export default function BatchPage() {
 
   return (
     <section className="page-section batch">
+      {/* D-44: trang lô noindex */}
+      <Seo title={b.title ?? t('batch.eyebrow')} description={t('batch.note')} noindex />
       <span className="eyebrow">{t('batch.eyebrow')}</span>
       <h1 className="page-title">{b.title ?? t('batch.eyebrow')}</h1>
       <div className="batch-meta">

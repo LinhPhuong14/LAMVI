@@ -1,6 +1,7 @@
 // Bản dịch do đội dev soạn — chờ PO duyệt (ba-spec §31.2 G-14).
 export default {
   meta: {
+    productTitle: '{name} — Mộc handmade dó paper lanterns',
     title: 'Mộc — Handmade Dó Paper Lanterns',
     description:
       'Handmade dó paper lanterns as gifts, with a QR-linked message and the story of how they were made.',

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { createApp } from './app.js'
+import { createWeb } from './ssr.js'
 import { loadConfig } from './config.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
 import { createMemoryAuth } from './adapters/memory/auth.js'
@@ -35,6 +36,10 @@ if (config.useSupabase) {
   }
 }
 
-createApp({ repo, auth, storage, config }).listen(config.port, () => {
-  console.log(`[api] http://localhost:${config.port}`)
+// D-49: một server phục vụ cả web (SSR) và API. API_ONLY=1 để chỉ chạy API.
+const dev = process.env.NODE_ENV !== 'production'
+const web = process.env.API_ONLY === '1' ? undefined : await createWeb({ repo, config, dev })
+
+createApp({ repo, auth, storage, web, config }).listen(config.port, () => {
+  console.log(`[web+api] http://localhost:${config.port}`)
 })

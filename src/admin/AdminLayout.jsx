@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import { Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import { useAuth } from '../auth/context.js'
-import { useNoIndex } from '../hooks/useNoIndex.js'
+import Seo from '../seo/Seo.jsx'
 import { S } from './strings.js'
 
+// BR-SEO-001: admin noindex
 function Gate() {
-  useNoIndex() // BR-SEO-001
   const { user, authedApi } = useAuth()
   const location = useLocation()
   const [state, setState] = useState({ status: 'loading' })
@@ -23,13 +23,22 @@ function Gate() {
     }
   }, [user, authedApi])
 
+  const seo = <Seo title={S.title} noindex />
   if (!user) {
     return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />
   }
-  if (state.status === 'loading') return <p className="admin-main">{S.common.loading}</p>
+  if (state.status === 'loading') {
+    return (
+      <p className="admin-main">
+        {seo}
+        {S.common.loading}
+      </p>
+    )
+  }
   if (state.status !== 'ok') {
     return (
       <section className="admin-main">
+        {seo}
         <h1>{S.common.forbiddenTitle}</h1>
         <p>{S.common.forbiddenText}</p>
       </section>
@@ -38,6 +47,7 @@ function Gate() {
 
   return (
     <div className="admin">
+      {seo}
       <aside className="admin-nav">
         <span className="nav-mark">MỘC</span>
         <strong>{S.title}</strong>

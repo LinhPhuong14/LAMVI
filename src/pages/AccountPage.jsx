@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import Field from '../components/Field'
 import { LOCALES, useI18n } from '../i18n/index.js'
-import { useNoIndex } from '../hooks/useNoIndex.js'
+import Seo from '../seo/Seo.jsx'
 import { useAuth } from '../auth/context.js'
 import { useSubmit } from '../auth/useForm.js'
 
@@ -61,7 +61,6 @@ function ProfileForm({ profile, onSaved, initiallySaved = false }) {
 
 // FR-ACC-001/002: trang tài khoản (dashboard); đơn hàng làm ở giai đoạn sau
 export default function AccountPage() {
-  useNoIndex()
   const { t, path } = useI18n()
   const { user, authedApi, logout } = useAuth()
   const location = useLocation()
@@ -91,6 +90,7 @@ export default function AccountPage() {
 
   return (
     <section className="page-section narrow account">
+        <Seo title={t('account.title')} noindex />
       <h1 className="page-title">{t('account.title')}</h1>
       <div className="account-card">
         <h2>{t('account.profile')}</h2>

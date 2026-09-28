@@ -3,12 +3,17 @@ import Lantern from '../components/Lantern'
 import Price from '../components/Price'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
+import Seo from '../seo/Seo.jsx'
+import { productJsonLd } from '../seo/head.js'
+import { useSiteUrl } from '../seo/context.js'
 
 // FR-CAT-001: chi tiết sản phẩm
 export default function ProductPage() {
   const { slug } = useParams()
   const { t, lang, path } = useI18n()
   const res = useApi(`/products/${encodeURIComponent(slug)}`, lang)
+  const siteUrl = useSiteUrl()
+  const pagePath = `/products/${encodeURIComponent(slug)}`
   const back = (
     <Link to={{ pathname: path('/'), hash: '#products' }} className="back-link">
       {t('products.backToCollection')}
@@ -17,8 +22,14 @@ export default function ProductPage() {
 
   if (res.status === 'loading') return <section className="page-section">{t('products.loading')}</section>
   if (res.status === 'error') {
+    const notFound = res.error.status === 404
     return (
       <section className="page-section">
+        <Seo
+          title={notFound ? t('products.notFound') : t('products.error')}
+          noindex
+          status={notFound ? 404 : 500}
+        />
         {back}
         <h1 className="page-title">
           {res.error.status === 404 ? t('products.notFound') : t('products.error')}
@@ -30,6 +41,13 @@ export default function ProductPage() {
   const p = res.data.item
   return (
     <section className="page-section product-detail">
+      <Seo
+        title={t('meta.productTitle', { name: p.name })}
+        description={p.description ?? t('meta.description')}
+        path={pagePath}
+        type="product"
+        jsonLd={productJsonLd(p, `${siteUrl}${path(pagePath)}`)}
+      />
       {back}
       <div className="product-detail-grid">
         <div className="product-detail-art">

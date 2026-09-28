@@ -2,6 +2,7 @@
 // Các câu đánh dấu §31.3 là câu thay thế đề xuất — chờ PO/Marketing duyệt.
 export default {
   meta: {
+    productTitle: '{name} — Mộc đèn giấy dó thủ công',
     title: 'Mộc — Đèn Giấy Dó Thủ Công',
     description:
       'Đèn giấy dó thủ công làm quà tặng, kèm lời chúc gắn mã QR và video hành trình làm đèn.',

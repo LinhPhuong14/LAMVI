@@ -48,19 +48,21 @@ const switcher = () => screen.getByRole('navigation', { name: /Ngôn ngữ|Langu
 const hrefOf = (el) => el.getAttribute('href')
 
 describe('US-012 AC-001 — bộ chọn ngôn ngữ', () => {
-  it('vi → en → zh → vi, giữ đường dẫn con; giao diện, html lang, title đổi theo', async () => {
+  it('vi → en → zh → vi, giữ đường dẫn con; giao diện, html lang, title đổi theo (FR-SEO-001: title riêng từng sản phẩm)', async () => {
     const f = mockApi(handlers)
     renderWithLoc('/products/den-nguyet')
     await screen.findByRole('heading', { level: 1, name: 'Đèn Nguyệt' })
     expect(document.documentElement.lang).toBe('vi')
-    expect(document.title).toBe(viMsg.meta.title)
+    // <Seo> đặt title trong effect → chờ
+    await waitFor(() => expect(document.title).toBe(viMsg.meta.productTitle.replace('{name}', 'Đèn Nguyệt')))
     expect(screen.getByText(viMsg.products.backToCollection)).toBeInTheDocument()
 
     fireEvent.click(within(switcher()).getByRole('link', { name: 'EN' }))
     expect(loc()).toBe('/en/products/den-nguyet')
     await screen.findByRole('heading', { level: 1, name: 'Đèn Nguyệt EN' })
     expect(document.documentElement.lang).toBe('en')
-    expect(document.title).toBe(enMsg.meta.title)
+    // <Seo> đặt title trong effect → chờ
+    await waitFor(() => expect(document.title).toBe(enMsg.meta.productTitle.replace('{name}', 'Đèn Nguyệt EN')))
     expect(screen.getByText(enMsg.products.backToCollection)).toBeInTheDocument()
     expect(screen.queryByText(viMsg.products.backToCollection)).toBeNull()
     expect(f.mock.calls.some(([u]) => String(u) === '/api/products/den-nguyet?lang=en')).toBe(true)
@@ -69,14 +71,16 @@ describe('US-012 AC-001 — bộ chọn ngôn ngữ', () => {
     expect(loc()).toBe('/zh/products/den-nguyet')
     await screen.findByRole('heading', { level: 1, name: 'Đèn Nguyệt ZH' })
     expect(document.documentElement.lang).toBe('zh-Hans')
-    expect(document.title).toBe(zhMsg.meta.title)
+    // <Seo> đặt title trong effect → chờ
+    await waitFor(() => expect(document.title).toBe(zhMsg.meta.productTitle.replace('{name}', 'Đèn Nguyệt ZH')))
     expect(screen.getByText(zhMsg.products.backToCollection)).toBeInTheDocument()
 
     fireEvent.click(within(switcher()).getByRole('link', { name: 'VI' }))
     expect(loc()).toBe('/products/den-nguyet')
     await screen.findByRole('heading', { level: 1, name: 'Đèn Nguyệt' })
     expect(document.documentElement.lang).toBe('vi')
-    expect(document.title).toBe(viMsg.meta.title)
+    // <Seo> đặt title trong effect → chờ
+    await waitFor(() => expect(document.title).toBe(viMsg.meta.productTitle.replace('{name}', 'Đèn Nguyệt')))
   })
 
   it('giữ query và hash khi đổi ngôn ngữ', async () => {

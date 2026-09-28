@@ -9,6 +9,7 @@ import Faq from '../components/Faq'
 import Price from '../components/Price'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
+import Seo from '../seo/Seo.jsx'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -97,6 +98,7 @@ export default function HomePage() {
 
   return (
     <>
+      <Seo title={t('meta.title')} description={t('meta.description')} path="/" />
       <ScrollProgress />
 
 

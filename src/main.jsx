@@ -1,18 +1,13 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import './styles/App.css'
 import './styles/pages.css'
-import AppRoutes from './routes.jsx'
-import AuthProvider from './auth/AuthProvider.jsx'
+import AppShell from './AppShell.jsx'
+import { createDataStore } from './seo/context.js'
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
-  </StrictMode>,
-)
+// D-49: trang công khai được server render sẵn → hydrate; trang riêng tư chỉ có khung → render mới
+const app = <AppShell dataStore={createDataStore(window.__INITIAL_DATA__)} Router={BrowserRouter} />
+const root = document.getElementById('root')
+if (root.hasChildNodes()) hydrateRoot(root, app)
+else createRoot(root).render(app)

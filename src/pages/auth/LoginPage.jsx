@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../../components/Field'
 import { useI18n } from '../../i18n/index.js'
-import { useNoIndex } from '../../hooks/useNoIndex.js'
+import Seo from '../../seo/Seo.jsx'
 import { safeNext, useAuth } from '../../auth/context.js'
 import { useSubmit } from '../../auth/useForm.js'
 
 export default function LoginPage() {
-  useNoIndex()
   const { t, path } = useI18n()
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -26,6 +25,7 @@ export default function LoginPage() {
 
   return (
     <section className="page-section narrow">
+        <Seo title={t('auth.loginTitle')} noindex />
       <h1 className="page-title">{t('auth.loginTitle')}</h1>
       <form className="form" onSubmit={onSubmit} noValidate>
         <Field label={t('auth.email')} type="email" autoComplete="email" required value={form.email} onChange={set('email')} />

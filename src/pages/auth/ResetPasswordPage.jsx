@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Field from '../../components/Field'
 import { api } from '../../api/client.js'
 import { useI18n } from '../../i18n/index.js'
-import { useNoIndex } from '../../hooks/useNoIndex.js'
+import Seo from '../../seo/Seo.jsx'
 import { useSubmit } from '../../auth/useForm.js'
 
 // Link email của Supabase trả token khôi phục trong #hash (type=recovery)
@@ -18,7 +18,6 @@ function readRecoveryToken() {
 }
 
 export default function ResetPasswordPage() {
-  useNoIndex()
   const { t, path } = useI18n()
   const [token] = useState(readRecoveryToken)
   const [password, setPassword] = useState('')
@@ -73,6 +72,7 @@ export default function ResetPasswordPage() {
 
   return (
     <section className="page-section narrow">
+        <Seo title={t('auth.resetTitle')} noindex />
       <h1 className="page-title">{t('auth.resetTitle')}</h1>
       {content}
       <div className="form-links">

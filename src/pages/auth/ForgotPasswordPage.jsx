@@ -3,11 +3,10 @@ import { Link } from 'react-router-dom'
 import Field from '../../components/Field'
 import { api } from '../../api/client.js'
 import { useI18n } from '../../i18n/index.js'
-import { useNoIndex } from '../../hooks/useNoIndex.js'
+import Seo from '../../seo/Seo.jsx'
 import { useSubmit } from '../../auth/useForm.js'
 
 export default function ForgotPasswordPage() {
-  useNoIndex()
   const { t, lang, path } = useI18n()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
@@ -23,6 +22,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <section className="page-section narrow">
+        <Seo title={t('auth.forgotTitle')} noindex />
       <h1 className="page-title">{t('auth.forgotTitle')}</h1>
       {sent ? (
         <p className="notice success" role="status">

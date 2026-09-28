@@ -2,10 +2,11 @@ import express from 'express'
 import { catalogRouter } from './routes/catalog.js'
 import { authRouter } from './routes/auth.js'
 import { adminRouter } from './routes/admin.js'
+import { seoRouter } from './routes/seo.js'
 import { errorHandler, notFound } from './errors.js'
 
 // T-02: nhận adapter qua tham số để test bằng adapter bộ nhớ
-export function createApp({ repo, auth, storage, config = { publicSiteUrl: 'http://localhost:5173' } }) {
+export function createApp({ repo, auth, storage, web, config = { publicSiteUrl: 'http://localhost:5173' } }) {
   const app = express()
   app.disable('x-powered-by')
   app.use(express.json({ limit: '100kb' }))
@@ -22,6 +23,9 @@ export function createApp({ repo, auth, storage, config = { publicSiteUrl: 'http
   })
 
   app.use('/api', api)
+  app.use(seoRouter({ repo, config }))
+  // D-49: SSR/trang web (không có trong test API)
+  if (web) app.use(web)
   app.use(errorHandler)
   return app
 }

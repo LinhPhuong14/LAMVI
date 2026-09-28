@@ -1,6 +1,7 @@
 // 简体中文。Bản dịch do đội dev soạn — chờ PO duyệt (ba-spec §31.2 G-14).
 export default {
   meta: {
+    productTitle: '{name} — Mộc 手工纸灯',
     title: 'Mộc — 手工纸灯',
     description: '手工纸灯礼物，附带二维码祝福和制灯过程视频。',
   },

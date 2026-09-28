@@ -3,13 +3,12 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../../components/Field'
 import { api } from '../../api/client.js'
 import { LOCALES, useI18n } from '../../i18n/index.js'
-import { useNoIndex } from '../../hooks/useNoIndex.js'
+import Seo from '../../seo/Seo.jsx'
 import { safeNext, useAuth } from '../../auth/context.js'
 import { useSubmit } from '../../auth/useForm.js'
 
 // FR-ACC-001, D-36, D-42: đăng ký bằng email + mật khẩu
 export default function RegisterPage() {
-  useNoIndex()
   const { t, lang, path } = useI18n()
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -36,6 +35,7 @@ export default function RegisterPage() {
   if (confirmSent) {
     return (
       <section className="page-section narrow">
+        <Seo title={t('auth.registerTitle')} noindex />
         <h1 className="page-title">{t('auth.registerTitle')}</h1>
         <p className="notice success" role="status">
           {t('auth.registeredConfirm')}
@@ -49,6 +49,7 @@ export default function RegisterPage() {
 
   return (
     <section className="page-section narrow">
+        <Seo title={t('auth.registerTitle')} noindex />
       <h1 className="page-title">{t('auth.registerTitle')}</h1>
       <form className="form" onSubmit={onSubmit} noValidate>
         <Field label={t('auth.fullName')} autoComplete="name" required value={form.fullName} onChange={set('fullName')} error={fields.fullName} />
