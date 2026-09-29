@@ -316,7 +316,10 @@ Vận hành xưởng ngoài phạm vi (D-34). Ở tầng web chỉ cần một q
 | Tạm tính | Σ(giá hiện hành chưa VAT × số lượng) của dòng còn bán; ghi "Phí vận chuyển và VAT được tính ở bước thanh toán" (chờ Q-09, Q-11) `[ASSUMPTION]` |
 | Nút Thanh toán (chưa có checkout) | Chưa đăng nhập → đăng nhập rồi quay lại giỏ, giỏ còn nguyên (US-001 AC-003); đã đăng nhập → báo "Thanh toán trực tuyến sẽ sớm ra mắt" `[CONFIRMED]` D-61 |
 | Trang giỏ | `noindex` (BR-SEO-001); không SSR nội dung (phụ thuộc trình duyệt/phiên) `[DERIVED]` D-49 |
-| Bảo trì (D-54) | Thêm/sửa/xoá giỏ trả 503; xem giỏ và tính giá giỏ vãng lai vẫn chạy `[ASSUMPTION]` |
+| Bảo trì (D-54) | Thêm/sửa/xoá giỏ trả 503; xem giỏ và tính giá giỏ vãng lai vẫn chạy `[ASSUMPTION]` . Người đã đăng nhập còn giỏ trình duyệt: gộp bị 503 thì vẫn hiện giỏ tài khoản, giữ giỏ trình duyệt để gộp lần sau `[ASSUMPTION]` |
+| Sản phẩm nháp / ẩn trong giỏ vãng lai | Sản phẩm nháp bị bỏ khỏi giỏ (coi như không tồn tại, D-39); sản phẩm đã ẩn hiện "Sản phẩm không còn bán" **không kèm tên/ảnh** `[ASSUMPTION]` |
+| Thêm sản phẩm không bán vào giỏ tài khoản | Sản phẩm không tồn tại, nháp hoặc đã ẩn mà chưa có trong giỏ → cùng lỗi 404 "không còn bán" (không dò được mã sản phẩm nháp); đã có trong giỏ thì chỉ được giảm/xoá `[ASSUMPTION]` |
+| Giỏ trình duyệt quá dài | Trình duyệt gộp dòng trùng, tối đa 10 mỗi dòng, giữ 50 dòng đầu; phần thừa bị bỏ `[ASSUMPTION]` |
 
 ## 12. Checkout
 
@@ -1072,6 +1075,7 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-29 | Mây tra đơn (FR-AI-004, US-008) | Chưa có đơn hàng nên chưa có `get_my_orders` / `lookup_order` và chống dò mã đơn | Missing | **Mới** (v0.6) — làm cùng đơn hàng |
 | G-30 | Mây — quyền xoá lịch sử chat, xoá khi xoá tài khoản | Chưa có — chờ `[LEGAL]` I-15 | Missing | **Mới** (v0.6) |
 | G-31 | Nút "Dịch tự động" dùng chung ngân sách Mây (§22.4) | Chưa có trang QR lời chúc nên chưa có | Missing | **Mới** (v0.6) |
+| G-32 | Giỏ hàng trên Supabase | Giới hạn 50 dòng và gộp giỏ là đọc-rồi-ghi, hai thao tác đồng thời có thể vượt 50 dòng / lệch số lượng; bảng `cart_items` bật RLS không có policy (chỉ server dùng service role truy cập) | Rủi ro thấp | **Mới** (v0.7) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)

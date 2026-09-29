@@ -247,6 +247,7 @@ export default {
     BAD_REQUEST: 'Yêu cầu không hợp lệ.',
   },
   cart: {
+    unavailableName: 'Sản phẩm không còn bán',
     title: 'Giỏ hàng',
     nav: 'Giỏ hàng',
     navCount: 'Giỏ hàng ({n})',

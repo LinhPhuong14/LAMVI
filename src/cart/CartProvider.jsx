@@ -13,12 +13,22 @@ export default function CartProvider({ children }) {
   const [cart, setCart] = useState(null)
   const [error, setError] = useState(null)
   const localRef = useRef([])
+  // Mỗi lần nạp/đổi giỏ tăng mã; kết quả của yêu cầu cũ (vd quote chậm về sau khi đã đăng nhập) bị bỏ
+  const seq = useRef(0)
+  const apply = useCallback((id, data) => {
+    if (id === seq.current) setCart(data)
+  }, [])
 
-  const quoteLocal = useCallback(async () => {
-    const items = localRef.current
-    if (!items.length) return setCart({ items: [], subtotalExclVat: 0, itemCount: 0, hasUnavailable: false, maxQuantity: MAX_QTY })
-    setCart(await api('/cart/quote', { method: 'POST', body: { items }, lang }))
-  }, [lang])
+  const quoteLocal = useCallback(
+    async (id = ++seq.current) => {
+      const items = localRef.current
+      if (!items.length) {
+        return apply(id, { items: [], subtotalExclVat: 0, itemCount: 0, hasUnavailable: false, maxQuantity: MAX_QTY })
+      }
+      apply(id, await api('/cart/quote', { method: 'POST', body: { items }, lang }))
+    },
+    [lang, apply],
+  )
 
   const run = useCallback(async (fn) => {
     setError(null)
@@ -32,30 +42,31 @@ export default function CartProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    let alive = true
+    const id = ++seq.current
     const load = async () => {
       if (!user) {
         localRef.current = loadLocalCart()
-        await quoteLocal()
+        await quoteLocal(id)
         return
       }
+      localRef.current = []
       const local = loadLocalCart()
       if (local.length) {
-        // D-59: gộp giỏ trình duyệt vào tài khoản rồi xoá bản trình duyệt
-        const merged = await authedApi(`/cart/merge?lang=${lang}`, { method: 'POST', body: { items: local } })
-        saveLocalCart([])
-        localRef.current = []
-        if (alive) setCart(merged)
-        return
+        try {
+          // D-59: gộp giỏ trình duyệt vào tài khoản rồi xoá bản trình duyệt
+          const merged = await authedApi(`/cart/merge?lang=${lang}`, { method: 'POST', body: { items: local } })
+          saveLocalCart([])
+          return apply(id, merged)
+        } catch (err) {
+          // Gộp lỗi (vd bảo trì 503): vẫn hiện giỏ tài khoản, giữ giỏ trình duyệt để gộp lần sau
+          if (err.status === 401) throw err
+        }
       }
-      const data = await authedApi(`/cart?lang=${lang}`)
-      if (alive) setCart(data)
+      apply(id, await authedApi(`/cart?lang=${lang}`))
     }
-    load().catch((err) => alive && setError(err.code ?? 'INTERNAL_ERROR'))
-    return () => {
-      alive = false
-    }
-  }, [user, authedApi, lang, quoteLocal])
+    // Effect chạy lại (đổi user/lang) tăng mã mới → kết quả lần nạp này tự bị bỏ
+    load().catch((err) => id === seq.current && setError(err.code ?? 'INTERNAL_ERROR'))
+  }, [user, authedApi, lang, quoteLocal, apply])
 
   const setQuantity = useCallback(
     (slug, quantity) =>
@@ -70,9 +81,10 @@ export default function CartProvider({ children }) {
           await quoteLocal()
           return
         }
-        setCart(await authedApi(`/cart/items/${encodeURIComponent(slug)}?lang=${lang}`, { method: 'PUT', body: { quantity: q } }))
+        const id = ++seq.current
+        apply(id, await authedApi(`/cart/items/${encodeURIComponent(slug)}?lang=${lang}`, { method: 'PUT', body: { quantity: q } }))
       }),
-    [user, authedApi, lang, quoteLocal, run],
+    [user, authedApi, lang, quoteLocal, run, apply],
   )
 
   const add = useCallback(
@@ -92,9 +104,10 @@ export default function CartProvider({ children }) {
           await quoteLocal()
           return
         }
-        setCart(await authedApi(`/cart/items/${encodeURIComponent(slug)}?lang=${lang}`, { method: 'DELETE' }))
+        const id = ++seq.current
+        apply(id, await authedApi(`/cart/items/${encodeURIComponent(slug)}?lang=${lang}`, { method: 'DELETE' }))
       }),
-    [user, authedApi, lang, quoteLocal, run],
+    [user, authedApi, lang, quoteLocal, run, apply],
   )
 
   const value = useMemo(() => ({ cart, error, add, setQuantity, remove }), [cart, error, add, setQuantity, remove])

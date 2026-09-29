@@ -26,15 +26,23 @@ export function createCartService({ repo }) {
   const isPublic = (p) => PUBLIC_PRODUCT_STATUSES.includes(p.status)
 
   // Dòng giỏ → hiển thị. Sản phẩm bị ẩn/nháp: cảnh báo, không tính vào tạm tính (D-41)
-  function present(lines, lang) {
+  // hideUnavailableNames: giỏ vãng lai — không trả tên/ảnh sản phẩm đã ẩn (D-39), chỉ báo "không còn bán"
+  function present(lines, lang, { hideUnavailableNames = false } = {}) {
     const items = lines.map(({ product, quantity }) => {
       const available = isPublic(product)
       const p = presentProduct(product, lang)
+      const hideName = !available && hideUnavailableNames
       return {
         slug: product.slug,
         quantity,
         available,
-        product: { name: p.name, kind: p.kind, tone: p.tone, badge: p.badge, priceExclVat: available ? p.priceExclVat : null },
+        product: {
+          name: hideName ? null : p.name,
+          kind: hideName ? null : p.kind,
+          tone: hideName ? null : p.tone,
+          badge: hideName ? null : p.badge,
+          priceExclVat: available ? p.priceExclVat : null,
+        },
         lineTotalExclVat: available ? p.priceExclVat * quantity : null,
       }
     })
@@ -71,9 +79,12 @@ export function createCartService({ repo }) {
     async setQuantity(userId, slug, quantity, lang) {
       validateQuantity(quantity)
       const product = await productBySlug(slug)
-      if (!product) throw new HttpError(404, 'PRODUCT_UNAVAILABLE', 'Sản phẩm không còn bán')
-      const current = (await repo.getCart(userId)).find((l) => l.productId === product.id)
-      if (!isPublic(product) && (!current || quantity > current.quantity)) {
+      const current = product ? (await repo.getCart(userId)).find((l) => l.productId === product.id) : null
+      // Không tồn tại hoặc chưa/không còn bán và chưa có trong giỏ → cùng 404 (không dò được slug nháp — D-39)
+      if (!product || (!isPublic(product) && !current)) {
+        throw new HttpError(404, 'PRODUCT_UNAVAILABLE', 'Sản phẩm không còn bán')
+      }
+      if (!isPublic(product) && quantity > current.quantity) {
         throw new HttpError(409, 'PRODUCT_UNAVAILABLE', 'Sản phẩm không còn bán')
       }
       if (!current && (await repo.getCart(userId)).length >= MAX_LINES) {
@@ -110,9 +121,10 @@ export function createCartService({ repo }) {
       const out = []
       for (const [slug, quantity] of merged) {
         const product = await productBySlug(slug)
-        if (product) out.push({ product, quantity })
+        // D-39: sản phẩm nháp coi như không tồn tại với khách; sản phẩm đã ẩn vẫn báo để khách xoá (§11)
+        if (product && product.status !== 'draft') out.push({ product, quantity })
       }
-      return present(out.slice(0, MAX_LINES), lang)
+      return present(out.slice(0, MAX_LINES), lang, { hideUnavailableNames: true })
     },
   }
 }

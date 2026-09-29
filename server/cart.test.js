@@ -76,7 +76,7 @@ describe('Giỏ của người đã đăng nhập (FR-CART-001, D-41)', () => {
   it('thêm sản phẩm không có / nháp → lỗi', async () => {
     expect((await put('khong-co', 1)).status).toBe(404)
     await hide('den-nguyet')
-    expect((await put('den-nguyet', 1)).status).toBe(409)
+    expect((await put('den-nguyet', 1)).status).toBe(404) // cùng mã với không tồn tại — không dò được slug (D-39)
   })
 
   it('giỏ riêng từng tài khoản; chưa đăng nhập → 401', async () => {

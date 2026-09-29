@@ -232,6 +232,7 @@ export default {
     BAD_REQUEST: 'Invalid request.',
   },
   cart: {
+    unavailableName: 'Product no longer available',
     title: 'Cart',
     nav: 'Cart',
     navCount: 'Cart ({n})',

@@ -68,17 +68,21 @@ export default function CartPage() {
       <ul className="cart-lines">
         {cart.items.map((i) => (
           <li key={i.slug} className={`cart-line ${i.available ? '' : 'is-unavailable'}`}>
-            <Lantern size={64} tone={i.product.tone} />
+            <Lantern size={64} tone={i.product.tone ?? undefined} />
             <div className="cart-line-info">
-              <Link to={path(`/products/${i.slug}`)} className="product-link">
-                <strong>{i.product.name}</strong>
-              </Link>
+              {i.product.name ? (
+                <Link to={path(`/products/${i.slug}`)} className="product-link">
+                  <strong>{i.product.name}</strong>
+                </Link>
+              ) : (
+                <strong>{t('cart.unavailableName')}</strong>
+              )}
               {i.available ? <Price amount={i.product.priceExclVat} /> : <span className="field-error">{t('cart.unavailable')}</span>}
             </div>
             <QuantityInput
               value={i.quantity}
               disabled={!i.available}
-              label={`${t('cart.quantity')} — ${i.product.name}`}
+              label={`${t('cart.quantity')} — ${i.product.name ?? t('cart.unavailableName')}`}
               onChange={(q) => q !== i.quantity && setQuantity(i.slug, q)}
             />
             <div className="cart-line-total">

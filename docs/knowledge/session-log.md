@@ -16,6 +16,7 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 1. Server: `server/cart/service.js`, `/api/cart/*`, migration `20260929000005_cart.sql`; bảo trì cho phép `/api/cart/quote`.
 2. Frontend: `CartProvider`, nút thêm vào giỏ (thẻ + trang chi tiết), header đếm số lượng, `/cart`. Test cũ cập nhật theo hành vi mới (nút thẻ sản phẩm đổi từ "Xem chi tiết" sang thêm vào giỏ; test render routes cần `AuthProvider`). Sửa header xuống dòng ở 1280px.
 3. Spec v0.7: D-59…D-61, gỡ Q-13, G-02 đã xử lý.
+4. Subagent kiểm thử giỏ hàng (101 test mới) phát hiện: `/api/cart/quote` lộ tên sản phẩm nháp cho khách (D-39); quote chậm ghi đè giỏ vừa gộp khi đăng nhập; giỏ trình duyệt >100 dòng làm kẹt trang giỏ/gộp → đã sửa (quote bỏ nháp, ẩn tên sản phẩm đã ẩn; mã yêu cầu tăng dần trong `CartProvider`; `loadLocalCart` gộp trùng + cắt 50 dòng). Thêm: PUT sản phẩm nháp/ẩn chưa có trong giỏ trả cùng 404 như không tồn tại; gộp lỗi (bảo trì 503) vẫn hiện giỏ tài khoản. Rủi ro còn lại ghi G-32.
 
 **Còn lại / cần người dùng**
 

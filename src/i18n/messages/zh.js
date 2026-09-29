@@ -219,6 +219,7 @@ export default {
     BAD_REQUEST: '请求无效。',
   },
   cart: {
+    unavailableName: '已下架的商品',
     title: '购物车',
     nav: '购物车',
     navCount: '购物车（{n}）',
