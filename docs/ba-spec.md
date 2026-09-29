@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.6 (bản nháp) |
-| Ngày | 2026-09-28 |
+| Phiên bản | v0.7 (bản nháp) |
+| Ngày | 2026-09-29 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình) |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -31,7 +31,7 @@ MỘC là web **B2C** bán đèn giấy dó thủ công tại Việt Nam, địn
 
 Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý coupon. Thanh toán qua **payOS** hoặc **COD**. **Bắt buộc có tài khoản để đặt hàng.** Chỉ giao trong nước, tiền tệ VND.
 
-**Hiện trạng repo (v0.6)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap), vai trò IT + dashboard IT, AI Mây (chat, FAQ offline, tour — OpenAI mặc định tắt chờ I-14). Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây tra đơn, admin đơn/coupon/đổi trả, GA (xem §31).
+**Hiện trạng repo (v0.7)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap), vai trò IT + dashboard IT, AI Mây (chat, FAQ offline, tour — OpenAI mặc định tắt chờ I-14), giỏ hàng. Chưa có: checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây tra đơn, admin đơn/coupon/đổi trả, GA (xem §31).
 
 ---
 
@@ -84,7 +84,8 @@ Vai trò lưu ở hồ sơ: `customer` / `admin` / `it` (D-38, sửa bởi D-51)
 | Actor | Đối tượng | Tạo | Xem | Sửa | Xóa/Hủy |
 |---|---|:-:|:-:|:-:|:-:|
 | Khách vãng lai | Sản phẩm | – | ✓ | – | – |
-| Khách vãng lai | Giỏ hàng | `[BA DECISION REQUIRED]` Q-13 | | | |
+| Khách vãng lai | Giỏ hàng (lưu trình duyệt) | ✓ | ✓ | ✓ | ✓ (D-59) |
+| Khách hàng | Giỏ hàng của mình (lưu server) | ✓ | ✓ | ✓ | ✓ |
 | Khách hàng | Đơn của mình | ✓ | ✓ | – | Hủy trước SHIPPED |
 | Khách hàng | Lời chúc của đơn mình | ✓ | ✓ | Theo BR-MSG-001/008 | `[BA DECISION REQUIRED]` |
 | Khách hàng | Yêu cầu đổi trả | ✓ | ✓ | – | – |
@@ -293,7 +294,8 @@ Không có chỉ số định lượng nào được cung cấp; các ô "Mục 
 - Admin tạo/sửa/ẩn/xoá sản phẩm tại `/admin` (FR-CAT-004). Sản phẩm mới mặc định là Draft `[ASSUMPTION]`. Tên tiếng Việt bắt buộc; slug gồm chữ thường không dấu, số, gạch nối; giá là số nguyên VND ≥ 0 `[ASSUMPTION]`.
 - Xoá sản phẩm được phép (§3.2). Khi đã có đơn hàng, sản phẩm đã bán phải chuyển Hidden thay vì xoá `[ASSUMPTION]`.
 - Tài khoản admin do người quản trị hệ thống cấp bằng cách đặt `role = 'admin'` trong bảng `profiles` của Supabase; web chưa có màn hình cấp quyền `[ASSUMPTION]`.
-- Trong lúc chưa có giỏ hàng (Q-13), nút trên thẻ sản phẩm dẫn tới trang chi tiết ("Xem chi tiết"); trang chi tiết báo "Đặt hàng trực tuyến sẽ sớm ra mắt" `[ASSUMPTION]`.
+- Thẻ sản phẩm có nút thêm vào giỏ ("Tặng ngay" khi chọn Mua tặng, "Thêm vào giỏ" khi chọn Mua cho mình — cả hai chỉ thêm vào giỏ; loại đơn chọn ở checkout, FR-CHK-002) `[ASSUMPTION]`; tên sản phẩm dẫn tới trang chi tiết. Trang chi tiết có chọn số lượng + "Thêm vào giỏ".
+- Bộ Sum Vầy chỉ thêm vào giỏ nguyên bộ; bán lẻ từng đèn chờ Q-05 (FR-CAT-002).
 
 ## 10. Tồn kho
 
@@ -305,11 +307,16 @@ Vận hành xưởng ngoài phạm vi (D-34). Ở tầng web chỉ cần một q
 
 | Chủ đề | Quy tắc |
 |---|---|
-| Ai có giỏ | `[BA DECISION REQUIRED]` Q-13: khách vãng lai có thêm vào giỏ được không (lưu trình duyệt, gộp khi đăng nhập), hay bấm "Thêm vào giỏ" là bắt đăng nhập? |
+| Ai có giỏ | Khách vãng lai thêm vào giỏ được; giỏ lưu trình duyệt (chỉ mã sản phẩm + số lượng). Khi đăng nhập, gộp vào giỏ tài khoản: cộng số lượng (tối đa 10), bỏ sản phẩm không còn bán, xoá bản trình duyệt `[CONFIRMED]` D-59 |
 | Giá trong giỏ | Luôn hiển thị **giá hiện hành**; giá được chốt (snapshot) tại thời điểm tạo đơn `[CONFIRMED]` D-41 |
 | Sản phẩm bị ẩn khi đang trong giỏ | Hiện cảnh báo, không cho checkout dòng đó `[CONFIRMED]` D-41 |
-| Số lượng tối đa mỗi dòng | `[BA DECISION REQUIRED]` |
+| Số lượng tối đa mỗi dòng | **10** `[CONFIRMED]` D-60. Tối đa 50 dòng mỗi giỏ `[ASSUMPTION]` |
 | Lưu giỏ | Giỏ của user đã đăng nhập lưu trên server, đồng bộ giữa các thiết bị `[CONFIRMED]` D-41 |
+| Giá giỏ của vãng lai | Server tính lại từ mã sản phẩm + số lượng; không nhận giá từ trình duyệt `[DERIVED]` §12 |
+| Tạm tính | Σ(giá hiện hành chưa VAT × số lượng) của dòng còn bán; ghi "Phí vận chuyển và VAT được tính ở bước thanh toán" (chờ Q-09, Q-11) `[ASSUMPTION]` |
+| Nút Thanh toán (chưa có checkout) | Chưa đăng nhập → đăng nhập rồi quay lại giỏ, giỏ còn nguyên (US-001 AC-003); đã đăng nhập → báo "Thanh toán trực tuyến sẽ sớm ra mắt" `[CONFIRMED]` D-61 |
+| Trang giỏ | `noindex` (BR-SEO-001); không SSR nội dung (phụ thuộc trình duyệt/phiên) `[DERIVED]` D-49 |
+| Bảo trì (D-54) | Thêm/sửa/xoá giỏ trả 503; xem giỏ và tính giá giỏ vãng lai vẫn chạy `[ASSUMPTION]` |
 
 ## 12. Checkout
 
@@ -983,7 +990,6 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Q-16 | Hoàn tiền payOS: tự động hay thủ công? | Thanh toán |
 | Q-08 | Soạn lời chúc lúc nào; chưa soạn khi tới hạn khóa thì sao? | Checkout, lời chúc |
 | Q-26 | Media lưu bao lâu nếu không ai xác nhận? | Lưu trữ |
-| Q-13 | Vãng lai có giỏ hàng không? | Giỏ hàng |
 | I-04, I-14 | `[LEGAL]` niêm yết giá chưa VAT; chuyển dữ liệu sang OpenAI | Pháp lý |
 
 ### P1 — trước khi làm tính năng liên quan
@@ -1037,7 +1043,7 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | ID | Yêu cầu | Hiện trạng | Loại | Trạng thái |
 |---|---|---|---|---|
 | G-01 | Catalog từ DB, giá dạng số | Bảng `products`, giá số nguyên VND; `GET /api/products` (`server/routes/catalog.js`) | — | **Đã xử lý** (v0.2) |
-| G-02 | Giỏ hàng | Chưa có; nút trên thẻ sản phẩm tạm dẫn tới trang chi tiết (§9) | Missing | **Còn thiếu** — chờ Q-13 |
+| G-02 | Giỏ hàng | `/cart`, `/api/cart/*`, thêm vào giỏ ở thẻ + trang chi tiết (FR-CART-001, D-59…D-61) | — | **Đã xử lý** (v0.7) |
 | G-03 | Tài khoản, checkout, thanh toán, đơn | Đã có backend Express + Supabase, routing, tài khoản (FR-ACC-001). Chưa có checkout, thanh toán, đơn | Missing | **Một phần** |
 | G-04 | Trang QR lời chúc, QR đèn | Trang QR lô đèn `/lo/:code` (FR-QR-006) đã có. Trang QR lời chúc chưa có | Missing | **Một phần** |
 | G-05 | AI Mây | Chat (OpenAI function calling, mặc định tắt — D-55), FAQ offline, tour, hạn mức, ngân sách, lịch sử, cấu hình admin (`server/may/*`, `src/may/*`, `/admin/may`). Chưa có tra đơn (FR-AI-004) | Missing | **Một phần** (v0.6) |
@@ -1153,3 +1159,6 @@ Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.j
 | D-56 | Q-31: kênh hỗ trợ người thật do admin nhập trong cấu hình Mây | Hiệu lực (v0.6) |
 | D-57 | US-009: chờ OpenAI tối đa 15 giây rồi hiện câu "ốm" | Hiệu lực (v0.6) |
 | D-58 | Ngân sách OpenAI mặc định 20 USD/tháng (admin sửa được) | Hiệu lực (v0.6) |
+| D-59 | Q-13: khách vãng lai có giỏ (lưu trình duyệt), gộp vào giỏ tài khoản khi đăng nhập | Hiệu lực (v0.7) |
+| D-60 | Tối đa 10 sản phẩm mỗi dòng giỏ | Hiệu lực (v0.7) |
+| D-61 | Khi chưa có checkout: nút Thanh toán bắt đăng nhập rồi báo "sắp ra mắt" | Hiệu lực (v0.7) |

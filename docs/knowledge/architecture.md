@@ -22,13 +22,14 @@ server/
   services/catalog.js      Truy vấn công khai dùng chung API + SSR
   monitoring/              metrics.js (số liệu API), maintenance.js (bảo trì), health.js (kiểm tra tích hợp)
   may/                     config.js (cấu hình mặc định + validate), guard.js (PII, kiểm tra số, FAQ offline), tools.js (hàm backend cho Mây), service.js
+  cart/service.js          Giỏ hàng: tính giá, gộp, giới hạn (D-59, D-60)
   app.js                   createApp({ repo, auth, config }) — dùng trong test
   config.js                Đọc biến môi trường
   errors.js                HttpError + errorHandler (định dạng lỗi thống nhất)
   i18n.js                  normalizeLang, pick (D-40), localePath (D-37)
   domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
-  routes/                  catalog.js, auth.js, admin.js, it.js, may.js, seo.js (sitemap, robots)
+  routes/                  catalog.js, auth.js, admin.js, it.js, may.js, cart.js, seo.js (sitemap, robots)
   adapters/openai.js       Chat Completions qua fetch (T-21)
   domain/admin.js          Kiểm tra dữ liệu admin (sản phẩm, FAQ, lô, video)
   adapters/
@@ -55,6 +56,7 @@ src/
   admin/                   AdminLayout, ProductsPage, FaqPage, BatchesPage, I18nInput, strings.js (D-48)
   it/                      ItDashboard.jsx, strings.js (D-51)
   may/                     May.jsx (nút, tour), MayChat.jsx, Tour.jsx, MayAvatar.jsx, storage.js
+  cart/                    CartProvider.jsx, context.js (useCart), AddToCart.jsx, QuantityInput.jsx
   lib/money.js             formatVnd
   styles/                  App.css (landing), pages.css (trang mới)
   test/                    renderApp.jsx (mockApi, renderAt), fixtures.js
@@ -90,6 +92,13 @@ Thêm phương thức → thêm ở **cả** `memory` và `supabase` + test.
 | `getSetting(key)`, `setSetting(key, value, userId)` | Cài đặt (bảo trì) |
 
 Auth provider và storage có thêm `ping()`.
+
+### Giỏ hàng (repository)
+
+| Phương thức | Ghi chú |
+|---|---|
+| `getCart(userId)` | `[{ productId, quantity, addedAt }]` theo thứ tự thêm |
+| `setCartItem(userId, productId, quantity)`, `removeCartItem(userId, productId)` | |
 
 ### Mây (repository)
 
@@ -133,6 +142,7 @@ Lỗi chung: `RATE_LIMITED`.
 | `api_metrics` | PK (`bucket` phút, `method`, `route`, `status`); `count`, `total_ms`, `max_ms`, histogram `le_50…gt_2500` | D-53; ghi qua RPC `record_api_metrics` |
 | `api_errors` | `at`, `method`, `route`, `path`, `status`, `code`, `message` | Lỗi 5xx |
 | `app_settings` | `key`, `value` jsonb, `updated_by`, `updated_at` | `maintenance` (D-54), `may` (cấu hình Mây) |
+| `cart_items` | PK (`user_id`, `product_id`), `quantity` 1..10 | Giỏ người đã đăng nhập (D-41, D-60) |
 | `chat_messages` | `user_id`, `session_id`, `role`, `kind`, `content`, `lang` | Lịch sử chat người đã đăng nhập (D-19) |
 | `may_counters` | `key` (đã băm), `count`, `expires_at` | Hạn mức §22.4; RPC `may_increment` |
 | `may_usage` | `month`, `requests`, tokens, `cost_usd` | Ngân sách (D-58); RPC `may_add_usage` |
@@ -167,6 +177,10 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | POST | `/api/admin/batches/:id/video` | Admin | `{ path }` → gắn video (thay được sau xuất bản) |
 | POST | `/api/admin/batches/:id/publish` | Admin | 409 `VIDEO_REQUIRED` |
 | PUT/GET | `/api/dev-storage/upload/:token`, `/api/dev-storage/o/*` | Token | Chỉ khi chạy adapter bộ nhớ |
+| POST | `/api/cart/quote?lang=` | – | `{ items: [{ slug, quantity }] }` → giỏ đã tính giá (vãng lai) |
+| GET | `/api/cart?lang=` | Bearer | Giỏ tài khoản |
+| PUT/DELETE | `/api/cart/items/:slug` | Bearer | `{ quantity }` 1..10 |
+| POST | `/api/cart/merge` | Bearer | Gộp giỏ trình duyệt (D-59) |
 | POST | `/api/may/chat` | Tuỳ chọn | `{ message, lang, sessionId, history }` → `{ reply: { kind: answer\|resting\|tired\|sick\|unknown, text, faq? } }` |
 | GET | `/api/may/history` | Bearer | Lịch sử chat của mình |
 | GET/PUT | `/api/admin/may/config` | Admin, IT | Cấu hình Mây |

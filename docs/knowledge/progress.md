@@ -12,7 +12,7 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 | Tài khoản | FR-ACC-002 (đơn của tôi) | ⬜ | Chỗ trống ở `AccountPage` | — | Cần đơn hàng |
 | Tài khoản | FR-ACC-003 (lời chúc) | ⛔ | — | — | Q-08 |
 | Tài khoản | FR-ACC-004 (lịch sử chat Mây) | ✅ | `src/pages/AccountPage.jsx` | `src/may/May.test.jsx` | Xoá lịch sử chờ `[LEGAL]` I-15 |
-| Giỏ hàng | FR-CART-001 | ⛔ | — | — | Q-13 |
+| Giỏ hàng | FR-CART-001 | ✅ | `server/cart/*`, `server/routes/cart.js`, `src/cart/*`, `src/pages/CartPage.jsx` | `server/cart*.test.js`, `src/cart/Cart*.test.jsx` | — |
 | Checkout | FR-CHK-001…008 | ⛔ | — | — | Q-09, Q-11, Q-10/C-1…C-3/C-5, Q-08, Q-15 |
 | Thanh toán | FR-PAY-001/002 | ⛔ | — | — | Q-15, Q-16 |
 | Đơn | FR-ORD-001/002 | ⬜ | — | — | Q-20 (hoàn tiền) |
