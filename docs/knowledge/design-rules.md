@@ -179,7 +179,27 @@ Quy tắc:
 | Hoạ tiết Việt | Tự vẽ chữ Hán, rồng, mái cung điện Trung Hoa lên giao diện |
 | Hiệu ứng tắt khi giảm chuyển động | Animation bằng `filter`/`box-shadow` lặp liên tục |
 
-## 12. Checklist khi thêm thành phần
+## 12. Dashboard tài khoản (`/account`)
+
+Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệu (`APP_PAGES`, class `.page-app`, bỏ cả viền tối quanh khung nhìn). Style ở mục "Dashboard tài khoản" cuối `pages.css`. Tinh thần **thanh thoát**, bo góc mềm, có minh hoạ cho sinh động; lấy nguyên tắc từ dashboard Trung Quốc (T-34): nhiều khoảng trắng, nền giấy sáng, chỉ nét 1px, không bóng đổ, một điểm nhấn son.
+
+| Phần | Cách trình bày |
+|---|---|
+| Nét | Một token riêng `--dash-line` (sepia 18%) cho mọi đường kẻ, `--dash-soft` (7%) cho nền hover/tab chọn. Không `--print`, không khung viền đôi, không góc triện trong dashboard |
+| Thanh bên (264px, dính, cao 100dvh) | Nền `--diep-light`, một nét mảnh bên phải; logo ấn triện nhỏ + đổi ngôn ngữ (gạch chân son ở ngôn ngữ đang chọn) |
+| Avatar | Vòng son mảnh (chỉ nét, không tô), chữ cái đầu của tên gọi màu son, Fraunces 500 |
+| Tab dọc | Biểu tượng nét 1,2px + nhãn ngắn, không xuống dòng; tab chọn: nền `--dash-soft`, chữ đậm, vạch son 2px ở mép thanh bên; huy hiệu là chữ nhỏ sepia, không viên |
+| Đầu vùng nội dung | Eyebrow sepia chữ thưa, h1 Fraunces 500, câu phụ theo tab, đèn nhỏ 64px; một nét mảnh bên dưới |
+| Số liệu | Dải không khung, ngăn bằng nét dọc (≤640px: nét ngang, số trái chữ phải); số Fraunces **300** 3rem `oldstyle-nums` |
+| Thẻ | Nền `--diep-light`, nét `--dash-line`, bo 4px, không bóng; tiêu đề mục có **vạch son 3px** phía trước |
+| Liên kết phụ | Chữ son đậm, gạch chân mọc ra khi hover/focus (không gạch sẵn) |
+| Chat Mây | Nhãn ngày chữ thưa giữa hai nét mảnh; tin khách nền `--diep-deep`, tin Mây nền trong viền mảnh; bo 12px, góc phía người nói 2px |
+| Màn ≤960px | Thanh bên tách (`display: contents`): đầu trang → tab ngang gạch chân son, dính trên cùng (ẩn biểu tượng) → nội dung → chân |
+| Motion | Đổi tab: `dash-in` 0.6s, dịch 6px; ô số liệu lệch 80ms; tắt khi giảm chuyển động |
+| Bo góc (v0.13) | Thẻ và dải số liệu 20px (≤640px: 18px), khung đầu trang 24px, tab 12px, liên kết thanh bên 10px, ô nhập 12px, nút và nhãn dạng viên (999px), bong bóng chat 16px (góc phía người nói 4px) |
+| Minh hoạ (v0.13) | SVG tự vẽ ở `src/components/DashArt.jsx`, lối khắc gỗ nét 1,5px cùng bảng màu: cảnh đầu trang (dây 3 đèn trước trống đồng mờ, mây), hộp quà, phong thư ấn son, 4 công đoạn (giấy dó, khung tre, phơi nắng, đóng gói QR); kèm đèn và Mây có sẵn. Hình đặt trong nền tròn `--diep`. **Không** dùng ảnh tư liệu trong dashboard (§7.2) |
+
+## 13. Checklist khi thêm thành phần
 
 1. Dùng token màu; kiểm tra tương phản nếu có chữ.
 2. Khung: chọn tranh bồi / thiếp thư / danh sách nét mảnh — không tạo khung mới có viền dày.

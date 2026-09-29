@@ -26,7 +26,8 @@ describe('Tài khoản (FR-ACC-001)', () => {
     type('Password', 'matkhau123')
     fireEvent.click(screen.getByRole('button', { name: 'Sign in' }))
     expect(await screen.findByRole('heading', { name: 'My account' })).toBeInTheDocument()
-    expect(await screen.findByDisplayValue('Nguyễn An')).toBeInTheDocument()
+    // Tab Tổng quan tóm tắt hồ sơ (dashboard tab dọc)
+    expect((await screen.findAllByText('Nguyễn An')).length).toBeGreaterThan(0)
     expect(JSON.parse(localStorage.getItem('moc.session')).accessToken).toBe('a1')
   })
 
@@ -70,7 +71,7 @@ describe('Tài khoản (FR-ACC-001)', () => {
       'POST /auth/refresh': () => ({ body: session }),
       'GET /me': (url, init) => (init.headers.Authorization === 'Bearer a1' ? { body: { profile } } : { status: 401, body: {} }),
     })
-    renderAt('/account')
+    renderAt('/account?tab=profile')
     expect(await screen.findByDisplayValue('Nguyễn An')).toBeInTheDocument()
   })
 

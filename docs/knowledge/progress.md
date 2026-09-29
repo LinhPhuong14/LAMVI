@@ -8,8 +8,8 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 | Catalog | FR-CAT-002 (bán lẻ đèn trong bộ) | ⛔ | `products.kind = 'set'` | — | Q-05, Q-06 |
 | Catalog | FR-CAT-003 (giá chưa VAT) | ✅ | `src/components/Price.jsx` | `src/components/Components.extra.test.jsx` | `[LEGAL]` I-04 |
 | Catalog | FR-CAT-004 (admin sản phẩm) | ✅ | `server/routes/admin.js`, `src/admin/ProductsPage.jsx` | `server/admin*.test.js`, `src/admin/Admin*.test.jsx` | — |
-| Tài khoản | FR-ACC-001 (không xác nhận email, D-63) | ✅ | `server/routes/auth.js`, `server/adapters/supabase/auth.js`, `src/auth/*`, `src/pages/auth/*`, `src/pages/AccountPage.jsx` | `server/auth*.test.js`, `server/adapters/supabase/auth*.test.js`, `src/pages/auth/Auth*.test.jsx` | Cấu hình Supabase URL (G-16); rate limit (G-20, G-37) |
-| Tài khoản | FR-ACC-002 (đơn của tôi) | ⬜ | Chỗ trống ở `AccountPage` | — | Cần đơn hàng |
+| Tài khoản | FR-ACC-001 (không xác nhận email, D-63) | ✅ | `server/routes/auth.js`, `server/adapters/supabase/auth.js`, `src/auth/*`, `src/pages/auth/*`, `src/pages/AccountPage.jsx` (dashboard, v0.12) | `server/auth*.test.js`, `server/adapters/supabase/auth*.test.js`, `src/pages/auth/Auth*.test.jsx`, `src/pages/AccountDashboard.extra.test.jsx` | Cấu hình Supabase URL (G-16); rate limit (G-20, G-37) |
+| Tài khoản | FR-ACC-002 (đơn của tôi) | ⬜ | Chỗ chờ ở dashboard `AccountPage` (G-40) | — | Cần đơn hàng |
 | Tài khoản | FR-ACC-003 (lời chúc) | ⛔ | — | — | Q-08 |
 | Tài khoản | FR-ACC-004 (lịch sử chat Mây) | ✅ | `src/pages/AccountPage.jsx` | `src/may/May.test.jsx` | Xoá lịch sử chờ `[LEGAL]` I-15 |
 | Giỏ hàng | FR-CART-001 | ✅ | `server/cart/*`, `server/routes/cart.js`, `src/cart/*`, `src/pages/CartPage.jsx` | `server/cart*.test.js`, `src/cart/Cart*.test.jsx` | — |

@@ -129,7 +129,7 @@ describe('Lịch sử trên trang tài khoản (FR-ACC-004)', () => {
       'GET /me': () => ({ body: { profile: { id: 'u1', email: 'an@moc.test', fullName: 'An', phone: null, preferredLocale: 'vi', role: 'customer' } } }),
       'GET /may/history': () => ({ body: { items: [{ role: 'assistant', kind: 'answer', content: 'Đèn Vọng giá 1.050.000 ₫' }] } }),
     })
-    renderAt('/account')
+    renderAt('/account?tab=may')
     expect(await screen.findByRole('heading', { name: 'Lịch sử trò chuyện với Mây' })).toBeInTheDocument()
     expect(await screen.findByText('Đèn Vọng giá 1.050.000 ₫')).toBeInTheDocument()
   })
