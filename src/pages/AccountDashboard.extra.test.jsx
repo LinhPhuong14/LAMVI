@@ -563,16 +563,19 @@ describe('Giao diện sáng/tối và nền mây khói (T-35)', () => {
     }
   })
 
-  it('nền: một lớp trang trí aria-hidden gồm dải khói, hoạ tiết và 8 đèn trời', async () => {
+  it('nền: một lớp trang trí aria-hidden gồm ảnh nền, khói thật và 8 đèn trời thật', async () => {
     login()
     api()
     renderAt('/account')
     await screen.findByRole('tablist')
     const sky = document.querySelector('.dash-sky')
     expect(sky).toHaveAttribute('aria-hidden', 'true')
-    expect(sky.querySelectorAll('.dash-smoke').length).toBeGreaterThan(0)
-    expect(sky.querySelector('.motif-layer')).not.toBeNull()
-    expect(sky.querySelectorAll('.dash-rise-lantern')).toHaveLength(8)
+    expect(sky.querySelector('.dash-photo')).not.toBeNull()
+    expect(sky.querySelectorAll('img.dash-smoke').length).toBeGreaterThan(0)
+    expect(sky.querySelectorAll('.dash-rise-lantern img')).toHaveLength(8)
+    // Cảnh đầu trang cũng là ảnh thật
+    expect(document.querySelector('.dash-scene svg')).toBeNull()
+    expect(document.querySelectorAll('.dash-scene img.dash-scene-lantern')).toHaveLength(3)
   })
 
   it('CSS: giảm chuyển động tắt khói và đèn bay; tối khai báo lại bí danh cũ; không làm mờ phần tử dính', () => {

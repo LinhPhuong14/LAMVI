@@ -166,7 +166,7 @@ describe('Lưu giao diện qua tab và đăng xuất → đăng nhập', () => {
 })
 
 describe('DashSky', () => {
-  it('nằm trong .dash, aria-hidden, không có phần tử focus được, 8 đèn, ≤3 hoạ tiết', async () => {
+  it('nằm trong .dash, aria-hidden, không có phần tử focus được, 8 đèn; chỉ ảnh thật, không SVG tự vẽ', async () => {
     await open()
     const sky = document.querySelector('.dash-sky')
     expect(sky).not.toBeNull()
@@ -174,17 +174,29 @@ describe('DashSky', () => {
     expect(sky).toHaveAttribute('aria-hidden', 'true')
     expect(sky.querySelectorAll('a, button, input, select, textarea, [tabindex], [contenteditable]')).toHaveLength(0)
     expect(sky.querySelectorAll('.dash-rise-lantern')).toHaveLength(8)
-    const motifs = sky.querySelectorAll('.motif-layer .motif')
-    expect(motifs.length).toBeGreaterThan(0)
-    expect(motifs.length).toBeLessThanOrEqual(3)
+    expect(sky.querySelectorAll('svg, .motif-layer')).toHaveLength(0)
+    const imgs = [...sky.querySelectorAll('img')]
+    expect(imgs.length).toBeGreaterThan(8)
+    for (const img of imgs) {
+      expect(img.getAttribute('src')).toMatch(/^\/images\/dash\/[\w-]+\.webp$/)
+      expect(img.getAttribute('alt')).toBe('')
+    }
     expect(sky.textContent.trim()).toBe('')
     expect(document.querySelectorAll('.dash-sky')).toHaveLength(1)
   })
 
-  it('preset dash trong motifs.js ≤ 3 hoạ tiết, đều là hoạ tiết có thật', async () => {
-    const { MOTIFS, SECTION_MOTIFS } = await import('../data/motifs.js')
-    expect(SECTION_MOTIFS.dash.length).toBeLessThanOrEqual(3)
-    for (const it of SECTION_MOTIFS.dash) expect(MOTIFS[it.m]).toBeTruthy()
+  it('mọi ảnh nền dashboard có trong public/images/dash và có dòng nguồn CC0 trong CREDITS.md', async () => {
+    const { existsSync } = await import('node:fs')
+    const credits = readFileSync(join(process.cwd(), 'public/images/dash/CREDITS.md'), 'utf8')
+    const srcs = [readFileSync(join(process.cwd(), 'src/components/DashSky.jsx'), 'utf8'), readFileSync(join(process.cwd(), 'src/components/DashArt.jsx'), 'utf8'), readFileSync(join(process.cwd(), 'src/styles/pages.css'), 'utf8')].join('\n')
+    const files = [...new Set([...srcs.matchAll(/([\w-]+\.webp)/g)].map((m) => m[1]))].filter((f) => srcs.includes(`dash/${f}`) || /DashSky|smoke|sky-|mist/.test(f))
+    expect(files.length).toBeGreaterThanOrEqual(5)
+    for (const f of files) {
+      expect(existsSync(join(process.cwd(), 'public/images/dash', f)), f).toBe(true)
+      const row = credits.split('\n').find((l) => l.includes('`' + f + '`'))
+      expect(row, f).toBeDefined()
+      expect(row).toMatch(/CC0 1\.0/)
+    }
   })
 })
 

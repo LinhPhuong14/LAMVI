@@ -127,6 +127,8 @@ Quy tắc:
 
 ### 7.1 Nguồn và bản quyền
 
+- Ảnh nền trang trí (trời, sương, khói — không phải ảnh tư liệu, không phải ảnh sản phẩm) cũng theo quy tắc này; nguồn tìm: Openverse (lọc `license=cc0,pdm`), Wikimedia Commons. Unsplash/Pexels/Pixabay chặn truy cập tự động từ máy chủ; Canva không dùng (giấy phép chỉ cho dùng trong thiết kế Canva).
+
 - Chỉ dùng ảnh **public domain** hoặc **CC0** (ưu tiên), hoặc giấy phép cho phép dùng thương mại có ghi công. Ghi đầy đủ trong `public/images/folk/CREDITS.md` và `src/data/folkArt.js` (tên file gốc, tác giả, giấy phép, link).
 - Không dùng ảnh có **trẻ em** hay người nhận diện được.
 - Việc dùng ảnh bên ngoài trên trang bán hàng thuộc `[LEGAL]` — pháp chế duyệt trước go-live (xem spec §31.4).
@@ -198,7 +200,7 @@ Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệ
 | Motion | Đổi tab: `dash-in` 0.6s, dịch 6px; ô số liệu lệch 80ms; tắt khi giảm chuyển động |
 | Bo góc (v0.13) | Thẻ và dải số liệu 20px (≤640px: 18px), khung đầu trang 24px, tab 12px, liên kết thanh bên 10px, ô nhập 12px, nút và nhãn dạng viên (999px), bong bóng chat 16px (góc phía người nói 4px) |
 | Kính mờ (v0.14, T-35) | `.dash-top/.dash-stats/.dash-card/.dash-promo`: nền giấy trong 58%, `backdrop-filter: blur(18px) saturate(150%)`, viền trắng 70% 1px, bóng mềm; thanh bên và thanh tab mobile (phần tử dính) chỉ nền trong, **không** làm mờ (§9). Có `@supports` dự phòng tăng độ đục |
-| Nền (v0.14) | `DashSky`: 4 dải khói màu (hoè, hồng điệp, chàm, lá) mờ 48px trôi 46–62s; hoạ tiết `FloatingMotifs` preset `dash` (3 hoạ tiết); 8 đèn trời bay lên **một lượt** trong màn hình đầu khi vào trang (7–9,5s). Giảm chuyển động: khói đứng yên, không đèn bay |
+| Nền (v0.15) | `DashSky` dùng **ảnh thật CC0** (`public/images/dash/`, nguồn ở `CREDITS.md`): trời sương núi (sáng, lọc sepia, mờ 38%) / trời đêm đầy đèn trời (tối), phủ màn hình đầu và mờ dần; 3 lớp khói thật (ảnh khói nền đen tách theo độ sáng) trôi 48–60s; 8 đèn trời thật (ảnh tách nền) bay lên **một lượt** khi vào trang. Cảnh đầu trang: ảnh cùng bộ + 3 đèn trời thật trôi nhẹ. Không dùng SVG/gradient tự vẽ cho nền. Giảm chuyển động: khói và đèn đứng yên, không đèn bay |
 | Giao diện tối (v0.14) | "Đêm hội đèn": `--diep` #141c27, `--diep-light` #1b2533, chữ `--than` #efe6d6 (12,5:1), `--than-soft` #c7b9a3 (8:1), `--sepia` #c9ab82 (7:1), `--son` #e27a5f / `--son-deep` #f0937a (link 6,7:1); nút chính giữ son đậm #b3402a chữ sáng (5,3:1). Khai báo lại bí danh cũ (`--ink-soft`, `--cream`…) trong `.dash[data-theme='dark']`. Minh hoạ nét mực đặt trên đĩa giấy sáng có quầng như đèn thắp. Nút chuyển ở hàng logo, lưu `moc.dashTheme` |
 | Minh hoạ (v0.13) | SVG tự vẽ ở `src/components/DashArt.jsx`, lối khắc gỗ nét 1,5px cùng bảng màu: cảnh đầu trang (dây 3 đèn trước trống đồng mờ, mây), hộp quà, phong thư ấn son, 4 công đoạn (giấy dó, khung tre, phơi nắng, đóng gói QR); kèm đèn và Mây có sẵn. Hình đặt trong nền tròn `--diep`. **Không** dùng ảnh tư liệu trong dashboard (§7.2) |
 

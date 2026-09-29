@@ -16,7 +16,9 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 4. Test: nhóm "Giao diện sáng/tối và nền" trong `AccountDashboard.extra.test.jsx`; subagent kiểm thử độc lập (T-11) thêm `AccountTheme.extra.test.jsx` (21 test), phát hiện nút chính khi hover ở chế độ tối chỉ 4,33:1 → đổi sang son đậm #9f3a27 (6,3:1).
 5. Spec v0.14 (D-65, `[ASSUMPTION]` phạm vi dark mode), design rules §9/§12, T-35.
 
-**Còn lại**: dark mode cho trang công khai nếu người dùng muốn.
+6. Theo yêu cầu "tìm asset trên mạng/Canva, không tự vẽ SVG ở background": thay nền bằng ảnh thật CC0 (Openverse: rawpixel, StockSnap) — trời sương/trời đêm, khói tách nền, đèn trời tách nền; cảnh đầu trang cũng dùng ảnh. Bỏ preset hoạ tiết `dash` và dải khói gradient. `public/images/dash/CREDITS.md`. Canva không dùng (giấy phép + không có kết nối). Test nền cập nhật (chỉ ảnh thật, có dòng nguồn CC0). Spec v0.15, Q-36 mở rộng.
+
+**Còn lại**: dark mode cho trang công khai nếu người dùng muốn; pháp chế xác nhận ảnh nền (Q-36).
 
 ---
 

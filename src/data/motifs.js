@@ -69,12 +69,6 @@ export const MOTIFS = {
 // Bố cục theo phần: x/y là vị trí (%), w là rộng (px), dur/delay cho độ lệch pha, flip lật ngang.
 // tone: 'paper' (nét sepia trên nền giấy) | 'dark' (nét hoè nhạt trên nền tối).
 export const SECTION_MOTIFS = {
-  // Dashboard tài khoản: mây và khói trôi sau các thẻ kính
-  dash: [
-    { m: 'may-dai', x: '18%', y: '8%', w: 420, dur: 34, delay: -8 },
-    { m: 'may-cuon', x: '78%', y: '46%', w: 230, dur: 28, delay: -14, flip: true },
-    { m: 'khoi-huong', x: '92%', y: '10%', w: 48, dur: 12, delay: -3 },
-  ],
   hero: [
     { m: 'may-dai', x: '-4%', y: '78%', w: 380, dur: 30, delay: -6 },
     { m: 'khoi-huong', x: '71%', y: '4%', w: 46, dur: 11, delay: -2 },

@@ -1227,73 +1227,66 @@
   max-width: 58%;
 }
 
-/* Cảnh minh hoạ: trống đồng mờ, mây, dây đèn */
+/* Cảnh đầu trang: ảnh thật mờ dần vào chữ, đèn trời thật trôi nhẹ */
 .dash-scene {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 42%;
+  width: 52%;
   pointer-events: none;
 }
 
-.dash-scene-drum {
+.dash-scene-photo {
   position: absolute;
-  right: -40px;
-  top: 50%;
-  width: 260px;
-  height: 260px;
-  transform: translateY(-50%);
-  color: var(--hoe);
-  opacity: 0.16;
+  inset: 0;
+  background: url('/images/dash/mist-mountain.webp') center 35% / cover no-repeat;
+  filter: sepia(0.35) saturate(0.85) brightness(1.05);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 45%);
+  mask-image: linear-gradient(to right, transparent, #000 45%);
+  opacity: 0.85;
 }
 
-.dash-scene-cloud {
-  position: absolute;
-  color: var(--diep-light);
-  opacity: 0.9;
-}
-
-.dash-scene-cloud-a {
-  width: 120px;
-  right: 58%;
-  bottom: 18px;
-}
-
-.dash-scene-cloud-b {
-  width: 90px;
-  right: 6%;
-  top: 14px;
-}
-
-.dash-scene-string {
-  position: absolute;
-  left: 4%;
-  right: 4%;
-  top: 0;
-  width: 92%;
-  height: 56px;
+.dash[data-theme='dark'] .dash-scene-photo {
+  background-image: url('/images/dash/sky-night.webp');
+  filter: none;
+  opacity: 1;
 }
 
 .dash-scene-lantern {
   position: absolute;
-  top: 18px;
-  filter: drop-shadow(0 8px 14px rgba(120, 70, 20, 0.18));
+  height: auto;
+  filter: drop-shadow(0 0 14px rgba(255, 180, 80, 0.55));
+  animation: dash-bob 6s ease-in-out infinite alternate;
 }
 
 .dash-scene-lantern.l1 {
-  left: 16%;
-  top: 14px;
+  width: 46px;
+  right: 58%;
+  top: 34%;
+  animation-delay: -1s;
 }
 
 .dash-scene-lantern.l2 {
-  left: 44%;
-  top: 30px;
+  width: 64px;
+  right: 30%;
+  top: 16%;
 }
 
 .dash-scene-lantern.l3 {
-  left: 72%;
-  top: 14px;
+  width: 34px;
+  right: 10%;
+  top: 46%;
+  animation-delay: -3s;
+}
+
+@keyframes dash-bob {
+  from {
+    transform: translateY(6px) rotate(-3deg);
+  }
+  to {
+    transform: translateY(-8px) rotate(3deg);
+  }
 }
 
 .dash-top .eyebrow {
@@ -1940,13 +1933,12 @@
   .dash-scene {
     position: relative;
     width: auto;
-    height: 118px;
+    height: 130px;
     margin: 0 -22px 6px;
   }
-  .dash-scene-drum {
-    width: 200px;
-    height: 200px;
-    right: -30px;
+  .dash-scene-photo {
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent);
   }
   .dash-panel {
     gap: 28px;
@@ -2206,40 +2198,62 @@
   pointer-events: none;
 }
 
-/* Dải khói màu: hình elip mờ lớn trôi rất chậm qua lại */
+/* Ảnh nền thật (CC0 — public/images/dash/CREDITS.md): trời sương ở giao diện sáng, trời đêm đầy đèn trời ở giao diện tối.
+   Phủ màn hình đầu, mờ dần xuống dưới; lọc màu một lần cho ấm như giấy điệp. */
+.dash-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 115vh;
+  background: url('/images/dash/mist-mountain.webp') center 30% / cover no-repeat;
+  filter: sepia(0.45) saturate(0.8) brightness(1.08);
+  opacity: 0.38;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent);
+}
+
+.dash[data-theme='dark'] .dash-photo {
+  background-image: url('/images/dash/sky-night.webp');
+  filter: none;
+  opacity: 0.85;
+}
+
+/* Khói thật: ảnh khói tách nền, trôi rất chậm qua lại */
 .dash-smoke {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(48px);
-  opacity: 0.55;
+  height: auto;
+  opacity: 0.4;
   will-change: transform;
   animation: dash-smoke 50s ease-in-out infinite alternate;
 }
 
-.dash-smoke-hoe {
-  background: radial-gradient(closest-side, rgba(242, 192, 78, 0.75), rgba(242, 192, 78, 0));
+.dash-smoke.is-flip {
+  --flip: -1;
 }
 
-.dash-smoke-hong {
-  background: radial-gradient(closest-side, rgba(201, 127, 102, 0.6), rgba(201, 127, 102, 0));
+/* Khói trắng ngà chỉ hiện rõ trên nền tối */
+.dash-smoke.is-thin {
+  opacity: 0;
 }
 
-.dash-smoke-cham {
-  background: radial-gradient(closest-side, rgba(38, 55, 74, 0.35), rgba(38, 55, 74, 0));
+.dash[data-theme='dark'] .dash-smoke {
+  opacity: 0.32;
 }
 
-.dash-smoke-la {
-  background: radial-gradient(closest-side, rgba(91, 107, 76, 0.4), rgba(91, 107, 76, 0));
+.dash[data-theme='dark'] .dash-smoke.is-thin {
+  opacity: 0.45;
 }
 
 @keyframes dash-smoke {
   from {
-    transform: translate3d(-6%, 10px, 0) scale(1);
+    transform: translate3d(-5%, 12px, 0) scaleX(var(--flip, 1));
   }
   to {
-    transform: translate3d(8%, -18px, 0) scale(1.08);
+    transform: translate3d(7%, -20px, 0) scaleX(var(--flip, 1)) scale(1.06);
   }
 }
+
 
 /* Đèn trời: bay lên một lượt trong màn hình đầu rồi tan */
 .dash-rise {
@@ -2252,14 +2266,27 @@
   overflow: hidden;
 }
 
+/* Đèn trời thật (ảnh tách nền) có quầng sáng phía sau */
 .dash-rise-lantern {
   position: absolute;
-  bottom: -40px;
-  border-radius: 40% 40% 30% 30%;
-  background: linear-gradient(#ffe7a6, var(--hoe) 55%, var(--son));
-  box-shadow: 0 0 14px 5px rgba(236, 166, 60, 0.45);
+  bottom: -60px;
   opacity: 0;
   animation: dash-rise 8s cubic-bezier(0.33, 0.1, 0.4, 1) 1 forwards;
+}
+
+.dash-rise-lantern::before {
+  content: '';
+  position: absolute;
+  inset: 20% -40% -10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 190, 90, 0.55), transparent);
+}
+
+.dash-rise-lantern img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 @keyframes dash-rise {
@@ -2283,9 +2310,6 @@
 }
 
 @media (max-width: 640px) {
-  .dash-smoke {
-    filter: blur(36px);
-  }
   .dash-rise-lantern:nth-child(even) {
     display: none;
   }
@@ -2297,6 +2321,9 @@
   }
   .dash-rise {
     display: none;
+  }
+  .dash-scene-lantern {
+    animation: none;
   }
 }
 
@@ -2345,19 +2372,6 @@
     radial-gradient(30rem 26rem at 8% 88%, rgba(91, 107, 76, 0.14), transparent 70%);
 }
 
-.dash[data-theme='dark'] .dash-smoke {
-  opacity: 0.32;
-}
-
-.dash[data-theme='dark'] .dash-smoke-cham {
-  background: radial-gradient(closest-side, rgba(90, 130, 190, 0.45), rgba(90, 130, 190, 0));
-}
-
-.dash[data-theme='dark'] .motif-paper {
-  color: var(--hoe-light);
-  opacity: 0.16;
-}
-
 .dash[data-theme='dark'] .dash-side {
   background: linear-gradient(180deg, rgba(27, 37, 51, 0.82), rgba(20, 28, 39, 0.6));
   border-right-color: rgba(255, 255, 255, 0.06);
@@ -2375,18 +2389,6 @@
 .dash[data-theme='dark'] .dash-profile-art {
   background: radial-gradient(circle, #f7efdf 55%, #e9dcc2 100%);
   box-shadow: 0 0 22px -4px rgba(242, 192, 78, 0.45);
-}
-
-.dash[data-theme='dark'] .dash-scene-drum {
-  opacity: 0.22;
-}
-
-.dash[data-theme='dark'] .dash-scene-cloud {
-  color: rgba(239, 230, 214, 0.18);
-}
-
-.dash[data-theme='dark'] .dash-scene-string path {
-  stroke: #e2c68f;
 }
 
 /* Nút chính và ấn triện giữ son đậm, chữ sáng */
