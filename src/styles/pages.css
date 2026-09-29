@@ -2725,3 +2725,237 @@
   background: var(--diep-light);
   margin-bottom: 12px;
 }
+
+/* ---------- Checkout & đơn hàng (FR-CHK-*, FR-ORD-*) ---------- */
+/* Bố cục hai cột: biểu mẫu bên trái, tóm tắt đơn dính bên phải (design-rules §3: nét mảnh) */
+.checkout-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.checkout-main {
+  display: grid;
+  gap: 20px;
+}
+
+.checkout-aside {
+  position: sticky;
+  top: 24px;
+}
+
+.checkout fieldset {
+  border: 1px solid var(--hair-soft);
+  margin: 0;
+}
+
+.checkout legend {
+  padding: 0 8px;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--than);
+}
+
+.choice-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.btn-choice {
+  border: 1px solid var(--hair);
+  background: transparent;
+  color: var(--than);
+}
+
+.btn-choice.is-active {
+  border-color: var(--son);
+  color: var(--son-deep);
+  background: color-mix(in srgb, var(--son) 8%, transparent);
+}
+
+.check-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.check-row.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.check-row input {
+  margin-top: 4px;
+  flex: none;
+}
+
+.check-row .field-hint {
+  display: block;
+}
+
+.coupon-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.coupon-row .field {
+  flex: 1;
+}
+
+.sum-items {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.sum-items li,
+.sum-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.95rem;
+}
+
+.sum-row {
+  padding: 6px 0;
+  border-top: 1px solid var(--hair-soft);
+}
+
+.sum-total {
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--son-deep);
+  border-top: 1px solid var(--hair);
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+}
+
+/* Trạng thái đơn */
+.order-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.order-status-confirmed,
+.order-status-in_production,
+.order-status-packed,
+.order-status-shipped {
+  border-color: var(--hoe);
+  color: var(--sepia);
+}
+
+.order-status-delivered {
+  border-color: var(--la);
+  color: var(--la);
+}
+
+.order-status-cancelled,
+.order-status-delivery_failed {
+  border-color: var(--hair);
+  color: var(--than-soft);
+}
+
+.order-status-pending_payment {
+  border-color: var(--son);
+  color: var(--son-deep);
+}
+
+/* C-11: bốn công đoạn + đã giao */
+.order-flow {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 18px 0;
+  padding: 0;
+  font-size: 0.86rem;
+  color: var(--than-soft);
+}
+
+.order-flow li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.order-flow-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--hair);
+}
+
+.order-flow .is-done {
+  color: var(--than);
+}
+
+.order-flow .is-done .order-flow-dot {
+  background: var(--son);
+  border-color: var(--son);
+}
+
+.order-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.order-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.order-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hair-soft);
+}
+
+.order-row .field-hint {
+  display: block;
+}
+
+.order-row-total {
+  font-weight: 600;
+}
+
+.order-thanks {
+  border-left: 3px solid var(--son);
+}
+
+@media (max-width: 860px) {
+  .checkout-form {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-aside {
+    position: static;
+  }
+
+  .order-row {
+    grid-template-columns: 1fr auto;
+  }
+}

@@ -249,9 +249,11 @@ export function createMemoryRepo(data = {}) {
       c.usedCount += 1
       return c.usedCount
     },
-    async releaseCoupon(couponId) {
+    // C-8: trả cả lượt tổng và lượt theo khách (xoá bản ghi lượt dùng của đơn)
+    async releaseCoupon(couponId, orderId) {
       const c = byId(state.coupons, couponId)
       if (c) c.usedCount = Math.max(0, c.usedCount - 1)
+      if (orderId) state.couponRedemptions = state.couponRedemptions.filter((r) => r.orderId !== orderId)
     },
 
     // --- Đơn hàng (FR-CHK-*, FR-ORD-*)

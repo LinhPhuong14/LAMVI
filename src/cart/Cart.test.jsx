@@ -100,7 +100,7 @@ describe('Giỏ tài khoản (D-41, D-59, D-61)', () => {
     expect(localStorage.getItem('moc.cart')).toBeNull()
   })
 
-  it('sản phẩm bị ẩn: cảnh báo, không đổi được số lượng; thanh toán báo sắp ra mắt', async () => {
+  it('sản phẩm bị ẩn: cảnh báo, không đổi được số lượng', async () => {
     localStorage.setItem('moc.session', JSON.stringify(session))
     mockApi({
       ...base,
@@ -111,8 +111,6 @@ describe('Giỏ tài khoản (D-41, D-59, D-61)', () => {
     expect(screen.getByText(/Giỏ có sản phẩm không còn bán/)).toBeInTheDocument()
     const hiddenLine = screen.getByText('Đèn Sum Vầy', { selector: 'strong' }).closest('li')
     expect(within(hiddenLine).getByRole('button', { name: 'Tăng số lượng' })).toBeDisabled()
-    fireEvent.click(screen.getByRole('button', { name: 'Thanh toán' }))
-    expect(await screen.findByText('Thanh toán trực tuyến sẽ sớm ra mắt. Giỏ hàng của bạn đã được lưu.')).toBeInTheDocument()
   })
 
   it('trang sản phẩm: chọn số lượng rồi thêm → PUT số lượng cộng dồn', async () => {

@@ -160,3 +160,75 @@ describe('Mã đơn gửi payOS', () => {
     expect(generatePayosOrderCode(new Date('2020-01-01T00:00:00Z'))).toBeGreaterThanOrEqual(0)
   })
 })
+
+// --- Kiểm thử độc lập bổ sung (T-11): các nhánh còn trống của adapter payOS
+describe('parseWebhook — nhánh còn lại (NFR-SEC-002)', () => {
+  const sign = (data) => ({ data, signature: signData(data, KEY) })
+
+  it('thiếu code trong data → lấy code ở cấp ngoài của webhook', () => {
+    const body = { ...sign({ orderCode: 42, amount: 1000 }), code: '00' }
+    expect(parseWebhook(body, KEY)).toMatchObject({ ok: true, paid: true })
+    expect(parseWebhook({ ...body, code: '01' }, KEY)).toMatchObject({ ok: true, paid: false })
+  })
+
+  it('chữ ký chỉ tính trên data: sửa code ở cấp ngoài vẫn qua chữ ký nhưng không sửa được số tiền', () => {
+    const body = { ...sign({ orderCode: 42, amount: 1000, code: '00' }), code: '99' }
+    // code trong data thắng → vẫn là đã trả
+    expect(parseWebhook(body, KEY)).toMatchObject({ ok: true, paid: true, amount: 1000 })
+    expect(parseWebhook({ ...body, data: { ...body.data, amount: 2000 } }, KEY)).toMatchObject({
+      ok: false,
+      reason: 'INVALID_SIGNATURE',
+    })
+  })
+
+  it('số tiền/mã đơn gửi dạng chuỗi số vẫn đọc được (payOS trả JSON số hoặc chuỗi)', () => {
+    const r = parseWebhook(sign({ orderCode: '42', amount: '920000', code: '00' }), KEY)
+    expect(r).toMatchObject({ ok: true, orderCode: 42, amount: 920_000 })
+  })
+
+  it('thiếu signature hoặc signature không phải chuỗi → INVALID_SIGNATURE', () => {
+    const { data } = sign({ orderCode: 1, amount: 1, code: '00' })
+    for (const signature of [undefined, null, 123, {}]) {
+      expect(parseWebhook({ data, signature }, KEY)).toMatchObject({ ok: false, reason: 'INVALID_SIGNATURE' })
+    }
+  })
+
+  it('reference / transactionDateTime không phải chuỗi → null, không lan kiểu lạ vào nhật ký', () => {
+    const r = parseWebhook(sign({ orderCode: 1, amount: 1, code: '00', reference: 7, transactionDateTime: {} }), KEY)
+    expect(r).toMatchObject({ reference: null, transactionDateTime: null })
+  })
+})
+
+describe('createPayosClient — huỷ link và tra trạng thái (§15.1)', () => {
+  const keys = { clientId: 'c', apiKey: 'k', checksumKey: KEY }
+  const okJson = (data) => async () => ({ ok: true, json: async () => ({ code: '00', data }) })
+
+  it('huỷ link gọi đúng đường dẫn và gửi lý do', async () => {
+    const fetchImpl = vi.fn(okJson({}))
+    await createPayosClient({ ...keys, fetchImpl }).cancelPaymentLink(7, 'Khách huỷ đơn')
+    const [url, init] = fetchImpl.mock.calls[0]
+    expect(url).toContain('/v2/payment-requests/7/cancel')
+    expect(init.method).toBe('POST')
+    expect(JSON.parse(init.body)).toEqual({ cancellationReason: 'Khách huỷ đơn' })
+  })
+
+  it('tra trạng thái: thiếu transactions → mảng rỗng, không ném lỗi', async () => {
+    const client = createPayosClient({ ...keys, fetchImpl: okJson({ status: 'PAID', amountPaid: 920_000 }) })
+    expect(await client.getPaymentLink(7)).toEqual({ status: 'PAID', amountPaid: 920_000, transactions: [] })
+  })
+
+  it('không truyền expiredAt → không gửi trường hạn cho payOS', async () => {
+    const fetchImpl = vi.fn(okJson({ checkoutUrl: 'u', paymentLinkId: 'p', qrCode: 'q' }))
+    await createPayosClient({ ...keys, fetchImpl }).createPaymentLink({ orderCode: 1, amount: 1 })
+    expect(JSON.parse(fetchImpl.mock.calls[0][1].body).expiredAt).toBeUndefined()
+  })
+})
+
+describe('Mã đơn payOS — rủi ro trùng trong cùng mili-giây', () => {
+  it('[RỦI RO] chỉ 1000 hậu tố ngẫu nhiên: hai đơn cùng mili-giây có thể trùng', () => {
+    const t = new Date('2026-10-01T03:00:00Z')
+    const codes = Array.from({ length: 300 }, () => generatePayosOrderCode(t))
+    // Cột payos_order_code là UNIQUE, mà service không thử lại khi trùng
+    expect(new Set(codes).size).toBeLessThan(codes.length)
+  })
+})

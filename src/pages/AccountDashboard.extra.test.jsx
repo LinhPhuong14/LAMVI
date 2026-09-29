@@ -32,15 +32,26 @@ function login() {
   localStorage.setItem('moc.session', JSON.stringify(session))
 }
 
-function api({ me = { body: { profile } }, items = history, historyFails = false, cart = emptyCart, extra = {} } = {}) {
+function api({ me = { body: { profile } }, items = history, historyFails = false, cart = emptyCart, orders = [], extra = {} } = {}) {
   return mockApi({
     ...base,
     'GET /me': () => me,
     'GET /may/history': () => (historyFails ? { status: 500, body: { error: { code: 'INTERNAL_ERROR' } } } : { body: { items } }),
     'GET /cart': () => ({ body: cart }),
+    // FR-ACC-002: đơn của tôi
+    'GET /orders': () => ({ body: { items: orders } }),
     'POST /auth/logout': () => ({ status: 204 }),
     ...extra,
   })
+}
+
+// Một đơn mẫu cho tab Đơn hàng
+const sampleOrder = {
+  code: 'LV2610-ACDEFGH',
+  status: 'in_production',
+  total: 920_000,
+  createdAt: '2026-10-01T03:00:00.000Z',
+  items: [{ slug: 'den-nguyet', name: 'Đèn Nguyệt', quantity: 1, unitPrice: 890_000, lineTotal: 890_000 }],
 }
 
 const tablist = () => screen.getByRole('tablist')
@@ -135,21 +146,27 @@ describe('Tab — chuột, URL, ARIA', () => {
     },
   )
 
-  it('?tab=orders: chỗ chờ, không có đơn giả; danh sách tính năng từ i18n', async () => {
+  it('?tab=orders: chưa có đơn → lời mời xem đèn, không hiện đơn giả (FR-ACC-002)', async () => {
     login()
     api()
     renderAt('/account?tab=orders')
     await screen.findByRole('heading', { name: 'Đơn hàng' })
-    const items = [...panel().querySelectorAll('.dash-features li')].map((li) => li.textContent)
-    expect(items).toEqual([
-      'Theo dõi đèn của bạn đang ở công đoạn nào',
-      'Soạn và sửa lời chúc gửi kèm món quà',
-      'Xem mã vận đơn khi đèn lên đường',
-    ])
-    // Minh hoạ 4 công đoạn (C-11) dùng câu chữ trang chủ, không phải đơn thật
-    const journey = within(panel()).getByRole('region', { name: 'Theo dõi đơn của bạn qua từng công đoạn' })
-    expect([...journey.querySelectorAll('li strong')].map((el) => el.textContent)).toEqual(['Chọn giấy dó', 'Lên khung tre', 'Phơi nắng', 'Đóng gói & khắc QR'])
-    expect(panel().textContent).not.toMatch(/#\d|Mã đơn|₫/)
+    expect(await within(panel()).findByText('Bạn chưa có đơn hàng nào.')).toBeInTheDocument()
+    expect(panel().querySelectorAll('.order-row')).toHaveLength(0)
+    expect(panel().textContent).not.toMatch(/₫/)
+  })
+
+  it('?tab=orders: có đơn → mã đơn, sản phẩm, trạng thái, tổng tiền', async () => {
+    login()
+    api({ orders: [sampleOrder] })
+    renderAt('/account?tab=orders')
+    const row = await within(panel()).findByText('LV2610-ACDEFGH')
+    const li = row.closest('.order-row')
+    expect(within(li).getByText('Đang làm')).toBeInTheDocument()
+    expect(within(li).getByText('Đèn Nguyệt × 1', { exact: false })).toBeInTheDocument()
+    expect(li.textContent).toContain('920.000')
+    // Mã đơn dẫn tới trang chi tiết
+    expect(row.closest('a')).toHaveAttribute('href', '/don-hang/LV2610-ACDEFGH')
   })
 })
 
@@ -206,14 +223,22 @@ describe('Tab — bàn phím (WAI-ARIA)', () => {
 })
 
 describe('Badge', () => {
-  it('orders "Sắp có"; may = số tin của khách', async () => {
+  it('orders = số đơn; may = số tin của khách', async () => {
+    login()
+    api({ orders: [sampleOrder] })
+    renderAt('/account')
+    await waitFor(() => expect(tab('Trò chuyện').querySelector('.dash-tab-badge')?.textContent).toBe('2'))
+    await waitFor(() => expect(tab('Đơn hàng').querySelector('.dash-tab-badge')?.textContent).toBe('1'))
+    expect(tab('Tổng quan').querySelector('.dash-tab-badge')).toBeNull()
+    expect(tab('Hồ sơ').querySelector('.dash-tab-badge')).toBeNull()
+  })
+
+  it('chưa có đơn → ẩn badge Đơn hàng', async () => {
     login()
     api()
     renderAt('/account')
-    await waitFor(() => expect(tab('Trò chuyện').querySelector('.dash-tab-badge')?.textContent).toBe('2'))
-    expect(tab('Đơn hàng').querySelector('.dash-tab-badge').textContent).toBe('Sắp có')
-    expect(tab('Tổng quan').querySelector('.dash-tab-badge')).toBeNull()
-    expect(tab('Hồ sơ').querySelector('.dash-tab-badge')).toBeNull()
+    await screen.findByRole('heading', { name: 'Tài khoản của tôi' })
+    await waitFor(() => expect(tab('Đơn hàng').querySelector('.dash-tab-badge')).toBeNull())
   })
 
   it('không có tin của khách (chỉ tin Mây) → ẩn badge may', async () => {
@@ -235,7 +260,9 @@ describe('Tổng quan — số liệu', () => {
     await waitFor(() => expect(stats()[0].querySelector('.dash-stat-value').textContent).toBe('2'))
     expect(stats()[0].textContent).toMatch(/1\.780\.000/)
     expect(within(stats()[0]).getByText('đã gồm VAT')).toBeInTheDocument()
-    expect(stats()[1].textContent).toContain('Sắp ra mắt')
+    // Ô đơn hàng: số đơn thật (FR-ACC-002), không còn chỗ chờ "Sắp ra mắt"
+    expect(stats()[1].querySelector('.dash-stat-value').textContent).toBe('0')
+    expect(stats()[1].textContent).toContain('Bạn chưa có đơn hàng nào.')
     await waitFor(() => expect(stats()[2].querySelector('.dash-stat-value').textContent).toBe('2'))
     // Link giỏ ở thanh bên hiển thị số lượng
     expect(screen.getByRole('link', { name: 'Giỏ hàng (2)' })).toBeInTheDocument()

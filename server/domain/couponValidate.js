@@ -74,6 +74,13 @@ export function validateCoupon(body, { partial = false, currentType } = {}) {
   if (values.type && values.type !== 'free_shipping' && !Object.hasOwn(b, 'value') && partial && values.type !== currentType) {
     errors.value = 'REQUIRED'
   }
+  // C-6: trần giảm chỉ dành cho coupon %. Đổi sang loại khác thì xoá luôn, không để lại dữ liệu
+  // vô nghĩa trong DB.
+  if (values.type && values.type !== 'percent' && !Object.hasOwn(b, 'maxDiscount')) {
+    values.maxDiscount = null
+  }
+  // free_shipping không có giá trị giảm — kể cả khi PATCH chỉ đổi type
+  if (values.type === 'free_shipping') values.value = 0
 
   optionalInt(b, 'maxDiscount', errors, values, 1, 1_000_000_000)
   optionalInt(b, 'minOrder', errors, values, 0, 1_000_000_000)

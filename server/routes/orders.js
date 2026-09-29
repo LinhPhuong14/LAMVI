@@ -74,10 +74,16 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
     if (values.paymentMethod === 'payos' && !payos) {
       throw new HttpError(503, 'PAYMENT_UNAVAILABLE', 'Thanh toán trực tuyến chưa sẵn sàng')
     }
+    // D-41: client gửi expectedTotal sai kiểu → báo lỗi thay vì âm thầm bỏ bước chốt giá.
+    // Không gửi (undefined/null) là hợp lệ: server vẫn là nguồn sự thật về giá.
+    const expectedTotal = b.expectedTotal ?? undefined
+    if (expectedTotal !== undefined && !(Number.isInteger(expectedTotal) && expectedTotal >= 0)) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', { expectedTotal: 'INVALID' })
+    }
     const { order, payment } = await orders.createOrder({
       userId: req.user.id,
       checkout: values,
-      expectedTotal: Number.isInteger(b.expectedTotal) ? b.expectedTotal : undefined,
+      expectedTotal,
       lang: lang(req),
       siteUrl: config.publicSiteUrl,
     })
@@ -87,7 +93,9 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
   // FR-ACC-002: đơn của tôi
   r.get('/orders', guard, async (req, res) => {
     const list = await repo.listOrdersByUser(req.user.id)
-    res.json({ items: list.map((o) => presentOrder(o, { lang: lang(req) })) })
+    // BR-PAY-003: danh sách và trang chi tiết phải nói cùng một trạng thái, kể cả khi cron chưa chạy
+    const items = await Promise.all(list.map((o) => orders.expireIfDue(o)))
+    res.json({ items: items.map((o) => presentOrder(o, { lang: lang(req) })) })
   })
 
   r.get('/orders/:code', guard, async (req, res) => {
@@ -111,7 +119,10 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
    * BR-PAY-003: quét đơn payOS quá hạn. Trên serverless không có tiến trình nền, nên việc này do
    * lịch chạy ngoài gọi vào (Vercel Cron). Bảo vệ bằng CRON_SECRET; thiếu secret → tắt endpoint.
    */
-  r.post('/internal/expire-orders', async (req, res) => {
+  // Vercel Cron gọi bằng GET và tự gắn `Authorization: Bearer $CRON_SECRET`; nhận cả POST để
+  // gọi tay được lúc vận hành.
+  r.all('/internal/expire-orders', async (req, res) => {
+    if (req.method !== 'GET' && req.method !== 'POST') throw new HttpError(405, 'METHOD_NOT_ALLOWED', 'Không hỗ trợ')
     const secret = config.cronSecret
     if (!secret) throw new HttpError(404, 'NOT_FOUND', 'Không tìm thấy')
     const given = req.get('authorization')

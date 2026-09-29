@@ -284,8 +284,13 @@ export function createSupabaseRepo(client) {
       const r = unwrap(await client.rpc('claim_coupon', { p_coupon_id: couponId }))
       return r ?? null
     },
-    async releaseCoupon(couponId) {
+    /**
+     * C-8: trả lượt khi huỷ đơn. Phải trả cả lượt TỔNG và lượt THEO KHÁCH — xoá bản ghi
+     * coupon_redemptions của đơn, nếu không per_user_limit bị tiêu vĩnh viễn dù đơn đã huỷ.
+     */
+    async releaseCoupon(couponId, orderId) {
       unwrap(await client.rpc('release_coupon', { p_coupon_id: couponId }))
+      if (orderId) unwrap(await client.from('coupon_redemptions').delete().eq('order_id', orderId))
     },
 
     // --- Đơn hàng (FR-CHK-*, FR-ORD-*)

@@ -45,14 +45,33 @@ export const isMessageLocked = (status) => AFTER_SHIPPED.has(status)
 // Mã đơn hiển thị: dễ đọc qua điện thoại, không đoán được đơn kế tiếp.
 // Bỏ các ký tự dễ nhầm (0/O, 1/I) — khách hay đọc mã cho tổng đài.
 const CODE_ALPHABET = '23456789ACDEFGHJKLMNPQRTUVWXY'
+// 7 ký tự × 29 = ~17 tỉ tổ hợp mỗi tháng. Với 6 ký tự (594 triệu), một shop 10k đơn/tháng đã có
+// vài phần trăm khả năng trùng mỗi tháng — uniqueOrderCode vẫn thử lại được nhưng tốn truy vấn.
+const CODE_LENGTH = 7
 
 export function generateOrderCode(now = new Date(), random = randomBytes) {
   const y = String(now.getUTCFullYear()).slice(2)
   const m = String(now.getUTCMonth() + 1).padStart(2, '0')
-  const bytes = random(6)
-  let tail = ''
-  for (const b of bytes) tail += CODE_ALPHABET[b % CODE_ALPHABET.length]
-  return `LV${y}${m}-${tail}`
+  return `LV${y}${m}-${randomChars(CODE_LENGTH, random)}`
+}
+
+/**
+ * Chuỗi ngẫu nhiên từ CODE_ALPHABET, phân bố đều.
+ * Dùng `b % 29` trực tiếp sẽ lệch (256 không chia hết cho 29 → 24 ký tự đầu hay ra hơn), làm giảm
+ * độ khó đoán của mã. Ở đây loại bỏ các byte rơi vào phần dư rồi lấy thêm byte khác.
+ */
+function randomChars(length, random) {
+  const n = CODE_ALPHABET.length
+  const limit = 256 - (256 % n)
+  let out = ''
+  while (out.length < length) {
+    for (const b of random(length * 2)) {
+      if (b >= limit) continue
+      out += CODE_ALPHABET[b % n]
+      if (out.length === length) break
+    }
+  }
+  return out
 }
 
 /**

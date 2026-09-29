@@ -110,6 +110,18 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
   }
 
   /**
+   * Mã gửi payOS cũng là cột UNIQUE: trong cùng mili-giây chỉ có 1000 hậu tố ngẫu nhiên, nên vẫn
+   * phải kiểm trùng như mã đơn hiển thị.
+   */
+  async function uniquePayosOrderCode(at) {
+    for (let i = 0; i < 5; i += 1) {
+      const code = generatePayosOrderCode(at)
+      if (!(await repo.getOrderByPayosCode(code))) return code
+    }
+    throw new HttpError(500, 'INTERNAL_ERROR', 'Không sinh được mã thanh toán')
+  }
+
+  /**
    * Tạo đơn từ giỏ (§12 bước "Tạo đơn"). Kiểm tra lại giá và coupon ngay lúc tạo (BR-CPN-002):
    * khách xác nhận bảng giá nào thì phải ra đúng bảng giá đó, lệch thì trả 409 kèm bảng giá mới.
    */
@@ -130,7 +142,13 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
     let claimed = null
     if (coupon) {
       claimed = await repo.claimCoupon(coupon.id)
-      if (claimed === null) throw new HttpError(409, 'COUPON_USED_UP', 'Mã giảm giá đã hết lượt dùng')
+      if (claimed === null) {
+        // claimCoupon trả null cho cả hai trường hợp: hết lượt, hoặc admin vừa tắt mã. Đọc lại để
+        // báo đúng lý do cho khách.
+        const fresh = await repo.getCouponById(coupon.id)
+        const reason = fresh && fresh.status !== 'active' ? 'COUPON_INACTIVE' : 'COUPON_USED_UP'
+        throw new HttpError(409, reason, 'Mã giảm giá không dùng được')
+      }
     }
 
     try {
@@ -144,7 +162,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
         ...checkout,
         paymentStatus: 'pending',
         paymentExpiresAt: isCod ? null : new Date(createdAt.getTime() + PAYMENT_WINDOW_MS).toISOString(),
-        payosOrderCode: isCod ? null : generatePayosOrderCode(createdAt),
+        payosOrderCode: isCod ? null : await uniquePayosOrderCode(createdAt),
         subtotal: quote.subtotal,
         discount: quote.discount,
         shippingFee: quote.shippingFee,
@@ -154,7 +172,6 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
         couponId: coupon?.id ?? null,
         couponCode: coupon?.code ?? null,
       }
-      delete order.couponCode_
       const items = lines.map(({ product, quantity }) => ({
         productId: product.id,
         slug: product.slug,
@@ -219,9 +236,12 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
    * lần hai không đổi gì.
    */
   async function applyPayosWebhook({ orderCode, amount, paid, reference }) {
-    const order = await repo.getOrderByPayosCode(orderCode)
-    if (!order) return { handled: false, reason: 'ORDER_NOT_FOUND' }
+    const found = await repo.getOrderByPayosCode(orderCode)
+    if (!found) return { handled: false, reason: 'ORDER_NOT_FOUND' }
     if (!paid) return { handled: false, reason: 'NOT_PAID' }
+    // Quá hạn mà cron chưa chạy: huỷ trước rồi mới xử lý, để kết quả không phụ thuộc lịch chạy
+    // (§15.1 — trả tiền sau khi đơn hết hạn thì gắn cờ hoàn tiền tay, dù cron đã chạy hay chưa)
+    const order = await expireIfDue(found)
     // BR-PAY-002: đã ghi nhận rồi thì thôi
     if (order.paymentStatus === 'paid') return { handled: true, idempotent: true, order }
 
@@ -257,6 +277,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
       status: 'confirmed',
       paymentStatus: 'paid',
       paymentExpiresAt: null,
+      // Gỡ cờ lệch tiền của lần chuyển trước, nếu có — lần này đã đúng số tiền
+      paymentFlag: null,
     })
     if (!updated) return { handled: false, reason: 'STATUS_CHANGED' }
     await audit({
@@ -288,7 +310,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
       cancelReason: 'PAYMENT_EXPIRED',
     })
     if (!updated) return null
-    if (order.couponId) await repo.releaseCoupon(order.couponId)
+    if (order.couponId) await repo.releaseCoupon(order.couponId, order.id)
     if (payos && order.payosOrderCode) {
       await payos.cancelPaymentLink(order.payosOrderCode, 'Hết hạn thanh toán').catch(() => {})
     }
@@ -328,7 +350,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
       paymentStatus: order.paymentStatus === 'paid' ? 'refund_pending' : 'cancelled',
     })
     if (!updated) throw new HttpError(409, 'ORDER_NOT_CANCELLABLE', 'Trạng thái đơn vừa thay đổi')
-    if (order.couponId) await repo.releaseCoupon(order.couponId)
+    if (order.couponId) await repo.releaseCoupon(order.couponId, order.id)
     if (payos && order.payosOrderCode && order.paymentStatus === 'pending') {
       await payos.cancelPaymentLink(order.payosOrderCode, 'Khách huỷ đơn').catch(() => {})
     }
@@ -360,7 +382,13 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
 
     const updated = await repo.updateOrderIfStatus(order.id, order.status, values)
     if (!updated) throw new HttpError(409, 'INVALID_STATUS_TRANSITION', 'Trạng thái đơn vừa thay đổi')
-    if (next === 'cancelled' && order.couponId) await repo.releaseCoupon(order.couponId)
+    if (next === 'cancelled') {
+      if (order.couponId) await repo.releaseCoupon(order.couponId, order.id)
+      // Link thanh toán còn sống tới 15 phút: không huỷ thì khách vẫn trả được vào đơn đã huỷ
+      if (payos && order.payosOrderCode && order.paymentStatus === 'pending') {
+        await payos.cancelPaymentLink(order.payosOrderCode, 'Admin huỷ đơn').catch(() => {})
+      }
+    }
     await audit({
       actorId: adminId,
       actorRole: 'admin',

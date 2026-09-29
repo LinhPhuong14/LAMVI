@@ -195,7 +195,7 @@ describe('Tạo đơn COD (FR-PAY-002, §15.2)', () => {
       shippingFee: 0,
       total: 1_780_000,
     })
-    expect(r.body.order.code).toMatch(/^LV\d{4}-[A-Z0-9]{6}$/)
+    expect(r.body.order.code).toMatch(/^LV\d{4}-[A-Z0-9]{7}$/)
     expect(r.body.order.items[0]).toMatchObject({ slug: 'den-nguyet', quantity: 2, unitPrice: 890_000 })
     expect(r.body.payment).toBeNull()
     const cart = await request(app).get('/api/cart').set('Authorization', customer)
@@ -387,7 +387,8 @@ describe('Thanh toán payOS (FR-PAY-001, §15.1)', () => {
     expect(
       (await request(app).post('/api/internal/expire-orders').set('Authorization', 'Bearer sai')).status,
     ).toBe(401)
-    const ok = await request(app).post('/api/internal/expire-orders').set('Authorization', 'Bearer bimat-cron')
+    // Vercel Cron gọi bằng GET
+    const ok = await request(app).get('/api/internal/expire-orders').set('Authorization', 'Bearer bimat-cron')
     expect(ok.status).toBe(200)
     expect(ok.body.cancelled).toBe(1)
   })
