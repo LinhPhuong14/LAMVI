@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.5 (bản nháp) |
+| Phiên bản | v0.6 (bản nháp) |
 | Ngày | 2026-09-28 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì) |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình) |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -31,7 +31,7 @@ MỘC là web **B2C** bán đèn giấy dó thủ công tại Việt Nam, địn
 
 Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý coupon. Thanh toán qua **payOS** hoặc **COD**. **Bắt buộc có tài khoản để đặt hàng.** Chỉ giao trong nước, tiền tệ VND.
 
-**Hiện trạng repo (v0.5)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap), vai trò IT + dashboard IT. Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây, admin đơn/coupon/Mây/đổi trả, GA (xem §31).
+**Hiện trạng repo (v0.6)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap), vai trò IT + dashboard IT, AI Mây (chat, FAQ offline, tour — OpenAI mặc định tắt chờ I-14). Chưa có: giỏ hàng, checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây tra đơn, admin đơn/coupon/đổi trả, GA (xem §31).
 
 ---
 
@@ -639,7 +639,27 @@ EMPTY ──(soạn)──▶ DRAFT ──(PACKED)──▶ TEXT_LOCKED ──(S
 
 Các câu thông báo có đủ vi/en/zh-Hans; admin sửa được. Nút "Dịch tự động" ở trang QR dùng chung ngân sách, không dùng chung hạn mức tin nhắn `[CONFIRMED]` D-41.
 
-`[BA DECISION REQUIRED]` Q-31: kênh hỗ trợ người thật (Zalo, hotline, email) để Mây chuyển tiếp.
+Kênh hỗ trợ người thật (Q-31): admin nhập tại cấu hình Mây (3 ngôn ngữ); để trống thì Mây chỉ nói "chưa biết", không gợi ý kênh `[CONFIRMED]` D-56.
+
+**Hiện thực (v0.6)**
+
+- **Bật/tắt OpenAI** `[CONFIRMED]` D-55: cờ trong cấu hình Mây, **mặc định tắt** cho tới khi pháp chế duyệt I-14. Khi tắt, hoặc server chưa có khoá OpenAI, Mây chạy **FAQ offline**: trả câu nhóm "nghỉ ngơi" + tối đa 3 câu FAQ khớp từ khoá câu hỏi `[ASSUMPTION]`.
+- **Ngân sách tháng mặc định 20 USD** `[CONFIRMED]` D-58; chi phí tính theo token × đơn giá cấu hình ở server (`OPENAI_PRICE_*`); tháng tính theo giờ Việt Nam `[ASSUMPTION]`. Cảnh báo 80%/100% hiện ở trang cấu hình Mây và dashboard IT (kênh gửi cảnh báo chờ Q-24).
+- **Timeout 15 giây** cho cả lượt trả lời (gồm các lần gọi hàm) `[CONFIRMED]` D-57 → câu nhóm "ốm".
+- Hàm backend Mây gọi được (v0.6): `get_products`, `get_product(slug)`, `get_faq`. Chưa có `get_policy` (chưa có nội dung chính sách — G-10), `get_my_orders` / `lookup_order` (chưa có đơn — FR-AI-004).
+- Tối đa 4 vòng gọi hàm mỗi lượt; hết vòng mà chưa có câu trả lời → câu "chưa biết" `[ASSUMPTION]`.
+- **Kiểm tra số liệu ở server (BR-AI-003)**: mọi số từ 4 chữ số trở lên trong câu trả lời (giá, năm, mã…) phải có trong kết quả hàm của lượt đó; nếu không → thay bằng câu "chưa biết" `[DERIVED]`.
+- **Không gửi SĐT, email sang OpenAI** — server thay bằng `[phone]`, `[email]` trong tin nhắn và lịch sử trước khi gửi `[DERIVED]` NFR-PRV-001.
+- **Chặn nhắc giảm giá ở server (BR-AI-005)**: câu trả lời có từ khoá giảm giá/khuyến mãi/coupon/voucher/%, hoặc số tiền viết tắt (799k, 1,05 triệu, 万) → thay bằng câu "chưa biết" `[ASSUMPTION]` (danh sách từ khoá do dev đặt, BA/PO bổ sung được).
+- Lịch sử gửi kèm cho OpenAI: tối đa 10 lượt, mỗi lượt cắt theo độ dài tối đa tin nhắn (500 ký tự) `[ASSUMPTION]`.
+- Không đọc được chi phí tháng → coi như hết ngân sách (FAQ offline); ghi chi phí hoặc lưu lịch sử lỗi → vẫn trả câu trả lời cho khách, ghi log `[ASSUMPTION]` NFR-AVL-001.
+- Hạn mức theo phiên của khách vãng lai dùng mã phiên do trình duyệt tạo; hạn mức theo IP dùng IP đã băm, không lưu IP thô `[ASSUMPTION]`. Hạn mức theo ngày tính theo giờ Việt Nam `[ASSUMPTION]`.
+- Khách vãng lai: lịch sử chỉ giữ trong tab trình duyệt (sessionStorage), gửi kèm tối đa 10 lượt gần nhất làm ngữ cảnh `[ASSUMPTION]`; server không lưu (BR-AI-008).
+- Người đã đăng nhập: lưu cả câu hỏi gốc và câu trả lời; xem ở trang tài khoản (FR-ACC-004). Quyền xoá lịch sử chờ `[LEGAL]` I-15.
+- Tour: 5 bước trên trang chủ (giới thiệu → bộ sưu tập → hai mã QR → hỏi đáp → nút Mây); chỉ tự bật khi lần đầu vào **trang chủ** `[ASSUMPTION]`; bấm "Dẫn tour" ở trang khác thì về trang chủ rồi chạy tour. Nội dung tour do đội dev soạn — chờ Marketing `[ASSUMPTION]` (G-14).
+- Mascot Mây hiện trên mọi trang khách (trừ `/admin`, `/it`); lỗi của Mây không làm vỡ trang (NFR-AVL-001).
+- Bảo trì bật (D-54) → gửi tin cho Mây trả 503, khung chat báo "đang bảo trì" `[DERIVED]`.
+- Model mặc định `gpt-4o-mini`, đổi qua `OPENAI_MODEL` `[ASSUMPTION]` (tech lead chốt).
 
 ### 22.5 Quy tắc "chỉ nói thông tin thật" (kiểm thử được)
 
@@ -798,7 +818,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 - AC-004: Câu trả lời không chứa địa chỉ, SĐT.
 
 **US-009 — Mây khi lỗi**
-- AC-001: Given OpenAI lỗi, When khách gửi tin, Then hiện một câu từ nhóm "ốm" bằng ngôn ngữ đang chọn trong thời gian `[BA DECISION REQUIRED]`.
+- AC-001: Given OpenAI lỗi, When khách gửi tin, Then hiện một câu từ nhóm "ốm" bằng ngôn ngữ đang chọn trong thời gian tối đa 15 giây (D-57).
 - AC-002: Given hết ngân sách tháng, Then Mây chuyển FAQ offline, không gọi OpenAI.
 
 **US-010 — Tour Mây**
@@ -979,7 +999,6 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Q-25 | QR của đơn tự mua không có lời chúc dẫn tới đâu |
 | Q-27 | Người mua xem trước trang QR? |
 | Q-29 | Lời chúc không phải tiếng Việt → thiệp viết tay xử lý thế nào |
-| Q-31 | Kênh hỗ trợ người thật để Mây chuyển tiếp |
 | Q-32 | `[LEGAL]` Banner đồng ý cookie/GA |
 | Q-33 | Có cần lớp bảo vệ thêm (PIN) cho trang lời chúc? |
 | I-15 | `[LEGAL]` Quyền xóa lịch sử chat |
@@ -1021,7 +1040,7 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-02 | Giỏ hàng | Chưa có; nút trên thẻ sản phẩm tạm dẫn tới trang chi tiết (§9) | Missing | **Còn thiếu** — chờ Q-13 |
 | G-03 | Tài khoản, checkout, thanh toán, đơn | Đã có backend Express + Supabase, routing, tài khoản (FR-ACC-001). Chưa có checkout, thanh toán, đơn | Missing | **Một phần** |
 | G-04 | Trang QR lời chúc, QR đèn | Trang QR lô đèn `/lo/:code` (FR-QR-006) đã có. Trang QR lời chúc chưa có | Missing | **Một phần** |
-| G-05 | AI Mây | Không có | Missing | **Còn thiếu** |
+| G-05 | AI Mây | Chat (OpenAI function calling, mặc định tắt — D-55), FAQ offline, tour, hạn mức, ngân sách, lịch sử, cấu hình admin (`server/may/*`, `src/may/*`, `/admin/may`). Chưa có tra đơn (FR-AI-004) | Missing | **Một phần** (v0.6) |
 | G-06 | Admin (sản phẩm, đơn, lô, coupon, FAQ, Mây) | `/admin` + `/api/admin/*` (v0.3): sản phẩm, FAQ, lô & video lô. Chưa có: đơn, coupon, cấu hình Mây, đổi trả (chưa có nghiệp vụ tương ứng); tài khoản admin cấp bằng tay trong Supabase (`profiles.role`) | Missing | **Một phần** (v0.3) |
 | G-07 | FAQ từ DB (để Mây đọc) | Bảng `faq_entries`, `GET /api/faq` | — | **Đã xử lý** (v0.2) |
 | G-08 | Đa ngôn ngữ | vi/en/zh cho giao diện, sản phẩm, FAQ, trang lô; URL `/`, `/en`, `/zh` (D-37) | — | **Đã xử lý** (v0.2) — bản dịch chờ duyệt (G-14) |
@@ -1044,6 +1063,9 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-26 | Giám sát payOS webhook, chi phí OpenAI (NFR-OBS-001) | Chưa có vì chưa tích hợp payOS/OpenAI; dashboard chỉ báo đã cấu hình biến môi trường chưa | Missing | **Mới** (v0.5) |
 | G-27 | Nhật ký bật/tắt bảo trì | Chỉ lưu người/thời điểm đổi lần cuối (`app_settings`) + log server; chưa có lịch sử đầy đủ | Missing | **Mới** (v0.5) |
 | G-28 | Nội dung lỗi 5xx lưu cho IT | Lưu thông điệp lỗi nội bộ (có thể chứa chi tiết DB); chưa lọc dữ liệu cá nhân | Privacy | **Mới** (v0.5) |
+| G-29 | Mây tra đơn (FR-AI-004, US-008) | Chưa có đơn hàng nên chưa có `get_my_orders` / `lookup_order` và chống dò mã đơn | Missing | **Mới** (v0.6) — làm cùng đơn hàng |
+| G-30 | Mây — quyền xoá lịch sử chat, xoá khi xoá tài khoản | Chưa có — chờ `[LEGAL]` I-15 | Missing | **Mới** (v0.6) |
+| G-31 | Nút "Dịch tự động" dùng chung ngân sách Mây (§22.4) | Chưa có trang QR lời chúc nên chưa có | Missing | **Mới** (v0.6) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
@@ -1127,3 +1149,7 @@ Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.j
 | D-52 | Dashboard IT gồm: số liệu API, trạng thái tích hợp, bật/tắt chế độ bảo trì | Hiệu lực (v0.5) |
 | D-53 | Số liệu API lưu Supabase | Hiệu lực (v0.5) |
 | D-54 | Chế độ bảo trì: web hiện trang bảo trì, API ghi trả 503 | Hiệu lực (v0.5) |
+| D-55 | Mây: OpenAI tích hợp đủ nhưng tắt bằng cờ, mặc định tắt (FAQ offline) cho tới khi pháp chế duyệt I-14 | Hiệu lực (v0.6) |
+| D-56 | Q-31: kênh hỗ trợ người thật do admin nhập trong cấu hình Mây | Hiệu lực (v0.6) |
+| D-57 | US-009: chờ OpenAI tối đa 15 giây rồi hiện câu "ốm" | Hiệu lực (v0.6) |
+| D-58 | Ngân sách OpenAI mặc định 20 USD/tháng (admin sửa được) | Hiệu lực (v0.6) |

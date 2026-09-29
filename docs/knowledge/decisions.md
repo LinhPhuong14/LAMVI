@@ -23,6 +23,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-18 | 2026-09-28 | Giám sát: middleware đếm mọi request, gộp theo phút trong bộ nhớ, flush 60 giây vào `api_metrics` qua RPC `record_api_metrics` (cộng dồn nguyên tử) | Hiệu lực |
 | T-19 | 2026-09-28 | Nhãn route chụp lúc `writeHead` (còn `req.route`/`req.baseUrl`); lỗi từ errorHandler dùng `req.route` còn sót + tiền tố `/api` | Hiệu lực |
 | T-20 | 2026-09-28 | Phân quyền theo vai trò bằng `requireRole(auth, repo, roles)`; `ADMIN_ROLES = ['admin','it']`, `IT_ROLES = ['it']` | Hiệu lực |
+| T-21 | 2026-09-28 | Mây gọi OpenAI Chat Completions bằng `fetch` (không thêm SDK); adapter `server/adapters/openai.js`, test dùng client giả `{ complete() }` | Hiệu lực |
+| T-22 | 2026-09-28 | Luật của Mây thực thi ở server, không dựa vào prompt: danh sách tool cố định chỉ đọc, che PII, kiểm tra số (BR-AI-003), hạn mức, ngân sách, timeout | Hiệu lực |
+| T-23 | 2026-09-28 | Cấu hình Mây lưu `app_settings` key `may`, gộp với mặc định trong `server/may/config.js` | Hiệu lực |
 | T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
 
 ---
@@ -70,3 +73,8 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - Dashboard đọc dữ liệu đã lưu + phần chưa flush, nên số liệu thấy ngay.
 - Flush lỗi → bỏ lô đó và ghi log (tránh bộ nhớ phình) — chấp nhận mất tối đa 1 phút số liệu.
 - Thêm route mới không cần làm gì thêm: nhãn tự lấy từ mẫu route Express.
+
+### T-21 / T-22 — AI Mây
+- Luồng một lượt (`server/may/service.js#chat`): kiểm tra độ dài → hạn mức (`incrementMayCounter`) → cờ OpenAI/khoá/ngân sách (offline nếu không đạt) → vòng gọi OpenAI + tool (≤ 4 vòng, `AbortController` 15 giây) → ghi chi phí → kiểm tra số → lưu lịch sử nếu đã đăng nhập.
+- Thêm tool mới: khai báo trong `MAY_TOOLS` và `runTool` (`server/may/tools.js`); chỉ trả trường cần thiết, không có thao tác ghi (BR-AI-006). Khi làm đơn hàng: thêm `get_my_orders` (dùng `user` của phiên, không nhận user từ model) và `lookup_order` có chống dò.
+- Frontend: `src/may/May.jsx` (nút + tour, lazy-load khung chat, error boundary). Tour chỉ tự bật ở trang chủ.

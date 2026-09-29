@@ -52,6 +52,15 @@ function HealthPanel({ health }) {
             <span className={`status status-${c.status}`}>{S.health.status[c.status]}</span>
             {c.latencyMs != null && <small>{fmt(S.health.latency, { ms: c.latencyMs })}</small>}
             {c.status === 'not_integrated' && <small>{c.configured ? S.health.configured : S.health.notConfigured}</small>}
+            {c.budgetUsd != null && (
+              <small>
+                {fmt(S.health.budget, {
+                  cost: (c.costUsd ?? 0).toFixed(2),
+                  budget: c.budgetUsd,
+                  pct: c.budgetPct == null ? '—' : Math.round(c.budgetPct * 100),
+                })}
+              </small>
+            )}
             {c.message && <small className="field-error">{c.message}</small>}
           </li>
         ))}

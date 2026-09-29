@@ -408,7 +408,8 @@ describe('Sức khoẻ (D-52)', () => {
       const r = await request(app).get('/api/it/health').set('Authorization', tokens.it.bearer)
       expect(r.status).toBe(200)
       expect(JSON.stringify(r.body)).not.toContain('sk-bi-mat-env')
-      expect(r.body.checks.find((c) => c.name === 'openai').configured).toBe(true)
+      // 'configured' theo client OpenAI tạo lúc khởi động (app test không có client), không đọc env lúc gọi
+      expect(r.body.checks.find((c) => c.name === 'openai')).toMatchObject({ configured: false, status: 'not_configured' })
     } finally {
       vi.unstubAllEnvs()
     }

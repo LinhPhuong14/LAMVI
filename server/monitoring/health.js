@@ -16,8 +16,22 @@ async function check(fn, timeoutMs) {
   }
 }
 
+// Mây (D-55): chưa có khoá → not_configured; có khoá nhưng admin chưa bật (chờ I-14) → disabled; bật → ok
+async function openaiCheck(may, env) {
+  if (!may) return { name: 'openai', status: 'not_integrated', configured: Boolean(env.OPENAI_API_KEY) }
+  try {
+    const u = await may.usage()
+    const base = { name: 'openai', configured: u.openaiConfigured, budgetPct: u.budgetPct, costUsd: u.costUsd, budgetUsd: u.budgetUsd }
+    if (!u.openaiConfigured) return { ...base, status: 'not_configured' }
+    if (!u.openaiEnabled) return { ...base, status: 'disabled' }
+    return { ...base, status: u.alert === 'exhausted' ? 'error' : 'ok', message: u.alert ? `budget_${u.alert}` : undefined }
+  } catch (err) {
+    return { name: 'openai', status: 'error', message: String(err?.message ?? err).slice(0, 200) }
+  }
+}
+
 // D-52: trạng thái tích hợp — chỉ báo đã cấu hình/kết nối được, không bao giờ trả giá trị khoá
-export async function runHealthChecks({ repo, auth, storage, config, env = process.env, timeoutMs = 3000 }) {
+export async function runHealthChecks({ repo, auth, storage, config, may, env = process.env, timeoutMs = 3000 }) {
   const supabase = config.useSupabase ? 'supabase' : 'memory'
   const [database, authCheck, storageCheck] = await Promise.all([
     check(() => repo.ping(), timeoutMs),
@@ -35,7 +49,7 @@ export async function runHealthChecks({ repo, auth, storage, config, env = proce
     { name: 'auth', provider: supabase, ...authCheck },
     { name: 'storage', provider: supabase, ...storageCheck },
     integration('payos', Boolean(env.PAYOS_CLIENT_ID && env.PAYOS_API_KEY && env.PAYOS_CHECKSUM_KEY)),
-    integration('openai', Boolean(env.OPENAI_API_KEY)),
+    await openaiCheck(may, env),
   ]
   const mem = process.memoryUsage()
   return {

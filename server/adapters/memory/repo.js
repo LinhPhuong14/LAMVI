@@ -14,6 +14,9 @@ export function createMemoryRepo(data = {}) {
     apiMetrics: new Map(), // `${bucket}|${method}|${route}|${status}` → row
     apiErrors: [],
     settings: new Map(),
+    chatMessages: [],
+    mayCounters: new Map(), // key → { count, expiresAt }
+    mayUsage: new Map(), // month → usage
   }
 
   const now = () => new Date().toISOString()
@@ -88,6 +91,35 @@ export function createMemoryRepo(data = {}) {
       const s = { key, value, updatedBy: userId ?? null, updatedAt: now() }
       state.settings.set(key, s)
       return clone(s)
+    },
+
+    // --- Mây (FR-AI-*)
+    async incrementMayCounter(key, ttlSeconds, at = Date.now()) {
+      const c = state.mayCounters.get(key)
+      if (!c || c.expiresAt <= at) {
+        state.mayCounters.set(key, { count: 1, expiresAt: at + ttlSeconds * 1000 })
+        return 1
+      }
+      c.count += 1
+      return c.count
+    },
+    async addMayUsage(month, { promptTokens, completionTokens, costUsd }) {
+      const u = state.mayUsage.get(month) ?? { month, requests: 0, promptTokens: 0, completionTokens: 0, costUsd: 0 }
+      u.requests += 1
+      u.promptTokens += promptTokens
+      u.completionTokens += completionTokens
+      u.costUsd += costUsd
+      state.mayUsage.set(month, u)
+      return clone(u)
+    },
+    async getMayUsage(month) {
+      return clone(state.mayUsage.get(month) ?? { month, requests: 0, promptTokens: 0, completionTokens: 0, costUsd: 0 })
+    },
+    async appendChatMessages(rows) {
+      for (const r of rows) state.chatMessages.push({ id: state.chatMessages.length + 1, createdAt: now(), ...clone(r) })
+    },
+    async listChatMessages(userId, { limit = 100 } = {}) {
+      return clone(state.chatMessages.filter((m) => m.userId === userId).slice(-limit))
     },
 
     // --- Sản phẩm (FR-CAT-004)

@@ -7,12 +7,12 @@ import { RANGES } from '../monitoring/metrics.js'
 const rangeOf = (req) => (Object.hasOwn(RANGES, req.query.range) ? req.query.range : '24h')
 
 // D-51, D-52: dashboard IT — sức khoẻ, số liệu API, lỗi gần đây, chế độ bảo trì (D-54)
-export function itRouter({ repo, auth, storage, config, metrics, maintenance }) {
+export function itRouter({ repo, auth, storage, config, metrics, maintenance, may }) {
   const r = Router()
   r.use('/it', requireIt(auth, repo))
 
   r.get('/it/health', async (req, res) => {
-    const health = await runHealthChecks({ repo, auth, storage, config })
+    const health = await runHealthChecks({ repo, auth, storage, config, may })
     res.json({ ...health, maintenance: await maintenance.get() })
   })
 

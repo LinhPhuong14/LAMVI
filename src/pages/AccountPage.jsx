@@ -59,6 +59,38 @@ function ProfileForm({ profile, onSaved, initiallySaved = false }) {
   )
 }
 
+// FR-ACC-004: lịch sử chat với Mây (D-19)
+function MayHistory() {
+  const { t } = useI18n()
+  const { authedApi } = useAuth()
+  const [items, setItems] = useState(null)
+  useEffect(() => {
+    let alive = true
+    authedApi('/may/history')
+      .then((res) => alive && setItems(res.items))
+      .catch(() => alive && setItems([]))
+    return () => {
+      alive = false
+    }
+  }, [authedApi])
+  return (
+    <div className="account-card">
+      <h2>{t('accountMay.title')}</h2>
+      {items === null && <p>{t('account.loading')}</p>}
+      {items?.length === 0 && <p>{t('accountMay.empty')}</p>}
+      {items?.length > 0 && (
+        <ol className="may-list may-history">
+          {items.map((m, i) => (
+            <li key={i} className={`may-msg may-${m.role} may-kind-${m.kind}`}>
+              {m.content}
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  )
+}
+
 // FR-ACC-001/002: trang tài khoản (dashboard); đơn hàng làm ở giai đoạn sau
 export default function AccountPage() {
   const { t, path } = useI18n()
@@ -114,6 +146,7 @@ export default function AccountPage() {
         <h2>{t('account.orders')}</h2>
         <p>{t('account.ordersSoon')}</p>
       </div>
+      <MayHistory />
       <button className="btn btn-ghost" type="button" onClick={onLogout}>
         {t('account.logout')}
       </button>

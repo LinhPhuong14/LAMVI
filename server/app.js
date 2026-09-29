@@ -4,6 +4,8 @@ import { authRouter } from './routes/auth.js'
 import { adminRouter } from './routes/admin.js'
 import { seoRouter } from './routes/seo.js'
 import { itRouter } from './routes/it.js'
+import { mayRouter } from './routes/may.js'
+import { createMayService } from './may/service.js'
 import { createMetrics } from './monitoring/metrics.js'
 import { createMaintenance } from './monitoring/maintenance.js'
 import { classifyPath } from '../src/seo/routes.js'
@@ -18,9 +20,12 @@ export function createApp({
   config = { publicSiteUrl: 'http://localhost:5173' },
   metrics = createMetrics({ repo, classify: classifyPath }),
   maintenance = createMaintenance({ repo }),
+  may = createMayService({ repo, openai: null }),
 }) {
   const app = express()
   app.disable('x-powered-by')
+  // IP thật khi chạy sau proxy (hạn mức Mây theo IP) — đặt TRUST_PROXY theo hạ tầng
+  if (config.trustProxy !== undefined) app.set('trust proxy', config.trustProxy)
   // D-52: đếm mọi request (API + trang web)
   app.use(metrics.middleware)
   app.use(express.json({ limit: '100kb' }))
@@ -32,7 +37,8 @@ export function createApp({
   api.use(catalogRouter({ repo }))
   if (auth) api.use(authRouter({ repo, auth, config }))
   if (auth && storage) api.use(adminRouter({ repo, auth, storage, config }))
-  if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance }))
+  if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may }))
+  if (auth) api.use(mayRouter({ repo, auth, may }))
   // Storage bộ nhớ (dev/test) tự phục vụ tải lên/đọc file
   if (storage?.router) api.use(storage.router)
   api.use(() => {

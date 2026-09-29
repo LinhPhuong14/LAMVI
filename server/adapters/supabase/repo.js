@@ -51,6 +51,14 @@ const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', priceExclVa
 const FAQ_COLS = { sortOrder: 'sort_order', isPublished: 'is_published', question: 'question', answer: 'answer' }
 const BATCH_COLS = { code: 'code', status: 'status', videoUrl: 'video_url', videoPath: 'video_path', producedOn: 'produced_on', title: 'title', story: 'story' }
 
+const toUsage = (r) => ({
+  month: r.month,
+  requests: r.requests,
+  promptTokens: Number(r.prompt_tokens),
+  completionTokens: Number(r.completion_tokens),
+  costUsd: Number(r.cost_usd),
+})
+
 function toRow(obj, cols) {
   const row = {}
   for (const [k, col] of Object.entries(cols)) if (obj[k] !== undefined) row[col] = obj[k]
@@ -124,6 +132,44 @@ export function createSupabaseRepo(client) {
           .single(),
       )
       return { key: r.key, value: r.value, updatedBy: r.updated_by, updatedAt: r.updated_at }
+    },
+
+    // --- Mây (FR-AI-*)
+    async incrementMayCounter(key, ttlSeconds) {
+      return unwrap(await client.rpc('may_increment', { p_key: key, p_ttl_seconds: ttlSeconds }))
+    },
+    async addMayUsage(month, { promptTokens, completionTokens, costUsd }) {
+      const r = unwrap(
+        await client.rpc('may_add_usage', { p_month: month, p_prompt: promptTokens, p_completion: completionTokens, p_cost: costUsd }),
+      )
+      return toUsage(Array.isArray(r) ? r[0] : r)
+    },
+    async getMayUsage(month) {
+      const r = unwrap(await client.from('may_usage').select('*').eq('month', month).maybeSingle())
+      return r ? toUsage(r) : { month, requests: 0, promptTokens: 0, completionTokens: 0, costUsd: 0 }
+    },
+    async appendChatMessages(rows) {
+      if (!rows.length) return
+      unwrap(
+        await client.from('chat_messages').insert(
+          rows.map((m) => ({ user_id: m.userId, session_id: m.sessionId, role: m.role, kind: m.kind, content: m.content, lang: m.lang })),
+        ),
+      )
+    },
+    async listChatMessages(userId, { limit = 100 } = {}) {
+      const rows = unwrap(
+        await client.from('chat_messages').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(limit),
+      )
+      return rows.reverse().map((r) => ({
+        id: r.id,
+        userId: r.user_id,
+        sessionId: r.session_id,
+        role: r.role,
+        kind: r.kind,
+        content: r.content,
+        lang: r.lang,
+        createdAt: r.created_at,
+      }))
     },
 
     getProductById: (id) => one('products', id, toProduct),

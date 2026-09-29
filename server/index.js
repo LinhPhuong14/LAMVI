@@ -3,6 +3,8 @@ import { createApp } from './app.js'
 import { createWeb } from './ssr.js'
 import { createMetrics } from './monitoring/metrics.js'
 import { createMaintenance } from './monitoring/maintenance.js'
+import { createMayService } from './may/service.js'
+import { createOpenAiClient } from './adapters/openai.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { loadConfig } from './config.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
@@ -47,6 +49,13 @@ const dev = process.env.NODE_ENV !== 'production'
 // D-52, D-54: dùng chung cho API và SSR
 const metrics = createMetrics({ repo, classify: classifyPath })
 const maintenance = createMaintenance({ repo })
+const may = createMayService({
+  repo,
+  openai: config.openai.apiKey ? createOpenAiClient({ apiKey: config.openai.apiKey, model: config.openai.model }) : null,
+  priceInPer1M: config.openai.priceInPer1M,
+  priceOutPer1M: config.openai.priceOutPer1M,
+  hashSalt: config.mayHashSalt,
+})
 const web = process.env.API_ONLY === '1' ? undefined : await createWeb({ repo, config, dev, maintenance })
 
 metrics.start()
@@ -58,6 +67,6 @@ for (const sig of ['SIGTERM', 'SIGINT']) {
   })
 }
 
-createApp({ repo, auth, storage, web, config, metrics, maintenance }).listen(config.port, () => {
+createApp({ repo, auth, storage, web, config, metrics, maintenance, may }).listen(config.port, () => {
   console.log(`[web+api] http://localhost:${config.port}`)
 })
