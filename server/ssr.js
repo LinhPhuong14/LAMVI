@@ -51,7 +51,7 @@ export function maintenancePage(lang) {
   </head>
   <body>
     <main>
-      <p class="mark">MỘC</p>
+      <p class="mark">LAMVI</p>
       <h1>${t('maintenance.title')}</h1>
       <p>${t('maintenance.text')}</p>
     </main>

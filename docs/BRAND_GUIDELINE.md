@@ -1,6 +1,8 @@
-# LÂM VỊ — Branding Guideline & Design Rules (Web)
+# LAMVI — Branding Guideline & Design Rules (Web)
 
-> Tài liệu này được rút ra từ landing page “LÂM VỊ — Artisanal Light & Folk Art Archive”.
+> **Cập nhật (D-62):** tên thương hiệu là **LAMVI** (viết liền, không dấu) ở mọi nơi, kể cả wordmark và triện — không dùng "LÂM VỊ".
+
+> Tài liệu này được rút ra từ landing page “LAMVI — Artisanal Light & Folk Art Archive”.
 > Mọi trang, component và nội dung mới trên web cần tuân theo các quy tắc dưới đây.
 > Khi code và tài liệu mâu thuẫn, **tài liệu là chuẩn** — code cần được sửa theo (xem [Phụ lục B](#phụ-lục-b--các-điểm-lệch-chuẩn-trong-landing-page-hiện-tại)).
 
@@ -29,13 +31,13 @@
 
 ### 1.1 Định vị
 
-**LÂM VỊ (LAMVI)** là một *kho lưu trữ nghệ thuật ánh sáng* — không phải cửa hàng đèn.
+**LAMVI** là một *kho lưu trữ nghệ thuật ánh sáng* — không phải cửa hàng đèn.
 Mỗi chiếc đèn là “một bảo tàng thu nhỏ trong không gian sống”: giấy Dó Dương Ổ, mộc bản Đông Hồ và
 nguồn sáng chuẩn bảo tàng (CRI > 97).
 
 | Thuộc tính | Mô tả |
 |---|---|
-| **Tên thương hiệu** | `LÂM VỊ` (viết hoa, có dấu) trong nhận diện; `LAMVI` (không dấu, liền) khi dùng trong câu văn, tên sản phẩm, tên xưởng (`LAMVI Atelier`) |
+| **Tên thương hiệu** | `LAMVI` (viết liền, không dấu) ở mọi nơi — nhận diện, câu văn, tên sản phẩm, tên xưởng (`LAMVI Atelier`) |
 | **Tagline tiếng Anh** | *Artisanal Light & Folk Art Archive* |
 | **Thông điệp chính** | “Mang câu chuyện Việt sống lại bằng ánh sáng và công nghệ.” |
 | **Câu kết thương hiệu** | “Để câu chuyện Việt tiếp tục được kể.” |
@@ -104,19 +106,19 @@ Mỗi section theo mẫu 3 tầng:
 ### 3.1 Wordmark
 
 ```
-LÂM VỊ ●
+LAMVI ●
 ARTISANAL LIGHT & FOLK ART ARCHIVE
 ```
 
-- Chữ `LÂM VỊ`: Playfair Display, 1.5rem, weight 500, in hoa, `tracking-wider`, màu `primary`.
+- Chữ `LAMVI`: Playfair Display, 1.5rem, weight 500, in hoa, `tracking-wider`, màu `primary`.
 - Chấm tròn 6×6px màu `secondary` (đỏ son) đặt sau chữ, cách 6px — **luôn đi kèm wordmark**, tượng trưng cho ngọn lửa đèn.
 - Tagline: Be Vietnam Pro, 0.625rem, weight 600, in hoa, tracking 0.2em, màu `outline`, sát dưới wordmark (−2px).
 - Vùng an toàn tối thiểu: bằng chiều cao chữ `L` ở mọi phía.
-- Không đổi màu chấm son, không xoay, không thêm hiệu ứng, không bỏ dấu tiếng Việt.
+- Không đổi màu chấm son, không xoay, không thêm hiệu ứng.
 
 ### 3.2 Triện son (Chop Seal)
 
-Ô vuông 48×48px, viền 1px `secondary`, chữ `LÂM / VỊ` hai dòng màu `secondary`, font Playfair đậm.
+Ô vuông 48×48px, viền 1px `secondary`, chữ `LAMVI` màu `secondary`, font Playfair đậm.
 Dùng cho: chứng thư, chữ ký cuối bài, đóng dấu xác thực. **Không** dùng thay logo trên header.
 
 ### 3.3 Dấu thoi (Diamond marker)

@@ -194,13 +194,13 @@ describe('VerticalSeal', () => {
 })
 
 describe('Trang chủ sau đổi giao diện', () => {
-  it.each(['vi', 'en', 'zh'])('%s: .hero-seal chứa VerticalSeal MỘC, không còn .story-cloud / postmark', async (lang) => {
+  it.each(['vi', 'en', 'zh'])('%s: .hero-seal chứa VerticalSeal LAMVI, không còn .story-cloud / postmark', async (lang) => {
     mockApi(handlers)
     const { container } = renderAt(PREFIX[lang])
     const seal = container.querySelector('.hero-seal .vseal')
     expect(seal).not.toBeNull()
     expect(seal).toHaveAttribute('aria-hidden', 'true')
-    expect([...seal.children].map((c) => c.textContent)).toEqual(['M', 'Ộ', 'C'])
+    expect([...seal.children].map((c) => c.textContent)).toEqual(['L', 'A', 'M', 'V', 'I'])
     expect(container.querySelector('.story-cloud')).toBeNull()
     expect(container.querySelector('#story .folk-cloud')).toBeNull()
     expect(container.querySelector('[class*="postmark"]')).toBeNull()

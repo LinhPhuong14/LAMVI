@@ -50,7 +50,7 @@ function Gate() {
     <div className="admin">
       {seo}
       <aside className="admin-nav">
-        <span className="nav-mark">MỘC</span>
+        <span className="nav-mark">LAMVI</span>
         <strong>{S.title}</strong>
         <nav>
           <NavLink to="/admin/products">{S.nav.products}</NavLink>

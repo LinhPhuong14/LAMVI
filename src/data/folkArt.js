@@ -1,6 +1,6 @@
 // Ảnh tư liệu (tranh Đông Hồ, tranh giấy dó thế kỷ 18) từ Wikimedia Commons — phạm vi công cộng hoặc CC0.
 // File sinh bằng script xử lý ảnh (cùng lúc với public/images/folk/CREDITS.md); tên, alt, chú thích nằm ở i18n: gallery.items.<id>.
-// Không dùng các ảnh này như ảnh sản phẩm hay ảnh nghệ nhân MỘC (design-rules §7.2).
+// Không dùng các ảnh này như ảnh sản phẩm hay ảnh nghệ nhân LAMVI (design-rules §7.2).
 export const FOLK_ART = [
   {
     id: 'chuot-ruoc-den',

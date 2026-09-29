@@ -312,7 +312,7 @@ function Hero() {
           animate={{ opacity: 1, scale: 1, rotate: -3 }}
           transition={{ type: 'spring', stiffness: 260, damping: 16, delay: 1.3 }}
         >
-          <VerticalSeal label="MỘC" />
+          <VerticalSeal label="LAMVI" />
         </m.div>
       </div>
 

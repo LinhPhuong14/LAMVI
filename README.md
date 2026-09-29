@@ -1,4 +1,4 @@
-# MỘC — Web bán đèn giấy dó
+# LAMVI — Web bán đèn giấy dó
 
 React + Vite (frontend), Express (API), Supabase (Postgres + Auth).
 

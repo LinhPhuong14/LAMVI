@@ -2,8 +2,8 @@
 // Các câu đánh dấu §31.3 là câu thay thế đề xuất — chờ PO/Marketing duyệt.
 export default {
   meta: {
-    productTitle: '{name} — Mộc đèn giấy dó thủ công',
-    title: 'Mộc — Đèn Giấy Dó Thủ Công',
+    productTitle: '{name} — LAMVI · đèn giấy dó thủ công',
+    title: 'LAMVI — Đèn Giấy Dó Thủ Công',
     description:
       'Đèn giấy dó thủ công làm quà tặng, kèm lời chúc gắn mã QR và video hành trình làm đèn.',
   },
@@ -50,7 +50,7 @@ export default {
   gallery: {
     label: 'Phòng tranh dân gian',
     source: 'Nguồn ảnh',
-    note: 'Tranh dân gian Đông Hồ và tranh vẽ trên giấy dó cuối thế kỷ 18 (Bảo tàng Mỹ thuật Việt Nam). Ảnh tư liệu từ Wikimedia Commons, thuộc phạm vi công cộng hoặc CC0 — không phải ảnh sản phẩm của MỘC.',
+    note: 'Tranh dân gian Đông Hồ và tranh vẽ trên giấy dó cuối thế kỷ 18 (Bảo tàng Mỹ thuật Việt Nam). Ảnh tư liệu từ Wikimedia Commons, thuộc phạm vi công cộng hoặc CC0 — không phải ảnh sản phẩm của LAMVI.',
     items: {
       'chuot-ruoc-den': {
         name: 'Chuột rước đèn',
@@ -218,7 +218,7 @@ export default {
     newsText: 'Câu chuyện làng nghề và ưu đãi mới, gửi mỗi tháng một lần.',
     newsPlaceholder: 'Email của bạn',
     newsSubmit: 'Đăng ký',
-    copyright: '© 2026 Mộc — Đèn giấy dó thủ công.',
+    copyright: '© 2026 LAMVI — Đèn giấy dó thủ công.',
   },
   batch: {
     eyebrow: 'Hành trình làm đèn',
@@ -230,7 +230,7 @@ export default {
     code: 'Mã lô: {code}',
     videoFallback: 'Trình duyệt không phát được video.',
     note: 'Video ghi lại quá trình làm cả lô đèn, trong đó có chiếc đèn của bạn.',
-    toHome: 'Khám phá MỘC',
+    toHome: 'Khám phá LAMVI',
   },
   auth: {
     loginTitle: 'Đăng nhập',
@@ -339,8 +339,8 @@ export default {
     open: 'Trò chuyện với Mây',
     close: 'Đóng',
     title: 'Mây',
-    subtitle: 'Trợ lý AI của Mộc',
-    aiNotice: 'Mây là trợ lý AI, chỉ trả lời dựa trên thông tin của Mộc. Mây không đặt hàng hay sửa tài khoản giúp bạn được.',
+    subtitle: 'Trợ lý AI của LAMVI',
+    aiNotice: 'Mây là trợ lý AI, chỉ trả lời dựa trên thông tin của LAMVI. Mây không đặt hàng hay sửa tài khoản giúp bạn được.',
     greeting: 'Chào bạn, Mây đây! Bạn muốn hỏi về đèn, lời chúc hay mã QR nè?',
     placeholder: 'Nhập câu hỏi…',
     send: 'Gửi',
@@ -358,7 +358,7 @@ export default {
       skip: 'Bỏ qua tour',
       step: 'Bước {n}/{total}',
       steps: [
-        'Chào mừng bạn đến với Mộc! Mây dẫn bạn đi một vòng nhé: đây là đèn giấy dó thủ công làm quà tặng kể chuyện.',
+        'Chào mừng bạn đến với LAMVI! Mây dẫn bạn đi một vòng nhé: đây là đèn giấy dó thủ công làm quà tặng kể chuyện.',
         'Đây là bộ sưu tập. Chọn “Mua tặng” hoặc “Mua cho mình”, rồi bấm vào đèn để xem chi tiết. Giá hiển thị là giá chưa gồm VAT.',
         'Mỗi món quà có hai mã QR: mã trên thiệp cảm ơn mở lời chúc của bạn, mã khắc trên đèn mở video hành trình làm ra mẻ đèn.',
         'Còn thắc mắc gì, bạn xem phần hỏi đáp này nha.',
@@ -372,7 +372,7 @@ export default {
     you: 'Bạn',
   },
   maintenance: {
-    title: 'Mộc đang bảo trì',
+    title: 'LAMVI đang bảo trì',
     text: 'Chúng tôi đang nâng cấp hệ thống. Vui lòng quay lại sau ít phút.',
   },
   notFound: {

@@ -49,7 +49,7 @@ describe('SSR (D-49, G-12)', () => {
     expect(r.html).toContain('<html lang="en">')
     expect(r.html).toMatch(/<h1[^>]*>Vong Lantern<\/h1>/)
     expect(r.html).toContain('excl. VAT')
-    expect(r.html).toContain('<title data-seo>Vong Lantern — Mộc handmade dó paper lanterns</title>')
+    expect(r.html).toContain('<title data-seo>Vong Lantern — LAMVI · handmade dó paper lanterns</title>')
     expect(r.html).toContain('<link rel="canonical" href="https://moc.test/en/products/den-vong" data-seo>')
     expect(r.html).toContain('hreflang="zh-Hans" href="https://moc.test/zh/products/den-vong"')
     const ld = JSON.parse(r.html.match(/<script type="application\/ld\+json" data-seo>(.*?)<\/script>/)[1])

@@ -1,4 +1,4 @@
-# Knowledge base — MỘC
+# Knowledge base — LAMVI
 
 Bộ tài liệu này giữ cho mọi phiên code (người hoặc AI) làm việc thống nhất. Đọc theo thứ tự dưới đây trước khi bắt đầu.
 

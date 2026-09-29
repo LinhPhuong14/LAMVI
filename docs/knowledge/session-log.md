@@ -4,6 +4,16 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 — Đổi tên thương hiệu sang LAMVI (nhánh `feat/brand-lamvi`)
+
+**Quyết định từ người dùng**: tên web và thương hiệu là **LAMVI** (viết liền, không dấu) ở mọi nơi; không dùng "MỘC", cũng không dùng "LÂM VỊ" → D-62.
+
+**Đã làm**: logo/ấn triện/chữ lớn footer, trang admin, IT, trang bảo trì SSR, JSON-LD `brand`, prompt của Mây, i18n vi/en/zh (tiêu đề, bản quyền, lời chào tour, nhãn trợ lý) → LAMVI. Cập nhật test theo tên mới; spec v0.10 (D-62, bỏ giả định "giữ MỘC"), `BRAND_GUIDELINE.md`, `design-rules.md`, README.
+
+**Còn lại**: favicon, ảnh chia sẻ mạng xã hội chưa có chữ thương hiệu (G-23); tên miền/Zalo/mạng xã hội thật chưa có.
+
+---
+
 ## 2026-09-29 (phiên 7) — Gộp nhánh vào `master` + Vercel (nhánh `claude/relaxed-knuth-46vztf`)
 
 **Đã làm**

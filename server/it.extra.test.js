@@ -611,14 +611,14 @@ describe('Chế độ bảo trì — SSR (D-54)', () => {
     await maintenance.set(true, null)
     const vi_ = await page('/')
     expect(vi_.html).toContain('<html lang="vi">')
-    expect(vi_.html).toContain('Mộc đang bảo trì')
+    expect(vi_.html).toContain('LAMVI đang bảo trì')
     const en = await page('/en/products/a')
     expect(en.html).toContain('<html lang="en">')
-    expect(en.html).toContain('Mộc is under maintenance')
+    expect(en.html).toContain('LAMVI is under maintenance')
     const zh = await page('/zh/lo/b')
     expect(zh.html).toContain('<html lang="zh-Hans">')
-    expect(zh.html).toContain('Mộc 正在维护')
-    expect(maintenancePage('zh')).toContain('<title>Mộc 正在维护</title>')
+    expect(zh.html).toContain('LAMVI 正在维护')
+    expect(maintenancePage('zh')).toContain('<title>LAMVI 正在维护</title>')
   })
 
   it('trang riêng tư không bị chặn: /login, /en/login, /register, /account, /admin/*, /it', async () => {
@@ -626,7 +626,7 @@ describe('Chế độ bảo trì — SSR (D-54)', () => {
     for (const url of ['/login', '/en/login', '/zh/register', '/account', '/admin', '/admin/products', '/it']) {
       const p = await page(url)
       expect(p.status, url).toBe(200)
-      expect(p.html).not.toContain('Mộc đang bảo trì')
+      expect(p.html).not.toContain('LAMVI đang bảo trì')
     }
   })
 

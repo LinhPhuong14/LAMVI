@@ -64,7 +64,7 @@ describe('Phân quyền & SEO', () => {
     const fetchMock = mockApi({ 'GET /me': me('admin'), 'GET /admin/products': () => ({ body: { items: products } }) })
     renderAt(path)
     expect(await screen.findByRole('heading', { level: 1 })).toBeInTheDocument()
-    expect(screen.queryByText('Quản trị MỘC')).toBeNull()
+    expect(screen.queryByText('Quản trị LAMVI')).toBeNull()
     expect(screen.queryByRole('heading', { name: 'Sản phẩm' })).toBeNull()
     expect(adminCalls(fetchMock)).toHaveLength(0)
   })

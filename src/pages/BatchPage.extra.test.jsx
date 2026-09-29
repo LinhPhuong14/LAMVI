@@ -165,7 +165,7 @@ describe('Trang lỗi (404 vs 500)', () => {
     renderAt('/lo/KHONG-CO')
     expect(await screen.findByRole('heading', { level: 1, name: 'Không tìm thấy lô đèn' })).toBeInTheDocument()
     expect(screen.getByText(/chưa có video hoặc không tồn tại/)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Khám phá MỘC' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Khám phá LAMVI' })).toHaveAttribute('href', '/')
   })
 
   it('500 → thông điệp lỗi chung, KHÔNG nói lô "không tồn tại"/"không tìm thấy"', async () => {
@@ -241,21 +241,21 @@ describe('noindex chỉ ở trang lô (D-44)', () => {
     expect(robots()).toHaveLength(0)
   })
 
-  it('bấm "Khám phá MỘC" từ trang lô → sang trang chủ, gỡ noindex', async () => {
+  it('bấm "Khám phá LAMVI" từ trang lô → sang trang chủ, gỡ noindex', async () => {
     mockApi(withBatch())
     renderAt('/lo/L-01')
     await screen.findByRole('heading', { level: 1, name: 'Lô tháng 9' })
     expect(robots()).toHaveLength(1)
-    fireEvent.click(screen.getByRole('link', { name: 'Khám phá MỘC' }))
+    fireEvent.click(screen.getByRole('link', { name: 'Khám phá LAMVI' }))
     await waitFor(() => expect(robots()).toHaveLength(0))
     expect(document.querySelector('.batch')).toBeNull()
   })
 
-  it('bấm logo MỘC trên header từ trang lô lỗi → gỡ noindex', async () => {
+  it('bấm logo LAMVI trên header từ trang lô lỗi → gỡ noindex', async () => {
     mockApi(base)
     renderAt('/en/lo/KHONG-CO')
     await screen.findByRole('heading', { level: 1 })
-    fireEvent.click(screen.getByRole('link', { name: 'MỘC' }))
+    fireEvent.click(screen.getByRole('link', { name: 'LAMVI' }))
     await waitFor(() => expect(robots()).toHaveLength(0))
   })
 

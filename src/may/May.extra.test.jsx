@@ -183,7 +183,7 @@ describe('Khung chat', () => {
   it('có nhãn trợ lý AI; dialog có tên; nút mở có aria-expanded', async () => {
     await setup()
     expect(screen.getByRole('dialog', { name: 'Mây' })).toBeInTheDocument()
-    expect(screen.getByText('Trợ lý AI của Mộc')).toBeInTheDocument()
+    expect(screen.getByText('Trợ lý AI của LAMVI')).toBeInTheDocument()
     expect(screen.getByText(/Mây là trợ lý AI/)).toBeInTheDocument()
     expect(screen.getByRole('button', FAB)).toHaveAttribute('aria-expanded', 'true')
   })

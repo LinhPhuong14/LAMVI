@@ -87,7 +87,7 @@ describe('Header — logo con dấu và tự ẩn khi cuộn', () => {
     const mark = container.querySelector('.nav-mark')
     expect(mark.tagName).toBe('A')
     expect(mark).toHaveAttribute('href', PREFIX[lang])
-    expect(screen.getByRole('link', { name: 'MỘC' })).toBe(mark)
+    expect(screen.getByRole('link', { name: 'LAMVI' })).toBe(mark)
     expect(mark.querySelector('.seal')).not.toBeNull()
   })
 
