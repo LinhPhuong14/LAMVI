@@ -47,11 +47,12 @@ export function Cloud({ className = '' }) {
       <path
         d="M10 58 H150 C150 44 138 36 126 40 C124 22 104 14 92 26 C86 10 62 8 54 26 C44 18 28 24 30 38 C18 36 10 46 10 58 Z"
         fill="currentColor"
-        stroke="#1d1712"
-        strokeWidth="2.5"
+        stroke="#8b6a45"
+        strokeOpacity="0.7"
+        strokeWidth="1.4"
         strokeLinejoin="round"
       />
-      <g fill="none" stroke="#1d1712" strokeWidth="2" strokeLinecap="round">
+      <g fill="none" stroke="#8b6a45" strokeOpacity="0.7" strokeWidth="1.3" strokeLinecap="round">
         <path d="M62 44 C62 34 76 32 78 42 C79 48 70 49 70 44" />
         <path d="M100 46 C100 38 112 37 113 45" />
         <path d="M36 50 C36 44 45 43 46 49" />
@@ -81,37 +82,17 @@ export function Lotus({ className = '' }) {
   )
 }
 
-/** Dấu bưu điện cũ: vòng tròn đôi, chữ thương hiệu, vạch sóng huỷ tem. Chỉ trang trí. */
-export function Postmark({ label, className = '' }) {
-  const waves = [0, 1, 2, 3].map((i) => {
-    const y = 58 + i * 12
-    return `M112 ${y} q9 -6 18 0 t18 0 t18 0 t18 0 t18 0 t18 0`
-  })
+/**
+ * Ấn triện dọc: từng chữ xếp đứng trong khung son, như lạc khoản đóng bên mép tranh. Chỉ trang trí.
+ * Tách theo ký tự đã chuẩn hoá NFC để chữ có dấu (Ộ) không bị tách rời dấu.
+ */
+export function VerticalSeal({ label, className = '' }) {
   return (
-    <svg viewBox="0 0 230 140" className={`postmark ${className}`} aria-hidden="true">
-      <g fill="none" stroke="currentColor">
-        <circle cx="64" cy="70" r="56" strokeWidth="3" />
-        <circle cx="64" cy="70" r="46" strokeWidth="1.5" strokeDasharray="3 4" />
-        {waves.map((d) => (
-          <path key={d} d={d} strokeWidth="3" strokeLinecap="round" />
-        ))}
-      </g>
-      <g fill="currentColor">
-        <circle cx="30" cy="70" r="3" />
-        <circle cx="98" cy="70" r="3" />
-        <text
-          x="64"
-          y="79"
-          textAnchor="middle"
-          fontFamily="Fraunces Variable, Georgia, serif"
-          fontWeight="800"
-          fontSize="26"
-          letterSpacing="1"
-        >
-          {label}
-        </text>
-      </g>
-    </svg>
+    <span className={`vseal ${className}`} aria-hidden="true">
+      {[...label.normalize('NFC')].map((ch, i) => (
+        <span key={i}>{ch}</span>
+      ))}
+    </span>
   )
 }
 

@@ -26,6 +26,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
 | T-21 | 2026-09-28 | Font tự host bằng `@fontsource` (Fraunces Variable soft + italic, Be Vietnam Pro 400/500/600), preload 6 file woff2 chính trong `index.html`; bỏ Google Fonts | Hiệu lực |
 | T-22 | 2026-09-28 | Motion: `LazyMotion features={domAnimation} strict` ở `LocaleLayout` → chỉ dùng `m.*`; xuất hiện/biến mất theo `useViewState` (IntersectionObserver, `below`/`in`/`above`); animation lặp (đung đưa, marquee, hạt lửa) bằng CSS | Hiệu lực |
+| T-25 | 2026-09-29 | Bỏ phong cách "viền đen dày + bóng đổ cứng" (neo-brutalism). Dùng nét mảnh sepia, khung viền đôi, góc hoa văn triện, bóng mềm, mảng màu phẳng có hoa văn chìm — tham khảo nguyên tắc trình bày của các trang bảo tàng/di sản Trung Quốc, dịch sang hoạ tiết Việt | Hiệu lực |
 | T-24 | 2026-09-28 | Hiệu ứng lấy ý tưởng từ Aceternity UI nhưng tự viết lại (không chép code — trang của họ ghi "All Rights Reserved"; không dùng Tailwind). Hiệu ứng theo con trỏ chỉ bật khi `useFinePointer()` và không giảm chuyển động | Hiệu lực |
 | T-23 | 2026-09-28 | Giao diện "Đông Hồ cổ": token màu ở `src/index.css` (giữ bí danh tên cũ cho `pages.css`); texture giấy/mực là SVG nội tuyến, vẽ trên nền tĩnh — không dùng lớp phủ cố định có `mix-blend-mode`/`backdrop-filter` | Hiệu lực |
 
@@ -107,3 +108,17 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
   - Thẻ có `TiltCard` không được `overflow: hidden` (làm phẳng lớp 3D).
   - `.thread` cần `@property` (Chrome/Edge, Safari 16.4+, Firefox 128+); trình duyệt cũ thấy viền đứng yên.
   - Màn hình đầu dùng animation CSS thay framer để chữ tiêu đề không bị `opacity: 0` trong HTML SSR (giảm G-30).
+
+### T-25 — Phong cách cổ điển (thay neo-brutalism)
+- **Bối cảnh**: người dùng nhận xét các khối viền đen dày + bóng đổ cứng "chưa cổ điển", yêu cầu tham khảo web văn hoá dân gian Trung Quốc.
+- **Nguồn đã xem** (chụp màn hình ngày 2026-09-29): Cố Cung (dpm.org.cn), Cố Cung Danh Hoạ Ký (minghuaji.dpm.org.cn), Số hoá văn vật Cố Cung (digicol.dpm.org.cn), Đôn Hoàng số (e-dunhuang.com), Hoa Tây Tử (huaxizi.com), Bảo tàng Lịch sử Thiểm Tây (sxhm.com). Không truy cập được: ihchina.cn, szmuseum.com (lỗi upstream), chnmuseum.cn (quá thời gian).
+- **Nguyên tắc rút ra → áp dụng ở MỘC** (không dùng chữ Hán, rồng, mái cung điện Trung Hoa):
+  - Không viền dày/bóng cứng → token `--hair`, `--hair-soft`; `--print`/`--print-lg` là bóng mềm.
+  - Khung viền đôi mảnh + góc hồi văn (Danh Hoạ Ký) → `--corner-*` (góc triện) cho thiếp thư testimonials; `border: 3px double` cho nav, marquee, FAQ.
+  - Khung góc lõm (Hoa Tây Tử) → `.product-art::after` khoét 4 góc như ô hộc cửa bức bàn.
+  - Mái cong làm đường chuyển (Thiểm Tây) → mái đình Việt: nóc phẳng, mặt nguyệt, đầu đao (`--roof-mask`, có bản riêng cho màn hẹp).
+  - Logo dọc + dấu son (Đôn Hoàng) → `VerticalSeal` (ấn triện dọc) ở hero thay dấu bưu điện.
+  - Mảng màu phẳng có hoa văn chìm (Cố Cung) → `--pat-cloud` trên nền chàm.
+  - Tab gạch chân, cột ngăn bằng nét chấm → tab Mua tặng/Mua cho mình, số liệu, công đoạn.
+  - Nút như ấn son: góc 3px, đường chỉ sáng bên trong bằng `box-shadow: inset`.
+- **Hệ quả**: không thêm lại `border: 2px solid var(--than)` hay bóng lệch cứng; khung mới dùng `--hair` + góc triện.

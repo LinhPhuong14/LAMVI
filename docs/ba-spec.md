@@ -1079,11 +1079,13 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 | Chất cổ | Vân sợi giấy dó, vết ố, viền tối như ảnh cũ, mực in mòn trên mảng màu, chữ lệch khuôn in, số kiểu cổ; logo con dấu son, dấu bưu điện, ảnh cũ viền răng cưa có góc dán album |
 | Motion | Mỗi khối hiện ra khi cuộn tới và tan đi theo hướng cuộn khi rời màn hình; tiêu đề hiện như mực loang; thẻ "đóng dấu"; số liệu đếm lên; đèn lookbook thắp sáng khi tới, lịm khi qua; đèn hero bay lên như thả đèn trời khi cuộn đi; header ẩn khi cuộn xuống, hiện khi cuộn lên; FAQ mở như trải cuộn thư |
 | NFR-A11Y-001 | Giảm chuyển động → không animation lặp, không dịch chuyển, số liệu hiện giá trị thật ngay (đã kiểm: 0 animation chạy). Trình đọc màn hình luôn đọc giá trị số thật; hoạ tiết `aria-hidden` |
+| Phong cách cổ điển (T-25, tham khảo nguyên tắc trình bày của web bảo tàng/di sản Trung Quốc, dịch sang hoạ tiết Việt) | Bỏ viền đen dày và bóng đổ cứng; nét mảnh, khung viền đôi, góc hoa văn triện, bóng mềm; mái đình làm đường chuyển giữa các phần; ấn triện dọc ở màn hình đầu; thẻ sản phẩm kiểu tranh bồi góc lõm; thiếp thư cho lời khách hàng; tab gạch chân; mây chìm trên nền chàm |
 | Hiệu ứng tương tác (tham khảo ý tưởng Aceternity UI, tự viết lại — T-24) | Đèn treo rọi sáng tiêu đề lookbook; quầng đèn theo con trỏ ở hero; thẻ sản phẩm nghiêng 3D; lời nghệ nhân hiện từng chữ; sợi chỉ đỏ theo tiến độ cuộn ở công đoạn; viền chỉ vàng chạy quanh nút chính; lookbook làm mờ đèn không được chọn; đèn trời bay trên nền đêm; chữ MỘC ở footer loang màu son theo con trỏ. Hiệu ứng theo con trỏ chỉ có trên máy có chuột |
-| Hiệu năng | Font tự host + preload; `LazyMotion`; animation lặp bằng CSS; texture vẽ trên nền tĩnh. Đo bản build local (không giới hạn mạng, desktop 1440×900): LCP ~1,55 s → ~0,45–0,58 s; CLS 0 → 0; JS 156,2 → 152,5 kB gzip (đã gồm hiệu ứng T-24) |
+| Hiệu năng | Font tự host + preload; `LazyMotion`; animation lặp bằng CSS; texture vẽ trên nền tĩnh. Đo bản build local (không giới hạn mạng, desktop 1440×900): LCP ~1,55 s → ~0,3–0,6 s; CLS 0 → 0–0,02 (chữ tiêu đề đôi khi vẽ trước khi font Fraunces về rồi đổi font; vẫn dưới ngưỡng 0,1); JS 156,2 → 152,4 kB gzip (đã gồm hiệu ứng T-24, T-25) |
 
 - `[ASSUMPTION]` Ngưỡng hiệu năng nội bộ cho trang công khai, chờ PO chốt NFR-PERF-001: LCP ≤ 2,5 s, CLS ≤ 0,1 (mức "tốt" của Core Web Vitals).
 - `[ASSUMPTION]` Motion "biến mất" áp dụng khi khối rời khỏi màn hình (cuộn qua), không áp dụng khi chuyển trang (tránh chặn điều hướng và SSR).
+- `[ASSUMPTION]` Tham khảo web Trung Quốc chỉ ở mức nguyên tắc trình bày (nét, khung, khoảng trắng); không dùng chữ Hán, rồng, mái cung điện để web vẫn mang bản sắc Việt.
 - `[ASSUMPTION]` Giữ thương hiệu MỘC. Nhánh `docs/branding-guideline` (đổi sang "LÂM VỊ" + Tailwind) chưa gộp vào `master` nên không áp dụng; cần PO thống nhất trước khi gộp.
 - Khoảng trống mới: G-29, G-30 (§31.2).
 

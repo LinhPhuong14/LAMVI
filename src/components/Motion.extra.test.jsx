@@ -10,7 +10,7 @@ import zhMsg from '../i18n/messages/zh.js'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
 import { faqVi, productsVi } from '../test/fixtures.js'
 import Lantern from './Lantern.jsx'
-import { Cloud, DrumSun, Lotus, OldPhoto, Postmark } from './Motifs.jsx'
+import { Cloud, DrumSun, Lotus, OldPhoto, VerticalSeal } from './Motifs.jsx'
 
 const MESSAGES = { vi: viMsg, en: enMsg, zh: zhMsg }
 const PREFIX = { vi: '/', en: '/en', zh: '/zh' }
@@ -202,7 +202,6 @@ describe('Hoạ tiết SVG trang trí đều aria-hidden', () => {
     ['DrumSun', <DrumSun key="d" />],
     ['Cloud', <Cloud key="c" />],
     ['Lotus', <Lotus key="l" />],
-    ['Postmark', <Postmark key="p" label="MỘC" />],
     ['OldPhoto', <OldPhoto key="o"><rect width="1" height="1" /></OldPhoto>],
     ['Lantern', <Lantern key="n" />],
   ])('%s', (_, el) => {
@@ -210,6 +209,13 @@ describe('Hoạ tiết SVG trang trí đều aria-hidden', () => {
     const svg = container.querySelector('svg')
     expect(svg).not.toBeNull()
     expect(svg).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('VerticalSeal: ấn triện dọc aria-hidden, mỗi ký tự một ô, giữ nguyên chữ có dấu', () => {
+    const { container } = render(<VerticalSeal label="MỘC" />)
+    const seal = container.firstChild
+    expect(seal).toHaveAttribute('aria-hidden', 'true')
+    expect([...seal.children].map((c) => c.textContent)).toEqual(['M', 'Ộ', 'C'])
   })
 
   it('trên trang chủ: mọi <svg> đều aria-hidden hoặc nằm trong vùng aria-hidden', async () => {

@@ -6,7 +6,7 @@ import { useRef } from 'react'
 import { MotionConfig } from 'framer-motion'
 import { group3, parseStat, useViewState } from '../lib/motion.js'
 import { CountUp } from './Reveal.jsx'
-import { Postmark } from './Motifs.jsx'
+import { VerticalSeal } from './Motifs.jsx'
 
 // IntersectionObserver giả: giữ callback để test tự bắn sự kiện vào/ra khung nhìn
 function stubObserver() {
@@ -121,8 +121,8 @@ describe('parseStat / group3', () => {
 })
 
 describe('Hoạ tiết trang trí', () => {
-  it('dấu bưu điện ẩn với trình đọc màn hình', () => {
-    const { container } = render(<Postmark label="MỘC" />)
-    expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
+  it('ấn triện dọc ẩn với trình đọc màn hình', () => {
+    const { container } = render(<VerticalSeal label="MỘC" />)
+    expect(container.firstChild).toHaveAttribute('aria-hidden', 'true')
   })
 })

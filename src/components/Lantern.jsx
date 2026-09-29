@@ -8,7 +8,7 @@ const TONES = {
   moss: ['#f6f2d2', '#c0b560', '#56703b', '#b8322a'],
 }
 
-const INK = '#1d1712'
+const INK = '#3a2a1e'
 
 /**
  * Đèn giấy vẽ theo lối tranh khắc gỗ: nét mực đậm, màu phẳng, dải răng cưa, tua rua.
@@ -57,7 +57,7 @@ export default function Lantern({
       <line x1="100" y1="0" x2="100" y2="36" stroke={INK} strokeWidth="2.4" />
       <circle cx="100" cy="8" r="4" fill="none" stroke={INK} strokeWidth="2.4" />
 
-      <path d="M76 34 H124 L132 52 H68 Z" fill="#1e3553" stroke={INK} strokeWidth="2.6" strokeLinejoin="round" />
+      <path d="M76 34 H124 L132 52 H68 Z" fill="#1e3553" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
 
       <path d={body} fill={`url(#${bodyId})`} />
 
@@ -100,9 +100,9 @@ export default function Lantern({
         <circle r="4.5" fill={band} fillOpacity="1" />
       </g>
 
-      <path d={body} fill="none" stroke={INK} strokeWidth="3" />
+      <path d={body} fill="none" stroke={INK} strokeWidth="2.2" />
 
-      <path d="M70 218 H130 L123 234 H77 Z" fill="#1e3553" stroke={INK} strokeWidth="2.6" strokeLinejoin="round" />
+      <path d="M70 218 H130 L123 234 H77 Z" fill="#1e3553" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
 
       <g className="lantern-tassel">
         <line x1="100" y1="234" x2="100" y2="248" stroke={INK} strokeWidth="2.2" />

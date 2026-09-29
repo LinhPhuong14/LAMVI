@@ -20,6 +20,7 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 5. Test `src/components/Motion.test.jsx`. Test phát hiện: `useReducedMotion` bỏ qua `MotionConfig` → đổi sang `useReducedMotionConfig`.
 5a. Subagent kiểm thử độc lập (T-11): `Motion.extra.test.jsx`, `server/ssr.design.extra.test.js` — không có lỗi; lưu ý HTML SSR có 68 phần tử `opacity:0` (G-30) và cảnh báo lint `set-state-in-effect` → đã sửa: màn hình đầu chạy bằng CSS, `@media (scripting: none)`, `useFinePointer` dùng `useSyncExternalStore`.
 5b. Theo yêu cầu "tham khảo Aceternity UI": 9 hiệu ứng tự viết lại (T-24) — Lamp, Spotlight, 3D Card, Text Generate, Tracing Beam, Moving Border, Focus Cards, Sparkles (đèn trời), Text Hover.
+5d. Theo nhận xét "khối có stroke chưa cổ điển": xem 6 web bảo tàng/di sản Trung Quốc, chuyển sang phong cách cổ điển (T-25) — nét mảnh, khung viền đôi, góc triện, mái đình, ấn triện dọc, tranh bồi, thiếp thư. Subagent kiểm thử độc lập lần 3 (T-11): `Classic.extra.test.jsx`, `server/ssr.classic.extra.test.js` (36 test) — không có lỗi.
 5c. Subagent kiểm thử độc lập lần 2 (T-11): `Effects.extra.test.jsx`, `server/ssr.effects.extra.test.js` (31 test) — không có lỗi; rủi ro id gradient `brandInk` viết cứng (trùng nếu tái dùng) → đã sửa bằng `useId()`.
 6. Spec v0.6: §31.4, G-29, G-30, `[ASSUMPTION]` ngưỡng NFR-PERF-001.
 

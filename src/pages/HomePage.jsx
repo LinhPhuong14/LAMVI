@@ -17,7 +17,7 @@ import Faq from '../components/Faq'
 import Price from '../components/Price'
 import { CountUp, Reveal } from '../components/Reveal'
 import { PointerGlow, TiltCard } from '../components/Effects'
-import { Cloud, DrumSun, Lotus, OldPhoto, Postmark, Seal } from '../components/Motifs'
+import { Cloud, DrumSun, Lotus, OldPhoto, Seal, VerticalSeal } from '../components/Motifs'
 import {
   EASE_IN,
   EASE_OUT,
@@ -301,14 +301,14 @@ function Hero() {
         >
           <Lantern size={58} tone="moss" swing />
         </m.div>
-        {/* Dấu bưu điện đóng lên sau cùng, như con dấu trên bưu thiếp cũ */}
+        {/* Ấn triện dọc đóng lên sau cùng, như lạc khoản bên mép tranh */}
         <m.div
-          className="hero-postmark"
-          initial={{ opacity: 0, scale: 1.7, rotate: -34 }}
-          animate={{ opacity: 0.8, scale: 1, rotate: -14 }}
+          className="hero-seal"
+          initial={{ opacity: 0, scale: 1.6, rotate: -18 }}
+          animate={{ opacity: 1, scale: 1, rotate: -3 }}
           transition={{ type: 'spring', stiffness: 260, damping: 16, delay: 1.3 }}
         >
-          <Postmark label="MỘC" />
+          <VerticalSeal label="MỘC" />
         </m.div>
       </div>
 
@@ -384,8 +384,6 @@ export default function HomePage() {
       <Marquee />
 
       <Reveal as="section" id="story" className="story" variants={group}>
-        <Cloud className="story-cloud cloud-l" />
-        <Cloud className="story-cloud cloud-r" />
         <SectionHead eyebrow={t('story.eyebrow')} title={t('story.title')} />
         <m.p className="story-text drop-cap" variants={rise}>
           {t('story.text')}
