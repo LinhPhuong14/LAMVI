@@ -4,7 +4,7 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
-## 2026-09-28 (phiên 5) — AI Mây (nhánh `feat/may`, từ `master`)
+## 2026-09-28 (phiên 5) — AI Mây (nhánh `feat/may`, từ `master`), gộp vào `master`
 
 **Quyết định từ người dùng**
 
