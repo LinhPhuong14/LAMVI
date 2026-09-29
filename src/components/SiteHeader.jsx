@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useMotionValueEvent, useScroll } from 'framer-motion'
 import { LOCALES, localePath, splitLocale, useI18n } from '../i18n/index.js'
 import { useCart } from '../cart/context.js'
+import { Seal } from './Motifs'
 
 const SECTIONS = ['story', 'artisan', 'products', 'lookbook', 'qr', 'faq']
 
@@ -37,12 +40,26 @@ function CartLink() {
   )
 }
 
+// Thanh điều hướng lui đi khi cuộn xuống đọc, hiện lại ngay khi cuộn lên
+function useHeaderState() {
+  const { scrollY } = useScroll()
+  const [state, setState] = useState({ hidden: false, scrolled: false })
+  useMotionValueEvent(scrollY, 'change', (y) => {
+    const prev = scrollY.getPrevious() ?? 0
+    const hidden = y > 240 && y > prev + 2 ? true : y < prev - 2 ? false : state.hidden
+    const scrolled = y > 12
+    if (hidden !== state.hidden || scrolled !== state.scrolled) setState({ hidden, scrolled })
+  })
+  return state
+}
+
 export default function SiteHeader() {
   const { t, path } = useI18n()
+  const { hidden, scrolled } = useHeaderState()
   return (
-    <header className="nav">
-      <Link to={path('/')} className="nav-mark">
-        MỘC
+    <header className={`nav${hidden ? ' is-hidden' : ''}${scrolled ? ' is-scrolled' : ''}`}>
+      <Link to={path('/')} className="nav-mark" aria-label="MỘC">
+        <Seal>MỘC</Seal>
       </Link>
       <nav className="nav-links">
         {SECTIONS.map((s) => (
@@ -57,7 +74,7 @@ export default function SiteHeader() {
         <Link to={path('/account')} className="nav-account">
           {t('nav.account')}
         </Link>
-        <Link to={{ pathname: path('/'), hash: '#products' }} className="nav-cta">
+        <Link to={{ pathname: path('/'), hash: '#products' }} className="nav-cta thread">
           {t('nav.cta')}
         </Link>
       </div>

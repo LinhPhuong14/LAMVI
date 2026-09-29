@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
+import { Seal } from './Motifs'
+import { Reveal } from './Reveal'
+import { BrandHover } from './Effects'
+import { group } from '../lib/motion.js'
 
 export default function SiteFooter() {
   const { t, lang, path } = useI18n()
@@ -11,7 +15,7 @@ export default function SiteFooter() {
     <footer className="footer">
       <div className="footer-grid">
         <div className="footer-brand">
-          <span className="nav-mark">MỘC</span>
+          <Seal className="seal-lg">MỘC</Seal>
           <p>{t('footer.tagline')}</p>
           <div className="social-links">
             <a href="#" aria-label="Facebook">
@@ -46,13 +50,21 @@ export default function SiteFooter() {
           <p>{t('footer.newsText')}</p>
           {/* G-11: newsletter chưa có backend — giữ hay bỏ form chờ PO (§30 P2) */}
           <form className="news-form" onSubmit={(e) => e.preventDefault()}>
-            <input type="email" placeholder={t('footer.newsPlaceholder')} required />
+            <input
+              type="email"
+              placeholder={t('footer.newsPlaceholder')}
+              aria-label={t('footer.newsPlaceholder')}
+              required
+            />
             <button type="submit" className="btn btn-small">
               {t('footer.newsSubmit')}
             </button>
           </form>
         </div>
       </div>
+      <Reveal className="footer-brandmark" variants={group} margin="0px">
+        <BrandHover text="MỘC" />
+      </Reveal>
       <div className="footer-bottom">
         <span>{t('footer.copyright')}</span>
       </div>

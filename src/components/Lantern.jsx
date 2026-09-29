@@ -1,71 +1,115 @@
 import { useId } from 'react'
 
+// [sáng, giữa, tối, màu dải hoa văn]
 const TONES = {
-  amber: ['#fff3d6', '#f0be6f', '#c47f3a'],
-  dawn: ['#ffe9dd', '#f2a68f', '#c15a3a'],
-  dusk: ['#ffe6b8', '#e8935a', '#8a3d2a'],
-  moss: ['#f6f1d8', '#c9a75a', '#6b5a2a'],
+  amber: ['#fff6d4', '#f2c04e', '#c27f17', '#b8322a'],
+  dawn: ['#fff0e2', '#f19c80', '#b64a37', '#1e3553'],
+  dusk: ['#ffe4ad', '#e8683a', '#98281d', '#e6a623'],
+  moss: ['#f6f2d2', '#c0b560', '#56703b', '#b8322a'],
 }
 
-export default function Lantern({ size = 220, lit = true, tone = 'amber', className = '' }) {
+const INK = '#3a2a1e'
+
+/**
+ * Đèn giấy vẽ theo lối tranh khắc gỗ: nét mực đậm, màu phẳng, dải răng cưa, tua rua.
+ * `swing` treo đèn đung đưa quanh móc; `flicker` cho ánh lửa bên trong chập chờn.
+ * Hiệu ứng chạy bằng CSS (transform/opacity) để không tốn luồng JS.
+ */
+export default function Lantern({
+  size = 220,
+  tone = 'amber',
+  swing = false,
+  flicker = false,
+  className = '',
+}) {
   const uid = useId()
-  const glowId = `lanternGlow-${uid}`
-  const capId = `capGrad-${uid}`
-  const [c1, c2, c3] = TONES[tone] || TONES.amber
+  const bodyId = `lanternBody-${uid}`
+  const flameId = `lanternFlame-${uid}`
+  const clipId = `lanternClip-${uid}`
+  const [c1, c2, c3, band] = TONES[tone] || TONES.amber
+  const body =
+    'M70 52 C44 94 44 176 70 218 C84 240 116 240 130 218 C156 176 156 94 130 52 Z'
 
   return (
     <svg
-      viewBox="0 0 200 260"
+      viewBox="0 0 200 290"
       width={size}
-      height={(size * 260) / 200}
-      className={`lantern-svg ${lit ? 'is-lit' : ''} ${className}`}
+      height={(size * 290) / 200}
+      className={`lantern-svg ${swing ? 'is-swing' : ''} ${className}`}
       role="presentation"
       aria-hidden="true"
     >
       <defs>
-        <radialGradient id={glowId} cx="50%" cy="46%" r="60%">
+        <radialGradient id={bodyId} cx="50%" cy="50%" r="58%">
           <stop offset="0%" stopColor={c1} />
           <stop offset="55%" stopColor={c2} />
           <stop offset="100%" stopColor={c3} />
         </radialGradient>
-        <linearGradient id={capId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#6b4226" />
-          <stop offset="100%" stopColor="#4a2c18" />
-        </linearGradient>
+        <radialGradient id={flameId} cx="50%" cy="52%" r="40%">
+          <stop offset="0%" stopColor="#fffbe8" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#fffbe8" stopOpacity="0" />
+        </radialGradient>
+        <clipPath id={clipId}>
+          <path d={body} />
+        </clipPath>
       </defs>
 
-      <line x1="100" y1="6" x2="100" y2="34" stroke="#6b4226" strokeWidth="2" />
+      <line x1="100" y1="0" x2="100" y2="36" stroke={INK} strokeWidth="2.4" />
+      <circle cx="100" cy="8" r="4" fill="none" stroke={INK} strokeWidth="2.4" />
 
-      <path d="M78 34 L122 34 L128 50 L72 50 Z" fill={`url(#${capId})`} />
+      <path d="M76 34 H124 L132 52 H68 Z" fill="#1e3553" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
 
-      <path
-        d="M72 50 C48 90 48 170 72 210 C84 232 116 232 128 210 C152 170 152 90 128 50 Z"
-        fill={`url(#${glowId})`}
-        stroke="#8a5a34"
-        strokeWidth="1.5"
-      />
+      <path d={body} fill={`url(#${bodyId})`} />
 
-      {[70, 90, 110, 130, 150, 170, 190].map((y) => (
-        <path
-          key={y}
-          d={`M${52 + Math.sin((y / 260) * Math.PI) * -2} ${y} Q100 ${y + 4} ${148 - Math.sin((y / 260) * Math.PI) * -2} ${y}`}
-          fill="none"
-          stroke="rgba(107,66,38,0.28)"
-          strokeWidth="1"
+      <g clipPath={`url(#${clipId})`}>
+        <ellipse
+          className={flicker ? 'lantern-flame' : undefined}
+          cx="100"
+          cy="138"
+          rx="46"
+          ry="62"
+          fill={`url(#${flameId})`}
         />
-      ))}
-      {[62, 100, 138].map((x) => (
+        {/* Dải răng cưa trên & dưới — như mép cờ đuôi nheo ngày hội */}
+        <rect x="40" y="62" width="120" height="12" fill={band} />
         <path
-          key={x}
-          d={`M${x} 50 C${x - 20} 100 ${x - 20} 160 ${x} 210`}
-          fill="none"
-          stroke="rgba(107,66,38,0.35)"
-          strokeWidth="1.4"
+          d="M40 74 l8 9 l8 -9 l8 9 l8 -9 l8 9 l8 -9 l8 9 l8 -9 l8 9 l8 -9 l8 9 l8 -9 l8 9 l8 -9"
+          fill={band}
         />
-      ))}
+        <rect x="40" y="196" width="120" height="12" fill={band} />
+        <path
+          d="M40 196 l8 -9 l8 9 l8 -9 l8 9 l8 -9 l8 9 l8 -9 l8 9 l8 -9 l8 9 l8 -9 l8 9 l8 -9 l8 9"
+          fill={band}
+        />
+        {[62, 100, 138].map((x) => (
+          <path
+            key={x}
+            d={`M${x} 52 C${x - (x - 100) * 0.9} 110 ${x - (x - 100) * 0.9} 160 ${x} 218`}
+            fill="none"
+            stroke={INK}
+            strokeOpacity="0.28"
+            strokeWidth="1.6"
+          />
+        ))}
+      </g>
 
-      <path d="M72 210 L128 210 L122 226 L78 226 Z" fill={`url(#${capId})`} />
-      <ellipse cx="100" cy="230" rx="14" ry="5" fill="#4a2c18" />
+      {/* Hoa thị bốn cánh ở giữa thân đèn */}
+      <g transform="translate(100 136)" fill={c3} fillOpacity="0.55">
+        <ellipse rx="6" ry="15" />
+        <ellipse rx="6" ry="15" transform="rotate(90)" />
+        <circle r="4.5" fill={band} fillOpacity="1" />
+      </g>
+
+      <path d={body} fill="none" stroke={INK} strokeWidth="2.2" />
+
+      <path d="M70 218 H130 L123 234 H77 Z" fill="#1e3553" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+
+      <g className="lantern-tassel">
+        <line x1="100" y1="234" x2="100" y2="248" stroke={INK} strokeWidth="2.2" />
+        <circle cx="100" cy="251" r="5" fill="#e6a623" stroke={INK} strokeWidth="2" />
+        <path d="M94 256 L90 286 H110 L106 256 Z" fill="#b8322a" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+        <path d="M97 260 V284 M100 260 V285 M103 260 V284" stroke={INK} strokeOpacity="0.35" strokeWidth="1" />
+      </g>
     </svg>
   )
 }

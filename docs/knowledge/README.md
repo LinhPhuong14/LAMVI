@@ -7,6 +7,7 @@ Bộ tài liệu này giữ cho mọi phiên code (người hoặc AI) làm vi�
 | [`../ba-spec.md`](../ba-spec.md) | **Nguồn yêu cầu nghiệp vụ duy nhất** (FR, BR, US/AC). Quyết định nghiệp vụ `D-xx` ở Phụ lục A | Sau mỗi tính năng (xem quy trình bên dưới) |
 | [`decisions.md`](decisions.md) | Quyết định **kỹ thuật** `T-xx` (stack, kiến trúc, quy ước) | Khi chọn/đổi công nghệ hoặc cách làm |
 | [`architecture.md`](architecture.md) | Cấu trúc thư mục, luồng dữ liệu, adapter, schema, API | Khi thêm module/bảng/endpoint |
+| [`design-rules.md`](design-rules.md) | Design rules: màu, chữ, nét/khung, hoạ tiết, ảnh (nguồn, giấy phép), motion, hiệu năng | Khi đổi token, thêm component giao diện hoặc ảnh |
 | [`conventions.md`](conventions.md) | Quy ước code, i18n, API, test, commit | Khi thống nhất quy ước mới |
 | [`glossary.md`](glossary.md) | Thuật ngữ nghiệp vụ ↔ tên trong code | Khi xuất hiện khái niệm mới |
 | [`progress.md`](progress.md) | Bảng trạng thái tính năng theo FR, file, test | Cuối mỗi tính năng |

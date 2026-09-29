@@ -32,7 +32,10 @@
 - Giá hiển thị qua `<Price />` — luôn kèm chú thích "chưa gồm VAT" (BR-PRC-003).
 - Mỗi trang render `<Seo>` (T-16): trang công khai truyền `title`, `description`, `path` (không có tiền tố ngôn ngữ); trang không được index (QR, tài khoản, giỏ, checkout, admin — BR-SEO-001, D-44) truyền `noindex`; trang lỗi truyền `status`. Không gọi `useNoIndex()` trực tiếp khi đã có `<Seo noindex>`.
 - Trang công khai phải render được trên server (T-15): không đọc `window`/`localStorage` khi render; khai báo key dữ liệu trong `src/seo/routes.js`.
-- Tôn trọng `prefers-reduced-motion` (NFR-A11Y-001): CSS có media query trong `pages.css`; framer-motion được bọc `MotionConfig reducedMotion="user"` ở `LocaleLayout`.
+- Tôn trọng `prefers-reduced-motion` (NFR-A11Y-001): CSS có media query trong `pages.css`; framer-motion được bọc `MotionConfig reducedMotion="user"` ở `LocaleLayout`. Hook cần biết trạng thái giảm chuyển động dùng `useReducedMotionConfig()`.
+- framer-motion: chỉ dùng `m.*` (LazyMotion strict — T-22); hiệu ứng xuất hiện/biến mất dùng `<Reveal>` + biến thể trong `src/lib/motion.js`; hiệu ứng lặp viết bằng CSS.
+- Giao diện theo [`design-rules.md`](design-rules.md) (màu, khung, ảnh, motion). Ảnh ngoài: chỉ public domain/CC0, ghi nguồn ở `public/images/folk/CREDITS.md` + `src/data/folkArt.js`.
+- Màu dùng token trong `src/index.css` (`--diep`, `--than`, `--son`, `--hoe`, `--cham`, `--la`…); tên cũ (`--ink`, `--brown`…) chỉ là bí danh cho code cũ (T-23). SVG trang trí đặt `aria-hidden="true"`.
 
 ## Test
 

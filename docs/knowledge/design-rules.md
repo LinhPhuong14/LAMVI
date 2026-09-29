@@ -1,0 +1,188 @@
+# Design rules — MỘC (web)
+
+Quy tắc thiết kế cho giao diện công khai của MỘC. Token nằm ở `src/index.css`; component ở `src/styles/App.css`, trang phụ ở `src/styles/pages.css`. Quyết định gốc: T-21…T-28 trong [`decisions.md`](decisions.md).
+
+> Thương hiệu "LÂM VỊ" ở nhánh `docs/branding-guideline` chưa gộp vào `master` — tài liệu này áp dụng cho MỘC hiện tại.
+
+## 1. Tinh thần
+
+**Tranh Đông Hồ treo trong một gian đình cũ.** Cổ điển, hoài niệm, tiết chế:
+
+- Nét mảnh, nhiều khoảng trắng; màu phẳng lấy từ bột màu tự nhiên.
+- Hoạ tiết Việt: mái đình (nóc, mặt nguyệt, đầu đao), mây cuộn, hoa sen, trống đồng, ấn triện, hoa văn triện, ô hộc cửa bức bàn.
+- Tham khảo cách trình bày của web bảo tàng/di sản (Cố Cung, Danh Hoạ Ký, Đôn Hoàng, Thiểm Tây — T-25) **ở mức nguyên tắc**; hoạ tiết giao diện do MỘC tự vẽ không dùng chữ Hán, rồng, mái cung điện Trung Hoa.
+- Tranh tư liệu Việt nguyên bản (Đông Hồ, tranh giấy dó) **giữ nguyên** — kể cả chữ Hán-Nôm và hình rồng vốn có trong tranh; không cắt, không tô lại.
+
+## 2. Màu
+
+### 2.1 Token
+
+| Token | Hex | Tên | Dùng cho |
+|---|---|---|---|
+| `--diep` | `#f4ede0` | Giấy điệp | Nền trang |
+| `--diep-deep` | `#e9dfcb` | Giấy điệp đậm | Nền phần nhấn (lời khách hàng), nhãn |
+| `--diep-light` | `#fbf7ef` | Giấy điệp sáng | Mặt thẻ, chữ trên nền tối |
+| `--than` | `#2a211b` | Mực than tre | Chữ chính, footer |
+| `--than-2` | `#3a2c22` | Mực than nhạt | Dải hoành phi (marquee) |
+| `--than-soft` | `#5a4b3e` | Mực loãng | Chữ phụ |
+| `--son` | `#a3321f` | Đỏ son | Nút chính, ấn triện, eyebrow, số liệu then chốt |
+| `--son-deep` | `#7c2617` | Son đậm | Hover nút, link |
+| `--hoe` | `#bf8a3a` | Vàng hoè ngả đồng | Ánh đèn, trống đồng, nét trên nền tối |
+| `--hoe-light` | `#e2c68f` | Hoè nhạt | Số liệu/chú thích trên nền chàm |
+| `--cham` | `#26374a` | Xanh chàm | Mảng nền tối (Di sản) |
+| `--cham-deep` | `#1a2735` | Chàm đêm | Lookbook |
+| `--sepia` | `#7a5d3c` | Sepia | Nét, nhãn phụ nhỏ |
+| `--la`, `--hong` | `#5b6b4c`, `#c97f66` | Lá, hồng điệp | **Chỉ** trong minh hoạ (đèn, nền tranh) và chỉ số bước |
+| `--hair`, `--hair-soft` | sepia 42% / 20% | Nét mảnh | Viền, đường kẻ |
+
+Tên cũ (`--ink`, `--paper`, `--brown`…) là bí danh cho code cũ; code mới dùng tên ở bảng trên.
+
+### 2.2 Tỉ lệ
+
+~70% giấy · ~20% mực (than, chàm) · ~7% son · ~3% hoè. Mỗi màn hình **chỉ một** điểm nhấn son nổi bật (thường là nút chính). Lá và hồng không dùng cho chữ hay nút.
+
+### 2.3 Độ tương phản (đã đo, WCAG)
+
+| Cặp | Tỉ lệ | Mức |
+|---|---|---|
+| `--than` / `--diep` | 13,5 | AAA |
+| `--than-soft` / `--diep` | 7,2 | AAA |
+| `--than-soft` / `--diep-deep` | 6,3 | AA |
+| `--son` / `--diep` (eyebrow chữ nhỏ) | 6,0 | AA |
+| `--diep-light` / `--son` (chữ trên nút) | 6,5 | AA |
+| `--hoe-light` / `--cham` | 7,4 | AAA |
+| `--diep` / `--cham` | 10,4 | AAA |
+| `--sepia` / `--diep` | 5,2 | AA |
+
+Không dùng `--hoe` cho chữ: trên nền sáng và trên `--cham` đều dưới 4,5:1 (4,0 trên chàm). Chữ nhỏ trên nền tối dùng `--hoe-light`.
+
+## 3. Chữ
+
+| Vai trò | Font | Cỡ | Ghi chú |
+|---|---|---|---|
+| h1 | Fraunces Variable, SOFT 100, 700 | `clamp(2.5rem, 4.6vw, 4.3rem)` | Dòng thứ hai nghiêng, màu son, gạch nền hoè |
+| h2 | Fraunces 600 | `clamp(2rem, 3.6vw, 3rem)` | `text-wrap: balance` |
+| h3 / tên sản phẩm | Fraunces 600 | 1.45rem | |
+| Thân bài | Be Vietnam Pro 400 | 17px / 1.65 | |
+| Eyebrow | Be Vietnam Pro 600 | 0.78rem, chữ hoa, `letter-spacing: .18em` | Kẹp giữa hai hoa sen |
+| Số liệu | Fraunces 600, `oldstyle-nums` | 1.9–3.2rem | |
+| Trích dẫn | Fraunces nghiêng | 1.4rem | Nét dọc mảnh + dấu thoi son |
+
+Font tự host (T-21), preload 6 file. Không thêm font thứ ba.
+
+## 4. Khoảng cách & bố cục
+
+- Phần (section): đệm dọc 110px; ngang 56px (desktop), 24px (≤960px), 16px (≤640px).
+- Chiều rộng nội dung: 1240px (hero, sản phẩm), 1160px (lời khách hàng), 1100px (công đoạn), 800px (FAQ).
+- Breakpoint: 960px, 640px.
+- Nhịp nền: giấy → **mái đình** → chàm → giấy … Chỉ chuyển từ giấy sang mảng tối bằng mái đình (`--roof-mask`, có bản riêng cho màn hẹp).
+
+## 5. Nét, khung, chiều sâu
+
+- **Không** dùng viền dày (≥2px) màu mực, **không** bóng đổ lệch cứng (`4px 4px 0`) — đã bỏ ở T-25.
+- Viền: `1px solid var(--hair)`; đường kẻ đôi `3px double var(--hair)` cho thanh điều hướng, dải hoành phi, danh sách.
+- Bóng: `--print` (thẻ nhỏ), `--print-lg` (tranh treo, thẻ sản phẩm).
+- Góc: 2–3px cho khung/nút; tròn cho chỉ số và avatar; vòm (`999px 999px 16px 16px`) chỉ cho lookbook.
+- Khung có sẵn:
+  - **Tranh bồi**: nền lụa `--diep-light`, đệm 12px, đường chỉ `inset 6px` (`--hair-soft`) — thẻ sản phẩm, khung ảnh chi tiết, phòng tranh.
+  - **Ô hộc góc lõm**: `.product-art::after` khoét 4 góc.
+  - **Thiếp thư**: 4 góc hoa văn triện `--corner-*` + khung trong `inset 16px`.
+
+## 6. Hoạ tiết
+
+| Hoạ tiết | Nơi dùng | Component/token |
+|---|---|---|
+| Ấn triện son | Logo, nhãn "Bán chạy", ấn dọc ở hero | `Seal`, `VerticalSeal` |
+| Mái đình | Đường chuyển sang mảng tối | `--roof-mask` |
+| Mây cuộn | Hero (nét sepia mảnh), mây chìm trên nền chàm | `Cloud`, `--pat-cloud` |
+| Hoa sen | Eyebrow, dấu ngăn marquee | `Lotus` |
+| Trống đồng | Sau đèn ở hero | `DrumSun` |
+| Hoa văn triện | Góc thiếp thư | `--corner-*` |
+| Đèn giấy khắc gỗ | Minh hoạ sản phẩm | `Lantern` |
+
+Hoạ tiết là trang trí → `aria-hidden="true"`.
+
+### 6.1 Hoạ tiết lơ lửng (`FloatingMotifs`, T-28)
+
+Bộ preset tự vẽ ở `src/data/motifs.js`, bố cục theo phần ở `SECTION_MOTIFS`; mỗi phần gắn `<FloatingMotifs preset="…" />` và class `has-motifs`.
+
+| Preset | Hình | Hợp với |
+|---|---|---|
+| `may-cuon` | Mây cuộn: đuôi dài uốn vào xoáy lớn | Góc phần giấy, nền chàm |
+| `may-doi` | Mây đôi: hai xoáy đối xứng, đỉnh như ý | Góc phần có khung (sản phẩm, lời khách) |
+| `may-dai` | Dải mây dài | Nền rộng (hero, lookbook đêm) |
+| `van-nuoc` | Vân nước: cung sóng lồng nhau | Công đoạn, FAQ |
+| `van-go` | Đường vân gỗ / sợi dó | Nền sau khối chữ ít |
+| `khoi-huong` | Khói hương: hai sợi mảnh bay lên | Gần nguồn sáng (đèn), sau ảnh cũ |
+| `khoi-cuon` | Khói kết thúc bằng xoáy | Như trên |
+
+Quy tắc:
+- Tối đa 3 hoạ tiết mỗi phần; trên màn ≤640px chỉ giữ 2 và thu nhỏ 60%.
+- Nét 1,3px không co giãn; `--sepia` 28% trên giấy, `--hoe-light` 20% trên nền tối — không đậm hơn.
+- Không đặt đè lên chữ, số liệu, nút; ưu tiên mép và góc phần.
+- Khói chỉ đặt gần nguồn sáng hoặc ảnh cũ (gợi hương khói), không rải khắp trang.
+- Chuyển động: mây/vân trôi 22–38s qua lại; khói 11–14s vẽ dần rồi tan; parallax theo cuộn chỉ khi trình duyệt hỗ trợ `animation-timeline: view()`. Giảm chuyển động → đứng yên, khói hiện tĩnh.
+
+## 7. Hình ảnh
+
+### 7.1 Nguồn và bản quyền
+
+- Chỉ dùng ảnh **public domain** hoặc **CC0** (ưu tiên), hoặc giấy phép cho phép dùng thương mại có ghi công. Ghi đầy đủ trong `public/images/folk/CREDITS.md` và `src/data/folkArt.js` (tên file gốc, tác giả, giấy phép, link).
+- Không dùng ảnh có **trẻ em** hay người nhận diện được.
+- Việc dùng ảnh bên ngoài trên trang bán hàng thuộc `[LEGAL]` — pháp chế duyệt trước go-live (xem spec §31.4).
+
+### 7.2 Không gây hiểu lầm
+
+- Ảnh tư liệu (tranh Đông Hồ, tranh giấy dó cổ) **không** được đặt ở vị trí ảnh sản phẩm, ảnh nghệ nhân hay ảnh xưởng MỘC.
+- Mọi ảnh tư liệu có chú thích nguồn ngay dưới ảnh.
+- Minh hoạ SVG (đèn, chân dung nghệ nhân) vẫn là minh hoạ cho tới khi có ảnh thật (G-23, G-33).
+
+### 7.3 Xử lý và hiển thị
+
+- WebP tối đa hai cỡ (480px, 960px) qua `srcset`, **không phóng to** ảnh nguồn nhỏ (ảnh <480px giữ một bản đúng cỡ gốc — `widths` trong `folkArt.js`); `sizes` theo bề rộng hiển thị thật; `loading="lazy"`, `decoding="async"`, luôn có `width`/`height` để tránh nhảy bố cục.
+- Tải từ Commons: dùng bản thu nhỏ cỡ chuẩn (`thumb.wikimedia.org`, 330/500/960/1280) với User-Agent riêng — file gốc bị giới hạn tần suất.
+- Không lọc màu, không cắt mất chi tiết của tranh; trình bày như tranh treo (khung tranh bồi) trên nền chàm hoặc giấy.
+- `alt` qua i18n (vi/en/zh), mô tả nội dung tranh.
+
+## 8. Motion
+
+| Loại | Quy tắc |
+|---|---|
+| Xuất hiện/biến mất | `Reveal` + biến thể `rise` / `ink` / `stamp` / `group` (`src/lib/motion.js`); hiện khi cuộn tới, tan theo hướng cuộn |
+| Thời lượng | vào 0.7–0.9s (`EASE_OUT`), ra 0.4–0.45s (`EASE_IN`); lò xo thẻ `stiffness 170, damping 18` |
+| Lặp nền | CSS transform/opacity: đèn đung đưa 5.5s, trống đồng 140s, marquee 34s, đèn trời 22–30s |
+| Theo con trỏ (T-24) | Chỉ khi `useFinePointer()` và không giảm chuyển động; qua motion value, không re-render |
+| Màn hình đầu | Animation CSS (không chờ JS) |
+| Giảm chuyển động | Tắt mọi animation lặp và dịch chuyển; nội dung, số liệu hiện ngay |
+
+## 9. Hiệu năng
+
+- Ngân sách `[ASSUMPTION]` (NFR-PERF-001): LCP ≤ 2,5s, CLS ≤ 0,1.
+- Không lớp phủ `position: fixed` có `mix-blend-mode`/`backdrop-filter`.
+- Texture là data-URI SVG nhỏ trong biến CSS.
+- Ảnh: WebP, lazy, có kích thước; tổng ảnh tư liệu trên trang chủ < 600 KB ở desktop.
+
+## 10. Tiếp cận
+
+- Tương phản theo §2.3; focus ring `2px solid var(--son)`.
+- Trình đọc màn hình đọc giá trị số thật (`.sr-only` trong `CountUp`).
+- Hoạ tiết, hiệu ứng: `aria-hidden`.
+
+## 11. Nên / không nên
+
+| Nên | Không nên |
+|---|---|
+| Nét mảnh sepia, đường kẻ đôi | Viền đen dày, bóng đổ lệch cứng |
+| Một điểm nhấn son mỗi màn hình | Nhiều nút son cạnh nhau |
+| Mái đình khi chuyển sang mảng tối | Sóng/đường cắt tuỳ ý |
+| Ảnh tư liệu có chú thích nguồn | Ảnh tư liệu đặt như ảnh sản phẩm/nghệ nhân |
+| Hoạ tiết Việt | Tự vẽ chữ Hán, rồng, mái cung điện Trung Hoa lên giao diện |
+| Hiệu ứng tắt khi giảm chuyển động | Animation bằng `filter`/`box-shadow` lặp liên tục |
+
+## 12. Checklist khi thêm thành phần
+
+1. Dùng token màu; kiểm tra tương phản nếu có chữ.
+2. Khung: chọn tranh bồi / thiếp thư / danh sách nét mảnh — không tạo khung mới có viền dày.
+3. Chuỗi hiển thị qua `t()` (vi/en/zh), kể cả `alt`.
+4. Motion: `Reveal` + biến thể có sẵn; kiểm tra với giảm chuyển động.
+5. Ảnh mới: ghi nguồn, giấy phép vào `CREDITS.md` + `folkArt.js`.

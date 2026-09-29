@@ -1,29 +1,75 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import {
+  AnimatePresence,
+  m,
+  useMotionValueEvent,
+  useReducedMotionConfig,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion'
 import Lantern from '../components/Lantern'
 import ScrollProgress from '../components/ScrollProgress'
 import Marquee from '../components/Marquee'
 import Particles from '../components/Particles'
 import Faq from '../components/Faq'
+import FolkGallery from '../components/FolkGallery'
+import FloatingMotifs from '../components/FloatingMotifs'
 import Price from '../components/Price'
+import { CountUp, Reveal } from '../components/Reveal'
+import { PointerGlow, TiltCard } from '../components/Effects'
+import { Cloud, DrumSun, Lotus, OldPhoto, Seal, VerticalSeal } from '../components/Motifs'
+import {
+  EASE_IN,
+  EASE_OUT,
+  group,
+  ink,
+  inkWord,
+  lampBeam,
+  lampOrb,
+  rise,
+  stamp,
+  wordGroup,
+} from '../lib/motion.js'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
 import Seo from '../seo/Seo.jsx'
 import AddToCart from '../cart/AddToCart.jsx'
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
-}
-
-const stagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.15 } },
-}
-
 const TONES = ['amber', 'dusk', 'dawn', 'moss', 'dusk']
 const SIZES = ['tall', 'short', 'short', 'tall', 'short']
+
+// Màn hình đầu chạy bằng CSS (class `intro`, `word`): hiện ngay khi HTML server tới trình duyệt,
+// không chờ JS hydrate → chữ tiêu đề (LCP) không bị ẩn khi JS chậm hoặc lỗi (G-34)
+const introDelay = (i) => ({ animationDelay: `${0.1 + i * 0.1}s` })
+
+// Đèn lookbook: tắt khi chưa tới, bập bùng rồi sáng hẳn khi cuộn tới, lịm dần khi cuộn qua
+const lampHalo = {
+  below: { opacity: 0, scale: 0.6, transition: { duration: 0.5, ease: EASE_IN } },
+  in: {
+    opacity: [0, 0.85, 0.3, 1, 0.8],
+    scale: 1,
+    transition: { duration: 1.3, times: [0, 0.2, 0.35, 0.6, 1], ease: 'easeOut' },
+  },
+  above: { opacity: 0, scale: 0.8, transition: { duration: 0.6, ease: EASE_IN } },
+}
+const lampBody = {
+  below: { filter: 'brightness(0.45) saturate(0.3)', transition: { duration: 0.5 } },
+  in: { filter: 'brightness(1) saturate(1)', transition: { duration: 1.1, delay: 0.1, ease: EASE_OUT } },
+  above: { filter: 'brightness(0.45) saturate(0.3)', transition: { duration: 0.6 } },
+}
+
+const phone = {
+  below: { opacity: 0, y: 70, rotate: -7, transition: { duration: 0.45, ease: EASE_IN } },
+  in: { opacity: 1, y: 0, rotate: -2, transition: { type: 'spring', stiffness: 90, damping: 16 } },
+  above: { opacity: 0, y: -50, rotate: 3, transition: { duration: 0.45, ease: EASE_IN } },
+}
+const sun = {
+  below: { opacity: 0, scale: 0.4, transition: { duration: 0.4 } },
+  in: { opacity: 1, scale: 1, transition: { duration: 1, ease: EASE_OUT } },
+  above: { opacity: 0, scale: 0.6, transition: { duration: 0.4 } },
+}
 
 function Initials({ name }) {
   const letters = name
@@ -43,6 +89,243 @@ function useScrollToHash() {
   }, [hash])
 }
 
+function Eyebrow({ children, variants = rise }) {
+  return (
+    <m.span className="eyebrow" variants={variants}>
+      <Lotus />
+      {children}
+      <Lotus />
+    </m.span>
+  )
+}
+
+// Đặt trong một Reveal: nhận trạng thái below/in/above từ cha
+function SectionHead({ eyebrow, title, children }) {
+  return (
+    <m.div className="section-head" variants={group}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <m.h2 variants={ink}>{title}</m.h2>
+      {children}
+    </m.div>
+  )
+}
+
+// Tách từ để chữ hiện lần lượt như mực thấm; khoảng trắng nằm ngoài span để không bị nuốt
+function Words({ text, start = 0 }) {
+  const words = text.split(' ')
+  return words.map((w, i) => (
+    <Fragment key={i}>
+      <span className="word" style={{ animationDelay: `${0.25 + (start + i) * 0.06}s` }}>
+        {w}
+      </span>
+      {i < words.length - 1 ? ' ' : null}
+    </Fragment>
+  ))
+}
+
+// Lời trích hiện từng từ như mực thấm; đặt trong Reveal
+function InkWords({ text }) {
+  const words = text.split(' ')
+  return words.map((w, i) => (
+    <Fragment key={i}>
+      <m.span className="word" variants={inkWord}>
+        {w}
+      </m.span>
+      {i < words.length - 1 ? ' ' : null}
+    </Fragment>
+  ))
+}
+
+// Đèn trời bay lên trên nền đêm của lookbook — chỉ trang trí, chạy bằng CSS
+const SKY_LANTERNS = [
+  { left: '6%', delay: 0, duration: 22, size: 12 },
+  { left: '17%', delay: 7, duration: 26, size: 9 },
+  { left: '31%', delay: 3, duration: 24, size: 7 },
+  { left: '48%', delay: 11, duration: 28, size: 10 },
+  { left: '63%', delay: 5, duration: 23, size: 8 },
+  { left: '76%', delay: 14, duration: 27, size: 12 },
+  { left: '88%', delay: 9, duration: 25, size: 9 },
+  { left: '95%', delay: 2, duration: 30, size: 7 },
+]
+
+function SkyLanterns() {
+  return (
+    <div className="sky-lanterns" aria-hidden="true">
+      {SKY_LANTERNS.map((l, i) => (
+        <span
+          key={i}
+          className="sky-lantern"
+          style={{
+            left: l.left,
+            width: l.size,
+            height: l.size * 1.3,
+            animationDuration: `${l.duration}s`,
+            animationDelay: `-${l.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Đèn treo rọi luồng sáng xuống tiêu đề; mở khi cuộn tới, thu lại khi rời đi (ý tưởng "Lamp Effect")
+function LampHead({ eyebrow, title }) {
+  return (
+    <Reveal className="lamp" variants={group}>
+      <div className="lamp-light" aria-hidden="true">
+        <m.span className="lamp-beam" variants={lampBeam} />
+        <m.span className="lamp-orb" variants={lampOrb} />
+        <div className="lamp-lantern">
+          <Lantern size={46} tone="amber" swing flicker />
+        </div>
+      </div>
+      <SectionHead eyebrow={eyebrow} title={title} />
+    </Reveal>
+  )
+}
+
+// Sợi chỉ đỏ chạy theo tiến độ cuộn; qua bước nào thì bước đó "thắp" lên (ý tưởng "Tracing Beam")
+function ProcessTimeline({ steps }) {
+  const ref = useRef(null)
+  const reduce = useReducedMotionConfig()
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 85%', 'end 50%'] })
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24, restDelta: 0.001 })
+  const sparkX = useTransform(progress, (v) => `${v * 100}%`)
+  const [lit, setLit] = useState(0)
+  useMotionValueEvent(progress, 'change', (v) => {
+    const next = v <= 0.02 ? 0 : Math.min(steps.length, 1 + Math.floor(v * (steps.length - 1) + 0.02))
+    if (next !== lit) setLit(next)
+  })
+  const litCount = reduce ? steps.length : lit
+
+  return (
+    <div className="timeline-wrap" ref={ref}>
+      <div className="timeline-track" aria-hidden="true">
+        <m.span className="timeline-beam" style={{ scaleX: reduce ? 1 : progress }} />
+        {!reduce && (
+          <m.span className="timeline-spark-rail" style={{ x: sparkX }}>
+            <span className="timeline-spark" />
+          </m.span>
+        )}
+      </div>
+      <Reveal as="ol" className="timeline" variants={group}>
+        {steps.map((s, i) => (
+          <m.li key={s.label} variants={stamp} custom={i} className={i < litCount ? 'is-lit' : undefined}>
+            <span className="timeline-index">{String(i + 1).padStart(2, '0')}</span>
+            <span className="timeline-label">{s.label}</span>
+            <span className="timeline-note">{s.note}</span>
+          </m.li>
+        ))}
+      </Reveal>
+    </div>
+  )
+}
+
+function Hero() {
+  const { t } = useI18n()
+  const reduce = useReducedMotionConfig()
+  const { scrollY } = useScroll()
+  // Rời màn hình đầu: chữ mờ dần và lui lên; đèn bay lên như thả đèn trời; trống đồng chìm xuống
+  const copyOpacity = useTransform(scrollY, [0, 520], [1, 0])
+  const copyY = useTransform(scrollY, [0, 520], [0, reduce ? 0 : -70])
+  const lanternY = useTransform(scrollY, [0, 700], [0, reduce ? 0 : -180])
+  const lanternOpacity = useTransform(scrollY, [250, 700], [1, 0])
+  const drumY = useTransform(scrollY, [0, 700], [0, reduce ? 0 : 140])
+  const cueOpacity = useTransform(scrollY, [0, 140], [1, 0])
+
+  return (
+    <section className="hero aged has-motifs">
+      <FloatingMotifs preset="hero" />
+      <PointerGlow />
+      <Particles />
+      <Cloud className="hero-cloud cloud-a" />
+      <Cloud className="hero-cloud cloud-b" />
+
+      <m.div className="hero-copy" style={{ opacity: copyOpacity, y: copyY }}>
+        <div>
+          <span className="eyebrow intro" style={introDelay(0)}>
+            <Lotus />
+            {t('hero.eyebrow')}
+            <Lotus />
+          </span>
+          <h1>
+            <Words text={t('hero.title1')} />
+            <br />
+            <span className="h1-accent">
+              <Words text={t('hero.title2')} start={t('hero.title1').split(' ').length} />
+            </span>
+          </h1>
+          <p className="hero-sub intro" style={introDelay(5)}>
+            {t('hero.sub')}
+          </p>
+          <div className="hero-actions intro" style={introDelay(6)}>
+            <a href="#products" className="btn btn-primary thread">
+              {t('hero.explore')}
+            </a>
+            <a href="#story" className="btn btn-ghost">
+              {t('hero.story')}
+            </a>
+          </div>
+        </div>
+      </m.div>
+
+      <div className="hero-art">
+        <m.div className="hero-drum" style={{ y: drumY }}>
+          <m.div
+            initial={{ opacity: 0, scale: 0.7, rotate: -40 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 1.6, ease: EASE_OUT }}
+          >
+            <DrumSun />
+          </m.div>
+        </m.div>
+        <div className="hero-glow" />
+        <m.div className="hero-lantern" style={{ y: lanternY, opacity: lanternOpacity }}>
+          <m.div
+            initial={{ y: -140, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 55, damping: 11, delay: 0.3 }}
+          >
+            <Lantern size={250} tone="dusk" swing flicker />
+          </m.div>
+        </m.div>
+        <m.div
+          className="hero-art-satellite satellite-a"
+          initial={{ y: -80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 60, damping: 12, delay: 0.6 }}
+        >
+          <Lantern size={78} tone="amber" swing />
+        </m.div>
+        <m.div
+          className="hero-art-satellite satellite-b"
+          initial={{ y: -80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 60, damping: 12, delay: 0.8 }}
+        >
+          <Lantern size={58} tone="moss" swing />
+        </m.div>
+        {/* Ấn triện dọc đóng lên sau cùng, như lạc khoản bên mép tranh */}
+        <m.div
+          className="hero-seal"
+          initial={{ opacity: 0, scale: 1.6, rotate: -18 }}
+          animate={{ opacity: 1, scale: 1, rotate: -3 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 16, delay: 1.3 }}
+        >
+          <VerticalSeal label="MỘC" />
+        </m.div>
+      </div>
+
+      <m.a href="#story" className="scroll-cue" style={{ opacity: cueOpacity }}>
+        <span>{t('hero.scroll')}</span>
+        <svg width="14" height="20" viewBox="0 0 14 20" fill="none" aria-hidden="true">
+          <path d="M1 1L7 19L13 1" stroke="currentColor" strokeWidth="1.6" />
+        </svg>
+      </m.a>
+    </section>
+  )
+}
+
 function ProductGrid({ intent }) {
   const { t, lang, path } = useI18n()
   const res = useApi('/products', lang)
@@ -57,33 +340,31 @@ function ProductGrid({ intent }) {
   if (res.data.items.length === 0) return <p className="products-status">{t('products.empty')}</p>
 
   return (
-    <motion.div
-      className="product-grid"
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.2 }}
-      variants={stagger}
-    >
-      {res.data.items.map((p) => (
-        <motion.article className="product-card" key={p.slug} variants={fadeUp}>
-          {p.badge && <span className="product-badge">{p.badge}</span>}
-          <div className="product-art">
-            <Lantern size={120} tone={p.tone} />
+    <Reveal className="product-grid" variants={group} margin="-8% 0px -8% 0px">
+      {res.data.items.map((p, i) => (
+        <TiltCard className={`product-card tone-${p.tone}`} key={p.slug} variants={stamp} custom={i}>
+          {p.badge && <Seal className="product-badge lift">{p.badge}</Seal>}
+          <div className="product-art worn">
+            <div className="lift">
+              <Lantern size={112} tone={p.tone} swing />
+            </div>
           </div>
-          <h3>
-            <Link to={path(`/products/${p.slug}`)} className="product-link">
-              {p.name}
-            </Link>
-          </h3>
-          <p className="product-desc">{p.description}</p>
-          <div className="product-foot">
-            <Price amount={p.priceExclVat} />
-            {/* FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002) */}
-            <AddToCart slug={p.slug} label={intent === 'gift' ? t('cart.giftAdd') : t('cart.add')} />
+          <div className="product-body">
+            <h3>
+              <Link to={path(`/products/${p.slug}`)} className="product-link">
+                {p.name}
+              </Link>
+            </h3>
+            <p className="product-desc">{p.description}</p>
+            <div className="product-foot">
+              <Price amount={p.priceExclVat} />
+              {/* FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002) */}
+              <AddToCart slug={p.slug} label={intent === 'gift' ? t('cart.giftAdd') : t('cart.add')} />
+            </div>
           </div>
-        </motion.article>
+        </TiltCard>
       ))}
-    </motion.div>
+    </Reveal>
   )
 }
 
@@ -97,282 +378,176 @@ export default function HomePage() {
       <Seo title={t('meta.title')} description={t('meta.description')} path="/" />
       <ScrollProgress />
 
-
-      <section className="hero">
-        <Particles />
-        <motion.div
-          className="hero-copy"
-          initial="hidden"
-          animate="show"
-          variants={stagger}
-        >
-          <motion.span className="eyebrow" variants={fadeUp}>
-            {t('hero.eyebrow')}
-          </motion.span>
-          <motion.h1 variants={fadeUp}>
-            {t('hero.title1')}
-            <br />
-            {t('hero.title2')}
-          </motion.h1>
-          <motion.p className="hero-sub" variants={fadeUp}>
-            {t('hero.sub')}
-          </motion.p>
-          <motion.div className="hero-actions" variants={fadeUp}>
-            <motion.a
-              href="#products"
-              className="btn btn-primary"
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              {t('hero.explore')}
-            </motion.a>
-            <motion.a
-              href="#story"
-              className="btn btn-ghost"
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              {t('hero.story')}
-            </motion.a>
-          </motion.div>
-        </motion.div>
-
-        <motion.div
-          className="hero-art"
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        >
-          <div className="hero-glow" />
-          <motion.div
-            className="hero-art-satellite satellite-a"
-            animate={{ y: [0, -14, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <Lantern size={70} tone="dusk" />
-          </motion.div>
-          <motion.div
-            className="hero-art-satellite satellite-b"
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-          >
-            <Lantern size={54} tone="dawn" />
-          </motion.div>
-          <Lantern size={260} />
-        </motion.div>
-
-        <motion.div
-          className="scroll-cue"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <span>{t('hero.scroll')}</span>
-          <svg width="14" height="20" viewBox="0 0 14 20" fill="none">
-            <path d="M1 1L7 19L13 1" stroke="currentColor" strokeWidth="1.4" />
-          </svg>
-        </motion.div>
-      </section>
+      <Hero />
 
       <Marquee />
 
-      <motion.section
-        id="story"
-        className="story"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
-        variants={stagger}
-      >
-        <motion.span className="eyebrow" variants={fadeUp}>
-          {t('story.eyebrow')}
-        </motion.span>
-        <motion.h2 variants={fadeUp}>{t('story.title')}</motion.h2>
-        <motion.p className="story-text drop-cap" variants={fadeUp}>
+      <Reveal as="section" id="story" className="story has-motifs" variants={group}>
+        <FloatingMotifs preset="story" />
+        <SectionHead eyebrow={t('story.eyebrow')} title={t('story.title')} />
+        <m.p className="story-text drop-cap" variants={rise}>
           {t('story.text')}
-        </motion.p>
-        <motion.div className="story-stats" variants={fadeUp}>
-          <div>
-            <strong>100+</strong>
-            <span>{t('story.statYears')}</span>
-          </div>
-          <div>
-            <strong>12</strong>
-            <span>{t('story.statArtisans')}</span>
-          </div>
-          <div>
-            <strong>1</strong>
-            <span>{t('story.statStory')}</span>
-          </div>
-        </motion.div>
-      </motion.section>
+        </m.p>
+        <m.div className="story-stats" variants={group}>
+          {[
+            ['100+', 'story.statYears'],
+            ['12', 'story.statArtisans'],
+            ['1', 'story.statStory'],
+          ].map(([value, key], i) => (
+            <m.div key={key} variants={stamp} custom={i}>
+              <CountUp value={value} />
+              <span>{t(key)}</span>
+            </m.div>
+          ))}
+        </m.div>
+        <FolkGallery />
+      </Reveal>
 
-      <motion.section
-        id="artisan"
-        className="artisan"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.4 }}
-        variants={stagger}
-      >
-        <motion.div className="artisan-portrait" variants={fadeUp}>
-          <div className="portrait-frame">
-            <div className="portrait-ring" />
-            <svg viewBox="0 0 200 200" className="portrait-figure" aria-hidden="true">
-              <circle cx="100" cy="76" r="38" fill="#8a5a34" opacity="0.9" />
-              <path
-                d="M40 190 C40 130 70 108 100 108 C130 108 160 130 160 190 Z"
-                fill="#6b4226"
-                opacity="0.9"
-              />
-            </svg>
-            <span className="portrait-quote-mark">”</span>
-          </div>
-        </motion.div>
-        <motion.div className="artisan-copy" variants={fadeUp}>
-          <span className="eyebrow">{t('artisan.eyebrow')}</span>
-          <h2>{t('artisan.title')}</h2>
-          <p className="artisan-quote">
-            {t('artisan.quote')}
-          </p>
-          <div className="artisan-meta">
+      <Reveal as="section" id="artisan" className="artisan has-motifs" variants={group}>
+        <FloatingMotifs preset="artisan" />
+        <m.div className="artisan-portrait" variants={stamp} custom={1}>
+          {/* Ảnh cũ ngả sepia: chỉ là minh hoạ, không phải ảnh thật của nghệ nhân */}
+          <OldPhoto>
+            <rect width="200" height="248" fill="#c9a877" />
+            <circle cx="100" cy="104" r="80" fill="#e2c592" />
+            <path
+              d="M34 248 C34 170 66 144 100 144 C134 144 166 170 166 248 Z"
+              fill="#5b4330"
+              stroke="#2b2119"
+              strokeWidth="3"
+            />
+            <path d="M84 144 L100 176 L116 144" fill="none" stroke="#2b2119" strokeWidth="3" />
+            <circle cx="100" cy="100" r="34" fill="#b08660" stroke="#2b2119" strokeWidth="3" />
+            <path d="M58 80 C60 52 140 52 142 80 C122 72 78 72 58 80 Z" fill="#2b2119" />
+            <path
+              d="M86 106 q5 3 9 0 M105 106 q5 3 9 0 M92 120 q8 6 16 0"
+              stroke="#2b2119"
+              strokeWidth="2.4"
+              fill="none"
+              strokeLinecap="round"
+            />
+          </OldPhoto>
+          <span className="portrait-quote-mark" aria-hidden="true">
+            ”
+          </span>
+        </m.div>
+        <m.div className="artisan-copy" variants={group}>
+          <Eyebrow>{t('artisan.eyebrow')}</Eyebrow>
+          <m.h2 variants={ink}>{t('artisan.title')}</m.h2>
+          <m.p className="artisan-quote" variants={wordGroup}>
+            <InkWords text={t('artisan.quote')} />
+          </m.p>
+          <m.div className="artisan-meta" variants={rise}>
             <div>
               <strong>{t('artisan.name')}</strong>
               <span>{t('artisan.place')}</span>
             </div>
             <div className="artisan-stats">
               <div>
-                <strong>32</strong>
+                <CountUp value="32" />
                 <span>{t('artisan.years')}</span>
               </div>
               <div>
-                <strong>4.000+</strong>
+                <CountUp value="4.000+" />
                 <span>{t('artisan.made')}</span>
               </div>
             </div>
-          </div>
-        </motion.div>
-      </motion.section>
+          </m.div>
+        </m.div>
+      </Reveal>
 
-      <section id="products" className="products">
-        <div className="section-head">
-          <span className="eyebrow">{t('products.eyebrow')}</span>
-          <h2>{t('products.title')}</h2>
-          <div className="intent-toggle">
-            <button
-              className={intent === 'gift' ? 'active' : ''}
-              onClick={() => setIntent('gift')}
-            >
-              {t('products.gift')}
-            </button>
-            <button
-              className={intent === 'self' ? 'active' : ''}
-              onClick={() => setIntent('self')}
-            >
-              {t('products.self')}
-            </button>
-          </div>
-          <motion.p
-            key={intent}
-            className="intent-copy"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            {intent === 'gift' ? t('products.giftCopy') : t('products.selfCopy')}
-          </motion.p>
-        </div>
+      <section id="products" className="products has-motifs">
+        <FloatingMotifs preset="products" />
+        <Reveal variants={group}>
+          <SectionHead eyebrow={t('products.eyebrow')} title={t('products.title')}>
+            <m.div className={`intent-toggle is-${intent}`} role="group" variants={rise}>
+              <span className="intent-pill" aria-hidden="true" />
+              {['gift', 'self'].map((key) => (
+                <button
+                  key={key}
+                  className={intent === key ? 'active' : ''}
+                  aria-pressed={intent === key}
+                  onClick={() => setIntent(key)}
+                >
+                  {t(`products.${key}`)}
+                </button>
+              ))}
+            </m.div>
+            <div className="intent-copy-wrap">
+              <AnimatePresence mode="wait" initial={false}>
+                <m.p
+                  key={intent}
+                  className="intent-copy"
+                  initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
+                  transition={{ duration: 0.3, ease: EASE_OUT }}
+                >
+                  {intent === 'gift' ? t('products.giftCopy') : t('products.selfCopy')}
+                </m.p>
+              </AnimatePresence>
+            </div>
+          </SectionHead>
+        </Reveal>
 
         <ProductGrid intent={intent} />
       </section>
 
-      <section id="lookbook" className="lookbook">
-        <div className="section-head">
-          <span className="eyebrow">{t('lookbook.eyebrow')}</span>
-          <h2>{t('lookbook.title')}</h2>
-        </div>
-        <motion.div
-          className="lookbook-grid"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.15 }}
-          variants={stagger}
-        >
-          {t('lookbook.items').map((label, i) => (
-            <motion.div
-              className={`lookbook-card size-${SIZES[i]}`}
-              key={`${TONES[i]}-${i}`}
-              variants={fadeUp}
-              whileHover={{ y: -6 }}
-            >
-              <Lantern size={SIZES[i] === 'tall' ? 150 : 110} tone={TONES[i]} />
-              <span className="lookbook-caption">{label}</span>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
-      <section id="process" className="process">
-        <div className="section-head">
-          <span className="eyebrow">{t('process.eyebrow')}</span>
-          <h2>{t('process.title')}</h2>
-        </div>
-        <motion.ol
-          className="timeline"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={stagger}
-        >
-          {t('process.steps').map((s, i) => (
-            <motion.li key={s.label} variants={fadeUp}>
-              <span className="timeline-index">{String(i + 1).padStart(2, '0')}</span>
-              <span className="timeline-label">{s.label}</span>
-              <span className="timeline-note">{s.note}</span>
-            </motion.li>
-          ))}
-        </motion.ol>
-      </section>
-
-      <section id="qr" className="qr-experience">
-        <motion.div
-          className="qr-copy"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.4 }}
-          variants={stagger}
-        >
-          <motion.span className="eyebrow" variants={fadeUp}>
-            {t('qr.eyebrow')}
-          </motion.span>
-          <motion.h2 variants={fadeUp}>
-            {t('qr.title')}
-          </motion.h2>
-          <motion.p className="story-text" variants={fadeUp}>
-            {t('qr.text')}
-          </motion.p>
-          <motion.ul className="qr-points" variants={fadeUp}>
-            {t('qr.points').map((point) => (
-              <li key={point}>{point}</li>
+      <section id="lookbook" className="lookbook has-motifs">
+        <FloatingMotifs preset="lookbook" />
+        <SkyLanterns />
+        <div className="lookbook-inner">
+          <LampHead eyebrow={t('lookbook.eyebrow')} title={t('lookbook.title')} />
+          <Reveal className="lookbook-grid" variants={group} margin="-10% 0px -10% 0px">
+            {t('lookbook.items').map((label, i) => (
+              <m.div
+                className={`lookbook-card size-${SIZES[i]} tone-${TONES[i]}`}
+                key={`${TONES[i]}-${i}`}
+                variants={rise}
+              >
+                <m.span className="lookbook-halo" aria-hidden="true" variants={lampHalo} />
+                <m.div className="lookbook-lamp" variants={lampBody}>
+                  <Lantern size={SIZES[i] === 'tall' ? 140 : 104} tone={TONES[i]} swing />
+                </m.div>
+                <span className="lookbook-caption">{label}</span>
+              </m.div>
             ))}
-          </motion.ul>
-        </motion.div>
+          </Reveal>
+        </div>
+      </section>
 
-        <motion.div
-          className="phone-mock"
-          initial={{ opacity: 0, y: 40, rotate: -2 }}
-          whileInView={{ opacity: 1, y: 0, rotate: -2 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="phone-frame">
+      <section id="process" className="process has-motifs">
+        <FloatingMotifs preset="process" />
+        <Reveal variants={group}>
+          <SectionHead eyebrow={t('process.eyebrow')} title={t('process.title')} />
+        </Reveal>
+        <ProcessTimeline steps={t('process.steps')} />
+      </section>
+
+      <section id="qr" className="qr-experience has-motifs">
+        <FloatingMotifs preset="qr" />
+        <Reveal className="qr-copy" variants={group}>
+          <Eyebrow>{t('qr.eyebrow')}</Eyebrow>
+          <m.h2 variants={ink}>{t('qr.title')}</m.h2>
+          <m.p className="story-text" variants={rise}>
+            {t('qr.text')}
+          </m.p>
+          <m.ul className="qr-points" variants={group}>
+            {t('qr.points').map((point) => (
+              <m.li key={point} variants={rise}>
+                {point}
+              </m.li>
+            ))}
+          </m.ul>
+        </Reveal>
+
+        <Reveal className="phone-mock" variants={group}>
+          <m.span className="phone-sun" aria-hidden="true" variants={sun} />
+          <m.div className="phone-frame" variants={phone}>
             <div className="phone-notch" />
             <div className="phone-screen">
               <div className="phone-video">
-                <motion.div
-                  className="play-glow"
-                  animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                />
+                <span className="play-glow" />
                 <span className="play-icon">▶</span>
               </div>
               <p className="phone-caption">{t('qr.phoneCaption')}</p>
@@ -381,24 +556,18 @@ export default function HomePage() {
                 <p>{t('qr.phoneMessage')}</p>
               </div>
             </div>
-          </div>
-        </motion.div>
+          </m.div>
+        </Reveal>
       </section>
 
-      <motion.section
-        className="testimonials"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={stagger}
-      >
-        <div className="section-head">
-          <span className="eyebrow">{t('testimonials.eyebrow')}</span>
-          <h2>{t('testimonials.title')}</h2>
-        </div>
-        <div className="testimonial-grid">
-          {t('testimonials.items').map((item) => (
-            <motion.figure className="testimonial-card" key={item.name} variants={fadeUp}>
+      <section className="testimonials has-motifs">
+        <FloatingMotifs preset="testimonials" />
+        <Reveal variants={group}>
+          <SectionHead eyebrow={t('testimonials.eyebrow')} title={t('testimonials.title')} />
+        </Reveal>
+        <Reveal className="testimonial-grid" variants={group}>
+          {t('testimonials.items').map((item, i) => (
+            <m.figure className="testimonial-card" key={item.name} variants={stamp} custom={i}>
               <div className="stars">★★★★★</div>
               <blockquote>{item.quote}</blockquote>
               <figcaption>
@@ -410,28 +579,20 @@ export default function HomePage() {
                   <span className="testimonial-context">{item.context}</span>
                 </span>
               </figcaption>
-            </motion.figure>
+            </m.figure>
           ))}
-        </div>
-      </motion.section>
+        </Reveal>
+      </section>
 
-      <motion.section
-        id="faq"
-        className="faq"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={stagger}
-      >
-        <motion.div className="section-head" variants={fadeUp}>
-          <span className="eyebrow">{t('faq.eyebrow')}</span>
-          <h2>{t('faq.title')}</h2>
-        </motion.div>
-        <motion.div variants={fadeUp}>
+      <section id="faq" className="faq has-motifs">
+        <FloatingMotifs preset="faq" />
+        <Reveal variants={group}>
+          <SectionHead eyebrow={t('faq.eyebrow')} title={t('faq.title')} />
+        </Reveal>
+        <Reveal variants={rise}>
           <Faq />
-        </motion.div>
-      </motion.section>
-
+        </Reveal>
+      </section>
     </>
   )
 }

@@ -122,12 +122,22 @@
 }
 
 .product-detail-art {
+  position: relative;
   display: flex;
   justify-content: center;
   padding: 40px;
-  border-radius: 24px;
+  border-radius: 2px;
   background: var(--cream);
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--print-lg);
+}
+
+/* Bồi tranh: đường chỉ mảnh trong mép, như thẻ sản phẩm ở trang chủ */
+.product-detail-art::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid var(--hair-soft);
+  pointer-events: none;
 }
 
 .product-detail-desc {

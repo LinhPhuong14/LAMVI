@@ -30,7 +30,7 @@ server/
   domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
   routes/                  catalog.js, auth.js, admin.js, it.js, may.js, cart.js, seo.js (sitemap, robots)
-  adapters/openai.js       Chat Completions qua fetch (T-21)
+  adapters/openai.js       Chat Completions qua fetch (T-29)
   domain/admin.js          Kiểm tra dữ liệu admin (sản phẩm, FAQ, lô, video)
   adapters/
     authErrors.js          AuthError (mã lỗi chuẩn hoá)
@@ -52,13 +52,15 @@ src/
   auth/                    AuthProvider.jsx, context.js (useAuth, phiên), useForm.js
   hooks/useNoIndex.js      meta robots noindex (BR-SEO-001, D-44)
   components/              SiteHeader, SiteFooter, LocaleLayout, Price, Field, Faq, Marquee, Lantern…
+                           Reveal.jsx (Reveal, CountUp — motion xuất hiện/biến mất), Effects.jsx (TiltCard, PointerGlow, BrandHover — T-24), Motifs.jsx (hoạ tiết SVG: trống đồng, mây, sen, con dấu, dấu bưu điện, ảnh cũ)
   pages/                   HomePage, ProductPage, BatchPage, AccountPage, NotFoundPage, auth/*
   admin/                   AdminLayout, ProductsPage, FaqPage, BatchesPage, I18nInput, strings.js (D-48)
   it/                      ItDashboard.jsx, strings.js (D-51)
   may/                     May.jsx (nút, tour), MayChat.jsx, Tour.jsx, MayAvatar.jsx, storage.js
   cart/                    CartProvider.jsx, context.js (useCart), AddToCart.jsx, QuantityInput.jsx
   lib/money.js             formatVnd
-  styles/                  App.css (landing), pages.css (trang mới)
+  lib/motion.js            useViewState (below/in/above), biến thể rise/ink/stamp/group (T-22)
+  styles/                  App.css (landing), pages.css (trang mới); token màu + texture ở index.css (T-23)
   test/                    renderApp.jsx (mockApi, renderAt), fixtures.js
 scripts/gen-seed-sql.js
 docs/ba-spec.md, docs/knowledge/

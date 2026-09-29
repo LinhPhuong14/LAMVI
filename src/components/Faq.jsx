@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
+
+const EASE = [0.22, 1, 0.36, 1]
 
 export default function Faq() {
   const [open, setOpen] = useState(0)
@@ -24,19 +26,22 @@ export default function Faq() {
               aria-expanded={isOpen}
             >
               <span>{item.question}</span>
-              <span className="faq-icon">{isOpen ? '−' : '+'}</span>
+              <span className="faq-icon" aria-hidden="true">
+                +
+              </span>
             </button>
             <AnimatePresence initial={false}>
               {isOpen && (
-                <motion.div
+                // Mở ra như trải cuộn thư từ trên xuống; đóng lại thì cuộn ngược lên
+                <m.div
                   className="faq-answer"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  initial={{ height: 0, opacity: 0, clipPath: 'inset(0 0 100% 0)' }}
+                  animate={{ height: 'auto', opacity: 1, clipPath: 'inset(0 0 0% 0)' }}
+                  exit={{ height: 0, opacity: 0, clipPath: 'inset(0 0 100% 0)' }}
+                  transition={{ duration: 0.45, ease: EASE }}
                 >
                   <p>{item.answer}</p>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>

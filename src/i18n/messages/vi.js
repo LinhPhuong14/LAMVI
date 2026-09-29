@@ -46,6 +46,69 @@ export default {
     // §31.3: thay "câu chuyện riêng mỗi đèn" (D-01, D-45)
     statStory: 'lời chúc riêng cho mỗi món quà',
   },
+  // Phòng tranh: ảnh tư liệu public domain/CC0 (src/data/folkArt.js). Chú thích do dev soạn — chờ Marketing duyệt
+  gallery: {
+    label: 'Phòng tranh dân gian',
+    source: 'Nguồn ảnh',
+    note: 'Tranh dân gian Đông Hồ và tranh vẽ trên giấy dó cuối thế kỷ 18 (Bảo tàng Mỹ thuật Việt Nam). Ảnh tư liệu từ Wikimedia Commons, thuộc phạm vi công cộng hoặc CC0 — không phải ảnh sản phẩm của MỘC.',
+    items: {
+      'chuot-ruoc-den': {
+        name: 'Chuột rước đèn',
+        meta: 'Tranh Đông Hồ',
+        alt: 'Tranh Đông Hồ: đàn chuột cầm cờ, rước đèn lồng và rồng giấy trong ngày hội',
+      },
+      'dam-cuoi-chuot': {
+        name: 'Đám cưới chuột',
+        meta: 'Tranh Đông Hồ',
+        alt: 'Tranh Đông Hồ: đàn chuột rước dâu bằng kiệu, mang lễ vật biếu mèo',
+      },
+      'ong-to-ba-nguyet': {
+        name: 'Ông Tơ – Bà Nguyệt',
+        meta: 'Tranh Đông Hồ',
+        alt: 'Tranh đôi Đông Hồ: Ông Tơ và Bà Nguyệt, hai vị thần se duyên, ngự trên linh vật giữa mây, hai bên có người hầu',
+      },
+      'lon-am-duong': {
+        name: 'Lợn âm dương',
+        meta: 'Tranh Đông Hồ',
+        alt: 'Tranh Đông Hồ: lợn mẹ và đàn lợn con, trên mình có hoa văn xoáy âm dương',
+      },
+      'vinh-hoa': {
+        name: 'Vinh hoa',
+        meta: 'Tranh Đông Hồ',
+        alt: 'Tranh Đông Hồ: em bé ôm con gà trống, cầu mong vinh hoa',
+      },
+      'phu-quy': {
+        name: 'Phú quý',
+        meta: 'Tranh Đông Hồ',
+        alt: 'Tranh Đông Hồ: em bé ôm con vịt, cầu mong phú quý',
+      },
+      'ca-chep': {
+        name: 'Cá chép',
+        meta: 'Tranh Đông Hồ',
+        alt: 'Tranh Đông Hồ: đàn cá chép lớn nhỏ bơi giữa hoa sen',
+      },
+      'muc-dong-tha-dieu': {
+        name: 'Mục đồng thả diều',
+        meta: 'Tranh Đông Hồ',
+        alt: 'Tranh Đông Hồ: cậu bé ngồi trên lưng trâu thả diều',
+      },
+      'giang-hoc-do': {
+        name: 'Giảng học đồ',
+        meta: 'Tranh trên giấy dó, đền Độc Lôi (Nghệ An), cuối thế kỷ 18 — Bảo tàng Mỹ thuật Việt Nam',
+        alt: 'Tranh cuộn trên giấy dó thế kỷ 18: thầy đồ giảng học cho học trò',
+      },
+      'vinh-quy': {
+        name: 'Vinh quy',
+        meta: 'Tranh trên giấy dó, đền Độc Lôi (Nghệ An), cuối thế kỷ 18 — Bảo tàng Mỹ thuật Việt Nam',
+        alt: 'Tranh cuộn trên giấy dó thế kỷ 18: quan văn vinh quy về làng cùng đoàn tuỳ tùng',
+      },
+      'van-tu-giay-do-1904': {
+        name: 'Văn tự trên giấy dó',
+        meta: 'Giấy tờ hành chính năm 1904, có tem thuế — phạm vi công cộng',
+        alt: 'Văn tự chữ Hán viết tay trên giấy dó năm 1904, có đóng dấu và dán tem',
+      },
+    },
+  },
   artisan: {
     eyebrow: 'Người giữ lửa nghề',
     title: 'Bàn tay tạo nên ánh sáng',

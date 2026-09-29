@@ -23,11 +23,19 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-18 | 2026-09-28 | Giám sát: middleware đếm mọi request, gộp theo phút trong bộ nhớ, flush 60 giây vào `api_metrics` qua RPC `record_api_metrics` (cộng dồn nguyên tử) | Hiệu lực |
 | T-19 | 2026-09-28 | Nhãn route chụp lúc `writeHead` (còn `req.route`/`req.baseUrl`); lỗi từ errorHandler dùng `req.route` còn sót + tiền tố `/api` | Hiệu lực |
 | T-20 | 2026-09-28 | Phân quyền theo vai trò bằng `requireRole(auth, repo, roles)`; `ADMIN_ROLES = ['admin','it']`, `IT_ROLES = ['it']` | Hiệu lực |
-| T-21 | 2026-09-28 | Mây gọi OpenAI Chat Completions bằng `fetch` (không thêm SDK); adapter `server/adapters/openai.js`, test dùng client giả `{ complete() }` | Hiệu lực |
-| T-22 | 2026-09-28 | Luật của Mây thực thi ở server, không dựa vào prompt: danh sách tool cố định chỉ đọc, che PII, kiểm tra số (BR-AI-003), hạn mức, ngân sách, timeout | Hiệu lực |
-| T-23 | 2026-09-28 | Cấu hình Mây lưu `app_settings` key `may`, gộp với mặc định trong `server/may/config.js` | Hiệu lực |
-| T-24 | 2026-09-29 | Giỏ hàng: server luôn tính giá (`server/cart/service.js#present`); giỏ vãng lai lưu `localStorage` `moc.cart` và lấy giá qua `POST /api/cart/quote`; `CartProvider` nằm trong `LocaleLayout`, chỉ đọc storage trong effect (không lệch hydrate) | Hiệu lực |
+| T-29 | 2026-09-28 | Mây gọi OpenAI Chat Completions bằng `fetch` (không thêm SDK); adapter `server/adapters/openai.js`, test dùng client giả `{ complete() }` | Hiệu lực |
+| T-30 | 2026-09-28 | Luật của Mây thực thi ở server, không dựa vào prompt: danh sách tool cố định chỉ đọc, che PII, kiểm tra số (BR-AI-003), hạn mức, ngân sách, timeout | Hiệu lực |
+| T-31 | 2026-09-28 | Cấu hình Mây lưu `app_settings` key `may`, gộp với mặc định trong `server/may/config.js` | Hiệu lực |
+| T-32 | 2026-09-29 | Giỏ hàng: server luôn tính giá (`server/cart/service.js#present`); giỏ vãng lai lưu `localStorage` `moc.cart` và lấy giá qua `POST /api/cart/quote`; `CartProvider` nằm trong `LocaleLayout`, chỉ đọc storage trong effect (không lệch hydrate) | Hiệu lực |
 | T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
+| T-21 | 2026-09-28 | Font tự host bằng `@fontsource` (Fraunces Variable soft + italic, Be Vietnam Pro 400/500/600), preload 6 file woff2 chính trong `index.html`; bỏ Google Fonts | Hiệu lực |
+| T-22 | 2026-09-28 | Motion: `LazyMotion features={domAnimation} strict` ở `LocaleLayout` → chỉ dùng `m.*`; xuất hiện/biến mất theo `useViewState` (IntersectionObserver, `below`/`in`/`above`); animation lặp (đung đưa, marquee, hạt lửa) bằng CSS | Hiệu lực |
+| T-26 | 2026-09-29 | Cân lại bảng màu theo bột màu tự nhiên của tranh Đông Hồ: nền giấy điệp nhạt hơn, son là điểm nhấn duy nhất, hoè ngả đồng, lá/hồng chỉ trong minh hoạ; tỉ lệ 70/20/7/3; mọi cặp chữ đạt WCAG AA | Hiệu lực |
+| T-27 | 2026-09-29 | Ảnh tư liệu thật (tranh Đông Hồ, tranh giấy dó thế kỷ 18) từ Wikimedia Commons, chỉ public domain/CC0; WebP 480/960 ở `public/images/folk/`; nguồn ghi ở `CREDITS.md` + `src/data/folkArt.js`; hiển thị như tranh treo có chú thích, không như ảnh sản phẩm | Hiệu lực — chờ `[LEGAL]` §31.4 |
+| T-28 | 2026-09-29 | Hoạ tiết lơ lửng (mây, đường vân, nét khói) tự vẽ thành bộ preset SVG (`src/data/motifs.js`) thay vì tải ngoài — Commons không có SVG hoạ tiết Việt dùng được (chỉ có biểu trưng hành chính); CSS transform/opacity + scroll-driven parallax khi hỗ trợ | Hiệu lực |
+| T-25 | 2026-09-29 | Bỏ phong cách "viền đen dày + bóng đổ cứng" (neo-brutalism). Dùng nét mảnh sepia, khung viền đôi, góc hoa văn triện, bóng mềm, mảng màu phẳng có hoa văn chìm — tham khảo nguyên tắc trình bày của các trang bảo tàng/di sản Trung Quốc, dịch sang hoạ tiết Việt | Hiệu lực |
+| T-24 | 2026-09-28 | Hiệu ứng lấy ý tưởng từ Aceternity UI nhưng tự viết lại (không chép code — trang của họ ghi "All Rights Reserved"; không dùng Tailwind). Hiệu ứng theo con trỏ chỉ bật khi `useFinePointer()` và không giảm chuyển động | Hiệu lực |
+| T-23 | 2026-09-28 | Giao diện "Đông Hồ cổ": token màu ở `src/index.css` (giữ bí danh tên cũ cho `pages.css`); texture giấy/mực là SVG nội tuyến, vẽ trên nền tĩnh — không dùng lớp phủ cố định có `mix-blend-mode`/`backdrop-filter` | Hiệu lực |
 
 ---
 
@@ -75,7 +83,64 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - Flush lỗi → bỏ lô đó và ghi log (tránh bộ nhớ phình) — chấp nhận mất tối đa 1 phút số liệu.
 - Thêm route mới không cần làm gì thêm: nhãn tự lấy từ mẫu route Express.
 
-### T-21 / T-22 — AI Mây
+### T-29 / T-30 — AI Mây
 - Luồng một lượt (`server/may/service.js#chat`): kiểm tra độ dài → hạn mức (`incrementMayCounter`) → cờ OpenAI/khoá/ngân sách (offline nếu không đạt) → vòng gọi OpenAI + tool (≤ 4 vòng, `AbortController` 15 giây) → ghi chi phí → kiểm tra số → lưu lịch sử nếu đã đăng nhập.
 - Thêm tool mới: khai báo trong `MAY_TOOLS` và `runTool` (`server/may/tools.js`); chỉ trả trường cần thiết, không có thao tác ghi (BR-AI-006). Khi làm đơn hàng: thêm `get_my_orders` (dùng `user` của phiên, không nhận user từ model) và `lookup_order` có chống dò.
 - Frontend: `src/may/May.jsx` (nút + tour, lazy-load khung chat, error boundary). Tour chỉ tự bật ở trang chủ.
+
+### T-21 / T-22 / T-23 — Giao diện dân gian cổ + motion
+- **Bối cảnh**: khách hàng yêu cầu web "nghệ thuật dân gian, cổ xưa, hoài niệm", motion tốt (cả xuất hiện và biến mất), hiệu năng tốt. Google Fonts chặn render và làm LCP chậm (~1,5 s đo local).
+- **Quyết định**:
+  - T-21: `src/main.jsx` import CSS của `@fontsource`; `index.html` preload font tiêu đề (Fraunces latin + vietnamese, thường + nghiêng) và thân bài (Be Vietnam Pro 400) qua đường dẫn `/node_modules/...` — Vite đổi sang file có hash khi build. Bỏ preload → chữ nhảy khi đổi font (CLS ~0,04).
+  - T-22: `src/lib/motion.js#useViewState(ref, margin)` trả `'below' | 'in' | 'above'`; `<Reveal>` truyền trạng thái cho con `m.*` cùng tên biến thể. Biến mất đi theo hướng cuộn (trên → lui lên, dưới → lui xuống). Không có IntersectionObserver → `'in'`. `CountUp` render giá trị thật khi SSR, chỉ đếm ở client; dùng `useReducedMotionConfig` (theo `MotionConfig`), không dùng `useReducedMotion` (chỉ đọc thiết bị một lần).
+  - T-23: texture (sợi dó, vết ố, mực mòn) là data-URI SVG trong biến CSS `--tex-*`; viền tối quanh khung nhìn là một gradient tĩnh `position: fixed` không blend.
+- **Hệ quả / quy tắc**:
+  - Component dưới `LocaleLayout` dùng `m.div`… — `motion.div` sẽ throw vì `strict`.
+  - Thêm khối cần hiệu ứng: bọc `<Reveal variants={group}>`, con dùng `variants={rise|ink|stamp}`. Hiệu ứng lặp mới: viết bằng CSS keyframes transform/opacity; `pages.css` đã tắt mọi animation CSS khi `prefers-reduced-motion`.
+  - Nội dung trong `Reveal` có `opacity: 0` trong HTML SSR tới khi JS chạy (như trước khi đổi giao diện) — xem G-34.
+
+### T-24 — Hiệu ứng tham khảo Aceternity UI
+- **Bối cảnh**: người dùng yêu cầu tham khảo Aceternity UI (ui.aceternity.com). Bộ đó là component copy-paste dựa trên Tailwind + framer-motion, bản quyền "All Rights Reserved" của Aceternity Labs.
+- **Quyết định**: chỉ lấy ý tưởng, tự viết bằng CSS thuần + `m.*`, ở `src/components/Effects.jsx` và `HomePage.jsx`:
+
+  | Ý tưởng Aceternity | Ở MỘC |
+  |---|---|
+  | Lamp Effect | `LampHead` — đèn treo rọi nón sáng xuống tiêu đề lookbook |
+  | Spotlight / Following Pointer | `PointerGlow` — quầng đèn theo con trỏ ở hero |
+  | 3D Card + Card Spotlight | `TiltCard` — thẻ sản phẩm |
+  | Text Generate Effect | `InkWords` — lời nghệ nhân |
+  | Tracing Beam / Timeline | `ProcessTimeline` — sợi chỉ đỏ theo cuộn, bước đã qua có `is-lit` |
+  | Moving Border | class `.thread` — nút chính |
+  | Focus Cards | CSS `:has()` trong lookbook |
+  | Sparkles / Shooting Stars | `SkyLanterns` — đèn trời |
+  | Text Hover Effect | `BrandHover` — chữ MỘC ở footer |
+
+- **Hệ quả**:
+  - Hiệu ứng theo con trỏ không gắn handler trên thiết bị cảm ứng hoặc khi giảm chuyển động; cập nhật qua motion value, không re-render.
+  - Thẻ có `TiltCard` không được `overflow: hidden` (làm phẳng lớp 3D).
+  - `.thread` cần `@property` (Chrome/Edge, Safari 16.4+, Firefox 128+); trình duyệt cũ thấy viền đứng yên.
+  - Màn hình đầu dùng animation CSS thay framer để chữ tiêu đề không bị `opacity: 0` trong HTML SSR (giảm G-34).
+
+### T-25 — Phong cách cổ điển (thay neo-brutalism)
+- **Bối cảnh**: người dùng nhận xét các khối viền đen dày + bóng đổ cứng "chưa cổ điển", yêu cầu tham khảo web văn hoá dân gian Trung Quốc.
+- **Nguồn đã xem** (chụp màn hình ngày 2026-09-29): Cố Cung (dpm.org.cn), Cố Cung Danh Hoạ Ký (minghuaji.dpm.org.cn), Số hoá văn vật Cố Cung (digicol.dpm.org.cn), Đôn Hoàng số (e-dunhuang.com), Hoa Tây Tử (huaxizi.com), Bảo tàng Lịch sử Thiểm Tây (sxhm.com). Không truy cập được: ihchina.cn, szmuseum.com (lỗi upstream), chnmuseum.cn (quá thời gian).
+- **Nguyên tắc rút ra → áp dụng ở MỘC** (không dùng chữ Hán, rồng, mái cung điện Trung Hoa):
+  - Không viền dày/bóng cứng → token `--hair`, `--hair-soft`; `--print`/`--print-lg` là bóng mềm.
+  - Khung viền đôi mảnh + góc hồi văn (Danh Hoạ Ký) → `--corner-*` (góc triện) cho thiếp thư testimonials; `border: 3px double` cho nav, marquee, FAQ.
+  - Khung góc lõm (Hoa Tây Tử) → `.product-art::after` khoét 4 góc như ô hộc cửa bức bàn.
+  - Mái cong làm đường chuyển (Thiểm Tây) → mái đình Việt: nóc phẳng, mặt nguyệt, đầu đao (`--roof-mask`, có bản riêng cho màn hẹp).
+  - Logo dọc + dấu son (Đôn Hoàng) → `VerticalSeal` (ấn triện dọc) ở hero thay dấu bưu điện.
+  - Mảng màu phẳng có hoa văn chìm (Cố Cung) → `--pat-cloud` trên nền chàm.
+  - Tab gạch chân, cột ngăn bằng nét chấm → tab Mua tặng/Mua cho mình, số liệu, công đoạn.
+  - Nút như ấn son: góc 3px, đường chỉ sáng bên trong bằng `box-shadow: inset`.
+- **Hệ quả**: không thêm lại `border: 2px solid var(--than)` hay bóng lệch cứng; khung mới dùng `--hair` + góc triện.
+
+### T-26 — Cân lại bảng màu
+- **Bối cảnh**: nhiều màu mạnh ngang nhau (son, hoè, chàm, lá, hồng cá hồi); nền giấy quá vàng sẽ lấn màu tranh thật khi thêm ảnh tư liệu.
+- **Quyết định**: token mới ở `src/index.css` (bảng và tỉ lệ ở [`design-rules.md`](design-rules.md) §2). Đã đo tương phản: mọi cặp chữ ≥ 4,5:1; `--sepia` làm đậm thành `#7a5d3c` để dùng cho chữ nhỏ. Bỏ màu viết cứng `#3a2a1e`, `#e9876b` → `--than-2`, `--hong`; các `rgba()` theo màu cũ đổi theo màu mới.
+
+### T-27 — Ảnh tư liệu
+- **Nguồn**: Wikimedia Commons, tải bằng API có User-Agent riêng, kích thước chuẩn (1280) để tránh bị giới hạn tần suất. Chỉ nhận `Public domain`/`CC0`; loại ảnh có trẻ em nhận diện được.
+- **Xử lý**: `sharp` → WebP 480/960 (chỉ các cỡ ≤ ảnh nguồn, danh sách `widths`), không chỉnh màu, không cắt; tải bản thu nhỏ cỡ chuẩn từ `thumb.wikimedia.org` (file gốc bị 429, Retry-After 600s); script ở ngoài repo, kết quả + `CREDITS.md` trong `public/images/folk/`.
+- **Hiển thị**: `FolkGallery` (phần Di sản) — khung tranh bồi trên vách chàm, tên + nguồn dưới mỗi tranh, ghi chú "không phải ảnh sản phẩm". `alt`/chú thích qua i18n.
+- **Hệ quả**: thêm ảnh mới phải cập nhật `CREDITS.md` và `folkArt.js`; không dùng ảnh tư liệu ở vị trí sản phẩm/nghệ nhân.

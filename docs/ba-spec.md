@@ -2,10 +2,11 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.7 (bản nháp) |
+| Phiên bản | v0.8 (bản nháp) |
 | Ngày | 2026-09-29 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
 | Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6 (nhánh `feat/folk-art-redesign`): giao diện dân gian cổ + motion xuất hiện/biến mất, không đổi câu chữ/nghiệp vụ (§31.4). v0.7: bảng màu cân lại, phòng tranh ảnh tư liệu thật (Q-36 `[LEGAL]`), design rules (§31.4) |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -240,9 +241,9 @@ Không có chỉ số định lượng nào được cung cấp; các ô "Mục 
 | NFR-PRV-002 | Riêng tư | Token QR và dữ liệu cá nhân không được gửi tới Google Analytics | — |
 | NFR-PRV-003 | Riêng tư | Xóa giọng nói/video là xóa thật, gồm bản sao lưu và cache CDN | Thời gian xóa khỏi backup `[BA DECISION REQUIRED]` |
 | NFR-AUD-001 | Kiểm toán | Ghi log thay đổi trạng thái đơn, coupon, hoàn tiền (ai, khi nào, giá trị cũ/mới) | — |
-| NFR-A11Y-001 | Tiếp cận | Tour Mây tắt được; tôn trọng `prefers-reduced-motion` | — |
+| NFR-A11Y-001 | Tiếp cận | Tour Mây tắt được; tôn trọng `prefers-reduced-motion` | — (trang công khai đã áp dụng cho mọi hiệu ứng từ v0.6, §31.4) |
 | NFR-L10N-001 | Bản địa hóa | Thiếu bản dịch thì hiển thị tiếng Việt `[CONFIRMED]` D-41 | — |
-| NFR-PERF-001 | Hiệu năng | Thời gian tải trang, thời gian phản hồi Mây | `[BA DECISION REQUIRED]` |
+| NFR-PERF-001 | Hiệu năng | Thời gian tải trang, thời gian phản hồi Mây | `[BA DECISION REQUIRED]` — trang công khai tạm dùng ngưỡng nội bộ ở §31.4 `[ASSUMPTION]` |
 | NFR-AVL-001 | Sẵn sàng | Mây lỗi không được chặn duyệt web, giỏ hàng, checkout | — |
 | NFR-OBS-001 | Quan sát | Theo dõi lỗi webhook, lỗi OpenAI, chi phí OpenAI theo ngày. v0.5: dashboard IT có số liệu API (request, lỗi, độ trễ theo endpoint) và lỗi 5xx gần đây; webhook/OpenAI chưa có vì chưa tích hợp (G-26) | — |
 
@@ -1012,6 +1013,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Q-33 | Có cần lớp bảo vệ thêm (PIN) cho trang lời chúc? |
 | I-15 | `[LEGAL]` Quyền xóa lịch sử chat |
 | Q-35 | Đăng ký bằng email đã tồn tại hiện "Email này đã được đăng ký" (tiện cho khách nhưng cho phép dò email có tài khoản), hay luôn báo "kiểm tra email" giống quên mật khẩu? Hiện code báo "đã đăng ký" `[ASSUMPTION]` |
+| Q-36 | `[LEGAL]` Dùng ảnh tư liệu public domain/CC0 (tranh Đông Hồ, tranh giấy dó của Bảo tàng Mỹ thuật Việt Nam) trên trang bán hàng — có cần xin phép bảo tàng? (§31.4, T-27) |
 
 ### P2 — có thể quyết định sau
 | ID | Câu hỏi |
@@ -1076,6 +1078,8 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-30 | Mây — quyền xoá lịch sử chat, xoá khi xoá tài khoản | Chưa có — chờ `[LEGAL]` I-15 | Missing | **Mới** (v0.6) |
 | G-31 | Nút "Dịch tự động" dùng chung ngân sách Mây (§22.4) | Chưa có trang QR lời chúc nên chưa có | Missing | **Mới** (v0.6) |
 | G-32 | Giỏ hàng trên Supabase | Giới hạn 50 dòng và gộp giỏ là đọc-rồi-ghi, hai thao tác đồng thời có thể vượt 50 dòng / lệch số lượng; bảng `cart_items` bật RLS không có policy (chỉ server dùng service role truy cập) | Rủi ro thấp | **Mới** (v0.7) |
+| G-33 | Hình minh hoạ thay cho ảnh thật | Đèn, chân dung nghệ nhân (khung "ảnh cũ"), hoạ tiết đều là SVG minh hoạ; chân dung không phải ảnh thật của nghệ nhân. Khi có ảnh thật phải thay, và không trình bày minh hoạ như ảnh tư liệu | Content | **Mới** (v0.6) — liên quan G-23 |
+| G-34 | Nội dung khi chưa chạy JS | Các khối có hiệu ứng xuất hiện nằm trong HTML SSR (máy tìm kiếm đọc được) nhưng `opacity: 0` tới khi JS chạy. Đã giảm: màn hình đầu (tiêu đề, LCP) chạy bằng CSS nên hiện ngay; trình duyệt tắt JS được CSS `@media (scripting: none)` ép hiện. Còn lại: JS tải chậm thì các khối dưới màn hình đầu chờ hydrate mới hiện | Technical debt | 🟡 Một phần (v0.6) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
@@ -1098,6 +1102,30 @@ Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.j
 | `src/App.jsx:426` | Mock điện thoại "Hành trình chiếc đèn của bạn" | `qr.phoneCaption`: "Hành trình mẻ đèn của bạn" | D-01, D-45 | ✅ Đã sửa |
 | `src/App.jsx:209-212` | "…câu chuyện của gia đình bạn cũng được lưu giữ theo cách bền bỉ như vậy" | `story.text`: "…được thắp lên từ chính chất liệu bền bỉ ấy" | D-26 | ✅ Đã sửa (phát hiện ở v0.2) — câu do dev soạn `[ASSUMPTION]`, chờ Marketing |
 | `testimonials.items[2]` | "…thấy cả quá trình đèn được làm cho riêng mình" | — | D-01 | ⬜ Chưa sửa — chờ Q-23 |
+
+### 31.4 Giao diện dân gian cổ (v0.6)
+
+Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm, motion tốt (cả xuất hiện và biến mất), hiệu năng tốt, màu sắc tốt hơn". **Không đổi câu chữ, giá, cam kết hay luồng nghiệp vụ** — mọi chuỗi vẫn lấy từ `src/i18n/messages/*`; không ảnh hưởng §31.3.
+
+| Hạng mục | Đã làm |
+|---|---|
+| Màu | Bảng màu tranh Đông Hồ đã ngả màu thời gian: giấy điệp ố vàng, mực than tre ngả nâu, đỏ son phai, vàng hoè, xanh chàm bạc, xanh lá |
+| Chất cổ | Vân sợi giấy dó, vết ố, viền tối như ảnh cũ, mực in mòn trên mảng màu, chữ lệch khuôn in, số kiểu cổ; logo con dấu son, dấu bưu điện, ảnh cũ viền răng cưa có góc dán album |
+| Motion | Mỗi khối hiện ra khi cuộn tới và tan đi theo hướng cuộn khi rời màn hình; tiêu đề hiện như mực loang; thẻ "đóng dấu"; số liệu đếm lên; đèn lookbook thắp sáng khi tới, lịm khi qua; đèn hero bay lên như thả đèn trời khi cuộn đi; header ẩn khi cuộn xuống, hiện khi cuộn lên; FAQ mở như trải cuộn thư |
+| NFR-A11Y-001 | Giảm chuyển động → không animation lặp, không dịch chuyển, số liệu hiện giá trị thật ngay (đã kiểm: 0 animation chạy). Trình đọc màn hình luôn đọc giá trị số thật; hoạ tiết `aria-hidden` |
+| Hoạ tiết lơ lửng (T-28) | Mây cuộn, mây đôi, dải mây, vân nước, vân gỗ, khói hương trôi chậm sau nội dung ở 9 phần; tự vẽ, mờ cùng tông, tắt khi giảm chuyển động |
+| Bảng màu & ảnh thật (T-26, T-27) | Bảng màu cân lại theo bột màu Đông Hồ (giấy điệp 70% · mực 20% · son 7% · hoè 3%), mọi cặp chữ đạt WCAG AA; phòng tranh ở phần Di sản với 11 ảnh tư liệu thật (8 tranh Đông Hồ, 2 tranh giấy dó thế kỷ 18, 1 văn tự giấy dó 1904; tổng ~350 KB ở cỡ 480), có tên, nguồn, ghi chú "không phải ảnh sản phẩm"; design rule ở `docs/knowledge/design-rules.md` |
+| Phong cách cổ điển (T-25, tham khảo nguyên tắc trình bày của web bảo tàng/di sản Trung Quốc, dịch sang hoạ tiết Việt) | Bỏ viền đen dày và bóng đổ cứng; nét mảnh, khung viền đôi, góc hoa văn triện, bóng mềm; mái đình làm đường chuyển giữa các phần; ấn triện dọc ở màn hình đầu; thẻ sản phẩm kiểu tranh bồi góc lõm; thiếp thư cho lời khách hàng; tab gạch chân; mây chìm trên nền chàm |
+| Hiệu ứng tương tác (tham khảo ý tưởng Aceternity UI, tự viết lại — T-24) | Đèn treo rọi sáng tiêu đề lookbook; quầng đèn theo con trỏ ở hero; thẻ sản phẩm nghiêng 3D; lời nghệ nhân hiện từng chữ; sợi chỉ đỏ theo tiến độ cuộn ở công đoạn; viền chỉ vàng chạy quanh nút chính; lookbook làm mờ đèn không được chọn; đèn trời bay trên nền đêm; chữ MỘC ở footer loang màu son theo con trỏ. Hiệu ứng theo con trỏ chỉ có trên máy có chuột |
+| Hiệu năng | Font tự host + preload; `LazyMotion`; animation lặp bằng CSS; texture vẽ trên nền tĩnh. Đo bản build local (không giới hạn mạng, desktop 1440×900): LCP ~1,55 s → ~0,3–0,6 s; CLS 0 → 0–0,02 (chữ tiêu đề đôi khi vẽ trước khi font Fraunces về rồi đổi font; vẫn dưới ngưỡng 0,1); JS 156,2 → 152,4 kB gzip (đã gồm hiệu ứng T-24, T-25) |
+
+- `[ASSUMPTION]` Ngưỡng hiệu năng nội bộ cho trang công khai, chờ PO chốt NFR-PERF-001: LCP ≤ 2,5 s, CLS ≤ 0,1 (mức "tốt" của Core Web Vitals).
+- `[ASSUMPTION]` Motion "biến mất" áp dụng khi khối rời khỏi màn hình (cuộn qua), không áp dụng khi chuyển trang (tránh chặn điều hướng và SSR).
+- `[LEGAL]` Q-36 — Ảnh tư liệu (tranh Đông Hồ, tranh giấy dó thế kỷ 18 — Wikimedia Commons, public domain/CC0; danh sách ở `public/images/folk/CREDITS.md`) được dùng làm hình văn hoá trên trang bán hàng. Cần pháp chế xác nhận: (1) tình trạng public domain tại Việt Nam của bản chụp tranh dân gian và của ảnh chụp hiện vật bảo tàng (CC0 do người chụp tuyên bố); (2) có cần xin phép Bảo tàng Mỹ thuật Việt Nam khi dùng thương mại không. Chưa có xác nhận thì không đưa lên môi trường thật.
+- `[ASSUMPTION]` Chú thích tranh (tên, mô tả, alt vi/en/zh) do dev soạn — chờ Marketing duyệt cùng G-14.
+- `[ASSUMPTION]` Tham khảo web Trung Quốc chỉ ở mức nguyên tắc trình bày (nét, khung, khoảng trắng); không dùng chữ Hán, rồng, mái cung điện để web vẫn mang bản sắc Việt.
+- `[ASSUMPTION]` Giữ thương hiệu MỘC. Nhánh `docs/branding-guideline` (đổi sang "LÂM VỊ" + Tailwind) chưa gộp vào `master` nên không áp dụng; cần PO thống nhất trước khi gộp.
+- Khoảng trống mới: G-33, G-34 (§31.2).
 
 ---
 

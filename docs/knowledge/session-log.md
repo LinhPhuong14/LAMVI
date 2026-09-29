@@ -47,6 +47,34 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-28 (phiên 5) — Giao diện dân gian cổ + motion (nhánh `feat/folk-art-redesign`)
+
+**Quyết định từ người dùng**
+
+- Web phải "thật nghệ thuật dân gian", thêm cảm giác cổ xưa hoài niệm; motion tốt cả khi xuất hiện và biến mất; hiệu năng tốt; màu tốt hơn.
+- Làm trên nhánh mới từ `master` (bản thiết kế đầu tiên ở nhánh `claude/folk-art-web-design-v3ice8` dựa trên master cũ, không gộp).
+
+**Đã làm**
+
+1. Bảng màu Đông Hồ đã ngả màu thời gian + bí danh biến cũ cho `pages.css` (T-23); texture sợi dó, vết ố, mực mòn, viền tối kiểu ảnh cũ.
+2. Hoạ tiết SVG (`Motifs.jsx`): trống đồng, mây, sen, con dấu son (logo), dấu bưu điện, ảnh cũ viền răng cưa; đèn vẽ lại theo lối khắc gỗ có tua rua.
+3. Motion (T-22): `useViewState` + `Reveal` — xuất hiện khi cuộn tới, biến mất theo hướng cuộn; `CountUp`; đèn lookbook thắp/lịm; hero cuộn đi thì đèn bay lên; header ẩn/hiện theo hướng cuộn; FAQ mở như cuộn thư; `LazyMotion strict`.
+4. Hiệu năng (T-21): font tự host + preload, bỏ Google Fonts. Đo local: LCP ~1,55 s → ~0,45 s, CLS 0.
+5. Test `src/components/Motion.test.jsx`. Test phát hiện: `useReducedMotion` bỏ qua `MotionConfig` → đổi sang `useReducedMotionConfig`.
+5a. Subagent kiểm thử độc lập (T-11): `Motion.extra.test.jsx`, `server/ssr.design.extra.test.js` — không có lỗi; lưu ý HTML SSR có 68 phần tử `opacity:0` (G-34) và cảnh báo lint `set-state-in-effect` → đã sửa: màn hình đầu chạy bằng CSS, `@media (scripting: none)`, `useFinePointer` dùng `useSyncExternalStore`.
+5b. Theo yêu cầu "tham khảo Aceternity UI": 9 hiệu ứng tự viết lại (T-24) — Lamp, Spotlight, 3D Card, Text Generate, Tracing Beam, Moving Border, Focus Cards, Sparkles (đèn trời), Text Hover.
+5e. Bảng màu cân lại (T-26); phòng tranh ảnh tư liệu Wikimedia Commons public domain/CC0 (T-27) — Commons giới hạn tần suất (429, Retry-After 600s), dùng User-Agent riêng + cỡ ảnh chuẩn 1280, tải chậm; loại ảnh có trẻ em. Design rules `docs/knowledge/design-rules.md`. Hoạ tiết lơ lửng tự vẽ (T-28) vì Commons không có SVG hoạ tiết Việt dùng được. Q-36 `[LEGAL]` chờ pháp chế. Subagent kiểm thử độc lập lần 4 (T-11): `Palette.extra`, `Folk.extra`, `ssr.folk.extra` (50 test) — không có lỗi; lưu ý phòng tranh vẫn `opacity:0` trong SSR (G-34), chữ nguồn ảnh 4,83:1 sát ngưỡng. Tự phát hiện: ảnh nguồn <480px bị phóng to → xuất theo `widths`.
+5d. Theo nhận xét "khối có stroke chưa cổ điển": xem 6 web bảo tàng/di sản Trung Quốc, chuyển sang phong cách cổ điển (T-25) — nét mảnh, khung viền đôi, góc triện, mái đình, ấn triện dọc, tranh bồi, thiếp thư. Subagent kiểm thử độc lập lần 3 (T-11): `Classic.extra.test.jsx`, `server/ssr.classic.extra.test.js` (36 test) — không có lỗi.
+5c. Subagent kiểm thử độc lập lần 2 (T-11): `Effects.extra.test.jsx`, `server/ssr.effects.extra.test.js` (31 test) — không có lỗi; rủi ro id gradient `brandInk` viết cứng (trùng nếu tái dùng) → đã sửa bằng `useId()`.
+6. Spec v0.6: §31.4, G-33, G-34, `[ASSUMPTION]` ngưỡng NFR-PERF-001.
+
+**Còn lại / cần người dùng**
+
+- PO chốt NFR-PERF-001; thống nhất thương hiệu MỘC ↔ "LÂM VỊ" (nhánh `docs/branding-guideline`) trước khi gộp.
+- Thay minh hoạ bằng ảnh thật khi có (G-23, G-33).
+
+---
+
 ## 2026-09-28 (phiên 4) — Vai trò IT + dashboard IT (nhánh `feat/it-dashboard`), gộp vào `master`
 
 **Quyết định từ người dùng**
