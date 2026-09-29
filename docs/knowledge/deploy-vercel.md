@@ -31,6 +31,14 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 6. **Thay đổi cấu hình deploy** (`vercel.json`, `api/`, biến môi trường bắt buộc mới) → cập nhật file này, `.env.example` và `decisions.md` cùng lúc.
 7. Mỗi lần thêm route/tệp đọc lúc chạy ngoài `dist/**` (ví dụ thư mục dữ liệu, template) → thêm vào `includeFiles`.
 
+## Nối Supabase với `lamvi.vercel.app` (thứ tự bắt buộc)
+
+1. **Tạo bảng trước**: Supabase → SQL Editor, chạy lần lượt `supabase/migrations/*.sql` rồi `supabase/seed.sql`. Đặt biến ở bước 2 khi DB chưa có bảng → mọi API trả 500 (`PGRST205`).
+2. **Vercel → Settings → Environment Variables** (Production): `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `PUBLIC_SITE_URL=https://lamvi.vercel.app`, `TRUST_PROXY=1`, `MAY_HASH_SALT` (chuỗi ngẫu nhiên).
+3. **Redeploy** Production (biến mới chỉ áp dụng cho lần deploy sau).
+4. **Supabase → Authentication → URL Configuration**: Site URL `https://lamvi.vercel.app`; Redirect URLs `https://lamvi.vercel.app/**` (link đặt lại mật khẩu, G-16). Xác nhận email đã bỏ ở tầng app (D-63) — không cần chỉnh "Confirm email".
+5. Kiểm tra: `/api/products` 200; đăng ký tài khoản mới → vào thẳng `/account`; Supabase → Authentication → Users thấy user mới.
+
 ## Kiểm thử cục bộ giống Vercel
 
 ```bash

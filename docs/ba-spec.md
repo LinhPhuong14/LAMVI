@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.10 (bản nháp) |
+| Phiên bản | v0.11 (bản nháp) |
 | Ngày | 2026-09-29 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`) |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — bỏ xác nhận email khi đăng ký; G-37…G-39 (nhánh `feat/signup-no-confirm`) |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -141,9 +141,9 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 - Mật khẩu 8–72 ký tự và không quá 72 byte UTF-8 (giới hạn của Supabase) `[ASSUMPTION]`.
 - SĐT hồ sơ phải là số di động Việt Nam (0/+84, đầu số 3/5/7/8/9), lưu dạng `0xxxxxxxxx` `[ASSUMPTION]`.
 - Ngôn ngữ ưa thích mặc định = ngôn ngữ giao diện lúc đăng ký `[ASSUMPTION]`.
-- Nếu cấu hình Supabase bật xác nhận email, khách phải xác nhận email trước khi đăng nhập `[ASSUMPTION]`.
+- **Không xác nhận email** khi đăng ký: tài khoản dùng được ngay, web tự đăng nhập sau khi đăng ký `[CONFIRMED]` D-63. Server tạo user đã xác nhận qua admin API nên không phụ thuộc cài đặt "Confirm email" của Supabase và không gửi thư.
 - "Quên mật khẩu" luôn trả cùng một thông báo, không tiết lộ email có đăng ký hay không, kể cả khi Supabase giới hạn gửi thư `[DERIVED]` (NFR-SEC).
-- Đăng ký bằng email đã tồn tại → báo "Email này đã được đăng ký" `[ASSUMPTION]` — chờ Q-35. Đăng ký lại email chưa xác nhận không ghi đè hồ sơ đã có `[DERIVED]`.
+- Đăng ký bằng email đã tồn tại → báo "Email này đã được đăng ký" `[ASSUMPTION]` — chờ Q-35. Đăng ký lại email đã có không ghi đè hồ sơ đã có `[DERIVED]`.
 - Lỗi mạng khi làm mới phiên không đăng xuất khách; chỉ đăng xuất khi phiên bị máy chủ từ chối `[DERIVED]`.
 - Đăng xuất vô hiệu mọi phiên của tài khoản trên mọi thiết bị; đặt lại mật khẩu xong phải đăng nhập lại `[ASSUMPTION]`.
 - Trang đăng nhập/đăng ký/quên mật khẩu/tài khoản đặt `noindex` `[DERIVED]` BR-SEO-001.
@@ -1061,7 +1061,7 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-13 | Google Analytics | Không có | Missing | **Còn thiếu** |
 | G-14 | Bản dịch en/zh | Do đội dev soạn (`src/i18n/messages/*`, `server/data/seed.js`) | Chưa duyệt | **Mới** — chờ PO duyệt `[ASSUMPTION]` |
 | G-15 | SEO đa ngôn ngữ | `hreflang`, canonical, meta description theo trang/ngôn ngữ (`src/seo/*`), `/sitemap.xml`, `/robots.txt` | — | **Đã xử lý** (v0.4) |
-| G-16 | Cấu hình Supabase Auth | Cần thêm Redirect URLs (`/login`, `/reset-password` × 3 ngôn ngữ) và chọn có bật xác nhận email | Cấu hình | **Mới** — xem `docs/knowledge/architecture.md` |
+| G-16 | Cấu hình Supabase Auth | Cần đặt Site URL `https://lamvi.vercel.app` và Redirect URLs (`/reset-password` × 3 ngôn ngữ). Xác nhận email: đã bỏ (D-63) | Cấu hình | 🟡 Một phần (v0.11) — xem `docs/knowledge/deploy-vercel.md` |
 | G-17 | Lưu phiên đăng nhập | Token ở `localStorage` (T-10) — rủi ro XSS | Technical debt | **Mới** — xem lại trước go-live |
 | G-18 | Đặt lại mật khẩu | `POST /api/auth/reset-password` nhận mọi access token hợp lệ, không riêng token khôi phục; chưa có chức năng đổi mật khẩu (có hỏi mật khẩu cũ) | Security | **Mới** — cần kiểm tra token khôi phục trước go-live |
 | G-19 | Khoá tài khoản | §7 có trạng thái User "bị khóa" nhưng chưa có cơ chế khoá | Missing | **Mới** — làm cùng admin (G-06) |
@@ -1081,6 +1081,9 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-34 | Nội dung khi chưa chạy JS | Các khối có hiệu ứng xuất hiện nằm trong HTML SSR (máy tìm kiếm đọc được) nhưng `opacity: 0` tới khi JS chạy. Đã giảm: màn hình đầu (tiêu đề, LCP) chạy bằng CSS nên hiện ngay; trình duyệt tắt JS được CSS `@media (scripting: none)` ép hiện. Còn lại: JS tải chậm thì các khối dưới màn hình đầu chờ hydrate mới hiện | Technical debt | 🟡 Một phần (v0.6) |
 | G-35 | Số liệu API trên Vercel (T-18) | Flush bằng timer/SIGTERM; instance serverless có thể bị đóng trước khi flush nên dashboard IT có thể thiếu số liệu | Technical debt | **Mới** (v0.9) |
 | G-36 | Deploy Vercel chưa kiểm chứng thật (T-33) | Mới thử local giả lập `VERCEL=1`; chưa deploy Preview/Production, chưa kiểm rewrite/`includeFiles` trên nền tảng | Chưa kiểm chứng | **Mới** (v0.9) |
+| G-37 | Không xác minh chủ email khi đăng ký (D-63) | Ai cũng đăng ký được bằng email của người khác; khi chủ thật muốn dùng email đó phải "Quên mật khẩu". Đăng ký qua admin API không chịu giới hạn đăng ký của Supabase → G-20 càng cần thiết | Security | **Mới** (v0.11) |
+| G-38 | Đăng ký: tạo user Supabase xong nhưng ghi hồ sơ lỗi | User đã tồn tại và đăng nhập được nhưng mất họ tên/SĐT/ngôn ngữ đã nhập (hồ sơ rỗng tạo lại ở `/me`); đăng ký lại báo email đã có. Chưa rollback (`admin.deleteUser`) | Rủi ro thấp | **Mới** (v0.11) |
+| G-39 | Tài khoản đăng ký trước D-63 chưa xác nhận email | Không đăng nhập được (EMAIL_NOT_CONFIRMED) và không còn thư xác nhận; lối ra: "Quên mật khẩu" hoặc xác nhận tay trên Supabase dashboard. Chưa kiểm trên project thật | Vận hành | **Mới** (v0.11) — hiện Supabase chưa có user nào |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
@@ -1196,3 +1199,4 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 | D-60 | Tối đa 10 sản phẩm mỗi dòng giỏ | Hiệu lực (v0.7) |
 | D-61 | Khi chưa có checkout: nút Thanh toán bắt đăng nhập rồi báo "sắp ra mắt" | Hiệu lực (v0.7) |
 | D-62 | Tên web và thương hiệu là **LAMVI** (viết liền, không dấu) ở mọi nơi — logo, tiêu đề trang, câu văn, bản dịch en/zh; không dùng "MỘC" hay "LÂM VỊ" | Hiệu lực (v0.10) |
+| D-63 | Bỏ xác nhận email sau khi đăng ký (dự án dùng Supabase gói Free): tài khoản dùng được ngay, không gửi thư xác nhận | Hiệu lực (v0.11) |
