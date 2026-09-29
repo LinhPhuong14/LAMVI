@@ -94,8 +94,10 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
       const client = makePublicClient()
       const res = await client.auth.signInWithPassword({ email: data.user.email, password })
       if (res.error) return false
-      // Thu hồi ngay phiên vừa tạo để không để lại phiên thừa
-      await client.auth.signOut().catch(() => {})
+      // Thu hồi ngay phiên vừa tạo. PHẢI dùng scope 'local': mặc định của Supabase là 'global',
+      // tức là đăng xuất khách khỏi mọi thiết bị chỉ vì vừa xác minh mật khẩu — và nếu bước đổi
+      // mật khẩu ngay sau đó thất bại thì khách mất phiên mà mật khẩu không đổi.
+      await client.auth.signOut({ scope: 'local' }).catch(() => {})
       return true
     },
   }

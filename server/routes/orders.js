@@ -58,15 +58,22 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
   const r = Router()
   const guard = requireAuth(auth)
   const lang = (req) => normalizeLang(req.query.lang)
-  // G-20: chặn tạo đơn hàng loạt (giữ lượt coupon, tạo link payOS rác)
-  const orderLimit = rateLimit({
-    repo,
-    salt: config.mayHashSalt ?? DEFAULT_HASH_SALT,
-    name: 'order',
-    max: config.rateLimit?.order?.max ?? 20,
-    windowSec: config.rateLimit?.order?.windowSec ?? 3600,
-    enabled: config.rateLimit?.enabled !== false,
-  })
+  // G-20: chặn tạo đơn và xin link thanh toán hàng loạt (giữ lượt coupon, tạo link payOS rác).
+  // Đặt SAU `guard`: nếu đặt trước thì request không có token (đều 401) vẫn tiêu hạn mức của cả
+  // IP, và khách hợp lệ dùng chung IP (NAT nhà mạng, văn phòng) sẽ bị chặn oan.
+  const limitOn = (name) =>
+    rateLimit({
+      repo,
+      salt: config.mayHashSalt ?? DEFAULT_HASH_SALT,
+      name,
+      max: config.rateLimit?.order?.max ?? 20,
+      windowSec: config.rateLimit?.order?.windowSec ?? 3600,
+      // Đã qua `guard` nên đếm theo người dùng, không theo IP
+      keys: (req) => [`u:${req.user.id}`],
+      enabled: config.rateLimit?.enabled !== false,
+    })
+  const orderLimit = limitOn('order')
+  const paymentLinkLimit = limitOn('payment-link')
 
   // FR-CHK-008: bảng giá của giỏ, kèm coupon nếu có (FR-CHK-006)
   r.post('/checkout/quote', guard, async (req, res) => {
@@ -75,7 +82,7 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
   })
 
   // FR-CHK-001: chỉ khách đã đăng nhập (D-36, BR-ACC-001)
-  r.post('/orders', orderLimit, guard, async (req, res) => {
+  r.post('/orders', guard, orderLimit, async (req, res) => {
     const b = body(req)
     const { errors, values } = validateCheckout(b)
     if (Object.keys(errors).length) {
@@ -119,7 +126,7 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
   })
 
   // FR-PAY-001: lấy lại liên kết thanh toán (lần tạo đơn gặp lỗi cổng, hoặc khách quay lại sau)
-  r.post('/orders/:code/payment', guard, async (req, res) => {
+  r.post('/orders/:code/payment', guard, paymentLinkLimit, async (req, res) => {
     const order = await repo.getOrderByCode(req.params.code)
     if (!order || order.userId !== req.user.id) throw notFound()
     res.json({ payment: await orders.paymentLinkFor(order, { siteUrl: config.publicSiteUrl }) })

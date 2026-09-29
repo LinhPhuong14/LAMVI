@@ -809,3 +809,111 @@ describe('Migration 20260930000008_orders.sql khớp logic JS', () => {
     })
   })
 })
+
+// ---------------------------------------------------------------------------
+// Kiểm thử độc lập (T-11) — lấy lại liên kết thanh toán (FR-PAY-001)
+// ---------------------------------------------------------------------------
+describe('POST /orders/:code/payment — biên và quyền', () => {
+  const pay = (code, token = customer) =>
+    request(app).post(`/api/orders/${encodeURIComponent(code)}/payment`).set('Authorization', token).send({})
+
+  async function payosOrder() {
+    await addToCart('den-nguyet', 1)
+    const r = await createOrder({ paymentMethod: 'payos' })
+    expect(r.status).toBe(201)
+    return r.body.order.code
+  }
+
+  it('mã đơn không tồn tại / dị dạng → 404, không phải 500', async () => {
+    for (const code of ['KHONG-CO', 'LV2610-ZZZZZZZ', 'a'.repeat(300), '../../etc/passwd', '%%%']) {
+      const r = await pay(code)
+      expect([404, 400], code).toContain(r.status)
+      expect(r.status, code).not.toBe(500)
+    }
+  })
+
+  it('chưa đăng nhập → 401, không tiết lộ đơn có tồn tại hay không', async () => {
+    const code = await payosOrder()
+    const r = await request(app).post(`/api/orders/${code}/payment`).send({})
+    expect(r.status).toBe(401)
+  })
+
+  it('đơn đã huỷ → 409 ORDER_NOT_PAYABLE, không gọi cổng', async () => {
+    const code = await payosOrder()
+    await request(app).post(`/api/orders/${code}/cancel`).set('Authorization', customer).send({})
+    payos.createPaymentLink.mockClear()
+    const r = await pay(code)
+    expect(r.status).toBe(409)
+    expect(r.body.error.code).toBe('ORDER_NOT_PAYABLE')
+    expect(payos.createPaymentLink).not.toHaveBeenCalled()
+  })
+
+  it('đơn đã thanh toán (CONFIRMED) → 409, không tạo link mới', async () => {
+    const code = await payosOrder()
+    const o = await repo.getOrderByCode(code)
+    await orders.applyPayosWebhook({ orderCode: o.payosOrderCode, amount: o.total, paid: true, reference: 'FT1' })
+    payos.createPaymentLink.mockClear()
+    const r = await pay(code)
+    expect(r.status).toBe(409)
+    expect(payos.createPaymentLink).not.toHaveBeenCalled()
+  })
+
+  it('đơn đang sản xuất (COD đã xác nhận) → 409', async () => {
+    await addToCart('den-nguyet', 1)
+    const cod = (await createOrder()).body.order.code
+    await setStatus(cod, 'in_production')
+    expect((await pay(cod)).status).toBe(409)
+  })
+
+  it('chưa cấu hình cổng payOS → 503, không 500', async () => {
+    const noGateway = createApp({
+      repo,
+      auth,
+      storage: createMemoryStorage(),
+      config,
+      orders: createOrderService({ repo, now: () => clock }),
+    })
+    // Đơn payOS tạo ở app có cổng, rồi gọi lại link ở app không có cổng (giống khi mất khoá payOS)
+    const code = await payosOrder()
+    const r = await request(noGateway).post(`/api/orders/${code}/payment`).set('Authorization', customer).send({})
+    expect(r.status).toBe(503)
+    expect(r.body.error.code).toBe('PAYMENT_UNAVAILABLE')
+  })
+
+  it('lấy lại link nhiều lần: giữ nguyên payosOrderCode và hạn thanh toán (không gia hạn)', async () => {
+    const code = await payosOrder()
+    const before = await repo.getOrderByCode(code)
+    payos.createPaymentLink.mockClear()
+    for (let i = 0; i < 3; i += 1) expect((await pay(code)).status).toBe(200)
+    const after = await repo.getOrderByCode(code)
+    expect(after.payosOrderCode).toBe(before.payosOrderCode)
+    expect(after.paymentExpiresAt).toBe(before.paymentExpiresAt)
+    // Mọi lần gọi đều dùng cùng orderCode và cùng expiredAt
+    const args = payos.createPaymentLink.mock.calls.map(([p]) => p)
+    expect(new Set(args.map((p) => p.orderCode)).size).toBe(1)
+    expect(new Set(args.map((p) => p.expiredAt)).size).toBe(1)
+    expect(args[0].amount).toBe(before.total)
+  })
+
+  it('đơn của người khác → 404 và KHÔNG tạo link thanh toán', async () => {
+    const code = await payosOrder()
+    const other = await login('nguoikhac@lamvi.test')
+    payos.createPaymentLink.mockClear()
+    expect((await pay(code, other.token)).status).toBe(404)
+    expect(payos.createPaymentLink).not.toHaveBeenCalled()
+  })
+
+  it('admin cũng không lấy được link của đơn khách (endpoint chỉ dành cho chủ đơn)', async () => {
+    const code = await payosOrder()
+    expect((await pay(code, admin)).status).toBe(404)
+  })
+
+  it('không ghi thêm nhật ký kiểm toán cho mỗi lần lấy lại link', async () => {
+    const code = await payosOrder()
+    const o = await repo.getOrderByCode(code)
+    const before = (await repo.listAuditLog({ entity: 'order', entityId: o.id })).length
+    await pay(code)
+    await pay(code)
+    expect((await repo.listAuditLog({ entity: 'order', entityId: o.id })).length).toBe(before)
+  })
+})

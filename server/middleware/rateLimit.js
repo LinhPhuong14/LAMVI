@@ -11,8 +11,12 @@ import { HttpError } from '../errors.js'
 
 const hash = (value, salt) => createHash('sha256').update(`${salt}:${value}`).digest('hex').slice(0, 32)
 
-/** IP thật của khách. Sau proxy cần đặt TRUST_PROXY để Express đọc X-Forwarded-For. */
-export const clientIp = (req) => req.ip ?? req.socket?.remoteAddress ?? ''
+/**
+ * IP thật của khách. Sau proxy cần đặt TRUST_PROXY để Express đọc X-Forwarded-For.
+ * Không xác định được → trả 'unknown' (một bộ đếm chung) thay vì chuỗi rỗng: chuỗi rỗng sẽ bị
+ * `filter(Boolean)` loại và request đó **không bị giới hạn gì cả**.
+ */
+export const clientIp = (req) => req.ip || req.socket?.remoteAddress || 'unknown'
 
 /**
  * @param {object} p

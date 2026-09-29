@@ -54,20 +54,23 @@ export function authRouter({ repo, auth, config }) {
   // G-20: chống dò mật khẩu và spam. Ngưỡng ở config (loadConfig). Đếm theo cả IP và email để
   // một IP đổi email liên tục vẫn không dò được một tài khoản cụ thể.
   const rl = config.rateLimit ?? {}
-  const limit = (name, keys) =>
+  const limit = (thresholds, keys, { name } = {}) =>
     rateLimit({
       repo,
       salt: config.mayHashSalt ?? DEFAULT_HASH_SALT,
-      name,
-      max: rl[name]?.max ?? 10,
-      windowSec: rl[name]?.windowSec ?? 300,
+      name: name ?? thresholds,
+      max: rl[thresholds]?.max ?? 10,
+      windowSec: rl[thresholds]?.windowSec ?? 300,
       keys,
       enabled: rl.enabled !== false,
     })
   const loginLimit = limit('login', byIpAndEmail)
   const registerLimit = limit('register', byIpAndEmail)
   const forgotLimit = limit('forgot', byIpAndEmail)
-  const passwordLimit = limit('password')
+  // Hai luồng đổi mật khẩu đếm riêng: dùng chung một bộ đếm thì người đặt lại mật khẩu bị chặn
+  // vì người khác cùng IP vừa đổi mật khẩu.
+  const resetLimit = limit('password', () => [], { name: 'reset' })
+  const changeLimit = limit('password', () => [], { name: 'change' })
 
   r.post('/auth/register', registerLimit, async (req, res) => {
     const b = body(req)
@@ -131,7 +134,7 @@ export function authRouter({ repo, auth, config }) {
   // G-18: CHỈ nhận token khôi phục. Trước đây mọi access token hợp lệ đều đổi được mật khẩu, nên
   // một phiên đang mở (máy dùng chung, token bị lấy cắp) đổi được mật khẩu mà không cần biết mật
   // khẩu cũ. Muốn đổi mật khẩu khi đang đăng nhập thì dùng /auth/change-password.
-  r.post('/auth/reset-password', passwordLimit, guard, async (req, res) => {
+  r.post('/auth/reset-password', guard, resetLimit, async (req, res) => {
     if (!req.user.isRecovery) {
       throw new HttpError(403, 'RECOVERY_TOKEN_REQUIRED', 'Cần mở lại link đặt lại mật khẩu trong email')
     }
@@ -143,7 +146,7 @@ export function authRouter({ repo, auth, config }) {
   })
 
   // G-18: đổi mật khẩu khi đang đăng nhập — bắt buộc nhập lại mật khẩu hiện tại
-  r.post('/auth/change-password', passwordLimit, guard, async (req, res) => {
+  r.post('/auth/change-password', guard, changeLimit, async (req, res) => {
     const b = body(req)
     const pwErr = validatePassword(b.password)
     if (pwErr) assertValid({ password: pwErr })

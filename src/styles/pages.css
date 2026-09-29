@@ -2738,11 +2738,14 @@
 .checkout-main {
   display: grid;
   gap: 20px;
+  /* Cho phép cột co nhỏ hơn min-content của nội dung bên trong */
+  min-width: 0;
 }
 
 .checkout-aside {
   position: sticky;
   top: 24px;
+  min-width: 0;
 }
 
 .checkout fieldset {
@@ -2947,8 +2950,10 @@
 }
 
 @media (max-width: 860px) {
+  /* minmax(0, …) chứ không phải 1fr: `1fr` có min là min-content, nên một ô con khó ngắt dòng
+     (hàng mã giảm giá, tên sản phẩm dài) sẽ đẩy cột rộng hơn khung và bị cắt ở màn hình hẹp. */
   .checkout-form {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .checkout-aside {

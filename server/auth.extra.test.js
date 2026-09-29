@@ -473,3 +473,76 @@ describe('Adapter bộ nhớ — hành vi riêng', () => {
     expect((await login()).status).toBe(200)
   })
 })
+
+// Kiểm thử độc lập (T-11) — G-18: đổi mật khẩu khi đang đăng nhập
+describe('G-18 — /auth/change-password: biên và tác dụng phụ', () => {
+  const change = (token, b) =>
+    request(app).post('/api/auth/change-password').set('Authorization', `Bearer ${token}`).send(b)
+
+  it('đổi sang CHÍNH mật khẩu cũ → vẫn nhận (204) và vẫn thu hồi mọi phiên', async () => {
+    const s = await registerAndLogin()
+    await change(s.accessToken, { currentPassword: valid.password, password: valid.password }).expect(204)
+    expect((await me(s.accessToken)).status).toBe(401)
+    expect((await login()).status).toBe(200)
+  })
+
+  it('mật khẩu mới > 72 byte (giới hạn bcrypt) → PASSWORD_TOO_LONG, không đụng mật khẩu cũ', async () => {
+    const s = await registerAndLogin()
+    const res = await change(s.accessToken, { currentPassword: valid.password, password: 'x'.repeat(73) })
+    expect(res.status).toBe(400)
+    expect(res.body.error.fields.password).toBe('PASSWORD_TOO_LONG')
+    // 72 ký tự tiếng Việt có dấu = 144 byte → cũng phải bị chặn
+    const utf8 = await change(s.accessToken, { currentPassword: valid.password, password: 'ố'.repeat(72) })
+    expect(utf8.body.error.fields.password).toBe('PASSWORD_TOO_LONG')
+    expect((await login()).status).toBe(200)
+  })
+
+  it('mật khẩu mới không hợp lệ → phiên hiện tại KHÔNG bị thu hồi', async () => {
+    const s = await registerAndLogin()
+    await change(s.accessToken, { currentPassword: valid.password, password: 'ngan' }).expect(400)
+    expect((await me(s.accessToken)).status).toBe(200)
+  })
+
+  it('currentPassword sai kiểu (số, mảng, rỗng) → REQUIRED, không phải 500', async () => {
+    const s = await registerAndLogin()
+    for (const currentPassword of [123, ['a'], { a: 1 }, '', null]) {
+      const res = await change(s.accessToken, { currentPassword, password: 'matkhaumoi1' })
+      expect(res.status, JSON.stringify(currentPassword)).toBe(400)
+      expect(res.body.error.fields.currentPassword).toBe('REQUIRED')
+    }
+    expect((await login()).status).toBe(200)
+  })
+
+  it('body là mảng → 400 (không ném lỗi)', async () => {
+    const s = await registerAndLogin()
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${s.accessToken}`)
+      .send([{ currentPassword: valid.password, password: 'matkhaumoi1' }])
+    expect(res.status).toBe(400)
+    expect((await login()).status).toBe(200)
+  })
+
+  it('đổi mật khẩu vô hiệu luôn token khôi phục đã phát trước đó', async () => {
+    const s = await registerAndLogin()
+    await request(app).post('/api/auth/forgot-password').send({ email: valid.email }).expect(202)
+    const rec = auth.outbox[0].accessToken
+    await change(s.accessToken, { currentPassword: valid.password, password: 'matkhaumoi1' }).expect(204)
+    const after = await request(app).post('/api/auth/reset-password').set('Authorization', `Bearer ${rec}`).send({ password: 'matkhaumoi2' })
+    expect(after.status).toBe(401)
+  })
+
+  it('token khôi phục cũng đổi được mật khẩu qua change-password nếu biết mật khẩu hiện tại', async () => {
+    await register().expect(201)
+    await request(app).post('/api/auth/forgot-password').send({ email: valid.email }).expect(202)
+    const rec = auth.outbox[0].accessToken
+    await change(rec, { currentPassword: valid.password, password: 'matkhaumoi1' }).expect(204)
+    expect((await login({ password: 'matkhaumoi1' })).status).toBe(200)
+  })
+
+  it('xin quên mật khẩu KHÔNG làm mất phiên đang đăng nhập', async () => {
+    const s = await registerAndLogin()
+    await request(app).post('/api/auth/forgot-password').send({ email: valid.email }).expect(202)
+    expect((await me(s.accessToken)).status).toBe(200)
+  })
+})
