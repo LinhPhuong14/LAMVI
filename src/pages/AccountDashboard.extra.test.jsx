@@ -140,12 +140,15 @@ describe('Tab — chuột, URL, ARIA', () => {
     api()
     renderAt('/account?tab=orders')
     await screen.findByRole('heading', { name: 'Đơn hàng' })
-    const items = within(panel()).getAllByRole('listitem').map((li) => li.textContent)
+    const items = [...panel().querySelectorAll('.dash-features li')].map((li) => li.textContent)
     expect(items).toEqual([
       'Theo dõi đèn của bạn đang ở công đoạn nào',
       'Soạn và sửa lời chúc gửi kèm món quà',
       'Xem mã vận đơn khi đèn lên đường',
     ])
+    // Minh hoạ 4 công đoạn (C-11) dùng câu chữ trang chủ, không phải đơn thật
+    const journey = within(panel()).getByRole('region', { name: 'Theo dõi đơn của bạn qua từng công đoạn' })
+    expect([...journey.querySelectorAll('li strong')].map((el) => el.textContent)).toEqual(['Chọn giấy dó', 'Lên khung tre', 'Phơi nắng', 'Đóng gói & khắc QR'])
     expect(panel().textContent).not.toMatch(/#\d|Mã đơn|₫/)
   })
 })

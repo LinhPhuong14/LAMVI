@@ -20,6 +20,8 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 6. Theo nhận xét "chưa đủ thanh thoát, thanh lịch, tham khảo dashboard Trung Quốc": làm lại giao diện (T-34) — thanh bên giấy sáng, nét 1px thống nhất, bỏ bóng/khung trang trí, dải số liệu ngăn nét dọc với số chữ mảnh, vạch son trước tiêu đề mục, nhãn tab ngắn ("Trò chuyện"). Không đổi chức năng; bộ test độc lập vẫn xanh (cập nhật tên tab). Spec v0.12.
 
+7. Theo yêu cầu "bo các góc và thêm nhiều hình ảnh minh hoạ": bo góc toàn dashboard; minh hoạ SVG tự vẽ `DashArt.jsx` (cảnh dây đèn đầu trang, hình trong ô số liệu, 4 công đoạn ở tab đơn hàng, phong thư ở hồ sơ, thẻ gợi ý có đèn ở thanh bên). Test tab đơn hàng giới hạn vào danh sách tính năng + kiểm 4 công đoạn. Spec v0.13. Gộp vào `master`.
+
 **Còn lại**: tab đơn hàng làm thật cùng FR-ACC-002/003 (chờ checkout, Q-08).
 
 ---

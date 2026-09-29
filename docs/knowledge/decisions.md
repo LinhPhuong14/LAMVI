@@ -156,4 +156,4 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Nguồn tham khảo** (mức nguyên tắc): hệ thiết kế Ant Design, TDesign, Arco (bố cục thanh bên + nội dung, dải số liệu tổng quan); bài viết về 留白 (khoảng trắng) và phong cách 新中式 trên woshipm.com.
 - **Nguyên tắc rút ra → áp dụng**: nền sáng, nhiều khoảng trắng; mọi đường kẻ 1px cùng một độ đậm (`--dash-line`); bỏ bóng đổ và khung trang trí trong dashboard; một điểm nhấn son (vạch tab chọn, vạch trước tiêu đề mục, nút chính); số liệu chữ mảnh cỡ lớn trên dải ngăn bằng nét dọc; nhãn ngắn một dòng. Không dùng chữ Hán, hoạ tiết cung đình (như T-25).
 - **Hệ quả**: chi tiết ở [`design-rules.md`](design-rules.md) §12. Trang công khai giữ phong cách T-25.
-
+- **Bổ sung (v0.13)**: theo yêu cầu người dùng "bo các góc và thêm nhiều hình ảnh minh hoạ cho sinh động" — thẻ bo 20px, nút viên; thêm minh hoạ SVG tự vẽ (`DashArt.jsx`). Không dùng ảnh tư liệu Wikimedia vì còn chờ `[LEGAL]` Q-36 và không được đặt ở vị trí gây hiểu lầm (design-rules §7.2).

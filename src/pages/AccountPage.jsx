@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../components/Field'
 import Lantern from '../components/Lantern'
+import { GiftArt, HeroScene, LetterArt, StepArt } from '../components/DashArt'
 import Price from '../components/Price'
 import { Lotus, Seal } from '../components/Motifs'
 import { LanguageSwitcher } from '../components/SiteHeader'
@@ -191,8 +192,10 @@ function Card({ title, id, tag, action, className = '', children }) {
 function OrdersPanel() {
   const { t, path } = useI18n()
   const features = t('account.ordersFeatures')
+  // Bốn công đoạn (C-11) dùng lại câu chữ đã duyệt ở trang chủ — chỉ minh hoạ, không phải đơn thật
+  const steps = t('process.steps')
   return (
-    <Card title={t('account.orders')} id="dash-orders-title" tag={t('account.soon')}>
+    <Card title={t('account.orders')} id="dash-orders-title" tag={t('account.soon')} className="dash-wide">
       <div className="dash-orders">
         <div className="dash-orders-art" aria-hidden="true">
           <Lantern size={88} tone="dusk" swing />
@@ -214,6 +217,25 @@ function OrdersPanel() {
           </Link>
         </div>
       </div>
+      {Array.isArray(steps) && (
+        <section className="dash-journey" aria-labelledby="dash-journey-title">
+          <h3 id="dash-journey-title">{t('process.title')}</h3>
+          <ol>
+            {steps.map((st, i) => (
+              <li key={st.label}>
+                <span className="dash-journey-art">
+                  <StepArt step={i} size={56} />
+                </span>
+                <span className="dash-journey-no" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <strong>{st.label}</strong>
+                <span className="dash-muted">{st.note}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
     </Card>
   )
 }
@@ -233,17 +255,24 @@ function MayPanel({ items }) {
 function ProfilePanel({ state, setState }) {
   const { t } = useI18n()
   return (
-    <Card title={t('account.profile')} id="dash-profile-title">
-      {state.status === 'loading' && <p className="dash-muted">{t('account.loading')}</p>}
-      {state.status === 'ok' && (
-        <ProfileForm
-          // Đổi key sau khi lưu để form hiển thị giá trị server đã chuẩn hoá (vd SĐT)
-          key={`${state.profile.fullName}|${state.profile.phone}|${state.profile.preferredLocale}`}
-          profile={state.profile}
-          onSaved={(p) => setState({ status: 'ok', profile: p, saved: true })}
-          initiallySaved={state.saved}
-        />
-      )}
+    <Card title={t('account.profile')} id="dash-profile-title" className="dash-profile">
+      <div className="dash-profile-body">
+        <div>
+          {state.status === 'loading' && <p className="dash-muted">{t('account.loading')}</p>}
+          {state.status === 'ok' && (
+            <ProfileForm
+              // Đổi key sau khi lưu để form hiển thị giá trị server đã chuẩn hoá (vd SĐT)
+              key={`${state.profile.fullName}|${state.profile.phone}|${state.profile.preferredLocale}`}
+              profile={state.profile}
+              onSaved={(p) => setState({ status: 'ok', profile: p, saved: true })}
+              initiallySaved={state.saved}
+            />
+          )}
+        </div>
+        <div className="dash-profile-art" aria-hidden="true">
+          <LetterArt size={150} />
+        </div>
+      </div>
     </Card>
   )
 }
@@ -258,6 +287,9 @@ function Overview({ cart, mayItems, profile, go }) {
     <>
       <ul className="dash-stats" aria-label={t('account.overview')}>
         <li className="dash-stat" style={{ '--i': 0 }}>
+          <span className="dash-stat-art" aria-hidden="true">
+            <Lantern size={46} tone="amber" swing />
+          </span>
           <span className="dash-stat-label">{t('account.statCart')}</span>
           <strong className="dash-stat-value">{count ?? '–'}</strong>
           <span className="dash-stat-sub">
@@ -268,6 +300,9 @@ function Overview({ cart, mayItems, profile, go }) {
           </Link>
         </li>
         <li className="dash-stat" style={{ '--i': 1 }}>
+          <span className="dash-stat-art" aria-hidden="true">
+            <GiftArt size={52} />
+          </span>
           <span className="dash-stat-label">{t('account.orders')}</span>
           <strong className="dash-stat-value dash-stat-word">{t('account.soon')}</strong>
           <span className="dash-stat-sub">{t('account.ordersSoonShort')}</span>
@@ -276,6 +311,9 @@ function Overview({ cart, mayItems, profile, go }) {
           </button>
         </li>
         <li className="dash-stat" style={{ '--i': 2 }}>
+          <span className="dash-stat-art" aria-hidden="true">
+            <MayAvatar size={52} />
+          </span>
           <span className="dash-stat-label">{t('account.statMay')}</span>
           <strong className="dash-stat-value">{asked ?? '–'}</strong>
           <span className="dash-stat-sub">{t('account.statMaySub')}</span>
@@ -454,6 +492,13 @@ export default function AccountPage() {
           ))}
         </div>
 
+        <Link to={{ pathname: path('/'), hash: '#products' }} className="dash-promo">
+          <span className="dash-promo-art" aria-hidden="true">
+            <Lantern size={60} tone="dusk" swing flicker />
+          </span>
+          <span className="dash-promo-text">{t('cart.continue')}</span>
+        </Link>
+
         <div className="dash-side-foot">
           <Link to={path('/')} className="dash-side-link">
             <span aria-hidden="true">←</span> {t('account.backToShop')}
@@ -477,9 +522,7 @@ export default function AccountPage() {
             <h1 className="page-title">{t('account.title')}</h1>
             <p className="dash-top-sub">{t(`account.subtitle.${tab}`)}</p>
           </div>
-          <div className="dash-top-lantern" aria-hidden="true">
-            <Lantern size={64} tone="amber" swing />
-          </div>
+          <HeroScene />
         </header>
 
         {state.status === 'error' && (

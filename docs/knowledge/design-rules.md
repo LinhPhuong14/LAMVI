@@ -181,7 +181,7 @@ Quy tắc:
 
 ## 12. Dashboard tài khoản (`/account`)
 
-Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệu (`APP_PAGES`, class `.page-app`, bỏ cả viền tối quanh khung nhìn). Style ở mục "Dashboard tài khoản" cuối `pages.css`. Tinh thần **thanh thoát**, lấy nguyên tắc từ dashboard Trung Quốc (T-34): nhiều khoảng trắng, nền giấy sáng, chỉ nét 1px, không bóng đổ, một điểm nhấn son.
+Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệu (`APP_PAGES`, class `.page-app`, bỏ cả viền tối quanh khung nhìn). Style ở mục "Dashboard tài khoản" cuối `pages.css`. Tinh thần **thanh thoát**, bo góc mềm, có minh hoạ cho sinh động; lấy nguyên tắc từ dashboard Trung Quốc (T-34): nhiều khoảng trắng, nền giấy sáng, chỉ nét 1px, không bóng đổ, một điểm nhấn son.
 
 | Phần | Cách trình bày |
 |---|---|
@@ -196,6 +196,8 @@ Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệ
 | Chat Mây | Nhãn ngày chữ thưa giữa hai nét mảnh; tin khách nền `--diep-deep`, tin Mây nền trong viền mảnh; bo 12px, góc phía người nói 2px |
 | Màn ≤960px | Thanh bên tách (`display: contents`): đầu trang → tab ngang gạch chân son, dính trên cùng (ẩn biểu tượng) → nội dung → chân |
 | Motion | Đổi tab: `dash-in` 0.6s, dịch 6px; ô số liệu lệch 80ms; tắt khi giảm chuyển động |
+| Bo góc (v0.13) | Thẻ và dải số liệu 20px (≤640px: 18px), khung đầu trang 24px, tab 12px, liên kết thanh bên 10px, ô nhập 12px, nút và nhãn dạng viên (999px), bong bóng chat 16px (góc phía người nói 4px) |
+| Minh hoạ (v0.13) | SVG tự vẽ ở `src/components/DashArt.jsx`, lối khắc gỗ nét 1,5px cùng bảng màu: cảnh đầu trang (dây 3 đèn trước trống đồng mờ, mây), hộp quà, phong thư ấn son, 4 công đoạn (giấy dó, khung tre, phơi nắng, đóng gói QR); kèm đèn và Mây có sẵn. Hình đặt trong nền tròn `--diep`. **Không** dùng ảnh tư liệu trong dashboard (§7.2) |
 
 ## 13. Checklist khi thêm thành phần
 

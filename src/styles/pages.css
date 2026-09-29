@@ -1089,9 +1089,9 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border: 0;
-  border-radius: 2px;
+  border-radius: 12px;
   background: transparent;
   color: var(--than-soft);
   font: inherit;
@@ -1111,7 +1111,7 @@
 }
 
 .dash-tab:focus-visible {
-  outline: 1px solid var(--son);
+  outline: 2px solid var(--son);
   outline-offset: 1px;
 }
 
@@ -1180,7 +1180,7 @@
   text-decoration: none;
   background: none;
   border: 0;
-  border-radius: 2px;
+  border-radius: 10px;
   cursor: pointer;
   transition: color 0.3s ease, background-color 0.3s ease;
 }
@@ -1207,13 +1207,93 @@
 }
 
 .dash-top {
+  position: relative;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  padding-bottom: 28px;
-  margin-bottom: 40px;
-  border-bottom: 1px solid var(--dash-line);
+  align-items: center;
+  min-height: 210px;
+  padding: 36px 40px;
+  margin-bottom: 36px;
+  border: 1px solid var(--dash-line);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 82% 40%, rgba(242, 192, 78, 0.22), transparent 42%),
+    linear-gradient(135deg, var(--diep-light) 0%, var(--diep-light) 45%, #efe4cf 100%);
+  overflow: hidden;
+}
+
+.dash-top > div:first-child {
+  position: relative;
+  z-index: 1;
+  max-width: 58%;
+}
+
+/* Cảnh minh hoạ: trống đồng mờ, mây, dây đèn */
+.dash-scene {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 42%;
+  pointer-events: none;
+}
+
+.dash-scene-drum {
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  width: 260px;
+  height: 260px;
+  transform: translateY(-50%);
+  color: var(--hoe);
+  opacity: 0.16;
+}
+
+.dash-scene-cloud {
+  position: absolute;
+  color: var(--diep-light);
+  opacity: 0.9;
+}
+
+.dash-scene-cloud-a {
+  width: 120px;
+  right: 58%;
+  bottom: 18px;
+}
+
+.dash-scene-cloud-b {
+  width: 90px;
+  right: 6%;
+  top: 14px;
+}
+
+.dash-scene-string {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 0;
+  width: 92%;
+  height: 56px;
+}
+
+.dash-scene-lantern {
+  position: absolute;
+  top: 18px;
+  filter: drop-shadow(0 8px 14px rgba(120, 70, 20, 0.18));
+}
+
+.dash-scene-lantern.l1 {
+  left: 16%;
+  top: 14px;
+}
+
+.dash-scene-lantern.l2 {
+  left: 44%;
+  top: 30px;
+}
+
+.dash-scene-lantern.l3 {
+  left: 72%;
+  top: 14px;
 }
 
 .dash-top .eyebrow {
@@ -1238,12 +1318,6 @@
   max-width: 56ch;
 }
 
-.dash-top-lantern {
-  flex-shrink: 0;
-  margin: 0 8px -6px 0;
-  opacity: 0.92;
-}
-
 .dash-panel {
   display: flex;
   flex-direction: column;
@@ -1258,11 +1332,14 @@
   padding: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--dash-line);
-  border-bottom: 1px solid var(--dash-line);
+  background: var(--diep-light);
+  border: 1px solid var(--dash-line);
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .dash-stat {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -1272,8 +1349,20 @@
   animation-delay: calc(var(--i) * 0.08s);
 }
 
-.dash-stat:first-child {
-  padding-left: 0;
+.dash-stat-art {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--diep);
+}
+
+.dash-stat-art .lantern-svg {
+  margin-top: 4px;
 }
 
 .dash-stat + .dash-stat {
@@ -1359,7 +1448,7 @@
   padding: 28px 32px 30px;
   background: var(--diep-light);
   border: 1px solid var(--dash-line);
-  border-radius: 4px;
+  border-radius: 20px;
 }
 
 .dash-card-head {
@@ -1410,6 +1499,10 @@
 
 .dash-panel > .dash-card:only-child {
   max-width: 640px;
+}
+
+.dash-panel > .dash-wide:only-child {
+  max-width: none;
 }
 
 .dash-duo {
@@ -1470,7 +1563,7 @@
   place-items: center;
   width: 128px;
   height: 156px;
-  border-radius: 999px 999px 4px 4px;
+  border-radius: 999px 999px 24px 24px;
   border: 1px solid var(--dash-line);
   background: radial-gradient(circle at 50% 45%, rgba(242, 192, 78, 0.16), transparent 65%);
 }
@@ -1497,6 +1590,19 @@
   height: 10px;
   color: var(--sepia);
   opacity: 0.8;
+}
+
+.dash .btn {
+  border-radius: 999px;
+}
+
+.dash .field input,
+.dash .field select {
+  border-radius: 12px;
+}
+
+.dash .notice {
+  border-radius: 14px;
 }
 
 .btn-compact {
@@ -1580,14 +1686,14 @@
 .dash-card .may-assistant {
   background: transparent;
   border: 1px solid var(--dash-line);
-  border-radius: 12px 12px 12px 2px;
+  border-radius: 16px 16px 16px 4px;
 }
 
 .dash-card .may-user {
   background: var(--diep-deep);
   color: var(--than);
   border: 1px solid transparent;
-  border-radius: 12px 12px 2px 12px;
+  border-radius: 16px 16px 4px 16px;
 }
 
 .dash-chat-time {
@@ -1597,6 +1703,118 @@
   color: var(--sepia);
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+/* Hành trình bốn công đoạn (C-11) — minh hoạ trước khi có đơn thật */
+.dash-journey {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--dash-line);
+}
+
+.dash-journey h3 {
+  margin: 0 0 18px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.dash-journey ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  counter-reset: none;
+}
+
+.dash-journey li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 16px 18px;
+  border-radius: 16px;
+  background: var(--diep);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.dash-journey li strong {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+
+.dash-journey-art {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: var(--diep-light);
+}
+
+.dash-journey-no {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: 1.4rem;
+  color: var(--sepia);
+  opacity: 0.7;
+}
+
+/* Hồ sơ: form + phong thư minh hoạ */
+.dash-panel > .dash-profile:only-child {
+  max-width: 860px;
+}
+
+.dash-profile-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 36px;
+  align-items: start;
+}
+
+.dash-profile-art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 192, 78, 0.18), transparent 70%), var(--diep);
+}
+
+/* Thẻ gợi ý ở thanh bên */
+.dash-promo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px 12px 10px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(242, 192, 78, 0.25), transparent 55%),
+    var(--diep);
+  border: 1px solid var(--dash-line);
+  color: var(--than);
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.35s var(--ease-out), border-color 0.3s ease;
+}
+
+.dash-promo:hover {
+  transform: translateY(-2px);
+  border-color: var(--hair);
+}
+
+.dash-promo-art {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 52px;
 }
 
 @keyframes dash-in {
@@ -1695,8 +1913,11 @@
   .dash-logout {
     margin-left: auto;
   }
-  .dash-top-lantern {
+  .dash-promo {
     display: none;
+  }
+  .dash-journey ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1704,9 +1925,28 @@
   .dash-main {
     padding: 26px 20px 48px;
   }
+  /* Cảnh minh hoạ nằm trên, chữ bên dưới */
   .dash-top {
-    padding-bottom: 20px;
-    margin-bottom: 28px;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+    padding: 0 22px 24px;
+    margin-bottom: 24px;
+    border-radius: 20px;
+  }
+  .dash-top > div:first-child {
+    max-width: none;
+  }
+  .dash-scene {
+    position: relative;
+    width: auto;
+    height: 118px;
+    margin: 0 -22px 6px;
+  }
+  .dash-scene-drum {
+    width: 200px;
+    height: 200px;
+    right: -30px;
   }
   .dash-panel {
     gap: 28px;
@@ -1715,13 +1955,23 @@
   .dash-stats {
     grid-template-columns: 1fr;
   }
+  .dash-stats {
+    border-radius: 18px;
+  }
   .dash-stat {
     display: grid;
     grid-template-columns: 4.4rem minmax(0, 1fr);
     column-gap: 16px;
     row-gap: 2px;
     align-items: center;
-    padding: 18px 0;
+    padding: 18px 76px 18px 20px;
+  }
+  .dash-stat-art {
+    width: 48px;
+    height: 48px;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%) scale(0.8);
   }
   .dash-stat + .dash-stat {
     border-left: 0;
@@ -1749,6 +1999,27 @@
   }
   .dash-card {
     padding: 22px 20px 24px;
+    border-radius: 18px;
+  }
+  .dash-profile-body {
+    grid-template-columns: 1fr;
+  }
+  .dash-profile-art {
+    display: none;
+  }
+  .dash-journey ol {
+    grid-template-columns: 1fr;
+  }
+  .dash-journey li {
+    display: grid;
+    padding-right: 48px;
+    grid-template-columns: 68px minmax(0, 1fr);
+    column-gap: 14px;
+    align-items: center;
+  }
+  .dash-journey-art {
+    grid-row: 1 / span 2;
+    margin: 0;
   }
   .dash-facts div {
     grid-template-columns: 1fr;
