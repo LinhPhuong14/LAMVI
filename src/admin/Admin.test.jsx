@@ -6,8 +6,8 @@ import { mockApi, renderAt } from '../test/renderApp.jsx'
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'admin@moc.test' } }
 const me = (role) => () => ({ body: { profile: { id: 'u1', email: 'admin@moc.test', role, preferredLocale: 'vi', fullName: 'A' } } })
 const products = [
-  { id: 'p1', slug: 'den-nguyet', kind: 'single', status: 'published', priceExclVat: 890000, name: { vi: 'Đèn Nguyệt' }, sortOrder: 1 },
-  { id: 'p2', slug: 'den-an', kind: 'single', status: 'hidden', priceExclVat: 500000, name: { vi: 'Đèn Ẩn' }, sortOrder: 2 },
+  { id: 'p1', slug: 'den-nguyet', kind: 'single', status: 'published', price: 890000, name: { vi: 'Đèn Nguyệt' }, sortOrder: 1 },
+  { id: 'p2', slug: 'den-an', kind: 'single', status: 'hidden', price: 500000, name: { vi: 'Đèn Ẩn' }, sortOrder: 2 },
 ]
 
 beforeEach(() => {
@@ -61,12 +61,12 @@ describe('Admin — sản phẩm (FR-CAT-004)', () => {
     renderAt('/admin/products')
     fireEvent.click(await screen.findByRole('button', { name: 'Thêm mới' }))
     fireEvent.change(screen.getByLabelText('Slug (đường dẫn)'), { target: { value: 'den-nguyet' } })
-    fireEvent.change(screen.getByLabelText('Giá chưa VAT (VND)'), { target: { value: '750000' } })
+    fireEvent.change(screen.getByLabelText('Giá bán đã gồm VAT (VND)'), { target: { value: '750000' } })
     fireEvent.change(screen.getByLabelText('Tên sản phẩm — Tiếng Việt'), { target: { value: 'Đèn Mới' } })
     fireEvent.change(screen.getByLabelText('Tên sản phẩm — English'), { target: { value: 'New' } })
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }))
     expect(await screen.findByText('Slug đã được dùng.')).toBeInTheDocument()
-    expect(posts[0]).toMatchObject({ slug: 'den-nguyet', priceExclVat: 750000, status: 'draft', name: { vi: 'Đèn Mới', en: 'New' } })
+    expect(posts[0]).toMatchObject({ slug: 'den-nguyet', price: 750000, status: 'draft', name: { vi: 'Đèn Mới', en: 'New' } })
 
     fireEvent.change(screen.getByLabelText('Slug (đường dẫn)'), { target: { value: 'den-moi' } })
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }))

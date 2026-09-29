@@ -59,7 +59,7 @@ export function validateProduct(body, { partial = false } = {}) {
   })
   field(body, 'kind', partial, errors, values, oneOf(PRODUCT_KINDS))
   field(body, 'status', partial, errors, values, (v) => (v === undefined && !partial ? { value: 'draft' } : oneOf(PRODUCT_STATUSES)(v)))
-  field(body, 'priceExclVat', partial, errors, values, (v) =>
+  field(body, 'price', partial, errors, values, (v) =>
     // T-09: số nguyên VND
     v === undefined ? { error: 'REQUIRED' } : isInt(v, 0, 1_000_000_000) ? { value: v } : { error: 'INVALID_PRICE' },
   )

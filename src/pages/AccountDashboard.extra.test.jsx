@@ -13,10 +13,10 @@ const base = {
 }
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'an@example.com' } }
 const profile = { id: 'u1', email: 'an@example.com', fullName: 'Nguyễn An', phone: null, preferredLocale: 'vi', role: 'customer' }
-const emptyCart = { items: [], subtotalExclVat: 0, itemCount: 0, hasUnavailable: false, maxQuantity: 10 }
+const emptyCart = { items: [], subtotal: 0, itemCount: 0, hasUnavailable: false, maxQuantity: 10 }
 const fullCart = {
   items: [{ slug: 'den-nguyet', quantity: 2 }],
-  subtotalExclVat: 1780000,
+  subtotal: 1780000,
   itemCount: 2,
   hasUnavailable: false,
   maxQuantity: 10,
@@ -228,13 +228,13 @@ describe('Badge', () => {
 describe('Tổng quan — số liệu', () => {
   const stats = () => [...document.querySelectorAll('.dash-stat')]
 
-  it('giỏ có hàng: số lượng + tạm tính kèm "chưa gồm VAT" (BR-PRC-003); chỉ đếm tin khách', async () => {
+  it('giỏ có hàng: số lượng + tạm tính kèm "đã gồm VAT" (BR-PRC-003, D-68); chỉ đếm tin khách', async () => {
     login()
     api({ cart: fullCart })
     renderAt('/account')
     await waitFor(() => expect(stats()[0].querySelector('.dash-stat-value').textContent).toBe('2'))
     expect(stats()[0].textContent).toMatch(/1\.780\.000/)
-    expect(within(stats()[0]).getByText('chưa gồm VAT')).toBeInTheDocument()
+    expect(within(stats()[0]).getByText('đã gồm VAT')).toBeInTheDocument()
     expect(stats()[1].textContent).toContain('Sắp ra mắt')
     await waitFor(() => expect(stats()[2].querySelector('.dash-stat-value').textContent).toBe('2'))
     // Link giỏ ở thanh bên hiển thị số lượng

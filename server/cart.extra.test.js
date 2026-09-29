@@ -43,7 +43,7 @@ const addProducts = async (n) => {
       slug,
       kind: 'single',
       status: 'published',
-      priceExclVat: 100000 + i,
+      price: 100000 + i,
       tone: 'amber',
       sortOrder: 100 + i,
       name: { vi: `Đèn ${i}` },
@@ -60,35 +60,35 @@ describe('Không tin dữ liệu từ trình duyệt (§12, BR-PRC-002)', () => 
     const res = await request(app)
       .post('/api/cart/quote')
       .send({
-        subtotalExclVat: 1,
+        subtotal: 1,
         items: [
           {
             slug: 'den-nguyet',
             quantity: 2,
-            priceExclVat: 1,
-            lineTotalExclVat: 2,
+            price: 1,
+            lineTotal: 2,
             available: true,
             id: '11111111-1111-4111-8111-000000000002',
-            product: { name: 'HACK', priceExclVat: 1 },
+            product: { name: 'HACK', price: 1 },
           },
         ],
       })
     expect(res.status).toBe(200)
     expect(res.body.items).toEqual([
-      expect.objectContaining({ slug: 'den-nguyet', quantity: 2, lineTotalExclVat: 1780000, product: expect.objectContaining({ name: 'Đèn Nguyệt', priceExclVat: 890000 }) }),
+      expect.objectContaining({ slug: 'den-nguyet', quantity: 2, lineTotal: 1780000, product: expect.objectContaining({ name: 'Đèn Nguyệt', price: 890000 }) }),
     ])
-    expect(res.body.subtotalExclVat).toBe(1780000)
+    expect(res.body.subtotal).toBe(1780000)
   })
 
   it('merge bỏ qua mọi trường khác slug/quantity; không ghi theo id client gửi', async () => {
-    const res = await merge([{ slug: 'den-nguyet', quantity: 1, productId: '11111111-1111-4111-8111-000000000002', priceExclVat: 1, userId: 'x' }])
+    const res = await merge([{ slug: 'den-nguyet', quantity: 1, productId: '11111111-1111-4111-8111-000000000002', price: 1, userId: 'x' }])
     expect(res.status).toBe(200)
-    expect(res.body.items.map((i) => [i.slug, i.quantity, i.lineTotalExclVat])).toEqual([['den-nguyet', 1, 890000]])
+    expect(res.body.items.map((i) => [i.slug, i.quantity, i.lineTotal])).toEqual([['den-nguyet', 1, 890000]])
   })
 
   it('PUT bỏ qua giá trong body', async () => {
-    const res = await request(app).put('/api/cart/items/den-nguyet').set('Authorization', token).send({ quantity: 1, priceExclVat: 1 })
-    expect(res.body.subtotalExclVat).toBe(890000)
+    const res = await request(app).put('/api/cart/items/den-nguyet').set('Authorization', token).send({ quantity: 1, price: 1 })
+    expect(res.body.subtotal).toBe(890000)
   })
 })
 
@@ -274,7 +274,7 @@ describe('Trạng thái sản phẩm (§11, D-39, D-41)', () => {
     await repo.deleteProduct(p.id)
     const res = await get()
     expect(res.body.items.map((i) => i.slug)).toEqual(['den-nguyet'])
-    expect(res.body).toMatchObject({ subtotalExclVat: 1780000, itemCount: 2, hasUnavailable: false })
+    expect(res.body).toMatchObject({ subtotal: 1780000, itemCount: 2, hasUnavailable: false })
     // quote vãng lai cũng bỏ
     expect((await quote([{ slug: 'den-vong', quantity: 1 }])).body.items).toEqual([])
   })
@@ -287,8 +287,8 @@ describe('Trạng thái sản phẩm (§11, D-39, D-41)', () => {
     expect((await put('den-vong', 5)).status).toBe(200)
     const dec = await put('den-vong', 2)
     expect(dec.status).toBe(200)
-    expect(dec.body).toMatchObject({ subtotalExclVat: 890000, itemCount: 1, hasUnavailable: true })
-    expect(dec.body.items.find((i) => i.slug === 'den-vong')).toMatchObject({ quantity: 2, available: false, lineTotalExclVat: null })
+    expect(dec.body).toMatchObject({ subtotal: 890000, itemCount: 1, hasUnavailable: true })
+    expect(dec.body.items.find((i) => i.slug === 'den-vong')).toMatchObject({ quantity: 2, available: false, lineTotal: null })
     // merge không thêm/tăng sản phẩm không còn bán
     const m = await merge([{ slug: 'den-vong', quantity: 3 }])
     expect(m.body.items.find((i) => i.slug === 'den-vong').quantity).toBe(2)
@@ -301,32 +301,32 @@ describe('Trạng thái sản phẩm (§11, D-39, D-41)', () => {
   it('hiện lại (published) → tính lại vào tạm tính', async () => {
     await put('den-vong', 2)
     await setStatus('den-vong', 'hidden')
-    expect((await get()).body.subtotalExclVat).toBe(0)
+    expect((await get()).body.subtotal).toBe(0)
     await setStatus('den-vong', 'published')
-    expect((await get()).body).toMatchObject({ subtotalExclVat: 2100000, itemCount: 2, hasUnavailable: false })
+    expect((await get()).body).toMatchObject({ subtotal: 2100000, itemCount: 2, hasUnavailable: false })
   })
 
   it('giá đổi → giỏ (tài khoản và vãng lai) theo giá mới', async () => {
     await put('den-vong', 3)
     const p = await repo.getProductBySlug('den-vong')
-    await repo.updateProduct(p.id, { priceExclVat: 1234567 })
-    expect((await get()).body.subtotalExclVat).toBe(3 * 1234567)
-    expect((await quote([{ slug: 'den-vong', quantity: 3 }])).body.subtotalExclVat).toBe(3 * 1234567)
+    await repo.updateProduct(p.id, { price: 1234567 })
+    expect((await get()).body.subtotal).toBe(3 * 1234567)
+    expect((await quote([{ slug: 'den-vong', quantity: 3 }])).body.subtotal).toBe(3 * 1234567)
   })
 
   it('tạm tính là số nguyên (không lệch float), itemCount chỉ đếm dòng còn bán', async () => {
     const slugs = await addProducts(3)
     for (const [i, s] of slugs.entries()) {
       const p = await repo.getProductBySlug(s)
-      await repo.updateProduct(p.id, { priceExclVat: [333333, 999999, 1] [i] })
+      await repo.updateProduct(p.id, { price: [333333, 999999, 1] [i] })
       await put(s, 10)
     }
     await put('den-nguyet', 7)
     await setStatus('den-nguyet', 'hidden')
     const res = await get()
-    expect(res.body.subtotalExclVat).toBe(10 * (333333 + 999999 + 1))
-    expect(Number.isInteger(res.body.subtotalExclVat)).toBe(true)
-    for (const i of res.body.items) if (i.available) expect(Number.isInteger(i.lineTotalExclVat)).toBe(true)
+    expect(res.body.subtotal).toBe(10 * (333333 + 999999 + 1))
+    expect(Number.isInteger(res.body.subtotal)).toBe(true)
+    for (const i of res.body.items) if (i.available) expect(Number.isInteger(i.lineTotal)).toBe(true)
     expect(res.body.itemCount).toBe(30)
   })
 
@@ -335,7 +335,7 @@ describe('Trạng thái sản phẩm (§11, D-39, D-41)', () => {
       slug: 'den-bi-mat',
       kind: 'single',
       status: 'draft',
-      priceExclVat: 500000,
+      price: 500000,
       tone: 'amber',
       sortOrder: 99,
       name: { vi: 'Đèn Bí Mật Chưa Ra Mắt' },
@@ -361,7 +361,7 @@ describe('Bảo trì (D-54)', () => {
     expect(g.body.items.map((i) => [i.slug, i.quantity])).toEqual([['den-nguyet', 2]])
     const q = await request(app).post('/api/cart/quote').set('Authorization', token).send({ items: [{ slug: 'den-vong', quantity: 4 }] })
     expect(q.status).toBe(200)
-    expect(q.body.subtotalExclVat).toBe(4200000)
+    expect(q.body.subtotal).toBe(4200000)
     expect((await get()).body.items.map((i) => [i.slug, i.quantity])).toEqual([['den-nguyet', 2]])
   })
 

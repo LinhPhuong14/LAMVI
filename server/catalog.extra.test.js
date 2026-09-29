@@ -26,7 +26,7 @@ describe('Sản phẩm — edge case', () => {
     const detail = await request(app).get('/api/products/den-nguyet')
     for (const item of [...list.body.items, detail.body.item]) {
       expect(Object.keys(item).sort()).toEqual(
-        ['badge', 'currency', 'description', 'kind', 'name', 'priceExclVat', 'slug', 'tone'].sort(),
+        ['badge', 'currency', 'description', 'kind', 'name', 'price', 'slug', 'tone'].sort(),
       )
     }
   })
@@ -103,10 +103,10 @@ describe('Sản phẩm — edge case', () => {
   it('giá là số nguyên, currency luôn VND (T-09)', async () => {
     const res = await request(makeApp()).get('/api/products')
     for (const p of res.body.items) {
-      expect(Number.isInteger(p.priceExclVat)).toBe(true)
+      expect(Number.isInteger(p.price)).toBe(true)
       expect(p.currency).toBe('VND')
     }
-    expect(res.body.items.map((p) => p.priceExclVat)).toEqual([890000, 1050000, 1680000])
+    expect(res.body.items.map((p) => p.price)).toEqual([890000, 1050000, 1680000])
   })
 })
 
@@ -266,12 +266,12 @@ describe('Adapter bộ nhớ — trả bản sao', () => {
     list[0].status = 'hidden'
     list.pop()
     const one = await repo.getProductBySlug('den-vong')
-    one.priceExclVat = 1
+    one.price = 1
     const again = await repo.listProducts()
     expect(again).toHaveLength(3)
     expect(again[0].name.vi).toBe('Đèn Nguyệt')
     expect(again[0].status).toBe('published')
-    expect((await repo.getProductBySlug('den-vong')).priceExclVat).toBe(1050000)
+    expect((await repo.getProductBySlug('den-vong')).price).toBe(1050000)
   })
 
   it('sửa kết quả listFaq/getBatchByCode không làm đổi dữ liệu repo', async () => {
@@ -373,7 +373,7 @@ describe('Migration SQL (D-39, D-43)', () => {
     for (const p of products) {
       expect(['draft', 'published', 'hidden']).toContain(p.status)
       expect(['single', 'set']).toContain(p.kind)
-      expect(Number.isInteger(p.priceExclVat) && p.priceExclVat >= 0).toBe(true)
+      expect(Number.isInteger(p.price) && p.price >= 0).toBe(true)
     }
     expect(new Set(products.map((p) => p.slug)).size).toBe(products.length)
     for (const b of demoBatches) {

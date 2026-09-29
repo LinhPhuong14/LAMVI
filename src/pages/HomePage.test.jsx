@@ -10,12 +10,12 @@ const handlers = {
 }
 
 describe('Trang chủ', () => {
-  it('G-01/G-09: sản phẩm lấy từ API, giá kèm "chưa gồm VAT"', async () => {
+  it('G-01/G-09: sản phẩm lấy từ API, giá kèm "đã gồm VAT" (D-68)', async () => {
     mockApi(handlers)
     renderAt('/')
     const grid = await screen.findByText('Đèn Sum Vầy', { selector: '.product-card a' })
     const card = grid.closest('.product-card')
-    expect(within(card).getByText('chưa gồm VAT')).toBeInTheDocument()
+    expect(within(card).getByText('đã gồm VAT')).toBeInTheDocument()
     expect(within(card).getByText(/1\.680\.000/)).toBeInTheDocument()
   })
 
@@ -46,7 +46,7 @@ describe('Trang sản phẩm', () => {
     mockApi({ ...handlers, 'GET /products/den-nguyet': () => ({ body: { item: productsVi.items[0] } }) })
     renderAt('/zh/products/den-nguyet')
     expect(await screen.findByRole('heading', { level: 1, name: 'Đèn Nguyệt' })).toBeInTheDocument()
-    expect(screen.getAllByText('不含增值税').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('含增值税').length).toBeGreaterThan(0)
   })
 
   it('404 → "Không tìm thấy sản phẩm."', async () => {

@@ -11,8 +11,8 @@ export function presentProduct(p, lang) {
     description: pick(p.description, lang),
     badge: pick(p.badge, lang),
     tone: p.tone,
-    // D-03 / T-09: giá chưa VAT, số nguyên VND
-    priceExclVat: p.priceExclVat,
+    // D-68 / T-09: giá niêm yết ĐÃ gồm VAT, số nguyên VND
+    price: p.price,
     currency: 'VND',
   }
 }

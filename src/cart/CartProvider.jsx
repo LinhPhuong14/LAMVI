@@ -23,7 +23,7 @@ export default function CartProvider({ children }) {
     async (id = ++seq.current) => {
       const items = localRef.current
       if (!items.length) {
-        return apply(id, { items: [], subtotalExclVat: 0, itemCount: 0, hasUnavailable: false, maxQuantity: MAX_QTY })
+        return apply(id, { items: [], subtotal: 0, itemCount: 0, hasUnavailable: false, maxQuantity: MAX_QTY })
       }
       apply(id, await api('/cart/quote', { method: 'POST', body: { items }, lang }))
     },

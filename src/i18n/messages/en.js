@@ -134,7 +134,7 @@ export default {
     notFound: 'Product not found.',
   },
   price: {
-    exclVat: 'excl. VAT',
+    inclVat: 'VAT included',
   },
   lookbook: {
     eyebrow: 'Lookbook',
@@ -347,7 +347,7 @@ export default {
     hasUnavailable: 'Your cart contains an unavailable product; it is not counted and cannot be ordered.',
     maxNote: 'Up to {max} per product.',
     subtotal: 'Subtotal',
-    shippingNote: 'Shipping and VAT are calculated at checkout.',
+    shippingNote: 'Prices include VAT. Shipping is calculated at checkout.',
     checkout: 'Checkout',
     checkoutSoon: 'Online checkout is coming soon. Your cart has been saved.',
     guestNote: 'Your cart is saved in this browser. Sign in to save it to your account.',
@@ -377,7 +377,7 @@ export default {
       step: 'Step {n}/{total}',
       steps: [
         'Welcome to LAMVI! Let Mây show you around: handmade dó paper lanterns, made as story-telling gifts.',
-        'This is the collection. Choose “As a gift” or “For myself”, then tap a lantern for details. Prices shown exclude VAT.',
+        'This is the collection. Choose “As a gift” or “For myself”, then tap a lantern for details. Prices shown include VAT.',
         'Each gift has two QR codes: the one on the thank-you card opens your message, the one engraved on the lantern opens the video of how its batch was made.',
         'Any other questions? Have a look at the FAQ.',
         'Mây is always here in the corner. Tap Mây to ask anything or replay the tour.',

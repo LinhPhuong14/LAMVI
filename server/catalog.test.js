@@ -11,7 +11,7 @@ describe('GET /api/products', () => {
     const res = await request(makeApp()).get('/api/products')
     expect(res.status).toBe(200)
     expect(res.body.items.map((p) => p.slug)).toEqual(['den-nguyet', 'den-vong', 'den-sum-vay'])
-    expect(res.body.items[0]).toMatchObject({ name: 'Đèn Nguyệt', priceExclVat: 890000, currency: 'VND' })
+    expect(res.body.items[0]).toMatchObject({ name: 'Đèn Nguyệt', price: 890000, currency: 'VND' })
   })
 
   it('D-39: ẩn sản phẩm draft/hidden', async () => {

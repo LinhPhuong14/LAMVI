@@ -7,7 +7,7 @@ const toProduct = (r) => ({
   slug: r.slug,
   kind: r.kind,
   status: r.status,
-  priceExclVat: r.price_excl_vat,
+  price: r.price,
   tone: r.tone,
   sortOrder: r.sort_order,
   name: r.name,
@@ -47,7 +47,7 @@ const toProfile = (r) => ({
 })
 
 // camelCase → snake_case cho các trường được phép ghi
-const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', priceExclVat: 'price_excl_vat', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge' }
+const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge' }
 const FAQ_COLS = { sortOrder: 'sort_order', isPublished: 'is_published', question: 'question', answer: 'answer' }
 const BATCH_COLS = { code: 'code', status: 'status', videoUrl: 'video_url', videoPath: 'video_path', producedOn: 'produced_on', title: 'title', story: 'story' }
 

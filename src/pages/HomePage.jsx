@@ -358,7 +358,7 @@ function ProductGrid({ intent }) {
             </h3>
             <p className="product-desc">{p.description}</p>
             <div className="product-foot">
-              <Price amount={p.priceExclVat} />
+              <Price amount={p.price} />
               {/* FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002) */}
               <AddToCart slug={p.slug} label={intent === 'gift' ? t('cart.giftAdd') : t('cart.add')} />
             </div>

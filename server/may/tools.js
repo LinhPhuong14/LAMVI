@@ -9,7 +9,7 @@ export const MAY_TOOLS = [
     type: 'function',
     function: {
       name: 'get_products',
-      description: 'Danh sách sản phẩm đang bán: tên, mô tả, giá chưa VAT (VND), đường dẫn.',
+      description: 'Danh sách sản phẩm đang bán: tên, mô tả, giá bán đã gồm VAT (VND), đường dẫn.',
       parameters: { type: 'object', properties: {}, additionalProperties: false },
     },
   },
@@ -42,7 +42,7 @@ const productForMay = (p, lang) => ({
   name: p.name,
   kind: p.kind,
   description: p.description,
-  priceExclVat: p.priceExclVat,
+  price: p.price,
   currency: 'VND',
   priceNote: 'excl. VAT',
   url: localePath(lang, `/products/${encodeURIComponent(p.slug)}`),

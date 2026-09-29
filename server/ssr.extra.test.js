@@ -1,4 +1,4 @@
-// Kiểm thử độc lập phía server cho SEO/SSR (D-49, D-50, BR-SEO-001, §23.2) — bổ sung cho seo.test.js
+// Kiểm thử độc lập phía server cho SEO/SSR (D-49, D-68, BR-SEO-001, §23.2) — bổ sung cho seo.test.js
 import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
@@ -196,14 +196,14 @@ describe('SSR — head', () => {
     expect(seoTags).not.toContain('#')
   })
 
-  it('JSON-LD sản phẩm: đúng 1 khối, giá chưa VAT, valueAddedTaxIncluded=false (D-50), url = canonical', async () => {
+  it('JSON-LD sản phẩm: đúng 1 khối, giá đã gồm VAT, valueAddedTaxIncluded=true (D-68), url = canonical', async () => {
     const r = await page('/zh/products/den-sum-vay')
     const blocks = [...r.html.matchAll(/<script type="application\/ld\+json" data-seo>(.*?)<\/script>/gs)]
     expect(blocks).toHaveLength(1)
     const ld = JSON.parse(blocks[0][1])
     expect(ld['@type']).toBe('Product')
     expect(ld.offers.price).toBe(1680000)
-    expect(ld.offers.priceSpecification).toMatchObject({ price: 1680000, valueAddedTaxIncluded: false, priceCurrency: 'VND' })
+    expect(ld.offers.priceSpecification).toMatchObject({ price: 1680000, valueAddedTaxIncluded: true, priceCurrency: 'VND' })
     expect(ld.url).toBe('https://moc.test/zh/products/den-sum-vay')
     expect(ld.offers.url).toBe(ld.url)
     expect(ld.name).toBe('团圆灯组')

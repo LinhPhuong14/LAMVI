@@ -62,7 +62,7 @@ export default function ProductPage() {
           {p.badge && <span className="product-badge static">{p.badge}</span>}
           <h1 className="page-title">{p.name}</h1>
           <p className="product-detail-desc">{p.description}</p>
-          <Price amount={p.priceExclVat} className="product-price large" />
+          <Price amount={p.price} className="product-price large" />
           {/* FR-CART-001 */}
           <div className="product-buy">
             <QuantityInput value={qty} onChange={setQty} />

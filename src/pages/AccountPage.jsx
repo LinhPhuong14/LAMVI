@@ -330,7 +330,7 @@ function Overview({ cart, mayItems, profile, go }) {
           <span className="dash-stat-label">{t('account.statCart')}</span>
           <strong className="dash-stat-value">{count ?? '–'}</strong>
           <span className="dash-stat-sub">
-            {count ? <Price amount={cart.subtotalExclVat} className="dash-stat-price" /> : t('account.cartEmpty')}
+            {count ? <Price amount={cart.subtotal} className="dash-stat-price" /> : t('account.cartEmpty')}
           </span>
           <Link to={path('/cart')} className="dash-stat-link">
             {t('cart.view')} <span aria-hidden="true">→</span>

@@ -9,7 +9,7 @@ import { faqVi, productsVi } from '../test/fixtures.js'
 
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'an@example.com' } }
 const profile = { id: 'u1', email: 'an@example.com', fullName: 'Nguyễn An', phone: null, preferredLocale: 'vi', role: 'customer' }
-const emptyCart = { items: [], subtotalExclVat: 0, itemCount: 0, hasUnavailable: false, maxQuantity: 10 }
+const emptyCart = { items: [], subtotal: 0, itemCount: 0, hasUnavailable: false, maxQuantity: 10 }
 const THEME = 'moc.dashTheme'
 
 function login() {

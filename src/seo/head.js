@@ -76,7 +76,7 @@ export function applyHeadTags(doc, tags) {
   }
 }
 
-// D-50: JSON-LD sản phẩm — giá chưa VAT, ghi rõ valueAddedTaxIncluded=false (khớp cách hiển thị, BR-PRC-003)
+// D-68 (thay D-50): JSON-LD sản phẩm — giá ĐÃ gồm VAT, valueAddedTaxIncluded=true (khớp cách hiển thị, BR-PRC-003)
 export function productJsonLd(p, url) {
   return {
     '@context': 'https://schema.org',
@@ -89,12 +89,12 @@ export function productJsonLd(p, url) {
       '@type': 'Offer',
       url,
       priceCurrency: 'VND',
-      price: p.priceExclVat,
+      price: p.price,
       priceSpecification: {
         '@type': 'UnitPriceSpecification',
-        price: p.priceExclVat,
+        price: p.price,
         priceCurrency: 'VND',
-        valueAddedTaxIncluded: false,
+        valueAddedTaxIncluded: true,
       },
     },
   }

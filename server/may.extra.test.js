@@ -151,7 +151,7 @@ describe('Prompt injection & chống bịa (BR-AI-001/003/005, R-07, R-12)', () 
     })
     const outAll = await runTool('get_products', {}, { repo, lang: 'vi' })
     expect(outAll.products.map((p) => p.slug)).toEqual([products[2].slug])
-    expect(Object.keys(outAll.products[0]).sort()).toEqual(['currency', 'description', 'kind', 'name', 'priceExclVat', 'priceNote', 'slug', 'url'])
+    expect(Object.keys(outAll.products[0]).sort()).toEqual(['currency', 'description', 'kind', 'name', 'price', 'priceNote', 'slug', 'url'])
     const s = JSON.stringify(outAll)
     expect(s).not.toMatch(/"id"|"status"|"tone"|"sortOrder"|"updatedAt"/)
     expect(await runTool('get_product', { slug: products[0].slug }, { repo, lang: 'vi' })).toEqual({ error: 'not_found' })
@@ -230,7 +230,7 @@ describe('Lịch sử từ client bị lọc (routes/may.js cleanHistory)', () =
 })
 
 describe('BR-AI-003: kiểm tra số liệu', () => {
-  const out = [{ products: [{ priceExclVat: 1050000 }, { priceExclVat: 890000 }] }]
+  const out = [{ products: [{ price: 1050000 }, { price: 890000 }] }]
   it.each(['1.050.000 ₫', '1,050,000 VND', '1 050 000đ', '1 050 000 ₫', '1050000', '890.000 và 1.050.000'])('khớp dữ liệu "%s" → cho qua', (s) => {
     expect(unverifiedNumbers(s, out)).toEqual([])
   })

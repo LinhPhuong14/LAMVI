@@ -140,7 +140,7 @@ export default {
   },
   price: {
     // BR-PRC-003, D-03
-    exclVat: 'chưa gồm VAT',
+    inclVat: 'đã gồm VAT',
   },
   lookbook: {
     eyebrow: 'Lookbook',
@@ -362,7 +362,7 @@ export default {
     hasUnavailable: 'Giỏ có sản phẩm không còn bán; sản phẩm đó không được tính và không thể đặt.',
     maxNote: 'Tối đa {max} sản phẩm mỗi loại.',
     subtotal: 'Tạm tính',
-    shippingNote: 'Phí vận chuyển và VAT được tính ở bước thanh toán.',
+    shippingNote: 'Giá đã gồm VAT. Phí vận chuyển được tính ở bước thanh toán.',
     checkout: 'Thanh toán',
     checkoutSoon: 'Thanh toán trực tuyến sẽ sớm ra mắt. Giỏ hàng của bạn đã được lưu.',
     guestNote: 'Giỏ đang lưu trên trình duyệt này. Đăng nhập để lưu vào tài khoản.',
@@ -392,7 +392,7 @@ export default {
       step: 'Bước {n}/{total}',
       steps: [
         'Chào mừng bạn đến với LAMVI! Mây dẫn bạn đi một vòng nhé: đây là đèn giấy dó thủ công làm quà tặng kể chuyện.',
-        'Đây là bộ sưu tập. Chọn “Mua tặng” hoặc “Mua cho mình”, rồi bấm vào đèn để xem chi tiết. Giá hiển thị là giá chưa gồm VAT.',
+        'Đây là bộ sưu tập. Chọn “Mua tặng” hoặc “Mua cho mình”, rồi bấm vào đèn để xem chi tiết. Giá hiển thị đã gồm VAT.',
         'Mỗi món quà có hai mã QR: mã trên thiệp cảm ơn mở lời chúc của bạn, mã khắc trên đèn mở video hành trình làm ra mẻ đèn.',
         'Còn thắc mắc gì, bạn xem phần hỏi đáp này nha.',
         'Mây luôn ở góc này. Bấm vào Mây để hỏi bất cứ lúc nào, hoặc xem lại tour.',

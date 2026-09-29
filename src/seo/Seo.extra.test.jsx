@@ -263,7 +263,7 @@ describe('Head sau khi client chạy (FR-SEO-001, BR-SEO-001)', () => {
     expect(document.documentElement.lang).toBe('en')
   })
 
-  it('JSON-LD trên client khớp SSR (giá chưa VAT, không lặp)', async () => {
+  it('JSON-LD trên client khớp SSR (giá đã gồm VAT, không lặp)', async () => {
     const h = await ssrThenHydrate('/zh/products/den-nguyet')
     mounted.push(h.reactRoot)
     await flush()
@@ -271,7 +271,7 @@ describe('Head sau khi client chạy (FR-SEO-001, BR-SEO-001)', () => {
     expect(scripts).toHaveLength(1)
     const ld = JSON.parse(scripts[0].textContent)
     expect(ld.name).toBe(products[0].name.zh)
-    expect(ld.offers.price).toBe(products[0].priceExclVat)
-    expect(ld.offers.priceSpecification.valueAddedTaxIncluded).toBe(false)
+    expect(ld.offers.price).toBe(products[0].price)
+    expect(ld.offers.priceSpecification.valueAddedTaxIncluded).toBe(true)
   })
 })

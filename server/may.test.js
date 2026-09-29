@@ -93,9 +93,9 @@ describe('D-67: OpenAI mặc định bật; admin tắt (D-55) hoặc thiếu kh
 describe('Trả lời bằng dữ liệu thật (FR-AI-003, BR-AI-001, BR-AI-003)', () => {
   it('gọi hàm get_products rồi trả lời; giá có trong dữ liệu → giữ câu trả lời', async () => {
     await enable()
-    build([callTool('get_products'), say('Đèn Vọng giá 1.050.000 ₫ (chưa gồm VAT).')])
+    build([callTool('get_products'), say('Đèn Vọng giá 1.050.000 ₫ (đã gồm VAT).')])
     const res = await chat({ message: 'Đèn Vọng giá bao nhiêu?' })
-    expect(res.body.reply).toEqual({ kind: 'answer', text: 'Đèn Vọng giá 1.050.000 ₫ (chưa gồm VAT).' })
+    expect(res.body.reply).toEqual({ kind: 'answer', text: 'Đèn Vọng giá 1.050.000 ₫ (đã gồm VAT).' })
     const toolMsg = openai.calls[1].messages.find((m) => m.role === 'tool')
     expect(JSON.parse(toolMsg.content).products.map((p) => p.slug)).toEqual(['den-nguyet', 'den-vong', 'den-sum-vay'])
     expect(openai.calls[0].tools.map((t) => t.function.name)).toEqual(['get_products', 'get_product', 'get_faq'])
@@ -258,7 +258,7 @@ describe('guard', () => {
     expect(redactPii('gọi 0901.234.567 hoặc +84 912 345 678, mail a@b.co')).toBe('gọi [phone] hoặc [phone], mail [email]')
   })
   it('unverifiedNumbers: so khớp số dù khác định dạng', () => {
-    const out = [{ products: [{ priceExclVat: 1050000 }] }]
+    const out = [{ products: [{ price: 1050000 }] }]
     expect(unverifiedNumbers('1.050.000 ₫ và 1,050,000 VND', out)).toEqual([])
     expect(unverifiedNumbers('còn 999.000 ₫ năm 2027', out)).toEqual(['999000', '2027'])
     expect(unverifiedNumbers('30 ngày', [])).toEqual([])

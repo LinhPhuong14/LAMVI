@@ -77,7 +77,7 @@ export default function CartPage() {
               ) : (
                 <strong>{t('cart.unavailableName')}</strong>
               )}
-              {i.available ? <Price amount={i.product.priceExclVat} /> : <span className="field-error">{t('cart.unavailable')}</span>}
+              {i.available ? <Price amount={i.product.price} /> : <span className="field-error">{t('cart.unavailable')}</span>}
             </div>
             <QuantityInput
               value={i.quantity}
@@ -86,7 +86,7 @@ export default function CartPage() {
               onChange={(q) => q !== i.quantity && setQuantity(i.slug, q)}
             />
             <div className="cart-line-total">
-              {i.available && <Price amount={i.lineTotalExclVat} />}
+              {i.available && <Price amount={i.lineTotal} />}
               <button type="button" className="btn btn-small btn-ghost" onClick={() => remove(i.slug)}>
                 {t('cart.remove')}
               </button>
@@ -98,7 +98,7 @@ export default function CartPage() {
       <div className="cart-summary account-card">
         <div className="cart-subtotal">
           <span>{t('cart.subtotal')}</span>
-          <Price amount={cart.subtotalExclVat} className="product-price large" />
+          <Price amount={cart.subtotal} className="product-price large" />
         </div>
         <p className="field-hint">{t('cart.shippingNote')}</p>
         {!user && <p className="field-hint">{t('cart.guestNote')}</p>}

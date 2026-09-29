@@ -8,12 +8,12 @@ import I18nInput from './I18nInput.jsx'
 import { useAdminList } from './useAdminList.js'
 import { S } from './strings.js'
 
-const EMPTY = { slug: '', kind: 'single', status: 'draft', priceExclVat: '', tone: '', sortOrder: 0, name: {}, description: {}, badge: {} }
+const EMPTY = { slug: '', kind: 'single', status: 'draft', price: '', tone: '', sortOrder: 0, name: {}, description: {}, badge: {} }
 
 function toBody(form) {
   return {
     ...form,
-    priceExclVat: form.priceExclVat === '' ? undefined : Number(form.priceExclVat),
+    price: form.price === '' ? undefined : Number(form.price),
     sortOrder: Number(form.sortOrder) || 0,
     tone: form.tone || null,
   }
@@ -42,7 +42,7 @@ function ProductForm({ initial, onDone, onCancel }) {
     <form className="form admin-form" onSubmit={onSubmit} noValidate>
       <div className="admin-grid">
         <Field label={S.products.slug} value={form.slug} onChange={set('slug')} error={fields.slug} hint={S.products.slugHint} />
-        <Field label={S.products.price} type="number" min="0" step="1000" value={form.priceExclVat} onChange={set('priceExclVat')} error={fields.priceExclVat} />
+        <Field label={S.products.price} type="number" min="0" step="1000" value={form.price} onChange={set('price')} error={fields.price} />
         <Field as="select" label={S.products.kind} value={form.kind} onChange={set('kind')} error={fields.kind}>
           {Object.entries(S.products.kinds).map(([k, l]) => (
             <option key={k} value={k}>
@@ -156,7 +156,7 @@ export default function ProductsPage() {
                 <td>
                   <code>{p.slug}</code>
                 </td>
-                <td>{formatVnd(p.priceExclVat)}</td>
+                <td>{formatVnd(p.price)}</td>
                 <td>
                   <span className={`status status-${p.status}`}>{S.products.statuses[p.status]}</span>
                 </td>

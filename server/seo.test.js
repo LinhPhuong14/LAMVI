@@ -42,13 +42,13 @@ describe('sitemap.xml & robots.txt (§23.2)', () => {
 })
 
 describe('SSR (D-49, G-12)', () => {
-  it('trang sản phẩm en: HTML có nội dung, lang, title, canonical, hreflang, JSON-LD giá chưa VAT (D-50)', async () => {
+  it('trang sản phẩm en: HTML có nội dung, lang, title, canonical, hreflang, JSON-LD giá đã gồm VAT (D-68)', async () => {
     const r = await page('/en/products/den-vong')
     expect(r.status).toBe(200)
     expect(r.noindex).toBe(false)
     expect(r.html).toContain('<html lang="en">')
     expect(r.html).toMatch(/<h1[^>]*>Vong Lantern<\/h1>/)
-    expect(r.html).toContain('excl. VAT')
+    expect(r.html).toContain('VAT included')
     expect(r.html).toContain('<title data-seo>Vong Lantern — LAMVI · handmade dó paper lanterns</title>')
     expect(r.html).toContain('<link rel="canonical" href="https://moc.test/en/products/den-vong" data-seo>')
     expect(r.html).toContain('hreflang="zh-Hans" href="https://moc.test/zh/products/den-vong"')
@@ -56,7 +56,7 @@ describe('SSR (D-49, G-12)', () => {
     expect(ld).toMatchObject({
       '@type': 'Product',
       name: 'Vong Lantern',
-      offers: { price: 1050000, priceCurrency: 'VND', priceSpecification: { valueAddedTaxIncluded: false } },
+      offers: { price: 1050000, priceCurrency: 'VND', priceSpecification: { valueAddedTaxIncluded: true } },
     })
     // Dữ liệu nạp sẵn cho hydrate
     expect(r.html).toContain('window.__INITIAL_DATA__=')

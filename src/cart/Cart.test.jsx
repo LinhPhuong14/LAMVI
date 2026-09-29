@@ -15,13 +15,13 @@ function present(lines, hidden = []) {
       slug,
       quantity,
       available,
-      product: { name: slug === 'den-nguyet' ? 'Đèn Nguyệt' : 'Đèn Sum Vầy', tone: 'amber', priceExclVat: available ? PRICES[slug] : null },
-      lineTotalExclVat: available ? PRICES[slug] * quantity : null,
+      product: { name: slug === 'den-nguyet' ? 'Đèn Nguyệt' : 'Đèn Sum Vầy', tone: 'amber', price: available ? PRICES[slug] : null },
+      lineTotal: available ? PRICES[slug] * quantity : null,
     }
   })
   return {
     items,
-    subtotalExclVat: items.reduce((s, i) => s + (i.lineTotalExclVat ?? 0), 0),
+    subtotal: items.reduce((s, i) => s + (i.lineTotal ?? 0), 0),
     itemCount: items.filter((i) => i.available).reduce((s, i) => s + i.quantity, 0),
     hasUnavailable: items.some((i) => !i.available),
     maxQuantity: 10,
@@ -55,7 +55,7 @@ describe('Giỏ khách vãng lai (D-59)', () => {
     mockApi(base)
     renderAt('/cart')
     expect(await screen.findByText(/3\.460\.000/)).toBeInTheDocument()
-    expect(screen.getByText('Phí vận chuyển và VAT được tính ở bước thanh toán.')).toBeInTheDocument()
+    expect(screen.getByText('Giá đã gồm VAT. Phí vận chuyển được tính ở bước thanh toán.')).toBeInTheDocument()
     const line = screen.getByText('Đèn Nguyệt', { selector: 'strong' }).closest('li')
     fireEvent.click(within(line).getByRole('button', { name: 'Tăng số lượng' }))
     await waitFor(() => expect(JSON.parse(localStorage.getItem('moc.cart'))[0]).toEqual({ slug: 'den-nguyet', quantity: 3 }))
