@@ -4,6 +4,14 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 (phiên 10) — Cân lại bố cục dashboard màn rộng (nhánh `fix/dashboard-layout`, từ `master`)
+
+**Nhận xét người dùng**: cụm nội dung bên phải bị dồn trái, để lại khoảng trống lớn → layout lệch.
+
+**Đã làm**: vùng nội dung dashboard rộng tối đa 1320px và căn giữa; tab một thẻ (Trò chuyện) trải hết cột, Hồ sơ 980px căn giữa; hai thẻ hàng dưới Tổng quan cao bằng nhau. Kiểm ở 1440/1812/2560px. Design rules §12.
+
+---
+
 ## 2026-09-29 — Mây: OpenAI mặc định bật (nhánh `feat/may-openai-default`)
 
 **Quyết định từ người dùng**: đồng ý `[LEGAL]` I-14, đổi mặc định bật OpenAI → D-67 (trên nhánh đánh D-64; khi gộp `master` đổi thành D-67 vì D-64…D-66 đã dùng).
@@ -11,6 +19,8 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 **Đã làm**: `DEFAULT_MAY_CONFIG.openaiEnabled = true` (`server/may/config.js`); thiếu `OPENAI_API_KEY` vẫn chạy FAQ offline; admin vẫn tắt được ở `/admin/may`. Bỏ câu "chờ pháp chế" ở admin/IT/`.env.example`. Subagent kiểm thử (T-11): không có lỗi, thêm `server/may.default.extra.test.js` (12 test, gồm che SĐT/email trước khi gửi OpenAI). Spec v0.17.
 
 **Còn lại / cần người dùng**: Vercel đã có `OPENAI_API_KEY`; cấu hình Mây lưu ở Supabase nên vẫn cần nối Supabase. Cấu hình đã lưu với `openaiEnabled: false` giữ nguyên.
+
+---
 
 ## 2026-09-29 (phiên 9) — Dashboard kính mờ, nền mây khói, giao diện tối (nhánh `feat/account-glass`, từ `master`)
 
