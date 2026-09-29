@@ -179,7 +179,23 @@ Quy tắc:
 | Hoạ tiết Việt | Tự vẽ chữ Hán, rồng, mái cung điện Trung Hoa lên giao diện |
 | Hiệu ứng tắt khi giảm chuyển động | Animation bằng `filter`/`box-shadow` lặp liên tục |
 
-## 12. Checklist khi thêm thành phần
+## 12. Dashboard tài khoản (`/account`)
+
+Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệu (`APP_PAGES`, class `.page-app`). Style ở mục "Dashboard tài khoản" cuối `pages.css`.
+
+| Phần | Cách trình bày |
+|---|---|
+| Thanh bên (288px, dính, cao 100dvh) | Mảng chàm + `--pat-cloud`, nét phân cách `--hoe-light` 20%; logo ấn triện + đổi ngôn ngữ; khối người dùng; tab dọc; chân: về cửa hàng, giỏ, đăng xuất |
+| Avatar | Ấn triện son tròn, chữ cái đầu của tên gọi (từ cuối họ tên), xoay −4°, texture mực mòn |
+| Tab dọc | Biểu tượng nét 1,4px + nhãn; tab đang chọn là **tờ giấy điệp chìa ra** nối liền vùng nội dung (nền `--diep`, chữ `--than`, nét son 2px bên trái); huy hiệu viền mảnh |
+| Đầu vùng nội dung | Eyebrow lời chào, h1, câu phụ theo tab, đèn khắc gỗ treo bên phải; kẻ đôi bên dưới |
+| Số liệu | Ô tranh bồi, số Fraunces `oldstyle-nums` màu `--than` — không dùng son cho số để giữ một điểm nhấn son; ≤640px thu thành hàng (số trái, chữ phải) |
+| Thẻ | Tranh bồi + đầu thẻ kẻ đôi; hồ sơ dùng khung thiếp thư (4 góc triện) |
+| Chat Mây | Nhãn ngày dính đầu khung giữa hai nét mảnh; tin khách nền `--than` chữ `--diep-light`, tin Mây nền `--diep` viền `--hair-soft` |
+| Màn ≤960px | Thanh bên tách (`display: contents`): đầu trang chàm → thanh tab ngang dạng viên thuốc, dính trên cùng → nội dung → chân chàm |
+| Motion | Đổi tab: `dash-in` 0.5s (`--ease-out`), ô số liệu lệch 70ms; tắt khi giảm chuyển động |
+
+## 13. Checklist khi thêm thành phần
 
 1. Dùng token màu; kiểm tra tương phản nếu có chữ.
 2. Khung: chọn tranh bồi / thiếp thư / danh sách nét mảnh — không tạo khung mới có viền dày.

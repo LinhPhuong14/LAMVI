@@ -139,7 +139,7 @@ describe('Form — trạng thái gửi', () => {
     expect(await screen.findByRole('button', { name: 'Đang xử lý…' })).toBeDisabled()
     r2.unmount()
 
-    renderAt('/account')
+    renderAt('/account?tab=profile')
     fireEvent.click(await screen.findByRole('button', { name: 'Lưu thay đổi' }))
     expect(await screen.findByRole('button', { name: 'Đang xử lý…' })).toBeDisabled()
   })
@@ -160,7 +160,7 @@ describe('SEO — noindex (BR-SEO-001)', () => {
   it('/account đặt noindex; rời trang (sang trang chủ) → gỡ meta', async () => {
     localStorage.setItem('moc.session', JSON.stringify(session))
     mockApi({ ...base, 'GET /me': () => ({ body: { profile } }) })
-    renderAt('/account')
+    renderAt('/account?tab=profile')
     await screen.findByDisplayValue('Nguyễn An')
     expect(robots()).toHaveLength(1)
     fireEvent.click(screen.getByRole('link', { name: 'LAMVI' }))
@@ -339,7 +339,7 @@ describe('Hồ sơ — PATCH /me', () => {
       'GET /me': () => ({ body: { profile } }),
       'PATCH /me': (url, init) => ({ body: { profile: { ...profile, ...JSON.parse(init.body), phone: '0901234567' } } }),
     })
-    renderAt('/account')
+    renderAt('/account?tab=profile')
     await screen.findByDisplayValue('Nguyễn An')
     type('Họ và tên', 'An Nguyễn')
     type('Số điện thoại (không bắt buộc)', '+84 901 234 567')
@@ -360,7 +360,7 @@ describe('Hồ sơ — PATCH /me', () => {
       'GET /me': () => ({ body: { profile } }),
       'PATCH /me': () => ({ body: { profile: { ...profile, phone: '0901234567' } } }),
     })
-    renderAt('/account')
+    renderAt('/account?tab=profile')
     await screen.findByDisplayValue('Nguyễn An')
     type('Số điện thoại (không bắt buộc)', '+84 901 234 567')
     fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
@@ -375,7 +375,7 @@ describe('Hồ sơ — PATCH /me', () => {
       'GET /me': () => ({ body: { profile } }),
       'PATCH /me': () => ({ status: 400, body: { error: { code: 'VALIDATION_ERROR', fields: { phone: 'INVALID_PHONE', fullName: 'TOO_LONG' } } } }),
     })
-    renderAt('/account')
+    renderAt('/account?tab=profile')
     await screen.findByDisplayValue('Nguyễn An')
     fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
     expect(await screen.findByText('Số điện thoại Việt Nam không hợp lệ.')).toBeInTheDocument()
@@ -387,7 +387,7 @@ describe('Hồ sơ — PATCH /me', () => {
   it('email hiển thị chỉ đọc; không có ô sửa role', async () => {
     localStorage.setItem('moc.session', JSON.stringify(session))
     const fetchMock = mockApi({ ...base, 'GET /me': () => ({ body: { profile } }), 'PATCH /me': () => ({ body: { profile } }) })
-    renderAt('/account')
+    renderAt('/account?tab=profile')
     const email = await screen.findByDisplayValue('an@example.com')
     expect(email).toHaveAttribute('readonly')
     fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
@@ -406,7 +406,7 @@ describe('Hồ sơ — PATCH /me', () => {
       'POST /auth/refresh': () => ({ body: { ...session, accessToken: 'a2', refreshToken: 'r2' } }),
       'PATCH /me': (url, init) => (expired && init.headers.Authorization === 'Bearer a1' ? { status: 401, body: {} } : { body: { profile } }),
     })
-    renderAt('/account')
+    renderAt('/account?tab=profile')
     await screen.findByDisplayValue('Nguyễn An')
     expired = true
     fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))

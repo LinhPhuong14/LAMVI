@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.10 (bản nháp) |
+| Phiên bản | v0.11 (bản nháp) |
 | Ngày | 2026-09-29 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`) |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — dashboard tài khoản khách dạng tab dọc (nhánh `feat/account-dashboard`), G-37 |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -147,6 +147,14 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 - Lỗi mạng khi làm mới phiên không đăng xuất khách; chỉ đăng xuất khi phiên bị máy chủ từ chối `[DERIVED]`.
 - Đăng xuất vô hiệu mọi phiên của tài khoản trên mọi thiết bị; đặt lại mật khẩu xong phải đăng nhập lại `[ASSUMPTION]`.
 - Trang đăng nhập/đăng ký/quên mật khẩu/tài khoản đặt `noindex` `[DERIVED]` BR-SEO-001.
+
+**Dashboard tài khoản (v0.11)**
+
+- Trang `/account` là dashboard dạng ứng dụng: **không** có header/footer của trang giới thiệu; thanh bên (logo về trang chủ, đổi ngôn ngữ, tên + email, tab dọc, về cửa hàng, giỏ hàng, đăng xuất). Màn ≤960px: tab chuyển thành thanh ngang dính đầu trang `[CONFIRMED]` D-63.
+- 4 tab: Tổng quan, Đơn hàng, Trò chuyện với Mây, Hồ sơ. Tab đang mở lưu ở `?tab=` (`orders`, `may`, `profile`; không có hoặc sai → Tổng quan) để tải lại, chia sẻ link và nút Back giữ đúng tab; điều hướng bàn phím theo WAI-ARIA tabs `[ASSUMPTION]`.
+- Tổng quan: số liệu nhanh (số sản phẩm và tạm tính của giỏ — có chú thích chưa gồm VAT theo BR-PRC-003; đơn hàng; số câu đã hỏi Mây), 2 tin chat gần nhất, tóm tắt hồ sơ `[ASSUMPTION]`.
+- Khi chưa có đơn hàng (FR-ACC-002 chưa làm), tab đơn hàng chỉ báo "sắp ra mắt" và liệt kê những gì sẽ có (công đoạn, lời chúc, mã vận đơn — FR-ACC-002/003, D-41); **không** hiển thị đơn mẫu `[ASSUMPTION]`. Câu "soạn và sửa lời chúc" chưa nói thời hạn vì còn chờ Q-08.
+- Lịch sử chat Mây chia theo ngày, kèm giờ từng tin, theo giờ Việt Nam (Asia/Ho_Chi_Minh) `[ASSUMPTION]`; "số câu đã hỏi Mây" chỉ đếm tin của khách trong 100 tin gần nhất mà API trả về `[ASSUMPTION]`.
 
 ### 5.2a Dashboard IT (v0.5)
 
@@ -1081,6 +1089,7 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-34 | Nội dung khi chưa chạy JS | Các khối có hiệu ứng xuất hiện nằm trong HTML SSR (máy tìm kiếm đọc được) nhưng `opacity: 0` tới khi JS chạy. Đã giảm: màn hình đầu (tiêu đề, LCP) chạy bằng CSS nên hiện ngay; trình duyệt tắt JS được CSS `@media (scripting: none)` ép hiện. Còn lại: JS tải chậm thì các khối dưới màn hình đầu chờ hydrate mới hiện | Technical debt | 🟡 Một phần (v0.6) |
 | G-35 | Số liệu API trên Vercel (T-18) | Flush bằng timer/SIGTERM; instance serverless có thể bị đóng trước khi flush nên dashboard IT có thể thiếu số liệu | Technical debt | **Mới** (v0.9) |
 | G-36 | Deploy Vercel chưa kiểm chứng thật (T-33) | Mới thử local giả lập `VERCEL=1`; chưa deploy Preview/Production, chưa kiểm rewrite/`includeFiles` trên nền tảng | Chưa kiểm chứng | **Mới** (v0.9) |
+| G-37 | Dashboard tài khoản: mục đơn hàng (v0.11) | `/account` đã thiết kế lại thành dashboard tab dọc; tab đơn hàng và ô số liệu đơn hàng mới là chỗ chờ, làm thật cùng FR-ACC-002/003. Số câu hỏi Mây chỉ tính trên 100 tin gần nhất | Missing | **Mới** (v0.11) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
@@ -1126,7 +1135,7 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 - `[ASSUMPTION]` Chú thích tranh (tên, mô tả, alt vi/en/zh) do dev soạn — chờ Marketing duyệt cùng G-14.
 - `[ASSUMPTION]` Tham khảo web Trung Quốc chỉ ở mức nguyên tắc trình bày (nét, khung, khoảng trắng); không dùng chữ Hán, rồng, mái cung điện để web vẫn mang bản sắc Việt.
 - ~~`[ASSUMPTION]` Giữ thương hiệu MỘC~~ — thay bởi D-62: tên web và thương hiệu là **LAMVI**.
-- Khoảng trống mới: G-33, G-34 (§31.2). Deploy Vercel: G-35, G-36.
+- Khoảng trống mới: G-33, G-34 (§31.2). Deploy Vercel: G-35, G-36. Dashboard tài khoản: G-37.
 
 ---
 
@@ -1196,3 +1205,4 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 | D-60 | Tối đa 10 sản phẩm mỗi dòng giỏ | Hiệu lực (v0.7) |
 | D-61 | Khi chưa có checkout: nút Thanh toán bắt đăng nhập rồi báo "sắp ra mắt" | Hiệu lực (v0.7) |
 | D-62 | Tên web và thương hiệu là **LAMVI** (viết liền, không dấu) ở mọi nơi — logo, tiêu đề trang, câu văn, bản dịch en/zh; không dùng "MỘC" hay "LÂM VỊ" | Hiệu lực (v0.10) |
+| D-63 | Dashboard tài khoản khách dạng tab dọc, không dùng header (và footer) của trang giới thiệu; tối ưu trải nghiệm người dùng | Hiệu lực (v0.11) |

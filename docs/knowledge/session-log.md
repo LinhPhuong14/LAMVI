@@ -4,6 +4,24 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 (phiên 8) — Dashboard tài khoản khách (nhánh `feat/account-dashboard`, từ `master`)
+
+**Quyết định từ người dùng**
+
+- D-63: dashboard tài khoản dạng tab dọc, không dùng header (và footer) của trang giới thiệu, tối ưu trải nghiệm.
+
+**Đã làm**
+
+1. `LocaleLayout`: trang dạng ứng dụng (`/account`) không render `SiteHeader`/`SiteFooter` (class `.page-app`).
+2. `AccountPage` thành dashboard: thanh bên chàm (logo, đổi ngôn ngữ, người dùng, tab dọc WAI-ARIA, về cửa hàng, giỏ, đăng xuất); tab lưu ở `?tab=`; Tổng quan (số liệu giỏ/đơn/Mây, chat gần đây, tóm tắt hồ sơ), Đơn hàng (chỗ chờ, không đơn giả — G-37), Trò chuyện với Mây (chia theo ngày giờ VN), Hồ sơ. Màn ≤960px: tab ngang dính đầu trang. Design rules §12.
+3. Test cũ đổi sang `/account?tab=profile` / `?tab=may`.
+4. Subagent kiểm thử độc lập (T-11): `src/pages/AccountDashboard.extra.test.jsx` (58 test) phát hiện: giờ tiếng Anh hiện 12h; tin không có thời điểm xen giữa làm lặp tiêu đề ngày; hai nút "Xem" trùng tên truy cập → đã sửa.
+5. Spec v0.11: D-63, quy tắc dashboard §5.2 (`[ASSUMPTION]`), G-37.
+
+**Còn lại**: tab đơn hàng làm thật cùng FR-ACC-002/003 (chờ checkout, Q-08).
+
+---
+
 ## 2026-09-29 — Đổi tên thương hiệu sang LAMVI (nhánh `feat/brand-lamvi`)
 
 **Quyết định từ người dùng**: tên web và thương hiệu là **LAMVI** (viết liền, không dấu) ở mọi nơi; không dùng "MỘC", cũng không dùng "LÂM VỊ" → D-62.
