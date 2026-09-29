@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.11 (bản nháp) |
+| Phiên bản | v0.12 (bản nháp) |
 | Ngày | 2026-09-29 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — dashboard tài khoản khách dạng tab dọc (nhánh `feat/account-dashboard`), G-37 |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — dashboard tài khoản khách dạng tab dọc (nhánh `feat/account-dashboard`), G-37. v0.12: dashboard tài khoản đổi sang phong cách thanh thoát (T-34), không đổi nghiệp vụ |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**

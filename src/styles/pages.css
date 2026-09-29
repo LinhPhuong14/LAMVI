@@ -966,16 +966,24 @@
 
 /* ---------- Dashboard tài khoản (FR-ACC) ----------
    Ứng dụng nhỏ, không dùng header/footer của trang giới thiệu (LocaleLayout → .page-app).
-   Thanh bên chàm như cột gỗ sơn của gian đình; tab đang chọn là tờ giấy điệp
-   chìa ra nối liền với vùng nội dung. Màn hẹp: thanh tab nằm ngang, dính đầu trang. */
+   Tinh thần thanh thoát theo dashboard Trung Quốc ở mức nguyên tắc (T-34): nhiều khoảng trắng,
+   nền giấy sáng, chỉ nét 1px, không bóng đổ, một điểm nhấn son; vạch nhỏ trước tiêu đề mục;
+   dải số liệu ngăn bằng nét dọc. Không dùng chữ Hán, hoạ tiết cung đình. */
 .dash {
+  --dash-line: rgba(122, 93, 60, 0.18);
+  --dash-soft: rgba(122, 93, 60, 0.07);
   display: grid;
-  grid-template-columns: 288px minmax(0, 1fr);
+  grid-template-columns: 264px minmax(0, 1fr);
   min-height: 100vh;
   min-height: 100dvh;
 }
 
-/* ----- Thanh bên ----- */
+/* Trang ứng dụng: bỏ viền tối kiểu ảnh cũ quanh khung nhìn cho mặt giấy trong trẻo */
+.page-app::before {
+  display: none;
+}
+
+/* ----- Thanh bên: giấy sáng, một nét mảnh bên phải ----- */
 .dash-side {
   position: sticky;
   top: 0;
@@ -983,12 +991,11 @@
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 26px 0 22px 22px;
+  gap: 36px;
+  padding: 32px 24px 28px;
   overflow-y: auto;
-  color: var(--diep);
-  background: var(--pat-cloud) 0 0 / 300px 170px, var(--cham);
-  box-shadow: inset -1px 0 0 rgba(226, 198, 143, 0.22);
+  background: var(--diep-light);
+  border-right: 1px solid var(--dash-line);
   scrollbar-width: none;
 }
 
@@ -997,94 +1004,83 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-right: 22px;
+}
+
+.dash-brand .seal-inner {
+  font-size: 0.92rem;
+}
+
+.dash .lang-switch {
+  gap: 2px;
+  font-size: 0.72rem;
 }
 
 .dash .lang-switch a {
-  color: rgba(244, 237, 224, 0.78);
-}
-
-.dash .lang-switch a:hover {
-  color: var(--diep-light);
+  padding: 3px 6px;
+  color: var(--sepia);
 }
 
 .dash .lang-switch a.active {
-  color: var(--cham);
-  background: var(--hoe-light);
+  color: var(--than);
+  background: transparent;
+  box-shadow: inset 0 -1px 0 var(--son);
+  border-radius: 0;
 }
 
 .dash-user {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 22px 18px 0;
-  border-top: 1px solid rgba(226, 198, 143, 0.2);
-  border-bottom: 1px solid rgba(226, 198, 143, 0.2);
+  gap: 12px;
   min-width: 0;
 }
 
-/* Ấn triện tròn mang chữ cái đầu của tên */
+/* Ấn triện tròn chỉ nét: vòng son mảnh, chữ son */
 .dash-avatar {
-  position: relative;
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: var(--son);
-  box-shadow:
-    inset 0 0 0 3px var(--son),
-    inset 0 0 0 4px rgba(248, 239, 217, 0.7),
-    0 8px 20px -10px rgba(0, 0, 0, 0.6);
-  transform: rotate(-4deg);
+  border: 1px solid var(--son);
+  box-shadow: inset 0 0 0 3px var(--diep-light), inset 0 0 0 4px rgba(163, 50, 31, 0.35);
   font-family: var(--serif);
-  font-weight: 700;
-  font-size: 1.5rem;
+  font-weight: 500;
+  font-size: 1.15rem;
   line-height: 1;
-  color: var(--diep-light);
-}
-
-.dash-avatar::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--tex-worn);
-  opacity: 0.3;
-  pointer-events: none;
+  color: var(--son);
 }
 
 .dash-user-text {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .dash-user-text strong {
   font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.08rem;
-  color: var(--diep-light);
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--than);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .dash-user-text span {
-  font-size: 0.8rem;
-  color: var(--hoe-light);
+  font-size: 0.78rem;
+  color: var(--sepia);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Tab dọc */
+/* Tab dọc: chỉ chữ + biểu tượng nét, tab đang chọn có vạch son ở mép thanh bên */
 .dash-tabs {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .dash-tab {
@@ -1093,259 +1089,264 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 22px 12px 14px;
+  padding: 10px 12px;
   border: 0;
-  border-radius: 3px 0 0 3px;
+  border-radius: 2px;
   background: transparent;
-  color: rgba(244, 237, 224, 0.82);
+  color: var(--than-soft);
   font: inherit;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.92rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   text-align: left;
   cursor: pointer;
   transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .dash-tab:hover {
-  color: var(--diep-light);
-  background: rgba(226, 198, 143, 0.1);
+  color: var(--than);
+  background: var(--dash-soft);
 }
 
 .dash-tab:focus-visible {
-  outline: 2px solid var(--hoe-light);
-  outline-offset: -2px;
+  outline: 1px solid var(--son);
+  outline-offset: 1px;
 }
 
-/* Tab đang chọn: tờ giấy điệp nối liền vùng nội dung, nét son đánh dấu bên trái */
 .dash-tab[aria-selected='true'] {
   color: var(--than);
-  background: var(--diep);
+  background: var(--dash-soft);
   font-weight: 600;
-  box-shadow: 0 10px 22px -16px rgba(0, 0, 0, 0.7);
 }
 
 .dash-tab[aria-selected='true']::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 10px;
-  bottom: 10px;
+  left: -24px;
+  top: 50%;
   width: 2px;
+  height: 18px;
+  transform: translateY(-50%);
   background: var(--son);
 }
 
-.dash-tab[aria-selected='true']:focus-visible {
-  outline-color: var(--son);
+.dash-tab-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--sepia);
 }
 
-.dash-tab-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
+.dash-tab[aria-selected='true'] .dash-tab-icon {
+  color: var(--than);
 }
 
 .dash-tab-label {
   flex: 1;
   min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dash-tab-badge {
   flex-shrink: 0;
-  min-width: 22px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  border: 1px solid currentColor;
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 500;
   letter-spacing: 0.04em;
-  text-align: center;
-  opacity: 0.8;
+  color: var(--sepia);
+  font-variant-numeric: tabular-nums;
 }
 
 .dash-side-foot {
   margin-top: auto;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 16px 22px 0 0;
-  border-top: 1px solid rgba(226, 198, 143, 0.2);
+  gap: 2px;
+  padding-top: 18px;
+  border-top: 1px solid var(--dash-line);
 }
 
 .dash-side-link,
 .dash-logout {
   display: block;
-  padding: 7px 0;
-  color: rgba(244, 237, 224, 0.82);
+  padding: 6px 12px;
+  color: var(--than-soft);
   font: inherit;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   text-align: left;
   text-decoration: none;
   background: none;
   border: 0;
+  border-radius: 2px;
   cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .dash-side-link:hover,
 .dash-logout:hover {
-  color: var(--hoe-light);
+  color: var(--than);
+  background: var(--dash-soft);
 }
 
 .dash-logout {
-  margin-top: 8px;
-  padding: 9px 14px;
-  border: 1px solid rgba(226, 198, 143, 0.45);
-  border-radius: 3px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.dash-logout:hover {
-  background: rgba(226, 198, 143, 0.12);
+  color: var(--sepia);
 }
 
 /* ----- Vùng nội dung ----- */
 .dash-main {
   min-width: 0;
-  padding: 44px 56px 88px;
+  padding: 64px 72px 96px;
   outline: none;
 }
 
 .dash-main > * {
-  max-width: 1040px;
+  max-width: 960px;
 }
 
 .dash-top {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
-  padding-bottom: 20px;
-  margin-bottom: 30px;
-  border-bottom: 3px double var(--hair);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--dash-line);
 }
 
 .dash-top .eyebrow {
-  margin-bottom: 4px;
+  margin-bottom: 10px;
+  color: var(--sepia);
+  font-weight: 500;
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
 }
 
 .dash-top .page-title {
-  margin: 0 0 6px;
+  margin: 0 0 10px;
+  font-weight: 500;
+  font-size: clamp(1.9rem, 2.8vw, 2.5rem);
+  letter-spacing: 0.005em;
 }
 
 .dash-top-sub {
   margin: 0;
   color: var(--than-soft);
+  font-size: 0.95rem;
   max-width: 56ch;
 }
 
 .dash-top-lantern {
   flex-shrink: 0;
-  margin: -44px 12px -20px 0;
-  filter: drop-shadow(0 0 22px rgba(242, 192, 78, 0.35));
+  margin: 0 8px -6px 0;
+  opacity: 0.92;
 }
 
 .dash-panel {
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  animation: dash-in 0.5s var(--ease-out) both;
+  gap: 40px;
+  animation: dash-in 0.6s var(--ease-out) both;
 }
 
-/* Ô số liệu */
+/* Dải số liệu: không khung, ngăn bằng nét dọc mảnh */
 .dash-stats {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 22px;
+  border-top: 1px solid var(--dash-line);
+  border-bottom: 1px solid var(--dash-line);
 }
 
 .dash-stat {
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 24px 24px 20px;
-  background: var(--diep-light);
-  border-radius: 2px;
-  box-shadow: var(--print);
+  gap: 6px;
+  padding: 26px 28px 24px;
   --i: 0;
   animation: dash-in 0.6s var(--ease-out) both;
-  animation-delay: calc(var(--i) * 0.07s);
+  animation-delay: calc(var(--i) * 0.08s);
 }
 
-.dash-stat::after,
-.dash-card::after {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border: 1px solid var(--hair-soft);
-  pointer-events: none;
+.dash-stat:first-child {
+  padding-left: 0;
+}
+
+.dash-stat + .dash-stat {
+  border-left: 1px solid var(--dash-line);
 }
 
 .dash-stat-label {
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--sepia);
 }
 
 .dash-stat-value {
   font-family: var(--serif);
-  font-weight: 600;
-  font-size: 2.7rem;
-  line-height: 1.1;
+  font-weight: 300;
+  font-size: 3rem;
+  line-height: 1.05;
   font-variant-numeric: oldstyle-nums;
   color: var(--than);
 }
 
 .dash-stat-word {
-  font-size: 1.65rem;
-  line-height: 1.55;
+  font-size: 1.5rem;
+  line-height: 1.7;
+  font-weight: 400;
   font-style: italic;
+  color: var(--than-soft);
 }
 
 .dash-stat-sub {
   color: var(--than-soft);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   min-height: 2.6em;
 }
 
 .dash-stat-price {
   font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.05rem;
+  font-weight: 500;
+  font-size: 1rem;
   color: var(--than);
 }
 
 .dash-stat-link,
 .dash-head-link {
-  position: relative;
-  z-index: 1;
   align-self: flex-start;
   padding: 0;
   color: var(--son-deep);
   font: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   text-decoration: none;
   background: none;
   border: 0;
-  border-bottom: 1px solid var(--hair);
   cursor: pointer;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.35s var(--ease-out);
 }
 
 .dash-stat-link {
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .dash-stat-link:hover,
-.dash-head-link:hover {
-  border-bottom-color: var(--son-deep);
+.dash-head-link:hover,
+.dash-stat-link:focus-visible,
+.dash-head-link:focus-visible {
+  background-size: 100% 1px;
 }
 
 .dash-head-link {
@@ -1353,13 +1354,12 @@
   flex-shrink: 0;
 }
 
-/* Thẻ tranh bồi */
+/* Thẻ: nền giấy sáng, một nét mảnh, không bóng */
 .dash-card {
-  position: relative;
-  padding: 28px 30px 30px;
+  padding: 28px 32px 30px;
   background: var(--diep-light);
-  border-radius: 2px;
-  box-shadow: var(--print-lg);
+  border: 1px solid var(--dash-line);
+  border-radius: 4px;
 }
 
 .dash-card-head {
@@ -1367,63 +1367,55 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 14px;
-  margin-bottom: 20px;
-  border-bottom: 3px double var(--hair);
+  margin-bottom: 22px;
 }
 
+/* Vạch son nhỏ trước tiêu đề mục */
 .dash-card-head h2 {
-  font-size: 1.45rem;
+  position: relative;
   margin: 0;
+  padding-left: 14px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.dash-card-head h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 0.95em;
+  transform: translateY(-50%);
+  background: var(--son);
 }
 
 .dash-tag {
   flex-shrink: 0;
-  padding: 3px 10px;
-  border: 1px solid var(--hair);
-  border-radius: 2px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  padding: 2px 10px;
+  border: 1px solid var(--dash-line);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--sepia);
-  background: var(--diep);
 }
 
 .dash-muted {
   color: var(--than-soft);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 
-/* Khung thiếp thư: bốn góc hoa văn triện */
-.dash-letter {
-  background:
-    var(--corner-tl) 10px 10px / 28px no-repeat,
-    var(--corner-tr) right 10px top 10px / 28px no-repeat,
-    var(--corner-bl) left 10px bottom 10px / 28px no-repeat,
-    var(--corner-br) right 10px bottom 10px / 28px no-repeat,
-    var(--diep-light);
-  padding: 38px 36px 34px;
-}
-
-.dash-letter::after {
-  inset: 16px;
-}
-
-.dash-letter .form,
-.dash-letter .dash-facts {
-  position: relative;
-  z-index: 1;
-}
-
-.dash-panel > .dash-letter {
-  max-width: 560px;
+.dash-panel > .dash-card:only-child {
+  max-width: 640px;
 }
 
 .dash-duo {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  gap: 22px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px;
   align-items: start;
 }
 
@@ -1431,15 +1423,18 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .dash-facts div {
   display: grid;
-  grid-template-columns: 9.5em minmax(0, 1fr);
+  grid-template-columns: 9em minmax(0, 1fr);
   gap: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--hair-soft);
+  padding: 11px 0;
+  border-bottom: 1px dashed var(--dash-line);
+}
+
+.dash-facts div:first-child {
+  padding-top: 0;
 }
 
 .dash-facts div:last-child {
@@ -1449,44 +1444,46 @@
 
 .dash-facts dt {
   color: var(--sepia);
-  font-size: 0.86rem;
+  font-size: 0.84rem;
 }
 
 .dash-facts dd {
   margin: 0;
+  font-size: 0.95rem;
   overflow-wrap: anywhere;
 }
 
-/* Đơn hàng: trạng thái chờ, minh hoạ đèn */
+/* Đơn hàng: trạng thái chờ */
 .dash-orders {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 28px;
+  gap: 36px;
   align-items: center;
 }
 
 .dash-orders p {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
 }
 
 .dash-orders-art {
   display: grid;
   place-items: center;
-  width: 150px;
-  height: 180px;
-  border-radius: 999px 999px 16px 16px;
-  background: radial-gradient(circle at 50% 42%, rgba(242, 192, 78, 0.28), transparent 62%), var(--diep-deep);
+  width: 128px;
+  height: 156px;
+  border-radius: 999px 999px 4px 4px;
+  border: 1px solid var(--dash-line);
+  background: radial-gradient(circle at 50% 45%, rgba(242, 192, 78, 0.16), transparent 65%);
 }
 
 .dash-features {
   list-style: none;
-  margin: 0 0 20px;
+  margin: 0 0 22px;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
   color: var(--than-soft);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
 .dash-features li {
@@ -1496,26 +1493,25 @@
 }
 
 .dash-features .lotus {
+  width: 14px;
+  height: 10px;
   color: var(--sepia);
-  transform: translateY(2px);
+  opacity: 0.8;
 }
 
 .btn-compact {
-  position: relative;
-  z-index: 1;
-  padding: 10px 20px;
-  font-size: 0.9rem;
+  padding: 9px 20px;
+  font-size: 0.86rem;
+  font-weight: 500;
 }
 
 .dash-empty {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
-  padding: 8px 0 4px;
+  gap: 6px;
+  padding: 12px 0 6px;
 }
 
 .dash-empty p {
@@ -1523,28 +1519,25 @@
   max-width: 34ch;
 }
 
-/* Lịch sử Mây: sổ chép, chia theo ngày */
+/* Lịch sử Mây */
 .dash-chat {
-  position: relative;
-  z-index: 1;
   max-height: min(62vh, 620px);
   overflow-y: auto;
   padding: 0 6px 4px 0;
   scrollbar-width: thin;
-  scrollbar-color: var(--hair) transparent;
+  scrollbar-color: var(--dash-line) transparent;
 }
 
 .dash-chat:focus-visible {
-  outline: 2px solid var(--son);
+  outline: 1px solid var(--son);
   outline-offset: 4px;
 }
 
 .dash-card .may-history {
-  position: relative;
-  z-index: 1;
   max-height: none;
   overflow: visible;
-  padding: 0 0 12px;
+  gap: 10px;
+  padding: 0 0 14px;
 }
 
 .dash-recent {
@@ -1557,14 +1550,14 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   margin: 0 0 14px;
   padding: 6px 0;
   background: var(--diep-light);
   font-family: var(--sans);
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--sepia);
 }
@@ -1574,36 +1567,42 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--hair-soft);
+  background: var(--dash-line);
 }
 
 .dash-card .may-msg {
-  border-radius: 3px;
-  line-height: 1.55;
+  max-width: 78%;
+  padding: 9px 14px;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .dash-card .may-assistant {
-  background: var(--diep);
-  border: 1px solid var(--hair-soft);
+  background: transparent;
+  border: 1px solid var(--dash-line);
+  border-radius: 12px 12px 12px 2px;
 }
 
 .dash-card .may-user {
-  background: var(--than);
-  color: var(--diep-light);
+  background: var(--diep-deep);
+  color: var(--than);
+  border: 1px solid transparent;
+  border-radius: 12px 12px 2px 12px;
 }
 
 .dash-chat-time {
   display: block;
-  margin-top: 4px;
-  font-size: 0.72rem;
-  opacity: 0.75;
+  margin-top: 2px;
+  font-size: 0.7rem;
+  color: var(--sepia);
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 @keyframes dash-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -1612,12 +1611,15 @@
 }
 
 @media (max-width: 1180px) {
+  .dash-main {
+    padding: 48px 48px 80px;
+  }
   .dash-duo {
     grid-template-columns: 1fr;
   }
 }
 
-/* Màn hẹp: thanh bên tách thành đầu trang + thanh tab ngang dính trên cùng + chân trang */
+/* Màn hẹp: thanh bên tách thành đầu trang + thanh tab ngang (gạch chân son) dính trên cùng + chân trang */
 @media (max-width: 960px) {
   .dash {
     display: flex;
@@ -1630,22 +1632,15 @@
   .dash-user,
   .dash-tabs,
   .dash-side-foot {
-    color: var(--diep);
-    background: var(--pat-cloud) 0 0 / 300px 170px, var(--cham);
+    background: var(--diep-light);
   }
   .dash-brand {
     order: 0;
-    padding: 16px 16px 8px;
+    padding: 16px 20px 6px;
   }
   .dash-user {
     order: 1;
-    padding: 8px 16px 16px;
-    border: 0;
-  }
-  .dash-avatar {
-    width: 44px;
-    height: 44px;
-    font-size: 1.25rem;
+    padding: 10px 20px 14px;
   }
   .dash-tabs {
     order: 2;
@@ -1653,43 +1648,52 @@
     top: 0;
     z-index: 30;
     flex-direction: row;
-    gap: 6px;
-    padding: 8px 16px;
+    gap: 4px;
+    padding: 0 12px;
     overflow-x: auto;
     scrollbar-width: none;
-    box-shadow: 0 10px 20px -16px rgba(0, 0, 0, 0.7);
+    border-top: 1px solid var(--dash-line);
+    border-bottom: 1px solid var(--dash-line);
   }
   .dash-tab {
     width: auto;
     flex-shrink: 0;
-    padding: 8px 14px;
-    border-radius: 999px;
+    gap: 6px;
+    padding: 13px 8px 12px;
     font-size: 0.88rem;
-    gap: 8px;
+    background: transparent;
   }
-  .dash-tab-icon {
-    width: 18px;
-    height: 18px;
+  .dash-tab:hover,
+  .dash-tab[aria-selected='true'] {
+    background: transparent;
   }
   .dash-tab[aria-selected='true']::before {
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: -1px;
+    width: auto;
+    height: 2px;
+    transform: none;
+  }
+  .dash-tab-icon {
     display: none;
   }
   .dash-main {
     order: 3;
-    padding: 28px 24px 56px;
+    padding: 32px 24px 56px;
   }
   .dash-side-foot {
     order: 4;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 20px;
+    gap: 4px 8px;
     margin: 0;
-    padding: 18px 16px 96px;
-    border: 0;
+    padding: 16px 12px 96px;
   }
   .dash-logout {
-    margin: 0 0 0 auto;
+    margin-left: auto;
   }
   .dash-top-lantern {
     display: none;
@@ -1698,33 +1702,39 @@
 
 @media (max-width: 640px) {
   .dash-main {
-    padding: 22px 16px 48px;
+    padding: 26px 20px 48px;
   }
   .dash-top {
-    margin-bottom: 22px;
+    padding-bottom: 20px;
+    margin-bottom: 28px;
   }
+  .dash-panel {
+    gap: 28px;
+  }
+  /* Dải số liệu xếp dọc: mỗi hàng số bên trái, chữ bên phải, ngăn bằng nét ngang */
   .dash-stats {
     grid-template-columns: 1fr;
-    gap: 14px;
   }
-  /* Ô số liệu gọn thành hàng: số bên trái, chữ bên phải */
   .dash-stat {
     display: grid;
-    grid-template-columns: 4.6rem minmax(0, 1fr);
-    column-gap: 14px;
+    grid-template-columns: 4.4rem minmax(0, 1fr);
+    column-gap: 16px;
     row-gap: 2px;
     align-items: center;
-    padding: 16px 18px;
+    padding: 18px 0;
+  }
+  .dash-stat + .dash-stat {
+    border-left: 0;
+    border-top: 1px solid var(--dash-line);
   }
   .dash-stat-value {
     grid-column: 1;
     grid-row: 1 / span 3;
-    font-size: 2.3rem;
-    text-align: center;
+    font-size: 2.4rem;
   }
   .dash-stat-word {
-    font-size: 1.05rem;
-    line-height: 1.25;
+    font-size: 1rem;
+    line-height: 1.3;
   }
   .dash-stat-label,
   .dash-stat-sub,
@@ -1733,15 +1743,12 @@
   }
   .dash-stat-sub {
     min-height: 0;
-    font-size: 0.86rem;
   }
   .dash-stat-link {
-    margin-top: 2px;
     justify-self: start;
   }
-  .dash-card,
-  .dash-letter {
-    padding: 26px 20px 24px;
+  .dash-card {
+    padding: 22px 20px 24px;
   }
   .dash-facts div {
     grid-template-columns: 1fr;
@@ -1750,10 +1757,7 @@
   .dash-orders {
     grid-template-columns: 1fr;
     justify-items: center;
-  }
-  .dash-orders-art {
-    width: 120px;
-    height: 144px;
+    gap: 22px;
   }
 }
 

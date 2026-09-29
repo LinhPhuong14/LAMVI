@@ -253,7 +253,7 @@ export default {
     orders: 'Orders',
     ordersSoon: 'Your orders will appear here once online ordering launches.',
     loading: 'Loading…',
-    tabs: { overview: 'Overview', orders: 'Orders', may: 'Chats with Mây', profile: 'Profile' },
+    tabs: { overview: 'Overview', orders: 'Orders', may: 'Chats', profile: 'Profile' },
     subtitle: {
       overview: 'Everything you have at LAMVI, on one page.',
       orders: 'Follow your lantern from the workshop to its recipient.',

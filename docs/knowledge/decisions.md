@@ -150,3 +150,10 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Xử lý**: `sharp` → WebP 480/960 (chỉ các cỡ ≤ ảnh nguồn, danh sách `widths`), không chỉnh màu, không cắt; tải bản thu nhỏ cỡ chuẩn từ `thumb.wikimedia.org` (file gốc bị 429, Retry-After 600s); script ở ngoài repo, kết quả + `CREDITS.md` trong `public/images/folk/`.
 - **Hiển thị**: `FolkGallery` (phần Di sản) — khung tranh bồi trên vách chàm, tên + nguồn dưới mỗi tranh, ghi chú "không phải ảnh sản phẩm". `alt`/chú thích qua i18n.
 - **Hệ quả**: thêm ảnh mới phải cập nhật `CREDITS.md` và `folkArt.js`; không dùng ảnh tư liệu ở vị trí sản phẩm/nghệ nhân.
+
+### T-34 — Dashboard tài khoản thanh thoát (tham khảo dashboard Trung Quốc)
+- **Bối cảnh**: bản dashboard tab dọc đầu tiên (thanh bên chàm, khung tranh bồi, bóng đổ) bị nhận xét "chưa đủ thanh thoát, thanh lịch"; người dùng yêu cầu tham khảo dashboard Trung Quốc.
+- **Nguồn tham khảo** (mức nguyên tắc): hệ thiết kế Ant Design, TDesign, Arco (bố cục thanh bên + nội dung, dải số liệu tổng quan); bài viết về 留白 (khoảng trắng) và phong cách 新中式 trên woshipm.com.
+- **Nguyên tắc rút ra → áp dụng**: nền sáng, nhiều khoảng trắng; mọi đường kẻ 1px cùng một độ đậm (`--dash-line`); bỏ bóng đổ và khung trang trí trong dashboard; một điểm nhấn son (vạch tab chọn, vạch trước tiêu đề mục, nút chính); số liệu chữ mảnh cỡ lớn trên dải ngăn bằng nét dọc; nhãn ngắn một dòng. Không dùng chữ Hán, hoạ tiết cung đình (như T-25).
+- **Hệ quả**: chi tiết ở [`design-rules.md`](design-rules.md) §12. Trang công khai giữ phong cách T-25.
+

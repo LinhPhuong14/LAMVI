@@ -240,7 +240,7 @@ export default {
     orders: '订单',
     ordersSoon: '在线订购上线后，您的订单将显示在这里。',
     loading: '加载中…',
-    tabs: { overview: '概览', orders: '订单', may: '与 Mây 聊天', profile: '个人资料' },
+    tabs: { overview: '概览', orders: '订单', may: '聊天', profile: '个人资料' },
     subtitle: {
       overview: '您在 LAMVI 的一切，尽在一页。',
       orders: '从作坊到收礼人手中，随时了解您的灯。',

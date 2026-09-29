@@ -43,7 +43,7 @@ const ICONS = {
 
 function TabIcon({ name }) {
   return (
-    <svg viewBox="0 0 24 24" className="dash-tab-icon" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" className="dash-tab-icon" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
       {ICONS[name]}
     </svg>
   )
@@ -195,7 +195,7 @@ function OrdersPanel() {
     <Card title={t('account.orders')} id="dash-orders-title" tag={t('account.soon')}>
       <div className="dash-orders">
         <div className="dash-orders-art" aria-hidden="true">
-          <Lantern size={112} tone="dusk" swing />
+          <Lantern size={88} tone="dusk" swing />
         </div>
         <div>
           <p>{t('account.ordersSoon')}</p>
@@ -233,7 +233,7 @@ function MayPanel({ items }) {
 function ProfilePanel({ state, setState }) {
   const { t } = useI18n()
   return (
-    <Card title={t('account.profile')} id="dash-profile-title" className="dash-letter">
+    <Card title={t('account.profile')} id="dash-profile-title">
       {state.status === 'loading' && <p className="dash-muted">{t('account.loading')}</p>}
       {state.status === 'ok' && (
         <ProfileForm
@@ -314,7 +314,7 @@ function Overview({ cart, mayItems, profile, go }) {
         <Card
           title={t('account.profile')}
           id="dash-summary-title"
-          className="dash-letter"
+          
           action={
             <button type="button" className="dash-head-link" onClick={() => go('profile')}>
               {t('account.edit')}
@@ -478,7 +478,7 @@ export default function AccountPage() {
             <p className="dash-top-sub">{t(`account.subtitle.${tab}`)}</p>
           </div>
           <div className="dash-top-lantern" aria-hidden="true">
-            <Lantern size={96} tone="amber" swing flicker />
+            <Lantern size={64} tone="amber" swing />
           </div>
         </header>
 

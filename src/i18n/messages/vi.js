@@ -268,7 +268,7 @@ export default {
     orders: 'Đơn hàng',
     ordersSoon: 'Danh sách đơn hàng sẽ hiển thị ở đây khi đặt hàng trực tuyến ra mắt.',
     loading: 'Đang tải…',
-    tabs: { overview: 'Tổng quan', orders: 'Đơn hàng', may: 'Trò chuyện với Mây', profile: 'Hồ sơ' },
+    tabs: { overview: 'Tổng quan', orders: 'Đơn hàng', may: 'Trò chuyện', profile: 'Hồ sơ' },
     subtitle: {
       overview: 'Mọi thứ của bạn ở LAMVI, gói gọn trong một trang.',
       orders: 'Theo dõi đèn của bạn từ xưởng tới tay người nhận.',

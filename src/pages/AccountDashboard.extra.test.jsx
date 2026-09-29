@@ -84,7 +84,7 @@ describe('Chưa đăng nhập', () => {
     fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'matkhau123' } })
     fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }))
     expect(await screen.findByRole('heading', { name: 'Lịch sử trò chuyện với Mây' })).toBeInTheDocument()
-    expect(tab('Trò chuyện với Mây')).toHaveAttribute('aria-selected', 'true')
+    expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')
   })
 })
 
@@ -164,8 +164,8 @@ describe('Tab — bàn phím (WAI-ARIA)', () => {
     expect(document.activeElement).toBe(tab('Đơn hàng'))
 
     key('ArrowRight')
-    expect(tab('Trò chuyện với Mây')).toHaveAttribute('aria-selected', 'true')
-    expect(document.activeElement).toBe(tab('Trò chuyện với Mây'))
+    expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')
+    expect(document.activeElement).toBe(tab('Trò chuyện'))
 
     key('ArrowDown')
     key('ArrowDown') // quay vòng từ Hồ sơ về Tổng quan
@@ -177,7 +177,7 @@ describe('Tab — bàn phím (WAI-ARIA)', () => {
     expect(document.activeElement).toBe(tab('Hồ sơ'))
 
     key('ArrowLeft')
-    expect(tab('Trò chuyện với Mây')).toHaveAttribute('aria-selected', 'true')
+    expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')
 
     key('Home')
     expect(tab('Tổng quan')).toHaveAttribute('aria-selected', 'true')
@@ -207,7 +207,7 @@ describe('Badge', () => {
     login()
     api()
     renderAt('/account')
-    await waitFor(() => expect(tab('Trò chuyện với Mây').querySelector('.dash-tab-badge')?.textContent).toBe('2'))
+    await waitFor(() => expect(tab('Trò chuyện').querySelector('.dash-tab-badge')?.textContent).toBe('2'))
     expect(tab('Đơn hàng').querySelector('.dash-tab-badge').textContent).toBe('Sắp có')
     expect(tab('Tổng quan').querySelector('.dash-tab-badge')).toBeNull()
     expect(tab('Hồ sơ').querySelector('.dash-tab-badge')).toBeNull()
@@ -218,7 +218,7 @@ describe('Badge', () => {
     api({ items: [{ role: 'assistant', kind: 'answer', content: 'Chào bạn', createdAt: '2026-09-28T03:00:00Z' }] })
     renderAt('/account')
     await screen.findByText('Chào bạn')
-    expect(tab('Trò chuyện với Mây').querySelector('.dash-tab-badge')).toBeNull()
+    expect(tab('Trò chuyện').querySelector('.dash-tab-badge')).toBeNull()
   })
 })
 
@@ -259,7 +259,7 @@ describe('Tổng quan — số liệu', () => {
     expect(tab('Đơn hàng')).toHaveAttribute('aria-selected', 'true')
     fireEvent.click(tab('Tổng quan'))
     fireEvent.click(within(stats()[2]).getByRole('button'))
-    expect(tab('Trò chuyện với Mây')).toHaveAttribute('aria-selected', 'true')
+    expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')
   })
 
   it('lịch sử Mây lỗi → trạng thái trống, không có alert; số câu = 0', async () => {
@@ -270,7 +270,7 @@ describe('Tổng quan — số liệu', () => {
     expect(screen.queryAllByRole('alert')).toHaveLength(0)
     expect(stats()[2].querySelector('.dash-stat-value').textContent).toBe('0')
     expect(screen.queryByRole('button', { name: 'Xem tất cả' })).toBeNull()
-    fireEvent.click(tab('Trò chuyện với Mây'))
+    fireEvent.click(tab('Trò chuyện'))
     expect(screen.getByText('Bạn chưa trò chuyện với Mây.')).toBeInTheDocument()
     expect(screen.queryAllByRole('alert')).toHaveLength(0)
   })
@@ -284,7 +284,7 @@ describe('Tổng quan — số liệu', () => {
     expect([...recent.querySelectorAll('li')].map((l) => l.textContent)).toEqual(['Bạn: Giao hàng mấy ngày?', 'Khoảng 3–5 ngày.'])
     expect(screen.queryByText('Đèn nào hợp tặng mẹ?')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Xem tất cả' }))
-    expect(tab('Trò chuyện với Mây')).toHaveAttribute('aria-selected', 'true')
+    expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('Đèn nào hợp tặng mẹ?')).toBeInTheDocument()
   })
 

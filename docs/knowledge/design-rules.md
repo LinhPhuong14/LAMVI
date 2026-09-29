@@ -181,19 +181,21 @@ Quy tắc:
 
 ## 12. Dashboard tài khoản (`/account`)
 
-Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệu (`APP_PAGES`, class `.page-app`). Style ở mục "Dashboard tài khoản" cuối `pages.css`.
+Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệu (`APP_PAGES`, class `.page-app`, bỏ cả viền tối quanh khung nhìn). Style ở mục "Dashboard tài khoản" cuối `pages.css`. Tinh thần **thanh thoát**, lấy nguyên tắc từ dashboard Trung Quốc (T-34): nhiều khoảng trắng, nền giấy sáng, chỉ nét 1px, không bóng đổ, một điểm nhấn son.
 
 | Phần | Cách trình bày |
 |---|---|
-| Thanh bên (288px, dính, cao 100dvh) | Mảng chàm + `--pat-cloud`, nét phân cách `--hoe-light` 20%; logo ấn triện + đổi ngôn ngữ; khối người dùng; tab dọc; chân: về cửa hàng, giỏ, đăng xuất |
-| Avatar | Ấn triện son tròn, chữ cái đầu của tên gọi (từ cuối họ tên), xoay −4°, texture mực mòn |
-| Tab dọc | Biểu tượng nét 1,4px + nhãn; tab đang chọn là **tờ giấy điệp chìa ra** nối liền vùng nội dung (nền `--diep`, chữ `--than`, nét son 2px bên trái); huy hiệu viền mảnh |
-| Đầu vùng nội dung | Eyebrow lời chào, h1, câu phụ theo tab, đèn khắc gỗ treo bên phải; kẻ đôi bên dưới |
-| Số liệu | Ô tranh bồi, số Fraunces `oldstyle-nums` màu `--than` — không dùng son cho số để giữ một điểm nhấn son; ≤640px thu thành hàng (số trái, chữ phải) |
-| Thẻ | Tranh bồi + đầu thẻ kẻ đôi; hồ sơ dùng khung thiếp thư (4 góc triện) |
-| Chat Mây | Nhãn ngày dính đầu khung giữa hai nét mảnh; tin khách nền `--than` chữ `--diep-light`, tin Mây nền `--diep` viền `--hair-soft` |
-| Màn ≤960px | Thanh bên tách (`display: contents`): đầu trang chàm → thanh tab ngang dạng viên thuốc, dính trên cùng → nội dung → chân chàm |
-| Motion | Đổi tab: `dash-in` 0.5s (`--ease-out`), ô số liệu lệch 70ms; tắt khi giảm chuyển động |
+| Nét | Một token riêng `--dash-line` (sepia 18%) cho mọi đường kẻ, `--dash-soft` (7%) cho nền hover/tab chọn. Không `--print`, không khung viền đôi, không góc triện trong dashboard |
+| Thanh bên (264px, dính, cao 100dvh) | Nền `--diep-light`, một nét mảnh bên phải; logo ấn triện nhỏ + đổi ngôn ngữ (gạch chân son ở ngôn ngữ đang chọn) |
+| Avatar | Vòng son mảnh (chỉ nét, không tô), chữ cái đầu của tên gọi màu son, Fraunces 500 |
+| Tab dọc | Biểu tượng nét 1,2px + nhãn ngắn, không xuống dòng; tab chọn: nền `--dash-soft`, chữ đậm, vạch son 2px ở mép thanh bên; huy hiệu là chữ nhỏ sepia, không viên |
+| Đầu vùng nội dung | Eyebrow sepia chữ thưa, h1 Fraunces 500, câu phụ theo tab, đèn nhỏ 64px; một nét mảnh bên dưới |
+| Số liệu | Dải không khung, ngăn bằng nét dọc (≤640px: nét ngang, số trái chữ phải); số Fraunces **300** 3rem `oldstyle-nums` |
+| Thẻ | Nền `--diep-light`, nét `--dash-line`, bo 4px, không bóng; tiêu đề mục có **vạch son 3px** phía trước |
+| Liên kết phụ | Chữ son đậm, gạch chân mọc ra khi hover/focus (không gạch sẵn) |
+| Chat Mây | Nhãn ngày chữ thưa giữa hai nét mảnh; tin khách nền `--diep-deep`, tin Mây nền trong viền mảnh; bo 12px, góc phía người nói 2px |
+| Màn ≤960px | Thanh bên tách (`display: contents`): đầu trang → tab ngang gạch chân son, dính trên cùng (ẩn biểu tượng) → nội dung → chân |
+| Motion | Đổi tab: `dash-in` 0.6s, dịch 6px; ô số liệu lệch 80ms; tắt khi giảm chuyển động |
 
 ## 13. Checklist khi thêm thành phần
 

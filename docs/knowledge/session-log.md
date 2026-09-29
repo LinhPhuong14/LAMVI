@@ -18,6 +18,8 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 4. Subagent kiểm thử độc lập (T-11): `src/pages/AccountDashboard.extra.test.jsx` (58 test) phát hiện: giờ tiếng Anh hiện 12h; tin không có thời điểm xen giữa làm lặp tiêu đề ngày; hai nút "Xem" trùng tên truy cập → đã sửa.
 5. Spec v0.11: D-63, quy tắc dashboard §5.2 (`[ASSUMPTION]`), G-37.
 
+6. Theo nhận xét "chưa đủ thanh thoát, thanh lịch, tham khảo dashboard Trung Quốc": làm lại giao diện (T-34) — thanh bên giấy sáng, nét 1px thống nhất, bỏ bóng/khung trang trí, dải số liệu ngăn nét dọc với số chữ mảnh, vạch son trước tiêu đề mục, nhãn tab ngắn ("Trò chuyện"). Không đổi chức năng; bộ test độc lập vẫn xanh (cập nhật tên tab). Spec v0.12.
+
 **Còn lại**: tab đơn hàng làm thật cùng FR-ACC-002/003 (chờ checkout, Q-08).
 
 ---
