@@ -593,3 +593,65 @@ describe('Admin — coupon (FR-CPN-001, §14)', () => {
     expect((await request(app).get('/api/admin/coupons').set('Authorization', customer)).status).toBe(403)
   })
 })
+
+describe('Lấy lại liên kết thanh toán (FR-PAY-001)', () => {
+  async function pendingOrder() {
+    await addToCart('den-nguyet', 1)
+    const r = await createOrder({ paymentMethod: 'payos' })
+    return r.body.order.code
+  }
+
+  it('đơn đang chờ thanh toán → trả link mới', async () => {
+    const code = await pendingOrder()
+    const r = await request(app).post(`/api/orders/${code}/payment`).set('Authorization', customer).send({})
+    expect(r.status).toBe(200)
+    expect(r.body.payment.checkoutUrl).toContain('https://pay.test/')
+    // Gọi lại lần nữa vẫn được (khách đóng tab payOS rồi quay lại)
+    expect((await request(app).post(`/api/orders/${code}/payment`).set('Authorization', customer).send({})).status).toBe(200)
+  })
+
+  it('lần tạo đơn gặp lỗi cổng → đơn vẫn tồn tại và lấy lại được link sau đó', async () => {
+    payos.createPaymentLink.mockRejectedValueOnce(Object.assign(new Error('x'), { code: 'PAYMENT_GATEWAY_ERROR' }))
+    await addToCart('den-nguyet', 1)
+    const created = await createOrder({ paymentMethod: 'payos' })
+    expect(created.status).toBe(201)
+    expect(created.body.payment).toMatchObject({ error: 'PAYMENT_GATEWAY_ERROR' })
+
+    const retry = await request(app)
+      .post(`/api/orders/${created.body.order.code}/payment`)
+      .set('Authorization', customer)
+      .send({})
+    expect(retry.status).toBe(200)
+    expect(retry.body.payment.checkoutUrl).toBeTruthy()
+  })
+
+  it('cổng vẫn lỗi → 502, không trả link rỗng', async () => {
+    const code = await pendingOrder()
+    payos.createPaymentLink.mockRejectedValueOnce(Object.assign(new Error('x'), { code: 'PAYMENT_GATEWAY_ERROR' }))
+    const r = await request(app).post(`/api/orders/${code}/payment`).set('Authorization', customer).send({})
+    expect(r.status).toBe(502)
+    expect(r.body.error.code).toBe('PAYMENT_GATEWAY_ERROR')
+  })
+
+  it('đơn COD hoặc đã thanh toán → 409', async () => {
+    await addToCart('den-nguyet', 1)
+    const cod = (await createOrder()).body.order.code
+    const r = await request(app).post(`/api/orders/${cod}/payment`).set('Authorization', customer).send({})
+    expect(r.status).toBe(409)
+    expect(r.body.error.code).toBe('ORDER_NOT_PAYABLE')
+  })
+
+  it('đơn quá hạn → huỷ đơn và 409, không sinh link mới', async () => {
+    const code = await pendingOrder()
+    clock = new Date(clock.getTime() + PAYMENT_WINDOW_MS + 1000)
+    const r = await request(app).post(`/api/orders/${code}/payment`).set('Authorization', customer).send({})
+    expect(r.status).toBe(409)
+    expect((await repo.getOrderByCode(code)).status).toBe('cancelled')
+  })
+
+  it('đơn của người khác → 404', async () => {
+    const code = await pendingOrder()
+    const other = await login('khac2@lamvi.test')
+    expect((await request(app).post(`/api/orders/${code}/payment`).set('Authorization', other.token).send({})).status).toBe(404)
+  })
+})

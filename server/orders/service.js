@@ -209,6 +209,19 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
     }
   }
 
+  /**
+   * Lấy lại link thanh toán cho đơn đang chờ trả tiền (FR-PAY-001). Dùng khi lần tạo đơn gặp lỗi
+   * cổng, hoặc khách đóng tab thanh toán rồi quay lại — nếu không có thì đơn kẹt tới lúc hết hạn.
+   */
+  async function paymentLinkFor(order, { siteUrl }) {
+    const fresh = await expireIfDue(order)
+    if (fresh.status !== 'pending_payment') throw new HttpError(409, 'ORDER_NOT_PAYABLE', 'Đơn không ở trạng thái chờ thanh toán')
+    if (!payos) throw new HttpError(503, 'PAYMENT_UNAVAILABLE', 'Thanh toán trực tuyến chưa sẵn sàng')
+    const payment = await startPayosPayment(fresh, { siteUrl })
+    if (payment?.error) throw new HttpError(502, payment.error, 'Chưa tạo được liên kết thanh toán')
+    return payment
+  }
+
   /** Tạo link thanh toán payOS. Cổng lỗi không được làm mất đơn — đơn vẫn ở PENDING_PAYMENT. */
   async function startPayosPayment(order, { siteUrl }) {
     if (!payos) return null
@@ -425,6 +438,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
     applyPayosWebhook,
     expireIfDue,
     expirePendingOrders,
+    paymentLinkFor,
     cancelByCustomer,
     setStatusByAdmin,
     markRefunded,

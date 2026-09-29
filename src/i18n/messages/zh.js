@@ -322,6 +322,7 @@ export default {
     PRICE_CHANGED: '价格已变动，请查看新的金额后再确认。',
     COD_NOT_ALLOWED_FOR_GIFT: '寄给他人的订单不支持货到付款。',
     PAYMENT_UNAVAILABLE: '在线支付暂时不可用，请选择货到付款。',
+    ORDER_NOT_PAYABLE: '该订单已不在待支付状态。',
     PAYMENT_GATEWAY_ERROR: '无法创建支付链接，请重试。',
     ORDER_NOT_CANCELLABLE: '订单已发出，无法取消。',
     INVALID_STATUS_TRANSITION: '不允许这样变更状态。',

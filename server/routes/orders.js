@@ -107,6 +107,13 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
     res.json({ item: presentOrder(order, { lang: lang(req) }) })
   })
 
+  // FR-PAY-001: lấy lại liên kết thanh toán (lần tạo đơn gặp lỗi cổng, hoặc khách quay lại sau)
+  r.post('/orders/:code/payment', guard, async (req, res) => {
+    const order = await repo.getOrderByCode(req.params.code)
+    if (!order || order.userId !== req.user.id) throw notFound()
+    res.json({ payment: await orders.paymentLinkFor(order, { siteUrl: config.publicSiteUrl }) })
+  })
+
   // FR-ORD-001 / BR-ORD-001
   r.post('/orders/:code/cancel', guard, async (req, res) => {
     const order = await repo.getOrderByCode(req.params.code)

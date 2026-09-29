@@ -74,6 +74,23 @@ export default function OrderPage() {
     return () => clearInterval(id)
   }, [order?.status, load])
 
+  // Lấy lại liên kết thanh toán: lần tạo đơn có thể gặp lỗi cổng, hoặc khách đã đóng tab payOS
+  const [paying, setPaying] = useState(false)
+  async function payNow() {
+    setPaying(true)
+    setError(null)
+    try {
+      const r = await authedApi(`/orders/${encodeURIComponent(code)}/payment`, { method: 'POST', body: {}, lang })
+      if (r.payment?.checkoutUrl) window.location.assign(r.payment.checkoutUrl)
+      else setError('PAYMENT_GATEWAY_ERROR')
+    } catch (err) {
+      setError(err.code ?? 'INTERNAL_ERROR')
+      load()
+    } finally {
+      setPaying(false)
+    }
+  }
+
   async function cancel() {
     if (!window.confirm(t('orders.cancelConfirm'))) return
     setCancelling(true)
@@ -140,11 +157,18 @@ export default function OrderPage() {
         <OrderProgress status={order.status} />
 
         {order.status === 'pending_payment' && (
-          <p className="notice" role="status">
-            {t('orders.awaitingPayment')}{' '}
-            {order.paymentExpiresAt &&
-              t('orders.payExpires', { time: new Date(order.paymentExpiresAt).toLocaleTimeString() })}
-          </p>
+          <>
+            <p className="notice" role="status">
+              {t('orders.awaitingPayment')}{' '}
+              {order.paymentExpiresAt &&
+                t('orders.payExpires', { time: new Date(order.paymentExpiresAt).toLocaleTimeString() })}
+            </p>
+            {order.paymentMethod === 'payos' && (
+              <button type="button" className="btn btn-primary" onClick={payNow} disabled={paying}>
+                {t('orders.payNow')}
+              </button>
+            )}
+          </>
         )}
         {order.paymentStatus === 'expired' && <p className="notice">{t('orders.payExpired')}</p>}
         {error && (
