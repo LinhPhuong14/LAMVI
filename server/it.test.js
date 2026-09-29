@@ -165,7 +165,7 @@ describe('Chế độ bảo trì (D-54)', () => {
     const page = (url) => renderPage({ repo, config: { publicSiteUrl: 'https://moc.test' }, template, render, url, pathname: url, maintenance })
     const home = await page('/en')
     expect(home.status).toBe(503)
-    expect(home.html).toContain('Mộc is under maintenance')
+    expect(home.html).toContain('LAMVI is under maintenance')
     expect(home.html).not.toContain('/src/main.jsx')
     expect((await page('/login')).status).toBe(200)
     expect((await page('/it')).status).toBe(200)

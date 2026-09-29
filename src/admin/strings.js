@@ -1,6 +1,6 @@
 // D-48: giao diện admin chỉ tiếng Việt. Nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh.
 export const S = {
-  title: 'Quản trị MỘC',
+  title: 'Quản trị LAMVI',
   nav: { products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', may: 'Mây (AI)', it: 'Dashboard IT →', site: '← Về trang web' },
   common: {
     loading: 'Đang tải…',

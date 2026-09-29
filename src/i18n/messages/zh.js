@@ -1,8 +1,8 @@
 // 简体中文。Bản dịch do đội dev soạn — chờ PO duyệt (ba-spec §31.2 G-14).
 export default {
   meta: {
-    productTitle: '{name} — Mộc 手工纸灯',
-    title: 'Mộc — 手工纸灯',
+    productTitle: '{name} — LAMVI · 手工纸灯',
+    title: 'LAMVI — 手工纸灯',
     description: '手工纸灯礼物，附带二维码祝福和制灯过程视频。',
   },
   nav: {
@@ -39,7 +39,7 @@ export default {
   gallery: {
     label: '民间画廊',
     source: '图片来源',
-    note: '东湖民间年画及 18 世纪末 dó 纸绘画（越南国家美术博物馆）。资料图片来自维基共享资源，属公有领域或 CC0——并非 MỘC 的产品照片。',
+    note: '东湖民间年画及 18 世纪末 dó 纸绘画（越南国家美术博物馆）。资料图片来自维基共享资源，属公有领域或 CC0——并非 LAMVI 的产品照片。',
     items: {
       'chuot-ruoc-den': {
         name: '老鼠提灯游行',
@@ -192,7 +192,7 @@ export default {
     newsText: '手艺村故事和新优惠，每月一封。',
     newsPlaceholder: '您的邮箱',
     newsSubmit: '订阅',
-    copyright: '© 2026 Mộc — 手工纸灯。',
+    copyright: '© 2026 LAMVI — 手工纸灯。',
   },
   batch: {
     eyebrow: '您的灯是如何制作的',
@@ -204,7 +204,7 @@ export default {
     code: '批次编号：{code}',
     videoFallback: '您的浏览器无法播放此视频。',
     note: '视频记录了整批灯的制作过程，其中包括您的灯。',
-    toHome: '探索 MỘC',
+    toHome: '探索 LAMVI',
   },
   auth: {
     loginTitle: '登录',
@@ -311,8 +311,8 @@ export default {
     open: '和 Mây 聊天',
     close: '关闭',
     title: 'Mây',
-    subtitle: 'Mộc 的 AI 助手',
-    aiNotice: 'Mây 是 AI 助手，只根据 Mộc 的信息回答。Mây 不能替您下单或修改账户。',
+    subtitle: 'LAMVI 的 AI 助手',
+    aiNotice: 'Mây 是 AI 助手，只根据 LAMVI 的信息回答。Mây 不能替您下单或修改账户。',
     greeting: '你好，我是 Mây！想了解纸灯、祝福还是二维码呢？',
     placeholder: '输入您的问题…',
     send: '发送',
@@ -330,7 +330,7 @@ export default {
       skip: '跳过导览',
       step: '第 {n}/{total} 步',
       steps: [
-        '欢迎来到 Mộc！让 Mây 带您逛一圈：这里是作为讲故事礼物的手工纸灯。',
+        '欢迎来到 LAMVI！让 Mây 带您逛一圈：这里是作为讲故事礼物的手工纸灯。',
         '这是产品系列。选择“送礼”或“自用”，点击灯查看详情。显示价格不含增值税。',
         '每份礼物有两个二维码：感谢卡上的二维码打开您的祝福，灯上刻的二维码打开这批灯的制作视频。',
         '还有疑问？看看这里的常见问题吧。',
@@ -344,7 +344,7 @@ export default {
     you: '您',
   },
   maintenance: {
-    title: 'Mộc 正在维护',
+    title: 'LAMVI 正在维护',
     text: '我们正在升级系统，请几分钟后再来。',
   },
   notFound: {

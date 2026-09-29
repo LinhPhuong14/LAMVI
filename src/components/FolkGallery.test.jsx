@@ -72,7 +72,7 @@ describe('FolkGallery — ảnh tư liệu (T-27)', () => {
     const { container } = renderGallery(lang)
     const note = container.querySelector('.folk-gallery-note')
     expect(note).toHaveTextContent(MESSAGES[lang].gallery.note)
-    expect(MESSAGES[lang].gallery.note).toMatch(/không phải ảnh sản phẩm|not photos of MỘC products|并非 MỘC 的产品照片/)
+    expect(MESSAGES[lang].gallery.note).toMatch(/không phải ảnh sản phẩm|not photos of LAMVI products|并非 LAMVI 的产品照片/)
   })
 
   it('dải tranh là vùng cuộn truy cập được bằng bàn phím', () => {

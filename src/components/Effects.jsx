@@ -8,7 +8,7 @@ import {
 } from 'framer-motion'
 import { useFinePointer } from '../lib/motion.js'
 
-// Hiệu ứng theo con trỏ (ý tưởng từ Aceternity UI, viết lại cho MỘC).
+// Hiệu ứng theo con trỏ (ý tưởng từ Aceternity UI, viết lại cho LAMVI).
 // Chỉ bật khi có chuột/bút chính xác và người dùng không bật giảm chuyển động.
 // Mọi cập nhật đi qua motion value → không re-render React khi di chuột.
 

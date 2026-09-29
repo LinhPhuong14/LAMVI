@@ -163,7 +163,7 @@ describe('SEO — noindex (BR-SEO-001)', () => {
     renderAt('/account')
     await screen.findByDisplayValue('Nguyễn An')
     expect(robots()).toHaveLength(1)
-    fireEvent.click(screen.getByRole('link', { name: 'MỘC' }))
+    fireEvent.click(screen.getByRole('link', { name: 'LAMVI' }))
     await waitFor(() => expect(screen.queryByRole('heading', { name: 'Tài khoản của tôi' })).toBeNull())
     expect(robots()).toHaveLength(0)
   })

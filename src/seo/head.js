@@ -84,7 +84,7 @@ export function productJsonLd(p, url) {
     name: p.name,
     description: p.description ?? undefined,
     url,
-    brand: { '@type': 'Brand', name: 'Mộc' },
+    brand: { '@type': 'Brand', name: 'LAMVI' },
     offers: {
       '@type': 'Offer',
       url,

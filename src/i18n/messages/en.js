@@ -1,8 +1,8 @@
 // Bản dịch do đội dev soạn — chờ PO duyệt (ba-spec §31.2 G-14).
 export default {
   meta: {
-    productTitle: '{name} — Mộc handmade dó paper lanterns',
-    title: 'Mộc — Handmade Dó Paper Lanterns',
+    productTitle: '{name} — LAMVI · handmade dó paper lanterns',
+    title: 'LAMVI — Handmade Dó Paper Lanterns',
     description:
       'Handmade dó paper lanterns as gifts, with a QR-linked message and the story of how they were made.',
   },
@@ -46,7 +46,7 @@ export default {
   gallery: {
     label: 'Folk painting gallery',
     source: 'Image source',
-    note: 'Đông Hồ folk prints and late 18th-century paintings on dó paper (Vietnam National Museum of Fine Arts). Archival images from Wikimedia Commons, public domain or CC0 — not photos of MỘC products.',
+    note: 'Đông Hồ folk prints and late 18th-century paintings on dó paper (Vietnam National Museum of Fine Arts). Archival images from Wikimedia Commons, public domain or CC0 — not photos of LAMVI products.',
     items: {
       'chuot-ruoc-den': {
         name: 'Mice’s lantern procession',
@@ -205,7 +205,7 @@ export default {
     newsText: 'Craft-village stories and new offers, once a month.',
     newsPlaceholder: 'Your email',
     newsSubmit: 'Subscribe',
-    copyright: '© 2026 Mộc — Handmade dó paper lanterns.',
+    copyright: '© 2026 LAMVI — Handmade dó paper lanterns.',
   },
   batch: {
     eyebrow: 'How your lantern was made',
@@ -217,7 +217,7 @@ export default {
     code: 'Batch code: {code}',
     videoFallback: 'Your browser cannot play this video.',
     note: 'The video shows how the whole batch was made, including your lantern.',
-    toHome: 'Discover MỘC',
+    toHome: 'Discover LAMVI',
   },
   auth: {
     loginTitle: 'Sign in',
@@ -324,8 +324,8 @@ export default {
     open: 'Chat with Mây',
     close: 'Close',
     title: 'Mây',
-    subtitle: 'Mộc’s AI assistant',
-    aiNotice: 'Mây is an AI assistant and only answers from Mộc’s information. Mây cannot place orders or change your account.',
+    subtitle: 'LAMVI’s AI assistant',
+    aiNotice: 'Mây is an AI assistant and only answers from LAMVI’s information. Mây cannot place orders or change your account.',
     greeting: 'Hi, Mây here! Would you like to ask about lanterns, messages or QR codes?',
     placeholder: 'Type your question…',
     send: 'Send',
@@ -343,7 +343,7 @@ export default {
       skip: 'Skip tour',
       step: 'Step {n}/{total}',
       steps: [
-        'Welcome to Mộc! Let Mây show you around: handmade dó paper lanterns, made as story-telling gifts.',
+        'Welcome to LAMVI! Let Mây show you around: handmade dó paper lanterns, made as story-telling gifts.',
         'This is the collection. Choose “As a gift” or “For myself”, then tap a lantern for details. Prices shown exclude VAT.',
         'Each gift has two QR codes: the one on the thank-you card opens your message, the one engraved on the lantern opens the video of how its batch was made.',
         'Any other questions? Have a look at the FAQ.',
@@ -357,7 +357,7 @@ export default {
     you: 'You',
   },
   maintenance: {
-    title: 'Mộc is under maintenance',
+    title: 'LAMVI is under maintenance',
     text: 'We are upgrading our system. Please come back in a few minutes.',
   },
   notFound: {

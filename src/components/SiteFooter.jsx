@@ -15,7 +15,7 @@ export default function SiteFooter() {
     <footer className="footer">
       <div className="footer-grid">
         <div className="footer-brand">
-          <Seal className="seal-lg">MỘC</Seal>
+          <Seal className="seal-lg">LAMVI</Seal>
           <p>{t('footer.tagline')}</p>
           <div className="social-links">
             <a href="#" aria-label="Facebook">
@@ -63,7 +63,7 @@ export default function SiteFooter() {
         </div>
       </div>
       <Reveal className="footer-brandmark" variants={group} margin="0px">
-        <BrandHover text="MỘC" />
+        <BrandHover text="LAMVI" />
       </Reveal>
       <div className="footer-bottom">
         <span>{t('footer.copyright')}</span>

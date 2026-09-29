@@ -1,8 +1,8 @@
-# Design rules — MỘC (web)
+# Design rules — LAMVI (web)
 
-Quy tắc thiết kế cho giao diện công khai của MỘC. Token nằm ở `src/index.css`; component ở `src/styles/App.css`, trang phụ ở `src/styles/pages.css`. Quyết định gốc: T-21…T-28 trong [`decisions.md`](decisions.md).
+Quy tắc thiết kế cho giao diện công khai của LAMVI. Token nằm ở `src/index.css`; component ở `src/styles/App.css`, trang phụ ở `src/styles/pages.css`. Quyết định gốc: T-21…T-28 trong [`decisions.md`](decisions.md).
 
-> Thương hiệu "LÂM VỊ" ở nhánh `docs/branding-guideline` chưa gộp vào `master` — tài liệu này áp dụng cho MỘC hiện tại.
+> Tên thương hiệu: **LAMVI** (viết liền, không dấu) ở mọi nơi — D-62. Không dùng "LAMVI" hay "LÂM VỊ".
 
 ## 1. Tinh thần
 
@@ -10,7 +10,7 @@ Quy tắc thiết kế cho giao diện công khai của MỘC. Token nằm ở `
 
 - Nét mảnh, nhiều khoảng trắng; màu phẳng lấy từ bột màu tự nhiên.
 - Hoạ tiết Việt: mái đình (nóc, mặt nguyệt, đầu đao), mây cuộn, hoa sen, trống đồng, ấn triện, hoa văn triện, ô hộc cửa bức bàn.
-- Tham khảo cách trình bày của web bảo tàng/di sản (Cố Cung, Danh Hoạ Ký, Đôn Hoàng, Thiểm Tây — T-25) **ở mức nguyên tắc**; hoạ tiết giao diện do MỘC tự vẽ không dùng chữ Hán, rồng, mái cung điện Trung Hoa.
+- Tham khảo cách trình bày của web bảo tàng/di sản (Cố Cung, Danh Hoạ Ký, Đôn Hoàng, Thiểm Tây — T-25) **ở mức nguyên tắc**; hoạ tiết giao diện do LAMVI tự vẽ không dùng chữ Hán, rồng, mái cung điện Trung Hoa.
 - Tranh tư liệu Việt nguyên bản (Đông Hồ, tranh giấy dó) **giữ nguyên** — kể cả chữ Hán-Nôm và hình rồng vốn có trong tranh; không cắt, không tô lại.
 
 ## 2. Màu
@@ -133,7 +133,7 @@ Quy tắc:
 
 ### 7.2 Không gây hiểu lầm
 
-- Ảnh tư liệu (tranh Đông Hồ, tranh giấy dó cổ) **không** được đặt ở vị trí ảnh sản phẩm, ảnh nghệ nhân hay ảnh xưởng MỘC.
+- Ảnh tư liệu (tranh Đông Hồ, tranh giấy dó cổ) **không** được đặt ở vị trí ảnh sản phẩm, ảnh nghệ nhân hay ảnh xưởng LAMVI.
 - Mọi ảnh tư liệu có chú thích nguồn ngay dưới ảnh.
 - Minh hoạ SVG (đèn, chân dung nghệ nhân) vẫn là minh hoạ cho tới khi có ảnh thật (G-23, G-33).
 

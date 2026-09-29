@@ -58,8 +58,8 @@ export default function SiteHeader() {
   const { hidden, scrolled } = useHeaderState()
   return (
     <header className={`nav${hidden ? ' is-hidden' : ''}${scrolled ? ' is-scrolled' : ''}`}>
-      <Link to={path('/')} className="nav-mark" aria-label="MỘC">
-        <Seal>MỘC</Seal>
+      <Link to={path('/')} className="nav-mark" aria-label="LAMVI">
+        <Seal>LAMVI</Seal>
       </Link>
       <nav className="nav-links">
         {SECTIONS.map((s) => (
