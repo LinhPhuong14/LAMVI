@@ -4,6 +4,14 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 — Kiểm tra production sau khi nối Supabase; sửa link bịa của Mây (nhánh `fix/may-links`)
+
+**Kiểm tra** (người dùng đã chạy migration và đặt biến Vercel): đủ 11 bảng + bucket `batch-videos`; seed 3 sản phẩm, 5 FAQ. `lamvi.vercel.app` `/`, `/en`, `/api/health`, `/api/products`, `/api/faq`, `/sitemap.xml` → 200; server ghi `api_metrics`, `profiles`, `chat_messages` vào Supabase (không còn dữ liệu bộ nhớ). 2 tài khoản đều đã xác nhận email (D-63 chạy đúng). Gửi 1 câu hỏi khách tới Mây → trả lời bằng OpenAI (`kind: answer`, ~7,8 giây), `may_usage` ghi 939 token / 0,000165 USD.
+
+**Lỗi phát hiện**: câu trả lời của Mây chứa markdown `[tại đây](https://lamvi.com/products/den-nguyet)` — domain bịa, và khung chat hiển thị văn bản thuần nên lộ nguyên cú pháp. **Sửa**: `toPlainText` (`server/may/guard.js`) bỏ link/URL/đậm trước khi trả; system prompt cấm markdown/link. Test `server/may.links.extra.test.js`. Spec v0.18, G-41.
+
+**Còn lại**: chưa có admin (cả 2 profile là `customer`); Supabase Auth URL Configuration chưa kiểm được từ phiên này.
+
 ## 2026-09-29 — Mây: OpenAI mặc định bật (nhánh `feat/may-openai-default`)
 
 **Quyết định từ người dùng**: đồng ý `[LEGAL]` I-14, đổi mặc định bật OpenAI → D-67 (trên nhánh đánh D-64; khi gộp `master` đổi thành D-67 vì D-64…D-66 đã dùng).

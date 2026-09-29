@@ -37,6 +37,23 @@ export function forbiddenContent(reply) {
   return FORBIDDEN.some((re) => re.test(String(reply)))
 }
 
+// Khung chat hiển thị văn bản thuần: bỏ markdown link/đậm và mọi URL (model có thể tự bịa
+// domain không có thật) `[ASSUMPTION]`
+const MD_LINK = /\[([^\]]*)\]\((?:[^()\s]|\([^()\s]*\))*\)/g
+const URL_RE = /\b(?:https?:\/\/|www\.)[^\s<>()]+/gi
+const MD_EMPHASIS = /(\*\*|__)(.+?)\1/g
+
+export function toPlainText(reply) {
+  return String(reply)
+    .replace(MD_LINK, '$1')
+    .replace(URL_RE, '')
+    .replace(MD_EMPHASIS, '$2')
+    .replace(/\(\s*\)/g, '')
+    .replace(/[ \t]+([.,!?;:])/g, '$1')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim()
+}
+
 // Bỏ dấu tiếng Việt để khớp từ khoá (FAQ offline)
 export function normalizeText(s) {
   return String(s)
