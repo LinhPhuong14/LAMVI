@@ -15,6 +15,7 @@ import Marquee from '../components/Marquee'
 import Particles from '../components/Particles'
 import Faq from '../components/Faq'
 import FolkGallery from '../components/FolkGallery'
+import FloatingMotifs from '../components/FloatingMotifs'
 import Price from '../components/Price'
 import { CountUp, Reveal } from '../components/Reveal'
 import { PointerGlow, TiltCard } from '../components/Effects'
@@ -232,7 +233,8 @@ function Hero() {
   const cueOpacity = useTransform(scrollY, [0, 140], [1, 0])
 
   return (
-    <section className="hero aged">
+    <section className="hero aged has-motifs">
+      <FloatingMotifs preset="hero" />
       <PointerGlow />
       <Particles />
       <Cloud className="hero-cloud cloud-a" />
@@ -384,7 +386,8 @@ export default function HomePage() {
 
       <Marquee />
 
-      <Reveal as="section" id="story" className="story" variants={group}>
+      <Reveal as="section" id="story" className="story has-motifs" variants={group}>
+        <FloatingMotifs preset="story" />
         <SectionHead eyebrow={t('story.eyebrow')} title={t('story.title')} />
         <m.p className="story-text drop-cap" variants={rise}>
           {t('story.text')}
@@ -404,7 +407,8 @@ export default function HomePage() {
         <FolkGallery />
       </Reveal>
 
-      <Reveal as="section" id="artisan" className="artisan" variants={group}>
+      <Reveal as="section" id="artisan" className="artisan has-motifs" variants={group}>
+        <FloatingMotifs preset="artisan" />
         <m.div className="artisan-portrait" variants={stamp} custom={1}>
           {/* Ảnh cũ ngả sepia: chỉ là minh hoạ, không phải ảnh thật của nghệ nhân */}
           <OldPhoto>
@@ -456,7 +460,8 @@ export default function HomePage() {
         </m.div>
       </Reveal>
 
-      <section id="products" className="products">
+      <section id="products" className="products has-motifs">
+        <FloatingMotifs preset="products" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('products.eyebrow')} title={t('products.title')}>
             <m.div className={`intent-toggle is-${intent}`} role="group" variants={rise}>
@@ -492,7 +497,8 @@ export default function HomePage() {
         <ProductGrid intent={intent} />
       </section>
 
-      <section id="lookbook" className="lookbook">
+      <section id="lookbook" className="lookbook has-motifs">
+        <FloatingMotifs preset="lookbook" />
         <SkyLanterns />
         <div className="lookbook-inner">
           <LampHead eyebrow={t('lookbook.eyebrow')} title={t('lookbook.title')} />
@@ -514,14 +520,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="process" className="process">
+      <section id="process" className="process has-motifs">
+        <FloatingMotifs preset="process" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('process.eyebrow')} title={t('process.title')} />
         </Reveal>
         <ProcessTimeline steps={t('process.steps')} />
       </section>
 
-      <section id="qr" className="qr-experience">
+      <section id="qr" className="qr-experience has-motifs">
+        <FloatingMotifs preset="qr" />
         <Reveal className="qr-copy" variants={group}>
           <Eyebrow>{t('qr.eyebrow')}</Eyebrow>
           <m.h2 variants={ink}>{t('qr.title')}</m.h2>
@@ -556,7 +564,8 @@ export default function HomePage() {
         </Reveal>
       </section>
 
-      <section className="testimonials">
+      <section className="testimonials has-motifs">
+        <FloatingMotifs preset="testimonials" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('testimonials.eyebrow')} title={t('testimonials.title')} />
         </Reveal>
@@ -579,7 +588,8 @@ export default function HomePage() {
         </Reveal>
       </section>
 
-      <section id="faq" className="faq">
+      <section id="faq" className="faq has-motifs">
+        <FloatingMotifs preset="faq" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('faq.eyebrow')} title={t('faq.title')} />
         </Reveal>

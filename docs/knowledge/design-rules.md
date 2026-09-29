@@ -1,6 +1,6 @@
 # Design rules — MỘC (web)
 
-Quy tắc thiết kế cho giao diện công khai của MỘC. Token nằm ở `src/index.css`; component ở `src/styles/App.css`, trang phụ ở `src/styles/pages.css`. Quyết định gốc: T-21…T-26 trong [`decisions.md`](decisions.md).
+Quy tắc thiết kế cho giao diện công khai của MỘC. Token nằm ở `src/index.css`; component ở `src/styles/App.css`, trang phụ ở `src/styles/pages.css`. Quyết định gốc: T-21…T-28 trong [`decisions.md`](decisions.md).
 
 > Thương hiệu "LÂM VỊ" ở nhánh `docs/branding-guideline` chưa gộp vào `master` — tài liệu này áp dụng cho MỘC hiện tại.
 
@@ -102,6 +102,27 @@ Font tự host (T-21), preload 6 file. Không thêm font thứ ba.
 
 Hoạ tiết là trang trí → `aria-hidden="true"`.
 
+### 6.1 Hoạ tiết lơ lửng (`FloatingMotifs`, T-28)
+
+Bộ preset tự vẽ ở `src/data/motifs.js`, bố cục theo phần ở `SECTION_MOTIFS`; mỗi phần gắn `<FloatingMotifs preset="…" />` và class `has-motifs`.
+
+| Preset | Hình | Hợp với |
+|---|---|---|
+| `may-cuon` | Mây cuộn: đuôi dài uốn vào xoáy lớn | Góc phần giấy, nền chàm |
+| `may-doi` | Mây đôi: hai xoáy đối xứng, đỉnh như ý | Góc phần có khung (sản phẩm, lời khách) |
+| `may-dai` | Dải mây dài | Nền rộng (hero, lookbook đêm) |
+| `van-nuoc` | Vân nước: cung sóng lồng nhau | Công đoạn, FAQ |
+| `van-go` | Đường vân gỗ / sợi dó | Nền sau khối chữ ít |
+| `khoi-huong` | Khói hương: hai sợi mảnh bay lên | Gần nguồn sáng (đèn), sau ảnh cũ |
+| `khoi-cuon` | Khói kết thúc bằng xoáy | Như trên |
+
+Quy tắc:
+- Tối đa 3 hoạ tiết mỗi phần; trên màn ≤640px chỉ giữ 2 và thu nhỏ 60%.
+- Nét 1,3px không co giãn; `--sepia` 28% trên giấy, `--hoe-light` 20% trên nền tối — không đậm hơn.
+- Không đặt đè lên chữ, số liệu, nút; ưu tiên mép và góc phần.
+- Khói chỉ đặt gần nguồn sáng hoặc ảnh cũ (gợi hương khói), không rải khắp trang.
+- Chuyển động: mây/vân trôi 22–38s qua lại; khói 11–14s vẽ dần rồi tan; parallax theo cuộn chỉ khi trình duyệt hỗ trợ `animation-timeline: view()`. Giảm chuyển động → đứng yên, khói hiện tĩnh.
+
 ## 7. Hình ảnh
 
 ### 7.1 Nguồn và bản quyền
@@ -118,7 +139,8 @@ Hoạ tiết là trang trí → `aria-hidden="true"`.
 
 ### 7.3 Xử lý và hiển thị
 
-- WebP, hai cỡ (≈480px và ≈960px chiều rộng) qua `srcset`; `loading="lazy"`, `decoding="async"`, luôn có `width`/`height` để tránh nhảy bố cục.
+- WebP tối đa hai cỡ (480px, 960px) qua `srcset`, **không phóng to** ảnh nguồn nhỏ (ảnh <480px giữ một bản đúng cỡ gốc — `widths` trong `folkArt.js`); `sizes` theo bề rộng hiển thị thật; `loading="lazy"`, `decoding="async"`, luôn có `width`/`height` để tránh nhảy bố cục.
+- Tải từ Commons: dùng bản thu nhỏ cỡ chuẩn (`thumb.wikimedia.org`, 330/500/960/1280) với User-Agent riêng — file gốc bị giới hạn tần suất.
 - Không lọc màu, không cắt mất chi tiết của tranh; trình bày như tranh treo (khung tranh bồi) trên nền chàm hoặc giấy.
 - `alt` qua i18n (vi/en/zh), mô tả nội dung tranh.
 

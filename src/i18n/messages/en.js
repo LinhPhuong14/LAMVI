@@ -61,12 +61,12 @@ export default {
       'ong-to-ba-nguyet': {
         name: 'Ông Tơ and Bà Nguyệt',
         meta: 'Đông Hồ woodblock print',
-        alt: 'Đông Hồ print: Ông Tơ and Bà Nguyệt, the deities who tie the threads of marriage',
+        alt: 'Pair of Đông Hồ prints: Ông Tơ and Bà Nguyệt, the matchmaking deities, riding mythical beasts among clouds, flanked by attendants',
       },
       'lon-am-duong': {
         name: 'Yin–yang pig',
         meta: 'Đông Hồ woodblock print',
-        alt: 'Đông Hồ print: a plump pig marked with yin–yang swirls',
+        alt: 'Đông Hồ print: a sow and her piglets marked with yin–yang swirls',
       },
       'vinh-hoa': {
         name: 'Glory (Vinh hoa)',
@@ -81,12 +81,12 @@ export default {
       'ca-chep': {
         name: 'Carp',
         meta: 'Đông Hồ woodblock print',
-        alt: 'Đông Hồ print: a carp',
+        alt: 'Đông Hồ print: large and small carp swimming among lotus flowers',
       },
       'muc-dong-tha-dieu': {
         name: 'Buffalo boy flying a kite',
         meta: 'Đông Hồ woodblock print',
-        alt: 'Đông Hồ print: a buffalo boy flying a kite',
+        alt: 'Đông Hồ print: a boy sitting on a buffalo’s back, flying a kite',
       },
       'giang-hoc-do': {
         name: 'Teaching scene (Giảng học đồ)',
@@ -97,6 +97,11 @@ export default {
         name: 'Triumphant return (Vinh quy)',
         meta: 'Painting on dó paper, Độc Lôi temple (Nghệ An), late 18th century — Vietnam National Museum of Fine Arts',
         alt: '18th-century hanging scroll on dó paper: a civil mandarin returning home in triumph with his retinue',
+      },
+      'van-tu-giay-do-1904': {
+        name: 'Deed on dó paper',
+        meta: 'Administrative document, 1904, with revenue stamp — public domain',
+        alt: 'Handwritten document in Chinese characters on dó paper, 1904, stamped and bearing a revenue stamp',
       },
     },
   },

@@ -65,12 +65,12 @@ export default {
       'ong-to-ba-nguyet': {
         name: 'Ông Tơ – Bà Nguyệt',
         meta: 'Tranh Đông Hồ',
-        alt: 'Tranh Đông Hồ: Ông Tơ và Bà Nguyệt, hai vị thần se duyên',
+        alt: 'Tranh đôi Đông Hồ: Ông Tơ và Bà Nguyệt, hai vị thần se duyên, ngự trên linh vật giữa mây, hai bên có người hầu',
       },
       'lon-am-duong': {
         name: 'Lợn âm dương',
         meta: 'Tranh Đông Hồ',
-        alt: 'Tranh Đông Hồ: chú lợn béo mang hoa văn âm dương trên mình',
+        alt: 'Tranh Đông Hồ: lợn mẹ và đàn lợn con, trên mình có hoa văn xoáy âm dương',
       },
       'vinh-hoa': {
         name: 'Vinh hoa',
@@ -85,12 +85,12 @@ export default {
       'ca-chep': {
         name: 'Cá chép',
         meta: 'Tranh Đông Hồ',
-        alt: 'Tranh Đông Hồ: cá chép',
+        alt: 'Tranh Đông Hồ: đàn cá chép lớn nhỏ bơi giữa hoa sen',
       },
       'muc-dong-tha-dieu': {
         name: 'Mục đồng thả diều',
         meta: 'Tranh Đông Hồ',
-        alt: 'Tranh Đông Hồ: cậu bé chăn trâu thả diều',
+        alt: 'Tranh Đông Hồ: cậu bé ngồi trên lưng trâu thả diều',
       },
       'giang-hoc-do': {
         name: 'Giảng học đồ',
@@ -101,6 +101,11 @@ export default {
         name: 'Vinh quy',
         meta: 'Tranh trên giấy dó, đền Độc Lôi (Nghệ An), cuối thế kỷ 18 — Bảo tàng Mỹ thuật Việt Nam',
         alt: 'Tranh cuộn trên giấy dó thế kỷ 18: quan văn vinh quy về làng cùng đoàn tuỳ tùng',
+      },
+      'van-tu-giay-do-1904': {
+        name: 'Văn tự trên giấy dó',
+        meta: 'Giấy tờ hành chính năm 1904, có tem thuế — phạm vi công cộng',
+        alt: 'Văn tự chữ Hán viết tay trên giấy dó năm 1904, có đóng dấu và dán tem',
       },
     },
   },

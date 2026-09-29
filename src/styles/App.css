@@ -2291,6 +2291,8 @@
 /* Tranh bồi: mép lụa + đường chỉ mảnh, treo nổi trên vách tối */
 .folk-print-frame {
   position: relative;
+  /* Khung ôm sát tranh; chú thích bên dưới được rộng hơn tranh cuộn dọc */
+  width: fit-content;
   padding: 10px;
   background: var(--diep-light);
   box-shadow: 0 22px 44px -26px rgba(0, 0, 0, 0.75);
@@ -2321,7 +2323,7 @@
   flex-direction: column;
   gap: 2px;
   margin-top: 12px;
-  max-width: 320px;
+  max-width: 260px;
 }
 
 .folk-print-name {
@@ -2363,5 +2365,143 @@
   }
   .folk-print img {
     height: 200px;
+  }
+}
+
+/* ---------- Hoạ tiết lơ lửng: mây, đường vân, nét khói (FloatingMotifs) ---------- */
+
+.has-motifs {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Nằm sau nội dung trong phần có isolation → không che chữ, không bắt chuột */
+.motif-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Parallax theo cuộn (trình duyệt hỗ trợ scroll-driven animation) — hoạ tiết trôi chậm hơn nội dung */
+@supports (animation-timeline: view()) {
+  .motif-layer {
+    animation: motif-parallax linear both;
+    animation-timeline: view();
+  }
+}
+
+@keyframes motif-parallax {
+  from {
+    transform: translateY(40px);
+  }
+  to {
+    transform: translateY(-40px);
+  }
+}
+
+.motif {
+  position: absolute;
+  display: block;
+}
+
+.motif svg {
+  display: block;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.motif-paper {
+  color: var(--sepia);
+  opacity: 0.28;
+}
+
+.motif-dark {
+  color: var(--hoe-light);
+  opacity: 0.2;
+}
+
+/* Mây, đường vân: trôi chậm qua lại */
+.motif-drift {
+  animation: motif-drift 24s ease-in-out infinite alternate;
+}
+
+@keyframes motif-drift {
+  from {
+    transform: translate(-18px, 6px);
+  }
+  to {
+    transform: translate(18px, -8px);
+  }
+}
+
+/* Nét khói: bay lên, sợi khói vẽ dần từ dưới lên rồi tan */
+.motif-smoke {
+  opacity: 0.45;
+  animation: smoke-rise 12s ease-in-out infinite;
+}
+
+.motif-smoke path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: smoke-draw 12s ease-in-out infinite;
+}
+
+@keyframes smoke-rise {
+  0% {
+    transform: translateY(24px);
+  }
+  100% {
+    transform: translateY(-36px);
+  }
+}
+
+@keyframes smoke-draw {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  55% {
+    stroke-dashoffset: 0;
+  }
+  85% {
+    opacity: 0.4;
+  }
+  100% {
+    stroke-dashoffset: -1;
+    opacity: 0;
+  }
+}
+
+/* Giảm chuyển động: hoạ tiết đứng yên, khói hiện tĩnh */
+@media (prefers-reduced-motion: reduce) {
+  .motif-layer,
+  .motif-drift,
+  .motif-smoke,
+  .motif-smoke path {
+    animation: none !important;
+  }
+  .motif-smoke path {
+    stroke-dashoffset: 0;
+    opacity: 0.6;
+  }
+}
+
+/* Màn hẹp: bớt hoạ tiết, thu nhỏ để không rối */
+@media (max-width: 640px) {
+  .motif {
+    transform-origin: top left;
+    scale: 0.6;
+  }
+  .motif-layer .motif:nth-child(n + 3) {
+    display: none;
   }
 }

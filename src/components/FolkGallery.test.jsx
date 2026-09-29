@@ -23,10 +23,11 @@ const renderGallery = (lang) =>
   )
 
 describe('FolkGallery — ảnh tư liệu (T-27)', () => {
-  it('có ít nhất một ảnh và mỗi ảnh có file WebP 480/960 thật trong public/', () => {
+  it('có ít nhất một ảnh và mỗi độ rộng khai báo có file WebP thật trong public/', () => {
     expect(FOLK_ART.length).toBeGreaterThan(0)
     for (const art of FOLK_ART) {
-      for (const w of [480, 960]) {
+      expect(art.widths.length).toBeGreaterThan(0)
+      for (const w of art.widths) {
         expect(existsSync(join(process.cwd(), 'public', folkSrc(art.id, w)))).toBe(true)
       }
     }
@@ -57,7 +58,8 @@ describe('FolkGallery — ảnh tư liệu (T-27)', () => {
       expect(img).toHaveAttribute('loading', 'lazy')
       expect(img).toHaveAttribute('width', String(art.width))
       expect(img).toHaveAttribute('height', String(art.height))
-      expect(img.getAttribute('srcset')).toContain(folkSrc(art.id, 960))
+      for (const w of art.widths) expect(img.getAttribute('srcset')).toContain(`${folkSrc(art.id, w)} ${w}w`)
+      expect(img.getAttribute('sizes')).toMatch(/px/)
       expect(within(fig).getByText(item.name)).toBeInTheDocument()
       const link = within(fig).getByRole('link')
       expect(link).toHaveAttribute('href', art.source)

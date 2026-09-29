@@ -8,6 +8,12 @@ import { group, stamp } from '../lib/motion.js'
  * Phòng tranh: tranh Đông Hồ và tranh giấy dó thật (ảnh tư liệu, phạm vi công cộng/CC0).
  * Mỗi tranh treo trong khung tranh bồi, có tên và nguồn ngay dưới — không trình bày như ảnh sản phẩm.
  */
+// Tranh hiển thị theo chiều cao cố định (CSS .folk-print img) → bề rộng thật = cao × tỉ lệ khung
+const displaySizes = (art) => {
+  const w = (h) => `${Math.ceil((h * art.width) / art.height)}px`
+  return `(max-width: 640px) ${w(200)}, ${w(250)}`
+}
+
 export default function FolkGallery() {
   const { t } = useI18n()
   return (
@@ -17,9 +23,9 @@ export default function FolkGallery() {
           <m.figure className="folk-print" key={art.id} role="listitem" variants={stamp} custom={i}>
             <div className="folk-print-frame">
               <img
-                src={folkSrc(art.id, 480)}
-                srcSet={`${folkSrc(art.id, 480)} 480w, ${folkSrc(art.id, 960)} 960w`}
-                sizes="(max-width: 640px) 60vw, 360px"
+                src={folkSrc(art.id, art.widths[0])}
+                srcSet={art.widths.map((w) => `${folkSrc(art.id, w)} ${w}w`).join(', ')}
+                sizes={displaySizes(art)}
                 width={art.width}
                 height={art.height}
                 alt={t(`gallery.items.${art.id}.alt`)}
