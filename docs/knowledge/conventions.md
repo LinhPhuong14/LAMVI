@@ -22,14 +22,15 @@
 - Mã HTTP: 400 dữ liệu sai, 401 chưa/sai đăng nhập, 403 không đủ quyền, 404 không có (hoặc không được phép biết — AC-004 US-004), 409 xung đột, 500 lỗi hệ thống.
 - Tham số ngôn ngữ: query `?lang=vi|en|zh`; giá trị lạ → `vi`.
 - Tên trường JSON: camelCase. Tên cột DB: snake_case. Chuyển đổi trong adapter.
-- Tiền: số nguyên VND (`priceExclVat`), kèm `currency: "VND"`.
+- Tiền: số nguyên VND, **đã gồm VAT** (`price`, `total`, `lineTotal`…), kèm `currency: "VND"` (D-68).
+  Bảng giá chỉ được tính ở `server/domain/pricing.js` + `quoteCart` (T-40) — không tính lại ở frontend.
 
 ## Frontend (`src/`)
 
 - Trang ở `src/pages/`, thành phần dùng lại ở `src/components/`, gọi API ở `src/api/`, i18n ở `src/i18n/`.
 - Không viết chuỗi hiển thị trực tiếp trong JSX — dùng `t('key')`. Thêm key thì thêm cho **cả** `vi`, `en`, `zh`; thiếu → hiện `vi` (D-40).
 - Link nội bộ dùng `useI18n().path('/…')` để giữ tiền tố ngôn ngữ (D-37).
-- Giá hiển thị qua `<Price />` — luôn kèm chú thích "chưa gồm VAT" (BR-PRC-003).
+- Giá hiển thị qua `<Price />` — luôn kèm chú thích "đã gồm VAT" (BR-PRC-003, D-68).
 - Mỗi trang render `<Seo>` (T-16): trang công khai truyền `title`, `description`, `path` (không có tiền tố ngôn ngữ); trang không được index (QR, tài khoản, giỏ, checkout, admin — BR-SEO-001, D-44) truyền `noindex`; trang lỗi truyền `status`. Không gọi `useNoIndex()` trực tiếp khi đã có `<Seo noindex>`.
 - Trang công khai phải render được trên server (T-15): không đọc `window`/`localStorage` khi render; khai báo key dữ liệu trong `src/seo/routes.js`.
 - Tôn trọng `prefers-reduced-motion` (NFR-A11Y-001): CSS có media query trong `pages.css`; framer-motion được bọc `MotionConfig reducedMotion="user"` ở `LocaleLayout`. Hook cần biết trạng thái giảm chuyển động dùng `useReducedMotionConfig()`.
