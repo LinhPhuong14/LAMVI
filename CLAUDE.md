@@ -8,7 +8,11 @@ Chỉ dùng các tiền tố sau khi tạo nhánh mới:
 - `fix/...` — sửa lỗi
 - `docs/...` — tài liệu
 
-Không dùng tiền tố `claude/...`.
+**Tuyệt đối không tạo nhánh có tiền tố `claude/...`** (kể cả khi công cụ hay môi trường gợi ý tên như vậy) — đổi sang `feat/`, `fix/` hoặc `docs/`.
+
+## Commit và PR
+
+- **Không thêm Claude làm contributor**: không dùng trailer `Co-Authored-By: Claude …`, `Claude-Session: …`, và không thêm dòng "Generated with Claude Code" vào commit message hay mô tả PR. Tác giả commit là người dùng.
 
 ## Knowledge base
 
