@@ -2,11 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.8 (bản nháp) |
+| Phiên bản | v0.9 (bản nháp) |
 | Ngày | 2026-09-29 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6 (nhánh `feat/folk-art-redesign`): giao diện dân gian cổ + motion xuất hiện/biến mất, không đổi câu chữ/nghiệp vụ (§31.4). v0.7: bảng màu cân lại, phòng tranh ảnh tư liệu thật (Q-36 `[LEGAL]`), design rules (§31.4) |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36 |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -1080,6 +1079,8 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-32 | Giỏ hàng trên Supabase | Giới hạn 50 dòng và gộp giỏ là đọc-rồi-ghi, hai thao tác đồng thời có thể vượt 50 dòng / lệch số lượng; bảng `cart_items` bật RLS không có policy (chỉ server dùng service role truy cập) | Rủi ro thấp | **Mới** (v0.7) |
 | G-33 | Hình minh hoạ thay cho ảnh thật | Đèn, chân dung nghệ nhân (khung "ảnh cũ"), hoạ tiết đều là SVG minh hoạ; chân dung không phải ảnh thật của nghệ nhân. Khi có ảnh thật phải thay, và không trình bày minh hoạ như ảnh tư liệu | Content | **Mới** (v0.6) — liên quan G-23 |
 | G-34 | Nội dung khi chưa chạy JS | Các khối có hiệu ứng xuất hiện nằm trong HTML SSR (máy tìm kiếm đọc được) nhưng `opacity: 0` tới khi JS chạy. Đã giảm: màn hình đầu (tiêu đề, LCP) chạy bằng CSS nên hiện ngay; trình duyệt tắt JS được CSS `@media (scripting: none)` ép hiện. Còn lại: JS tải chậm thì các khối dưới màn hình đầu chờ hydrate mới hiện | Technical debt | 🟡 Một phần (v0.6) |
+| G-35 | Số liệu API trên Vercel (T-18) | Flush bằng timer/SIGTERM; instance serverless có thể bị đóng trước khi flush nên dashboard IT có thể thiếu số liệu | Technical debt | **Mới** (v0.9) |
+| G-36 | Deploy Vercel chưa kiểm chứng thật (T-33) | Mới thử local giả lập `VERCEL=1`; chưa deploy Preview/Production, chưa kiểm rewrite/`includeFiles` trên nền tảng | Chưa kiểm chứng | **Mới** (v0.9) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
 ### 31.3 Nội dung web phải sửa (Incorrect)
@@ -1125,7 +1126,7 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 - `[ASSUMPTION]` Chú thích tranh (tên, mô tả, alt vi/en/zh) do dev soạn — chờ Marketing duyệt cùng G-14.
 - `[ASSUMPTION]` Tham khảo web Trung Quốc chỉ ở mức nguyên tắc trình bày (nét, khung, khoảng trắng); không dùng chữ Hán, rồng, mái cung điện để web vẫn mang bản sắc Việt.
 - `[ASSUMPTION]` Giữ thương hiệu MỘC. Nhánh `docs/branding-guideline` (đổi sang "LÂM VỊ" + Tailwind) chưa gộp vào `master` nên không áp dụng; cần PO thống nhất trước khi gộp.
-- Khoảng trống mới: G-33, G-34 (§31.2).
+- Khoảng trống mới: G-33, G-34 (§31.2). Deploy Vercel: G-35, G-36.
 
 ---
 

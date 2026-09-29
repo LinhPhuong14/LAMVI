@@ -36,6 +36,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-25 | 2026-09-29 | Bỏ phong cách "viền đen dày + bóng đổ cứng" (neo-brutalism). Dùng nét mảnh sepia, khung viền đôi, góc hoa văn triện, bóng mềm, mảng màu phẳng có hoa văn chìm — tham khảo nguyên tắc trình bày của các trang bảo tàng/di sản Trung Quốc, dịch sang hoạ tiết Việt | Hiệu lực |
 | T-24 | 2026-09-28 | Hiệu ứng lấy ý tưởng từ Aceternity UI nhưng tự viết lại (không chép code — trang của họ ghi "All Rights Reserved"; không dùng Tailwind). Hiệu ứng theo con trỏ chỉ bật khi `useFinePointer()` và không giảm chuyển động | Hiệu lực |
 | T-23 | 2026-09-28 | Giao diện "Đông Hồ cổ": token màu ở `src/index.css` (giữ bí danh tên cũ cho `pages.css`); texture giấy/mực là SVG nội tuyến, vẽ trên nền tĩnh — không dùng lớp phủ cố định có `mix-blend-mode`/`backdrop-filter` | Hiệu lực |
+| T-33 | 2026-09-29 | Deploy Vercel: một Function `api/index.js` re-export Express `app` (web SSR + API), `vercel.json` rewrite `/(.*)→/api`, `includeFiles: dist/**`, `outputDirectory: public`; bắt buộc Supabase; upload video qua signed URL. Chi tiết: `deploy-vercel.md` | Hiệu lực |
 
 ---
 
@@ -64,6 +65,11 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Bối cảnh**: video có thể vài trăm MB; đi qua Express tốn bộ nhớ/thời gian và vướng giới hạn body. T-05 cấm đưa key Supabase vào frontend.
 - **Quyết định**: `POST /api/admin/batches/:id/video-upload` → server gọi `createSignedUploadUrl(path)` → trình duyệt `PUT` file lên URL đó (XHR để có %). Sau đó `POST /api/admin/batches/:id/video { path }` → server `info(path)` kiểm tra file có thật, đúng dung lượng rồi mới gắn `video_url`.
 - **Hệ quả**: mỗi lần tải là một đường dẫn mới `<batchId>/<timestamp>-<rand>.<ext>`; video cũ không bị ghi đè (D-10). Chưa thử với Supabase thật (G-22). Bucket `batch-videos` tạo bằng migration, đặt giới hạn file ≥ `MAX_VIDEO_MB`.
+
+### T-33 — Deploy Vercel
+- **Bối cảnh**: D-49 chọn một server Express cho web + API; Vercel chỉ có hàm serverless.
+- **Quyết định**: giữ nguyên Express, bọc bằng `api/index.js`; `server/index.js` export `app` và bỏ `listen` khi `VERCEL` (SSR đọc `dist/**` nên phải `includeFiles`; `outputDirectory: public` để CDN không trả `index.html` rỗng cho `/`).
+- **Hệ quả**: không adapter bộ nhớ ở môi trường Vercel; số liệu API có thể thiếu do flush theo timer (G-35). Quy tắc và biến môi trường: `deploy-vercel.md`.
 
 ### T-15 / T-16 / T-17 — SSR
 - **Bối cảnh**: §23.2 yêu cầu HTML render sẵn; D-49 chọn SSR trong Express để dữ liệu admin sửa hiện ngay.

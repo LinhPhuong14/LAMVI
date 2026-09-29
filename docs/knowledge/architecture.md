@@ -16,8 +16,10 @@ Trình duyệt ──GET trang──► Express (server/) ──SSR (server/ssr.
 ## Thư mục
 
 ```text
+api/index.js               Vercel Function: re-export `app` (T-33, xem deploy-vercel.md)
+vercel.json                Rewrite, includeFiles, buildCommand (T-33)
 server/
-  index.js                 Khởi động: đọc env, chọn adapter Supabase/bộ nhớ, gắn SSR
+  index.js                 Khởi động: đọc env, chọn adapter Supabase/bộ nhớ, gắn SSR; export `app` (không listen khi VERCEL, T-33)
   ssr.js                   createWeb (Vite middleware / dist) + renderPage (SSR)
   services/catalog.js      Truy vấn công khai dùng chung API + SSR
   monitoring/              metrics.js (số liệu API), maintenance.js (bảo trì), health.js (kiểm tra tích hợp)

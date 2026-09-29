@@ -30,3 +30,14 @@ Nguồn yêu cầu nghiệp vụ duy nhất: `docs/ba-spec.md`.
 - Quyết định mới từ người dùng: thêm vào Phụ lục A (mã `D-xx` tiếp theo), gỡ nhãn `[BA DECISION REQUIRED]` tương ứng và câu hỏi ở mục 30.
 - Giả định phát sinh trong lúc code: ghi vào spec với nhãn `[ASSUMPTION]`.
 - Tăng phiên bản ở đầu tài liệu (ví dụ v0.1 → v0.2) và cập nhật ngày.
+
+## Triển khai Vercel
+
+Chi tiết và lý do: `docs/knowledge/deploy-vercel.md` (T-33). Quy tắc bắt buộc:
+
+- Web + API chạy bằng **một** Vercel Function `api/index.js` (re-export Express `app` từ `server/index.js`), cấu hình ở `vercel.json`. Không tách thêm function, không đổi `outputDirectory` sang `dist/client` (sẽ bỏ qua SSR).
+- `server/index.js` không được `listen` khi có `process.env.VERCEL`. Thêm tệp đọc lúc chạy ngoài `dist/**` → thêm vào `includeFiles`.
+- Preview/Production **bắt buộc** có `SUPABASE_*` (không dùng adapter bộ nhớ), `PUBLIC_SITE_URL` là domain thật, `TRUST_PROXY=1`, `MAY_HASH_SALT` riêng. Biến môi trường đặt ở Vercel, không commit `.env`/token; không đặt `DEV_ADMIN_*`/`DEV_IT_*`. Biến mới bắt buộc → cập nhật `.env.example` + `deploy-vercel.md`.
+- Giới hạn serverless: body ≤ 4,5 MB (video lô luôn qua signed upload URL, T-12), không ghi file cục bộ, không giữ trạng thái trong bộ nhớ tiến trình.
+- Trước khi push: `npm run lint`, `npm test`, `npm run build` xanh. Production = `master`; không `vercel --prod` từ máy khi chưa được yêu cầu.
+- Đổi cấu hình deploy phải cập nhật `deploy-vercel.md`, `decisions.md` (T-xx) và `progress.md` trong cùng commit.

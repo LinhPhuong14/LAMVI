@@ -67,6 +67,11 @@ for (const sig of ['SIGTERM', 'SIGINT']) {
   })
 }
 
-createApp({ repo, auth, storage, web, config, metrics, maintenance, may }).listen(config.port, () => {
-  console.log(`[web+api] http://localhost:${config.port}`)
-})
+export const app = createApp({ repo, auth, storage, web, config, metrics, maintenance, may })
+
+// T-33: trên Vercel, `api/index.js` dùng `app` làm hàm serverless — không tự listen
+if (!process.env.VERCEL) {
+  app.listen(config.port, () => {
+    console.log(`[web+api] http://localhost:${config.port}`)
+  })
+}

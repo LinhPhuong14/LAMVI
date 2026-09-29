@@ -9,6 +9,7 @@ Bộ tài liệu này giữ cho mọi phiên code (người hoặc AI) làm vi�
 | [`architecture.md`](architecture.md) | Cấu trúc thư mục, luồng dữ liệu, adapter, schema, API | Khi thêm module/bảng/endpoint |
 | [`design-rules.md`](design-rules.md) | Design rules: màu, chữ, nét/khung, hoạ tiết, ảnh (nguồn, giấy phép), motion, hiệu năng | Khi đổi token, thêm component giao diện hoặc ảnh |
 | [`conventions.md`](conventions.md) | Quy ước code, i18n, API, test, commit | Khi thống nhất quy ước mới |
+| [`deploy-vercel.md`](deploy-vercel.md) | Cách chạy trên Vercel, biến môi trường, quy tắc deploy (T-33) | Khi đổi cấu hình deploy |
 | [`glossary.md`](glossary.md) | Thuật ngữ nghiệp vụ ↔ tên trong code | Khi xuất hiện khái niệm mới |
 | [`progress.md`](progress.md) | Bảng trạng thái tính năng theo FR, file, test | Cuối mỗi tính năng |
 | [`session-log.md`](session-log.md) | Nhật ký từng phiên: làm gì, quyết gì, còn gì | Cuối mỗi phiên |
@@ -51,6 +52,7 @@ npm test             # Vitest: test server + frontend
 npm run lint         # oxlint
 npm run build        # client + SSR
 npm start            # chạy bản build
+# Vercel: xem deploy-vercel.md (api/index.js + vercel.json, T-33)
 ```
 
 Biến môi trường: xem [`../../.env.example`](../../.env.example). Không có biến Supabase → server chạy adapter bộ nhớ với dữ liệu seed (T-04).

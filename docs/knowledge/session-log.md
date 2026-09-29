@@ -4,6 +4,17 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 (phiên 7) — Gộp nhánh vào `master` + Vercel (nhánh `claude/relaxed-knuth-46vztf`)
+
+**Đã làm**
+
+1. Gộp vào `master`: `docs/branding-guideline`, `feat/folk-art-redesign` (giải xung đột; T-21…T-24 của Mây/giỏ hàng đánh số lại T-29…T-32, G-29/G-30 của redesign → G-33/G-34; test "Xem chi tiết" cập nhật theo nút giỏ hàng). `feat/landing-page` và `claude/folk-art-web-design-v3ice8` là nguyên mẫu cũ xung đột toàn bộ điểm vào app → gộp kiểu `-s ours` (chỉ ghi lịch sử, không lấy nội dung). `fix/web-copy-ba-spec` đã nằm trong `master`.
+2. Vercel (T-33): `api/index.js`, `vercel.json`, `deploy-vercel.md`, quy tắc trong `CLAUDE.md`, `engines` Node 22.
+
+**Còn lại**: deploy thử thật và kiểm quy tắc 4 (G-36); số liệu API trên serverless (G-35).
+
+---
+
 ## 2026-09-29 (phiên 6) — Giỏ hàng (nhánh `feat/cart`, từ `master`), gộp vào `master`
 
 **Quyết định từ người dùng**
