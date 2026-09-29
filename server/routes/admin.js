@@ -3,7 +3,18 @@ import { Router } from 'express'
 import { HttpError, notFound } from '../errors.js'
 import { RepoError } from '../adapters/repoErrors.js'
 import { requireAdmin } from '../middleware/auth.js'
-import { VIDEO_TYPES, isVideoType, validateBatch, validateFaq, validateProduct, validateVideoUpload } from '../domain/admin.js'
+import {
+  IMAGE_TYPES,
+  VIDEO_TYPES,
+  isImageType,
+  isVideoType,
+  validateBatch,
+  validateFaq,
+  validateImageUpload,
+  validateProduct,
+  validateVideoUpload,
+} from '../domain/admin.js'
+import { PRODUCT_IMAGE_BUCKET } from '../adapters/supabase/storage.js'
 
 const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {})
 
@@ -36,6 +47,7 @@ export function adminRouter({ repo, auth, storage, config }) {
   const r = Router()
   r.use('/admin', requireAdmin(auth, repo))
   const maxVideoBytes = (config.maxVideoMb ?? 500) * 1024 * 1024
+  const maxImageBytes = (config.maxImageMb ?? 5) * 1024 * 1024
 
   // --- Sản phẩm
   r.get('/admin/products', async (req, res) => {
@@ -59,6 +71,53 @@ export function adminRouter({ repo, auth, storage, config }) {
   r.delete('/admin/products/:id', async (req, res) => {
     if (!(await repo.deleteProduct(req.params.id))) throw notFound()
     res.status(204).end()
+  })
+
+  // --- Ảnh sản phẩm (G-23, G-33). Cùng cơ chế signed upload URL như video lô (D-46, T-12):
+  // trình duyệt tải thẳng lên Storage, không đi qua Express (giới hạn body 4,5 MB của Vercel).
+
+  // Bước 1: cấp URL tải ảnh
+  r.post('/admin/products/:id/image-upload', async (req, res) => {
+    const b = body(req)
+    const product = found(await repo.getProductById(req.params.id))
+    assertValid(validateImageUpload(b, maxImageBytes))
+    // Đường dẫn mới mỗi lần tải → không ghi đè ảnh đang hiển thị nếu tải lên hỏng giữa chừng
+    const path = `${product.id}/${Date.now()}-${randomBytes(4).toString('hex')}.${IMAGE_TYPES[b.contentType]}`
+    const upload = await storage.createUpload({ path, contentType: b.contentType, bucket: PRODUCT_IMAGE_BUCKET })
+    res.status(201).json({ path, ...upload })
+  })
+
+  // Bước 2: xác nhận file đã tải lên → gắn vào sản phẩm (thay ảnh cũ, xoá object cũ)
+  r.post('/admin/products/:id/image', async (req, res) => {
+    const { path } = body(req)
+    const product = found(await repo.getProductById(req.params.id))
+    if (typeof path !== 'string' || !path.startsWith(`${product.id}/`) || path.includes('..')) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Đường dẫn không hợp lệ', { path: 'INVALID' })
+    }
+    const obj = await storage.statObject(path, PRODUCT_IMAGE_BUCKET)
+    if (!obj) throw new HttpError(400, 'VALIDATION_ERROR', 'Chưa có file', { path: 'IMAGE_NOT_UPLOADED' })
+    if (obj.size > maxImageBytes) throw new HttpError(400, 'VALIDATION_ERROR', 'File quá lớn', { size: 'IMAGE_TOO_LARGE' })
+    // Kiểm lại kiểu file thật: lúc PUT người tải có thể gửi Content-Type khác lúc xin URL
+    if (!isImageType(obj.contentType)) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Không phải ảnh', { contentType: 'INVALID_IMAGE_TYPE' })
+    }
+    const item = found(
+      await repo.updateProduct(product.id, {
+        imagePath: path,
+        imageUrl: storage.publicUrl(path, PRODUCT_IMAGE_BUCKET),
+      }),
+    )
+    await removeImageObject(product.imagePath, path)
+    res.json({ item })
+  })
+
+  // Gỡ ảnh: sản phẩm quay về hình minh hoạ SVG
+  r.delete('/admin/products/:id/image', async (req, res) => {
+    const product = found(await repo.getProductById(req.params.id))
+    if (!product.imagePath) return res.json({ item: product })
+    const item = found(await repo.updateProduct(product.id, { imagePath: null, imageUrl: null }))
+    await removeImageObject(product.imagePath, null)
+    res.json({ item })
   })
 
   // --- FAQ
@@ -150,4 +209,15 @@ export function adminRouter({ repo, auth, storage, config }) {
   })
 
   return r
+
+  // Xoá object ảnh cũ sau khi DB đã trỏ sang ảnh mới. Lỗi ở bước này không được làm hỏng request:
+  // sản phẩm đã có ảnh đúng, file thừa chỉ tốn dung lượng.
+  async function removeImageObject(oldPath, newPath) {
+    if (!oldPath || oldPath === newPath || !storage.removeObject) return
+    try {
+      await storage.removeObject(oldPath, PRODUCT_IMAGE_BUCKET)
+    } catch (err) {
+      console.error('[admin] không xoá được ảnh cũ', oldPath, err)
+    }
+  }
 }

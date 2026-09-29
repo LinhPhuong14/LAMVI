@@ -37,6 +37,12 @@ export function createApp({
   app.use(express.json({ limit: '100kb' }))
 
   const api = express.Router()
+  // API không được cache: phần lớn endpoint phụ thuộc phiên đăng nhập (giỏ hàng, tài khoản, admin)
+  // và phần còn lại phải phản ánh DB ngay. Đặt ở đây để không sót endpoint nào.
+  api.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
+  })
   // D-54: bảo trì → API ghi trả 503
   api.use(maintenance.apiGuard)
   api.get('/health', (req, res) => res.json({ ok: true }))

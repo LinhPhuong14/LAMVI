@@ -26,7 +26,8 @@ describe('Sản phẩm — edge case', () => {
     const detail = await request(app).get('/api/products/den-nguyet')
     for (const item of [...list.body.items, detail.body.item]) {
       expect(Object.keys(item).sort()).toEqual(
-        ['badge', 'currency', 'description', 'kind', 'name', 'price', 'slug', 'tone'].sort(),
+        // 'image' là { url, alt } — không lộ imagePath (đường dẫn trong Storage)
+        ['badge', 'currency', 'description', 'image', 'kind', 'name', 'price', 'slug', 'tone'].sort(),
       )
     }
   })

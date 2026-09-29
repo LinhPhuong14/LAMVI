@@ -3,8 +3,9 @@ import { fileURLToPath } from 'node:url'
 import express from 'express'
 import { HTML_LANG, localePath, translate } from '../src/i18n/core.js'
 import { classifyPath, dataKeysFor } from '../src/seo/routes.js'
-import { buildHeadTags, renderHeadTags, safeJson } from '../src/seo/head.js'
+import { buildHeadTags, normalizeSiteUrl, renderHeadTags, safeJson } from '../src/seo/head.js'
 import { gaInlineScript, gaScriptSrc } from '../src/analytics/ga.js'
+import { cspHash } from './middleware/security.js'
 import { HttpError } from './errors.js'
 import { getPublicBatch, getPublicProduct, listPublicFaq, listPublicProducts } from './services/catalog.js'
 
@@ -35,16 +36,23 @@ const escHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<':
 
 // FR-GA-001 (D-72): nhúng gtag.js khi có GA_MEASUREMENT_ID. Không nhúng ở trang nội bộ (/admin,
 // /it) và trang bảo trì. ID đã được config.js kiểm định dạng G-XXXX nên an toàn khi nội suy.
-function analyticsTags(measurementId, nonce) {
-  if (!measurementId) return ''
-  const n = nonce ? ` nonce="${escHtml(nonce)}"` : ''
-  return [
-    `<script async${n} src="${escHtml(gaScriptSrc(measurementId))}"></script>`,
-    `<script${n}>${gaInlineScript(measurementId)}</script>`,
-  ].join('\n    ')
+function analyticsTags(measurementId) {
+  if (!measurementId) return { html: '', hashes: [] }
+  const inline = gaInlineScript(measurementId)
+  return {
+    html: [
+      `<script async src="${escHtml(gaScriptSrc(measurementId))}"></script>`,
+      `<script>${inline}</script>`,
+    ].join('\n    '),
+    hashes: [cspHash(inline)],
+  }
 }
 
-const isInternalPath = (pathname) => /^\/(admin|it)(\/|$)/.test(pathname)
+// Không phân biệt hoa/thường — xem classifyPath
+const isInternalPath = (pathname) => /^\/(admin|it)(\/|$)/i.test(pathname)
+
+// Nội dung script nạp sẵn dữ liệu — tách ra để tính hash CSP trên đúng chuỗi được nhúng
+const initialDataScript = (data) => `window.__INITIAL_DATA__=${safeJson(data)}`
 
 // Trang bảo trì tĩnh (không hydrate)
 export function maintenancePage(lang) {
@@ -74,28 +82,27 @@ export function maintenancePage(lang) {
 `
 }
 
-function fill(template, { lang, head, html, data, analytics = '', nonce = null }) {
-  const n = nonce ? ` nonce="${escHtml(nonce)}"` : ''
+function fill(template, { lang, head, html, data, analytics = '' }) {
   // Dùng hàm thay thế: chuỗi thay thế sẽ diễn giải $&, $`, $' có trong nội dung DB
   return template
     .replace('<html lang="vi">', () => `<html lang="${HTML_LANG[lang]}">`)
     .replace('<!--app-head-->', () => (analytics ? `${analytics}\n    ${head}` : head))
     .replace('<!--app-html-->', () => html)
-    .replace('<!--app-data-->', () => (data ? `<script${n}>window.__INITIAL_DATA__=${safeJson(data)}</script>` : ''))
+    .replace('<!--app-data-->', () => (data ? `<script>${initialDataScript(data)}</script>` : ''))
 }
 
 /**
  * Render một trang thành HTML đầy đủ. Trả { status, noindex, html }.
  * Tách riêng để test không cần Vite/dist.
  */
-export async function renderPage({ repo, config, template, render, url, pathname, maintenance, nonce = null }) {
+export async function renderPage({ repo, config, template, render, url, pathname, maintenance }) {
   const route = classifyPath(pathname)
-  const siteUrl = config.publicSiteUrl
-  const analytics = isInternalPath(pathname) ? '' : analyticsTags(config.gaMeasurementId, nonce)
+  const siteUrl = normalizeSiteUrl(config.publicSiteUrl)
+  const ga = isInternalPath(pathname) ? { html: '', hashes: [] } : analyticsTags(config.gaMeasurementId)
 
   // D-54: bảo trì → trang công khai trả 503 (trang tĩnh, không tải app); /login, /admin, /it vẫn vào được
   if (route.kind !== 'private' && maintenance && (await maintenance.get()).enabled) {
-    return { status: 503, noindex: true, retryAfter: 600, html: maintenancePage(route.lang) }
+    return { status: 503, noindex: true, private: true, retryAfter: 600, scriptHashes: [], html: maintenancePage(route.lang) }
   }
 
   if (route.kind === 'private') {
@@ -105,7 +112,10 @@ export async function renderPage({ repo, config, template, render, url, pathname
     return {
       status: 200,
       noindex: true,
-      html: fill(template, { lang: route.lang, head, html: '', data: null, analytics, nonce }),
+      // Nội dung phụ thuộc phiên đăng nhập ở trình duyệt → CDN không được giữ bản dùng chung
+      private: true,
+      scriptHashes: ga.hashes,
+      html: fill(template, { lang: route.lang, head, html: '', data: null, analytics: ga.html }),
     }
   }
 
@@ -117,7 +127,9 @@ export async function renderPage({ repo, config, template, render, url, pathname
   return {
     status: meta.status,
     noindex: meta.noindex,
-    html: fill(template, { lang: route.lang, head, html, data: initialData, analytics, nonce }),
+    private: false,
+    scriptHashes: [...ga.hashes, cspHash(initialDataScript(initialData))],
+    html: fill(template, { lang: route.lang, head, html, data: initialData, analytics: ga.html }),
   }
 }
 
@@ -159,25 +171,14 @@ export async function createWeb({ repo, config, dev, maintenance }) {
         template = await vite.transformIndexHtml(req.originalUrl, readFileSync(`${root}/index.html`, 'utf8'))
         render = (await vite.ssrLoadModule('/src/entry-server.jsx')).render
       }
-      const page = await renderPage({
-        repo,
-        config,
-        template,
-        render,
-        url: req.originalUrl,
-        pathname: req.path,
-        maintenance,
-        nonce: res.locals.cspNonce ?? null,
-      })
+      const page = await renderPage({ repo, config, template, render, url: req.originalUrl, pathname: req.path, maintenance })
+      // CSP cho đúng các script nội tuyến của response này (hash, không nonce — response được CDN
+      // chia sẻ). Ở dev không có setCsp vì CSP tắt.
+      res.locals.setCsp?.(page.scriptHashes ?? [])
       res.set('Content-Type', 'text/html; charset=utf-8')
-      // Trang công khai không phụ thuộc phiên đăng nhập (SSR chỉ đọc DB) → cho CDN giữ bản chung.
-      // Trang riêng tư trả khung rỗng nhưng vẫn để no-store cho chắc, tránh CDN giữ nhầm.
-      res.set(
-        'Cache-Control',
-        page.noindex
-          ? 'private, no-store'
-          : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300',
-      )
+      // Quyết định theo "có phụ thuộc phiên đăng nhập hay không", KHÔNG theo noindex: trang lô
+      // /lo/:code là trang công khai in trên đèn (noindex theo D-44) nhưng vẫn nên qua CDN.
+      res.set('Cache-Control', page.private ? 'private, no-store' : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300')
       if (page.noindex) res.set('X-Robots-Tag', 'noindex')
       if (page.retryAfter) res.set('Retry-After', String(page.retryAfter))
       res.status(page.status).send(page.html)

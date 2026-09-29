@@ -158,7 +158,7 @@ describe('Bảo mật — mọi endpoint /api/admin/* (D-38, §3.2)', () => {
     expect(up.body.path).toMatch(/\.mp4$/)
     await request(app).put(up.body.uploadUrl).set('Content-Type', 'video/mp4').send(Buffer.from('abc')).expect(200)
     await request(app).put(up.body.uploadUrl).set('Content-Type', 'video/mp4').send(Buffer.from('zzz')).expect(403)
-    expect(storage.objects.get(up.body.path).bytes.toString()).toBe('abc')
+    expect(storage.getObject(up.body.path).bytes.toString()).toBe('abc')
     expect(storage.objects.size).toBe(1)
   })
 

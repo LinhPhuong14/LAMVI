@@ -1,4 +1,5 @@
 import { isValidMeasurementId } from '../src/analytics/ga.js'
+import { normalizeSiteUrl } from '../src/seo/head.js'
 
 export function loadConfig(env = process.env) {
   const supabase = {
@@ -10,9 +11,12 @@ export function loadConfig(env = process.env) {
   return {
     // D-49: một server cho cả web (SSR) và API
     port: Number(env.PORT) || 5173,
-    publicSiteUrl: env.PUBLIC_SITE_URL || 'http://localhost:5173',
+    // Cắt "/" ở cuối: canonical/hreflang/sitemap nối trực tiếp đường dẫn nên sẽ sinh "//" nếu để
+    publicSiteUrl: normalizeSiteUrl(env.PUBLIC_SITE_URL || 'http://localhost:5173'),
     // Giới hạn dung lượng video lô [ASSUMPTION]; phải ≤ giới hạn file của bucket Supabase
     maxVideoMb: Number(env.MAX_VIDEO_MB) || 500,
+    // Giới hạn ảnh sản phẩm [ASSUMPTION] — ảnh web nên ≤ 5 MB (G-23)
+    maxImageMb: Number(env.MAX_IMAGE_MB) || 5,
     // Số proxy phía trước (vd 1 khi sau load balancer); không đặt → không tin X-Forwarded-For
     trustProxy: env.TRUST_PROXY === undefined ? undefined : Number(env.TRUST_PROXY) || env.TRUST_PROXY,
     // FR-GA-001, D-72: Google Analytics 4. Không đặt → không nhúng GA (dev/test, Preview).

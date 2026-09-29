@@ -1,13 +1,14 @@
 import { Router } from 'express'
 import { HTML_LANG, LOCALES, localePath } from '../../src/i18n/core.js'
 import { PUBLIC_PRODUCT_STATUSES } from '../domain/catalog.js'
+import { normalizeSiteUrl } from '../../src/seo/head.js'
 
 const xml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c])
 
 // §23.2: sitemap (URL mỗi ngôn ngữ + hreflang) và robots.txt
 export function seoRouter({ repo, config }) {
   const r = Router()
-  const site = () => config.publicSiteUrl
+  const site = () => normalizeSiteUrl(config.publicSiteUrl)
 
   r.get('/sitemap.xml', async (req, res) => {
     // Chỉ trang công khai được index: trang chủ + sản phẩm Published (D-39). Trang lô noindex (D-44)

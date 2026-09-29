@@ -5,6 +5,9 @@ const OG_LOCALE = { vi: 'vi_VN', en: 'en_US', zh: 'zh_CN' }
 
 // D-62: tên thương hiệu. G-23: ảnh chia sẻ mặc định (1200×630) khi trang không có ảnh riêng.
 export const SITE_NAME = 'LAMVI'
+
+/** Bỏ dấu "/" thừa ở cuối URL gốc — canonical/hreflang/sitemap nối thẳng đường dẫn vào sau. */
+export const normalizeSiteUrl = (url) => String(url ?? '').replace(/\/+$/, '')
 export const DEFAULT_OG_IMAGE = '/images/og/default.png'
 export const OG_IMAGE_SIZE = { width: 1200, height: 630 }
 
@@ -81,7 +84,8 @@ export function absoluteUrl(siteUrl, url) {
   if (!url) return null
   if (/^https?:\/\//i.test(url)) return url
   if (!siteUrl) return null
-  return `${siteUrl}${url.startsWith('/') ? '' : '/'}${url}`
+  const base = normalizeSiteUrl(siteUrl)
+  return `${base}${url.startsWith('/') ? '' : '/'}${url}`
 }
 
 // SSR: thẻ → chuỗi HTML (đánh dấu data-seo để client thay thế)
@@ -116,12 +120,14 @@ export function applyHeadTags(doc, tags) {
 }
 
 // D-68 (thay D-50): JSON-LD sản phẩm — giá ĐÃ gồm VAT, valueAddedTaxIncluded=true (khớp cách hiển thị, BR-PRC-003)
-export function productJsonLd(p, url) {
+export function productJsonLd(p, url, siteUrl) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: p.name,
     description: p.description ?? undefined,
+    // G-23: ảnh thật của sản phẩm nếu có; không có thì bỏ trường (không nhét ảnh OG chung vào)
+    image: absoluteUrl(siteUrl, p.image?.url) ?? undefined,
     url,
     brand: { '@type': 'Brand', name: 'LAMVI' },
     offers: {

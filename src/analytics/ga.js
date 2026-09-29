@@ -31,8 +31,8 @@ export function isValidMeasurementId(id) {
 // Đường dẫn có đoạn bí mật: đoạn cuối bị thay bằng nhãn cố định trước khi gửi (NFR-PRV-002).
 // Trang QR lời chúc dùng token trong URL; trang lô dùng mã lô (mã chung, không bí mật — D-43).
 const SECRET_SEGMENT = [
-  { re: /^(\/(?:en|zh))?\/qr\/[^/]+/, label: '/qr/:token' },
-  { re: /^(\/(?:en|zh))?\/reset-password\/[^/]+/, label: '/reset-password/:token' },
+  { re: /^(\/(?:en|zh))?\/qr\/[^/]+/i, label: '/qr/:token' },
+  { re: /^(\/(?:en|zh))?\/reset-password\/[^/]+/i, label: '/reset-password/:token' },
 ]
 
 /**
@@ -41,10 +41,12 @@ const SECRET_SEGMENT = [
  */
 export function sanitizePath(pathname) {
   if (typeof pathname !== 'string' || !pathname) return '/'
-  const path = pathname.split('?')[0].split('#')[0] || '/'
+  // Gộp dấu "/" lặp trước khi so mẫu: `//qr/token` mở cùng trang nhưng lách được mẫu bên dưới
+  const path = pathname.split('?')[0].split('#')[0].replace(/\/{2,}/g, '/') || '/'
   for (const { re, label } of SECRET_SEGMENT) {
     const m = path.match(re)
-    if (m) return `${m[1] ?? ''}${label}`
+    // Tiền tố ngôn ngữ về chữ thường để GA gộp đúng một trang (URL in trên đèn có thể viết HOA)
+    if (m) return `${(m[1] ?? '').toLowerCase()}${label}`
   }
   return path
 }

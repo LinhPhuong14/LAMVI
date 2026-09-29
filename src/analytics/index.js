@@ -46,10 +46,11 @@ export function trackPageView(pathname, title) {
   const path = sanitizePath(pathname)
   try {
     const origin = typeof window !== 'undefined' ? window.location.origin : ''
+    // page_title cũng đi qua bộ lọc: tiêu đề trang QR lời chúc có thể chứa tên người nhận
     fn('event', 'page_view', {
+      ...sanitizeParams({ page_title: title ?? undefined }),
       page_path: path,
       page_location: `${origin}${path}`,
-      page_title: title ?? undefined,
     })
     return true
   } catch {

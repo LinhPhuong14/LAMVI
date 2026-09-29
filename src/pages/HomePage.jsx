@@ -34,6 +34,7 @@ import {
 } from '../lib/motion.js'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
+import ProductImage from '../components/ProductImage.jsx'
 import Seo from '../seo/Seo.jsx'
 import { organizationJsonLd, webSiteJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
@@ -349,7 +350,7 @@ function ProductGrid({ intent }) {
           {p.badge && <Seal className="product-badge lift">{p.badge}</Seal>}
           <div className="product-art worn">
             <div className="lift">
-              <Lantern size={112} tone={p.tone} swing />
+              <ProductImage image={p.image} size={112} tone={p.tone} name={p.name} swing />
             </div>
           </div>
           <div className="product-body">

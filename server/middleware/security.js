@@ -1,10 +1,16 @@
-import { randomBytes } from 'node:crypto'
+import { createHash } from 'node:crypto'
 import { GTAG_ORIGIN } from '../../src/analytics/ga.js'
+
+/** Hash CSP của một đoạn script nội tuyến (đúng nội dung giữa <script> và </script>). */
+export const cspHash = (source) => `sha256-${createHash('sha256').update(source, 'utf8').digest('base64')}`
 
 // T-37: HTTP security headers cho môi trường thật. Đặt trước mọi router để áp cho cả API và web.
 //
-// CSP dùng nonce cho script nội tuyến do SSR sinh (__INITIAL_DATA__, gtag). Ở chế độ dev, Vite
-// chèn thêm script nội tuyến của riêng nó (HMR/react-refresh) nên CSP chỉ bật khi không phải dev.
+// CSP cho script nội tuyến do SSR sinh (__INITIAL_DATA__, gtag) dùng **hash**, không dùng nonce:
+// trang công khai được CDN giữ và phục vụ cho nhiều người (s-maxage, xem deploy-vercel.md quy tắc 9),
+// mà nonce dùng lại cho nhiều người thì mất hết tác dụng — chỉ mạnh khi mỗi người một giá trị mới.
+// Hash thì công khai theo thiết kế và luôn khớp đúng nội dung được cache.
+// Ở chế độ dev, Vite chèn script nội tuyến riêng (HMR/react-refresh) nên CSP chỉ bật khi không phải dev.
 
 const GA_COLLECT = 'https://www.google-analytics.com'
 const GA_REGION_COLLECT = 'https://*.analytics.google.com'
@@ -19,9 +25,13 @@ function supabaseOrigin(url) {
   }
 }
 
-export function buildCsp({ nonce, supabaseUrl, gaEnabled }) {
+/**
+ * @param {object} p
+ * @param {string[]} [p.inlineScriptHashes] hash CSP của script nội tuyến trên chính response này
+ */
+export function buildCsp({ supabaseUrl, gaEnabled, inlineScriptHashes = [] }) {
   const supa = supabaseOrigin(supabaseUrl)
-  const script = ["'self'", `'nonce-${nonce}'`]
+  const script = ["'self'", ...inlineScriptHashes.map((h) => `'${h}'`)]
   const connect = ["'self'"]
   const img = ["'self'", 'data:', 'blob:']
   const media = ["'self'", 'blob:']
@@ -78,9 +88,11 @@ export function securityHeaders({ config, dev = false }) {
       if (req.secure || req.get('x-forwarded-proto') === 'https') {
         res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
       }
-      const nonce = randomBytes(16).toString('base64')
-      res.locals.cspNonce = nonce
-      res.set('Content-Security-Policy', buildCsp({ nonce, supabaseUrl, gaEnabled }))
+      // Mặc định: không cho phép script nội tuyến nào. Trang HTML do SSR dựng sẽ đặt lại header
+      // này kèm hash của đúng các script nội tuyến của nó (res.locals.setCsp).
+      res.locals.setCsp = (inlineScriptHashes = []) =>
+        res.set('Content-Security-Policy', buildCsp({ supabaseUrl, gaEnabled, inlineScriptHashes }))
+      res.locals.setCsp()
     }
     next()
   }

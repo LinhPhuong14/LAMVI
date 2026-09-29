@@ -64,12 +64,11 @@ function MayInner() {
       <button
         type="button"
         className="may-fab"
-        onClick={() =>
-          setOpen((o) => {
-            if (!o) track('mascot_open')
-            return !o
-          })
-        }
+        onClick={() => {
+          // Gửi sự kiện NGOÀI hàm updater: StrictMode gọi updater hai lần ở bản dev → đếm đôi
+          if (!open) track('mascot_open')
+          setOpen((o) => !o)
+        }}
         aria-label={t('may.open')}
         aria-expanded={open}
       >

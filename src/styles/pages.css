@@ -2702,3 +2702,26 @@
     max-height: 58vh;
   }
 }
+
+/* Ảnh sản phẩm trong admin (G-23) */
+.admin-image {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hair-soft);
+}
+
+.admin-image h3 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.admin-image-preview {
+  display: block;
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border: 1px solid var(--hair-soft);
+  border-radius: 4px;
+  background: var(--diep-light);
+  margin-bottom: 12px;
+}

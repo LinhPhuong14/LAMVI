@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import Lantern from '../components/Lantern'
+import ProductImage from '../components/ProductImage.jsx'
 import Price from '../components/Price'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
@@ -59,8 +59,9 @@ export default function ProductPage() {
         description={p.description ?? t('meta.description')}
         path={pagePath}
         type="product"
+        image={p.image?.url}
         jsonLd={[
-          productJsonLd(p, `${siteUrl}${path(pagePath)}`),
+          productJsonLd(p, `${siteUrl}${path(pagePath)}`, siteUrl),
           breadcrumbJsonLd(siteUrl, lang, [
             { name: t('nav.home'), path: '/' },
             { name: p.name, path: pagePath },
@@ -71,7 +72,7 @@ export default function ProductPage() {
       {back}
       <div className="product-detail-grid">
         <div className="product-detail-art">
-          <Lantern size={220} tone={p.tone} />
+          <ProductImage image={p.image} size={220} tone={p.tone} name={p.name} priority />
         </div>
         <div className="product-detail-copy">
           {p.kind === 'set' && <span className="eyebrow">{t('products.setBadge')}</span>}

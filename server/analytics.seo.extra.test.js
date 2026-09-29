@@ -7,22 +7,14 @@ import { createMemoryRepo } from './adapters/memory/repo.js'
 import { renderPage } from './ssr.js'
 import { render } from '../src/entry-server.jsx'
 import { loadConfig } from './config.js'
-import { buildCsp } from './middleware/security.js'
+import { buildCsp, cspHash } from './middleware/security.js'
 
 const GA_ID = 'G-TEST12345'
 const baseConfig = { publicSiteUrl: 'https://lamvi.test' }
 const template = readFileSync(new URL('../index.html', import.meta.url), 'utf8')
 
-const page = (url, { config = baseConfig, data, nonce } = {}) =>
-  renderPage({
-    repo: createMemoryRepo(data),
-    config,
-    template,
-    render,
-    url,
-    pathname: url.split('?')[0],
-    nonce,
-  })
+const page = (url, { config = baseConfig, data } = {}) =>
+  renderPage({ repo: createMemoryRepo(data), config, template, render, url, pathname: url.split('?')[0] })
 
 const ldBlocks = (html) =>
   [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1]))
@@ -64,10 +56,14 @@ describe('Nhúng Google Analytics (FR-GA-001, D-72)', () => {
     expect(cfg.gaMeasurementId).toBeNull()
   })
 
-  it('script GA và script dữ liệu đều mang nonce của CSP', async () => {
-    const r = await page('/', { config: { ...baseConfig, gaMeasurementId: GA_ID }, nonce: 'abc123' })
-    expect(r.html).toContain('<script async nonce="abc123"')
-    expect(r.html).toContain('<script nonce="abc123">window.__INITIAL_DATA__=')
+  it('trả hash CSP của đúng script nội tuyến trên trang (GA + dữ liệu nạp sẵn)', async () => {
+    const r = await page('/', { config: { ...baseConfig, gaMeasurementId: GA_ID } })
+    expect(r.scriptHashes).toHaveLength(2)
+    for (const h of r.scriptHashes) expect(h).toMatch(/^sha256-[A-Za-z0-9+/]+=*$/)
+    // Hash phải khớp đúng nội dung nhúng trong HTML
+    const inline = [...r.html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1])
+    expect(inline).toHaveLength(2)
+    for (const src of inline) expect(r.scriptHashes).toContain(cspHash(src))
   })
 })
 
@@ -128,16 +124,13 @@ describe('Security headers (T-37)', () => {
     expect(res.headers['permissions-policy']).toContain('geolocation=()')
   })
 
-  it('CSP có nonce ngẫu nhiên mỗi request, chặn object/frame, không có unsafe-inline cho script', async () => {
-    const a = app()
-    const r1 = await request(a).get('/api/health')
-    const r2 = await request(a).get('/api/health')
-    const csp = r1.headers['content-security-policy']
-    expect(csp).toMatch(/script-src 'self' 'nonce-[^']+'/)
+  it('CSP mặc định (API): không cho script nội tuyến nào, chặn object/frame', async () => {
+    const csp = (await request(app()).get('/api/health')).headers['content-security-policy']
+    expect(csp).toContain("script-src 'self'")
     expect(csp).not.toMatch(/script-src[^;]*unsafe-inline/)
+    expect(csp).not.toMatch(/script-src[^;]*(nonce|sha256)/)
     expect(csp).toContain("object-src 'none'")
     expect(csp).toContain("frame-ancestors 'none'")
-    expect(csp).not.toBe(r2.headers['content-security-policy'])
   })
 
   it('chế độ dev: không đặt CSP (Vite chèn script nội tuyến riêng)', async () => {
@@ -154,23 +147,19 @@ describe('Security headers (T-37)', () => {
   })
 
   it('CSP chỉ mở đúng host Supabase và GA khi có cấu hình, không dùng ký tự đại diện', () => {
-    const csp = buildCsp({
-      nonce: 'n1',
-      supabaseUrl: 'https://abc.supabase.co',
-      gaEnabled: true,
-    })
+    const csp = buildCsp({ supabaseUrl: 'https://abc.supabase.co', gaEnabled: true })
     expect(csp).toContain('https://abc.supabase.co')
     expect(csp).toContain('https://www.googletagmanager.com')
     expect(csp).toContain('https://www.google-analytics.com')
     expect(csp).not.toContain("connect-src 'self' *")
 
-    const off = buildCsp({ nonce: 'n1', supabaseUrl: null, gaEnabled: false })
+    const off = buildCsp({ supabaseUrl: null, gaEnabled: false })
     expect(off).not.toContain('googletagmanager')
     expect(off).not.toContain('supabase')
   })
 
   it('URL Supabase hỏng không làm vỡ CSP', () => {
-    expect(() => buildCsp({ nonce: 'n', supabaseUrl: 'khong-phai-url', gaEnabled: false })).not.toThrow()
+    expect(() => buildCsp({ supabaseUrl: 'khong-phai-url', gaEnabled: false })).not.toThrow()
   })
 })
 

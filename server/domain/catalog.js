@@ -14,6 +14,8 @@ export function presentProduct(p, lang) {
     // D-68 / T-09: giá niêm yết ĐÃ gồm VAT, số nguyên VND
     price: p.price,
     currency: 'VND',
+    // G-23: ảnh thật của sản phẩm; chưa có thì frontend dùng hình minh hoạ SVG (G-33)
+    image: p.imageUrl ? { url: p.imageUrl, alt: pick(p.imageAlt, lang) } : null,
   }
 }
 
