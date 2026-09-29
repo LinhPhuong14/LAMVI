@@ -158,7 +158,7 @@ Quy tắc:
 ## 9. Hiệu năng
 
 - Ngân sách `[ASSUMPTION]` (NFR-PERF-001): LCP ≤ 2,5s, CLS ≤ 0,1.
-- Không lớp phủ `position: fixed` có `mix-blend-mode`/`backdrop-filter`.
+- Không lớp phủ `position: fixed` có `mix-blend-mode`/`backdrop-filter`. `backdrop-filter` chỉ dùng cho phần tử cuộn cùng trang (dashboard, T-35), không cho phần tử dính/cố định.
 - Texture là data-URI SVG nhỏ trong biến CSS.
 - Ảnh: WebP, lazy, có kích thước; tổng ảnh tư liệu trên trang chủ < 600 KB ở desktop.
 
@@ -197,6 +197,9 @@ Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệ
 | Màn ≤960px | Thanh bên tách (`display: contents`): đầu trang → tab ngang gạch chân son, dính trên cùng (ẩn biểu tượng) → nội dung → chân |
 | Motion | Đổi tab: `dash-in` 0.6s, dịch 6px; ô số liệu lệch 80ms; tắt khi giảm chuyển động |
 | Bo góc (v0.13) | Thẻ và dải số liệu 20px (≤640px: 18px), khung đầu trang 24px, tab 12px, liên kết thanh bên 10px, ô nhập 12px, nút và nhãn dạng viên (999px), bong bóng chat 16px (góc phía người nói 4px) |
+| Kính mờ (v0.14, T-35) | `.dash-top/.dash-stats/.dash-card/.dash-promo`: nền giấy trong 58%, `backdrop-filter: blur(18px) saturate(150%)`, viền trắng 70% 1px, bóng mềm; thanh bên và thanh tab mobile (phần tử dính) chỉ nền trong, **không** làm mờ (§9). Có `@supports` dự phòng tăng độ đục |
+| Nền (v0.14) | `DashSky`: 4 dải khói màu (hoè, hồng điệp, chàm, lá) mờ 48px trôi 46–62s; hoạ tiết `FloatingMotifs` preset `dash` (3 hoạ tiết); 8 đèn trời bay lên **một lượt** trong màn hình đầu khi vào trang (7–9,5s). Giảm chuyển động: khói đứng yên, không đèn bay |
+| Giao diện tối (v0.14) | "Đêm hội đèn": `--diep` #141c27, `--diep-light` #1b2533, chữ `--than` #efe6d6 (12,5:1), `--than-soft` #c7b9a3 (8:1), `--sepia` #c9ab82 (7:1), `--son` #e27a5f / `--son-deep` #f0937a (link 6,7:1); nút chính giữ son đậm #b3402a chữ sáng (5,3:1). Khai báo lại bí danh cũ (`--ink-soft`, `--cream`…) trong `.dash[data-theme='dark']`. Minh hoạ nét mực đặt trên đĩa giấy sáng có quầng như đèn thắp. Nút chuyển ở hàng logo, lưu `moc.dashTheme` |
 | Minh hoạ (v0.13) | SVG tự vẽ ở `src/components/DashArt.jsx`, lối khắc gỗ nét 1,5px cùng bảng màu: cảnh đầu trang (dây 3 đèn trước trống đồng mờ, mây), hộp quà, phong thư ấn son, 4 công đoạn (giấy dó, khung tre, phơi nắng, đóng gói QR); kèm đèn và Mây có sẵn. Hình đặt trong nền tròn `--diep`. **Không** dùng ảnh tư liệu trong dashboard (§7.2) |
 
 ## 13. Checklist khi thêm thành phần

@@ -157,3 +157,12 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Nguyên tắc rút ra → áp dụng**: nền sáng, nhiều khoảng trắng; mọi đường kẻ 1px cùng một độ đậm (`--dash-line`); bỏ bóng đổ và khung trang trí trong dashboard; một điểm nhấn son (vạch tab chọn, vạch trước tiêu đề mục, nút chính); số liệu chữ mảnh cỡ lớn trên dải ngăn bằng nét dọc; nhãn ngắn một dòng. Không dùng chữ Hán, hoạ tiết cung đình (như T-25).
 - **Hệ quả**: chi tiết ở [`design-rules.md`](design-rules.md) §12. Trang công khai giữ phong cách T-25.
 - **Bổ sung (v0.13)**: theo yêu cầu người dùng "bo các góc và thêm nhiều hình ảnh minh hoạ cho sinh động" — thẻ bo 20px, nút viên; thêm minh hoạ SVG tự vẽ (`DashArt.jsx`). Không dùng ảnh tư liệu Wikimedia vì còn chờ `[LEGAL]` Q-36 và không được đặt ở vị trí gây hiểu lầm (design-rules §7.2).
+
+### T-35 — Dashboard kính mờ, nền mây khói, giao diện tối
+- **Bối cảnh**: người dùng yêu cầu "beauty glassmorphism hơn một chút", nền có dải màu như mây khói lơ lửng hoặc đèn lồng bay lên khi mới vào, và dark mode (D-65).
+- **Quyết định**:
+  - Kính mờ bằng `backdrop-filter` chỉ trên thẻ cuộn cùng trang; phần tử dính dùng nền trong không làm mờ (tránh vẽ lại liên tục khi cuộn — design-rules §9). Nền phía sau là gradient + dải khói mờ trôi bằng `transform` (lớp compositor).
+  - Đèn trời chạy **một lượt** (`animation-iteration-count: 1`, `forwards`) để không tốn tài nguyên sau khi vào trang.
+  - Giao diện tối chỉ trong phạm vi `.dash` bằng `data-theme` + đổi token CSS; lựa chọn lưu `localStorage` (`moc.dashTheme`), mặc định `prefers-color-scheme`. Không làm dark mode toàn site ở bước này vì trang công khai có nhiều màu minh hoạ cố định.
+- **Hệ quả**: bí danh màu cũ phải khai báo lại trong phạm vi tối (biến tính ở `:root` không tự đổi). Minh hoạ SVG nét mực cần nền sáng phía sau ở chế độ tối.
+

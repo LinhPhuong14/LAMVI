@@ -524,3 +524,65 @@ describe('CSS dashboard', () => {
     expect(hit).toMatch(/animation:\s*none/)
   })
 })
+
+describe('Giao diện sáng/tối và nền mây khói (T-35)', () => {
+  const dash = () => document.querySelector('.dash')
+  const toggle = () => screen.getByRole('button', { name: 'Giao diện tối' })
+
+  it('mặc định theo thiết bị (sáng); bấm nút → tối, lưu lựa chọn; mở lại vẫn tối', async () => {
+    login()
+    api()
+    const r = renderAt('/account')
+    await screen.findByRole('tablist')
+    expect(dash()).toHaveAttribute('data-theme', 'light')
+    expect(toggle()).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(toggle())
+    expect(dash()).toHaveAttribute('data-theme', 'dark')
+    expect(toggle()).toHaveAttribute('aria-pressed', 'true')
+    expect(localStorage.getItem('moc.dashTheme')).toBe('dark')
+    r.unmount()
+    renderAt('/account')
+    await screen.findByRole('tablist')
+    expect(dash()).toHaveAttribute('data-theme', 'dark')
+    fireEvent.click(toggle())
+    expect(localStorage.getItem('moc.dashTheme')).toBe('light')
+  })
+
+  it('chưa chọn + thiết bị bật chế độ tối → tối; giá trị lưu hỏng → theo thiết bị', async () => {
+    const orig = window.matchMedia
+    window.matchMedia = (q) => ({ matches: q.includes('dark'), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} })
+    try {
+      login()
+      localStorage.setItem('moc.dashTheme', 'tim')
+      api()
+      renderAt('/account')
+      await screen.findByRole('tablist')
+      expect(dash()).toHaveAttribute('data-theme', 'dark')
+    } finally {
+      window.matchMedia = orig
+    }
+  })
+
+  it('nền: một lớp trang trí aria-hidden gồm dải khói, hoạ tiết và 8 đèn trời', async () => {
+    login()
+    api()
+    renderAt('/account')
+    await screen.findByRole('tablist')
+    const sky = document.querySelector('.dash-sky')
+    expect(sky).toHaveAttribute('aria-hidden', 'true')
+    expect(sky.querySelectorAll('.dash-smoke').length).toBeGreaterThan(0)
+    expect(sky.querySelector('.motif-layer')).not.toBeNull()
+    expect(sky.querySelectorAll('.dash-rise-lantern')).toHaveLength(8)
+  })
+
+  it('CSS: giảm chuyển động tắt khói và đèn bay; tối khai báo lại bí danh cũ; không làm mờ phần tử dính', () => {
+    const css = readFileSync(join(process.cwd(), 'src/styles/pages.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+    const reduce = [...css.matchAll(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{([\s\S]*?)\n\}/g)].map((m) => m[1]).join('\n')
+    expect(reduce).toMatch(/\.dash-smoke\s*\{\s*animation:\s*none/)
+    expect(reduce).toMatch(/\.dash-rise\s*\{\s*display:\s*none/)
+    const dark = css.match(/\.dash\[data-theme='dark'\]\s*\{([\s\S]*?)\n\}/)[1]
+    for (const v of ['--ink-soft', '--cream', '--brown-line', '--white']) expect(dark).toMatch(new RegExp(`${v}:`))
+    // backdrop-filter chỉ trên phần tử cuộn cùng trang (design-rules §9)
+    for (const m of css.matchAll(/([^{}]+)\{[^{}]*backdrop-filter[^{}]*\}/g)) expect(m[1]).not.toMatch(/dash-side|dash-tabs/)
+  })
+})

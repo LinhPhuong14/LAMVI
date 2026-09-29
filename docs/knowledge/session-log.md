@@ -4,6 +4,22 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 (phiên 9) — Dashboard kính mờ, nền mây khói, giao diện tối (nhánh `feat/account-glass`, từ `master`)
+
+**Quyết định từ người dùng**: D-65 — glassmorphism, nền dải mây khói/đèn trời bay lên khi vào trang, dark mode.
+
+**Đã làm**
+
+1. Kính mờ cho thẻ, dải số liệu, khung đầu trang, thẻ gợi ý; thanh bên nền trong (T-35).
+2. `DashSky`: dải khói màu trôi, hoạ tiết preset `dash`, 8 đèn trời bay lên một lượt.
+3. Giao diện tối trong phạm vi dashboard (`data-theme`, nút chuyển ở hàng logo, lưu trình duyệt, mặc định theo thiết bị); đo tương phản ≥ 5,3:1 cho chữ.
+4. Test: nhóm "Giao diện sáng/tối và nền" trong `AccountDashboard.extra.test.jsx`; subagent kiểm thử độc lập (T-11) thêm `AccountTheme.extra.test.jsx` (21 test), phát hiện nút chính khi hover ở chế độ tối chỉ 4,33:1 → đổi sang son đậm #9f3a27 (6,3:1).
+5. Spec v0.14 (D-65, `[ASSUMPTION]` phạm vi dark mode), design rules §9/§12, T-35.
+
+**Còn lại**: dark mode cho trang công khai nếu người dùng muốn.
+
+---
+
 ## 2026-09-29 (phiên 8) — Dashboard tài khoản khách (nhánh `feat/account-dashboard`, từ `master`)
 
 **Quyết định từ người dùng**
