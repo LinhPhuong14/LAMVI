@@ -350,6 +350,7 @@ export default {
     PRICE_CHANGED: 'Giá đã thay đổi. Vui lòng xem lại bảng giá mới rồi xác nhận.',
     COD_NOT_ALLOWED_FOR_GIFT: 'Đơn giao cho người khác không thanh toán khi nhận hàng được.',
     PAYMENT_UNAVAILABLE: 'Thanh toán trực tuyến đang tạm ngưng. Vui lòng chọn thanh toán khi nhận hàng.',
+    RECOVERY_TOKEN_REQUIRED: 'Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Hãy bấm "Quên mật khẩu?" để nhận link mới.',
     ORDER_NOT_PAYABLE: 'Đơn không còn ở trạng thái chờ thanh toán.',
     PAYMENT_GATEWAY_ERROR: 'Chưa tạo được liên kết thanh toán. Vui lòng thử lại.',
     ORDER_NOT_CANCELLABLE: 'Đơn đã được gửi đi nên không huỷ được nữa.',

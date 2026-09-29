@@ -4,6 +4,8 @@ import { normalizeLang } from '../i18n.js'
 import { requireAuth } from '../middleware/auth.js'
 import { validateCheckout } from '../domain/order.js'
 import { parseWebhook } from '../adapters/payos.js'
+import { rateLimit } from '../middleware/rateLimit.js'
+import { DEFAULT_HASH_SALT } from '../config.js'
 
 const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {})
 
@@ -56,6 +58,15 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
   const r = Router()
   const guard = requireAuth(auth)
   const lang = (req) => normalizeLang(req.query.lang)
+  // G-20: chặn tạo đơn hàng loạt (giữ lượt coupon, tạo link payOS rác)
+  const orderLimit = rateLimit({
+    repo,
+    salt: config.mayHashSalt ?? DEFAULT_HASH_SALT,
+    name: 'order',
+    max: config.rateLimit?.order?.max ?? 20,
+    windowSec: config.rateLimit?.order?.windowSec ?? 3600,
+    enabled: config.rateLimit?.enabled !== false,
+  })
 
   // FR-CHK-008: bảng giá của giỏ, kèm coupon nếu có (FR-CHK-006)
   r.post('/checkout/quote', guard, async (req, res) => {
@@ -64,7 +75,7 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
   })
 
   // FR-CHK-001: chỉ khách đã đăng nhập (D-36, BR-ACC-001)
-  r.post('/orders', guard, async (req, res) => {
+  r.post('/orders', orderLimit, guard, async (req, res) => {
     const b = body(req)
     const { errors, values } = validateCheckout(b)
     if (Object.keys(errors).length) {

@@ -22,7 +22,7 @@ import {
 } from './domain/order.js'
 import { COUPON_TYPES } from './domain/pricing.js'
 
-const config = { publicSiteUrl: 'https://lamvi.test', cronSecret: 'bimat-cron' }
+const config = { publicSiteUrl: 'https://lamvi.test', cronSecret: 'bimat-cron', rateLimit: { enabled: false } }
 const root = new URL('../', import.meta.url)
 
 let app, repo, auth, orders, payos, customer, customerId, admin, clock

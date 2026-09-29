@@ -1,6 +1,12 @@
 import { isValidMeasurementId } from '../src/analytics/ga.js'
 import { normalizeSiteUrl } from '../src/seo/head.js'
 
+/**
+ * Muối băm dự phòng khi thiếu MAY_HASH_SALT (chỉ hợp lệ ở dev). Môi trường thật BẮT BUỘC đặt
+ * MAY_HASH_SALT riêng — xem docs/knowledge/deploy-vercel.md.
+ */
+export const DEFAULT_HASH_SALT = 'dev-hash-salt'
+
 export function loadConfig(env = process.env) {
   const supabase = {
     url: env.SUPABASE_URL,
@@ -22,6 +28,19 @@ export function loadConfig(env = process.env) {
     // FR-GA-001, D-72: Google Analytics 4. Không đặt → không nhúng GA (dev/test, Preview).
     // Giá trị hỏng bị bỏ qua vì được nhúng vào <script> nội tuyến (xem isValidMeasurementId).
     gaMeasurementId: isValidMeasurementId(env.GA_MEASUREMENT_ID) ? env.GA_MEASUREMENT_ID : null,
+    /**
+     * G-20: chống dò/spam ở tầng ứng dụng. Ngưỡng [ASSUMPTION] — đủ rộng cho người gõ nhầm vài
+     * lần và cho nhiều người dùng chung một IP (văn phòng, quán), đủ chặt để không dò được.
+     * `RATE_LIMIT=0` tắt hẳn (chỉ dùng cho test tự động, KHÔNG dùng ở môi trường thật).
+     */
+    rateLimit: {
+      enabled: env.RATE_LIMIT !== '0',
+      login: { max: 10, windowSec: 300 },
+      register: { max: 20, windowSec: 3600 },
+      forgot: { max: 5, windowSec: 3600 },
+      password: { max: 10, windowSec: 3600 },
+      order: { max: 20, windowSec: 3600 },
+    },
     // BR-PAY-003: bí mật cho lịch quét đơn quá hạn (Vercel Cron). Để trống → tắt endpoint.
     cronSecret: env.CRON_SECRET || null,
     // Thanh toán payOS (FR-PAY-001, D-35). Thiếu khoá → checkout chỉ cho COD.
@@ -37,7 +56,7 @@ export function loadConfig(env = process.env) {
       priceInPer1M: Number(env.OPENAI_PRICE_INPUT_PER_1M) || 0.15,
       priceOutPer1M: Number(env.OPENAI_PRICE_OUTPUT_PER_1M) || 0.6,
     },
-    mayHashSalt: env.MAY_HASH_SALT || env.SUPABASE_URL || 'moc-dev',
+    mayHashSalt: env.MAY_HASH_SALT || env.SUPABASE_URL || DEFAULT_HASH_SALT,
     supabase,
     useSupabase: Boolean(supabase.url && supabase.anonKey && supabase.serviceRoleKey),
   }

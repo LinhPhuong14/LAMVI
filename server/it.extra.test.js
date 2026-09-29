@@ -224,14 +224,43 @@ describe('Nhãn route trong số liệu (D-52)', () => {
   })
 
   it('message lỗi 5xx cắt ≤ 300 ký tự; path cắt ≤ 200', async () => {
+    // Từ ngắn nối bằng khoảng trắng: không bị nhầm là token (xem test che dữ liệu bên dưới)
+    const long = 'loi '.repeat(400)
     repo.listFaq = async () => {
-      throw new Error('x'.repeat(1000))
+      throw new Error(long)
     }
     await request(app).get('/api/faq')
     const [e] = await metrics.recentErrors('1h')
     expect(e.message.length).toBe(300)
-    metrics.record({ method: 'GET', route: '/api/x', status: 500, ms: 1, path: 'p', message: 'y'.repeat(999) })
+    metrics.record({ method: 'GET', route: '/api/x', status: 500, ms: 1, path: 'p', message: long })
     expect((await metrics.recentErrors('1h'))[0].message.length).toBe(300)
+  })
+
+  // G-28 / NFR-PRV-002: IT xem được nhật ký lỗi nên không được lưu dữ liệu cá nhân
+  it('che email, SĐT và chuỗi giống token trong thông điệp lỗi', async () => {
+    metrics.record({
+      method: 'POST',
+      route: '/api/x',
+      status: 500,
+      ms: 1,
+      path: '/api/x',
+      message: 'Không gửi được cho an.nguyen@example.com (0912345678), token eyJhbGciOiJIUzI1NiJ9abcdefgh',
+    })
+    const [e] = await metrics.recentErrors('1h')
+    expect(e.message).not.toContain('an.nguyen@example.com')
+    expect(e.message).not.toContain('0912345678')
+    expect(e.message).not.toContain('eyJhbGciOiJIUzI1NiJ9abcdefgh')
+    expect(e.message).toContain('[email]')
+    expect(e.message).toContain('[phone]')
+    expect(e.message).toContain('[token]')
+  })
+
+  it('che token trong đường dẫn trang QR lời chúc và đặt lại mật khẩu', async () => {
+    metrics.record({ method: 'GET', route: '/qr/:token', status: 500, ms: 1, path: '/qr/bimat-cua-nguoi-nhan' })
+    metrics.record({ method: 'GET', route: '/reset-password', status: 500, ms: 1, path: '/en/reset-password/eyJhbGci' })
+    const paths = (await metrics.recentErrors('1h')).map((e) => e.path)
+    expect(paths).toContain('/qr/:token')
+    expect(paths).toContain('/en/reset-password/:token')
   })
 
   it('4xx không vào danh sách lỗi', async () => {

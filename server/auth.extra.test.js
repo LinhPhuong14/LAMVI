@@ -7,7 +7,9 @@ import { normalizeVnPhone } from './domain/account.js'
 
 // Test bổ sung độc lập cho FR-ACC-001 (D-36, D-38, D-42)
 let app, auth, repo, clock
-const config = { publicSiteUrl: 'https://moc.test' }
+// G-20: tắt rate limit trong bộ test chức năng (nhiều test đăng ký/đăng nhập liên tiếp từ cùng
+// một IP). Hành vi giới hạn được kiểm riêng ở server/rateLimit.extra.test.js.
+const config = { publicSiteUrl: 'https://moc.test', rateLimit: { enabled: false } }
 const valid = { email: 'an@example.com', password: 'matkhau123', fullName: 'Nguyễn An' }
 
 function setup(opts = {}) {

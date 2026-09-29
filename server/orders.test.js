@@ -10,7 +10,7 @@ import { signData } from './adapters/payos.js'
 import { products } from './data/seed.js'
 
 const CHECKSUM = 'khoa-checksum-thu'
-const config = { publicSiteUrl: 'https://lamvi.test', cronSecret: 'bimat-cron' }
+const config = { publicSiteUrl: 'https://lamvi.test', cronSecret: 'bimat-cron', rateLimit: { enabled: false } }
 
 let app, repo, auth, orders, payos, customer, customerId, admin, adminId, clock
 

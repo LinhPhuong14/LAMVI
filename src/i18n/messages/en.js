@@ -335,6 +335,7 @@ export default {
     PRICE_CHANGED: 'The price has changed. Please review the new total and confirm.',
     COD_NOT_ALLOWED_FOR_GIFT: 'Cash on delivery is not available for orders shipped to someone else.',
     PAYMENT_UNAVAILABLE: 'Online payment is temporarily unavailable. Please choose cash on delivery.',
+    RECOVERY_TOKEN_REQUIRED: 'That password reset link is invalid or has expired. Use “Forgot password?” to get a new one.',
     ORDER_NOT_PAYABLE: 'This order is no longer awaiting payment.',
     PAYMENT_GATEWAY_ERROR: 'We could not create the payment link. Please try again.',
     ORDER_NOT_CANCELLABLE: 'This order has already shipped and can no longer be cancelled.',

@@ -2,6 +2,8 @@ import { Router } from 'express'
 import { HttpError } from '../errors.js'
 import { AuthError } from '../adapters/authErrors.js'
 import { requireAuth } from '../middleware/auth.js'
+import { byIpAndEmail, rateLimit } from '../middleware/rateLimit.js'
+import { DEFAULT_HASH_SALT } from '../config.js'
 import { localePath, normalizeLang } from '../i18n.js'
 import {
   normalizeEmail,
@@ -49,7 +51,25 @@ export function authRouter({ repo, auth, config }) {
   const guard = requireAuth(auth)
   const siteUrl = (lang, path) => `${config.publicSiteUrl}${localePath(lang, path)}`
 
-  r.post('/auth/register', async (req, res) => {
+  // G-20: chống dò mật khẩu và spam. Ngưỡng ở config (loadConfig). Đếm theo cả IP và email để
+  // một IP đổi email liên tục vẫn không dò được một tài khoản cụ thể.
+  const rl = config.rateLimit ?? {}
+  const limit = (name, keys) =>
+    rateLimit({
+      repo,
+      salt: config.mayHashSalt ?? DEFAULT_HASH_SALT,
+      name,
+      max: rl[name]?.max ?? 10,
+      windowSec: rl[name]?.windowSec ?? 300,
+      keys,
+      enabled: rl.enabled !== false,
+    })
+  const loginLimit = limit('login', byIpAndEmail)
+  const registerLimit = limit('register', byIpAndEmail)
+  const forgotLimit = limit('forgot', byIpAndEmail)
+  const passwordLimit = limit('password')
+
+  r.post('/auth/register', registerLimit, async (req, res) => {
     const b = body(req)
     const email = normalizeEmail(b.email)
     const { errors, values } = validateProfileInput({
@@ -77,7 +97,7 @@ export function authRouter({ repo, auth, config }) {
     res.status(201).json({ user: result.user, needsConfirmation: result.needsConfirmation })
   })
 
-  r.post('/auth/login', async (req, res) => {
+  r.post('/auth/login', loginLimit, async (req, res) => {
     const b = body(req)
     const email = normalizeEmail(b.email)
     if (validateEmail(email) || typeof b.password !== 'string' || !b.password) {
@@ -98,7 +118,7 @@ export function authRouter({ repo, auth, config }) {
   })
 
   // Luôn trả 202 để không tiết lộ email có tồn tại hay không
-  r.post('/auth/forgot-password', async (req, res) => {
+  r.post('/auth/forgot-password', forgotLimit, async (req, res) => {
     const email = normalizeEmail(body(req).email)
     const emailErr = validateEmail(email)
     if (emailErr) assertValid({ email: emailErr })
@@ -107,11 +127,33 @@ export function authRouter({ repo, auth, config }) {
     res.status(202).json({ ok: true })
   })
 
-  // Token khôi phục (từ link email) gửi qua Authorization: Bearer
-  r.post('/auth/reset-password', guard, async (req, res) => {
+  // Token khôi phục (từ link email) gửi qua Authorization: Bearer.
+  // G-18: CHỈ nhận token khôi phục. Trước đây mọi access token hợp lệ đều đổi được mật khẩu, nên
+  // một phiên đang mở (máy dùng chung, token bị lấy cắp) đổi được mật khẩu mà không cần biết mật
+  // khẩu cũ. Muốn đổi mật khẩu khi đang đăng nhập thì dùng /auth/change-password.
+  r.post('/auth/reset-password', passwordLimit, guard, async (req, res) => {
+    if (!req.user.isRecovery) {
+      throw new HttpError(403, 'RECOVERY_TOKEN_REQUIRED', 'Cần mở lại link đặt lại mật khẩu trong email')
+    }
     const pwErr = validatePassword(body(req).password)
     if (pwErr) assertValid({ password: pwErr })
     await call(() => auth.updatePassword(req.user.id, body(req).password))
+    await call(() => auth.signOut(req.accessToken))
+    res.status(204).end()
+  })
+
+  // G-18: đổi mật khẩu khi đang đăng nhập — bắt buộc nhập lại mật khẩu hiện tại
+  r.post('/auth/change-password', passwordLimit, guard, async (req, res) => {
+    const b = body(req)
+    const pwErr = validatePassword(b.password)
+    if (pwErr) assertValid({ password: pwErr })
+    if (typeof b.currentPassword !== 'string' || !b.currentPassword) {
+      assertValid({ currentPassword: 'REQUIRED' })
+    }
+    const ok = await call(() => auth.verifyPassword(req.user.id, b.currentPassword))
+    if (!ok) assertValid({ currentPassword: 'INVALID_CREDENTIALS' })
+    await call(() => auth.updatePassword(req.user.id, b.password))
+    // Đổi mật khẩu thu hồi mọi phiên (kể cả phiên hiện tại) — khách đăng nhập lại bằng mật khẩu mới
     await call(() => auth.signOut(req.accessToken))
     res.status(204).end()
   })
