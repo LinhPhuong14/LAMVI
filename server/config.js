@@ -1,8 +1,9 @@
 export function loadConfig(env = process.env) {
   const supabase = {
     url: env.SUPABASE_URL,
-    anonKey: env.SUPABASE_ANON_KEY,
-    serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY,
+    // Khoá mới (sb_publishable_/sb_secret_) ưu tiên; tên cũ anon/service_role vẫn nhận
+    anonKey: env.SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_ANON_KEY,
+    serviceRoleKey: env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY,
   }
   return {
     // D-49: một server cho cả web (SSR) và API

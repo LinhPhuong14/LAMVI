@@ -47,7 +47,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 
 ### T-03 / T-04 — Supabase qua adapter
 - **Bối cảnh**: người dùng chọn Supabase; môi trường test/CI không có Supabase.
-- **Quyết định**: `server/adapters/supabase/*` dùng `@supabase/supabase-js` với service role key (chỉ ở server). `server/adapters/memory/*` cùng interface, nạp dữ liệu từ `server/data/seed.js`. `server/index.js` chọn Supabase khi có đủ `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`; nếu thiếu → bộ nhớ và in cảnh báo.
+- **Quyết định**: `server/adapters/supabase/*` dùng `@supabase/supabase-js` với service role key (chỉ ở server). `server/adapters/memory/*` cùng interface, nạp dữ liệu từ `server/data/seed.js`. `server/index.js` chọn Supabase khi có đủ `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (hoặc tên cũ `SUPABASE_ANON_KEY`), `SUPABASE_SECRET_KEY` (hoặc `SUPABASE_SERVICE_ROLE_KEY`); nếu thiếu → bộ nhớ và in cảnh báo.
 - **Hệ quả**: schema ở `supabase/migrations/*.sql`, seed SQL ở `supabase/seed.sql` phải khớp `server/data/seed.js`. Thêm phương thức repository thì phải thêm cho **cả hai** adapter.
 
 ### T-05 — Frontend không gọi Supabase trực tiếp

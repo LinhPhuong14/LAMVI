@@ -10,7 +10,9 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 **Đã làm**: `claude mcp add --scope project --transport http supabase …` → `.mcp.json` (features: docs, account, database, debugging, development, functions, branching). `npx skills add supabase/agent-skills --agent claude-code` → `.claude/skills/{supabase,supabase-postgres-best-practices}` + `skills-lock.json` (chỉ Markdown, không có script).
 
-**Còn lại / cần người dùng**: xác thực OAuth trên máy cá nhân: `claude /mcp` → chọn `supabase` → Authenticate. Không commit token.
+Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE_KEY`/`SUPABASE_SECRET_KEY` (tên cũ anon/service_role vẫn nhận; test `server/config.keys.extra.test.js`); cập nhật `.env.example`, `deploy-vercel.md`, T-04 trong `decisions.md`. Chạy thử local với `.env` (không commit): server báo "Dùng Supabase", Auth trả 200, nhưng REST trả `PGRST205` — **chưa chạy migration** trên project.
+
+**Còn lại / cần người dùng**: xác thực OAuth trên máy cá nhân: `claude /mcp` → chọn `supabase` → Authenticate. Chạy `supabase/migrations/*.sql` theo thứ tự rồi `supabase/seed.sql`. Đặt biến `SUPABASE_*` mới ở Vercel. Không commit token.
 
 ## 2026-09-29 — Đổi tên thương hiệu sang LAMVI (nhánh `feat/brand-lamvi`)
 
