@@ -5,6 +5,7 @@ import ProductPage from './pages/ProductPage'
 import NotFoundPage from './pages/NotFoundPage'
 import AccountPage from './pages/AccountPage'
 import BatchPage from './pages/BatchPage'
+import CartPage from './pages/CartPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
@@ -23,6 +24,7 @@ function localeChildren() {
       <Route index element={<HomePage />} />
       <Route path="products/:slug" element={<ProductPage />} />
       <Route path="lo/:code" element={<BatchPage />} />
+      <Route path="cart" element={<CartPage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<ForgotPasswordPage />} />

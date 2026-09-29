@@ -61,9 +61,12 @@ describe('Trang lô — truy cập công khai (US-005 AC-001)', () => {
     const fetchMock = mockApi(withBatch())
     renderAt('/lo/L-01')
     await screen.findByRole('heading', { level: 1, name: 'Lô tháng 9' })
-    expect(calledPaths(fetchMock).some((p) => p.startsWith('/api/auth'))).toBe(false)
-    for (const [, init = {}] of fetchMock.mock.calls) {
-      expect(init.headers?.Authorization).toBeUndefined()
+    expect(calledPaths(fetchMock).some((p) => p.startsWith('/api/me'))).toBe(false)
+    // Chỉ giỏ hàng trên header (FR-CART-001) dùng phiên; API trang lô không gửi token
+    for (const [u, init = {}] of fetchMock.mock.calls) {
+      if (!String(u).startsWith('/api/cart') && !String(u).startsWith('/api/auth/refresh')) {
+        expect(init.headers?.Authorization, String(u)).toBeUndefined()
+      }
     }
   })
 })

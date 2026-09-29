@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { LOCALES, localePath, splitLocale, useI18n } from '../i18n/index.js'
+import { useCart } from '../cart/context.js'
 
 const SECTIONS = ['story', 'artisan', 'products', 'lookbook', 'qr', 'faq']
 
@@ -25,6 +26,17 @@ export function LanguageSwitcher() {
   )
 }
 
+function CartLink() {
+  const { t, path } = useI18n()
+  const { cart } = useCart()
+  const n = cart?.itemCount ?? 0
+  return (
+    <Link to={path('/cart')} className="nav-cart">
+      {n > 0 ? t('cart.navCount', { n }) : t('cart.nav')}
+    </Link>
+  )
+}
+
 export default function SiteHeader() {
   const { t, path } = useI18n()
   return (
@@ -41,6 +53,7 @@ export default function SiteHeader() {
       </nav>
       <div className="nav-actions">
         <LanguageSwitcher />
+        <CartLink />
         <Link to={path('/account')} className="nav-account">
           {t('nav.account')}
         </Link>

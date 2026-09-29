@@ -2,7 +2,7 @@
 import { splitLocale } from '../i18n/core.js'
 
 // Trang riêng tư: không SSR nội dung, chỉ trả khung HTML + noindex (BR-SEO-001)
-const PRIVATE = ['/login', '/register', '/forgot-password', '/reset-password', '/account']
+const PRIVATE = ['/login', '/register', '/forgot-password', '/reset-password', '/account', '/cart']
 
 const seg = (s) => {
   try {

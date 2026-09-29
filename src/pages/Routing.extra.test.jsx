@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import AppRoutes from '../routes.jsx'
+import AuthProvider from '../auth/AuthProvider.jsx'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
 import { productsVi } from '../test/fixtures.js'
 import viMsg from '../i18n/messages/vi.js'
@@ -37,7 +38,10 @@ function LocationProbe() {
 function renderWithLoc(path) {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <AppRoutes />
+      {/* App thật luôn có AuthProvider (giỏ hàng trong layout cần phiên — FR-CART-001) */}
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
       <LocationProbe />
     </MemoryRouter>,
   )
@@ -131,12 +135,12 @@ describe('D-37 — link nội bộ giữ tiền tố ngôn ngữ', () => {
         { selector: '.product-card a' },
       )
       const card = cardLink.closest('.product-card')
-      expect(hrefOf(cardLink)).toBe(`${p}/products/den-nguyet`)
-      expect(hrefOf(within(card).getByRole('link', { name: MESSAGES[lang].products.viewDetail }))).toBe(
-        `${p}/products/den-nguyet?intent=gift`,
-      )
-
       const header = document.querySelector('header')
+      expect(hrefOf(cardLink)).toBe(`${p}/products/den-nguyet`)
+      // FR-CART-001: nút trên thẻ là "Tặng ngay/Thêm vào giỏ"; link chi tiết là tên sản phẩm
+      expect(within(card).getByRole('button', { name: MESSAGES[lang].cart.giftAdd })).toBeInTheDocument()
+      expect(hrefOf(within(header).getByRole('link', { name: MESSAGES[lang].cart.nav }))).toBe(`${p}/cart`)
+
       expect(hrefOf(header.querySelector('.nav-mark'))).toBe(home)
       expect(hrefOf(within(header).getByRole('link', { name: MESSAGES[lang].nav.story }))).toBe(`${home}#story`)
       expect(hrefOf(within(header).getByRole('link', { name: MESSAGES[lang].nav.account }))).toBe(`${p}/account`)
@@ -158,14 +162,14 @@ describe('D-37 — link nội bộ giữ tiền tố ngôn ngữ', () => {
     })
   }
 
-  it('lưới sản phẩm: chuyển Mua cho mình → link chi tiết đổi intent, giữ tiền tố', async () => {
+  it('lưới sản phẩm: chuyển Mua cho mình → nút đổi thành "Thêm vào giỏ", link tên giữ tiền tố', async () => {
     mockApi(handlers)
     renderAt('/en')
-    const card = (await screen.findByText('Đèn Nguyệt EN', { selector: '.product-card a' })).closest('.product-card')
+    const link = await screen.findByText('Đèn Nguyệt EN', { selector: '.product-card a' })
+    const card = link.closest('.product-card')
     fireEvent.click(screen.getByRole('button', { name: enMsg.products.self }))
-    expect(hrefOf(within(card).getByRole('link', { name: enMsg.products.viewDetail }))).toBe(
-      '/en/products/den-nguyet?intent=self',
-    )
+    expect(within(card).getByRole('button', { name: enMsg.cart.add })).toBeInTheDocument()
+    expect(hrefOf(link)).toBe('/en/products/den-nguyet')
   })
 })
 

@@ -15,6 +15,7 @@ export function createMemoryRepo(data = {}) {
     apiErrors: [],
     settings: new Map(),
     chatMessages: [],
+    carts: new Map(), // userId → Map(productId → { quantity, addedAt })
     mayCounters: new Map(), // key → { count, expiresAt }
     mayUsage: new Map(), // month → usage
   }
@@ -91,6 +92,23 @@ export function createMemoryRepo(data = {}) {
       const s = { key, value, updatedBy: userId ?? null, updatedAt: now() }
       state.settings.set(key, s)
       return clone(s)
+    },
+
+    // --- Giỏ hàng (FR-CART-001)
+    async getCart(userId) {
+      const c = state.carts.get(userId)
+      if (!c) return []
+      return [...c.entries()]
+        .map(([productId, v]) => ({ productId, quantity: v.quantity, addedAt: v.addedAt }))
+        .sort((a, b) => a.addedAt.localeCompare(b.addedAt))
+    },
+    async setCartItem(userId, productId, quantity) {
+      if (!state.carts.has(userId)) state.carts.set(userId, new Map())
+      const c = state.carts.get(userId)
+      c.set(productId, { quantity, addedAt: c.get(productId)?.addedAt ?? now() })
+    },
+    async removeCartItem(userId, productId) {
+      state.carts.get(userId)?.delete(productId)
     },
 
     // --- Mây (FR-AI-*)
