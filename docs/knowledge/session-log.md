@@ -4,7 +4,7 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
-## 2026-09-29 (phiên 6) — Giỏ hàng (nhánh `feat/cart`, từ `master`)
+## 2026-09-29 (phiên 6) — Giỏ hàng (nhánh `feat/cart`, từ `master`), gộp vào `master`
 
 **Quyết định từ người dùng**
 
