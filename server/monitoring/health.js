@@ -16,7 +16,7 @@ async function check(fn, timeoutMs) {
   }
 }
 
-// Mây (D-55): chưa có khoá → not_configured; có khoá nhưng admin chưa bật (chờ I-14) → disabled; bật → ok
+// Mây (D-55): chưa có khoá → not_configured; có khoá nhưng admin tắt → disabled; bật → ok
 async function openaiCheck(may, env) {
   if (!may) return { name: 'openai', status: 'not_integrated', configured: Boolean(env.OPENAI_API_KEY) }
   try {

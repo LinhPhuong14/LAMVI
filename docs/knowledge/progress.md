@@ -22,7 +22,7 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 | Lời chúc & QR | FR-QR-007 (admin lô + video) | ✅ | `server/routes/admin.js`, `server/adapters/*/storage.js`, `src/admin/BatchesPage.jsx` | `server/admin*.test.js`, `src/admin/Admin*.test.jsx` | Thử với Supabase thật (G-22) |
 | Admin | FAQ (G-07) | ✅ | `src/admin/FaqPage.jsx` | `server/admin*.test.js` | — |
 | Admin | Đơn, coupon, cấu hình Mây, đổi trả | ⛔ | — | — | Chưa có nghiệp vụ tương ứng |
-| AI Mây | FR-AI-001…003, 005…007 | ✅ | `server/may/*`, `server/routes/may.js`, `src/may/*`, `src/admin/MayConfigPage.jsx` | `server/may*.test.js`, `src/may/May*.test.jsx` | OpenAI tắt tới khi `[LEGAL]` I-14 duyệt (D-55) |
+| AI Mây | FR-AI-001…003, 005…007 | ✅ | `server/may/*`, `server/routes/may.js`, `src/may/*`, `src/admin/MayConfigPage.jsx` | `server/may*.test.js`, `src/may/May*.test.jsx` | OpenAI mặc định bật (D-64); cần `OPENAI_API_KEY` + Supabase trên Vercel |
 | AI Mây | FR-AI-004 (tra đơn) | ⛔ | — | — | Cần đơn hàng (G-29) |
 | Coupon | FR-CPN-001/002 | ⛔ | — | — | C-1…C-3, C-5, C-6, C-8 |
 | Nền tảng | FR-I18N-001 | ✅ | `src/i18n/*`, `server/i18n.js` | `src/i18n/core.test.js`, `src/pages/Routing.extra.test.jsx` | Duyệt bản dịch (G-14) |

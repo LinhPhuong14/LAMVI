@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.11 (bản nháp) |
+| Phiên bản | v0.12 (bản nháp) |
 | Ngày | 2026-09-29 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — bỏ xác nhận email khi đăng ký; G-37…G-39 (nhánh `feat/signup-no-confirm`) |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — bỏ xác nhận email khi đăng ký; G-37…G-39 (nhánh `feat/signup-no-confirm`). v0.12: D-64 — PO duyệt I-14, OpenAI của Mây mặc định bật (nhánh `feat/may-openai-default`) |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -31,7 +31,7 @@ MỘC là web **B2C** bán đèn giấy dó thủ công tại Việt Nam, địn
 
 Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý coupon. Thanh toán qua **payOS** hoặc **COD**. **Bắt buộc có tài khoản để đặt hàng.** Chỉ giao trong nước, tiền tệ VND.
 
-**Hiện trạng repo (v0.7)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap), vai trò IT + dashboard IT, AI Mây (chat, FAQ offline, tour — OpenAI mặc định tắt chờ I-14), giỏ hàng. Chưa có: checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây tra đơn, admin đơn/coupon/đổi trả, GA (xem §31).
+**Hiện trạng repo (v0.7)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap), vai trò IT + dashboard IT, AI Mây (chat, FAQ offline, tour — OpenAI mặc định bật — D-64), giỏ hàng. Chưa có: checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây tra đơn, admin đơn/coupon/đổi trả, GA (xem §31).
 
 ---
 
@@ -236,7 +236,7 @@ Không có chỉ số định lượng nào được cung cấp; các ô "Mục 
 | NFR-SEC-001 | Bảo mật | Token QR lời chúc ngẫu nhiên, không đoán được, không chứa dữ liệu cá nhân dạng đọc được | Độ dài/entropy do tech lead chốt |
 | NFR-SEC-002 | Bảo mật | Webhook payOS phải được xác minh chữ ký trước khi xử lý | — |
 | NFR-SEC-003 | Bảo mật | Quyền truy cập dữ liệu của Mây do backend kiểm tra, không dựa vào prompt | — |
-| NFR-PRV-001 | Riêng tư | Chỉ gửi sang OpenAI các trường cần thiết; không gửi địa chỉ, SĐT | `[LEGAL]` I-14 |
+| NFR-PRV-001 | Riêng tư | Chỉ gửi sang OpenAI các trường cần thiết; không gửi địa chỉ, SĐT | I-14 `[CONFIRMED]` D-64 |
 | NFR-PRV-002 | Riêng tư | Token QR và dữ liệu cá nhân không được gửi tới Google Analytics | — |
 | NFR-PRV-003 | Riêng tư | Xóa giọng nói/video là xóa thật, gồm bản sao lưu và cache CDN | Thời gian xóa khỏi backup `[BA DECISION REQUIRED]` |
 | NFR-AUD-001 | Kiểm toán | Ghi log thay đổi trạng thái đơn, coupon, hoàn tiền (ai, khi nào, giá trị cũ/mới) | — |
@@ -653,7 +653,7 @@ Kênh hỗ trợ người thật (Q-31): admin nhập tại cấu hình Mây (3 
 
 **Hiện thực (v0.6)**
 
-- **Bật/tắt OpenAI** `[CONFIRMED]` D-55: cờ trong cấu hình Mây, **mặc định tắt** cho tới khi pháp chế duyệt I-14. Khi tắt, hoặc server chưa có khoá OpenAI, Mây chạy **FAQ offline**: trả câu nhóm "nghỉ ngơi" + tối đa 3 câu FAQ khớp từ khoá câu hỏi `[ASSUMPTION]`.
+- **Bật/tắt OpenAI** `[CONFIRMED]` D-55, D-64: cờ trong cấu hình Mây, **mặc định bật** (PO đã duyệt I-14); admin tắt được. Khi tắt, hoặc server chưa có khoá OpenAI, Mây chạy **FAQ offline**: trả câu nhóm "nghỉ ngơi" + tối đa 3 câu FAQ khớp từ khoá câu hỏi `[ASSUMPTION]`.
 - **Ngân sách tháng mặc định 20 USD** `[CONFIRMED]` D-58; chi phí tính theo token × đơn giá cấu hình ở server (`OPENAI_PRICE_*`); tháng tính theo giờ Việt Nam `[ASSUMPTION]`. Cảnh báo 80%/100% hiện ở trang cấu hình Mây và dashboard IT (kênh gửi cảnh báo chờ Q-24).
 - **Timeout 15 giây** cho cả lượt trả lời (gồm các lần gọi hàm) `[CONFIRMED]` D-57 → câu nhóm "ốm".
 - Hàm backend Mây gọi được (v0.6): `get_products`, `get_product(slug)`, `get_faq`. Chưa có `get_policy` (chưa có nội dung chính sách — G-10), `get_my_orders` / `lookup_order` (chưa có đơn — FR-AI-004).
@@ -682,7 +682,7 @@ Kênh hỗ trợ người thật (Q-31): admin nhập tại cấu hình Mây (3 
 
 - Lưu vĩnh viễn với người đã đăng nhập (D-19).
 - `[LEGAL]` I-15: quyền yêu cầu xóa; xử lý khi xóa tài khoản.
-- `[LEGAL]` I-14: gửi dữ liệu sang OpenAI (máy chủ ngoài VN).
+- ~~`[LEGAL]` I-14: gửi dữ liệu sang OpenAI (máy chủ ngoài VN).~~ Đã duyệt `[CONFIRMED]` D-64 — vẫn giữ NFR-PRV-001 (không gửi SĐT/email/địa chỉ).
 
 ---
 
@@ -973,7 +973,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | R-10 | Nội dung web hứa "vĩnh viễn", "từng đèn" trái quyết định | Cao — quảng cáo sai | Chắc chắn nếu không sửa | §31.2 | Sửa nội dung | PO / Marketing |
 | R-11 | Bản dịch chính sách lệch bản gốc | Trung bình | UNKNOWN | 3 ngôn ngữ | Bản VN ưu tiên | Pháp chế |
 | R-12 | Lộ dữ liệu đơn qua Mây | Cao | UNKNOWN | Prompt injection | BR-AI-001/002 | Tech lead |
-| R-13 | Chuyển dữ liệu cá nhân sang OpenAI | Cao — pháp lý | UNKNOWN | Máy chủ ngoài VN | NFR-PRV-001; I-14 | Pháp chế |
+| R-13 | Chuyển dữ liệu cá nhân sang OpenAI | Cao — pháp lý | UNKNOWN | Máy chủ ngoài VN | NFR-PRV-001; I-14 (đã duyệt D-64) | Pháp chế |
 | R-14 | Giá hiển thị chưa VAT trái quy định niêm yết | Cao — pháp lý | UNKNOWN | D-03 | I-04 | Pháp chế |
 | R-15 | SEO kém do SPA chỉ render phía trình duyệt | Trung bình | UNKNOWN | `index.html` + React SPA | Pre-render/SSR | Tech lead |
 | R-16 | Người nhận quà không biết phải quay video khui hàng | Cao — khiếu nại | UNKNOWN | D-07 + D-02 | Hướng dẫn trên thiệp & trang QR | PO |
@@ -993,7 +993,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Q-16 | Hoàn tiền payOS: tự động hay thủ công? | Thanh toán |
 | Q-08 | Soạn lời chúc lúc nào; chưa soạn khi tới hạn khóa thì sao? | Checkout, lời chúc |
 | Q-26 | Media lưu bao lâu nếu không ai xác nhận? | Lưu trữ |
-| I-04, I-14 | `[LEGAL]` niêm yết giá chưa VAT; chuyển dữ liệu sang OpenAI | Pháp lý |
+| I-04 | `[LEGAL]` niêm yết giá chưa VAT (I-14 đã duyệt — D-64) | Pháp lý |
 
 ### P1 — trước khi làm tính năng liên quan
 | ID | Câu hỏi |
@@ -1191,7 +1191,7 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 | D-52 | Dashboard IT gồm: số liệu API, trạng thái tích hợp, bật/tắt chế độ bảo trì | Hiệu lực (v0.5) |
 | D-53 | Số liệu API lưu Supabase | Hiệu lực (v0.5) |
 | D-54 | Chế độ bảo trì: web hiện trang bảo trì, API ghi trả 503 | Hiệu lực (v0.5) |
-| D-55 | Mây: OpenAI tích hợp đủ nhưng tắt bằng cờ, mặc định tắt (FAQ offline) cho tới khi pháp chế duyệt I-14 | Hiệu lực (v0.6) |
+| D-55 | Mây: OpenAI tích hợp đủ nhưng tắt bằng cờ, mặc định tắt (FAQ offline) cho tới khi pháp chế duyệt I-14 | Thay phần "mặc định tắt" bởi D-64; cờ bật/tắt vẫn hiệu lực |
 | D-56 | Q-31: kênh hỗ trợ người thật do admin nhập trong cấu hình Mây | Hiệu lực (v0.6) |
 | D-57 | US-009: chờ OpenAI tối đa 15 giây rồi hiện câu "ốm" | Hiệu lực (v0.6) |
 | D-58 | Ngân sách OpenAI mặc định 20 USD/tháng (admin sửa được) | Hiệu lực (v0.6) |
@@ -1200,3 +1200,4 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 | D-61 | Khi chưa có checkout: nút Thanh toán bắt đăng nhập rồi báo "sắp ra mắt" | Hiệu lực (v0.7) |
 | D-62 | Tên web và thương hiệu là **LAMVI** (viết liền, không dấu) ở mọi nơi — logo, tiêu đề trang, câu văn, bản dịch en/zh; không dùng "MỘC" hay "LÂM VỊ" | Hiệu lực (v0.10) |
 | D-63 | Bỏ xác nhận email sau khi đăng ký (dự án dùng Supabase gói Free): tài khoản dùng được ngay, không gửi thư xác nhận | Hiệu lực (v0.11) |
+| D-64 | PO duyệt `[LEGAL]` I-14 (gửi nội dung chat của Mây sang OpenAI, máy chủ ngoài VN). Cờ OpenAI của Mây **mặc định bật**; admin vẫn tắt được; không gửi SĐT/email/địa chỉ (NFR-PRV-001) | Hiệu lực (v0.12) |

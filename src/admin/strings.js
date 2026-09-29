@@ -58,7 +58,7 @@ export const S = {
     notConfigured: 'Server chưa có khoá OpenAI (OPENAI_API_KEY) — Mây luôn chạy chế độ FAQ offline.',
     openai: 'Bật trả lời bằng OpenAI',
     openaiHint:
-      'D-55: chỉ bật khi pháp chế đã duyệt việc gửi nội dung chat sang OpenAI (I-14). Khi tắt, Mây trả lời bằng FAQ offline. Mây không bao giờ gửi SĐT/email sang OpenAI.',
+      'Mặc định bật (D-64, I-14 đã duyệt). Khi tắt, Mây trả lời bằng FAQ offline. Mây không bao giờ gửi SĐT/email sang OpenAI.',
     budget: 'Ngân sách tháng (USD)',
     budgetHint: '80% → cảnh báo; 100% → chuyển FAQ offline (§22.4).',
     channel: 'Kênh hỗ trợ người thật (Q-31, D-56)',

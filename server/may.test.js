@@ -60,8 +60,20 @@ beforeEach(async () => {
   vi.spyOn(console, 'error').mockImplementation(() => {})
 })
 
-describe('D-55: OpenAI mặc định tắt → FAQ offline', () => {
-  it('chưa bật → không gọi OpenAI, trả câu "nghỉ ngơi" + FAQ khớp câu hỏi', async () => {
+describe('D-64: OpenAI mặc định bật; admin tắt (D-55) hoặc thiếu khoá → FAQ offline', () => {
+  it('chưa có cấu hình + có khoá → gọi OpenAI', async () => {
+    build([say('Chào bạn')])
+    expect((await chat({ message: 'Xin chào' })).body.reply.kind).toBe('answer')
+    expect(openai.calls).toHaveLength(1)
+  })
+
+  it('chưa có cấu hình + không có khoá → câu "nghỉ ngơi"', async () => {
+    build(null)
+    expect((await chat({ message: 'Video và lời chúc lưu bao lâu?' })).body.reply.kind).toBe('resting')
+  })
+
+  it('admin tắt → không gọi OpenAI, trả câu "nghỉ ngơi" + FAQ khớp câu hỏi', async () => {
+    await repo.setSetting(MAY_SETTING_KEY, { openaiEnabled: false }, null)
     build([say('không được gọi')])
     const res = await chat({ message: 'Video và lời chúc lưu bao lâu?' })
     expect(res.status).toBe(200)
@@ -216,7 +228,7 @@ describe('Cấu hình Mây (FR-AI-007)', () => {
   it('chỉ admin/IT; khách → 403', async () => {
     expect((await request(app).get('/api/admin/may/config').set('Authorization', tokens.customer.bearer)).status).toBe(403)
     const res = await request(app).get('/api/admin/may/config').set('Authorization', tokens.admin.bearer)
-    expect(res.body.config).toMatchObject({ openaiEnabled: false, monthlyBudgetUsd: 20, limits: { maxChars: 500 } })
+    expect(res.body.config).toMatchObject({ openaiEnabled: true, monthlyBudgetUsd: 20, limits: { maxChars: 500 } })
   })
 
   it('sửa cờ OpenAI, ngân sách, kênh, câu thông báo; dữ liệu sai → 400', async () => {
@@ -236,7 +248,7 @@ describe('Cấu hình Mây (FR-AI-007)', () => {
 
   it('validateMayConfig giữ nguyên trường không gửi', () => {
     const { values } = validateMayConfig({ monthlyBudgetUsd: 5 }, DEFAULT_MAY_CONFIG)
-    expect(values.openaiEnabled).toBe(false)
+    expect(values.openaiEnabled).toBe(true)
     expect(values.monthlyBudgetUsd).toBe(5)
   })
 })

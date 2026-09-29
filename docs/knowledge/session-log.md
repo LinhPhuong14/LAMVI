@@ -4,6 +4,14 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 — Mây: OpenAI mặc định bật (nhánh `feat/may-openai-default`)
+
+**Quyết định từ người dùng**: đồng ý `[LEGAL]` I-14, đổi mặc định bật OpenAI → D-64.
+
+**Đã làm**: `DEFAULT_MAY_CONFIG.openaiEnabled = true` (`server/may/config.js`); thiếu `OPENAI_API_KEY` vẫn chạy FAQ offline; admin vẫn tắt được ở `/admin/may`. Sửa câu hướng dẫn admin/IT không còn "chờ pháp chế". Test: mặc định + có khoá → gọi OpenAI; mặc định + không khoá → "nghỉ ngơi"; admin tắt → FAQ offline. Spec v0.12.
+
+**Còn lại / cần người dùng**: Vercel đã có `OPENAI_API_KEY`; cấu hình Mây lưu ở Supabase nên vẫn cần nối Supabase (migration + biến `SUPABASE_*`). Cấu hình đã lưu trước đó với `openaiEnabled: false` sẽ giữ nguyên (không bị ghi đè).
+
 ## 2026-09-29 — Bỏ xác nhận email + nối Supabase với lamvi.vercel.app (nhánh `feat/signup-no-confirm`)
 
 **Quyết định từ người dùng**: bỏ xác nhận email sau khi đăng ký (Supabase gói Free) → D-63.

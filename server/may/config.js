@@ -35,8 +35,9 @@ const DEFAULT_MESSAGES = {
 }
 
 export const DEFAULT_MAY_CONFIG = {
-  // D-55: mặc định TẮT cho tới khi pháp chế duyệt I-14 → chế độ FAQ offline
-  openaiEnabled: false,
+  // D-64: I-14 đã duyệt → mặc định BẬT (vẫn chạy FAQ offline khi server thiếu OPENAI_API_KEY);
+  // admin tắt được ở /admin/may (D-55)
+  openaiEnabled: true,
   // D-58
   monthlyBudgetUsd: 20,
   // D-56: admin nhập; rỗng → không gợi ý kênh
