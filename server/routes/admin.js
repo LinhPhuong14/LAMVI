@@ -15,6 +15,9 @@ import {
   validateVideoUpload,
 } from '../domain/admin.js'
 import { PRODUCT_IMAGE_BUCKET } from '../adapters/supabase/storage.js'
+import { validateCoupon } from '../domain/couponValidate.js'
+import { ORDER_STATUSES, adminNextStatuses } from '../domain/order.js'
+import { presentOrder } from './orders.js'
 
 const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {})
 
@@ -43,7 +46,7 @@ const found = (row) => {
 const isPublished = (b) => b.status === 'video_published'
 
 // Admin: sản phẩm (FR-CAT-004), FAQ (G-07), lô & video lô (FR-QR-007, D-46, D-47)
-export function adminRouter({ repo, auth, storage, config }) {
+export function adminRouter({ repo, auth, storage, config, orders = null }) {
   const r = Router()
   r.use('/admin', requireAdmin(auth, repo))
   const maxVideoBytes = (config.maxVideoMb ?? 500) * 1024 * 1024
@@ -208,7 +211,91 @@ export function adminRouter({ repo, auth, storage, config }) {
     res.json({ item: await repo.updateBatch(batch.id, { status: 'video_published' }) })
   })
 
+  // --- Coupon (FR-CPN-001/002, §14). Admin quản lý toàn bộ.
+  r.get('/admin/coupons', async (req, res) => {
+    res.json({ items: await repo.listCoupons() })
+  })
+  r.get('/admin/coupons/:id', async (req, res) => {
+    res.json({ item: found(await repo.getCouponById(req.params.id)) })
+  })
+  r.post('/admin/coupons', async (req, res) => {
+    const { errors, values } = validateCoupon(body(req))
+    assertValid(errors)
+    const item = await write(() => repo.createCoupon(values))
+    await logAdmin(req, 'coupon', item.id, 'create', null, values)
+    res.status(201).json({ item })
+  })
+  r.patch('/admin/coupons/:id', async (req, res) => {
+    const before = found(await repo.getCouponById(req.params.id))
+    const { errors, values } = validateCoupon(body(req), { partial: true, currentType: before.type })
+    assertValid(errors)
+    if (!Object.keys(values).length) return res.json({ item: before })
+    const item = found(await write(() => repo.updateCoupon(before.id, values)))
+    // NFR-AUD-001: coupon phải có nhật ký thay đổi
+    await logAdmin(req, 'coupon', before.id, 'update', before, values)
+    res.json({ item })
+  })
+  r.delete('/admin/coupons/:id', async (req, res) => {
+    const before = found(await repo.getCouponById(req.params.id))
+    // Coupon đã dùng thì không xoá (đơn còn tham chiếu) — tắt bằng status
+    if (before.usedCount > 0) throw new HttpError(409, 'COUPON_IN_USE', 'Coupon đã được dùng, hãy tắt thay vì xoá')
+    await repo.deleteCoupon(before.id)
+    await logAdmin(req, 'coupon', before.id, 'delete', before, null)
+    res.status(204).end()
+  })
+
+  // --- Đơn hàng (FR-ORD-002)
+  r.get('/admin/orders', async (req, res) => {
+    const status = ORDER_STATUSES.includes(req.query.status) ? req.query.status : undefined
+    const items = await repo.listOrders({ status })
+    res.json({
+      items: items.map((o) => ({
+        ...presentOrder(o),
+        // Admin cần biết để xử lý tay (§15.1)
+        paymentFlag: o.paymentFlag,
+        nextStatuses: adminNextStatuses(o.status),
+      })),
+    })
+  })
+  r.get('/admin/orders/:code', async (req, res) => {
+    const o = found(await repo.getOrderByCode(req.params.code))
+    res.json({
+      item: { ...presentOrder(o), paymentFlag: o.paymentFlag, nextStatuses: adminNextStatuses(o.status) },
+      audit: await repo.listAuditLog({ entity: 'order', entityId: o.id, limit: 50 }),
+    })
+  })
+  r.post('/admin/orders/:code/status', async (req, res) => {
+    if (!orders) throw new HttpError(503, 'UNAVAILABLE', 'Chưa bật module đơn hàng')
+    const o = found(await repo.getOrderByCode(req.params.code))
+    const b = body(req)
+    if (!ORDER_STATUSES.includes(b.status)) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Trạng thái không hợp lệ', { status: 'INVALID' })
+    }
+    const trackingCode = typeof b.trackingCode === 'string' ? b.trackingCode.trim().slice(0, 64) || null : undefined
+    const updated = await orders.setStatusByAdmin(o, req.user.id, b.status, { trackingCode })
+    res.json({ item: { ...presentOrder(updated), nextStatuses: adminNextStatuses(updated.status) } })
+  })
+  // D-74 (Q-16): hoàn tiền thủ công — admin chuyển khoản tay rồi ghi nhận
+  r.post('/admin/orders/:code/refund', async (req, res) => {
+    if (!orders) throw new HttpError(503, 'UNAVAILABLE', 'Chưa bật module đơn hàng')
+    const o = found(await repo.getOrderByCode(req.params.code))
+    const updated = await orders.markRefunded(o, req.user.id, body(req).note)
+    res.json({ item: presentOrder(updated) })
+  })
+
   return r
+
+  // NFR-AUD-001: ghi nhật ký thay đổi của admin. Lỗi ghi log không được làm hỏng thao tác.
+  async function logAdmin(req, entity, entityId, action, oldValue, newValue) {
+    if (!repo.appendAuditLog) return
+    try {
+      await repo.appendAuditLog([
+        { actorId: req.user.id, actorRole: req.role ?? 'admin', entity, entityId, action, oldValue, newValue },
+      ])
+    } catch (err) {
+      console.error('[audit]', err)
+    }
+  }
 
   // Xoá object ảnh cũ sau khi DB đã trỏ sang ảnh mới. Lỗi ở bước này không được làm hỏng request:
   // sản phẩm đã có ảnh đúng, file thừa chỉ tốn dung lượng.

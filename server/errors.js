@@ -1,9 +1,14 @@
 export class HttpError extends Error {
-  constructor(status, code, message = code, fields) {
+  /**
+   * @param {object} [details] dữ liệu kèm theo lỗi trả cho client (vd bảng giá mới khi giá đổi).
+   *   Chỉ đặt dữ liệu client được phép thấy — nội dung này đi thẳng vào response.
+   */
+  constructor(status, code, message = code, fields, details) {
     super(message)
     this.status = status
     this.code = code
     this.fields = fields
+    this.details = details
   }
 }
 
@@ -16,6 +21,7 @@ export function errorHandler(err, req, res, _next) {
   if (err instanceof HttpError) {
     const body = { code: err.code, message: err.message }
     if (err.fields) body.fields = err.fields
+    if (err.details) body.details = err.details
     return res.status(err.status).json({ error: body })
   }
   if (err?.type === 'entity.parse.failed') {

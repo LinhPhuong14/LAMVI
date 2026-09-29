@@ -7,6 +7,8 @@ import { itRouter } from './routes/it.js'
 import { mayRouter } from './routes/may.js'
 import { createMayService } from './may/service.js'
 import { cartRouter } from './routes/cart.js'
+import { ordersRouter } from './routes/orders.js'
+import { createOrderService } from './orders/service.js'
 import { createCartService } from './cart/service.js'
 import { createMetrics } from './monitoring/metrics.js'
 import { createMaintenance } from './monitoring/maintenance.js'
@@ -24,6 +26,8 @@ export function createApp({
   metrics = createMetrics({ repo, classify: classifyPath }),
   maintenance = createMaintenance({ repo }),
   may = createMayService({ repo, openai: null }),
+  payos = null,
+  orders = createOrderService({ repo, payos }),
   dev = false,
 }) {
   const app = express()
@@ -48,10 +52,12 @@ export function createApp({
   api.get('/health', (req, res) => res.json({ ok: true }))
   api.use(catalogRouter({ repo }))
   if (auth) api.use(authRouter({ repo, auth, config }))
-  if (auth && storage) api.use(adminRouter({ repo, auth, storage, config }))
+  if (auth && storage) api.use(adminRouter({ repo, auth, storage, config, orders }))
   if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may }))
   if (auth) api.use(mayRouter({ repo, auth, may }))
   if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))
+  // FR-CHK-*, FR-ORD-*, FR-PAY-*: cần repo có bảng đơn hàng (adapter cũ trong test không có)
+  if (auth && repo.createOrder) api.use(ordersRouter({ repo, auth, orders, config, payos }))
   // Storage bộ nhớ (dev/test) tự phục vụ tải lên/đọc file
   if (storage?.router) api.use(storage.router)
   api.use(() => {

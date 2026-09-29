@@ -40,6 +40,71 @@ const toBatch = (r) => ({
   updatedAt: r.updated_at,
 })
 
+const toCoupon = (r) => ({
+  id: r.id,
+  code: r.code,
+  type: r.type,
+  value: r.value,
+  maxDiscount: r.max_discount,
+  minOrder: r.min_order,
+  productIds: r.product_ids,
+  usageLimit: r.usage_limit,
+  perUserLimit: r.per_user_limit,
+  usedCount: r.used_count,
+  startsAt: r.starts_at,
+  endsAt: r.ends_at,
+  status: r.status,
+  createdAt: r.created_at,
+  updatedAt: r.updated_at,
+})
+
+const toOrderItem = (r) => ({
+  id: r.id,
+  productId: r.product_id,
+  slug: r.slug,
+  name: r.name,
+  unitPrice: r.unit_price,
+  quantity: r.quantity,
+  lineTotal: r.line_total,
+})
+
+const toOrder = (r) => ({
+  id: r.id,
+  code: r.code,
+  userId: r.user_id,
+  status: r.status,
+  orderKind: r.order_kind,
+  hasMessage: r.has_message,
+  qrLang: r.qr_lang,
+  recipientIsSelf: r.recipient_is_self,
+  recipientName: r.recipient_name,
+  recipientPhone: r.recipient_phone,
+  addressLine: r.address_line,
+  ward: r.ward,
+  district: r.district,
+  province: r.province,
+  note: r.note,
+  paymentMethod: r.payment_method,
+  paymentStatus: r.payment_status,
+  paymentExpiresAt: r.payment_expires_at,
+  payosOrderCode: r.payos_order_code === null || r.payos_order_code === undefined ? null : Number(r.payos_order_code),
+  paymentFlag: r.payment_flag,
+  subtotal: r.subtotal,
+  discount: r.discount,
+  shippingFee: r.shipping_fee,
+  total: r.total,
+  vatAmount: r.vat_amount,
+  vatRate: Number(r.vat_rate),
+  couponId: r.coupon_id,
+  couponCode: r.coupon_code,
+  trackingCode: r.tracking_code,
+  cancelledAt: r.cancelled_at,
+  cancelReason: r.cancel_reason,
+  createdAt: r.created_at,
+  updatedAt: r.updated_at,
+  items: (r.order_items ?? []).map(toOrderItem),
+})
+
 const toProfile = (r) => ({
   id: r.id,
   fullName: r.full_name,
@@ -53,6 +118,8 @@ const toProfile = (r) => ({
 const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge', imageUrl: 'image_url', imagePath: 'image_path', imageAlt: 'image_alt' }
 const FAQ_COLS = { sortOrder: 'sort_order', isPublished: 'is_published', question: 'question', answer: 'answer' }
 const BATCH_COLS = { code: 'code', status: 'status', videoUrl: 'video_url', videoPath: 'video_path', producedOn: 'produced_on', title: 'title', story: 'story' }
+const COUPON_COLS = { code: 'code', type: 'type', value: 'value', maxDiscount: 'max_discount', minOrder: 'min_order', productIds: 'product_ids', usageLimit: 'usage_limit', perUserLimit: 'per_user_limit', startsAt: 'starts_at', endsAt: 'ends_at', status: 'status' }
+const ORDER_COLS = { status: 'status', paymentStatus: 'payment_status', paymentExpiresAt: 'payment_expires_at', payosOrderCode: 'payos_order_code', paymentFlag: 'payment_flag', trackingCode: 'tracking_code', cancelledAt: 'cancelled_at', cancelReason: 'cancel_reason' }
 
 const toUsage = (r) => ({
   month: r.month,
@@ -69,7 +136,7 @@ function toRow(obj, cols) {
 }
 
 // 23505 = unique_violation của Postgres
-const UNIQUE_FIELD = { products_slug_key: 'slug', batches_code_key: 'code' }
+const UNIQUE_FIELD = { products_slug_key: 'slug', batches_code_key: 'code', coupons_code_key: 'code', orders_code_key: 'code' }
 
 function unwrap({ data, error }) {
   if (error) {
@@ -188,6 +255,188 @@ export function createSupabaseRepo(client) {
         content: r.content,
         lang: r.lang,
         createdAt: r.created_at,
+      }))
+    },
+
+    // --- Coupon (FR-CPN-001/002)
+    async listCoupons() {
+      return unwrap(await client.from('coupons').select('*').order('created_at', { ascending: false })).map(toCoupon)
+    },
+    getCouponById: (id) => one('coupons', id, toCoupon),
+    async getCouponByCode(code) {
+      const r = unwrap(await client.from('coupons').select('*').eq('code', code).maybeSingle())
+      return r ? toCoupon(r) : null
+    },
+    createCoupon: (c) => insert('coupons', toRow(c, COUPON_COLS), toCoupon),
+    updateCoupon: (id, c) => patch('coupons', id, toRow(c, COUPON_COLS), toCoupon),
+    deleteCoupon: (id) => del('coupons', id),
+    async countCouponUsesByUser(couponId, userId) {
+      const { count, error } = await client
+        .from('coupon_redemptions')
+        .select('id', { count: 'exact', head: true })
+        .eq('coupon_id', couponId)
+        .eq('user_id', userId)
+      if (error) throw error
+      return count ?? 0
+    },
+    // C-5: tăng lượt nguyên tử; hết lượt → null
+    async claimCoupon(couponId) {
+      const r = unwrap(await client.rpc('claim_coupon', { p_coupon_id: couponId }))
+      return r ?? null
+    },
+    async releaseCoupon(couponId) {
+      unwrap(await client.rpc('release_coupon', { p_coupon_id: couponId }))
+    },
+
+    // --- Đơn hàng (FR-CHK-*, FR-ORD-*)
+    async createOrder(order, items, redemption) {
+      const row = unwrap(
+        await client
+          .from('orders')
+          .insert({
+            code: order.code,
+            user_id: order.userId,
+            status: order.status,
+            order_kind: order.orderKind,
+            has_message: order.hasMessage,
+            qr_lang: order.qrLang,
+            recipient_is_self: order.recipientIsSelf,
+            recipient_name: order.recipientName,
+            recipient_phone: order.recipientPhone,
+            address_line: order.addressLine,
+            ward: order.ward,
+            district: order.district,
+            province: order.province,
+            note: order.note,
+            payment_method: order.paymentMethod,
+            payment_status: order.paymentStatus,
+            payment_expires_at: order.paymentExpiresAt,
+            payos_order_code: order.payosOrderCode,
+            subtotal: order.subtotal,
+            discount: order.discount,
+            shipping_fee: order.shippingFee,
+            total: order.total,
+            vat_amount: order.vatAmount,
+            vat_rate: order.vatRate,
+            coupon_id: order.couponId,
+            coupon_code: order.couponCode,
+          })
+          .select('*')
+          .single(),
+      )
+      unwrap(
+        await client.from('order_items').insert(
+          items.map((i) => ({
+            order_id: row.id,
+            product_id: i.productId,
+            slug: i.slug,
+            name: i.name,
+            unit_price: i.unitPrice,
+            quantity: i.quantity,
+            line_total: i.lineTotal,
+          })),
+        ),
+      )
+      if (redemption) {
+        unwrap(
+          await client
+            .from('coupon_redemptions')
+            .insert({ coupon_id: redemption.couponId, user_id: redemption.userId, order_id: row.id }),
+        )
+      }
+      return { ...toOrder(row), items: items.map((i) => ({ ...i })) }
+    },
+    async getOrderById(id) {
+      const r = unwrap(await client.from('orders').select('*, order_items(*)').eq('id', id).maybeSingle())
+      return r ? toOrder(r) : null
+    },
+    async getOrderByCode(code) {
+      const r = unwrap(await client.from('orders').select('*, order_items(*)').eq('code', code).maybeSingle())
+      return r ? toOrder(r) : null
+    },
+    async getOrderByPayosCode(payosOrderCode) {
+      const r = unwrap(
+        await client.from('orders').select('*, order_items(*)').eq('payos_order_code', payosOrderCode).maybeSingle(),
+      )
+      return r ? toOrder(r) : null
+    },
+    async listOrdersByUser(userId, { limit = 50 } = {}) {
+      const rows = unwrap(
+        await client
+          .from('orders')
+          .select('*, order_items(*)')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(limit),
+      )
+      return rows.map(toOrder)
+    },
+    async listOrders({ status, limit = 100 } = {}) {
+      let q = client.from('orders').select('*, order_items(*)').order('created_at', { ascending: false }).limit(limit)
+      if (status) q = q.eq('status', status)
+      return unwrap(await q).map(toOrder)
+    },
+    async listExpiredPendingOrders(now) {
+      const rows = unwrap(
+        await client
+          .from('orders')
+          .select('*, order_items(*)')
+          .eq('status', 'pending_payment')
+          .lt('payment_expires_at', now),
+      )
+      return rows.map(toOrder)
+    },
+    async updateOrder(id, values) {
+      const data = unwrap(await client.from('orders').update(toRow(values, ORDER_COLS)).eq('id', id).select('*, order_items(*)'))
+      return data.length ? toOrder(data[0]) : null
+    },
+    /**
+     * Đổi trạng thái chỉ khi trạng thái hiện tại đúng như mong đợi (khoá lạc quan) — hai request
+     * đồng thời (khách huỷ + webhook PAID) không được cùng thành công.
+     */
+    async updateOrderIfStatus(id, expectedStatus, values) {
+      const data = unwrap(
+        await client
+          .from('orders')
+          .update(toRow(values, ORDER_COLS))
+          .eq('id', id)
+          .eq('status', expectedStatus)
+          .select('*, order_items(*)'),
+      )
+      return data.length ? toOrder(data[0]) : null
+    },
+
+    // --- NFR-AUD-001
+    async appendAuditLog(entries) {
+      if (!entries.length) return
+      unwrap(
+        await client.from('audit_log').insert(
+          entries.map((e) => ({
+            actor_id: e.actorId ?? null,
+            actor_role: e.actorRole,
+            entity: e.entity,
+            entity_id: e.entityId ?? null,
+            action: e.action,
+            old_value: e.oldValue ?? null,
+            new_value: e.newValue ?? null,
+          })),
+        ),
+      )
+    },
+    async listAuditLog({ entity, entityId, limit = 100 } = {}) {
+      let q = client.from('audit_log').select('*').order('at', { ascending: false }).limit(limit)
+      if (entity) q = q.eq('entity', entity)
+      if (entityId) q = q.eq('entity_id', entityId)
+      return unwrap(await q).map((r) => ({
+        id: Number(r.id),
+        at: r.at,
+        actorId: r.actor_id,
+        actorRole: r.actor_role,
+        entity: r.entity,
+        entityId: r.entity_id,
+        action: r.action,
+        oldValue: r.old_value,
+        newValue: r.new_value,
       }))
     },
 

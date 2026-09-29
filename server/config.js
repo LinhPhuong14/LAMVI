@@ -22,6 +22,14 @@ export function loadConfig(env = process.env) {
     // FR-GA-001, D-72: Google Analytics 4. Không đặt → không nhúng GA (dev/test, Preview).
     // Giá trị hỏng bị bỏ qua vì được nhúng vào <script> nội tuyến (xem isValidMeasurementId).
     gaMeasurementId: isValidMeasurementId(env.GA_MEASUREMENT_ID) ? env.GA_MEASUREMENT_ID : null,
+    // BR-PAY-003: bí mật cho lịch quét đơn quá hạn (Vercel Cron). Để trống → tắt endpoint.
+    cronSecret: env.CRON_SECRET || null,
+    // Thanh toán payOS (FR-PAY-001, D-35). Thiếu khoá → checkout chỉ cho COD.
+    payos: {
+      clientId: env.PAYOS_CLIENT_ID || null,
+      apiKey: env.PAYOS_API_KEY || null,
+      checksumKey: env.PAYOS_CHECKSUM_KEY || null,
+    },
     // AI Mây (D-17, D-55…D-58). Khoá chỉ ở server.
     openai: {
       apiKey: env.OPENAI_API_KEY || null,

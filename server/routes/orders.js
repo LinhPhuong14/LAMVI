@@ -1,0 +1,140 @@
+import { Router } from 'express'
+import { HttpError, notFound } from '../errors.js'
+import { normalizeLang } from '../i18n.js'
+import { requireAuth } from '../middleware/auth.js'
+import { validateCheckout } from '../domain/order.js'
+import { parseWebhook } from '../adapters/payos.js'
+
+const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {})
+
+// Đơn hiển thị cho khách — không trả trường nội bộ (payosOrderCode, paymentFlag, userId)
+function presentOrder(o, { lang = 'vi' } = {}) {
+  const pick = (v) => (v && typeof v === 'object' ? (v[lang] ?? v.vi ?? null) : (v ?? null))
+  return {
+    code: o.code,
+    status: o.status,
+    orderKind: o.orderKind,
+    hasMessage: o.hasMessage,
+    qrLang: o.qrLang,
+    recipientIsSelf: o.recipientIsSelf,
+    recipientName: o.recipientName,
+    recipientPhone: o.recipientPhone,
+    addressLine: o.addressLine,
+    ward: o.ward,
+    district: o.district,
+    province: o.province,
+    note: o.note,
+    paymentMethod: o.paymentMethod,
+    paymentStatus: o.paymentStatus,
+    paymentExpiresAt: o.paymentExpiresAt,
+    subtotal: o.subtotal,
+    discount: o.discount,
+    shippingFee: o.shippingFee,
+    total: o.total,
+    vatAmount: o.vatAmount,
+    vatRate: o.vatRate,
+    couponCode: o.couponCode,
+    trackingCode: o.trackingCode,
+    cancelledAt: o.cancelledAt,
+    createdAt: o.createdAt,
+    currency: 'VND',
+    items: (o.items ?? []).map((i) => ({
+      slug: i.slug,
+      name: pick(i.name),
+      unitPrice: i.unitPrice,
+      quantity: i.quantity,
+      lineTotal: i.lineTotal,
+    })),
+  }
+}
+
+/**
+ * Checkout, đơn hàng của tôi (FR-CHK-*, FR-ORD-001, FR-ACC-002) và webhook payOS (FR-PAY-001).
+ * Webhook KHÔNG yêu cầu đăng nhập — bảo vệ bằng chữ ký (NFR-SEC-002).
+ */
+export function ordersRouter({ repo, auth, orders, config, payos = null }) {
+  const r = Router()
+  const guard = requireAuth(auth)
+  const lang = (req) => normalizeLang(req.query.lang)
+
+  // FR-CHK-008: bảng giá của giỏ, kèm coupon nếu có (FR-CHK-006)
+  r.post('/checkout/quote', guard, async (req, res) => {
+    const { view } = await orders.quoteCart(req.user.id, { couponCode: body(req).couponCode, lang: lang(req) })
+    res.json(view)
+  })
+
+  // FR-CHK-001: chỉ khách đã đăng nhập (D-36, BR-ACC-001)
+  r.post('/orders', guard, async (req, res) => {
+    const b = body(req)
+    const { errors, values } = validateCheckout(b)
+    if (Object.keys(errors).length) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', errors)
+    }
+    // COD chỉ khi không có cổng thanh toán? Không — COD luôn có. payOS cần cấu hình cổng.
+    if (values.paymentMethod === 'payos' && !payos) {
+      throw new HttpError(503, 'PAYMENT_UNAVAILABLE', 'Thanh toán trực tuyến chưa sẵn sàng')
+    }
+    const { order, payment } = await orders.createOrder({
+      userId: req.user.id,
+      checkout: values,
+      expectedTotal: Number.isInteger(b.expectedTotal) ? b.expectedTotal : undefined,
+      lang: lang(req),
+      siteUrl: config.publicSiteUrl,
+    })
+    res.status(201).json({ order: presentOrder(order, { lang: lang(req) }), payment })
+  })
+
+  // FR-ACC-002: đơn của tôi
+  r.get('/orders', guard, async (req, res) => {
+    const list = await repo.listOrdersByUser(req.user.id)
+    res.json({ items: list.map((o) => presentOrder(o, { lang: lang(req) })) })
+  })
+
+  r.get('/orders/:code', guard, async (req, res) => {
+    const found = await repo.getOrderByCode(req.params.code)
+    // Không phải đơn của mình → 404 (không xác nhận mã đơn có tồn tại hay không)
+    if (!found || found.userId !== req.user.id) throw notFound()
+    // BR-PAY-003: hết hạn thanh toán thì huỷ ngay khi khách mở đơn, không chờ cron
+    const order = await orders.expireIfDue(found)
+    res.json({ item: presentOrder(order, { lang: lang(req) }) })
+  })
+
+  // FR-ORD-001 / BR-ORD-001
+  r.post('/orders/:code/cancel', guard, async (req, res) => {
+    const order = await repo.getOrderByCode(req.params.code)
+    if (!order || order.userId !== req.user.id) throw notFound()
+    const updated = await orders.cancelByCustomer(order, req.user.id, body(req).reason)
+    res.json({ item: presentOrder(updated, { lang: lang(req) }) })
+  })
+
+  /**
+   * BR-PAY-003: quét đơn payOS quá hạn. Trên serverless không có tiến trình nền, nên việc này do
+   * lịch chạy ngoài gọi vào (Vercel Cron). Bảo vệ bằng CRON_SECRET; thiếu secret → tắt endpoint.
+   */
+  r.post('/internal/expire-orders', async (req, res) => {
+    const secret = config.cronSecret
+    if (!secret) throw new HttpError(404, 'NOT_FOUND', 'Không tìm thấy')
+    const given = req.get('authorization')
+    if (given !== `Bearer ${secret}`) throw new HttpError(401, 'UNAUTHORIZED', 'Chưa xác thực')
+    const cancelled = await orders.expirePendingOrders()
+    res.json({ cancelled: cancelled.length })
+  })
+
+  // FR-PAY-001: webhook payOS. NFR-SEC-002 — xác minh chữ ký trước khi xử lý.
+  // Luôn trả 200 khi chữ ký hợp lệ để payOS không gửi lại vô hạn với case đã xử lý.
+  r.post('/payments/payos/webhook', async (req, res) => {
+    if (!payos) throw new HttpError(503, 'PAYMENT_UNAVAILABLE', 'Chưa cấu hình cổng thanh toán')
+    const parsed = parseWebhook(req.body, payos.checksumKey)
+    if (!parsed.ok) {
+      // Chữ ký sai → 401, không tiết lộ thêm
+      const status = parsed.reason === 'INVALID_SIGNATURE' ? 401 : 400
+      throw new HttpError(status, parsed.reason, 'Webhook không hợp lệ')
+    }
+    const result = await orders.applyPayosWebhook(parsed)
+    res.json({ received: true, handled: result.handled })
+  })
+
+  return r
+}
+
+export { presentOrder }
