@@ -26,6 +26,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-21 | 2026-09-28 | Mây gọi OpenAI Chat Completions bằng `fetch` (không thêm SDK); adapter `server/adapters/openai.js`, test dùng client giả `{ complete() }` | Hiệu lực |
 | T-22 | 2026-09-28 | Luật của Mây thực thi ở server, không dựa vào prompt: danh sách tool cố định chỉ đọc, che PII, kiểm tra số (BR-AI-003), hạn mức, ngân sách, timeout | Hiệu lực |
 | T-23 | 2026-09-28 | Cấu hình Mây lưu `app_settings` key `may`, gộp với mặc định trong `server/may/config.js` | Hiệu lực |
+| T-24 | 2026-09-29 | Giỏ hàng: server luôn tính giá (`server/cart/service.js#present`); giỏ vãng lai lưu `localStorage` `moc.cart` và lấy giá qua `POST /api/cart/quote`; `CartProvider` nằm trong `LocaleLayout`, chỉ đọc storage trong effect (không lệch hydrate) | Hiệu lực |
 | T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
 
 ---

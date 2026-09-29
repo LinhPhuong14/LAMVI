@@ -4,6 +4,27 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 (phiên 6) — Giỏ hàng (nhánh `feat/cart`, từ `master`)
+
+**Quyết định từ người dùng**
+
+- D-59 (Q-13): vãng lai có giỏ lưu trình duyệt, gộp khi đăng nhập.
+- D-60: tối đa 10 mỗi dòng. D-61: nút Thanh toán bắt đăng nhập rồi báo sắp ra mắt.
+
+**Đã làm**
+
+1. Server: `server/cart/service.js`, `/api/cart/*`, migration `20260929000005_cart.sql`; bảo trì cho phép `/api/cart/quote`.
+2. Frontend: `CartProvider`, nút thêm vào giỏ (thẻ + trang chi tiết), header đếm số lượng, `/cart`. Test cũ cập nhật theo hành vi mới (nút thẻ sản phẩm đổi từ "Xem chi tiết" sang thêm vào giỏ; test render routes cần `AuthProvider`). Sửa header xuống dòng ở 1280px.
+3. Spec v0.7: D-59…D-61, gỡ Q-13, G-02 đã xử lý.
+4. Subagent kiểm thử giỏ hàng (101 test mới) phát hiện: `/api/cart/quote` lộ tên sản phẩm nháp cho khách (D-39); quote chậm ghi đè giỏ vừa gộp khi đăng nhập; giỏ trình duyệt >100 dòng làm kẹt trang giỏ/gộp → đã sửa (quote bỏ nháp, ẩn tên sản phẩm đã ẩn; mã yêu cầu tăng dần trong `CartProvider`; `loadLocalCart` gộp trùng + cắt 50 dòng). Thêm: PUT sản phẩm nháp/ẩn chưa có trong giỏ trả cùng 404 như không tồn tại; gộp lỗi (bảo trì 503) vẫn hiện giỏ tài khoản. Rủi ro còn lại ghi G-32.
+
+**Còn lại / cần người dùng**
+
+- Chạy migration `20260929000005_cart.sql`.
+- Checkout chờ P0: Q-09 (VAT), Q-11 (phí ship), coupon C-1…C-3/C-5, Q-08 (lời chúc), Q-15/Q-16 (payOS), Q-17 đã có (chặn COD khi giao người khác).
+
+---
+
 ## 2026-09-28 (phiên 5) — AI Mây (nhánh `feat/may`, từ `master`), gộp vào `master`
 
 **Quyết định từ người dùng**

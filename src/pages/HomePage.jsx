@@ -10,6 +10,7 @@ import Price from '../components/Price'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
 import Seo from '../seo/Seo.jsx'
+import AddToCart from '../cart/AddToCart.jsx'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -77,13 +78,8 @@ function ProductGrid({ intent }) {
           <p className="product-desc">{p.description}</p>
           <div className="product-foot">
             <Price amount={p.priceExclVat} />
-            {/* G-02: chưa có giỏ hàng (Q-13) — dẫn tới trang chi tiết */}
-            <Link
-              to={{ pathname: path(`/products/${p.slug}`), search: `?intent=${intent}` }}
-              className="btn btn-small"
-            >
-              {t('products.viewDetail')}
-            </Link>
+            {/* FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002) */}
+            <AddToCart slug={p.slug} label={intent === 'gift' ? t('cart.giftAdd') : t('cart.add')} />
           </div>
         </motion.article>
       ))}

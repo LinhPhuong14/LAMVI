@@ -15,6 +15,7 @@ Dùng đúng tên trong cột "Code" cho biến, bảng, endpoint.
 | Chế độ bảo trì | Maintenance mode | `app_settings.key = 'maintenance'` | D-54 |
 | Số liệu API | API metrics | bảng `api_metrics`, `server/monitoring/metrics.js` | D-53 |
 | Ngôn ngữ ưa thích | Preferred locale | `preferred_locale` | `vi` / `en` / `zh` |
+| Giỏ hàng | Cart | bảng `cart_items`, `src/cart/*`, localStorage `moc.cart` (vãng lai) | D-59, D-60 |
 | Đơn hàng | Order | `order` | Chưa làm |
 | Lời chúc | Gift message | `gift_message` | Chưa làm |
 | Thiệp cảm ơn in | Thank-you card | `thank_you_card` | Chưa làm |

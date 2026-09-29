@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Lantern from '../components/Lantern'
 import Price from '../components/Price'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
 import Seo from '../seo/Seo.jsx'
+import AddToCart from '../cart/AddToCart.jsx'
+import QuantityInput from '../cart/QuantityInput.jsx'
 import { productJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
 
@@ -14,6 +17,7 @@ export default function ProductPage() {
   const res = useApi(`/products/${encodeURIComponent(slug)}`, lang)
   const siteUrl = useSiteUrl()
   const pagePath = `/products/${encodeURIComponent(slug)}`
+  const [qty, setQty] = useState(1)
   const back = (
     <Link to={{ pathname: path('/'), hash: '#products' }} className="back-link">
       {t('products.backToCollection')}
@@ -59,8 +63,11 @@ export default function ProductPage() {
           <h1 className="page-title">{p.name}</h1>
           <p className="product-detail-desc">{p.description}</p>
           <Price amount={p.priceExclVat} className="product-price large" />
-          {/* G-02/G-03: giỏ hàng và checkout chưa có (Q-13) */}
-          <p className="notice">{t('products.orderingSoon')}</p>
+          {/* FR-CART-001 */}
+          <div className="product-buy">
+            <QuantityInput value={qty} onChange={setQty} />
+            <AddToCart slug={p.slug} quantity={qty} className="btn btn-primary" />
+          </div>
         </div>
       </div>
     </section>

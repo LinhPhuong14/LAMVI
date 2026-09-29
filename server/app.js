@@ -6,6 +6,8 @@ import { seoRouter } from './routes/seo.js'
 import { itRouter } from './routes/it.js'
 import { mayRouter } from './routes/may.js'
 import { createMayService } from './may/service.js'
+import { cartRouter } from './routes/cart.js'
+import { createCartService } from './cart/service.js'
 import { createMetrics } from './monitoring/metrics.js'
 import { createMaintenance } from './monitoring/maintenance.js'
 import { classifyPath } from '../src/seo/routes.js'
@@ -39,6 +41,7 @@ export function createApp({
   if (auth && storage) api.use(adminRouter({ repo, auth, storage, config }))
   if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may }))
   if (auth) api.use(mayRouter({ repo, auth, may }))
+  if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))
   // Storage bộ nhớ (dev/test) tự phục vụ tải lên/đọc file
   if (storage?.router) api.use(storage.router)
   api.use(() => {

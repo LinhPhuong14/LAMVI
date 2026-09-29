@@ -134,6 +134,22 @@ export function createSupabaseRepo(client) {
       return { key: r.key, value: r.value, updatedBy: r.updated_by, updatedAt: r.updated_at }
     },
 
+    // --- Giỏ hàng (FR-CART-001)
+    async getCart(userId) {
+      const rows = unwrap(await client.from('cart_items').select('*').eq('user_id', userId).order('added_at'))
+      return rows.map((r) => ({ productId: r.product_id, quantity: r.quantity, addedAt: r.added_at }))
+    },
+    async setCartItem(userId, productId, quantity) {
+      unwrap(
+        await client
+          .from('cart_items')
+          .upsert({ user_id: userId, product_id: productId, quantity }, { onConflict: 'user_id,product_id' }),
+      )
+    },
+    async removeCartItem(userId, productId) {
+      unwrap(await client.from('cart_items').delete().eq('user_id', userId).eq('product_id', productId))
+    },
+
     // --- Mây (FR-AI-*)
     async incrementMayCounter(key, ttlSeconds) {
       return unwrap(await client.rpc('may_increment', { p_key: key, p_ttl_seconds: ttlSeconds }))
