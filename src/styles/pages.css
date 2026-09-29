@@ -1203,7 +1203,8 @@
 }
 
 .dash-main > * {
-  max-width: 960px;
+  max-width: 1320px;
+  margin-inline: auto;
 }
 
 .dash-top {
@@ -1491,7 +1492,7 @@
 }
 
 .dash-panel > .dash-card:only-child {
-  max-width: 640px;
+  width: 100%;
 }
 
 .dash-panel > .dash-wide:only-child {
@@ -1502,7 +1503,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .dash-facts {
@@ -1762,7 +1763,8 @@
 
 /* Hồ sơ: form + phong thư minh hoạ */
 .dash-panel > .dash-profile:only-child {
-  max-width: 860px;
+  max-width: 980px;
+  margin-inline: auto;
 }
 
 .dash-profile-body {

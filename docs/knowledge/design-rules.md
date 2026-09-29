@@ -197,6 +197,7 @@ Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệ
 | Thanh bên (264px, dính, cao 100dvh) | Nền `--diep-light`, một nét mảnh bên phải; logo ấn triện nhỏ + đổi ngôn ngữ (gạch chân son ở ngôn ngữ đang chọn) |
 | Avatar | Vòng son mảnh (chỉ nét, không tô), chữ cái đầu của tên gọi màu son, Fraunces 500 |
 | Tab dọc | Biểu tượng nét 1,2px + nhãn ngắn, không xuống dòng; tab chọn: nền `--dash-soft`, chữ đậm, vạch son 2px ở mép thanh bên; huy hiệu là chữ nhỏ sepia, không viên |
+| Bề rộng vùng nội dung | Tối đa 1320px, **căn giữa** trong phần còn lại bên phải thanh bên (không dồn trái để lại khoảng trống); tab một thẻ trải hết cột, riêng Hồ sơ tối đa 980px căn giữa; hai thẻ hàng dưới Tổng quan cao bằng nhau |
 | Đầu vùng nội dung | Eyebrow sepia chữ thưa, h1 Fraunces 500, câu phụ theo tab, đèn nhỏ 64px; một nét mảnh bên dưới |
 | Số liệu | Dải không khung, ngăn bằng nét dọc (≤640px: nét ngang, số trái chữ phải); số Fraunces **300** 3rem `oldstyle-nums` |
 | Thẻ | Nền `--diep-light`, nét `--dash-line`, bo 4px, không bóng; tiêu đề mục có **vạch son 3px** phía trước |

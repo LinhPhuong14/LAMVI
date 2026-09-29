@@ -4,6 +4,14 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 (phiên 10) — Cân lại bố cục dashboard màn rộng (nhánh `fix/dashboard-layout`, từ `master`)
+
+**Nhận xét người dùng**: cụm nội dung bên phải bị dồn trái, để lại khoảng trống lớn → layout lệch.
+
+**Đã làm**: vùng nội dung dashboard rộng tối đa 1320px và căn giữa; tab một thẻ (Trò chuyện) trải hết cột, Hồ sơ 980px căn giữa; hai thẻ hàng dưới Tổng quan cao bằng nhau. Kiểm ở 1440/1812/2560px. Design rules §12.
+
+---
+
 ## 2026-09-29 (phiên 9) — Dashboard kính mờ, nền mây khói, giao diện tối (nhánh `feat/account-glass`, từ `master`)
 
 **Quyết định từ người dùng**: D-65 — glassmorphism, nền dải mây khói/đèn trời bay lên khi vào trang, dark mode.
