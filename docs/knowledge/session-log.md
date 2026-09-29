@@ -8,23 +8,41 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 **Quyết định từ người dùng**
 
-- D-63: dashboard tài khoản dạng tab dọc, không dùng header (và footer) của trang giới thiệu, tối ưu trải nghiệm.
+- D-64: dashboard tài khoản dạng tab dọc, không dùng header (và footer) của trang giới thiệu, tối ưu trải nghiệm.
 
 **Đã làm**
 
 1. `LocaleLayout`: trang dạng ứng dụng (`/account`) không render `SiteHeader`/`SiteFooter` (class `.page-app`).
-2. `AccountPage` thành dashboard: thanh bên chàm (logo, đổi ngôn ngữ, người dùng, tab dọc WAI-ARIA, về cửa hàng, giỏ, đăng xuất); tab lưu ở `?tab=`; Tổng quan (số liệu giỏ/đơn/Mây, chat gần đây, tóm tắt hồ sơ), Đơn hàng (chỗ chờ, không đơn giả — G-37), Trò chuyện với Mây (chia theo ngày giờ VN), Hồ sơ. Màn ≤960px: tab ngang dính đầu trang. Design rules §12.
+2. `AccountPage` thành dashboard: thanh bên chàm (logo, đổi ngôn ngữ, người dùng, tab dọc WAI-ARIA, về cửa hàng, giỏ, đăng xuất); tab lưu ở `?tab=`; Tổng quan (số liệu giỏ/đơn/Mây, chat gần đây, tóm tắt hồ sơ), Đơn hàng (chỗ chờ, không đơn giả — G-40), Trò chuyện với Mây (chia theo ngày giờ VN), Hồ sơ. Màn ≤960px: tab ngang dính đầu trang. Design rules §12.
 3. Test cũ đổi sang `/account?tab=profile` / `?tab=may`.
 4. Subagent kiểm thử độc lập (T-11): `src/pages/AccountDashboard.extra.test.jsx` (58 test) phát hiện: giờ tiếng Anh hiện 12h; tin không có thời điểm xen giữa làm lặp tiêu đề ngày; hai nút "Xem" trùng tên truy cập → đã sửa.
-5. Spec v0.11: D-63, quy tắc dashboard §5.2 (`[ASSUMPTION]`), G-37.
+5. Spec v0.12: D-64, quy tắc dashboard §5.2 (`[ASSUMPTION]`), G-40 (khi gộp `master` đánh số lại từ D-63/G-37 vì trùng mã với nhánh `feat/signup-no-confirm`).
 
-6. Theo nhận xét "chưa đủ thanh thoát, thanh lịch, tham khảo dashboard Trung Quốc": làm lại giao diện (T-34) — thanh bên giấy sáng, nét 1px thống nhất, bỏ bóng/khung trang trí, dải số liệu ngăn nét dọc với số chữ mảnh, vạch son trước tiêu đề mục, nhãn tab ngắn ("Trò chuyện"). Không đổi chức năng; bộ test độc lập vẫn xanh (cập nhật tên tab). Spec v0.12.
+6. Theo nhận xét "chưa đủ thanh thoát, thanh lịch, tham khảo dashboard Trung Quốc": làm lại giao diện (T-34) — thanh bên giấy sáng, nét 1px thống nhất, bỏ bóng/khung trang trí, dải số liệu ngăn nét dọc với số chữ mảnh, vạch son trước tiêu đề mục, nhãn tab ngắn ("Trò chuyện"). Không đổi chức năng; bộ test độc lập vẫn xanh (cập nhật tên tab). Spec v0.12 (T-34).
 
 7. Theo yêu cầu "bo các góc và thêm nhiều hình ảnh minh hoạ": bo góc toàn dashboard; minh hoạ SVG tự vẽ `DashArt.jsx` (cảnh dây đèn đầu trang, hình trong ô số liệu, 4 công đoạn ở tab đơn hàng, phong thư ở hồ sơ, thẻ gợi ý có đèn ở thanh bên). Test tab đơn hàng giới hạn vào danh sách tính năng + kiểm 4 công đoạn. Spec v0.13. Gộp vào `master`.
 
 **Còn lại**: tab đơn hàng làm thật cùng FR-ACC-002/003 (chờ checkout, Q-08).
 
 ---
+
+## 2026-09-29 — Bỏ xác nhận email + nối Supabase với lamvi.vercel.app (nhánh `feat/signup-no-confirm`)
+
+**Quyết định từ người dùng**: bỏ xác nhận email sau khi đăng ký (Supabase gói Free) → D-63.
+
+**Đã làm**: `server/adapters/supabase/auth.js` đăng ký bằng `auth.admin.createUser({ email_confirm: true })` — không gửi thư, không phụ thuộc cài đặt "Confirm email"; frontend đã sẵn nhánh tự đăng nhập khi `needsConfirmation: false`. Spec v0.11 (D-63, G-37, cập nhật G-16). `deploy-vercel.md`: quy trình nối Supabase với `lamvi.vercel.app`. Kiểm tra `lamvi.vercel.app/api/products` trả 200 bằng dữ liệu bộ nhớ → Vercel chưa có biến `SUPABASE_*`.
+
+**Còn lại / cần người dùng**: chạy migration + seed trên Supabase; đặt biến ở Vercel và redeploy; đặt Site URL/Redirect URLs trong Supabase Auth (không có quyền Vercel/Supabase Management từ phiên này). G-20 (rate limit đăng ký) nên làm sớm vì G-37.
+
+## 2026-09-29 — Supabase MCP + agent skills (nhánh `feat/supabase-mcp`)
+
+**Mục tiêu**: cho Claude Code truy cập Supabase project `nufguvziuoekyqnuqphf` qua MCP.
+
+**Đã làm**: `claude mcp add --scope project --transport http supabase …` → `.mcp.json` (features: docs, account, database, debugging, development, functions, branching). `npx skills add supabase/agent-skills --agent claude-code` → `.claude/skills/{supabase,supabase-postgres-best-practices}` + `skills-lock.json` (chỉ Markdown, không có script).
+
+Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE_KEY`/`SUPABASE_SECRET_KEY` (tên cũ anon/service_role vẫn nhận; test `server/config.keys.extra.test.js`); cập nhật `.env.example`, `deploy-vercel.md`, T-04 trong `decisions.md`. Chạy thử local với `.env` (không commit): server báo "Dùng Supabase", Auth trả 200, nhưng REST trả `PGRST205` — **chưa chạy migration** trên project.
+
+**Còn lại / cần người dùng**: xác thực OAuth trên máy cá nhân: `claude /mcp` → chọn `supabase` → Authenticate. Chạy `supabase/migrations/*.sql` theo thứ tự rồi `supabase/seed.sql`. Đặt biến `SUPABASE_*` mới ở Vercel. Không commit token.
 
 ## 2026-09-29 — Đổi tên thương hiệu sang LAMVI (nhánh `feat/brand-lamvi`)
 

@@ -9,10 +9,6 @@ import { createMemoryRepo } from '../memory/repo.js'
 function fakePublic(overrides = {}) {
   return {
     auth: {
-      signUp: vi.fn(async () => ({
-        data: { user: { id: 'u1', email: 'an@example.com', identities: [{ id: 'i1' }] }, session: { access_token: 'a' } },
-        error: null,
-      })),
       signInWithPassword: vi.fn(async () => ({
         data: {
           user: { id: 'u1', email: 'an@example.com', role: 'authenticated', app_metadata: {} },
@@ -37,6 +33,7 @@ function fakeAdmin(overrides = {}) {
       admin: {
         signOut: vi.fn(async () => ({ data: null, error: null })),
         updateUserById: vi.fn(async () => ({ data: {}, error: null })),
+        createUser: vi.fn(async () => ({ data: { user: { id: 'u1', email: 'an@example.com' } }, error: null })),
         ...overrides.admin,
       },
       ...overrides.auth,
@@ -84,32 +81,27 @@ describe('createSupabaseAuth — map lỗi Supabase → AuthError', () => {
   })
 
   it.each(['user_already_exists', 'email_exists'])('%s → EMAIL_TAKEN', async (code) => {
-    const { auth } = make({ pub: { signUp: async () => ({ data: {}, error: err(code, 422) }) } })
+    const { auth } = make({ admin: { admin: { createUser: async () => ({ data: { user: null }, error: err(code, 422) }) } } })
     await rejectsCode(auth.signUp({ email: 'a@b.cd', password: 'matkhau123' }), 'EMAIL_TAKEN')
   })
 
-  it('bật xác nhận email, email đã tồn tại → user có identities rỗng → EMAIL_TAKEN', async () => {
-    const { auth } = make({
-      pub: { signUp: async () => ({ data: { user: { id: 'fake', email: 'a@b.cd', identities: [] }, session: null }, error: null }) },
-    })
-    await rejectsCode(auth.signUp({ email: 'a@b.cd', password: 'matkhau123' }), 'EMAIL_TAKEN')
-  })
-
-  it('signUp thành công: có session → không cần xác nhận; không session → needsConfirmation', async () => {
+  it('signUp (D-63): tạo user đã xác nhận qua admin API, không gửi email, không cần xác nhận', async () => {
     const a = make()
-    expect(await a.auth.signUp({ email: 'an@example.com', password: 'matkhau123', redirectTo: 'https://moc.test/en/login' })).toEqual({
+    expect(await a.auth.signUp({ email: 'an@example.com', password: 'matkhau123', redirectTo: 'https://lamvi.test/en/login' })).toEqual({
       user: { id: 'u1', email: 'an@example.com' },
       needsConfirmation: false,
     })
-    expect(a.clients[0].auth.signUp).toHaveBeenCalledWith({
+    expect(a.admin.auth.admin.createUser).toHaveBeenCalledWith({
       email: 'an@example.com',
       password: 'matkhau123',
-      options: { emailRedirectTo: 'https://moc.test/en/login' },
+      email_confirm: true,
     })
-    const b = make({
-      pub: { signUp: async () => ({ data: { user: { id: 'u2', email: 'b@c.de', identities: [{ id: 'x' }] }, session: null }, error: null }) },
-    })
-    expect((await b.auth.signUp({ email: 'b@c.de', password: 'matkhau123' })).needsConfirmation).toBe(true)
+    expect(a.makePublicClient).not.toHaveBeenCalled()
+  })
+
+  it('signUp: mật khẩu yếu theo Supabase → PASSWORD_TOO_SHORT', async () => {
+    const { auth } = make({ admin: { admin: { createUser: async () => ({ data: { user: null }, error: err('weak_password', 422) }) } } })
+    await rejectsCode(auth.signUp({ email: 'a@b.cd', password: 'matkhau123' }), 'PASSWORD_TOO_SHORT')
   })
 
   it.each([
@@ -132,15 +124,13 @@ describe('createSupabaseAuth — map lỗi Supabase → AuthError', () => {
     await rejectsCode(auth.refresh('r0'), 'UNAUTHORIZED')
   })
 
-  it('weak_password → PASSWORD_TOO_SHORT', async () => {
-    const { auth } = make({ pub: { signUp: async () => ({ data: {}, error: err('weak_password', 422) }) } })
-    await rejectsCode(auth.signUp({ email: 'a@b.cd', password: 'matkhau123' }), 'PASSWORD_TOO_SHORT')
-  })
-
-  it('lỗi không nhận diện được → ném nguyên lỗi (không phải AuthError)', async () => {
+  it('lỗi không nhận diện được → Error thường (không phải AuthError, không có status), giữ lỗi gốc ở cause', async () => {
     const original = err('unexpected_failure', 500)
     const { auth } = make({ pub: { signInWithPassword: async () => ({ data: {}, error: original }) } })
-    await expect(auth.signIn({ email: 'a@b.cd', password: 'x' })).rejects.toBe(original)
+    const e = await auth.signIn({ email: 'a@b.cd', password: 'x' }).catch((x) => x)
+    expect(e).not.toBeInstanceOf(AuthError)
+    expect(e.status).toBeUndefined()
+    expect(e.cause).toBe(original)
   })
 })
 
@@ -161,15 +151,16 @@ describe('createSupabaseAuth — phiên & client', () => {
     expect(clients[0].auth.refreshSession).toHaveBeenCalledWith({ refresh_token: 'r1' })
   })
 
-  it('mỗi lần gọi signUp/signIn/refresh/resetPassword dùng một client public mới', async () => {
+  it('mỗi lần gọi signIn/refresh/resetPassword dùng một client public mới (signUp dùng admin, D-63)', async () => {
     const { auth, makePublicClient, clients } = make()
     await auth.signUp({ email: 'an@example.com', password: 'matkhau123' })
+    expect(makePublicClient).not.toHaveBeenCalled()
     await auth.signIn({ email: 'an@example.com', password: 'x' })
     await auth.signIn({ email: 'an@example.com', password: 'x' })
     await auth.refresh('r1')
     await auth.sendPasswordReset('an@example.com', 'https://moc.test/reset-password')
-    expect(makePublicClient).toHaveBeenCalledTimes(5)
-    expect(new Set(clients).size).toBe(5)
+    expect(makePublicClient).toHaveBeenCalledTimes(4)
+    expect(new Set(clients).size).toBe(4)
     clients.forEach((c) => {
       const used = Object.values(c.auth).filter((fn) => fn.mock.calls.length)
       expect(used).toHaveLength(1)
@@ -238,8 +229,8 @@ describe('Route + adapter Supabase: không lộ thông điệp lỗi gốc', () 
     const { auth } = make({
       pub: {
         signInWithPassword: async () => ({ data: {}, error: err('unexpected_failure', 500, secret) }),
-        signUp: async () => ({ data: {}, error: err('unexpected_failure', 500, secret) }),
       },
+      admin: { admin: { createUser: async () => ({ data: { user: null }, error: err('unexpected_failure', 500, secret) }) } },
     })
     const app = createApp({ repo: createMemoryRepo(), auth, config })
     const a = await request(app).post('/api/auth/login').send({ email: 'an@example.com', password: 'matkhau123' })
@@ -292,7 +283,7 @@ describe('Route + adapter Supabase: không lộ thông điệp lỗi gốc', () 
   })
 
   it('weak_password từ Supabase khi đăng ký → 400 VALIDATION_ERROR, fields.password', async () => {
-    const { auth } = make({ pub: { signUp: async () => ({ data: {}, error: err('weak_password', 422, secret) }) } })
+    const { auth } = make({ admin: { admin: { createUser: async () => ({ data: { user: null }, error: err('weak_password', 422, secret) }) } } })
     const app = createApp({ repo: createMemoryRepo(), auth, config })
     const res = await request(app).post('/api/auth/register').send({ email: 'an@example.com', password: 'matkhau123', fullName: 'An' })
     expect(res.status).toBe(400)

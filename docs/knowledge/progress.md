@@ -8,8 +8,8 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 | Catalog | FR-CAT-002 (bán lẻ đèn trong bộ) | ⛔ | `products.kind = 'set'` | — | Q-05, Q-06 |
 | Catalog | FR-CAT-003 (giá chưa VAT) | ✅ | `src/components/Price.jsx` | `src/components/Components.extra.test.jsx` | `[LEGAL]` I-04 |
 | Catalog | FR-CAT-004 (admin sản phẩm) | ✅ | `server/routes/admin.js`, `src/admin/ProductsPage.jsx` | `server/admin*.test.js`, `src/admin/Admin*.test.jsx` | — |
-| Tài khoản | FR-ACC-001 | ✅ | `server/routes/auth.js`, `src/auth/*`, `src/pages/auth/*`, `src/pages/AccountPage.jsx` (dashboard, v0.11) | `server/auth*.test.js`, `src/pages/auth/Auth*.test.jsx`, `src/pages/AccountDashboard.extra.test.jsx` | Cấu hình Supabase (G-16) |
-| Tài khoản | FR-ACC-002 (đơn của tôi) | ⬜ | Chỗ chờ ở dashboard `AccountPage` (G-37) | — | Cần đơn hàng |
+| Tài khoản | FR-ACC-001 (không xác nhận email, D-63) | ✅ | `server/routes/auth.js`, `server/adapters/supabase/auth.js`, `src/auth/*`, `src/pages/auth/*`, `src/pages/AccountPage.jsx` (dashboard, v0.12) | `server/auth*.test.js`, `server/adapters/supabase/auth*.test.js`, `src/pages/auth/Auth*.test.jsx`, `src/pages/AccountDashboard.extra.test.jsx` | Cấu hình Supabase URL (G-16); rate limit (G-20, G-37) |
+| Tài khoản | FR-ACC-002 (đơn của tôi) | ⬜ | Chỗ chờ ở dashboard `AccountPage` (G-40) | — | Cần đơn hàng |
 | Tài khoản | FR-ACC-003 (lời chúc) | ⛔ | — | — | Q-08 |
 | Tài khoản | FR-ACC-004 (lịch sử chat Mây) | ✅ | `src/pages/AccountPage.jsx` | `src/may/May.test.jsx` | Xoá lịch sử chờ `[LEGAL]` I-15 |
 | Giỏ hàng | FR-CART-001 | ✅ | `server/cart/*`, `server/routes/cart.js`, `src/cart/*`, `src/pages/CartPage.jsx` | `server/cart*.test.js`, `src/cart/Cart*.test.jsx` | — |
@@ -29,7 +29,7 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 | Nền tảng | FR-SEO-001 | ✅ | `server/ssr.js`, `server/routes/seo.js`, `src/seo/*`, `src/entry-server.jsx` | `server/seo*.test.js`, `server/ssr*.test.js`, `src/seo/*.test.js*` | Ảnh og:image (G-23); `[LEGAL]` I-04 cho giá JSON-LD |
 | Nền tảng | FR-GA-001 | ⬜ | — | — | `[LEGAL]` Q-32 (cookie) |
 | Giao diện | NFR-A11Y-001 (giảm chuyển động), giao diện dân gian cổ + motion (T-21…T-23) | ✅ | `src/index.css`, `src/styles/App.css`, `src/pages/HomePage.jsx`, `src/components/{Reveal,Motifs,Effects,FolkGallery,FloatingMotifs,Lantern,SiteHeader}.jsx`, `src/data/{folkArt,motifs}.js`, `src/lib/motion.js` | `src/components/{Motion,Effects,Classic,FolkGallery,FloatingMotifs}*.test.jsx`, `server/ssr.{design,effects,classic}.extra.test.js` | NFR-PERF-001 chưa có mục tiêu (dùng tạm `[ASSUMPTION]` §31.4) |
-| Vận hành | Deploy Vercel (T-33) | 🟡 | `api/index.js`, `vercel.json`, `docs/knowledge/deploy-vercel.md` | Kiểm tay local bằng `VERCEL=1` (SSR, API 200) | Chưa deploy thật (G-36) |
+| Vận hành | Deploy Vercel (T-33) | 🟡 | `api/index.js`, `vercel.json`, `docs/knowledge/deploy-vercel.md` | `lamvi.vercel.app` chạy (200) nhưng bằng dữ liệu bộ nhớ | Chưa có bảng trên Supabase + biến `SUPABASE_*` ở Vercel (G-36) |
 | Vận hành | FR-IT-001…004 (dashboard IT) | ✅ | `server/routes/it.js`, `server/monitoring/*`, `src/it/*` | `server/it*.test.js`, `src/it/It*.test.jsx` | Cảnh báo chủ động (G-25) chờ Q-24 |
 
 ## Việc có thể làm tiếp mà không bị chặn

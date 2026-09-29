@@ -66,7 +66,7 @@ export function authRouter({ repo, auth, config }) {
     const result = await call(() =>
       auth.signUp({ email, password: b.password, redirectTo: siteUrl(lang, '/login') }),
     )
-    // Email đã đăng ký nhưng chưa xác nhận: Supabase có thể trả lại user cũ — không ghi đè hồ sơ của chủ email
+    // Phòng hờ adapter trả lại user đã có — không ghi đè hồ sơ của chủ email
     const existing = await repo.getProfile(result.user.id)
     if (!existing) await repo.upsertProfile({
       id: result.user.id,

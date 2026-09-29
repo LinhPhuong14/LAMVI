@@ -16,7 +16,7 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 
 1. **Bắt buộc có Supabase ở Preview/Production.** Thiếu `SUPABASE_*` server rơi về adapter bộ nhớ (T-04) — trên serverless mỗi instance một bản dữ liệu, mất khi instance tắt. Không được deploy kiểu đó.
 2. **Biến môi trường** đặt ở Vercel (Project → Settings → Environment Variables), theo từng môi trường; không commit `.env`, không đưa key vào frontend (T-05). Danh sách: xem [`../../.env.example`](../../.env.example). Riêng Vercel:
-   - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (bắt buộc; service role chỉ ở server).
+   - `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_…`), `SUPABASE_SECRET_KEY` (`sb_secret_…`) (bắt buộc; secret key chỉ ở server). Tên cũ `SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` vẫn nhận nếu không có tên mới.
    - `PUBLIC_SITE_URL` = URL công khai thật (dùng cho link đặt lại mật khẩu, sitemap, hreflang) — Production đặt domain chính; Preview không dùng link đặt lại mật khẩu để kiểm thử thật. Thêm URL này vào Redirect URLs của Supabase (G-16).
    - `TRUST_PROXY=1` (Vercel đứng trước hàm; nếu không, hạn mức Mây theo IP và IP trong log sai).
    - `MAY_HASH_SALT` đặt giá trị bí mật riêng; `OPENAI_*`, `PAYOS_*` khi tích hợp. Không đặt `DEV_ADMIN_*`/`DEV_IT_*` trên Vercel.
@@ -30,6 +30,14 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 5. **Production = `master`.** Không deploy tay từ máy (`vercel --prod`) trừ khi người dùng yêu cầu; không dùng token Vercel trong repo. Thư mục `.vercel/` đã ở `.gitignore`.
 6. **Thay đổi cấu hình deploy** (`vercel.json`, `api/`, biến môi trường bắt buộc mới) → cập nhật file này, `.env.example` và `decisions.md` cùng lúc.
 7. Mỗi lần thêm route/tệp đọc lúc chạy ngoài `dist/**` (ví dụ thư mục dữ liệu, template) → thêm vào `includeFiles`.
+
+## Nối Supabase với `lamvi.vercel.app` (thứ tự bắt buộc)
+
+1. **Tạo bảng trước**: Supabase → SQL Editor, chạy lần lượt `supabase/migrations/*.sql` rồi `supabase/seed.sql`. Đặt biến ở bước 2 khi DB chưa có bảng → mọi API trả 500 (`PGRST205`).
+2. **Vercel → Settings → Environment Variables** (Production): `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `PUBLIC_SITE_URL=https://lamvi.vercel.app`, `TRUST_PROXY=1`, `MAY_HASH_SALT` (chuỗi ngẫu nhiên).
+3. **Redeploy** Production (biến mới chỉ áp dụng cho lần deploy sau).
+4. **Supabase → Authentication → URL Configuration**: Site URL `https://lamvi.vercel.app`; Redirect URLs `https://lamvi.vercel.app/**` (link đặt lại mật khẩu, G-16). Xác nhận email đã bỏ ở tầng app (D-63) — không cần chỉnh "Confirm email".
+5. Kiểm tra: `/api/products` 200; đăng ký tài khoản mới → vào thẳng `/account`; Supabase → Authentication → Users thấy user mới.
 
 ## Kiểm thử cục bộ giống Vercel
 
