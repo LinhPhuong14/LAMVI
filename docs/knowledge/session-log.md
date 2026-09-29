@@ -4,6 +4,14 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 — Bỏ xác nhận email + nối Supabase với lamvi.vercel.app (nhánh `feat/signup-no-confirm`)
+
+**Quyết định từ người dùng**: bỏ xác nhận email sau khi đăng ký (Supabase gói Free) → D-63.
+
+**Đã làm**: `server/adapters/supabase/auth.js` đăng ký bằng `auth.admin.createUser({ email_confirm: true })` — không gửi thư, không phụ thuộc cài đặt "Confirm email"; frontend đã sẵn nhánh tự đăng nhập khi `needsConfirmation: false`. Spec v0.11 (D-63, G-37, cập nhật G-16). `deploy-vercel.md`: quy trình nối Supabase với `lamvi.vercel.app`. Kiểm tra `lamvi.vercel.app/api/products` trả 200 bằng dữ liệu bộ nhớ → Vercel chưa có biến `SUPABASE_*`.
+
+**Còn lại / cần người dùng**: chạy migration + seed trên Supabase; đặt biến ở Vercel và redeploy; đặt Site URL/Redirect URLs trong Supabase Auth (không có quyền Vercel/Supabase Management từ phiên này). G-20 (rate limit đăng ký) nên làm sớm vì G-37.
+
 ## 2026-09-29 — Supabase MCP + agent skills (nhánh `feat/supabase-mcp`)
 
 **Mục tiêu**: cho Claude Code truy cập Supabase project `nufguvziuoekyqnuqphf` qua MCP.

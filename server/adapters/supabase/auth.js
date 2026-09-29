@@ -15,7 +15,11 @@ function mapError(error) {
   if (code === 'refresh_token_not_found' || code === 'refresh_token_already_used' || code === 'session_not_found') {
     return new AuthError('UNAUTHORIZED')
   }
-  return error
+  // Lỗi chưa map (vd not_admin khi sai SUPABASE_SECRET_KEY) là lỗi server: bỏ status 4xx gốc để
+  // errorHandler trả 500 và ghi log, thay vì báo như lỗi của khách
+  const wrapped = new Error(`Supabase Auth: ${code ?? error?.message ?? 'unknown'}`)
+  wrapped.cause = error
+  return wrapped
 }
 
 const toSession = (session, user) => ({
@@ -33,18 +37,12 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
       if (error) throw error
     },
 
-    async signUp({ email, password, redirectTo }) {
-      const { data, error } = await makePublicClient().auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: redirectTo },
-      })
+    // D-63: không xác nhận email — tạo user đã xác nhận bằng admin API, Supabase không gửi email
+    // (không phụ thuộc cài đặt "Confirm email" trên dashboard hay hạn mức SMTP gói Free)
+    async signUp({ email, password }) {
+      const { data, error } = await admin.auth.admin.createUser({ email, password, email_confirm: true })
       if (error) throw mapError(error)
-      // Khi bật xác nhận email, Supabase trả user không có identity nếu email đã tồn tại
-      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-        throw new AuthError('EMAIL_TAKEN')
-      }
-      return { user: { id: data.user.id, email: data.user.email }, needsConfirmation: !data.session }
+      return { user: { id: data.user.id, email: data.user.email }, needsConfirmation: false }
     },
 
     async signIn({ email, password }) {
