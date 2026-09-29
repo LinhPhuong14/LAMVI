@@ -2153,12 +2153,24 @@
 
 .sky-lantern {
   position: absolute;
-  bottom: -40px;
-  border-radius: 40% 40% 30% 30%;
-  background: linear-gradient(#ffe7a6, var(--hoe) 55%, var(--son));
-  box-shadow: 0 0 12px 4px rgba(236, 166, 60, 0.45);
+  bottom: -60px;
   opacity: 0;
   animation: sky-rise linear infinite;
+}
+
+.sky-lantern::before {
+  content: '';
+  position: absolute;
+  inset: -35%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 180, 80, 0.45), transparent);
+}
+
+.sky-lantern img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 @keyframes sky-rise {
@@ -2368,15 +2380,15 @@
   }
 }
 
-/* ---------- Hoạ tiết lơ lửng: mây, đường vân, nét khói (FloatingMotifs) ---------- */
-
+/* ---------- Cảnh nền bằng ảnh thật CC0 (Scene, D-66) ----------
+   Ảnh không khí (sương, mây, trời, khói, đèn trời) — nguồn ở public/images/scene/CREDITS.md.
+   Thay hoạ tiết SVG tự vẽ (T-28). Nằm sau nội dung trong phần có isolation; mờ dần bằng mask để chữ luôn rõ. */
 .has-motifs {
   position: relative;
   isolation: isolate;
 }
 
-/* Nằm sau nội dung trong phần có isolation → không che chữ, không bắt chuột */
-.motif-layer {
+.scene {
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -2384,124 +2396,256 @@
   pointer-events: none;
 }
 
-/* Parallax theo cuộn (trình duyệt hỗ trợ scroll-driven animation) — hoạ tiết trôi chậm hơn nội dung */
-@supports (animation-timeline: view()) {
-  .motif-layer {
-    animation: motif-parallax linear both;
-    animation-timeline: view();
-  }
+/* Phần nền giấy: cả lớp cảnh mờ dần ở bốn mép để không lộ khung chữ nhật */
+.scene:not(.scene-dark) {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-composite: intersect;
 }
 
-@keyframes motif-parallax {
-  from {
-    transform: translateY(40px);
-  }
-  to {
-    transform: translateY(-40px);
-  }
-}
-
-.motif {
+.scene-photo {
   position: absolute;
-  display: block;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+  filter: sepia(0.4) saturate(0.85);
 }
 
-.motif svg {
-  display: block;
-  overflow: visible;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.scene-dark .scene-photo {
+  filter: none;
+  opacity: 0.4;
 }
 
-.motif-paper {
-  color: var(--sepia);
+/* Trang chủ — mỗi phần một ảnh, mờ dần về phía chữ */
+.scene-hero .scene-photo {
+  opacity: 0.4;
+  object-position: center 62%;
+  -webkit-mask-image: linear-gradient(to right, transparent 18%, #000 62%);
+  mask-image: linear-gradient(to right, transparent 18%, #000 62%);
+}
+
+.scene-story .scene-photo {
+  opacity: 0.11;
+  filter: grayscale(1) brightness(1.25);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 70%, transparent);
+}
+
+.scene-products .scene-photo,
+.scene-process .scene-photo {
+  opacity: 0.3;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 55%);
+  mask-image: linear-gradient(to bottom, #000, transparent 55%);
+}
+
+.scene-lookbook .scene-photo {
+  opacity: 0.4;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+}
+
+.scene-qr .scene-photo {
+  opacity: 0.32;
+  -webkit-mask-image: linear-gradient(to left, #000, transparent 65%);
+  mask-image: linear-gradient(to left, #000, transparent 65%);
+}
+
+.scene-testimonials .scene-photo {
+  opacity: 0.22;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+}
+
+.scene-faq .scene-photo {
+  opacity: 0.32;
+  -webkit-mask-image: linear-gradient(to top, #000 5%, transparent 65%);
+  mask-image: linear-gradient(to top, #000 5%, transparent 65%);
+}
+
+/* Khói thật: trôi rất chậm */
+.scene-smoke {
+  position: absolute;
+  height: auto;
   opacity: 0.28;
+  will-change: transform;
+  animation: scene-smoke 42s ease-in-out infinite alternate;
 }
 
-.motif-dark {
-  color: var(--hoe-light);
-  opacity: 0.2;
+.scene-smoke-incense-smoke {
+  opacity: 0.4;
 }
 
-/* Mây, đường vân: trôi chậm qua lại */
-.motif-drift {
-  animation: motif-drift 24s ease-in-out infinite alternate;
+.scene-smoke-smoke-ember {
+  opacity: 0.3;
 }
 
-@keyframes motif-drift {
+@keyframes scene-smoke {
   from {
-    transform: translate(-18px, 6px);
+    transform: translate3d(-4%, 10px, 0);
   }
   to {
-    transform: translate(18px, -8px);
+    transform: translate3d(5%, -18px, 0) scale(1.05);
   }
 }
 
-/* Nét khói: bay lên, sợi khói vẽ dần từ dưới lên rồi tan */
-.motif-smoke {
-  opacity: 0.45;
-  animation: smoke-rise 12s ease-in-out infinite;
+/* Đèn trời thật bay lên một lượt khi vào trang */
+.scene-rise {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
-.motif-smoke path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: smoke-draw 12s ease-in-out infinite;
+.scene-rise-lantern {
+  position: absolute;
+  bottom: -60px;
+  opacity: 0;
+  animation: scene-rise 8s cubic-bezier(0.33, 0.1, 0.4, 1) 1 forwards;
 }
 
-@keyframes smoke-rise {
+.scene-rise-lantern::before {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 180, 80, 0.5), transparent);
+}
+
+.scene-rise-lantern img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes scene-rise {
   0% {
-    transform: translateY(24px);
-  }
-  100% {
-    transform: translateY(-36px);
-  }
-}
-
-@keyframes smoke-draw {
-  0% {
-    stroke-dashoffset: 1;
+    transform: translate(0, 0) rotate(-6deg);
     opacity: 0;
   }
-  18% {
-    opacity: 1;
+  12% {
+    opacity: 0.95;
   }
-  55% {
-    stroke-dashoffset: 0;
+  50% {
+    transform: translate(16px, -55vh) rotate(5deg);
   }
-  85% {
-    opacity: 0.4;
+  80% {
+    opacity: 0.7;
   }
   100% {
-    stroke-dashoffset: -1;
+    transform: translate(-12px, -110vh) rotate(-4deg);
     opacity: 0;
   }
 }
 
-/* Giảm chuyển động: hoạ tiết đứng yên, khói hiện tĩnh */
 @media (prefers-reduced-motion: reduce) {
-  .motif-layer,
-  .motif-drift,
-  .motif-smoke,
-  .motif-smoke path {
-    animation: none !important;
+  .scene-smoke {
+    animation: none;
   }
-  .motif-smoke path {
-    stroke-dashoffset: 0;
-    opacity: 0.6;
+  .scene-rise {
+    display: none;
   }
 }
 
-/* Màn hẹp: bớt hoạ tiết, thu nhỏ để không rối */
+/* Màn hẹp: ảnh đầu trang mờ dần xuống dưới (chữ nằm trên), bớt khói */
 @media (max-width: 640px) {
-  .motif {
-    transform-origin: top left;
-    scale: 0.6;
+  .scene-hero .scene-photo {
+    opacity: 0.3;
+    -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 70%);
+    mask-image: linear-gradient(to top, #000 10%, transparent 70%);
   }
-  .motif-layer .motif:nth-child(n + 3) {
+  .scene-smoke {
+    opacity: 0.18;
+  }
+  .scene-rise-lantern:nth-child(even) {
     display: none;
+  }
+}
+
+/* ---------- Cảnh nền ở các trang công khai khác (D-66) ---------- */
+.page-scene-main {
+  min-height: 70vh;
+}
+
+.page-scene {
+  bottom: auto;
+  height: min(78vh, 760px);
+}
+
+.page-scene .scene-photo {
+  opacity: 0.3;
+  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent);
+  mask-image: linear-gradient(to bottom, #000 30%, transparent);
+}
+
+/* Đăng nhập/đăng ký: ảnh biển mây rõ hơn, form trong thẻ kính mờ */
+.page-scene-auth .page-scene .scene-photo {
+  opacity: 0.55;
+  filter: sepia(0.2) saturate(0.95);
+}
+
+.page-scene-auth .page-section.narrow {
+  margin: 48px auto 64px;
+  padding: 40px 40px 44px;
+  min-height: 0;
+  background: rgba(251, 247, 239, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 24px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset, 0 30px 60px -34px rgba(96, 62, 28, 0.45);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+}
+
+.page-scene-auth .page-section.narrow .page-title {
+  margin-top: 0;
+}
+
+.page-scene-auth .field input,
+.page-scene-auth .field select {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .page-scene-auth .page-section.narrow {
+    background: rgba(251, 247, 239, 0.92);
+  }
+}
+
+/* 404: khung trời đêm */
+.notfound-night {
+  max-width: 880px;
+  min-height: 0;
+  margin: 48px auto 72px;
+  padding: 96px 40px;
+  border-radius: 24px;
+  overflow: hidden;
+  text-align: center;
+  color: var(--diep);
+  background: var(--cham-deep);
+  box-shadow: 0 30px 60px -34px rgba(20, 28, 40, 0.7);
+}
+
+.notfound-night .scene-photo {
+  opacity: 0.85;
+}
+
+.notfound-night .page-title {
+  color: var(--diep-light);
+  margin: 0 0 28px;
+}
+
+@media (max-width: 640px) {
+  .page-scene-auth .page-section.narrow {
+    margin: 24px 16px 48px;
+    width: auto;
+    padding: 28px 20px 32px;
+    border-radius: 20px;
+  }
+  .notfound-night {
+    margin: 24px 16px 48px;
+    padding: 72px 20px;
+    border-radius: 20px;
   }
 }

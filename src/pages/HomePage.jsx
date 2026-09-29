@@ -15,7 +15,7 @@ import Marquee from '../components/Marquee'
 import Particles from '../components/Particles'
 import Faq from '../components/Faq'
 import FolkGallery from '../components/FolkGallery'
-import FloatingMotifs from '../components/FloatingMotifs'
+import Scene from '../components/Scene'
 import Price from '../components/Price'
 import { CountUp, Reveal } from '../components/Reveal'
 import { PointerGlow, TiltCard } from '../components/Effects'
@@ -136,7 +136,7 @@ function InkWords({ text }) {
   ))
 }
 
-// Đèn trời bay lên trên nền đêm của lookbook — chỉ trang trí, chạy bằng CSS
+// Đèn trời (ảnh thật CC0 tách nền — public/images/scene/CREDITS.md) bay lên trên nền đêm của lookbook — chỉ trang trí, chạy bằng CSS
 const SKY_LANTERNS = [
   { left: '6%', delay: 0, duration: 22, size: 12 },
   { left: '17%', delay: 7, duration: 26, size: 9 },
@@ -157,12 +157,13 @@ function SkyLanterns() {
           className="sky-lantern"
           style={{
             left: l.left,
-            width: l.size,
-            height: l.size * 1.3,
+            width: l.size * 2.6,
             animationDuration: `${l.duration}s`,
             animationDelay: `-${l.delay}s`,
           }}
-        />
+        >
+          <img src="/images/scene/sky-lantern-glow.webp" alt="" width="176" height="180" loading="lazy" decoding="async" />
+        </span>
       ))}
     </div>
   )
@@ -235,7 +236,7 @@ function Hero() {
 
   return (
     <section className="hero aged has-motifs">
-      <FloatingMotifs preset="hero" />
+      <Scene name="hero" />
       <PointerGlow />
       <Particles />
       <Cloud className="hero-cloud cloud-a" />
@@ -383,7 +384,7 @@ export default function HomePage() {
       <Marquee />
 
       <Reveal as="section" id="story" className="story has-motifs" variants={group}>
-        <FloatingMotifs preset="story" />
+        <Scene name="story" />
         <SectionHead eyebrow={t('story.eyebrow')} title={t('story.title')} />
         <m.p className="story-text drop-cap" variants={rise}>
           {t('story.text')}
@@ -404,7 +405,7 @@ export default function HomePage() {
       </Reveal>
 
       <Reveal as="section" id="artisan" className="artisan has-motifs" variants={group}>
-        <FloatingMotifs preset="artisan" />
+        <Scene name="artisan" />
         <m.div className="artisan-portrait" variants={stamp} custom={1}>
           {/* Ảnh cũ ngả sepia: chỉ là minh hoạ, không phải ảnh thật của nghệ nhân */}
           <OldPhoto>
@@ -457,7 +458,7 @@ export default function HomePage() {
       </Reveal>
 
       <section id="products" className="products has-motifs">
-        <FloatingMotifs preset="products" />
+        <Scene name="products" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('products.eyebrow')} title={t('products.title')}>
             <m.div className={`intent-toggle is-${intent}`} role="group" variants={rise}>
@@ -494,7 +495,7 @@ export default function HomePage() {
       </section>
 
       <section id="lookbook" className="lookbook has-motifs">
-        <FloatingMotifs preset="lookbook" />
+        <Scene name="lookbook" />
         <SkyLanterns />
         <div className="lookbook-inner">
           <LampHead eyebrow={t('lookbook.eyebrow')} title={t('lookbook.title')} />
@@ -517,7 +518,7 @@ export default function HomePage() {
       </section>
 
       <section id="process" className="process has-motifs">
-        <FloatingMotifs preset="process" />
+        <Scene name="process" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('process.eyebrow')} title={t('process.title')} />
         </Reveal>
@@ -525,7 +526,7 @@ export default function HomePage() {
       </section>
 
       <section id="qr" className="qr-experience has-motifs">
-        <FloatingMotifs preset="qr" />
+        <Scene name="qr" />
         <Reveal className="qr-copy" variants={group}>
           <Eyebrow>{t('qr.eyebrow')}</Eyebrow>
           <m.h2 variants={ink}>{t('qr.title')}</m.h2>
@@ -561,7 +562,7 @@ export default function HomePage() {
       </section>
 
       <section className="testimonials has-motifs">
-        <FloatingMotifs preset="testimonials" />
+        <Scene name="testimonials" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('testimonials.eyebrow')} title={t('testimonials.title')} />
         </Reveal>
@@ -585,7 +586,7 @@ export default function HomePage() {
       </section>
 
       <section id="faq" className="faq has-motifs">
-        <FloatingMotifs preset="faq" />
+        <Scene name="faq" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('faq.eyebrow')} title={t('faq.title')} />
         </Reveal>

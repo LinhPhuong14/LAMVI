@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// Kiểm thử độc lập (T-11) cho phòng tranh ảnh tư liệu (T-27) và hoạ tiết lơ lửng (T-28).
+// Kiểm thử độc lập (T-11) cho phòng tranh ảnh tư liệu (T-27) và cảnh nền ảnh thật (D-66, thay hoạ tiết T-28).
 import { readFileSync, readdirSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -7,9 +7,8 @@ import { render } from '@testing-library/react'
 import { LazyMotion, domAnimation } from 'framer-motion'
 import { LocaleContext } from '../i18n/index.js'
 import FolkGallery from './FolkGallery.jsx'
-import FloatingMotifs from './FloatingMotifs.jsx'
+import Scene from './Scene.jsx'
 import { FOLK_ART, folkSrc } from '../data/folkArt.js'
-import { SECTION_MOTIFS } from '../data/motifs.js'
 import viMsg from '../i18n/messages/vi.js'
 import enMsg from '../i18n/messages/en.js'
 import zhMsg from '../i18n/messages/zh.js'
@@ -137,41 +136,53 @@ describe('T-27 — i18n gallery', () => {
   })
 })
 
-describe('T-28 — hoạ tiết lơ lửng', () => {
-  it('mọi preset: lớp aria-hidden, không phần tử focus được, mọi .motif nằm trong .motif-layer', () => {
-    for (const preset of Object.keys(SECTION_MOTIFS)) {
-      const { container, unmount } = render(<FloatingMotifs preset={preset} />)
-      const layer = container.querySelector('.motif-layer')
-      expect(layer, preset).toHaveAttribute('aria-hidden', 'true')
-      expect(layer.querySelectorAll('a, button, input, select, textarea, [tabindex], [href]')).toHaveLength(0)
-      for (const el of container.querySelectorAll('.motif')) expect(el.closest('.motif-layer')).toBe(layer)
-      expect(layer.querySelectorAll('.motif').length).toBeLessThanOrEqual(3)
+describe('D-66 — cảnh nền ảnh thật (thay hoạ tiết SVG)', () => {
+  const NAMES = ['hero', 'story', 'artisan', 'products', 'lookbook', 'process', 'qr', 'testimonials', 'faq', 'auth', 'product', 'cart', 'batch', 'notFound']
+  const credits = read('public/images/scene/CREDITS.md')
+
+  it('mọi cảnh: lớp aria-hidden, không phần tử focus được, không SVG; ảnh có alt rỗng, có trong public và có dòng nguồn CC0', () => {
+    for (const name of NAMES) {
+      const { container, unmount } = render(<Scene name={name} />)
+      const layer = container.querySelector('.scene')
+      expect(layer, name).toHaveAttribute('aria-hidden', 'true')
+      expect(layer.querySelectorAll('a, button, input, select, textarea, [tabindex], [href], svg')).toHaveLength(0)
+      for (const img of layer.querySelectorAll('img')) {
+        expect(img.getAttribute('alt')).toBe('')
+        const files = [img.getAttribute('src'), ...(img.getAttribute('srcset') ?? '').split(',').map((x) => x.trim().split(' ')[0])].filter(Boolean)
+        for (const f of files) {
+          expect(f).toMatch(/^\/images\/scene\/[\w-]+\.webp$/)
+          expect(existsSync(join(process.cwd(), 'public', f)), f).toBe(true)
+          const row = credits.split('\n').find((l) => l.includes('`' + f.split('/').pop() + '`'))
+          expect(row, f).toMatch(/CC0 1\.0/)
+        }
+      }
       unmount()
     }
   })
 
-  it('HomePage: 9 phần gắn FloatingMotifs, mỗi phần có class has-motifs và preset tồn tại', () => {
+  it('cảnh không tồn tại → không render gì', () => {
+    const { container } = render(<Scene name="khong-co" />)
+    expect(container.innerHTML).toBe('')
+  })
+
+  it('HomePage: 9 phần gắn Scene khác nhau, mỗi phần có class has-motifs; không còn FloatingMotifs', () => {
     const src = read('src/pages/HomePage.jsx')
-    const uses = [...src.matchAll(/<FloatingMotifs preset="([\w-]+)" \/>/g)]
+    expect(src).not.toMatch(/FloatingMotifs/)
+    const uses = [...src.matchAll(/<Scene name="([\w-]+)" \/>/g)]
     expect(uses).toHaveLength(9)
     for (const u of uses) {
-      expect(SECTION_MOTIFS[u[1]], u[1]).toBeTruthy()
-      // Thẻ mở ngay phía trước (section / Reveal as="section") phải có has-motifs
       const prevLine = src.slice(0, u.index).trimEnd().split('\n').at(-1)
       expect(prevLine, u[1]).toMatch(/<(section|Reveal as="section")[^>]*className="[^"]*\bhas-motifs\b/)
     }
     expect(new Set(uses.map((u) => u[1])).size).toBe(9)
   })
 
-  it('CSS: màn ≤640px chỉ giữ 2 hoạ tiết mỗi phần và thu nhỏ', () => {
-    const narrow = [...appCss.matchAll(/@media \(max-width: 640px\) \{([\s\S]*?)\n\}/g)].map((m) => m[1]).join('\n')
-    expect(narrow).toMatch(/\.motif-layer \.motif:nth-child\(n \+ 3\)\s*\{\s*display: none;/)
-    expect(narrow).toMatch(/\.motif\s*\{[^}]*scale: 0\.6/)
-  })
-
-  it('CSS: .has-motifs tạo stacking context để lớp z-index:-1 nằm trên nền phần, dưới nội dung', () => {
+  it('CSS: .has-motifs tạo stacking context; .scene nằm dưới nội dung; giảm chuyển động tắt khói và đèn bay', () => {
     expect(appCss).toMatch(/\.has-motifs \{[^}]*position: relative[^}]*isolation: isolate/)
-    expect(appCss).toMatch(/\.motif-layer \{[^}]*z-index: -1/)
+    expect(appCss).toMatch(/\.scene \{[^}]*z-index: -1/)
+    const reduce = [...appCss.matchAll(/@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n\}/g)].map((m) => m[1]).join('\n')
+    expect(reduce).toMatch(/\.scene-smoke \{\s*animation: none/)
+    expect(reduce).toMatch(/\.scene-rise \{\s*display: none/)
   })
 })
 
@@ -186,7 +197,7 @@ describe('Quy ước mã nguồn', () => {
     expect(hits).toEqual([])
   })
 
-  it.each(['src/components/FolkGallery.jsx', 'src/components/FloatingMotifs.jsx'])('%s: không có chuỗi tiếng Việt viết cứng (ngoài comment)', (f) => {
+  it.each(['src/components/FolkGallery.jsx', 'src/components/Scene.jsx'])('%s: không có chuỗi tiếng Việt viết cứng (ngoài comment)', (f) => {
     const code = read(f)
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
@@ -195,8 +206,8 @@ describe('Quy ước mã nguồn', () => {
     expect(code.match(/[À-ỹĐđ]+/g)).toBeNull()
   })
 
-  it('data/folkArt.js, data/motifs.js không chứa chuỗi hiển thị tiếng Việt (tên/alt nằm ở i18n)', () => {
-    for (const f of ['src/data/folkArt.js', 'src/data/motifs.js']) {
+  it('data/folkArt.js không chứa chuỗi hiển thị tiếng Việt (tên/alt nằm ở i18n)', () => {
+    for (const f of ['src/data/folkArt.js']) {
       const code = read(f).replace(/\/\/.*$/gm, '')
       expect(code.match(/['"`][^'"`]*[À-ỹ][^'"`]*['"`]/g), f).toBeNull()
     }

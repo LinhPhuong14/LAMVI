@@ -39,17 +39,18 @@ describe.each(['vi', 'en', 'zh'])('SSR %s — phòng tranh và hoạ tiết', (l
     // Ghi chú: tranh trong Reveal có opacity:0 trong HTML SSR tới khi JS chạy — khoảng trống đã biết G-34 (decisions T-22), không kiểm ở đây
   })
 
-  it('9 lớp .motif-layer aria-hidden, không phần tử focus được, mỗi lớp nằm trong phần has-motifs', async () => {
+  it('9 lớp cảnh .scene (ảnh thật) aria-hidden, không phần tử focus được, mỗi lớp nằm trong phần has-motifs', async () => {
     const d = await doc(PREFIX[lang])
-    const layers = [...d.querySelectorAll('.motif-layer')]
+    const layers = [...d.querySelectorAll('.scene')]
     expect(layers).toHaveLength(9)
     for (const layer of layers) {
       expect(layer.getAttribute('aria-hidden')).toBe('true')
-      expect(layer.querySelectorAll('a, button, input, select, textarea, [tabindex], [href]')).toHaveLength(0)
+      expect(layer.querySelectorAll('a, button, input, select, textarea, [tabindex], [href], svg')).toHaveLength(0)
       expect(layer.parentElement.classList.contains('has-motifs')).toBe(true)
       expect(layer.parentElement.tagName).toBe('SECTION')
+      for (const img of layer.querySelectorAll('img')) expect(img.getAttribute('alt')).toBe('')
     }
-    for (const el of d.querySelectorAll('.motif')) expect(el.closest('.motif-layer')).not.toBeNull()
-    for (const s of d.querySelectorAll('.has-motifs')) expect(s.querySelector(':scope > .motif-layer')).not.toBeNull()
+    expect(d.querySelectorAll('.motif-layer')).toHaveLength(0)
+    for (const s of d.querySelectorAll('.has-motifs')) expect(s.querySelector(':scope > .scene')).not.toBeNull()
   })
 })

@@ -32,11 +32,14 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-22 | 2026-09-28 | Motion: `LazyMotion features={domAnimation} strict` ở `LocaleLayout` → chỉ dùng `m.*`; xuất hiện/biến mất theo `useViewState` (IntersectionObserver, `below`/`in`/`above`); animation lặp (đung đưa, marquee, hạt lửa) bằng CSS | Hiệu lực |
 | T-26 | 2026-09-29 | Cân lại bảng màu theo bột màu tự nhiên của tranh Đông Hồ: nền giấy điệp nhạt hơn, son là điểm nhấn duy nhất, hoè ngả đồng, lá/hồng chỉ trong minh hoạ; tỉ lệ 70/20/7/3; mọi cặp chữ đạt WCAG AA | Hiệu lực |
 | T-27 | 2026-09-29 | Ảnh tư liệu thật (tranh Đông Hồ, tranh giấy dó thế kỷ 18) từ Wikimedia Commons, chỉ public domain/CC0; WebP 480/960 ở `public/images/folk/`; nguồn ghi ở `CREDITS.md` + `src/data/folkArt.js`; hiển thị như tranh treo có chú thích, không như ảnh sản phẩm | Hiệu lực — chờ `[LEGAL]` §31.4 |
-| T-28 | 2026-09-29 | Hoạ tiết lơ lửng (mây, đường vân, nét khói) tự vẽ thành bộ preset SVG (`src/data/motifs.js`) thay vì tải ngoài — Commons không có SVG hoạ tiết Việt dùng được (chỉ có biểu trưng hành chính); CSS transform/opacity + scroll-driven parallax khi hỗ trợ | Hiệu lực |
+| T-28 | 2026-09-29 | Hoạ tiết lơ lửng (mây, đường vân, nét khói) tự vẽ thành bộ preset SVG (`src/data/motifs.js`) thay vì tải ngoài — Commons không có SVG hoạ tiết Việt dùng được (chỉ có biểu trưng hành chính); CSS transform/opacity + scroll-driven parallax khi hỗ trợ | Thay bởi T-36 (ảnh thật) |
 | T-25 | 2026-09-29 | Bỏ phong cách "viền đen dày + bóng đổ cứng" (neo-brutalism). Dùng nét mảnh sepia, khung viền đôi, góc hoa văn triện, bóng mềm, mảng màu phẳng có hoa văn chìm — tham khảo nguyên tắc trình bày của các trang bảo tàng/di sản Trung Quốc, dịch sang hoạ tiết Việt | Hiệu lực |
 | T-24 | 2026-09-28 | Hiệu ứng lấy ý tưởng từ Aceternity UI nhưng tự viết lại (không chép code — trang của họ ghi "All Rights Reserved"; không dùng Tailwind). Hiệu ứng theo con trỏ chỉ bật khi `useFinePointer()` và không giảm chuyển động | Hiệu lực |
 | T-23 | 2026-09-28 | Giao diện "Đông Hồ cổ": token màu ở `src/index.css` (giữ bí danh tên cũ cho `pages.css`); texture giấy/mực là SVG nội tuyến, vẽ trên nền tĩnh — không dùng lớp phủ cố định có `mix-blend-mode`/`backdrop-filter` | Hiệu lực |
 | T-33 | 2026-09-29 | Deploy Vercel: một Function `api/index.js` re-export Express `app` (web SSR + API), `vercel.json` rewrite `/(.*)→/api`, `includeFiles: dist/**`, `outputDirectory: public`; bắt buộc Supabase; upload video qua signed URL. Chi tiết: `deploy-vercel.md` | Hiệu lực |
+| T-34 | 2026-09-29 | Dashboard tài khoản thanh thoát theo nguyên tắc dashboard Trung Quốc (khoảng trắng, nét 1px, một điểm nhấn son) | Hiệu lực |
+| T-35 | 2026-09-29 | Dashboard kính mờ, nền ảnh thật, giao diện tối trong phạm vi `.dash` | Hiệu lực |
+| T-36 | 2026-09-29 | Cảnh nền ảnh thật CC0 (`Scene`) cho trang chủ và các trang công khai, thay hoạ tiết SVG T-28 | Hiệu lực |
 
 ---
 
@@ -166,4 +169,10 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
   - Giao diện tối chỉ trong phạm vi `.dash` bằng `data-theme` + đổi token CSS; lựa chọn lưu `localStorage` (`moc.dashTheme`), mặc định `prefers-color-scheme`. Không làm dark mode toàn site ở bước này vì trang công khai có nhiều màu minh hoạ cố định.
 - **Hệ quả**: bí danh màu cũ phải khai báo lại trong phạm vi tối (biến tính ở `:root` không tự đổi). Minh hoạ SVG nét mực cần nền sáng phía sau ở chế độ tối.
 - **Bổ sung (v0.15)**: người dùng yêu cầu "tìm asset trên mạng/Canva chứ không tự vẽ SVG ở background". Nền và cảnh đầu trang chuyển sang ảnh thật CC0 tìm qua Openverse (rawpixel, StockSnap). Xử lý ảnh bằng Pillow: đèn trời tách nền trời trắng theo khoảng cách màu; khói nền đen → alpha theo độ sáng (giữ màu), làm mờ mép; nén WebP (tổng ~250 KB, lớn nhất 148 KB). Không dùng Canva: giấy phép Canva cấm dùng phần tử riêng lẻ ngoài thiết kế Canva, và phiên làm việc không có kết nối Canva. Biểu tượng nhỏ trong thẻ (hộp quà, phong thư, 4 công đoạn) vẫn là SVG vì là biểu tượng, không phải nền.
+
+### T-36 — Cảnh nền ảnh thật cho trang công khai (thay hoạ tiết T-28)
+- **Bối cảnh**: người dùng muốn nền là ảnh thật tìm trên mạng (không tự vẽ SVG), thêm vào trang chủ và các trang khác, cùng chủ đề với dashboard nhưng ảnh khác (D-66).
+- **Quyết định**: component `Scene` + bộ ảnh `public/images/scene` (Openverse, CC0: rawpixel, StockSnap, WordPress Photo Directory). Gỡ `FloatingMotifs`/`motifs.js` (T-28 hết hiệu lực). Trang khác: `LocaleLayout` chọn cảnh theo đường dẫn (`pageScene`), 404 tự đặt khung đêm. Đèn trời ở lookbook đổi từ khối CSS sang ảnh đèn thật tách nền.
+- **Hiệu năng**: WebP 640/1280 + `srcset`, lazy; hero `eager` với `fetchpriority="low"` để không tranh LCP; ảnh trang chủ < 600 KB. Mask + opacity tĩnh; chỉ khói/đèn chuyển động bằng `transform`.
+- **Dashboard mobile**: thanh tab cố định ở đáy — phần tử `fixed` nên không dùng `backdrop-filter` (§9).
 

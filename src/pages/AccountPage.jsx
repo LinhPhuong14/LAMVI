@@ -544,7 +544,7 @@ export default function AccountPage() {
             >
               <TabIcon name={k} />
               <span className="dash-tab-label">{t(`account.tabs.${k}`)}</span>
-              {badges[k] != null && <span className="dash-tab-badge">{badges[k]}</span>}
+              {badges[k] != null && <span className={`dash-tab-badge${typeof badges[k] === 'string' ? ' is-text' : ''}`}>{badges[k]}</span>}
             </button>
           ))}
         </div>

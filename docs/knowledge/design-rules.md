@@ -102,30 +102,36 @@ Font tự host (T-21), preload 6 file. Không thêm font thứ ba.
 
 Hoạ tiết là trang trí → `aria-hidden="true"`.
 
-### 6.1 Hoạ tiết lơ lửng (`FloatingMotifs`, T-28)
+### 6.1 Cảnh nền ảnh thật (`Scene`, D-66 — thay hoạ tiết lơ lửng T-28)
 
-Bộ preset tự vẽ ở `src/data/motifs.js`, bố cục theo phần ở `SECTION_MOTIFS`; mỗi phần gắn `<FloatingMotifs preset="…" />` và class `has-motifs`.
+Người dùng không muốn nền tự vẽ bằng SVG → mỗi phần trang chủ và đầu các trang công khai dùng **ảnh thật CC0** (`public/images/scene/`, nguồn ở `CREDITS.md`). `FloatingMotifs` và `src/data/motifs.js` đã gỡ.
 
-| Preset | Hình | Hợp với |
-|---|---|---|
-| `may-cuon` | Mây cuộn: đuôi dài uốn vào xoáy lớn | Góc phần giấy, nền chàm |
-| `may-doi` | Mây đôi: hai xoáy đối xứng, đỉnh như ý | Góc phần có khung (sản phẩm, lời khách) |
-| `may-dai` | Dải mây dài | Nền rộng (hero, lookbook đêm) |
-| `van-nuoc` | Vân nước: cung sóng lồng nhau | Công đoạn, FAQ |
-| `van-go` | Đường vân gỗ / sợi dó | Nền sau khối chữ ít |
-| `khoi-huong` | Khói hương: hai sợi mảnh bay lên | Gần nguồn sáng (đèn), sau ảnh cũ |
-| `khoi-cuon` | Khói kết thúc bằng xoáy | Như trên |
+| Nơi | Ảnh |
+|---|---|
+| Hero | Ruộng bậc thang trong sương + khói mực + 7 đèn trời bay lên một lượt khi vào |
+| Di sản (chàm) | Hòn đá trong sương (xám, 11%) + khói hương trắng ngà |
+| Nghệ nhân | Khói mực ở góc |
+| Sản phẩm | Trời mây vàng (dải trên, mờ dần) |
+| Lookbook (đêm) | Trời đêm đầy đèn trời + khói lửa; đèn trời bay lên là ảnh đèn thật tách nền |
+| Công đoạn | Thung lũng sương có nắng |
+| QR | Mây hoàng hôn (từ phải, mờ về trái) |
+| Lời khách | Hồ sương bình minh |
+| Hỏi đáp | Biển mây (dưới) |
+| Đăng nhập/đăng ký/quên, đặt lại mật khẩu | Biển mây rõ hơn + 4 đèn bay; form trong thẻ kính mờ |
+| Chi tiết sản phẩm · Giỏ hàng · Trang lô | Dải ảnh đầu trang mờ dần: trời mây vàng · hồ sương làng · thung lũng sương |
+| 404 | Khung trời sao chàm đêm bo 24px + 5 đèn bay |
 
 Quy tắc:
-- Tối đa 3 hoạ tiết mỗi phần; trên màn ≤640px chỉ giữ 2 và thu nhỏ 60%.
-- Nét 1,3px không co giãn; `--sepia` 28% trên giấy, `--hoe-light` 20% trên nền tối — không đậm hơn.
-- Không đặt đè lên chữ, số liệu, nút; ưu tiên mép và góc phần.
-- Khói chỉ đặt gần nguồn sáng hoặc ảnh cũ (gợi hương khói), không rải khắp trang.
-- Chuyển động: mây/vân trôi 22–38s qua lại; khói 11–14s vẽ dần rồi tan; parallax theo cuộn chỉ khi trình duyệt hỗ trợ `animation-timeline: view()`. Giảm chuyển động → đứng yên, khói hiện tĩnh.
+- Ảnh là nền không khí: lọc sepia nhẹ trên nền giấy, độ đậm 20–40%, **mờ dần bằng mask** về phía chữ và ở bốn mép phần (không lộ khung chữ nhật). Không đặt đè làm giảm tương phản chữ.
+- Hai cỡ WebP (640/1280) qua `srcset`, `loading="lazy"` (trừ hero: `eager` + `fetchpriority="low"` — chữ hero vẫn là LCP). Tổng ảnh trang chủ < 600 KB.
+- Khói: ảnh khói nền đen/trắng tách thành trong suốt; trôi 42s qua lại bằng `transform`. Đèn trời bay lên **một lượt**.
+- Giảm chuyển động: khói đứng yên, không đèn bay. Màn ≤640px: bớt khói và đèn.
 
 ## 7. Hình ảnh
 
 ### 7.1 Nguồn và bản quyền
+
+- Hai bộ ảnh nền: `public/images/dash` (dashboard) và `public/images/scene` (trang công khai) — không dùng lại ảnh giữa hai bộ.
 
 - Ảnh nền trang trí (trời, sương, khói — không phải ảnh tư liệu, không phải ảnh sản phẩm) cũng theo quy tắc này; nguồn tìm: Openverse (lọc `license=cc0,pdm`), Wikimedia Commons. Unsplash/Pexels/Pixabay chặn truy cập tự động từ máy chủ; Canva không dùng (giấy phép chỉ cho dùng trong thiết kế Canva).
 
@@ -197,6 +203,7 @@ Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệ
 | Liên kết phụ | Chữ son đậm, gạch chân mọc ra khi hover/focus (không gạch sẵn) |
 | Chat Mây | Nhãn ngày chữ thưa giữa hai nét mảnh; tin khách nền `--diep-deep`, tin Mây nền trong viền mảnh; bo 12px, góc phía người nói 2px |
 | Màn ≤960px | Thanh bên tách (`display: contents`): đầu trang → tab ngang gạch chân son, dính trên cùng (ẩn biểu tượng) → nội dung → chân |
+| Màn ≤640px (v0.16) | Kiểu ứng dụng: tab thành **thanh điều hướng cố định ở đáy** (4 mục, biểu tượng + nhãn, nền đục, không làm mờ; huy hiệu chữ thành chấm, huy hiệu số thành viên son nhỏ); 3 ô số liệu một hàng, chạm cả ô; nút Mây dời lên trên thanh |
 | Motion | Đổi tab: `dash-in` 0.6s, dịch 6px; ô số liệu lệch 80ms; tắt khi giảm chuyển động |
 | Bo góc (v0.13) | Thẻ và dải số liệu 20px (≤640px: 18px), khung đầu trang 24px, tab 12px, liên kết thanh bên 10px, ô nhập 12px, nút và nhãn dạng viên (999px), bong bóng chat 16px (góc phía người nói 4px) |
 | Kính mờ (v0.14, T-35) | `.dash-top/.dash-stats/.dash-card/.dash-promo`: nền giấy trong 58%, `backdrop-filter: blur(18px) saturate(150%)`, viền trắng 70% 1px, bóng mềm; thanh bên và thanh tab mobile (phần tử dính) chỉ nền trong, **không** làm mờ (§9). Có `@supports` dự phòng tăng độ đục |

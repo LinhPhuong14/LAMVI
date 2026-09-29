@@ -2153,7 +2153,7 @@
 }
 
 .dash-chat-date {
-  background: rgba(251, 247, 239, 0.88);
+  background: rgba(251, 247, 239, 0.97);
 }
 
 /* Trình duyệt không hỗ trợ làm mờ: tăng độ đục để chữ vẫn rõ */
@@ -2453,7 +2453,7 @@
 }
 
 .dash[data-theme='dark'] .dash-chat-date {
-  background: rgba(27, 37, 51, 0.92);
+  background: rgba(27, 37, 51, 0.98);
 }
 
 .dash[data-theme='dark'] .dash-orders-art {
@@ -2497,5 +2497,206 @@
   }
   .dash[data-theme='dark'] .dash-tabs {
     background: rgba(20, 28, 39, 0.94);
+  }
+}
+
+/* ---------- Dashboard: mobile kiểu ứng dụng (≤640px) ----------
+   Tab thành thanh điều hướng cố định ở đáy (biểu tượng + nhãn, đủ 4 mục, không cuộn ngang).
+   Phần tử cố định → nền đục, không backdrop-filter (design-rules §9). Nút Mây dời lên trên thanh. */
+@media (max-width: 640px) {
+  .dash-brand {
+    padding: 14px 16px 4px;
+  }
+  .dash-user {
+    padding: 6px 16px 12px;
+  }
+  .dash-user-text strong {
+    font-size: 1.02rem;
+  }
+  .dash-tabs,
+  .dash[data-theme='dark'] .dash-tabs {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 45;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    overflow: visible;
+    border-top: 1px solid var(--dash-line);
+    border-bottom: 0;
+    box-shadow: 0 -12px 28px -20px rgba(60, 40, 20, 0.45);
+  }
+  .dash-tabs {
+    background: rgba(251, 247, 239, 0.97);
+  }
+  .dash[data-theme='dark'] .dash-tabs {
+    background: rgba(20, 28, 39, 0.97);
+  }
+  .dash-tab {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-height: 54px;
+    padding: 6px 2px;
+    border-radius: 14px;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+  .dash-tab-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+  }
+  .dash-tab-label {
+    flex: none;
+    width: 100%;
+  }
+  .dash-tab[aria-selected='true'] {
+    background: var(--dash-soft);
+    color: var(--son-deep);
+  }
+  .dash-tab[aria-selected='true'] .dash-tab-icon {
+    color: var(--son-deep);
+  }
+  .dash-tab[aria-selected='true']::before {
+    left: 30%;
+    right: 30%;
+    top: 0;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+    border-radius: 2px;
+  }
+  /* Huy hiệu thành chấm số nhỏ góc biểu tượng */
+  .dash-tab-badge {
+    position: absolute;
+    top: 4px;
+    left: calc(50% + 6px);
+    min-width: 0;
+    padding: 0 5px;
+    border-radius: 999px;
+    font-size: 0.6rem;
+    line-height: 1.5;
+    color: var(--diep-light);
+    background: var(--son);
+    opacity: 1;
+  }
+  /* Nhãn chữ ("Sắp có") thành chấm nhỏ; chữ vẫn đọc được bằng trình đọc màn hình */
+  .dash-tab-badge.is-text {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    overflow: hidden;
+    font-size: 0;
+    top: 8px;
+    left: calc(50% + 10px);
+  }
+  .dash-main {
+    padding: 18px 16px 24px;
+  }
+  .dash-side-foot {
+    padding: 8px 12px calc(96px + env(safe-area-inset-bottom));
+  }
+  .page-app .may-fab {
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+  }
+  .page-app .may-panel {
+    bottom: calc(146px + env(safe-area-inset-bottom));
+  }
+
+  /* Đầu trang gọn */
+  .dash-top .page-title {
+    font-size: 1.7rem;
+  }
+  .dash-top-sub {
+    font-size: 0.88rem;
+  }
+  .dash-scene {
+    height: 112px;
+  }
+
+  /* Ba ô số liệu một hàng, chạm cả ô */
+  .dash-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-radius: 18px;
+  }
+  .dash-stat,
+  .dash-stat + .dash-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+    padding: 14px 6px 12px;
+    border-top: 0;
+  }
+  .dash-stat + .dash-stat {
+    border-left: 1px solid var(--dash-line);
+  }
+  .dash-stat-art {
+    position: static;
+    width: 40px;
+    height: 40px;
+    transform: none;
+    order: -1;
+    margin-bottom: 4px;
+  }
+  .dash-stat-art svg,
+  .dash-stat-art .lantern-svg {
+    width: 30px;
+    height: auto;
+  }
+  .dash-stat-value {
+    font-size: 1.9rem;
+    line-height: 1.1;
+  }
+  .dash-stat-word {
+    font-size: 0.92rem;
+    line-height: 1.9rem;
+  }
+  .dash-stat-label {
+    order: 2;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+  }
+  .dash-stat-sub {
+    display: none;
+  }
+  /* Liên kết phủ cả ô; chữ vẫn là tên truy cập cho trình đọc màn hình */
+  .dash-stat-link {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    font-size: 0;
+    color: transparent;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .dash-stat-link:focus-visible {
+    outline: 2px solid var(--son);
+    outline-offset: -3px;
+  }
+
+  .dash-card,
+  .dash-letter {
+    padding: 20px 16px 22px;
+  }
+  .dash-card-head {
+    margin-bottom: 16px;
+  }
+  .dash-card .may-msg {
+    max-width: 88%;
+  }
+  .dash-chat {
+    max-height: 58vh;
   }
 }
