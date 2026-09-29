@@ -25,8 +25,8 @@ describe('Tách VAT ngược từ giá đã gồm thuế (D-68, D-69 / Q-09)', (
   it('phần chưa VAT + VAT luôn bằng đúng tổng (không lệch đồng nào)', () => {
     for (const gross of [1, 999, 890_000, 1_050_000, 1_680_000, 2_580_000, 3_333_333]) {
       const vat = vatFromGross(gross, 0.1)
-      expect(gross - vat + vat).toBe(gross)
       expect(vat).toBeLessThan(gross)
+      expect(Number.isInteger(vat)).toBe(true)
     }
   })
 })

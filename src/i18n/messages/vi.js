@@ -8,6 +8,7 @@ export default {
       'Đèn giấy dó thủ công làm quà tặng, kèm lời chúc gắn mã QR và video hành trình làm đèn.',
   },
   nav: {
+    home: 'Trang chủ',
     story: 'Câu chuyện',
     artisan: 'Nghệ nhân',
     products: 'Sản phẩm',

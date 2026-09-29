@@ -1,7 +1,18 @@
+import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
 import Seo from '../seo/Seo.jsx'
+import { track } from '../analytics/index.js'
+
+// FR-GA-001 §23.3: open_qr_batch. Mã lô là mã chung của mẻ đèn, không phải token bí mật (D-43)
+// nên được gửi kèm; token QR lời chúc thì không (NFR-PRV-002, xem sanitizePath).
+function TrackOpenBatch({ code }) {
+  useEffect(() => {
+    track('open_qr_batch', { batch_code: code })
+  }, [code])
+  return null
+}
 
 // FR-QR-006, US-005: trang QR khắc trên đèn — public, video của lô (D-01, D-10, D-43), noindex (D-44)
 export default function BatchPage() {
@@ -42,6 +53,7 @@ export default function BatchPage() {
 
   return (
     <section className="page-section batch">
+      <TrackOpenBatch code={b.code} />
       {/* D-44: trang lô noindex */}
       <Seo title={b.title ?? t('batch.eyebrow')} description={t('batch.note')} noindex />
       <span className="eyebrow">{t('batch.eyebrow')}</span>

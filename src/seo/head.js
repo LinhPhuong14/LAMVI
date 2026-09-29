@@ -3,6 +3,11 @@ import { HTML_LANG, LOCALES, localePath } from '../i18n/core.js'
 
 const OG_LOCALE = { vi: 'vi_VN', en: 'en_US', zh: 'zh_CN' }
 
+// D-62: tên thương hiệu. G-23: ảnh chia sẻ mặc định (1200×630) khi trang không có ảnh riêng.
+export const SITE_NAME = 'LAMVI'
+export const DEFAULT_OG_IMAGE = '/images/og/default.png'
+export const OG_IMAGE_SIZE = { width: 1200, height: 630 }
+
 // Chống thoát khỏi <script> khi nhúng JSON vào HTML
 export function safeJson(value) {
   return JSON.stringify(value).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029')
@@ -22,7 +27,17 @@ const esc = (s) =>
  * @param {string} [p.type]  og:type
  * @param {object} [p.jsonLd]
  */
-export function buildHeadTags({ lang, siteUrl, path, title, description, noindex = false, type = 'website', jsonLd }) {
+export function buildHeadTags({
+  lang,
+  siteUrl,
+  path,
+  title,
+  description,
+  noindex = false,
+  type = 'website',
+  jsonLd,
+  image,
+}) {
   const tags = []
   if (title) tags.push({ tag: 'title', text: title })
   if (description) tags.push({ tag: 'meta', attrs: { name: 'description', content: description } })
@@ -41,8 +56,32 @@ export function buildHeadTags({ lang, siteUrl, path, title, description, noindex
   if (description) tags.push({ tag: 'meta', attrs: { property: 'og:description', content: description } })
   tags.push({ tag: 'meta', attrs: { property: 'og:type', content: type } })
   tags.push({ tag: 'meta', attrs: { property: 'og:locale', content: OG_LOCALE[lang] } })
-  if (jsonLd) tags.push({ tag: 'script', attrs: { type: 'application/ld+json' }, text: safeJson(jsonLd) })
+  tags.push({ tag: 'meta', attrs: { property: 'og:site_name', content: SITE_NAME } })
+  // G-23: ảnh chia sẻ — tuyệt đối hoá để Facebook/Zalo đọc được
+  const ogImage = absoluteUrl(siteUrl, image ?? DEFAULT_OG_IMAGE)
+  if (ogImage) {
+    tags.push({ tag: 'meta', attrs: { property: 'og:image', content: ogImage } })
+    tags.push({ tag: 'meta', attrs: { property: 'og:image:width', content: String(OG_IMAGE_SIZE.width) } })
+    tags.push({ tag: 'meta', attrs: { property: 'og:image:height', content: String(OG_IMAGE_SIZE.height) } })
+    tags.push({ tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } })
+    tags.push({ tag: 'meta', attrs: { name: 'twitter:image', content: ogImage } })
+  }
+  if (title) tags.push({ tag: 'meta', attrs: { name: 'twitter:title', content: title } })
+  if (description) tags.push({ tag: 'meta', attrs: { name: 'twitter:description', content: description } })
+  if (jsonLd) {
+    for (const block of [jsonLd].flat()) {
+      if (block) tags.push({ tag: 'script', attrs: { type: 'application/ld+json' }, text: safeJson(block) })
+    }
+  }
   return tags
+}
+
+/** Đường dẫn tương đối → URL tuyệt đối; URL tuyệt đối giữ nguyên. */
+export function absoluteUrl(siteUrl, url) {
+  if (!url) return null
+  if (/^https?:\/\//i.test(url)) return url
+  if (!siteUrl) return null
+  return `${siteUrl}${url.startsWith('/') ? '' : '/'}${url}`
 }
 
 // SSR: thẻ → chuỗi HTML (đánh dấu data-seo để client thay thế)
@@ -97,5 +136,47 @@ export function productJsonLd(p, url) {
         valueAddedTaxIncluded: true,
       },
     },
+  }
+}
+
+// §23.2 — dữ liệu có cấu trúc cấp trang chủ. Giúp Google hiểu thương hiệu và ô tìm kiếm trang web.
+export function organizationJsonLd(siteUrl) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${siteUrl}/#organization`,
+    name: SITE_NAME,
+    url: siteUrl,
+    logo: absoluteUrl(siteUrl, DEFAULT_OG_IMAGE),
+  }
+}
+
+export function webSiteJsonLd(siteUrl, { lang, name, description }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${siteUrl}/#website`,
+    url: `${siteUrl}${localePath(lang, '/')}`,
+    name: name ?? SITE_NAME,
+    description: description ?? undefined,
+    inLanguage: HTML_LANG[lang],
+    publisher: { '@id': `${siteUrl}/#organization` },
+  }
+}
+
+/**
+ * Đường dẫn phân cấp cho trang con (Google hiển thị thay cho URL trong kết quả tìm kiếm).
+ * @param {Array<{name: string, path: string}>} crumbs path là đường dẫn chưa có tiền tố ngôn ngữ
+ */
+export function breadcrumbJsonLd(siteUrl, lang, crumbs) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: `${siteUrl}${localePath(lang, c.path)}`,
+    })),
   }
 }

@@ -1,3 +1,5 @@
+import { isValidMeasurementId } from '../src/analytics/ga.js'
+
 export function loadConfig(env = process.env) {
   const supabase = {
     url: env.SUPABASE_URL,
@@ -13,6 +15,9 @@ export function loadConfig(env = process.env) {
     maxVideoMb: Number(env.MAX_VIDEO_MB) || 500,
     // Số proxy phía trước (vd 1 khi sau load balancer); không đặt → không tin X-Forwarded-For
     trustProxy: env.TRUST_PROXY === undefined ? undefined : Number(env.TRUST_PROXY) || env.TRUST_PROXY,
+    // FR-GA-001, D-72: Google Analytics 4. Không đặt → không nhúng GA (dev/test, Preview).
+    // Giá trị hỏng bị bỏ qua vì được nhúng vào <script> nội tuyến (xem isValidMeasurementId).
+    gaMeasurementId: isValidMeasurementId(env.GA_MEASUREMENT_ID) ? env.GA_MEASUREMENT_ID : null,
     // AI Mây (D-17, D-55…D-58). Khoá chỉ ở server.
     openai: {
       apiKey: env.OPENAI_API_KEY || null,

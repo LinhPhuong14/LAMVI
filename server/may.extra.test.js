@@ -161,9 +161,11 @@ describe('Prompt injection & chống bịa (BR-AI-001/003/005, R-07, R-12)', () 
     expect(faq.faq).toHaveLength(faqEntries.filter((f) => f.isPublished !== false).length)
   })
 
-  it('url sản phẩm theo ngôn ngữ, slug được mã hoá', async () => {
+  it('url sản phẩm theo ngôn ngữ, slug được mã hoá; ghi chú giá là ĐÃ gồm VAT (D-68, BR-PRC-003)', async () => {
     const out = await runTool('get_product', { slug: 'den-vong' }, { repo, lang: 'en' })
-    expect(out.product).toMatchObject({ url: '/en/products/den-vong', priceNote: 'excl. VAT', currency: 'VND' })
+    expect(out.product).toMatchObject({ url: '/en/products/den-vong', currency: 'VND' })
+    expect(out.product.priceNote).not.toMatch(/excl/i)
+    expect(out.product.priceNote).toMatch(/incl/i)
   })
 })
 

@@ -17,6 +17,9 @@ export const DEFAULT_PRICING = Object.freeze({
 
 export const PRICING_SETTING_KEY = 'pricing'
 
+// D-71 — ba loại coupon được phép. Dùng chung với kiểm tra dữ liệu ở admin.
+export const COUPON_TYPES = Object.freeze(['percent', 'amount', 'free_shipping'])
+
 const isFiniteNum = (v) => typeof v === 'number' && Number.isFinite(v)
 
 /** Chuẩn hoá cấu hình tính giá đọc từ app_settings; giá trị hỏng → mặc định. */
@@ -48,7 +51,11 @@ export function vatFromGross(grossTotal, vatRate) {
  * @returns {number} số tiền giảm (0 với free_shipping — loại này giảm ở phí ship)
  */
 export function couponDiscount(coupon, lines) {
-  if (!coupon || coupon.type === 'free_shipping') return 0
+  // Chỉ 3 loại ở D-71. Loại lạ (dữ liệu DB hỏng, coupon cũ) → KHÔNG giảm, không rơi vào
+  // nhánh "giảm số tiền" theo mặc định.
+  if (!coupon || !COUPON_TYPES.includes(coupon.type) || coupon.type === 'free_shipping') return 0
+  // Giá trị hỏng/thiếu → không giảm; nếu không NaN sẽ lan sang total, vatAmount của cả đơn
+  if (!isFiniteNum(coupon.value)) return 0
   // C-3: coupon có thể giới hạn vào một số sản phẩm; rỗng/null = toàn đơn
   const scoped = coupon.productIds?.length
     ? lines.filter((l) => coupon.productIds.includes(l.productId))

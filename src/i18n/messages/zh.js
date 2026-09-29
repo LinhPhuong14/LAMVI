@@ -6,6 +6,7 @@ export default {
     description: '手工纸灯礼物，附带二维码祝福和制灯过程视频。',
   },
   nav: {
+    home: '首页',
     story: '故事',
     artisan: '匠人',
     products: '产品',

@@ -196,10 +196,12 @@ describe('SSR — head', () => {
     expect(seoTags).not.toContain('#')
   })
 
-  it('JSON-LD sản phẩm: đúng 1 khối, giá đã gồm VAT, valueAddedTaxIncluded=true (D-68), url = canonical', async () => {
+  it('JSON-LD sản phẩm: Product + BreadcrumbList, giá đã gồm VAT, valueAddedTaxIncluded=true (D-68), url = canonical', async () => {
     const r = await page('/zh/products/den-sum-vay')
     const blocks = [...r.html.matchAll(/<script type="application\/ld\+json" data-seo>(.*?)<\/script>/gs)]
-    expect(blocks).toHaveLength(1)
+    // §23.2: mỗi khối JSON-LD là một <script> riêng (Product, rồi BreadcrumbList)
+    expect(blocks).toHaveLength(2)
+    expect(JSON.parse(blocks[1][1])['@type']).toBe('BreadcrumbList')
     const ld = JSON.parse(blocks[0][1])
     expect(ld['@type']).toBe('Product')
     expect(ld.offers.price).toBe(1680000)
@@ -264,9 +266,11 @@ describe('SSR — bảo mật / nội dung DB độc', () => {
       expect(r.html).not.toContain('<!--app-html-->')
       expect(r.html).not.toContain('<!--app-data-->')
       expect(r.html).not.toContain('<!--app-head-->')
-      // Số thẻ <script đúng như mong đợi: data + module (+ ld+json với sản phẩm)
+      // Số thẻ <script đúng như mong đợi: data + module, cộng 2 khối ld+json ở trang được index
+      // (trang chủ: Organization + WebSite; trang sản phẩm: Product + BreadcrumbList).
+      // Trang lô noindex (D-44) → không có ld+json.
       const scripts = count(r.html, /<script[\s>]/g)
-      expect(scripts).toBe(url.includes('/products/') ? 3 : 2)
+      expect(scripts).toBe(r.noindex ? 2 : 4)
       // U+2028/2029 thô không nằm trong script
       const m = r.html.match(/<script>window\.__INITIAL_DATA__=(.*?)<\/script>/s)
       expect(m[1]).not.toMatch(/[\u2028\u2029<]/)
@@ -280,13 +284,13 @@ describe('SSR — bảo mật / nội dung DB độc', () => {
     const r = await page('/products/den-nguyet', evilData())
     const dom = new JSDOM(r.html)
     const doc = dom.window.document
-    expect(doc.querySelectorAll('script').length).toBe(3)
+    expect(doc.querySelectorAll('script').length).toBe(4)
     expect(doc.title.startsWith('A</script><script>alert(1)</script>')).toBe(true)
     const ld = JSON.parse(doc.querySelector('script[type="application/ld+json"]').textContent)
     expect(ld.name).toBe(EVIL)
     const desc = doc.querySelector('meta[name="description"]').getAttribute('content')
     expect(desc).toBe(EVIL)
-    const code = doc.querySelectorAll('script')[1].textContent
+    const code = [...doc.querySelectorAll('script')].find((el) => el.textContent.startsWith('window.__INITIAL_DATA__=')).textContent
     const json = JSON.parse(code.replace(/^window\.__INITIAL_DATA__=/, ''))
     expect(json['/products/den-nguyet|vi'].data.item.name).toBe(EVIL)
   })

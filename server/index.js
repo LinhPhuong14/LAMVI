@@ -67,7 +67,7 @@ for (const sig of ['SIGTERM', 'SIGINT']) {
   })
 }
 
-export const app = createApp({ repo, auth, storage, web, config, metrics, maintenance, may })
+export const app = createApp({ repo, auth, storage, web, config, metrics, maintenance, may, dev })
 
 // T-33: trên Vercel, `api/index.js` dùng `app` làm hàm serverless — không tự listen
 if (!process.env.VERCEL) {

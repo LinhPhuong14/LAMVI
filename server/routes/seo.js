@@ -28,6 +28,8 @@ export function seoRouter({ repo, config }) {
         ].join('\n')
       }),
     )
+    // CDN giữ 1 giờ, phục vụ bản cũ trong lúc làm mới (Vercel edge) — sitemap không đổi liên tục
+    res.set('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400')
     res.type('application/xml').send(
       `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join('\n')}\n</urlset>\n`,
     )
@@ -36,6 +38,7 @@ export function seoRouter({ repo, config }) {
   r.get('/robots.txt', (req, res) => {
     // Trang riêng tư dùng noindex (không Disallow để bot đọc được noindex); chỉ chặn API và admin
     // /admin$ + /admin/ để không chặn nhầm đường dẫn khác bắt đầu bằng "/admin"
+    res.set('Cache-Control', 'public, max-age=3600, s-maxage=86400')
     res.type('text/plain').send(`User-agent: *\nDisallow: /api/\nDisallow: /admin$\nDisallow: /admin/\n\nSitemap: ${site()}/sitemap.xml\n`)
   })
 

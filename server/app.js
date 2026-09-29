@@ -12,6 +12,7 @@ import { createMetrics } from './monitoring/metrics.js'
 import { createMaintenance } from './monitoring/maintenance.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { errorHandler, notFound } from './errors.js'
+import { securityHeaders } from './middleware/security.js'
 
 // T-02: nhận adapter qua tham số để test bằng adapter bộ nhớ
 export function createApp({
@@ -23,11 +24,14 @@ export function createApp({
   metrics = createMetrics({ repo, classify: classifyPath }),
   maintenance = createMaintenance({ repo }),
   may = createMayService({ repo, openai: null }),
+  dev = false,
 }) {
   const app = express()
   app.disable('x-powered-by')
   // IP thật khi chạy sau proxy (hạn mức Mây theo IP) — đặt TRUST_PROXY theo hạ tầng
   if (config.trustProxy !== undefined) app.set('trust proxy', config.trustProxy)
+  // T-37: security headers cho mọi response (kể cả lỗi). Đặt trước router để không bỏ sót.
+  app.use(securityHeaders({ config, dev }))
   // D-52: đếm mọi request (API + trang web)
   app.use(metrics.middleware)
   app.use(express.json({ limit: '100kb' }))

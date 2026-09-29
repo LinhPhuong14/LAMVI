@@ -4,6 +4,7 @@ import express from 'express'
 import { HTML_LANG, localePath, translate } from '../src/i18n/core.js'
 import { classifyPath, dataKeysFor } from '../src/seo/routes.js'
 import { buildHeadTags, renderHeadTags, safeJson } from '../src/seo/head.js'
+import { gaInlineScript, gaScriptSrc } from '../src/analytics/ga.js'
 import { HttpError } from './errors.js'
 import { getPublicBatch, getPublicProduct, listPublicFaq, listPublicProducts } from './services/catalog.js'
 
@@ -31,6 +32,19 @@ async function loadData(repo, route) {
 }
 
 const escHtml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+
+// FR-GA-001 (D-72): nhúng gtag.js khi có GA_MEASUREMENT_ID. Không nhúng ở trang nội bộ (/admin,
+// /it) và trang bảo trì. ID đã được config.js kiểm định dạng G-XXXX nên an toàn khi nội suy.
+function analyticsTags(measurementId, nonce) {
+  if (!measurementId) return ''
+  const n = nonce ? ` nonce="${escHtml(nonce)}"` : ''
+  return [
+    `<script async${n} src="${escHtml(gaScriptSrc(measurementId))}"></script>`,
+    `<script${n}>${gaInlineScript(measurementId)}</script>`,
+  ].join('\n    ')
+}
+
+const isInternalPath = (pathname) => /^\/(admin|it)(\/|$)/.test(pathname)
 
 // Trang bảo trì tĩnh (không hydrate)
 export function maintenancePage(lang) {
@@ -60,22 +74,24 @@ export function maintenancePage(lang) {
 `
 }
 
-function fill(template, { lang, head, html, data }) {
+function fill(template, { lang, head, html, data, analytics = '', nonce = null }) {
+  const n = nonce ? ` nonce="${escHtml(nonce)}"` : ''
   // Dùng hàm thay thế: chuỗi thay thế sẽ diễn giải $&, $`, $' có trong nội dung DB
   return template
     .replace('<html lang="vi">', () => `<html lang="${HTML_LANG[lang]}">`)
-    .replace('<!--app-head-->', () => head)
+    .replace('<!--app-head-->', () => (analytics ? `${analytics}\n    ${head}` : head))
     .replace('<!--app-html-->', () => html)
-    .replace('<!--app-data-->', () => (data ? `<script>window.__INITIAL_DATA__=${safeJson(data)}</script>` : ''))
+    .replace('<!--app-data-->', () => (data ? `<script${n}>window.__INITIAL_DATA__=${safeJson(data)}</script>` : ''))
 }
 
 /**
  * Render một trang thành HTML đầy đủ. Trả { status, noindex, html }.
  * Tách riêng để test không cần Vite/dist.
  */
-export async function renderPage({ repo, config, template, render, url, pathname, maintenance }) {
+export async function renderPage({ repo, config, template, render, url, pathname, maintenance, nonce = null }) {
   const route = classifyPath(pathname)
   const siteUrl = config.publicSiteUrl
+  const analytics = isInternalPath(pathname) ? '' : analyticsTags(config.gaMeasurementId, nonce)
 
   // D-54: bảo trì → trang công khai trả 503 (trang tĩnh, không tải app); /login, /admin, /it vẫn vào được
   if (route.kind !== 'private' && maintenance && (await maintenance.get()).enabled) {
@@ -86,7 +102,11 @@ export async function renderPage({ repo, config, template, render, url, pathname
     // Không SSR: nội dung phụ thuộc phiên đăng nhập ở trình duyệt
     const tags = buildHeadTags({ lang: route.lang, siteUrl, title: translate(route.lang, 'meta.title'), noindex: true })
     const head = renderHeadTags(tags, { noindex: true })
-    return { status: 200, noindex: true, html: fill(template, { lang: route.lang, head, html: '', data: null }) }
+    return {
+      status: 200,
+      noindex: true,
+      html: fill(template, { lang: route.lang, head, html: '', data: null, analytics, nonce }),
+    }
   }
 
   // Đường dẫn sản phẩm/lô có mã hoá hỏng → render trang 404 thay vì trang "đang tải"
@@ -97,7 +117,7 @@ export async function renderPage({ repo, config, template, render, url, pathname
   return {
     status: meta.status,
     noindex: meta.noindex,
-    html: fill(template, { lang: route.lang, head, html, data: initialData }),
+    html: fill(template, { lang: route.lang, head, html, data: initialData, analytics, nonce }),
   }
 }
 
@@ -139,8 +159,25 @@ export async function createWeb({ repo, config, dev, maintenance }) {
         template = await vite.transformIndexHtml(req.originalUrl, readFileSync(`${root}/index.html`, 'utf8'))
         render = (await vite.ssrLoadModule('/src/entry-server.jsx')).render
       }
-      const page = await renderPage({ repo, config, template, render, url: req.originalUrl, pathname: req.path, maintenance })
+      const page = await renderPage({
+        repo,
+        config,
+        template,
+        render,
+        url: req.originalUrl,
+        pathname: req.path,
+        maintenance,
+        nonce: res.locals.cspNonce ?? null,
+      })
       res.set('Content-Type', 'text/html; charset=utf-8')
+      // Trang công khai không phụ thuộc phiên đăng nhập (SSR chỉ đọc DB) → cho CDN giữ bản chung.
+      // Trang riêng tư trả khung rỗng nhưng vẫn để no-store cho chắc, tránh CDN giữ nhầm.
+      res.set(
+        'Cache-Control',
+        page.noindex
+          ? 'private, no-store'
+          : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300',
+      )
       if (page.noindex) res.set('X-Robots-Tag', 'noindex')
       if (page.retryAfter) res.set('Retry-After', String(page.retryAfter))
       res.status(page.status).send(page.html)

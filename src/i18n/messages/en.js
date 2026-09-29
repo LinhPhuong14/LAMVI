@@ -7,6 +7,7 @@ export default {
       'Handmade dó paper lanterns as gifts, with a QR-linked message and the story of how they were made.',
   },
   nav: {
+    home: 'Home',
     story: 'Story',
     artisan: 'Artisan',
     products: 'Products',

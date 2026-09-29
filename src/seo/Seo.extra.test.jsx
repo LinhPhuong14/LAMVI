@@ -250,7 +250,8 @@ describe('Head sau khi client chạy (FR-SEO-001, BR-SEO-001)', () => {
     await flush()
     await clientNavigate('/products/den-nguyet')
     await flush()
-    expect(countHead()).toMatchObject({ robots: 0, canonical: 1, alternate: 4, title: 1, ld: 1 })
+    // §23.2: trang sản phẩm có 2 khối JSON-LD (Product + BreadcrumbList)
+    expect(countHead()).toMatchObject({ robots: 0, canonical: 1, alternate: 4, title: 1, ld: 2 })
   })
 
   it('điều hướng từ trang 404 sang trang chủ → không còn meta robots', async () => {
@@ -268,8 +269,10 @@ describe('Head sau khi client chạy (FR-SEO-001, BR-SEO-001)', () => {
     mounted.push(h.reactRoot)
     await flush()
     const scripts = document.head.querySelectorAll('script[type="application/ld+json"]')
-    expect(scripts).toHaveLength(1)
+    expect(scripts).toHaveLength(2)
+    expect(JSON.parse(scripts[1].textContent)['@type']).toBe('BreadcrumbList')
     const ld = JSON.parse(scripts[0].textContent)
+    expect(ld['@type']).toBe('Product')
     expect(ld.name).toBe(products[0].name.zh)
     expect(ld.offers.price).toBe(products[0].price)
     expect(ld.offers.priceSpecification.valueAddedTaxIncluded).toBe(true)
