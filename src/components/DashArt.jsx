@@ -1,7 +1,5 @@
-// Minh hoạ cho dashboard tài khoản — SVG tự vẽ theo lối khắc gỗ nét mảnh, cùng bảng màu (design-rules §2).
-// Chỉ trang trí → aria-hidden. Không dùng ảnh tư liệu (§7.2) để không gây hiểu lầm là ảnh thật.
-import Lantern from './Lantern'
-import { Cloud, DrumSun } from './Motifs'
+// Minh hoạ cho dashboard tài khoản. Cảnh đầu trang dùng ảnh thật CC0 (public/images/dash/CREDITS.md);
+// biểu tượng nhỏ trong thẻ là SVG nét mảnh cùng bảng màu (design-rules §2). Chỉ trang trí → aria-hidden.
 
 const INK = '#3a2a1e'
 const PAPER = '#f4ede0'
@@ -28,25 +26,14 @@ function Svg({ children, className = '', size = 64 }) {
   )
 }
 
-/** Cảnh đầu trang: dây đèn treo trước mặt trống đồng, mây trôi. */
+/** Cảnh đầu trang: ảnh trời sương (sáng) / trời đêm đầy đèn trời (tối), vài chiếc đèn trời thật trôi nhẹ. */
 export function HeroScene() {
   return (
     <div className="dash-scene" aria-hidden="true">
-      <DrumSun className="dash-scene-drum" />
-      <Cloud className="dash-scene-cloud dash-scene-cloud-a" />
-      <Cloud className="dash-scene-cloud dash-scene-cloud-b" />
-      <svg className="dash-scene-string" viewBox="0 0 300 60" preserveAspectRatio="none">
-        <path d="M0 6 Q150 58 300 6" fill="none" stroke={INK} strokeOpacity="0.55" strokeWidth="1.2" />
-      </svg>
-      <span className="dash-scene-lantern l1">
-        <Lantern size={58} tone="dawn" swing />
-      </span>
-      <span className="dash-scene-lantern l2">
-        <Lantern size={78} tone="amber" swing flicker />
-      </span>
-      <span className="dash-scene-lantern l3">
-        <Lantern size={58} tone="moss" swing />
-      </span>
+      <div className="dash-scene-photo" />
+      {['l1', 'l2', 'l3'].map((k) => (
+        <img key={k} className={`dash-scene-lantern ${k}`} src="/images/dash/sky-lantern.webp" alt="" width="132" height="157" decoding="async" />
+      ))}
     </div>
   )
 }

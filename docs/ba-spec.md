@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.13 (bản nháp) |
+| Phiên bản | v0.16 (bản nháp) |
 | Ngày | 2026-09-29 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — bỏ xác nhận email khi đăng ký; G-37…G-39 (nhánh `feat/signup-no-confirm`). v0.12: D-64 — dashboard tài khoản khách dạng tab dọc, phong cách thanh thoát (T-34) (nhánh `feat/account-dashboard`), G-40. v0.13: dashboard bo góc + minh hoạ; tab đơn hàng minh hoạ 4 công đoạn |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — bỏ xác nhận email khi đăng ký; G-37…G-39 (nhánh `feat/signup-no-confirm`). v0.12: D-64 — dashboard tài khoản khách dạng tab dọc, phong cách thanh thoát (T-34) (nhánh `feat/account-dashboard`), G-40. v0.13: dashboard bo góc + minh hoạ; tab đơn hàng minh hoạ 4 công đoạn. v0.14: D-65 — dashboard kính mờ, nền mây khói + đèn trời khi vào trang, giao diện tối (nhánh `feat/account-glass`). v0.15: nền dashboard dùng ảnh thật CC0 thay hình tự vẽ. v0.16: D-66 — ảnh nền thật cho trang chủ và các trang công khai; dashboard mobile có thanh điều hướng đáy |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -154,6 +154,9 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 - 4 tab: Tổng quan, Đơn hàng, Trò chuyện với Mây, Hồ sơ. Tab đang mở lưu ở `?tab=` (`orders`, `may`, `profile`; không có hoặc sai → Tổng quan) để tải lại, chia sẻ link và nút Back giữ đúng tab; điều hướng bàn phím theo WAI-ARIA tabs `[ASSUMPTION]`.
 - Tổng quan: số liệu nhanh (số sản phẩm và tạm tính của giỏ — có chú thích chưa gồm VAT theo BR-PRC-003; đơn hàng; số câu đã hỏi Mây), 2 tin chat gần nhất, tóm tắt hồ sơ `[ASSUMPTION]`.
 - Khi chưa có đơn hàng (FR-ACC-002 chưa làm), tab đơn hàng chỉ báo "sắp ra mắt" và liệt kê những gì sẽ có (công đoạn, lời chúc, mã vận đơn — FR-ACC-002/003, D-41); **không** hiển thị đơn mẫu `[ASSUMPTION]`. Câu "soạn và sửa lời chúc" chưa nói thời hạn vì còn chờ Q-08.
+- Giao diện dashboard: kính mờ, nền dải mây khói lơ lửng, đèn trời bay lên một lượt mỗi khi vào trang; có **giao diện tối** `[CONFIRMED]` D-65. Giao diện tối chỉ áp dụng cho dashboard tài khoản (trang công khai giữ giao diện sáng), mặc định theo cài đặt thiết bị, lựa chọn lưu trên trình duyệt (không lưu vào hồ sơ) `[ASSUMPTION]`. Bật giảm chuyển động → không có đèn bay, khói đứng yên `[DERIVED]` NFR-A11Y-001.
+- Nền và cảnh đầu trang dashboard dùng **ảnh thật** (trời sương, trời đêm đầy đèn trời, khói, đèn trời tách nền) giấy phép CC0 tìm qua Openverse — danh sách ở `public/images/dash/CREDITS.md`; không dùng Canva vì giấy phép Canva không cho dùng riêng lẻ phần tử ngoài thiết kế Canva `[ASSUMPTION]`. Ảnh là nền không khí, không phải ảnh sản phẩm.
+- Dashboard trên điện thoại (≤640px): các tab là thanh điều hướng cố định ở đáy màn hình `[ASSUMPTION]`.
 - Tab đơn hàng có phần minh hoạ 4 công đoạn (C-11), dùng lại câu chữ đã duyệt ở trang chủ (`process.*`); chỉ minh hoạ, không gắn với đơn nào `[ASSUMPTION]`.
 - Lịch sử chat Mây chia theo ngày, kèm giờ từng tin, theo giờ Việt Nam (Asia/Ho_Chi_Minh) `[ASSUMPTION]`; "số câu đã hỏi Mây" chỉ đếm tin của khách trong 100 tin gần nhất mà API trả về `[ASSUMPTION]`.
 
@@ -1136,6 +1139,8 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 - `[ASSUMPTION]` Ngưỡng hiệu năng nội bộ cho trang công khai, chờ PO chốt NFR-PERF-001: LCP ≤ 2,5 s, CLS ≤ 0,1 (mức "tốt" của Core Web Vitals).
 - `[ASSUMPTION]` Motion "biến mất" áp dụng khi khối rời khỏi màn hình (cuộn qua), không áp dụng khi chuyển trang (tránh chặn điều hướng và SSR).
 - `[LEGAL]` Q-36 — Ảnh tư liệu (tranh Đông Hồ, tranh giấy dó thế kỷ 18 — Wikimedia Commons, public domain/CC0; danh sách ở `public/images/folk/CREDITS.md`) được dùng làm hình văn hoá trên trang bán hàng. Cần pháp chế xác nhận: (1) tình trạng public domain tại Việt Nam của bản chụp tranh dân gian và của ảnh chụp hiện vật bảo tàng (CC0 do người chụp tuyên bố); (2) có cần xin phép Bảo tàng Mỹ thuật Việt Nam khi dùng thương mại không. Chưa có xác nhận thì không đưa lên môi trường thật.
+- `[LEGAL]` Q-36 (mở rộng v0.15) — Ảnh nền CC0 của dashboard tài khoản (rawpixel, StockSnap; `public/images/dash/CREDITS.md`) cũng cần pháp chế xác nhận cùng đợt.
+- `[LEGAL]` Q-36 (mở rộng v0.16) — Ảnh nền CC0 của trang công khai (`public/images/scene/CREDITS.md`) cũng cần pháp chế xác nhận cùng đợt.
 - `[ASSUMPTION]` Chú thích tranh (tên, mô tả, alt vi/en/zh) do dev soạn — chờ Marketing duyệt cùng G-14.
 - `[ASSUMPTION]` Tham khảo web Trung Quốc chỉ ở mức nguyên tắc trình bày (nét, khung, khoảng trắng); không dùng chữ Hán, rồng, mái cung điện để web vẫn mang bản sắc Việt.
 - ~~`[ASSUMPTION]` Giữ thương hiệu MỘC~~ — thay bởi D-62: tên web và thương hiệu là **LAMVI**.
@@ -1211,3 +1216,5 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 | D-62 | Tên web và thương hiệu là **LAMVI** (viết liền, không dấu) ở mọi nơi — logo, tiêu đề trang, câu văn, bản dịch en/zh; không dùng "MỘC" hay "LÂM VỊ" | Hiệu lực (v0.10) |
 | D-63 | Bỏ xác nhận email sau khi đăng ký (dự án dùng Supabase gói Free): tài khoản dùng được ngay, không gửi thư xác nhận | Hiệu lực (v0.11) |
 | D-64 | Dashboard tài khoản khách dạng tab dọc, không dùng header (và footer) của trang giới thiệu; tối ưu trải nghiệm người dùng | Hiệu lực (v0.12) |
+| D-65 | Dashboard tài khoản: phong cách kính mờ (glassmorphism), nền có dải màu như mây khói lơ lửng và đèn trời bay lên khi mới vào trang, thêm giao diện tối | Hiệu lực (v0.14) |
+| D-66 | Trang chủ và các trang công khai (sản phẩm, giỏ, đăng nhập/đăng ký, trang lô, 404) có ảnh nền thật cùng chủ đề (đèn trời, sương mây, khói, trời đêm) nhưng khác bộ ảnh của dashboard; không dùng hoạ tiết SVG tự vẽ làm nền | Hiệu lực (v0.16) |

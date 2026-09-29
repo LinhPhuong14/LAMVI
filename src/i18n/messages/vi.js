@@ -281,6 +281,8 @@ export default {
     edit: 'Sửa',
     phone: 'Số điện thoại',
     notSet: 'Chưa có',
+    themeDark: 'Giao diện tối',
+    themeLight: 'Giao diện sáng',
     backToShop: 'Về cửa hàng',
     greeting: 'Xin chào, {name}',
     greetingAnon: 'Xin chào',

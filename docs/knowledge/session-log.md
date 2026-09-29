@@ -4,6 +4,26 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 (phiên 9) — Dashboard kính mờ, nền mây khói, giao diện tối (nhánh `feat/account-glass`, từ `master`)
+
+**Quyết định từ người dùng**: D-65 — glassmorphism, nền dải mây khói/đèn trời bay lên khi vào trang, dark mode.
+
+**Đã làm**
+
+1. Kính mờ cho thẻ, dải số liệu, khung đầu trang, thẻ gợi ý; thanh bên nền trong (T-35).
+2. `DashSky`: dải khói màu trôi, hoạ tiết preset `dash`, 8 đèn trời bay lên một lượt.
+3. Giao diện tối trong phạm vi dashboard (`data-theme`, nút chuyển ở hàng logo, lưu trình duyệt, mặc định theo thiết bị); đo tương phản ≥ 5,3:1 cho chữ.
+4. Test: nhóm "Giao diện sáng/tối và nền" trong `AccountDashboard.extra.test.jsx`; subagent kiểm thử độc lập (T-11) thêm `AccountTheme.extra.test.jsx` (21 test), phát hiện nút chính khi hover ở chế độ tối chỉ 4,33:1 → đổi sang son đậm #9f3a27 (6,3:1).
+5. Spec v0.14 (D-65, `[ASSUMPTION]` phạm vi dark mode), design rules §9/§12, T-35.
+
+6. Theo yêu cầu "tìm asset trên mạng/Canva, không tự vẽ SVG ở background": thay nền bằng ảnh thật CC0 (Openverse: rawpixel, StockSnap) — trời sương/trời đêm, khói tách nền, đèn trời tách nền; cảnh đầu trang cũng dùng ảnh. Bỏ preset hoạ tiết `dash` và dải khói gradient. `public/images/dash/CREDITS.md`. Canva không dùng (giấy phép + không có kết nối). Test nền cập nhật (chỉ ảnh thật, có dòng nguồn CC0). Spec v0.15, Q-36 mở rộng.
+
+7. Theo yêu cầu "mobile chưa tốt; thêm ảnh như vậy vào trang chủ và các trang khác — cùng keyword nhưng tìm khác": bộ ảnh mới `public/images/scene` (15 ảnh CC0 qua Openverse: ruộng bậc thang sương, Hạ Long sương, trời đêm đầy đèn trời, biển mây, hồ sương, khói…); `Scene` thay `FloatingMotifs` ở 9 phần trang chủ; cảnh đầu trang cho đăng nhập/đăng ký (thẻ kính mờ), sản phẩm, giỏ, trang lô; 404 khung trời sao; đèn trời lookbook là ảnh thật. Dashboard mobile: thanh điều hướng đáy, 3 ô số liệu một hàng. D-66, T-36, spec v0.16. Người dùng yêu cầu bỏ qua kiểm thử độc lập (T-11) cho đợt này và gộp thẳng vào `master` — chỉ có test cập nhật trong `Folk.extra`/`ssr.folk.extra` + lint/test/build.
+
+**Còn lại**: dark mode cho trang công khai nếu người dùng muốn; pháp chế xác nhận ảnh nền (Q-36).
+
+---
+
 ## 2026-09-29 (phiên 8) — Dashboard tài khoản khách (nhánh `feat/account-dashboard`, từ `master`)
 
 **Quyết định từ người dùng**

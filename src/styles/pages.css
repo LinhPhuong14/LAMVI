@@ -1227,73 +1227,66 @@
   max-width: 58%;
 }
 
-/* Cảnh minh hoạ: trống đồng mờ, mây, dây đèn */
+/* Cảnh đầu trang: ảnh thật mờ dần vào chữ, đèn trời thật trôi nhẹ */
 .dash-scene {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 42%;
+  width: 52%;
   pointer-events: none;
 }
 
-.dash-scene-drum {
+.dash-scene-photo {
   position: absolute;
-  right: -40px;
-  top: 50%;
-  width: 260px;
-  height: 260px;
-  transform: translateY(-50%);
-  color: var(--hoe);
-  opacity: 0.16;
+  inset: 0;
+  background: url('/images/dash/mist-mountain.webp') center 35% / cover no-repeat;
+  filter: sepia(0.35) saturate(0.85) brightness(1.05);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 45%);
+  mask-image: linear-gradient(to right, transparent, #000 45%);
+  opacity: 0.85;
 }
 
-.dash-scene-cloud {
-  position: absolute;
-  color: var(--diep-light);
-  opacity: 0.9;
-}
-
-.dash-scene-cloud-a {
-  width: 120px;
-  right: 58%;
-  bottom: 18px;
-}
-
-.dash-scene-cloud-b {
-  width: 90px;
-  right: 6%;
-  top: 14px;
-}
-
-.dash-scene-string {
-  position: absolute;
-  left: 4%;
-  right: 4%;
-  top: 0;
-  width: 92%;
-  height: 56px;
+.dash[data-theme='dark'] .dash-scene-photo {
+  background-image: url('/images/dash/sky-night.webp');
+  filter: none;
+  opacity: 1;
 }
 
 .dash-scene-lantern {
   position: absolute;
-  top: 18px;
-  filter: drop-shadow(0 8px 14px rgba(120, 70, 20, 0.18));
+  height: auto;
+  filter: drop-shadow(0 0 14px rgba(255, 180, 80, 0.55));
+  animation: dash-bob 6s ease-in-out infinite alternate;
 }
 
 .dash-scene-lantern.l1 {
-  left: 16%;
-  top: 14px;
+  width: 46px;
+  right: 58%;
+  top: 34%;
+  animation-delay: -1s;
 }
 
 .dash-scene-lantern.l2 {
-  left: 44%;
-  top: 30px;
+  width: 64px;
+  right: 30%;
+  top: 16%;
 }
 
 .dash-scene-lantern.l3 {
-  left: 72%;
-  top: 14px;
+  width: 34px;
+  right: 10%;
+  top: 46%;
+  animation-delay: -3s;
+}
+
+@keyframes dash-bob {
+  from {
+    transform: translateY(6px) rotate(-3deg);
+  }
+  to {
+    transform: translateY(-8px) rotate(3deg);
+  }
 }
 
 .dash-top .eyebrow {
@@ -1940,13 +1933,12 @@
   .dash-scene {
     position: relative;
     width: auto;
-    height: 118px;
+    height: 130px;
     margin: 0 -22px 6px;
   }
-  .dash-scene-drum {
-    width: 200px;
-    height: 200px;
-    right: -30px;
+  .dash-scene-photo {
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent);
   }
   .dash-panel {
     gap: 28px;
@@ -2036,5 +2028,675 @@
   .dash-panel,
   .dash-stat {
     animation: none;
+  }
+}
+
+/* ---------- Dashboard tài khoản: kính mờ (glassmorphism, T-35) ----------
+   Nền có vài mảng màu ấm loang rất nhẹ (hoè, hồng điệp, chàm, lá) để lớp kính có gì mà "nhìn xuyên".
+   Thẻ, dải số liệu, khung đầu trang là kính: nền giấy trong 55–70%, làm mờ 18px, viền sáng 1px, bóng mềm.
+   Hiệu năng (design-rules §9): backdrop-filter chỉ trên phần tử cuộn cùng trang; phần tử dính
+   (thanh bên, thanh tab mobile) chỉ dùng nền trong, không làm mờ. */
+.dash {
+  --glass: rgba(251, 247, 239, 0.58);
+  --glass-strong: rgba(251, 247, 239, 0.78);
+  --glass-soft: rgba(255, 255, 255, 0.34);
+  --glass-edge: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset, 0 24px 48px -30px rgba(96, 62, 28, 0.38);
+  --glass-blur: blur(18px) saturate(150%);
+  position: relative;
+  isolation: isolate;
+}
+
+.dash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38rem 30rem at 22% 6%, rgba(242, 192, 78, 0.34), transparent 70%),
+    radial-gradient(34rem 28rem at 92% 18%, rgba(201, 127, 102, 0.26), transparent 70%),
+    radial-gradient(40rem 32rem at 70% 78%, rgba(38, 55, 74, 0.16), transparent 70%),
+    radial-gradient(30rem 26rem at 8% 88%, rgba(91, 107, 76, 0.16), transparent 70%);
+}
+
+.dash-side {
+  background: linear-gradient(180deg, rgba(251, 247, 239, 0.72), rgba(251, 247, 239, 0.5));
+  border-right: 1px solid var(--glass-edge);
+  box-shadow: 1px 0 0 var(--dash-line), 12px 0 40px -30px rgba(96, 62, 28, 0.35);
+}
+
+.dash-top,
+.dash-stats,
+.dash-card,
+.dash-promo {
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+/* Khung đầu trang: kính + ánh đèn hắt phía sau cảnh minh hoạ */
+.dash-top {
+  background:
+    radial-gradient(circle at 82% 40%, rgba(242, 192, 78, 0.3), transparent 42%),
+    linear-gradient(135deg, rgba(251, 247, 239, 0.72) 0%, rgba(251, 247, 239, 0.5) 100%);
+}
+
+.dash-promo {
+  background:
+    radial-gradient(circle at 20% 50%, rgba(242, 192, 78, 0.3), transparent 55%),
+    var(--glass);
+}
+
+.dash-stat + .dash-stat {
+  border-left-color: rgba(122, 93, 60, 0.12);
+}
+
+/* Tab chọn: miếng kính sáng nổi lên */
+.dash-tab:hover {
+  background: var(--glass-soft);
+}
+
+.dash-tab[aria-selected='true'] {
+  background: var(--glass-strong);
+  box-shadow: 0 0 0 1px var(--glass-edge) inset, 0 8px 20px -14px rgba(96, 62, 28, 0.45);
+}
+
+.dash-side-link:hover,
+.dash-logout:hover {
+  background: var(--glass-soft);
+}
+
+/* Chi tiết bên trong thẻ kính */
+.dash-stat-art,
+.dash-journey-art,
+.dash-profile-art {
+  background: var(--glass-soft);
+  box-shadow: 0 0 0 1px var(--glass-edge) inset;
+}
+
+.dash-journey li {
+  background: var(--glass-soft);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55) inset;
+}
+
+.dash-orders-art {
+  background: radial-gradient(circle at 50% 45%, rgba(242, 192, 78, 0.26), transparent 65%), var(--glass-soft);
+  border-color: var(--glass-edge);
+}
+
+.dash .field input,
+.dash .field select {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(122, 93, 60, 0.22);
+}
+
+.dash .field input:focus,
+.dash .field select:focus {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dash-tag {
+  background: var(--glass-soft);
+  border-color: var(--glass-edge);
+}
+
+.dash-card .may-assistant {
+  background: rgba(255, 255, 255, 0.45);
+  border-color: var(--glass-edge);
+}
+
+.dash-card .may-user {
+  background: rgba(233, 223, 203, 0.8);
+}
+
+.dash-chat-date {
+  background: rgba(251, 247, 239, 0.97);
+}
+
+/* Trình duyệt không hỗ trợ làm mờ: tăng độ đục để chữ vẫn rõ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .dash-top,
+  .dash-stats,
+  .dash-card,
+  .dash-promo {
+    background-color: var(--glass-strong);
+  }
+}
+
+@media (max-width: 960px) {
+  .dash-side {
+    background: none;
+    border: 0;
+    box-shadow: none;
+  }
+  .dash-brand,
+  .dash-user,
+  .dash-side-foot {
+    background: transparent;
+  }
+  /* Thanh tab dính: nền trong đục, không làm mờ (§9) */
+  .dash-tabs {
+    background: rgba(251, 247, 239, 0.93);
+    border-color: var(--glass-edge);
+    box-shadow: 0 10px 24px -20px rgba(96, 62, 28, 0.5);
+  }
+  .dash-tab[aria-selected='true'] {
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+/* ---------- Dashboard: nền mây khói + đèn trời khi vào trang (T-35) ---------- */
+.dash-sky {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Ảnh nền thật (CC0 — public/images/dash/CREDITS.md): trời sương ở giao diện sáng, trời đêm đầy đèn trời ở giao diện tối.
+   Phủ màn hình đầu, mờ dần xuống dưới; lọc màu một lần cho ấm như giấy điệp. */
+.dash-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 115vh;
+  background: url('/images/dash/mist-mountain.webp') center 30% / cover no-repeat;
+  filter: sepia(0.45) saturate(0.8) brightness(1.08);
+  opacity: 0.38;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent);
+}
+
+.dash[data-theme='dark'] .dash-photo {
+  background-image: url('/images/dash/sky-night.webp');
+  filter: none;
+  opacity: 0.85;
+}
+
+/* Khói thật: ảnh khói tách nền, trôi rất chậm qua lại */
+.dash-smoke {
+  position: absolute;
+  height: auto;
+  opacity: 0.4;
+  will-change: transform;
+  animation: dash-smoke 50s ease-in-out infinite alternate;
+}
+
+.dash-smoke.is-flip {
+  --flip: -1;
+}
+
+/* Khói trắng ngà chỉ hiện rõ trên nền tối */
+.dash-smoke.is-thin {
+  opacity: 0;
+}
+
+.dash[data-theme='dark'] .dash-smoke {
+  opacity: 0.32;
+}
+
+.dash[data-theme='dark'] .dash-smoke.is-thin {
+  opacity: 0.45;
+}
+
+@keyframes dash-smoke {
+  from {
+    transform: translate3d(-5%, 12px, 0) scaleX(var(--flip, 1));
+  }
+  to {
+    transform: translate3d(7%, -20px, 0) scaleX(var(--flip, 1)) scale(1.06);
+  }
+}
+
+
+/* Đèn trời: bay lên một lượt trong màn hình đầu rồi tan */
+.dash-rise {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Đèn trời thật (ảnh tách nền) có quầng sáng phía sau */
+.dash-rise-lantern {
+  position: absolute;
+  bottom: -60px;
+  opacity: 0;
+  animation: dash-rise 8s cubic-bezier(0.33, 0.1, 0.4, 1) 1 forwards;
+}
+
+.dash-rise-lantern::before {
+  content: '';
+  position: absolute;
+  inset: 20% -40% -10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 190, 90, 0.55), transparent);
+}
+
+.dash-rise-lantern img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes dash-rise {
+  0% {
+    transform: translate(0, 0) rotate(-4deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  45% {
+    transform: translate(14px, -48vh) rotate(4deg);
+  }
+  75% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(-10px, -108vh) rotate(-3deg);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-rise-lantern:nth-child(even) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-smoke {
+    animation: none;
+  }
+  .dash-rise {
+    display: none;
+  }
+  .dash-scene-lantern {
+    animation: none;
+  }
+}
+
+/* ---------- Dashboard: giao diện tối (T-35) ----------
+   "Đêm hội đèn": nền chàm đêm, chữ giấy điệp, son sáng lên cho đủ tương phản.
+   Chỉ đổi token trong phạm vi .dash; minh hoạ nét mực đặt trên đĩa giấy sáng như đèn thắp. */
+.dash[data-theme='dark'] {
+  --diep: #141c27;
+  --diep-light: #1b2533;
+  --diep-deep: #26334a;
+  --than: #efe6d6;
+  --than-soft: #c7b9a3;
+  --sepia: #c9ab82;
+  --son: #e27a5f;
+  --son-deep: #f0937a;
+  --hair: rgba(226, 198, 143, 0.35);
+  --hair-soft: rgba(226, 198, 143, 0.16);
+  --dash-line: rgba(226, 198, 143, 0.16);
+  --dash-soft: rgba(226, 198, 143, 0.08);
+  --glass: rgba(27, 37, 51, 0.55);
+  --glass-strong: rgba(38, 51, 74, 0.8);
+  --glass-soft: rgba(255, 255, 255, 0.06);
+  --glass-edge: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 28px 56px -30px rgba(0, 0, 0, 0.7);
+  /* Bí danh cũ (index.css) được tính ở :root → khai báo lại để thành phần dùng chung (giá, form, thông báo) theo màu tối */
+  --ink: var(--than);
+  --ink-soft: var(--than-soft);
+  --paper: var(--diep);
+  --paper-deep: var(--diep-deep);
+  --cream: var(--diep-light);
+  --brown: var(--sepia);
+  --brown-deep: var(--son-deep);
+  --brown-line: rgba(226, 198, 143, 0.22);
+  --ember: var(--son);
+  --white: #1f2a3a;
+  color-scheme: dark;
+  color: var(--than);
+  background: var(--diep);
+}
+
+.dash[data-theme='dark']::before {
+  background:
+    radial-gradient(38rem 30rem at 22% 6%, rgba(242, 192, 78, 0.16), transparent 70%),
+    radial-gradient(34rem 28rem at 92% 18%, rgba(201, 127, 102, 0.14), transparent 70%),
+    radial-gradient(40rem 32rem at 70% 78%, rgba(84, 120, 170, 0.18), transparent 70%),
+    radial-gradient(30rem 26rem at 8% 88%, rgba(91, 107, 76, 0.14), transparent 70%);
+}
+
+.dash[data-theme='dark'] .dash-side {
+  background: linear-gradient(180deg, rgba(27, 37, 51, 0.82), rgba(20, 28, 39, 0.6));
+  border-right-color: rgba(255, 255, 255, 0.06);
+}
+
+.dash[data-theme='dark'] .dash-top {
+  background:
+    radial-gradient(circle at 82% 40%, rgba(242, 192, 78, 0.22), transparent 42%),
+    linear-gradient(135deg, rgba(38, 51, 74, 0.7) 0%, rgba(27, 37, 51, 0.5) 100%);
+}
+
+/* Minh hoạ nét mực: đặt trên đĩa giấy sáng như chiếc đèn thắp */
+.dash[data-theme='dark'] .dash-stat-art,
+.dash[data-theme='dark'] .dash-journey-art,
+.dash[data-theme='dark'] .dash-profile-art {
+  background: radial-gradient(circle, #f7efdf 55%, #e9dcc2 100%);
+  box-shadow: 0 0 22px -4px rgba(242, 192, 78, 0.45);
+}
+
+/* Nút chính và ấn triện giữ son đậm, chữ sáng */
+.dash[data-theme='dark'] .btn-primary {
+  background: #b3402a;
+  color: #fbf7ef;
+  box-shadow:
+    inset 0 0 0 3px #b3402a,
+    inset 0 0 0 4px rgba(248, 239, 217, 0.5),
+    0 12px 24px -14px rgba(0, 0, 0, 0.7);
+}
+
+.dash[data-theme='dark'] .btn-primary:hover {
+  background: #9f3a27;
+  box-shadow:
+    inset 0 0 0 3px #9f3a27,
+    inset 0 0 0 4px rgba(248, 239, 217, 0.55),
+    0 14px 26px -14px rgba(0, 0, 0, 0.75);
+}
+
+.dash[data-theme='dark'] .seal {
+  background: #b3402a;
+}
+
+.dash[data-theme='dark'] .seal-inner {
+  color: #fbf7ef;
+}
+
+.dash[data-theme='dark'] .field input,
+.dash[data-theme='dark'] .field select {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(226, 198, 143, 0.22);
+  color: var(--than);
+}
+
+.dash[data-theme='dark'] .field input:focus,
+.dash[data-theme='dark'] .field select:focus {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.dash[data-theme='dark'] .field input:disabled {
+  color: var(--than-soft);
+}
+
+.dash[data-theme='dark'] .notice.success {
+  background: rgba(120, 160, 80, 0.18);
+  color: #cfe3b5;
+}
+
+.dash[data-theme='dark'] .notice.error {
+  background: rgba(226, 122, 95, 0.16);
+  color: #f6c3b5;
+}
+
+.dash[data-theme='dark'] .dash-card .may-assistant {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dash[data-theme='dark'] .dash-card .may-user {
+  background: rgba(226, 198, 143, 0.18);
+  color: var(--than);
+}
+
+.dash[data-theme='dark'] .dash-chat-date {
+  background: rgba(27, 37, 51, 0.98);
+}
+
+.dash[data-theme='dark'] .dash-orders-art {
+  background: radial-gradient(circle at 50% 45%, rgba(242, 192, 78, 0.3), transparent 65%), rgba(255, 255, 255, 0.04);
+}
+
+/* Nút chuyển giao diện */
+.dash-brand-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dash-theme {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--dash-line);
+  border-radius: 50%;
+  background: var(--glass-soft);
+  color: var(--than-soft);
+  cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease, transform 0.4s var(--ease-out);
+}
+
+.dash-theme:hover {
+  color: var(--than);
+  transform: rotate(-18deg);
+}
+
+.dash-theme:focus-visible {
+  outline: 2px solid var(--son);
+  outline-offset: 2px;
+}
+
+@media (max-width: 960px) {
+  .dash[data-theme='dark'] .dash-side {
+    background: none;
+  }
+  .dash[data-theme='dark'] .dash-tabs {
+    background: rgba(20, 28, 39, 0.94);
+  }
+}
+
+/* ---------- Dashboard: mobile kiểu ứng dụng (≤640px) ----------
+   Tab thành thanh điều hướng cố định ở đáy (biểu tượng + nhãn, đủ 4 mục, không cuộn ngang).
+   Phần tử cố định → nền đục, không backdrop-filter (design-rules §9). Nút Mây dời lên trên thanh. */
+@media (max-width: 640px) {
+  .dash-brand {
+    padding: 14px 16px 4px;
+  }
+  .dash-user {
+    padding: 6px 16px 12px;
+  }
+  .dash-user-text strong {
+    font-size: 1.02rem;
+  }
+  .dash-tabs,
+  .dash[data-theme='dark'] .dash-tabs {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 45;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    overflow: visible;
+    border-top: 1px solid var(--dash-line);
+    border-bottom: 0;
+    box-shadow: 0 -12px 28px -20px rgba(60, 40, 20, 0.45);
+  }
+  .dash-tabs {
+    background: rgba(251, 247, 239, 0.97);
+  }
+  .dash[data-theme='dark'] .dash-tabs {
+    background: rgba(20, 28, 39, 0.97);
+  }
+  .dash-tab {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-height: 54px;
+    padding: 6px 2px;
+    border-radius: 14px;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+  .dash-tab-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+  }
+  .dash-tab-label {
+    flex: none;
+    width: 100%;
+  }
+  .dash-tab[aria-selected='true'] {
+    background: var(--dash-soft);
+    color: var(--son-deep);
+  }
+  .dash-tab[aria-selected='true'] .dash-tab-icon {
+    color: var(--son-deep);
+  }
+  .dash-tab[aria-selected='true']::before {
+    left: 30%;
+    right: 30%;
+    top: 0;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+    border-radius: 2px;
+  }
+  /* Huy hiệu thành chấm số nhỏ góc biểu tượng */
+  .dash-tab-badge {
+    position: absolute;
+    top: 4px;
+    left: calc(50% + 6px);
+    min-width: 0;
+    padding: 0 5px;
+    border-radius: 999px;
+    font-size: 0.6rem;
+    line-height: 1.5;
+    color: var(--diep-light);
+    background: var(--son);
+    opacity: 1;
+  }
+  /* Nhãn chữ ("Sắp có") thành chấm nhỏ; chữ vẫn đọc được bằng trình đọc màn hình */
+  .dash-tab-badge.is-text {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    overflow: hidden;
+    font-size: 0;
+    top: 8px;
+    left: calc(50% + 10px);
+  }
+  .dash-main {
+    padding: 18px 16px 24px;
+  }
+  .dash-side-foot {
+    padding: 8px 12px calc(96px + env(safe-area-inset-bottom));
+  }
+  .page-app .may-fab {
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+  }
+  .page-app .may-panel {
+    bottom: calc(146px + env(safe-area-inset-bottom));
+  }
+
+  /* Đầu trang gọn */
+  .dash-top .page-title {
+    font-size: 1.7rem;
+  }
+  .dash-top-sub {
+    font-size: 0.88rem;
+  }
+  .dash-scene {
+    height: 112px;
+  }
+
+  /* Ba ô số liệu một hàng, chạm cả ô */
+  .dash-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-radius: 18px;
+  }
+  .dash-stat,
+  .dash-stat + .dash-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+    padding: 14px 6px 12px;
+    border-top: 0;
+  }
+  .dash-stat + .dash-stat {
+    border-left: 1px solid var(--dash-line);
+  }
+  .dash-stat-art {
+    position: static;
+    width: 40px;
+    height: 40px;
+    transform: none;
+    order: -1;
+    margin-bottom: 4px;
+  }
+  .dash-stat-art svg,
+  .dash-stat-art .lantern-svg {
+    width: 30px;
+    height: auto;
+  }
+  .dash-stat-value {
+    font-size: 1.9rem;
+    line-height: 1.1;
+  }
+  .dash-stat-word {
+    font-size: 0.92rem;
+    line-height: 1.9rem;
+  }
+  .dash-stat-label {
+    order: 2;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+  }
+  .dash-stat-sub {
+    display: none;
+  }
+  /* Liên kết phủ cả ô; chữ vẫn là tên truy cập cho trình đọc màn hình */
+  .dash-stat-link {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    font-size: 0;
+    color: transparent;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+  .dash-stat-link:focus-visible {
+    outline: 2px solid var(--son);
+    outline-offset: -3px;
+  }
+
+  .dash-card,
+  .dash-letter {
+    padding: 20px 16px 22px;
+  }
+  .dash-card-head {
+    margin-bottom: 16px;
+  }
+  .dash-card .may-msg {
+    max-width: 88%;
+  }
+  .dash-chat {
+    max-height: 58vh;
   }
 }

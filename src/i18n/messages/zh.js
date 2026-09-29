@@ -253,6 +253,8 @@ export default {
     edit: '编辑',
     phone: '电话',
     notSet: '未填写',
+    themeDark: '深色模式',
+    themeLight: '浅色模式',
     backToShop: '返回商店',
     greeting: '您好，{name}',
     greetingAnon: '您好',

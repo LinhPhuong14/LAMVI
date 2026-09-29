@@ -266,6 +266,8 @@ export default {
     edit: 'Edit',
     phone: 'Phone',
     notSet: 'Not set',
+    themeDark: 'Dark mode',
+    themeLight: 'Light mode',
     backToShop: 'Back to shop',
     greeting: 'Hello, {name}',
     greetingAnon: 'Hello',

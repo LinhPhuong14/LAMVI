@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react
 import Field from '../components/Field'
 import Lantern from '../components/Lantern'
 import { GiftArt, HeroScene, LetterArt, StepArt } from '../components/DashArt'
+import DashSky from '../components/DashSky'
 import Price from '../components/Price'
 import { Lotus, Seal } from '../components/Motifs'
 import { LanguageSwitcher } from '../components/SiteHeader'
@@ -46,6 +47,42 @@ function TabIcon({ name }) {
   return (
     <svg viewBox="0 0 24 24" className="dash-tab-icon" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
       {ICONS[name]}
+    </svg>
+  )
+}
+
+// Giao diện sáng/tối của dashboard: lựa chọn lưu ở trình duyệt, mặc định theo cài đặt thiết bị
+const THEME_KEY = 'moc.dashTheme'
+
+function readTheme() {
+  try {
+    const v = localStorage.getItem(THEME_KEY)
+    if (v === 'light' || v === 'dark') return v
+  } catch {
+    // chế độ riêng tư: bỏ qua
+  }
+  return typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function saveTheme(v) {
+  try {
+    localStorage.setItem(THEME_KEY, v)
+  } catch {
+    // bỏ qua
+  }
+}
+
+function ThemeIcon({ dark }) {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+      {dark ? (
+        <>
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
+        </>
+      ) : (
+        <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />
+      )}
     </svg>
   )
 }
@@ -396,6 +433,7 @@ export default function AccountPage() {
   const [params, setParams] = useSearchParams()
   const [state, setState] = useState({ status: 'loading' })
   const [mayItems, setMayItems] = useState(null)
+  const [theme, setTheme] = useState(readTheme)
   const tabRefs = useRef({})
   const panelRef = useRef(null)
 
@@ -437,6 +475,12 @@ export default function AccountPage() {
     go(TABS[(map[e.key] + TABS.length) % TABS.length], { focusTab: true })
   }
 
+  function toggleTheme() {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    saveTheme(next)
+  }
+
   async function onLogout() {
     await logout()
     navigate(path('/'), { replace: true })
@@ -450,15 +494,28 @@ export default function AccountPage() {
   const badges = { orders: t('account.soonShort'), may: asked || null }
 
   return (
-    <div className="dash">
+    <div className="dash" data-theme={theme}>
       <Seo title={t('account.title')} noindex />
+      <DashSky />
 
       <aside className="dash-side">
         <div className="dash-brand">
           <Link to={path('/')} className="nav-mark" aria-label="LAMVI">
             <Seal>LAMVI</Seal>
           </Link>
-          <LanguageSwitcher />
+          <div className="dash-brand-tools">
+            <LanguageSwitcher />
+            <button
+              type="button"
+              className="dash-theme"
+              onClick={toggleTheme}
+              aria-pressed={theme === 'dark'}
+              aria-label={t('account.themeDark')}
+              title={theme === 'dark' ? t('account.themeLight') : t('account.themeDark')}
+            >
+              <ThemeIcon dark={theme === 'dark'} />
+            </button>
+          </div>
         </div>
 
         <div className="dash-user">
@@ -487,7 +544,7 @@ export default function AccountPage() {
             >
               <TabIcon name={k} />
               <span className="dash-tab-label">{t(`account.tabs.${k}`)}</span>
-              {badges[k] != null && <span className="dash-tab-badge">{badges[k]}</span>}
+              {badges[k] != null && <span className={`dash-tab-badge${typeof badges[k] === 'string' ? ' is-text' : ''}`}>{badges[k]}</span>}
             </button>
           ))}
         </div>
