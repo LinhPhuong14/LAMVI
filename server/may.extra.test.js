@@ -370,7 +370,7 @@ describe('Ngân sách (D-58, US-009 AC-002)', () => {
   it('usage(): 80% → warning, <80% → null', async () => {
     const may = build(null)
     await repo.addMayUsage(vnMonth(clock), { promptTokens: 1, completionTokens: 1, costUsd: 16 })
-    expect(await may.usage()).toMatchObject({ budgetPct: 0.8, alert: 'warning', openaiEnabled: false, openaiConfigured: false })
+    expect(await may.usage()).toMatchObject({ budgetPct: 0.8, alert: 'warning', openaiEnabled: true, openaiConfigured: false })
     repo = createMemoryRepo()
     const may2 = build(null)
     await repo.addMayUsage(vnMonth(clock), { promptTokens: 1, completionTokens: 1, costUsd: 15.99 })
@@ -543,7 +543,7 @@ describe('Cấu hình (FR-AI-007)', () => {
   it('cấu hình đã lưu thiếu khoá / sai kiểu → dùng mặc định', async () => {
     await repo.setSetting(MAY_SETTING_KEY, { openaiEnabled: 'true', monthlyBudgetUsd: '5', limits: { maxChars: 300 }, messages: { sick: { vi: [] } } }, null)
     const c = await loadMayConfig(repo)
-    expect(c.openaiEnabled).toBe(false)
+    expect(c.openaiEnabled).toBe(true)
     expect(c.monthlyBudgetUsd).toBe(20)
     expect(c.limits).toEqual({ guestPerSession: 20, guestPerDayIp: 50, userPerDay: 100, maxChars: 300 })
     expect(c.messages.sick.vi).toEqual(DEFAULT_MAY_CONFIG.messages.sick.vi)
@@ -553,8 +553,8 @@ describe('Cấu hình (FR-AI-007)', () => {
     expect(DEFAULT_MAY_CONFIG.limits.maxChars).toBe(500)
   })
 
-  it('không có cấu hình → mặc định D-55/D-58/§22.4', async () => {
-    expect(await loadMayConfig(repo)).toMatchObject({ openaiEnabled: false, monthlyBudgetUsd: 20, limits: { guestPerSession: 20, guestPerDayIp: 50, userPerDay: 100, maxChars: 500 } })
+  it('không có cấu hình → mặc định D-67/D-58/§22.4', async () => {
+    expect(await loadMayConfig(repo)).toMatchObject({ openaiEnabled: true, monthlyBudgetUsd: 20, limits: { guestPerSession: 20, guestPerDayIp: 50, userPerDay: 100, maxChars: 500 } })
   })
 
   it('D-56: kênh vi có, en trống → câu en vẫn gợi ý kênh vi; không kênh nào → câu không có {channel}', async () => {
@@ -583,7 +583,8 @@ describe('Health IT — openai (D-52, D-55)', () => {
     const { openai: o } = await health(createMayService({ repo, openai: null, now: () => clock }))
     expect(o).toMatchObject({ status: 'not_configured', configured: false, budgetPct: 0 })
   })
-  it('có khoá, chưa bật → disabled', async () => {
+  it('có khoá, admin tắt → disabled', async () => {
+    await repo.setSetting(MAY_SETTING_KEY, { openaiEnabled: false }, null)
     const { openai: o, overall } = await health(createMayService({ repo, openai: fakeOpenAi([say('x')]), now: () => clock }))
     expect(o.status).toBe('disabled')
     expect(overall).toBe('ok')

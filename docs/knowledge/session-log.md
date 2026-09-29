@@ -4,6 +4,14 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-09-29 — Mây: OpenAI mặc định bật (nhánh `feat/may-openai-default`)
+
+**Quyết định từ người dùng**: đồng ý `[LEGAL]` I-14, đổi mặc định bật OpenAI → D-67 (trên nhánh đánh D-64; khi gộp `master` đổi thành D-67 vì D-64…D-66 đã dùng).
+
+**Đã làm**: `DEFAULT_MAY_CONFIG.openaiEnabled = true` (`server/may/config.js`); thiếu `OPENAI_API_KEY` vẫn chạy FAQ offline; admin vẫn tắt được ở `/admin/may`. Bỏ câu "chờ pháp chế" ở admin/IT/`.env.example`. Subagent kiểm thử (T-11): không có lỗi, thêm `server/may.default.extra.test.js` (12 test, gồm che SĐT/email trước khi gửi OpenAI). Spec v0.17.
+
+**Còn lại / cần người dùng**: Vercel đã có `OPENAI_API_KEY`; cấu hình Mây lưu ở Supabase nên vẫn cần nối Supabase. Cấu hình đã lưu với `openaiEnabled: false` giữ nguyên.
+
 ## 2026-09-29 (phiên 9) — Dashboard kính mờ, nền mây khói, giao diện tối (nhánh `feat/account-glass`, từ `master`)
 
 **Quyết định từ người dùng**: D-65 — glassmorphism, nền dải mây khói/đèn trời bay lên khi vào trang, dark mode.

@@ -23,7 +23,7 @@ export const S = {
       error: 'Lỗi',
       not_integrated: 'Chưa tích hợp',
       not_configured: 'Chưa có khoá',
-      disabled: 'Đang tắt (chờ pháp chế I-14)',
+      disabled: 'Admin đang tắt',
     },
     budget: 'Ngân sách tháng: {cost} / {budget} USD ({pct}%)',
     configured: 'Đã có cấu hình',

@@ -150,7 +150,7 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
       if (await overLimit(config, { user, sessionId, ip })) {
         reply = { kind: 'tired', text: canned(config, lang, 'tired') }
       } else if (!config.openaiEnabled || !openai) {
-        // D-55: chưa bật OpenAI (chờ I-14) hoặc thiếu khoá → FAQ offline
+        // D-55/D-67: admin tắt OpenAI hoặc thiếu khoá → FAQ offline
         reply = await offline(config, lang, message)
       } else if (
         // Không đọc được chi phí → coi như hết ngân sách (không gọi OpenAI khi không kiểm soát được chi phí)
