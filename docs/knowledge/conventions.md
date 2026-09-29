@@ -34,6 +34,7 @@
 - Trang công khai phải render được trên server (T-15): không đọc `window`/`localStorage` khi render; khai báo key dữ liệu trong `src/seo/routes.js`.
 - Tôn trọng `prefers-reduced-motion` (NFR-A11Y-001): CSS có media query trong `pages.css`; framer-motion được bọc `MotionConfig reducedMotion="user"` ở `LocaleLayout`. Hook cần biết trạng thái giảm chuyển động dùng `useReducedMotionConfig()`.
 - framer-motion: chỉ dùng `m.*` (LazyMotion strict — T-22); hiệu ứng xuất hiện/biến mất dùng `<Reveal>` + biến thể trong `src/lib/motion.js`; hiệu ứng lặp viết bằng CSS.
+- Giao diện theo [`design-rules.md`](design-rules.md) (màu, khung, ảnh, motion). Ảnh ngoài: chỉ public domain/CC0, ghi nguồn ở `public/images/folk/CREDITS.md` + `src/data/folkArt.js`.
 - Màu dùng token trong `src/index.css` (`--diep`, `--than`, `--son`, `--hoe`, `--cham`, `--la`…); tên cũ (`--ink`, `--brown`…) chỉ là bí danh cho code cũ (T-23). SVG trang trí đặt `aria-hidden="true"`.
 
 ## Test

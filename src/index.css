@@ -1,22 +1,31 @@
 /*
- * Bảng màu "Đông Hồ đã ngả màu thời gian": màu tự nhiên của tranh dân gian, phai như bản in cũ.
- * giấy điệp ố vàng (nền) · mực than tre ngả nâu · đỏ son phai · vàng hoè đất · xanh chàm bạc.
+ * Bảng màu MỘC — lấy từ bột màu tự nhiên của tranh Đông Hồ (xem docs/knowledge/design-rules.md).
+ * Tỉ lệ dùng: ~70% giấy · ~20% mực (than, chàm) · ~7% son · ~3% hoè. Lá và hồng chỉ dùng trong minh hoạ.
  */
 :root {
-  --diep: #f0e3c6;
-  --diep-deep: #e4d0a8;
-  --diep-light: #f8efd9;
-  --than: #2b2119;
-  --than-soft: #5d4a38;
-  --son: #a83a2a;
-  --son-deep: #82291d;
-  --hoe: #d69c34;
-  --hoe-light: #ecca86;
-  --cham: #273a50;
-  --cham-deep: #1b2a3c;
-  --la: #52704b;
-  --sepia: #8b6a45;
-  --line: #d3bd92;
+  /* Giấy điệp: nền trắng ngà, để tranh và ảnh thật nổi lên */
+  --diep: #f4ede0;
+  --diep-deep: #e9dfcb;
+  --diep-light: #fbf7ef;
+  /* Mực than tre: chữ và mảng tối */
+  --than: #2a211b;
+  --than-2: #3a2c22;
+  --than-soft: #5a4b3e;
+  /* Đỏ son (sỏi son): điểm nhấn duy nhất — nút chính, ấn triện, số liệu then chốt */
+  --son: #a3321f;
+  --son-deep: #7c2617;
+  /* Vàng hoè ngả đồng: ánh đèn, nét mảnh trên nền tối — dùng ít */
+  --hoe: #bf8a3a;
+  --hoe-light: #e2c68f;
+  /* Xanh chàm: mảng nền tối (Di sản, Lookbook) */
+  --cham: #26374a;
+  --cham-deep: #1a2735;
+  /* Chỉ dùng trong minh hoạ và nhãn nhỏ */
+  --la: #5b6b4c;
+  --hong: #c97f66;
+  /* Sepia: nét mảnh, nhãn phụ (đạt 4,5:1 trên --diep) */
+  --sepia: #7a5d3c;
+  --line: #d6c7a8;
 
   /* Bí danh cho các trang khác (tài khoản, lô, admin, IT) vẫn dùng tên biến cũ */
   --paper: var(--diep);
@@ -37,8 +46,8 @@
   --sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Nét mảnh và bóng mềm như tranh treo — không dùng viền đen dày, bóng đổ cứng */
-  --hair: rgba(139, 106, 69, 0.45);
-  --hair-soft: rgba(139, 106, 69, 0.22);
+  --hair: rgba(122, 93, 60, 0.42);
+  --hair-soft: rgba(122, 93, 60, 0.2);
   --print: 0 1px 2px rgba(60, 40, 20, 0.06), 0 12px 28px -18px rgba(60, 40, 20, 0.4);
   --print-lg: 0 2px 4px rgba(60, 40, 20, 0.06), 0 26px 50px -30px rgba(60, 40, 20, 0.5);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);

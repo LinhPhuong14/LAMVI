@@ -35,6 +35,64 @@ export default {
     statArtisans: '位合作匠人',
     statStory: '份专属祝福，伴随每份礼物',
   },
+  // Phòng tranh: ảnh tư liệu public domain/CC0 (src/data/folkArt.js). Chú thích do dev soạn — chờ Marketing duyệt
+  gallery: {
+    label: '民间画廊',
+    source: '图片来源',
+    note: '东湖民间年画及 18 世纪末 dó 纸绘画（越南国家美术博物馆）。资料图片来自维基共享资源，属公有领域或 CC0——并非 MỘC 的产品照片。',
+    items: {
+      'chuot-ruoc-den': {
+        name: '老鼠提灯游行',
+        meta: '东湖木版年画',
+        alt: '东湖年画：老鼠举旗、提灯、舞纸龙的节日游行',
+      },
+      'dam-cuoi-chuot': {
+        name: '老鼠娶亲',
+        meta: '东湖木版年画',
+        alt: '东湖年画：老鼠抬轿迎亲，并向猫献礼',
+      },
+      'ong-to-ba-nguyet': {
+        name: '月下老人',
+        meta: '东湖木版年画',
+        alt: '东湖年画：牵红线的月老与月婆',
+      },
+      'lon-am-duong': {
+        name: '阴阳猪',
+        meta: '东湖木版年画',
+        alt: '东湖年画：身上带阴阳纹的肥猪',
+      },
+      'vinh-hoa': {
+        name: '荣华',
+        meta: '东湖木版年画',
+        alt: '东湖年画：怀抱公鸡的孩童，寓意荣华',
+      },
+      'phu-quy': {
+        name: '富贵',
+        meta: '东湖木版年画',
+        alt: '东湖年画：怀抱鸭子的孩童，寓意富贵',
+      },
+      'ca-chep': {
+        name: '鲤鱼',
+        meta: '东湖木版年画',
+        alt: '东湖年画：鲤鱼',
+      },
+      'muc-dong-tha-dieu': {
+        name: '牧童放风筝',
+        meta: '东湖木版年画',
+        alt: '东湖年画：放风筝的牧童',
+      },
+      'giang-hoc-do': {
+        name: '讲学图',
+        meta: 'dó 纸绘画，乂安省独雷祠，18 世纪末——越南国家美术博物馆',
+        alt: '18 世纪 dó 纸立轴：先生为学生讲学',
+      },
+      'vinh-quy': {
+        name: '荣归图',
+        meta: 'dó 纸绘画，乂安省独雷祠，18 世纪末——越南国家美术博物馆',
+        alt: '18 世纪 dó 纸立轴：文官荣归故里，随从相伴',
+      },
+    },
+  },
   artisan: {
     eyebrow: '手艺的守护者',
     title: '创造光的双手',

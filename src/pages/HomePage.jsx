@@ -14,6 +14,7 @@ import ScrollProgress from '../components/ScrollProgress'
 import Marquee from '../components/Marquee'
 import Particles from '../components/Particles'
 import Faq from '../components/Faq'
+import FolkGallery from '../components/FolkGallery'
 import Price from '../components/Price'
 import { CountUp, Reveal } from '../components/Reveal'
 import { PointerGlow, TiltCard } from '../components/Effects'
@@ -400,6 +401,7 @@ export default function HomePage() {
             </m.div>
           ))}
         </m.div>
+        <FolkGallery />
       </Reveal>
 
       <Reveal as="section" id="artisan" className="artisan" variants={group}>

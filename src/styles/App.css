@@ -198,7 +198,7 @@
 }
 
 .btn-ghost:hover {
-  background: rgba(214, 156, 52, 0.12);
+  background: rgba(191, 138, 58, 0.12);
   border-color: var(--sepia);
 }
 
@@ -345,7 +345,7 @@
   font-style: italic;
   font-weight: 600;
   color: var(--son);
-  background: linear-gradient(transparent 70%, rgba(214, 156, 52, 0.42) 70% 92%, transparent 92%);
+  background: linear-gradient(transparent 70%, rgba(191, 138, 58, 0.42) 70% 92%, transparent 92%);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
@@ -681,9 +681,9 @@
 
 .marquee {
   overflow: hidden;
-  border-top: 3px double rgba(214, 156, 52, 0.55);
-  border-bottom: 3px double rgba(214, 156, 52, 0.55);
-  background: #3a2a1e;
+  border-top: 3px double rgba(191, 138, 58, 0.55);
+  border-bottom: 3px double rgba(191, 138, 58, 0.55);
+  background: var(--than-2);
   padding: 13px 0;
   position: relative;
   z-index: 3;
@@ -744,7 +744,7 @@
 }
 
 .story .eyebrow {
-  color: var(--hoe);
+  color: var(--hoe-light);
 }
 
 .story .story-text {
@@ -778,7 +778,7 @@
 }
 
 .story-stats > div + div {
-  border-left: 1px dashed rgba(236, 202, 134, 0.35);
+  border-left: 1px dashed rgba(226, 198, 143, 0.35);
 }
 
 .story-stats strong {
@@ -1051,7 +1051,7 @@
 }
 
 .tone-dawn {
-  --tone: #e9876b;
+  --tone: var(--hong);
 }
 
 .tone-moss {
@@ -1148,8 +1148,8 @@
   background: var(--cham-deep);
   background-image:
     var(--tex-grain),
-    radial-gradient(circle at 20% 30%, rgba(214, 156, 52, 0.16), transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(184, 50, 42, 0.2), transparent 45%);
+    radial-gradient(circle at 20% 30%, rgba(191, 138, 58, 0.16), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(163, 50, 31, 0.2), transparent 45%);
   color: var(--diep);
 }
 
@@ -1168,7 +1168,7 @@
 }
 
 .lookbook .eyebrow {
-  color: var(--hoe);
+  color: var(--hoe-light);
 }
 
 .lookbook-grid {
@@ -1325,7 +1325,7 @@
   left: 6%;
   right: 6%;
   height: 3px;
-  border-top: 3px dotted rgba(168, 58, 42, 0.3);
+  border-top: 3px dotted rgba(163, 50, 31, 0.3);
 }
 
 .timeline-beam {
@@ -1350,7 +1350,7 @@
   height: 14px;
   border-radius: 50%;
   background: radial-gradient(circle, #fff4cf 0 25%, var(--hoe) 50%, transparent 72%);
-  box-shadow: 0 0 14px 6px rgba(214, 156, 52, 0.45);
+  box-shadow: 0 0 14px 6px rgba(191, 138, 58, 0.45);
 }
 
 .timeline-label {
@@ -1423,8 +1423,8 @@
   /* Trăng rằm sau điện thoại: quầng sáng mềm, không viền */
   background: radial-gradient(circle at 42% 38%, #f6dca0, var(--hoe) 62%, #c98a2a);
   box-shadow:
-    0 0 0 14px rgba(214, 156, 52, 0.1),
-    0 0 0 30px rgba(214, 156, 52, 0.05);
+    0 0 0 14px rgba(191, 138, 58, 0.1),
+    0 0 0 30px rgba(191, 138, 58, 0.05);
 }
 
 .phone-frame {
@@ -1465,7 +1465,7 @@
   width: 100%;
   aspect-ratio: 9 / 12;
   background:
-    radial-gradient(circle at 50% 45%, rgba(230, 166, 35, 0.55), transparent 60%),
+    radial-gradient(circle at 50% 45%, rgba(191, 138, 58, 0.55), transparent 60%),
     var(--cham);
   border-radius: 18px;
   display: flex;
@@ -1972,7 +1972,7 @@
   }
   .story-stats > div + div {
     border-left: 0;
-    border-top: 1px dashed rgba(236, 202, 134, 0.35);
+    border-top: 1px dashed rgba(226, 198, 143, 0.35);
   }
   .timeline li:nth-child(2n) {
     border-left: 0;
@@ -2059,7 +2059,7 @@
   background: conic-gradient(
     from var(--thread-angle),
     transparent 0 62%,
-    rgba(236, 202, 134, 0.2) 70%,
+    rgba(226, 198, 143, 0.2) 70%,
     #ffe7a6 80%,
     var(--hoe) 84%,
     transparent 92%
@@ -2252,5 +2252,116 @@
   }
   .brand-hover-stroke {
     stroke-dashoffset: 0 !important;
+  }
+}
+
+/* ---------- Phòng tranh: tranh Đông Hồ & tranh giấy dó thật treo trên vách chàm ---------- */
+
+.folk-gallery {
+  margin-top: 76px;
+}
+
+.folk-gallery-track {
+  display: flex;
+  align-items: flex-end;
+  justify-content: safe center;
+  gap: 30px;
+  margin: 0 -24px;
+  padding: 14px 24px 26px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(226, 198, 143, 0.35) transparent;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+}
+
+.folk-gallery-track:focus-visible {
+  outline: 1px solid var(--hoe-light);
+  outline-offset: 4px;
+}
+
+.folk-print {
+  flex: 0 0 auto;
+  margin: 0;
+  text-align: left;
+  scroll-snap-align: center;
+}
+
+/* Tranh bồi: mép lụa + đường chỉ mảnh, treo nổi trên vách tối */
+.folk-print-frame {
+  position: relative;
+  padding: 10px;
+  background: var(--diep-light);
+  box-shadow: 0 22px 44px -26px rgba(0, 0, 0, 0.75);
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+
+.folk-print-frame::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--hair-soft);
+  pointer-events: none;
+}
+
+.folk-print:hover .folk-print-frame {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 54px -26px rgba(0, 0, 0, 0.85);
+}
+
+.folk-print img {
+  display: block;
+  width: auto;
+  height: 250px;
+}
+
+.folk-print figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 12px;
+  max-width: 320px;
+}
+
+.folk-print-name {
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--diep-light);
+}
+
+.folk-print-meta {
+  font-size: 0.78rem;
+  color: var(--hoe-light);
+}
+
+.folk-print-source {
+  font-size: 0.72rem;
+  color: rgba(245, 236, 215, 0.6);
+  text-decoration: underline dotted rgba(245, 236, 215, 0.35);
+  text-underline-offset: 3px;
+}
+
+.folk-print-source:hover {
+  color: var(--diep-light);
+}
+
+.folk-gallery-note {
+  max-width: 680px;
+  margin: 8px auto 0;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: rgba(245, 236, 215, 0.62);
+}
+
+@media (max-width: 640px) {
+  .folk-gallery-track {
+    margin: 0 -16px;
+    padding-inline: 16px;
+    gap: 20px;
+  }
+  .folk-print img {
+    height: 200px;
   }
 }

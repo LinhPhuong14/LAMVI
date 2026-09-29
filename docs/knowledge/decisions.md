@@ -26,6 +26,8 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
 | T-21 | 2026-09-28 | Font tự host bằng `@fontsource` (Fraunces Variable soft + italic, Be Vietnam Pro 400/500/600), preload 6 file woff2 chính trong `index.html`; bỏ Google Fonts | Hiệu lực |
 | T-22 | 2026-09-28 | Motion: `LazyMotion features={domAnimation} strict` ở `LocaleLayout` → chỉ dùng `m.*`; xuất hiện/biến mất theo `useViewState` (IntersectionObserver, `below`/`in`/`above`); animation lặp (đung đưa, marquee, hạt lửa) bằng CSS | Hiệu lực |
+| T-26 | 2026-09-29 | Cân lại bảng màu theo bột màu tự nhiên của tranh Đông Hồ: nền giấy điệp nhạt hơn, son là điểm nhấn duy nhất, hoè ngả đồng, lá/hồng chỉ trong minh hoạ; tỉ lệ 70/20/7/3; mọi cặp chữ đạt WCAG AA | Hiệu lực |
+| T-27 | 2026-09-29 | Ảnh tư liệu thật (tranh Đông Hồ, tranh giấy dó thế kỷ 18) từ Wikimedia Commons, chỉ public domain/CC0; WebP 480/960 ở `public/images/folk/`; nguồn ghi ở `CREDITS.md` + `src/data/folkArt.js`; hiển thị như tranh treo có chú thích, không như ảnh sản phẩm | Hiệu lực — chờ `[LEGAL]` §31.4 |
 | T-25 | 2026-09-29 | Bỏ phong cách "viền đen dày + bóng đổ cứng" (neo-brutalism). Dùng nét mảnh sepia, khung viền đôi, góc hoa văn triện, bóng mềm, mảng màu phẳng có hoa văn chìm — tham khảo nguyên tắc trình bày của các trang bảo tàng/di sản Trung Quốc, dịch sang hoạ tiết Việt | Hiệu lực |
 | T-24 | 2026-09-28 | Hiệu ứng lấy ý tưởng từ Aceternity UI nhưng tự viết lại (không chép code — trang của họ ghi "All Rights Reserved"; không dùng Tailwind). Hiệu ứng theo con trỏ chỉ bật khi `useFinePointer()` và không giảm chuyển động | Hiệu lực |
 | T-23 | 2026-09-28 | Giao diện "Đông Hồ cổ": token màu ở `src/index.css` (giữ bí danh tên cũ cho `pages.css`); texture giấy/mực là SVG nội tuyến, vẽ trên nền tĩnh — không dùng lớp phủ cố định có `mix-blend-mode`/`backdrop-filter` | Hiệu lực |
@@ -122,3 +124,13 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
   - Tab gạch chân, cột ngăn bằng nét chấm → tab Mua tặng/Mua cho mình, số liệu, công đoạn.
   - Nút như ấn son: góc 3px, đường chỉ sáng bên trong bằng `box-shadow: inset`.
 - **Hệ quả**: không thêm lại `border: 2px solid var(--than)` hay bóng lệch cứng; khung mới dùng `--hair` + góc triện.
+
+### T-26 — Cân lại bảng màu
+- **Bối cảnh**: nhiều màu mạnh ngang nhau (son, hoè, chàm, lá, hồng cá hồi); nền giấy quá vàng sẽ lấn màu tranh thật khi thêm ảnh tư liệu.
+- **Quyết định**: token mới ở `src/index.css` (bảng và tỉ lệ ở [`design-rules.md`](design-rules.md) §2). Đã đo tương phản: mọi cặp chữ ≥ 4,5:1; `--sepia` làm đậm thành `#7a5d3c` để dùng cho chữ nhỏ. Bỏ màu viết cứng `#3a2a1e`, `#e9876b` → `--than-2`, `--hong`; các `rgba()` theo màu cũ đổi theo màu mới.
+
+### T-27 — Ảnh tư liệu
+- **Nguồn**: Wikimedia Commons, tải bằng API có User-Agent riêng, kích thước chuẩn (1280) để tránh bị giới hạn tần suất. Chỉ nhận `Public domain`/`CC0`; loại ảnh có trẻ em nhận diện được.
+- **Xử lý**: `sharp` → WebP 480/960, không chỉnh màu, không cắt; script ở ngoài repo, kết quả + `CREDITS.md` trong `public/images/folk/`.
+- **Hiển thị**: `FolkGallery` (phần Di sản) — khung tranh bồi trên vách chàm, tên + nguồn dưới mỗi tranh, ghi chú "không phải ảnh sản phẩm". `alt`/chú thích qua i18n.
+- **Hệ quả**: thêm ảnh mới phải cập nhật `CREDITS.md` và `folkArt.js`; không dùng ảnh tư liệu ở vị trí sản phẩm/nghệ nhân.

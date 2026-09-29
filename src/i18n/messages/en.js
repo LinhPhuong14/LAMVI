@@ -42,6 +42,64 @@ export default {
     statArtisans: 'partner artisans',
     statStory: 'personal message for every gift',
   },
+  // Phòng tranh: ảnh tư liệu public domain/CC0 (src/data/folkArt.js). Chú thích do dev soạn — chờ Marketing duyệt
+  gallery: {
+    label: 'Folk painting gallery',
+    source: 'Image source',
+    note: 'Đông Hồ folk prints and late 18th-century paintings on dó paper (Vietnam National Museum of Fine Arts). Archival images from Wikimedia Commons, public domain or CC0 — not photos of MỘC products.',
+    items: {
+      'chuot-ruoc-den': {
+        name: 'Mice’s lantern procession',
+        meta: 'Đông Hồ woodblock print',
+        alt: 'Đông Hồ print: mice carrying flags, lanterns and a paper dragon in a festival parade',
+      },
+      'dam-cuoi-chuot': {
+        name: 'The mice’s wedding',
+        meta: 'Đông Hồ woodblock print',
+        alt: 'Đông Hồ print: a mouse wedding procession with a palanquin, offering gifts to the cat',
+      },
+      'ong-to-ba-nguyet': {
+        name: 'Ông Tơ and Bà Nguyệt',
+        meta: 'Đông Hồ woodblock print',
+        alt: 'Đông Hồ print: Ông Tơ and Bà Nguyệt, the deities who tie the threads of marriage',
+      },
+      'lon-am-duong': {
+        name: 'Yin–yang pig',
+        meta: 'Đông Hồ woodblock print',
+        alt: 'Đông Hồ print: a plump pig marked with yin–yang swirls',
+      },
+      'vinh-hoa': {
+        name: 'Glory (Vinh hoa)',
+        meta: 'Đông Hồ woodblock print',
+        alt: 'Đông Hồ print: a child holding a rooster, a wish for glory',
+      },
+      'phu-quy': {
+        name: 'Prosperity (Phú quý)',
+        meta: 'Đông Hồ woodblock print',
+        alt: 'Đông Hồ print: a child holding a duck, a wish for prosperity',
+      },
+      'ca-chep': {
+        name: 'Carp',
+        meta: 'Đông Hồ woodblock print',
+        alt: 'Đông Hồ print: a carp',
+      },
+      'muc-dong-tha-dieu': {
+        name: 'Buffalo boy flying a kite',
+        meta: 'Đông Hồ woodblock print',
+        alt: 'Đông Hồ print: a buffalo boy flying a kite',
+      },
+      'giang-hoc-do': {
+        name: 'Teaching scene (Giảng học đồ)',
+        meta: 'Painting on dó paper, Độc Lôi temple (Nghệ An), late 18th century — Vietnam National Museum of Fine Arts',
+        alt: '18th-century hanging scroll on dó paper: a teacher lecturing his students',
+      },
+      'vinh-quy': {
+        name: 'Triumphant return (Vinh quy)',
+        meta: 'Painting on dó paper, Độc Lôi temple (Nghệ An), late 18th century — Vietnam National Museum of Fine Arts',
+        alt: '18th-century hanging scroll on dó paper: a civil mandarin returning home in triumph with his retinue',
+      },
+    },
+  },
   artisan: {
     eyebrow: 'Keeper of the craft',
     title: 'The hands that make the light',
