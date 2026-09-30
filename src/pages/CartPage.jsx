@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Lantern from '../components/Lantern'
 import Price from '../components/Price'
@@ -14,12 +13,11 @@ export default function CartPage() {
   const { user } = useAuth()
   const { cart, error, setQuantity, remove } = useCart()
   const navigate = useNavigate()
-  const [soon, setSoon] = useState(false)
 
-  // D-61: chưa đăng nhập → đăng nhập rồi quay lại giỏ (US-001 AC-003); đã đăng nhập → báo sắp ra mắt
+  // D-61 / FR-CHK-001: chưa đăng nhập → đăng nhập rồi quay lại giỏ (US-001 AC-003)
   function onCheckout() {
     if (!user) return navigate(`${path('/login')}?next=${encodeURIComponent(path('/cart'))}`)
-    setSoon(true)
+    navigate(path('/checkout'))
   }
 
   const head = (
@@ -77,7 +75,7 @@ export default function CartPage() {
               ) : (
                 <strong>{t('cart.unavailableName')}</strong>
               )}
-              {i.available ? <Price amount={i.product.priceExclVat} /> : <span className="field-error">{t('cart.unavailable')}</span>}
+              {i.available ? <Price amount={i.product.price} /> : <span className="field-error">{t('cart.unavailable')}</span>}
             </div>
             <QuantityInput
               value={i.quantity}
@@ -86,7 +84,7 @@ export default function CartPage() {
               onChange={(q) => q !== i.quantity && setQuantity(i.slug, q)}
             />
             <div className="cart-line-total">
-              {i.available && <Price amount={i.lineTotalExclVat} />}
+              {i.available && <Price amount={i.lineTotal} />}
               <button type="button" className="btn btn-small btn-ghost" onClick={() => remove(i.slug)}>
                 {t('cart.remove')}
               </button>
@@ -98,18 +96,13 @@ export default function CartPage() {
       <div className="cart-summary account-card">
         <div className="cart-subtotal">
           <span>{t('cart.subtotal')}</span>
-          <Price amount={cart.subtotalExclVat} className="product-price large" />
+          <Price amount={cart.subtotal} className="product-price large" />
         </div>
         <p className="field-hint">{t('cart.shippingNote')}</p>
         {!user && <p className="field-hint">{t('cart.guestNote')}</p>}
         <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0}>
           {t('cart.checkout')}
         </button>
-        {soon && (
-          <p className="notice" role="status">
-            {t('cart.checkoutSoon')}
-          </p>
-        )}
       </div>
     </section>
   )

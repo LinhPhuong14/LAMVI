@@ -9,6 +9,10 @@ export const VIDEO_TYPES = { 'video/mp4': 'mp4', 'video/webm': 'webm', 'video/qu
 // Chỉ khoá riêng của VIDEO_TYPES (tránh '__proto__', 'toString'…)
 export const isVideoType = (t) => typeof t === 'string' && Object.hasOwn(VIDEO_TYPES, t)
 
+// Ảnh sản phẩm (G-23). Chỉ định dạng web phổ biến; không nhận SVG vì SVG có thể chứa script.
+export const IMAGE_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }
+export const isImageType = (t) => typeof t === 'string' && Object.hasOwn(IMAGE_TYPES, t)
+
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 // Mã lô in trên QR khắc đèn: chữ in hoa, số, gạch nối [ASSUMPTION]
 const BATCH_CODE_RE = /^[A-Z0-9]+(?:-[A-Z0-9]+)*$/
@@ -59,7 +63,7 @@ export function validateProduct(body, { partial = false } = {}) {
   })
   field(body, 'kind', partial, errors, values, oneOf(PRODUCT_KINDS))
   field(body, 'status', partial, errors, values, (v) => (v === undefined && !partial ? { value: 'draft' } : oneOf(PRODUCT_STATUSES)(v)))
-  field(body, 'priceExclVat', partial, errors, values, (v) =>
+  field(body, 'price', partial, errors, values, (v) =>
     // T-09: số nguyên VND
     v === undefined ? { error: 'REQUIRED' } : isInt(v, 0, 1_000_000_000) ? { value: v } : { error: 'INVALID_PRICE' },
   )
@@ -68,6 +72,8 @@ export function validateProduct(body, { partial = false } = {}) {
   field(body, 'name', partial, errors, values, (v) => parseI18n(v, { required: true, max: 120 }))
   field(body, 'description', partial, errors, values, (v) => parseI18n(v, { max: 1000 }))
   field(body, 'badge', partial, errors, values, (v) => parseI18n(v, { max: 40 }))
+  // Chú thích ảnh (alt) — a11y + SEO; ảnh và đường dẫn đặt qua endpoint tải ảnh, không qua form
+  field(body, 'imageAlt', partial, errors, values, (v) => parseI18n(v, { max: 160 }))
   return { errors, values }
 }
 
@@ -109,5 +115,13 @@ export function validateVideoUpload(body, maxBytes) {
   if (!isVideoType(body.contentType)) errors.contentType = 'INVALID_VIDEO_TYPE'
   if (!Number.isInteger(body.size) || body.size <= 0) errors.size = 'INVALID'
   else if (body.size > maxBytes) errors.size = 'VIDEO_TOO_LARGE'
+  return errors
+}
+
+export function validateImageUpload(body, maxBytes) {
+  const errors = {}
+  if (!isImageType(body.contentType)) errors.contentType = 'INVALID_IMAGE_TYPE'
+  if (!Number.isInteger(body.size) || body.size <= 0) errors.size = 'INVALID'
+  else if (body.size > maxBytes) errors.size = 'IMAGE_TOO_LARGE'
   return errors
 }

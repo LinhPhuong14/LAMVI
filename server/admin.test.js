@@ -26,7 +26,7 @@ beforeEach(async () => {
 const product = {
   slug: 'den-moi',
   kind: 'single',
-  priceExclVat: 750000,
+  price: 750000,
   name: { vi: 'Đèn Mới', en: 'New Lantern', zh: '' },
   description: { vi: 'Mô tả' },
 }
@@ -74,12 +74,12 @@ describe('Sản phẩm (FR-CAT-004)', () => {
     const res = await request(app)
       .post('/api/admin/products')
       .set('Authorization', admin)
-      .send({ slug: 'Đèn Mới', kind: 'lamp', priceExclVat: 1.5, name: { en: 'x' }, status: 'sold' })
+      .send({ slug: 'Đèn Mới', kind: 'lamp', price: 1.5, name: { en: 'x' }, status: 'sold' })
     expect(res.status).toBe(400)
     expect(res.body.error.fields).toEqual({
       slug: 'INVALID_SLUG',
       kind: 'INVALID',
-      priceExclVat: 'INVALID_PRICE',
+      price: 'INVALID_PRICE',
       name: 'REQUIRED',
       status: 'INVALID',
     })

@@ -15,13 +15,13 @@ function present(lines, hidden = []) {
       slug,
       quantity,
       available,
-      product: { name: slug === 'den-nguyet' ? 'Đèn Nguyệt' : 'Đèn Sum Vầy', tone: 'amber', priceExclVat: available ? PRICES[slug] : null },
-      lineTotalExclVat: available ? PRICES[slug] * quantity : null,
+      product: { name: slug === 'den-nguyet' ? 'Đèn Nguyệt' : 'Đèn Sum Vầy', tone: 'amber', price: available ? PRICES[slug] : null },
+      lineTotal: available ? PRICES[slug] * quantity : null,
     }
   })
   return {
     items,
-    subtotalExclVat: items.reduce((s, i) => s + (i.lineTotalExclVat ?? 0), 0),
+    subtotal: items.reduce((s, i) => s + (i.lineTotal ?? 0), 0),
     itemCount: items.filter((i) => i.available).reduce((s, i) => s + i.quantity, 0),
     hasUnavailable: items.some((i) => !i.available),
     maxQuantity: 10,
@@ -55,7 +55,7 @@ describe('Giỏ khách vãng lai (D-59)', () => {
     mockApi(base)
     renderAt('/cart')
     expect(await screen.findByText(/3\.460\.000/)).toBeInTheDocument()
-    expect(screen.getByText('Phí vận chuyển và VAT được tính ở bước thanh toán.')).toBeInTheDocument()
+    expect(screen.getByText('Giá đã gồm VAT. Phí vận chuyển được tính ở bước thanh toán.')).toBeInTheDocument()
     const line = screen.getByText('Đèn Nguyệt', { selector: 'strong' }).closest('li')
     fireEvent.click(within(line).getByRole('button', { name: 'Tăng số lượng' }))
     await waitFor(() => expect(JSON.parse(localStorage.getItem('moc.cart'))[0]).toEqual({ slug: 'den-nguyet', quantity: 3 }))
@@ -100,7 +100,7 @@ describe('Giỏ tài khoản (D-41, D-59, D-61)', () => {
     expect(localStorage.getItem('moc.cart')).toBeNull()
   })
 
-  it('sản phẩm bị ẩn: cảnh báo, không đổi được số lượng; thanh toán báo sắp ra mắt', async () => {
+  it('sản phẩm bị ẩn: cảnh báo, không đổi được số lượng', async () => {
     localStorage.setItem('moc.session', JSON.stringify(session))
     mockApi({
       ...base,
@@ -111,8 +111,6 @@ describe('Giỏ tài khoản (D-41, D-59, D-61)', () => {
     expect(screen.getByText(/Giỏ có sản phẩm không còn bán/)).toBeInTheDocument()
     const hiddenLine = screen.getByText('Đèn Sum Vầy', { selector: 'strong' }).closest('li')
     expect(within(hiddenLine).getByRole('button', { name: 'Tăng số lượng' })).toBeDisabled()
-    fireEvent.click(screen.getByRole('button', { name: 'Thanh toán' }))
-    expect(await screen.findByText('Thanh toán trực tuyến sẽ sớm ra mắt. Giỏ hàng của bạn đã được lưu.')).toBeInTheDocument()
   })
 
   it('trang sản phẩm: chọn số lượng rồi thêm → PUT số lượng cộng dồn', async () => {

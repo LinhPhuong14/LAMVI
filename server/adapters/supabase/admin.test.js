@@ -32,7 +32,7 @@ const productRow = {
   slug: 'den-moi',
   kind: 'set',
   status: 'draft',
-  price_excl_vat: 1200000,
+  price: 1200000,
   tone: 'moss',
   sort_order: 3,
   name: { vi: 'Đèn Mới' },
@@ -68,7 +68,7 @@ describe('Supabase repo — ghi sản phẩm', () => {
       slug: 'den-moi',
       kind: 'set',
       status: 'draft',
-      priceExclVat: 1200000,
+      price: 1200000,
       tone: 'moss',
       sortOrder: 3,
       name: { vi: 'Đèn Mới' },
@@ -82,7 +82,7 @@ describe('Supabase repo — ghi sản phẩm', () => {
         slug: 'den-moi',
         kind: 'set',
         status: 'draft',
-        price_excl_vat: 1200000,
+        price: 1200000,
         tone: 'moss',
         sort_order: 3,
         name: { vi: 'Đèn Mới' },
@@ -91,22 +91,22 @@ describe('Supabase repo — ghi sản phẩm', () => {
       },
     ])
     expect(ops.slice(1)).toEqual([['select', '*'], ['single']])
-    expect(p).toMatchObject({ id: 'p1', priceExclVat: 1200000, sortOrder: 3, updatedAt: '2026-09-02' })
+    expect(p).toMatchObject({ id: 'p1', price: 1200000, sortOrder: 3, updatedAt: '2026-09-02' })
     expect(p).not.toHaveProperty('price_excl_vat')
   })
 
   it('updateProduct: chỉ gửi cột có giá trị, bỏ trường lạ (id, created_at, role); eq(id)', async () => {
     const client = fakeClient({ products: { data: [productRow], error: null } })
     const repo = createSupabaseRepo(client)
-    await repo.updateProduct('p1', { priceExclVat: 5, id: 'hack', createdAt: 'x', role: 'admin', badge: null })
+    await repo.updateProduct('p1', { price: 5, id: 'hack', createdAt: 'x', role: 'admin', badge: null })
     const { ops } = client.calls[0]
-    expect(ops[0]).toEqual(['update', { price_excl_vat: 5, badge: null }])
+    expect(ops[0]).toEqual(['update', { price: 5, badge: null }])
     expect(ops).toContainEqual(['eq', 'id', 'p1'])
   })
 
   it('updateProduct: không có dòng nào → null', async () => {
     const repo = createSupabaseRepo(fakeClient({ products: { data: [], error: null } }))
-    expect(await repo.updateProduct('nope', { priceExclVat: 1 })).toBeNull()
+    expect(await repo.updateProduct('nope', { price: 1 })).toBeNull()
   })
 
   it('deleteProduct: true khi xoá được, false khi không có', async () => {

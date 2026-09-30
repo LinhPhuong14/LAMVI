@@ -2,7 +2,7 @@
 import { splitLocale } from '../i18n/core.js'
 
 // Trang riêng tư: không SSR nội dung, chỉ trả khung HTML + noindex (BR-SEO-001)
-const PRIVATE = ['/login', '/register', '/forgot-password', '/reset-password', '/account', '/cart']
+const PRIVATE = ['/login', '/register', '/forgot-password', '/reset-password', '/account', '/cart', '/checkout']
 
 const seg = (s) => {
   try {
@@ -12,16 +12,25 @@ const seg = (s) => {
   }
 }
 
+/**
+ * Phân loại đường dẫn. **Không phân biệt hoa/thường ở phần route** vì React Router cũng vậy:
+ * `/ADMIN`, `/Account` vẫn mở đúng trang, nên nếu ở đây phân biệt thì trang riêng tư sẽ bị coi là
+ * trang công khai → lọt index, lọt cache CDN dùng chung và bị nhúng GA.
+ * Riêng slug sản phẩm và mã lô là dữ liệu, giữ nguyên chữ hoa/thường.
+ */
 export function classifyPath(pathname) {
   // D-48, D-51: admin và IT chỉ tiếng Việt, không có tiền tố ngôn ngữ
-  if (/^\/(admin|it)(\/|$)/.test(pathname)) return { kind: 'private', lang: 'vi' }
+  if (/^\/(admin|it)(\/|$)/i.test(pathname)) return { kind: 'private', lang: 'vi' }
   const { lang, rest } = splitLocale(pathname)
   const path = rest.length > 1 ? rest.replace(/\/+$/, '') : rest
-  if (PRIVATE.includes(path)) return { kind: 'private', lang }
+  const lower = path.toLowerCase()
+  if (PRIVATE.includes(lower)) return { kind: 'private', lang }
+  // Trang chi tiết đơn: nội dung phụ thuộc phiên đăng nhập (BR-SEO-001)
+  if (/^\/don-hang\/[^/]+$/.test(lower)) return { kind: 'private', lang }
   if (path === '/') return { kind: 'home', lang }
-  let m = path.match(/^\/products\/([^/]+)$/)
+  let m = path.match(/^\/products\/([^/]+)$/i)
   if (m) return seg(m[1]) === null ? { kind: 'invalid', lang } : { kind: 'product', lang, slug: seg(m[1]) }
-  m = path.match(/^\/lo\/([^/]+)$/)
+  m = path.match(/^\/lo\/([^/]+)$/i)
   if (m) return seg(m[1]) === null ? { kind: 'invalid', lang } : { kind: 'batch', lang, code: seg(m[1]) }
   return { kind: 'other', lang }
 }

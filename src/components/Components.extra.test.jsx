@@ -141,10 +141,10 @@ describe('Price — BR-PRC-003', () => {
       </LocaleContext.Provider>,
     )
 
-  it.each(['vi', 'en', 'zh'])('%s: có chú thích chưa gồm VAT', (lang) => {
+  it.each(['vi', 'en', 'zh'])('%s: có chú thích đã gồm VAT', (lang) => {
     const { container } = renderPrice(lang, 890000)
-    expect(container.querySelector('.price-note')).toHaveTextContent(MESSAGES[lang].price.exclVat)
-    expect(MESSAGES[lang].price.exclVat).toMatch(/VAT|增值税/)
+    expect(container.querySelector('.price-note')).toHaveTextContent(MESSAGES[lang].price.inclVat)
+    expect(MESSAGES[lang].price.inclVat).toMatch(/VAT|增值税/)
   })
 
   it('định dạng VND số nguyên, dấu chấm hàng nghìn, không có phần thập phân', () => {

@@ -169,7 +169,8 @@ describe('createSupabaseAuth — phiên & client', () => {
 
   it('getUser/signOut/updatePassword dùng client admin, không tạo client public', async () => {
     const { auth, makePublicClient, admin } = make()
-    expect(await auth.getUser('tok')).toEqual({ id: 'u1', email: 'an@example.com' })
+    // G-18: kèm cờ token khôi phục (đọc từ claim amr); token giả trong test không phải recovery
+    expect(await auth.getUser('tok')).toEqual({ id: 'u1', email: 'an@example.com', isRecovery: false })
     await auth.signOut('tok')
     await auth.updatePassword('u1', 'matkhaumoi1')
     expect(makePublicClient).not.toHaveBeenCalled()

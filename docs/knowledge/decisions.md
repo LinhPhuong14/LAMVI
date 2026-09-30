@@ -176,3 +176,32 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Hiệu năng**: WebP 640/1280 + `srcset`, lazy; hero `eager` với `fetchpriority="low"` để không tranh LCP; ảnh trang chủ < 600 KB. Mask + opacity tĩnh; chỉ khói/đèn chuyển động bằng `transform`.
 - **Dashboard mobile**: thanh tab cố định ở đáy — phần tử `fixed` nên không dùng `backdrop-filter` (§9).
 
+
+### T-37 — Security headers và CSP dùng hash (không dùng nonce)
+- **Bối cảnh**: chuẩn bị chạy thật, cần header bảo mật cho mọi response. Bản đầu dùng nonce sinh mỗi request.
+- **Vấn đề phát hiện khi kiểm thử**: trang công khai đặt `s-maxage=60` để CDN Vercel giữ bản dùng chung (xem T-39). Nonce nằm trong **cả** header CSP lẫn thân HTML, nên CDN phát lại đúng một nonce cho mọi khách trong suốt thời gian cache — nonce dùng lại thì không còn tác dụng gì so với `unsafe-inline`.
+- **Quyết định**: CSP cho script nội tuyến do SSR sinh (`gtag`, `window.__INITIAL_DATA__`) dùng **hash `sha256`** tính trên đúng nội dung của từng response (`cspHash` ở `server/middleware/security.js`, `renderPage` trả `scriptHashes`). Hash công khai theo thiết kế và luôn khớp bản được cache.
+- **Chi tiết khác**: `style-src` buộc có `'unsafe-inline'` vì React/framer-motion đặt style nội tuyến trên phần tử. CSP chỉ bật khi `NODE_ENV=production` (dev Vite chèn script nội tuyến riêng). HSTS chỉ gửi khi request qua HTTPS. Host ngoài (GA, Supabase) mở **đúng host**, không dùng `*`.
+- **Hệ quả**: thêm script nội tuyến mới ở SSR thì phải thêm hash của nó vào `page.scriptHashes`, nếu không trình duyệt sẽ chặn im lặng.
+
+### T-38 — Chống dò/spam đếm trong DB (G-20)
+- **Bối cảnh**: trên Vercel mỗi request có thể rơi vào một tiến trình khác, nên bộ đếm trong bộ nhớ tiến trình vô dụng.
+- **Quyết định**: dùng lại `repo.incrementMayCounter(key, ttl)` (đã có cho hạn mức Mây) làm bộ đếm có hạn dùng, tăng nguyên tử trong DB. Cửa sổ trượt theo **khối**: mỗi khối một khoá, hết khối khoá tự hết hạn.
+- **Riêng tư**: khoá đếm là `rl:<tên>:<băm(giá trị, MAY_HASH_SALT)>:<khối>` — không lưu IP hay email thô (NFR-PRV-002).
+- **Đếm theo cả IP và email** với đăng nhập/đăng ký/quên mật khẩu: chỉ đếm theo IP thì đổi IP là dò tiếp được; chỉ đếm theo email thì quét nhiều email từ một IP vẫn lọt.
+- **Hệ quả**: `TRUST_PROXY=1` là bắt buộc trên Vercel, nếu không mọi request mang IP của hạ tầng và một người bị chặn sẽ chặn cả site. `RATE_LIMIT=0` chỉ dùng cho test tự động.
+
+### T-39 — Cache CDN theo "có phụ thuộc phiên đăng nhập hay không"
+- **Quyết định**: trang SSR công khai (`/`, sản phẩm, **và trang lô `/lo/:code`**) trả `public, max-age=0, s-maxage=60, stale-while-revalidate=300`; trang phụ thuộc phiên (giỏ, checkout, tài khoản, chi tiết đơn, admin, IT) trả `private, no-store`; `/api/*` luôn `no-store`.
+- **Lý do không dùng `noindex` làm tiêu chí**: trang lô là trang công khai in trên đèn, `noindex` chỉ vì D-44 không muốn nó lên kết quả tìm kiếm — nó vẫn nên qua CDN vì bị quét rất nhiều.
+- **Hệ quả**: nếu sau này SSR render nội dung theo phiên đăng nhập (ví dụ tên khách trên trang chủ) thì **phải** bỏ `s-maxage` cùng lúc, nếu không nội dung của một khách sẽ bị phát cho khách khác.
+
+### T-40 — Bảng giá sinh ra từ một hàm duy nhất
+- **Quyết định**: `quoteCart()` trong `server/orders/service.js` là nơi duy nhất tính bảng giá; trang checkout và bước tạo đơn đều gọi nó. Client gửi kèm `expectedTotal` (tổng khách nhìn thấy); lệch → 409 `PRICE_CHANGED` kèm bảng giá mới (§12, D-41).
+- **Lý do**: hai đường tính giá riêng là nguồn sai lệch tiền kinh điển — số khách thấy khác số bị trừ.
+- **Hệ quả**: mọi thay đổi về giá/khuyến mãi phải làm trong `server/domain/pricing.js` + `quoteCart`, không tính lại ở frontend.
+
+### T-41 — Khoá lạc quan cho chuyển trạng thái đơn
+- **Quyết định**: mọi thay đổi trạng thái đơn đi qua `repo.updateOrderIfStatus(id, trạngThaiKỳVọng, giáTrịMới)` — chỉ ghi khi trạng thái hiện tại đúng như lúc đọc.
+- **Lý do**: khách bấm huỷ đúng lúc webhook payOS báo đã trả tiền là tình huống có thật; không có khoá thì cả hai cùng "thành công" và đơn rơi vào trạng thái mâu thuẫn.
+- **Hệ quả**: nơi gọi phải xử lý trường hợp trả `null` (trạng thái vừa đổi) — trả 409 cho client, không ghi đè.

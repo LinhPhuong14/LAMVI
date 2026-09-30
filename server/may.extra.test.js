@@ -151,7 +151,7 @@ describe('Prompt injection & chống bịa (BR-AI-001/003/005, R-07, R-12)', () 
     })
     const outAll = await runTool('get_products', {}, { repo, lang: 'vi' })
     expect(outAll.products.map((p) => p.slug)).toEqual([products[2].slug])
-    expect(Object.keys(outAll.products[0]).sort()).toEqual(['currency', 'description', 'kind', 'name', 'priceExclVat', 'priceNote', 'slug', 'url'])
+    expect(Object.keys(outAll.products[0]).sort()).toEqual(['currency', 'description', 'kind', 'name', 'price', 'priceNote', 'slug', 'url'])
     const s = JSON.stringify(outAll)
     expect(s).not.toMatch(/"id"|"status"|"tone"|"sortOrder"|"updatedAt"/)
     expect(await runTool('get_product', { slug: products[0].slug }, { repo, lang: 'vi' })).toEqual({ error: 'not_found' })
@@ -161,9 +161,11 @@ describe('Prompt injection & chống bịa (BR-AI-001/003/005, R-07, R-12)', () 
     expect(faq.faq).toHaveLength(faqEntries.filter((f) => f.isPublished !== false).length)
   })
 
-  it('url sản phẩm theo ngôn ngữ, slug được mã hoá', async () => {
+  it('url sản phẩm theo ngôn ngữ, slug được mã hoá; ghi chú giá là ĐÃ gồm VAT (D-68, BR-PRC-003)', async () => {
     const out = await runTool('get_product', { slug: 'den-vong' }, { repo, lang: 'en' })
-    expect(out.product).toMatchObject({ url: '/en/products/den-vong', priceNote: 'excl. VAT', currency: 'VND' })
+    expect(out.product).toMatchObject({ url: '/en/products/den-vong', currency: 'VND' })
+    expect(out.product.priceNote).not.toMatch(/excl/i)
+    expect(out.product.priceNote).toMatch(/incl/i)
   })
 })
 
@@ -230,7 +232,7 @@ describe('Lịch sử từ client bị lọc (routes/may.js cleanHistory)', () =
 })
 
 describe('BR-AI-003: kiểm tra số liệu', () => {
-  const out = [{ products: [{ priceExclVat: 1050000 }, { priceExclVat: 890000 }] }]
+  const out = [{ products: [{ price: 1050000 }, { price: 890000 }] }]
   it.each(['1.050.000 ₫', '1,050,000 VND', '1 050 000đ', '1 050 000 ₫', '1050000', '890.000 và 1.050.000'])('khớp dữ liệu "%s" → cho qua', (s) => {
     expect(unverifiedNumbers(s, out)).toEqual([])
   })

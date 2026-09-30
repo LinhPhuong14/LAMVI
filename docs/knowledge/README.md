@@ -52,6 +52,8 @@ npm test             # Vitest: test server + frontend
 npm run lint         # oxlint
 npm run build        # client + SSR
 npm start            # chạy bản build
+npm run db:seed-sql  # sinh supabase/seed.sql từ server/data/seed.js
+npm run gen:og       # dựng lại ảnh og:image (cần python3 + Pillow)
 # Vercel: xem deploy-vercel.md (api/index.js + vercel.json, T-33)
 ```
 

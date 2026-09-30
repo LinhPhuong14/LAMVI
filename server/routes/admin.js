@@ -3,7 +3,21 @@ import { Router } from 'express'
 import { HttpError, notFound } from '../errors.js'
 import { RepoError } from '../adapters/repoErrors.js'
 import { requireAdmin } from '../middleware/auth.js'
-import { VIDEO_TYPES, isVideoType, validateBatch, validateFaq, validateProduct, validateVideoUpload } from '../domain/admin.js'
+import {
+  IMAGE_TYPES,
+  VIDEO_TYPES,
+  isImageType,
+  isVideoType,
+  validateBatch,
+  validateFaq,
+  validateImageUpload,
+  validateProduct,
+  validateVideoUpload,
+} from '../domain/admin.js'
+import { PRODUCT_IMAGE_BUCKET } from '../adapters/supabase/storage.js'
+import { validateCoupon } from '../domain/couponValidate.js'
+import { ORDER_STATUSES, adminNextStatuses } from '../domain/order.js'
+import { presentOrder } from './orders.js'
 
 const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {})
 
@@ -32,10 +46,11 @@ const found = (row) => {
 const isPublished = (b) => b.status === 'video_published'
 
 // Admin: sản phẩm (FR-CAT-004), FAQ (G-07), lô & video lô (FR-QR-007, D-46, D-47)
-export function adminRouter({ repo, auth, storage, config }) {
+export function adminRouter({ repo, auth, storage, config, orders = null }) {
   const r = Router()
   r.use('/admin', requireAdmin(auth, repo))
   const maxVideoBytes = (config.maxVideoMb ?? 500) * 1024 * 1024
+  const maxImageBytes = (config.maxImageMb ?? 5) * 1024 * 1024
 
   // --- Sản phẩm
   r.get('/admin/products', async (req, res) => {
@@ -59,6 +74,53 @@ export function adminRouter({ repo, auth, storage, config }) {
   r.delete('/admin/products/:id', async (req, res) => {
     if (!(await repo.deleteProduct(req.params.id))) throw notFound()
     res.status(204).end()
+  })
+
+  // --- Ảnh sản phẩm (G-23, G-33). Cùng cơ chế signed upload URL như video lô (D-46, T-12):
+  // trình duyệt tải thẳng lên Storage, không đi qua Express (giới hạn body 4,5 MB của Vercel).
+
+  // Bước 1: cấp URL tải ảnh
+  r.post('/admin/products/:id/image-upload', async (req, res) => {
+    const b = body(req)
+    const product = found(await repo.getProductById(req.params.id))
+    assertValid(validateImageUpload(b, maxImageBytes))
+    // Đường dẫn mới mỗi lần tải → không ghi đè ảnh đang hiển thị nếu tải lên hỏng giữa chừng
+    const path = `${product.id}/${Date.now()}-${randomBytes(4).toString('hex')}.${IMAGE_TYPES[b.contentType]}`
+    const upload = await storage.createUpload({ path, contentType: b.contentType, bucket: PRODUCT_IMAGE_BUCKET })
+    res.status(201).json({ path, ...upload })
+  })
+
+  // Bước 2: xác nhận file đã tải lên → gắn vào sản phẩm (thay ảnh cũ, xoá object cũ)
+  r.post('/admin/products/:id/image', async (req, res) => {
+    const { path } = body(req)
+    const product = found(await repo.getProductById(req.params.id))
+    if (typeof path !== 'string' || !path.startsWith(`${product.id}/`) || path.includes('..')) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Đường dẫn không hợp lệ', { path: 'INVALID' })
+    }
+    const obj = await storage.statObject(path, PRODUCT_IMAGE_BUCKET)
+    if (!obj) throw new HttpError(400, 'VALIDATION_ERROR', 'Chưa có file', { path: 'IMAGE_NOT_UPLOADED' })
+    if (obj.size > maxImageBytes) throw new HttpError(400, 'VALIDATION_ERROR', 'File quá lớn', { size: 'IMAGE_TOO_LARGE' })
+    // Kiểm lại kiểu file thật: lúc PUT người tải có thể gửi Content-Type khác lúc xin URL
+    if (!isImageType(obj.contentType)) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Không phải ảnh', { contentType: 'INVALID_IMAGE_TYPE' })
+    }
+    const item = found(
+      await repo.updateProduct(product.id, {
+        imagePath: path,
+        imageUrl: storage.publicUrl(path, PRODUCT_IMAGE_BUCKET),
+      }),
+    )
+    await removeImageObject(product.imagePath, path)
+    res.json({ item })
+  })
+
+  // Gỡ ảnh: sản phẩm quay về hình minh hoạ SVG
+  r.delete('/admin/products/:id/image', async (req, res) => {
+    const product = found(await repo.getProductById(req.params.id))
+    if (!product.imagePath) return res.json({ item: product })
+    const item = found(await repo.updateProduct(product.id, { imagePath: null, imageUrl: null }))
+    await removeImageObject(product.imagePath, null)
+    res.json({ item })
   })
 
   // --- FAQ
@@ -149,5 +211,100 @@ export function adminRouter({ repo, auth, storage, config }) {
     res.json({ item: await repo.updateBatch(batch.id, { status: 'video_published' }) })
   })
 
+  // --- Coupon (FR-CPN-001/002, §14). Admin quản lý toàn bộ.
+  r.get('/admin/coupons', async (req, res) => {
+    res.json({ items: await repo.listCoupons() })
+  })
+  r.get('/admin/coupons/:id', async (req, res) => {
+    res.json({ item: found(await repo.getCouponById(req.params.id)) })
+  })
+  r.post('/admin/coupons', async (req, res) => {
+    const { errors, values } = validateCoupon(body(req))
+    assertValid(errors)
+    const item = await write(() => repo.createCoupon(values))
+    await logAdmin(req, 'coupon', item.id, 'create', null, values)
+    res.status(201).json({ item })
+  })
+  r.patch('/admin/coupons/:id', async (req, res) => {
+    const before = found(await repo.getCouponById(req.params.id))
+    const { errors, values } = validateCoupon(body(req), { partial: true, currentType: before.type })
+    assertValid(errors)
+    if (!Object.keys(values).length) return res.json({ item: before })
+    const item = found(await write(() => repo.updateCoupon(before.id, values)))
+    // NFR-AUD-001: coupon phải có nhật ký thay đổi
+    await logAdmin(req, 'coupon', before.id, 'update', before, values)
+    res.json({ item })
+  })
+  r.delete('/admin/coupons/:id', async (req, res) => {
+    const before = found(await repo.getCouponById(req.params.id))
+    // Coupon đã dùng thì không xoá (đơn còn tham chiếu) — tắt bằng status
+    if (before.usedCount > 0) throw new HttpError(409, 'COUPON_IN_USE', 'Coupon đã được dùng, hãy tắt thay vì xoá')
+    await repo.deleteCoupon(before.id)
+    await logAdmin(req, 'coupon', before.id, 'delete', before, null)
+    res.status(204).end()
+  })
+
+  // --- Đơn hàng (FR-ORD-002)
+  r.get('/admin/orders', async (req, res) => {
+    const status = ORDER_STATUSES.includes(req.query.status) ? req.query.status : undefined
+    const items = await repo.listOrders({ status })
+    res.json({
+      items: items.map((o) => ({
+        ...presentOrder(o),
+        // Admin cần biết để xử lý tay (§15.1)
+        paymentFlag: o.paymentFlag,
+        nextStatuses: adminNextStatuses(o.status),
+      })),
+    })
+  })
+  r.get('/admin/orders/:code', async (req, res) => {
+    const o = found(await repo.getOrderByCode(req.params.code))
+    res.json({
+      item: { ...presentOrder(o), paymentFlag: o.paymentFlag, nextStatuses: adminNextStatuses(o.status) },
+      audit: await repo.listAuditLog({ entity: 'order', entityId: o.id, limit: 50 }),
+    })
+  })
+  r.post('/admin/orders/:code/status', async (req, res) => {
+    if (!orders) throw new HttpError(503, 'UNAVAILABLE', 'Chưa bật module đơn hàng')
+    const o = found(await repo.getOrderByCode(req.params.code))
+    const b = body(req)
+    if (!ORDER_STATUSES.includes(b.status)) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Trạng thái không hợp lệ', { status: 'INVALID' })
+    }
+    const trackingCode = typeof b.trackingCode === 'string' ? b.trackingCode.trim().slice(0, 64) || null : undefined
+    const updated = await orders.setStatusByAdmin(o, req.user.id, b.status, { trackingCode })
+    res.json({ item: { ...presentOrder(updated), nextStatuses: adminNextStatuses(updated.status) } })
+  })
+  // D-74 (Q-16): hoàn tiền thủ công — admin chuyển khoản tay rồi ghi nhận
+  r.post('/admin/orders/:code/refund', async (req, res) => {
+    if (!orders) throw new HttpError(503, 'UNAVAILABLE', 'Chưa bật module đơn hàng')
+    const o = found(await repo.getOrderByCode(req.params.code))
+    const updated = await orders.markRefunded(o, req.user.id, body(req).note)
+    res.json({ item: presentOrder(updated) })
+  })
+
   return r
+
+  // NFR-AUD-001: ghi nhật ký thay đổi của admin. Lỗi ghi log không được làm hỏng thao tác.
+  async function logAdmin(req, entity, entityId, action, oldValue, newValue) {
+    if (!repo.appendAuditLog) return
+    try {
+      await repo.appendAuditLog([
+        { actorId: req.user.id, actorRole: req.role ?? 'admin', entity, entityId, action, oldValue, newValue },
+      ])
+    } catch (err) {
+      console.error('[audit]', err)
+    }
+  }
+
+  // Xoá object ảnh cũ sau khi DB đã trỏ sang ảnh mới. Lỗi ở bước này không được làm hỏng request:
+  // sản phẩm đã có ảnh đúng, file thừa chỉ tốn dung lượng.
+  async function removeImageObject(oldPath, newPath) {
+    if (!oldPath || oldPath === newPath || !storage.removeObject) return
+    try {
+      await storage.removeObject(oldPath, PRODUCT_IMAGE_BUCKET)
+    } catch (err) {
+      console.error('[admin] không xoá được ảnh cũ', oldPath, err)
+    }
+  }
 }

@@ -32,8 +32,8 @@ describe('Giỏ của người đã đăng nhập (FR-CART-001, D-41)', () => {
   it('thêm, sửa số lượng, xoá; tạm tính theo giá hiện hành chưa VAT', async () => {
     await put('den-nguyet', 2).expect(200)
     const res = await put('den-vong', 1)
-    expect(res.body).toMatchObject({ subtotalExclVat: 2 * 890000 + 1050000, currency: 'VND', itemCount: 3, maxQuantity: 10 })
-    expect(res.body.items.map((i) => [i.slug, i.quantity, i.lineTotalExclVat])).toEqual([
+    expect(res.body).toMatchObject({ subtotal: 2 * 890000 + 1050000, currency: 'VND', itemCount: 3, maxQuantity: 10 })
+    expect(res.body.items.map((i) => [i.slug, i.quantity, i.lineTotal])).toEqual([
       ['den-nguyet', 2, 1780000],
       ['den-vong', 1, 1050000],
     ])
@@ -56,9 +56,9 @@ describe('Giỏ của người đã đăng nhập (FR-CART-001, D-41)', () => {
   it('giá đổi sau khi thêm → giỏ hiện giá mới (BR-PRC-002: chỉ chốt lúc tạo đơn)', async () => {
     await put('den-nguyet', 1)
     const p = await repo.getProductBySlug('den-nguyet')
-    await repo.updateProduct(p.id, { priceExclVat: 900000 })
+    await repo.updateProduct(p.id, { price: 900000 })
     const res = await request(app).get('/api/cart').set('Authorization', token)
-    expect(res.body.subtotalExclVat).toBe(900000)
+    expect(res.body.subtotal).toBe(900000)
   })
 
   it('§11: sản phẩm bị ẩn khi đang trong giỏ → cảnh báo, không tính tạm tính; không tăng được, vẫn xoá được', async () => {
@@ -67,8 +67,8 @@ describe('Giỏ của người đã đăng nhập (FR-CART-001, D-41)', () => {
     await hide('den-vong')
     const res = await request(app).get('/api/cart').set('Authorization', token)
     expect(res.body.hasUnavailable).toBe(true)
-    expect(res.body.items.find((i) => i.slug === 'den-vong')).toMatchObject({ available: false, lineTotalExclVat: null, product: { priceExclVat: null } })
-    expect(res.body.subtotalExclVat).toBe(1780000)
+    expect(res.body.items.find((i) => i.slug === 'den-vong')).toMatchObject({ available: false, lineTotal: null, product: { price: null } })
+    expect(res.body.subtotal).toBe(1780000)
     expect((await put('den-vong', 2)).body.error.code).toBe('PRODUCT_UNAVAILABLE')
     expect((await request(app).delete('/api/cart/items/den-vong').set('Authorization', token)).body.hasUnavailable).toBe(false)
   })
@@ -92,10 +92,10 @@ describe('Giỏ khách vãng lai + gộp khi đăng nhập (D-59)', () => {
   it('quote: server tính giá, không tin giá client; gộp dòng trùng; bỏ sản phẩm không tồn tại', async () => {
     const res = await request(app)
       .post('/api/cart/quote?lang=zh')
-      .send({ items: [{ slug: 'den-vong', quantity: 2, priceExclVat: 1 }, { slug: 'den-vong', quantity: 1 }, { slug: 'khong-co', quantity: 1 }, { slug: 'SAI SLUG', quantity: 1 }] })
+      .send({ items: [{ slug: 'den-vong', quantity: 2, price: 1 }, { slug: 'den-vong', quantity: 1 }, { slug: 'khong-co', quantity: 1 }, { slug: 'SAI SLUG', quantity: 1 }] })
     expect(res.status).toBe(200)
     expect(res.body.items).toHaveLength(1)
-    expect(res.body.items[0]).toMatchObject({ slug: 'den-vong', quantity: 3, lineTotalExclVat: 3150000, product: { name: '望灯' } })
+    expect(res.body.items[0]).toMatchObject({ slug: 'den-vong', quantity: 3, lineTotal: 3150000, product: { name: '望灯' } })
   })
 
   it('quote: số lượng vượt 10 bị giới hạn; body sai → 400', async () => {

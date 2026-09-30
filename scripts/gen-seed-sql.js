@@ -16,8 +16,8 @@ export function buildSeedSql() {
   const lines = ['-- Tự sinh bởi scripts/gen-seed-sql.js — không sửa tay.', '']
   for (const p of products) {
     lines.push(
-      `insert into public.products (id, slug, kind, status, price_excl_vat, tone, sort_order, name, description, badge) values (${[
-        p.id, p.slug, p.kind, p.status, p.priceExclVat, p.tone, p.sortOrder, p.name, p.description, p.badge,
+      `insert into public.products (id, slug, kind, status, price, tone, sort_order, name, description, badge) values (${[
+        p.id, p.slug, p.kind, p.status, p.price, p.tone, p.sortOrder, p.name, p.description, p.badge,
       ].map(lit).join(', ')}) on conflict (id) do nothing;`,
     )
   }

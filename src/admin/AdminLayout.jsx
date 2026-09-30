@@ -53,9 +53,11 @@ function Gate() {
         <span className="nav-mark">LAMVI</span>
         <strong>{S.title}</strong>
         <nav>
+          <NavLink to="/admin/orders">{S.nav.orders}</NavLink>
           <NavLink to="/admin/products">{S.nav.products}</NavLink>
           <NavLink to="/admin/faq">{S.nav.faq}</NavLink>
           <NavLink to="/admin/batches">{S.nav.batches}</NavLink>
+          <NavLink to="/admin/coupons">{S.nav.coupons}</NavLink>
           <NavLink to="/admin/may">{S.nav.may}</NavLink>
         </nav>
         {state.role === 'it' && <NavLink to="/it">{S.nav.it}</NavLink>}

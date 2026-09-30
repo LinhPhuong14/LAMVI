@@ -12,7 +12,7 @@ import { formatVnd } from '../lib/money.js'
 // Kiểm thử độc lập bổ sung cho giao diện admin (D-38, D-46, D-47, D-48, BR-SEO-001)
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'admin@moc.test' } }
 const me = (role) => () => ({ body: { profile: { id: 'u1', email: 'admin@moc.test', role, preferredLocale: 'vi', fullName: 'A' } } })
-const products = [{ id: 'p1', slug: 'den-nguyet', kind: 'single', status: 'published', priceExclVat: 890000, name: { vi: 'Đèn Nguyệt' }, sortOrder: 1 }]
+const products = [{ id: 'p1', slug: 'den-nguyet', kind: 'single', status: 'published', price: 890000, name: { vi: 'Đèn Nguyệt' }, sortOrder: 1 }]
 const faq = [{ id: 'f1', question: { vi: 'Hỏi 1?' }, answer: { vi: 'Đáp 1' }, isPublished: true, sortOrder: 1 }]
 const created = { id: 'b1', code: 'L-01', status: 'created', videoUrl: null, producedOn: '2026-10-01', title: { vi: 'Lô 1' } }
 const published = { ...created, id: 'b2', code: 'L-02', status: 'video_published', videoUrl: '/v.mp4' }
@@ -254,18 +254,18 @@ describe('Lỗi theo trường hiện đúng chỗ', () => {
       'GET /me': me('admin'),
       'GET /admin/products': () => ({ body: { items: [p] } }),
       'PATCH /admin/products/p1': (u, init) => (
-        bodies.push(JSON.parse(init.body)), { status: 400, body: { error: { code: 'VALIDATION_ERROR', fields: { priceExclVat: 'INVALID_PRICE' } } } }
+        bodies.push(JSON.parse(init.body)), { status: 400, body: { error: { code: 'VALIDATION_ERROR', fields: { price: 'INVALID_PRICE' } } } }
       ),
     })
     renderAt('/admin/products')
     fireEvent.click(within((await screen.findByText('Đèn Nguyệt')).closest('tr')).getByRole('button', { name: 'Sửa' }))
-    fireEvent.change(screen.getByLabelText('Giá chưa VAT (VND)'), { target: { value: '-5' } })
+    fireEvent.change(screen.getByLabelText('Giá bán đã gồm VAT (VND)'), { target: { value: '-5' } })
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }))
-    await waitFor(() => expect(screen.getByLabelText('Giá chưa VAT (VND)')).toHaveAccessibleDescription('Giá phải là số nguyên VND, không âm.'))
+    await waitFor(() => expect(screen.getByLabelText('Giá bán đã gồm VAT (VND)')).toHaveAccessibleDescription('Giá phải là số nguyên VND, không âm.'))
     expect(bodies[0]).not.toHaveProperty('id')
     expect(bodies[0]).not.toHaveProperty('createdAt')
     expect(bodies[0]).not.toHaveProperty('updatedAt')
-    expect(bodies[0].priceExclVat).toBe(-5)
+    expect(bodies[0].price).toBe(-5)
   })
 })
 

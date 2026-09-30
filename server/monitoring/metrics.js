@@ -1,4 +1,14 @@
 // D-52, D-53: số liệu API gộp theo phút × method × route × status, flush định kỳ vào repo (Supabase).
+import { redactPii } from '../may/guard.js'
+import { sanitizePath } from '../../src/analytics/ga.js'
+
+// Chuỗi dài không khoảng trắng trông như token/JWT/khoá — che trước khi lưu vào nhật ký lỗi
+const TOKENISH = /\b[A-Za-z0-9_-]{24,}\b/g
+
+/** G-28: che email, SĐT (redactPii) và các chuỗi giống token trong thông điệp lỗi. */
+export function redactSecrets(text) {
+  return redactPii(text).replace(TOKENISH, '[token]')
+}
 
 export const BOUNDS = [50, 100, 250, 500, 1000, 2500]
 export const HIST_KEYS = ['le_50', 'le_100', 'le_250', 'le_500', 'le_1000', 'le_2500', 'gt_2500']
@@ -62,8 +72,19 @@ export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flus
     row[histKey(ms)] += 1
     buffer.set(k, row)
     if (status >= 500) {
-      // Không lưu query string, body, token (dữ liệu cá nhân)
-      errors.push({ at: new Date(now()).toISOString(), method, route, path, status, code: code ?? null, message: message ? String(message).slice(0, 300) : null })
+      // G-28 / NFR-PRV-002: lỗi 5xx được IT xem, nên không lưu dữ liệu cá nhân.
+      // - Không lưu query string, body, token ngay từ đầu.
+      // - Đường dẫn: che đoạn bí mật (token trang QR lời chúc, token đặt lại mật khẩu).
+      // - Thông điệp lỗi có thể chứa email/SĐT khách (lỗi từ DB, từ cổng thanh toán) → che.
+      errors.push({
+        at: new Date(now()).toISOString(),
+        method,
+        route,
+        path: sanitizePath(path),
+        status,
+        code: code ?? null,
+        message: message ? redactSecrets(String(message)).slice(0, 300) : null,
+      })
     }
   }
 

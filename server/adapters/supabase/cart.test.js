@@ -62,7 +62,7 @@ const productRow = (over) => ({
   slug: 'den-nguyet',
   kind: 'single',
   status: 'published',
-  price_excl_vat: 890000,
+  price: 890000,
   tone: 'amber',
   sort_order: 1,
   name: { vi: 'Đèn Nguyệt', en: 'Nguyet Lantern' },
@@ -130,7 +130,7 @@ describe('Adapter Supabase — cart_items', () => {
 
   it('dịch vụ giỏ chạy trên adapter Supabase: thêm, gộp, giá hiện hành, sản phẩm bị xoá biến mất', async () => {
     const client = fakeClient({
-      products: [productRow(), productRow({ id: 'p2', slug: 'den-vong', price_excl_vat: 1050000, sort_order: 2, name: { vi: 'Đèn Vọng' } })],
+      products: [productRow(), productRow({ id: 'p2', slug: 'den-vong', price: 1050000, sort_order: 2, name: { vi: 'Đèn Vọng' } })],
     })
     const cart = createCartService({ repo: createSupabaseRepo(client) })
     await cart.setQuantity('u1', 'den-nguyet', 3, 'en')
@@ -140,7 +140,7 @@ describe('Adapter Supabase — cart_items', () => {
       ['den-vong', 1],
     ])
     expect(merged.items[0].product.name).toBe('Nguyet Lantern')
-    expect(merged.subtotalExclVat).toBe(8900000 + 1050000)
+    expect(merged.subtotal).toBe(8900000 + 1050000)
     // Sản phẩm bị xoá khỏi DB (cascade) → không còn trong giỏ
     client.tables.products = client.tables.products.filter((p) => p.id !== 'p2')
     client.tables.cart_items = client.tables.cart_items.filter((r) => r.product_id !== 'p2')

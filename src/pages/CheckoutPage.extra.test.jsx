@@ -1,0 +1,262 @@
+// @vitest-environment jsdom
+// Trang thanh toán (FR-CHK-001…008, §12) — luồng khách thật sự bấm, và giao diện theo design-rules.
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { mockApi, renderAt } from '../test/renderApp.jsx'
+
+const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'khach@lamvi.test' } }
+const profile = { id: 'u1', email: 'khach@lamvi.test', role: 'customer', preferredLocale: 'vi', fullName: 'A' }
+
+const quote = (over = {}) => ({
+  items: [{ slug: 'den-nguyet', name: 'Đèn Nguyệt', image: null, unitPrice: 890_000, quantity: 2, lineTotal: 1_780_000 }],
+  subtotal: 1_780_000,
+  discount: 0,
+  shippingFee: 0,
+  freeShipping: true,
+  total: 1_780_000,
+  vatAmount: 161_818,
+  vatRate: 0.1,
+  currency: 'VND',
+  couponCode: null,
+  couponError: null,
+  hasUnavailable: false,
+  freeShippingFrom: 1_000_000,
+  ...over,
+})
+
+const emptyCart = { items: [], subtotal: 0, currency: 'VND', itemCount: 0, hasUnavailable: false, maxQuantity: 10 }
+
+function api({ quoteBody = quote(), order: orderHandler, extra = {} } = {}) {
+  return mockApi({
+    'GET /me': () => ({ body: { profile } }),
+    'GET /cart': () => ({ body: emptyCart }),
+    'GET /products': () => ({ body: { items: [] } }),
+    'GET /may/history': () => ({ body: { items: [] } }),
+    'POST /checkout/quote': () => (typeof quoteBody === 'function' ? quoteBody() : { body: quoteBody }),
+    'POST /orders': orderHandler ?? (() => ({ status: 201, body: { order: { code: 'LV2610-ACDEFGH' }, payment: null } })),
+    ...extra,
+  })
+}
+
+const fill = (label, value) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
+
+beforeEach(() => {
+  localStorage.setItem('moc.session', JSON.stringify(session))
+})
+
+describe('Bảng giá và các bước (FR-CHK-002…008)', () => {
+  it('hiện ba bước có đánh số, tóm tắt đơn và dòng tổng', async () => {
+    api()
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+
+    // Ba bước checkout, mỗi bước là một tấm giấy có số thứ tự
+    const steps = [...document.querySelectorAll('.checkout fieldset legend')].map((l) => l.textContent)
+    expect(steps).toEqual(['1Đơn này là', '2Người nhận hàng', '3Thanh toán'])
+
+    const sum = document.querySelector('.order-summary')
+    expect(within(sum).getByText('Đèn Nguyệt', { exact: false })).toBeInTheDocument()
+    expect(sum.textContent).toContain('1.780.000')
+    // D-70: miễn phí ship khi tạm tính ≥ 1.000.000đ
+    expect(within(sum).getByText('Miễn phí')).toBeInTheDocument()
+    // D-68: tách dòng VAT cho minh bạch
+    expect(sum.querySelector('.sum-note').textContent).toContain('161.818')
+  })
+
+  it('giỏ rỗng → mời về giỏ hàng, không hiện form', async () => {
+    api({ quoteBody: quote({ items: [], subtotal: 0, total: 0 }) })
+    renderAt('/checkout')
+    expect(await screen.findByText('Giỏ hàng đang trống.')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Đặt hàng' })).toBeNull()
+  })
+
+  it('FR-CHK-001: chưa đăng nhập → chuyển sang đăng nhập kèm next', async () => {
+    localStorage.clear()
+    api()
+    renderAt('/checkout')
+    expect(await screen.findByRole('heading', { name: 'Đăng nhập' })).toBeInTheDocument()
+  })
+})
+
+describe('Loại đơn và lời chúc (FR-CHK-002/003/005)', () => {
+  it('đơn tặng: bỏ ô "Thêm lời chúc", hiện chọn ngôn ngữ trang QR', async () => {
+    api()
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    expect(screen.getByLabelText('Thêm lời chúc gắn mã QR')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Ngôn ngữ trang lời chúc')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mua tặng' }))
+    expect(screen.queryByLabelText('Thêm lời chúc gắn mã QR')).toBeNull()
+    expect(screen.getByLabelText('Ngôn ngữ trang lời chúc')).toBeInTheDocument()
+  })
+
+  it('đơn tự mua tích "Thêm lời chúc" → cũng phải chọn ngôn ngữ trang QR', async () => {
+    api()
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    fireEvent.click(screen.getByLabelText('Thêm lời chúc gắn mã QR'))
+    expect(screen.getByLabelText('Ngôn ngữ trang lời chúc')).toBeInTheDocument()
+  })
+})
+
+describe('BR-PAY-004: giao cho người khác không dùng COD', () => {
+  it('chọn "Giao cho người khác" → COD bị khoá và tự chuyển sang payOS', async () => {
+    api()
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    const cod = document.querySelector('input[value="cod"]')
+    const payos = document.querySelector('input[value="payos"]')
+    expect(cod.checked).toBe(true)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Giao cho người khác' }))
+    expect(cod.disabled).toBe(true)
+    expect(payos.checked).toBe(true)
+    expect(screen.getByText('Đơn giao cho người khác chưa hỗ trợ thanh toán khi nhận hàng.')).toBeInTheDocument()
+  })
+})
+
+describe('Mã giảm giá (FR-CHK-006)', () => {
+  it('áp mã hợp lệ → hiện mã đã áp và số tiền giảm', async () => {
+    let applied = false
+    api({
+      quoteBody: () => ({
+        body: applied ? quote({ discount: 178_000, total: 1_602_000, couponCode: 'TET2026' }) : quote(),
+      }),
+    })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    fill('Mã giảm giá', 'tet2026')
+    applied = true
+    fireEvent.click(screen.getByRole('button', { name: 'Áp dụng' }))
+    expect(await screen.findByText('Đã áp dụng mã TET2026.')).toBeInTheDocument()
+    expect(document.querySelector('.order-summary').textContent).toContain('178.000')
+  })
+
+  it('mã sai → nêu lý do ngay dưới ô nhập, vẫn hiện bảng giá', async () => {
+    api({ quoteBody: quote({ couponError: 'COUPON_EXPIRED' }) })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    await waitFor(() =>
+      expect(screen.getByLabelText('Mã giảm giá')).toHaveAccessibleDescription('Mã giảm giá đã hết hạn.'),
+    )
+    expect(document.querySelector('.order-summary').textContent).toContain('1.780.000')
+  })
+})
+
+describe('Đặt hàng', () => {
+  const address = () => {
+    fill('Họ tên người nhận', 'Nguyễn Văn A')
+    fill('Số điện thoại', '0912345678')
+    fill('Địa chỉ (số nhà, đường)', '12 Hàng Bông')
+    fill('Tỉnh / thành phố', 'Hà Nội')
+  }
+
+  it('gửi đúng dữ liệu kèm tổng khách đã thấy (D-41) rồi sang trang cảm ơn', async () => {
+    const posts = []
+    api({
+      order: (url, init) => {
+        posts.push(JSON.parse(init.body))
+        return { status: 201, body: { order: { code: 'LV2610-ACDEFGH' }, payment: null } }
+      },
+      extra: { 'GET /orders/LV2610-ACDEFGH': () => ({ status: 404, body: { error: { code: 'NOT_FOUND' } } }) },
+    })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    address()
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
+    await waitFor(() => expect(posts).toHaveLength(1))
+    expect(posts[0]).toMatchObject({
+      orderKind: 'self',
+      hasMessage: false,
+      recipientIsSelf: true,
+      recipientName: 'Nguyễn Văn A',
+      province: 'Hà Nội',
+      paymentMethod: 'cod',
+      expectedTotal: 1_780_000,
+    })
+  })
+
+  it('lỗi theo trường từ server hiện ngay dưới ô tương ứng', async () => {
+    api({
+      order: () => ({
+        status: 400,
+        body: { error: { code: 'VALIDATION_ERROR', fields: { recipientPhone: 'INVALID_PHONE' } } },
+      }),
+    })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    address()
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
+    await waitFor(() =>
+      expect(screen.getByLabelText('Số điện thoại')).toHaveAccessibleDescription(
+        'Số điện thoại Việt Nam không hợp lệ.',
+      ),
+    )
+  })
+
+  it('§12: giá đổi giữa chừng → báo xác nhận lại và nạp bảng giá mới', async () => {
+    let n = 0
+    api({
+      quoteBody: () => {
+        n += 1
+        return { body: n === 1 ? quote() : quote({ subtotal: 2_000_000, total: 2_000_000 }) }
+      },
+      order: () => ({
+        status: 409,
+        body: { error: { code: 'PRICE_CHANGED', message: 'x', details: { quote: { total: 2_000_000 } } } },
+      }),
+    })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    address()
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
+    expect(await screen.findByText(/Giá vừa thay đổi/)).toBeInTheDocument()
+    await waitFor(() => expect(document.querySelector('.order-summary').textContent).toContain('2.000.000'))
+  })
+
+  it('payOS: chuyển sang trang thanh toán của cổng', async () => {
+    const assign = vi.fn()
+    vi.spyOn(window, 'location', 'get').mockReturnValue({ ...window.location, assign, origin: 'http://localhost' })
+    api({
+      order: () => ({
+        status: 201,
+        body: { order: { code: 'LV2610-ACDEFGH' }, payment: { checkoutUrl: 'https://pay.test/1' } },
+      }),
+    })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    address()
+    fireEvent.click(document.querySelector('input[value="payos"]'))
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
+    await waitFor(() => expect(assign).toHaveBeenCalledWith('https://pay.test/1'))
+    vi.restoreAllMocks()
+  })
+})
+
+// design-rules §5 và §11: khung theo hệ có sẵn, không viền dày / bóng đổ cứng
+describe('Giao diện đồng bộ với các trang khác', () => {
+  it('các bước dùng khung tranh bồi, tóm tắt dùng thiếp thư có góc hoa văn', async () => {
+    api()
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    // Khung tranh bồi = .account-card (dùng chung với giỏ hàng, admin, dashboard IT)
+    expect(document.querySelectorAll('.checkout fieldset.account-card')).toHaveLength(3)
+    expect(document.querySelector('.order-summary')).toBeInTheDocument()
+    // Nhãn bước có số trong ấn son + hoa sen (hoạ tiết là trang trí → aria-hidden)
+    const seals = document.querySelectorAll('.checkout legend .step-no')
+    expect(seals).toHaveLength(3)
+    for (const el of seals) expect(el).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('CSS trang mới không dùng viền dày hay bóng đổ lệch cứng (design-rules §11)', () => {
+    const css = readFileSync(join(process.cwd(), 'src/styles/pages.css'), 'utf8')
+    const block = css.slice(css.indexOf('Checkout & đơn hàng'))
+    expect(block).not.toMatch(/border:\s*[2-9]px/)
+    expect(block).not.toMatch(/box-shadow:\s*\d+px\s+\d+px\s+0/)
+    // Dùng token màu, không viết mã màu cứng
+    expect(block).not.toMatch(/#[0-9a-f]{3,6}\b/i)
+  })
+})

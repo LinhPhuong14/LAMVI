@@ -23,7 +23,7 @@ export default function CartProvider({ children }) {
     async (id = ++seq.current) => {
       const items = localRef.current
       if (!items.length) {
-        return apply(id, { items: [], subtotalExclVat: 0, itemCount: 0, hasUnavailable: false, maxQuantity: MAX_QTY })
+        return apply(id, { items: [], subtotal: 0, itemCount: 0, hasUnavailable: false, maxQuantity: MAX_QTY })
       }
       apply(id, await api('/cart/quote', { method: 'POST', body: { items }, lang }))
     },
@@ -41,9 +41,10 @@ export default function CartProvider({ children }) {
     }
   }, [])
 
-  useEffect(() => {
+  // Nạp lại giỏ từ server. Dùng ở lần đầu và sau khi đặt hàng xong (server đã dọn giỏ).
+  const load = useCallback(async () => {
     const id = ++seq.current
-    const load = async () => {
+    const doLoad = async () => {
       if (!user) {
         localRef.current = loadLocalCart()
         await quoteLocal(id)
@@ -64,9 +65,13 @@ export default function CartProvider({ children }) {
       }
       apply(id, await authedApi(`/cart?lang=${lang}`))
     }
-    // Effect chạy lại (đổi user/lang) tăng mã mới → kết quả lần nạp này tự bị bỏ
-    load().catch((err) => id === seq.current && setError(err.code ?? 'INTERNAL_ERROR'))
+    // Lần nạp mới tăng mã → kết quả của lần nạp cũ tự bị bỏ (apply kiểm tra mã)
+    await doLoad().catch((err) => id === seq.current && setError(err.code ?? 'INTERNAL_ERROR'))
   }, [user, authedApi, lang, quoteLocal, apply])
+
+  useEffect(() => {
+    load()
+  }, [load])
 
   const setQuantity = useCallback(
     (slug, quantity) =>
@@ -110,6 +115,9 @@ export default function CartProvider({ children }) {
     [user, authedApi, lang, quoteLocal, run, apply],
   )
 
-  const value = useMemo(() => ({ cart, error, add, setQuantity, remove }), [cart, error, add, setQuantity, remove])
+  const value = useMemo(
+    () => ({ cart, error, add, setQuantity, remove, reload: load }),
+    [cart, error, add, setQuantity, remove, load],
+  )
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

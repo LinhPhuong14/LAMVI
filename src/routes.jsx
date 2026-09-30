@@ -6,11 +6,15 @@ import NotFoundPage from './pages/NotFoundPage'
 import AccountPage from './pages/AccountPage'
 import BatchPage from './pages/BatchPage'
 import CartPage from './pages/CartPage'
+import CheckoutPage from './pages/CheckoutPage'
+import OrderPage from './pages/OrderPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import AdminLayout from './admin/AdminLayout'
+import AdminOrdersPage from './admin/OrdersPage'
+import CouponsPage from './admin/CouponsPage'
 import ProductsPage from './admin/ProductsPage'
 import FaqPage from './admin/FaqPage'
 import BatchesPage from './admin/BatchesPage'
@@ -25,6 +29,8 @@ function localeChildren() {
       <Route path="products/:slug" element={<ProductPage />} />
       <Route path="lo/:code" element={<BatchPage />} />
       <Route path="cart" element={<CartPage />} />
+      <Route path="checkout" element={<CheckoutPage />} />
+      <Route path="don-hang/:code" element={<OrderPage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<ForgotPasswordPage />} />
@@ -43,7 +49,10 @@ export default function AppRoutes() {
       <Route path="/it" element={<ItDashboard />} />
       {/* D-48: admin chỉ tiếng Việt */}
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Navigate to="products" replace />} />
+        <Route index element={<Navigate to="orders" replace />} />
+        <Route path="orders" element={<AdminOrdersPage />} />
+        <Route path="orders/:code" element={<AdminOrdersPage />} />
+        <Route path="coupons" element={<CouponsPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="faq" element={<FaqPage />} />
         <Route path="batches" element={<BatchesPage />} />

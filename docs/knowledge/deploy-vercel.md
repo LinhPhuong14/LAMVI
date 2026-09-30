@@ -21,6 +21,7 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
    - `TRUST_PROXY=1` (Vercel đứng trước hàm; nếu không, hạn mức Mây theo IP và IP trong log sai).
    - `MAY_HASH_SALT` đặt giá trị bí mật riêng; `OPENAI_*`, `PAYOS_*` khi tích hợp. Không đặt `DEV_ADMIN_*`/`DEV_IT_*` trên Vercel.
    - `GIT_COMMIT`: có thể dùng `VERCEL_GIT_COMMIT_SHA` (chưa nối tự động).
+   - `GA_MEASUREMENT_ID` (FR-GA-001, D-72): **chỉ đặt ở Production**, không đặt ở Preview để số liệu thử nghiệm không lẫn vào báo cáo. Dạng `G-XXXXXXXXXX`; sai định dạng bị `loadConfig` bỏ qua và web chạy không có GA. Trang `/admin`, `/it` không nhúng GA.
 3. **Giới hạn serverless — đừng phá:**
    - Body request tối đa 4,5 MB → upload video lô **phải** đi qua signed upload URL (T-12), không qua Express. Không thêm endpoint nhận file lớn.
    - Không ghi file cục bộ, không giữ trạng thái quan trọng trong bộ nhớ tiến trình; mọi trạng thái vào Supabase.
@@ -30,6 +31,9 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 5. **Production = `master`.** Không deploy tay từ máy (`vercel --prod`) trừ khi người dùng yêu cầu; không dùng token Vercel trong repo. Thư mục `.vercel/` đã ở `.gitignore`.
 6. **Thay đổi cấu hình deploy** (`vercel.json`, `api/`, biến môi trường bắt buộc mới) → cập nhật file này, `.env.example` và `decisions.md` cùng lúc.
 7. Mỗi lần thêm route/tệp đọc lúc chạy ngoài `dist/**` (ví dụ thư mục dữ liệu, template) → thêm vào `includeFiles`.
+8. **Security headers (T-37)** do `server/middleware/security.js` đặt cho mọi response, không cấu hình ở `vercel.json` (để một chỗ duy nhất quyết định). CSP dùng `nonce` sinh mỗi request và **chỉ bật khi `NODE_ENV=production`** — ở dev Vite chèn script nội tuyến riêng. Thêm host bên ngoài (CDN ảnh, dịch vụ mới) → phải mở đúng host đó trong `buildCsp`, không dùng `*`. HSTS chỉ gửi khi `x-forwarded-proto: https`.
+9. **Chống dò/spam (G-20)** bật mặc định; ngưỡng ở `server/config.js`. Đếm bằng `app_settings`-style counter trong DB (không dùng bộ nhớ tiến trình vì serverless), khoá đếm là **băm** của IP/email với `MAY_HASH_SALT` → không lưu IP hay email thô. **Không đặt `RATE_LIMIT=0` ở Preview/Production.** `TRUST_PROXY=1` là bắt buộc, nếu không mọi request đều mang IP của Vercel và một người bị chặn sẽ chặn cả site.
+10. **Cache headers**: trang công khai `s-maxage=60, stale-while-revalidate=300` (CDN Vercel giữ bản chung — SSR trang công khai không phụ thuộc phiên đăng nhập); trang riêng tư `private, no-store`; `sitemap.xml` `s-maxage=3600`; `robots.txt` `s-maxage=86400`. Đổi SSR sang phụ thuộc phiên (ví dụ render tên người dùng ở server) thì **phải** bỏ `s-maxage` cùng lúc.
 
 ## Nối Supabase với `lamvi.vercel.app` (thứ tự bắt buộc)
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/index.js'
 import { useCart } from './context.js'
+import { track } from '../analytics/index.js'
 
 // Nút thêm vào giỏ (thẻ sản phẩm + trang chi tiết)
 export default function AddToCart({ slug, quantity = 1, label, className = 'btn btn-small', showLink = true }) {
@@ -11,7 +12,10 @@ export default function AddToCart({ slug, quantity = 1, label, className = 'btn 
 
   async function onClick() {
     setState('pending')
-    setState((await add(slug, quantity)) ? 'added' : 'error')
+    const ok = await add(slug, quantity)
+    setState(ok ? 'added' : 'error')
+    // FR-GA-001 §23.3 — chỉ gửi khi thêm thành công
+    if (ok) track('add_to_cart', { item_id: slug, quantity, currency: 'VND' })
   }
 
   return (

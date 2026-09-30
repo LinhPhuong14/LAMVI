@@ -35,7 +35,7 @@ beforeEach(async () => {
 
 afterEach(() => vi.restoreAllMocks())
 
-const product = { slug: 'den-thu', kind: 'single', priceExclVat: 750000, name: { vi: 'Đèn Thử' } }
+const product = { slug: 'den-thu', kind: 'single', price: 750000, name: { vi: 'Đèn Thử' } }
 const as = (method, url, who = admin) => request(app)[method](url).set('Authorization', who)
 
 async function createProduct(over = {}) {
@@ -158,7 +158,7 @@ describe('Bảo mật — mọi endpoint /api/admin/* (D-38, §3.2)', () => {
     expect(up.body.path).toMatch(/\.mp4$/)
     await request(app).put(up.body.uploadUrl).set('Content-Type', 'video/mp4').send(Buffer.from('abc')).expect(200)
     await request(app).put(up.body.uploadUrl).set('Content-Type', 'video/mp4').send(Buffer.from('zzz')).expect(403)
-    expect(storage.objects.get(up.body.path).bytes.toString()).toBe('abc')
+    expect(storage.getObject(up.body.path).bytes.toString()).toBe('abc')
     expect(storage.objects.size).toBe(1)
   })
 
@@ -239,13 +239,13 @@ describe('Toàn vẹn — sản phẩm', () => {
       id: 'hack-id',
       createdAt: '1999-01-01T00:00:00.000Z',
       role: 'admin',
-      priceExclVat: 800000,
+      price: 800000,
     })
     expect(res.status).toBe(200)
     expect(res.body.item.id).toBe(p.id)
     expect(res.body.item.createdAt).toBe(p.createdAt)
     expect(res.body.item).not.toHaveProperty('role')
-    expect(res.body.item.priceExclVat).toBe(800000)
+    expect(res.body.item.price).toBe(800000)
     expect((await as('get', '/api/admin/products/hack-id')).status).toBe(404)
   })
 
@@ -267,7 +267,7 @@ describe('Toàn vẹn — sản phẩm', () => {
   })
 
   it('PATCH/GET/DELETE id không tồn tại → 404', async () => {
-    expect((await as('patch', '/api/admin/products/khong-co').send({ priceExclVat: 1 })).status).toBe(404)
+    expect((await as('patch', '/api/admin/products/khong-co').send({ price: 1 })).status).toBe(404)
     expect((await as('get', '/api/admin/products/khong-co')).status).toBe(404)
     expect((await as('patch', '/api/admin/faq/khong-co').send({ isPublished: true })).status).toBe(404)
     expect((await as('delete', '/api/admin/faq/khong-co')).status).toBe(404)
@@ -281,9 +281,9 @@ describe('Toàn vẹn — sản phẩm', () => {
 
   it('PATCH lỗi validate không ghi một phần dữ liệu', async () => {
     const p = await createProduct()
-    const res = await as('patch', `/api/admin/products/${p.id}`).send({ priceExclVat: 1, slug: 'SAI SLUG' })
+    const res = await as('patch', `/api/admin/products/${p.id}`).send({ price: 1, slug: 'SAI SLUG' })
     expect(res.status).toBe(400)
-    expect((await as('get', `/api/admin/products/${p.id}`)).body.item.priceExclVat).toBe(750000)
+    expect((await as('get', `/api/admin/products/${p.id}`)).body.item.price).toBe(750000)
   })
 })
 
@@ -425,21 +425,21 @@ describe('Dữ liệu — validate', () => {
     expect(ok.body.item.description).toBeNull()
   })
 
-  it.each([[-1], [1.5], ['750000'], [1_000_000_001], [null], [Number.MAX_SAFE_INTEGER], [true], [[1]]])('giá %j → INVALID_PRICE', async (priceExclVat) => {
-    const res = await post({ ...product, priceExclVat })
+  it.each([[-1], [1.5], ['750000'], [1_000_000_001], [null], [Number.MAX_SAFE_INTEGER], [true], [[1]]])('giá %j → INVALID_PRICE', async (price) => {
+    const res = await post({ ...product, price })
     expect(res.status).toBe(400)
-    expect(res.body.error.fields).toEqual({ priceExclVat: 'INVALID_PRICE' })
+    expect(res.body.error.fields).toEqual({ price: 'INVALID_PRICE' })
   })
 
   it('giá 0 và 1 tỷ hợp lệ (biên)', async () => {
-    expect((await post({ ...product, slug: 'gia-0', priceExclVat: 0 })).status).toBe(201)
-    expect((await post({ ...product, slug: 'gia-max', priceExclVat: 1_000_000_000 })).status).toBe(201)
+    expect((await post({ ...product, slug: 'gia-0', price: 0 })).status).toBe(201)
+    expect((await post({ ...product, slug: 'gia-max', price: 1_000_000_000 })).status).toBe(201)
   })
 
   it('PATCH giá âm → 400', async () => {
     const p = await createProduct()
-    const res = await as('patch', `/api/admin/products/${p.id}`).send({ priceExclVat: -5 })
-    expect(res.body.error.fields).toEqual({ priceExclVat: 'INVALID_PRICE' })
+    const res = await as('patch', `/api/admin/products/${p.id}`).send({ price: -5 })
+    expect(res.body.error.fields).toEqual({ price: 'INVALID_PRICE' })
   })
 
   it.each([['Den'], ['den_moi'], ['-den'], ['den-'], ['den--moi'], ['a'.repeat(81)], [' den '], ['đèn']])('slug %j → INVALID_SLUG', async (slug) => {
@@ -539,7 +539,7 @@ describe('D-39/D-40 — sản phẩm admin tạo hiện ở /api/products', () =
     expect(slugs).not.toContain('den-draft')
     expect(slugs).not.toContain('den-hidden')
     const pubEn = en.body.items.find((p) => p.slug === 'den-pub')
-    expect(pubEn).toMatchObject({ name: 'Public Lantern', description: 'Mô tả VI', priceExclVat: 750000, currency: 'VND' })
+    expect(pubEn).toMatchObject({ name: 'Public Lantern', description: 'Mô tả VI', price: 750000, currency: 'VND' })
     expect(pubEn).not.toHaveProperty('status')
     expect(pubEn).not.toHaveProperty('id')
 

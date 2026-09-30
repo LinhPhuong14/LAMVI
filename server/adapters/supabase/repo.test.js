@@ -34,7 +34,7 @@ const productRow = (over) => ({
   slug: 'den-nguyet',
   kind: 'single',
   status: 'published',
-  price_excl_vat: 890000,
+  price: 890000,
   tone: 'amber',
   sort_order: 1,
   name: { vi: 'Đèn Nguyệt' },
@@ -54,7 +54,7 @@ describe('createSupabaseRepo — mapping snake_case → camelCase', () => {
       slug: 'den-nguyet',
       kind: 'single',
       status: 'published',
-      priceExclVat: 890000,
+      price: 890000,
       tone: 'amber',
       sortOrder: 1,
       name: { vi: 'Đèn Nguyệt' },
@@ -91,7 +91,7 @@ describe('createSupabaseRepo — mapping snake_case → camelCase', () => {
   it('getProductBySlug: eq(slug) + maybeSingle; không có → null', async () => {
     const client = fakeClient({ products: [productRow()] })
     const repo = createSupabaseRepo(client)
-    expect((await repo.getProductBySlug('den-nguyet')).priceExclVat).toBe(890000)
+    expect((await repo.getProductBySlug('den-nguyet')).price).toBe(890000)
     expect(await repo.getProductBySlug('khong-co')).toBeNull()
     expect(client.calls[0].ops).toContainEqual(['eq', 'slug', 'den-nguyet'])
     expect(client.calls[0].ops).toContainEqual(['maybeSingle'])

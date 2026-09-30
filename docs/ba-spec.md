@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.18 (bản nháp) |
-| Ngày | 2026-09-29 |
-| Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — bỏ xác nhận email khi đăng ký; G-37…G-39 (nhánh `feat/signup-no-confirm`). v0.12: D-64 — dashboard tài khoản khách dạng tab dọc, phong cách thanh thoát (T-34) (nhánh `feat/account-dashboard`), G-40. v0.13: dashboard bo góc + minh hoạ; tab đơn hàng minh hoạ 4 công đoạn. v0.14: D-65 — dashboard kính mờ, nền mây khói + đèn trời khi vào trang, giao diện tối (nhánh `feat/account-glass`). v0.15: nền dashboard dùng ảnh thật CC0 thay hình tự vẽ. v0.16: D-66 — ảnh nền thật cho trang chủ và các trang công khai; dashboard mobile có thanh điều hướng đáy. v0.17: D-67 — PO duyệt I-14, OpenAI của Mây mặc định bật (nhánh `feat/may-openai-default`). v0.18: câu trả lời Mây là văn bản thuần, không link/URL; G-41 (nhánh `fix/may-links`) |
+| Phiên bản | v0.19 (bản nháp) |
+| Ngày | 2026-09-30 |
+| Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41) và toàn bộ P0 còn lại ở v0.19 (D-68…D-77). Còn chờ PO: P1/P2 ở §30 và `[LEGAL]` Q-36 (ảnh tư liệu), I-15 (xoá lịch sử chat); giả định phát sinh gắn `[ASSUMPTION]` |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: gộp nhánh `feat/folk-art-redesign` (giao diện dân gian cổ + motion, bảng màu, phòng tranh ảnh tư liệu — Q-36 `[LEGAL]`, design rules — §31.4) và `docs/branding-guideline` vào `master`. v0.9: deploy Vercel (T-33), G-35, G-36. v0.10: D-62 — tên web và thương hiệu là LAMVI (nhánh `feat/brand-lamvi`). v0.11: D-63 — bỏ xác nhận email khi đăng ký; G-37…G-39 (nhánh `feat/signup-no-confirm`). v0.12: D-64 — dashboard tài khoản khách dạng tab dọc, phong cách thanh thoát (T-34) (nhánh `feat/account-dashboard`), G-40. v0.13: dashboard bo góc + minh hoạ; tab đơn hàng minh hoạ 4 công đoạn. v0.14: D-65 — dashboard kính mờ, nền mây khói + đèn trời khi vào trang, giao diện tối (nhánh `feat/account-glass`). v0.15: nền dashboard dùng ảnh thật CC0 thay hình tự vẽ. v0.16: D-66 — ảnh nền thật cho trang chủ và các trang công khai; dashboard mobile có thanh điều hướng đáy. v0.17: D-67 — PO duyệt I-14, OpenAI của Mây mặc định bật (nhánh `feat/may-openai-default`). v0.18: câu trả lời Mây là văn bản thuần, không link/URL; G-41 (nhánh `fix/may-links`). v0.19 (nhánh `feat/production-checkout-seo-ga`): PO chốt toàn bộ P0 còn lại → D-68…D-77. Giá niêm yết đã gồm VAT (D-68, thay D-03/D-50); checkout → thanh toán payOS/COD → đơn hàng → huỷ đơn (D-69, D-70, D-73, D-74, D-76); coupon đầy đủ (D-71); Google Analytics 4 không banner cookie (D-72); ảnh sản phẩm trong admin (D-77); SEO mức production (og:image, Organization/WebSite/Breadcrumb, cache CDN); security headers (T-37), chống dò/spam (T-38, G-20), G-18, G-28; admin đơn hàng và coupon. Khoảng trống mới: G-42…G-47 |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -31,7 +31,7 @@ MỘC là web **B2C** bán đèn giấy dó thủ công tại Việt Nam, địn
 
 Web có 3 ngôn ngữ (vi, en, zh-Hans), SEO, Google Analytics, admin quản lý coupon. Thanh toán qua **payOS** hoặc **COD**. **Bắt buộc có tài khoản để đặt hàng.** Chỉ giao trong nước, tiền tệ VND.
 
-**Hiện trạng repo (v0.7)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB, đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên mật khẩu/hồ sơ), trang QR lô đèn, admin sản phẩm/FAQ/lô & video lô, SEO (SSR, hreflang, sitemap), vai trò IT + dashboard IT, AI Mây (chat, FAQ offline, tour — OpenAI mặc định bật — D-67), giỏ hàng. Chưa có: checkout, thanh toán, đơn, lời chúc, trang QR lời chúc, Mây tra đơn, admin đơn/coupon/đổi trả, GA (xem §31).
+**Hiện trạng repo (v0.19)**: React + Vite frontend, backend Express + Supabase. Đã có: catalog và FAQ từ DB (kèm ảnh sản phẩm), đa ngôn ngữ vi/en/zh, tài khoản (đăng ký/đăng nhập/quên & đổi mật khẩu/hồ sơ), trang QR lô đèn, admin (sản phẩm, ảnh sản phẩm, FAQ, lô & video lô, **đơn hàng**, **coupon**), SEO (SSR, hreflang, sitemap, og:image, JSON-LD Organization/WebSite/Product/Breadcrumb), **Google Analytics 4**, vai trò IT + dashboard IT, AI Mây, giỏ hàng, **checkout → thanh toán payOS/COD → đơn hàng → huỷ đơn**, security headers + chống dò/spam. Chưa có: lời chúc, trang QR lời chúc, Mây tra đơn, đổi trả, thông báo (xem §31).
 
 ---
 
@@ -152,7 +152,7 @@ Không có chỉ số mục tiêu (KPI) định lượng — `[BA DECISION REQUI
 
 - Trang `/account` là dashboard dạng ứng dụng: **không** có header/footer của trang giới thiệu; thanh bên (logo về trang chủ, đổi ngôn ngữ, tên + email, tab dọc, về cửa hàng, giỏ hàng, đăng xuất). Màn ≤960px: tab chuyển thành thanh ngang dính đầu trang `[CONFIRMED]` D-64.
 - 4 tab: Tổng quan, Đơn hàng, Trò chuyện với Mây, Hồ sơ. Tab đang mở lưu ở `?tab=` (`orders`, `may`, `profile`; không có hoặc sai → Tổng quan) để tải lại, chia sẻ link và nút Back giữ đúng tab; điều hướng bàn phím theo WAI-ARIA tabs `[ASSUMPTION]`.
-- Tổng quan: số liệu nhanh (số sản phẩm và tạm tính của giỏ — có chú thích chưa gồm VAT theo BR-PRC-003; đơn hàng; số câu đã hỏi Mây), 2 tin chat gần nhất, tóm tắt hồ sơ `[ASSUMPTION]`.
+- Tổng quan: số liệu nhanh (số sản phẩm và tạm tính của giỏ — có chú thích đã gồm VAT theo BR-PRC-003; số đơn hàng và trạng thái đơn mới nhất; số câu đã hỏi Mây), 2 tin chat gần nhất, tóm tắt hồ sơ `[ASSUMPTION]`.
 - Khi chưa có đơn hàng (FR-ACC-002 chưa làm), tab đơn hàng chỉ báo "sắp ra mắt" và liệt kê những gì sẽ có (công đoạn, lời chúc, mã vận đơn — FR-ACC-002/003, D-41); **không** hiển thị đơn mẫu `[ASSUMPTION]`. Câu "soạn và sửa lời chúc" chưa nói thời hạn vì còn chờ Q-08.
 - Giao diện dashboard: kính mờ, nền dải mây khói lơ lửng, đèn trời bay lên một lượt mỗi khi vào trang; có **giao diện tối** `[CONFIRMED]` D-65. Giao diện tối chỉ áp dụng cho dashboard tài khoản (trang công khai giữ giao diện sáng), mặc định theo cài đặt thiết bị, lựa chọn lưu trên trình duyệt (không lưu vào hồ sơ) `[ASSUMPTION]`. Bật giảm chuyển động → không có đèn bay, khói đứng yên `[DERIVED]` NFR-A11Y-001.
 - Nền và cảnh đầu trang dashboard dùng **ảnh thật** (trời sương, trời đêm đầy đèn trời, khói, đèn trời tách nền) giấy phép CC0 tìm qua Openverse — danh sách ở `public/images/dash/CREDITS.md`; không dùng Canva vì giấy phép Canva không cho dùng riêng lẻ phần tử ngoài thiết kế Canva `[ASSUMPTION]`. Ảnh là nền không khí, không phải ảnh sản phẩm.
@@ -360,25 +360,31 @@ Giỏ hàng
 | Thanh toán | payOS / COD | BR-PAY-004 (COD và đơn giao người khác) | — |
 | Tạo đơn | toàn bộ trên | Kiểm tra lại giá, coupon, trạng thái sản phẩm ngay lúc tạo | Nếu giá/coupon đổi: hiện bảng giá mới, yêu cầu xác nhận lại `[CONFIRMED]` D-41 |
 
-**Thời điểm soạn lời chúc** `[BA DECISION REQUIRED]` Q-08: bắt buộc soạn trong checkout, hay cho soạn sau trong dashboard (đến hạn khóa BR-MSG-001/008)? Nếu đến lúc khóa mà chưa soạn thì sao?
+**Thời điểm soạn lời chúc** `[CONFIRMED]` D-76: checkout **chỉ tích ô "Thêm lời chúc"** (đơn Mua tặng luôn có); khách soạn sau ở trang cảm ơn hoặc mục Đơn hàng trong tài khoản, tới hạn khoá theo BR-MSG-001/008. Tới hạn mà chưa soạn → in thiệp không có lời chúc, QR vẫn dẫn tới trang xem video mẻ đèn; có nhắc trước khi khoá.
 
 ## 13. Tính giá
 
+**Mọi số tiền là giá ĐÃ gồm VAT** (D-68). VAT được tách ngược từ tổng để ghi trên hoá đơn.
+
 ```text
-Tạm tính          = Σ (đơn giá chưa VAT × số lượng)
-− Giảm giá coupon  (áp trước hay sau VAT: Q-10)
-+ Phí vận chuyển   (Q-11)
-+ VAT              (thuế suất: Q-09)
-= Tổng thanh toán
+Tạm tính          = Σ (giá niêm yết đã gồm VAT × số lượng)
+− Giảm giá coupon  (trừ vào tạm tính → cũng làm giảm cơ sở tính thuế, D-71)
++ Phí vận chuyển   (30.000đ; miễn phí khi tạm tính sau giảm giá ≥ 1.000.000đ — D-70)
+= Tổng thanh toán  (đã gồm VAT)
+
+VAT            = làm tròn(Tổng × 10% / 110%)   ← tách ngược, làm tròn MỘT lần ở tổng (D-69)
+Phần chưa VAT  = Tổng − VAT
 ```
 
 | Chủ đề | Quy tắc |
 |---|---|
 | Tiền tệ | VND, số nguyên đồng (D-32) |
-| Làm tròn | `[BA DECISION REQUIRED]` làm tròn VAT theo dòng hay theo tổng đơn |
-| Hiển thị giá chưa VAT | `[LEGAL]` I-04: xác nhận quy định niêm yết giá bán lẻ; nếu được phép, mọi nơi hiện giá phải có chú thích "chưa gồm VAT" |
-| Phí vận chuyển | `[BA DECISION REQUIRED]` Q-11: cố định, theo vùng, hay miễn phí từ mức nào? Web cần công thức để tính trước khi thanh toán |
-| Giá thiệp/lời chúc | `[BA DECISION REQUIRED]` Q-12: miễn phí hay tính phí? |
+| Làm tròn | VAT làm tròn nửa lên, **một lần duy nhất ở tổng đơn** `[CONFIRMED]` D-69 — không làm tròn theo từng dòng (tránh lệch cộng dồn) |
+| Hiển thị giá | Giá niêm yết **đã gồm VAT**; mọi nơi hiện giá ghi rõ "đã gồm VAT" (BR-PRC-003) `[CONFIRMED]` D-68 |
+| Thuế suất | 10%, tính trên **cả phí vận chuyển** `[CONFIRMED]` D-69. Sửa được ở cấu hình `app_settings.pricing` (không hard-code) |
+| Phí vận chuyển | Đồng giá 30.000đ toàn quốc; miễn phí khi tạm tính **sau giảm giá** ≥ 1.000.000đ `[CONFIRMED]` D-70. `[ASSUMPTION]` ngưỡng xét sau coupon; `freeShippingFrom = 0` nghĩa là **tắt** miễn phí ship, không phải miễn phí mọi đơn |
+| Giá thiệp/lời chúc | `[BA DECISION REQUIRED]` Q-12: miễn phí hay tính phí? Hiện hiện thực là **miễn phí** `[ASSUMPTION]` |
+| Nguồn sự thật | Bảng giá do **một hàm duy nhất** ở server sinh ra (`server/domain/pricing.js` + `quoteCart`), dùng chung cho trang checkout và lúc tạo đơn — số khách thấy luôn bằng số ghi vào đơn `[DERIVED]` |
 
 ## 14. Coupon
 
@@ -395,21 +401,21 @@ Coupon C hợp lệ cho đơn O khi:
   AND (C.min_order rỗng OR tạm_tính(O) ≥ C.min_order)
 ```
 
-Các thuộc tính sau cần PO chốt trước khi thiết kế data model:
-
-| # | Câu hỏi | Trạng thái |
+| # | Chủ đề | Quyết định |
 |---|---|---|
-| C-1 | Loại: giảm %, giảm số tiền, miễn phí ship? | `[BA DECISION REQUIRED]` |
-| C-2 | Giảm trước VAT hay sau VAT? | `[BA DECISION REQUIRED]` + `[LEGAL]` |
-| C-3 | Phạm vi: toàn đơn / sản phẩm cụ thể / có áp vào phí ship? | `[BA DECISION REQUIRED]` |
+| C-1 | Loại coupon | **3 loại**: giảm % (`percent`), giảm số tiền (`amount`), miễn phí ship (`free_shipping`) `[CONFIRMED]` D-71 |
+| C-2 | Giảm trước hay sau VAT | **Trước VAT** `[CONFIRMED]` D-71. Vì giá niêm yết đã gồm VAT (D-68), điều này được hiện thực bằng cách trừ giảm giá vào tạm tính rồi mới tách VAT ngược từ tổng còn lại — phần giảm cũng làm giảm cơ sở tính thuế `[ASSUMPTION]` |
+| C-3 | Phạm vi | Mặc định toàn đơn; **áp được cho một số sản phẩm cụ thể** (`product_ids`) `[CONFIRMED]` D-71. Không áp vào phí ship (loại `free_shipping` lo việc đó). `[ASSUMPTION]` `product_ids` rỗng = toàn đơn |
 | C-4 | Mỗi đơn dùng tối đa mấy coupon? | **1** `[CONFIRMED]` D-41 |
-| C-5 | Giới hạn tổng và giới hạn mỗi user? | `[BA DECISION REQUIRED]` (vì bắt buộc tài khoản, đếm theo user là khả thi) |
-| C-6 | Có mức giảm tối đa (cho loại %)? | `[BA DECISION REQUIRED]` |
-| C-8 | Hủy đơn có trả lại lượt dùng? Đổi trả một phần thì phân bổ giảm giá thế nào? | `[BA DECISION REQUIRED]` |
-| C-9 | Sửa/tắt coupon đang chạy ảnh hưởng đơn đang checkout thế nào? | Đề xuất: kiểm tra lại lúc tạo đơn (BR-CPN-002) `[CONFIRMED]` D-41 |
-| C-10 | Mây có được nhắc tới coupon không? | Đề xuất: **không** `[CONFIRMED]` D-41 (BR-AI-005) |
+| C-5 | Giới hạn lượt | Có **tổng lượt** (`usage_limit`) và **lượt mỗi khách** (`per_user_limit`, mặc định 1); để trống = không giới hạn `[CONFIRMED]` D-71 |
+| C-6 | Mức giảm tối đa | Có, **chỉ cho loại %** (`max_discount`) `[CONFIRMED]` D-71 |
+| C-8 | Huỷ đơn / đổi trả một phần | Huỷ đơn (và payOS hết hạn) **trả lại cả lượt tổng và lượt theo khách** `[CONFIRMED]` D-71. Đổi trả một phần: phân bổ giảm giá theo tỉ lệ giá trị dòng hàng |
+| C-9 | Sửa/tắt coupon đang chạy | Kiểm tra lại lúc tạo đơn (BR-CPN-002) `[CONFIRMED]` D-41 |
+| C-10 | Mây có được nhắc tới coupon không? | **Không** `[CONFIRMED]` D-41 (BR-AI-005) |
 
 **Thời điểm tính là đã dùng coupon** `[CONFIRMED]` D-41: khi đơn được tạo thành công. Đơn payOS hết hạn thanh toán thì trả lại lượt dùng.
+
+**Hiện thực (v0.19)**: bảng `coupons` + `coupon_redemptions`; lượt dùng tăng/trả **nguyên tử trong DB** (`claim_coupon` / `release_coupon`) để hai đơn đồng thời không vượt `usage_limit`. Quản lý ở `/admin/coupons`; coupon đã dùng không xoá được, chỉ tắt.
 
 ## 15. Thanh toán
 
@@ -429,10 +435,11 @@ PAID → REFUND_PENDING → REFUNDED
 | Nguồn sự thật | **Webhook payOS (đã xác minh chữ ký)** là nguồn duy nhất để chuyển đơn sang CONFIRMED. Trang return URL chỉ để hiển thị, không cập nhật trạng thái. |
 | Webhook trùng | Xử lý idempotent theo mã giao dịch; lần hai không đổi gì |
 | Webhook đến chậm | Trang cảm ơn hiện "Đang chờ xác nhận thanh toán"; backend chủ động hỏi trạng thái payOS nếu quá thời gian `[CONFIRMED]` D-41 |
-| Hạn link thanh toán | `[BA DECISION REQUIRED]` Q-15 (ví dụ 15 phút?). Hết hạn → đơn CANCELLED, trả lượt coupon |
+| Hạn link thanh toán | **15 phút** `[CONFIRMED]` D-73. Hết hạn → đơn CANCELLED, trả lượt coupon. Quét bằng lịch chạy ngoài (Vercel Cron 5 phút) **và** kiểm ngay khi khách mở đơn — serverless không có tiến trình nền `[DERIVED]` |
+| Lấy lại link thanh toán | Khách lấy lại được link khi đơn còn PENDING_PAYMENT (lần tạo đơn gặp lỗi cổng, hoặc đã đóng tab payOS) `[DERIVED]` |
 | Thanh toán sau khi đơn đã hết hạn/hủy | Ghi nhận PAID, gắn cờ cho admin **hoàn tiền thủ công** `[CONFIRMED]` D-41 |
 | Số tiền nhận khác số tiền đơn | Không xác nhận đơn, gắn cờ cho admin `[CONFIRMED]` D-41 |
-| Hoàn tiền | `[BA DECISION REQUIRED]` Q-16: hoàn tự động qua payOS hay admin chuyển khoản thủ công rồi ghi nhận trên web? |
+| Hoàn tiền | **Thủ công** `[CONFIRMED]` D-74: admin chuyển khoản qua ngân hàng rồi bấm "Đã hoàn tiền" ở `/admin/orders/:code`; thao tác được ghi nhật ký (NFR-AUD-001). Đơn huỷ khi đã trả tiền chuyển sang `refund_pending` |
 
 Chi tiết API (tên trạng thái, cơ chế chữ ký, hạn link) theo tài liệu payOS — tech lead xác nhận.
 
@@ -444,7 +451,7 @@ Chi tiết API (tên trạng thái, cơ chế chữ ký, hạn link) theo tài l
 | Ghi nhận thu tiền | Admin đánh dấu "Đã thu COD" khi giao thành công |
 | Giao thất bại / từ chối nhận | Admin chuyển đơn sang DELIVERY_FAILED `[CONFIRMED]` D-41 — xử lý tiếp là vận hành |
 | COD + giao cho người khác (quà) | **Chặn COD** khi người nhận là người khác (BR-PAY-004) `[CONFIRMED]` D-41 |
-| Giới hạn giá trị COD | `[BA DECISION REQUIRED]` |
+| Giới hạn giá trị COD | `[BA DECISION REQUIRED]` — hiện **chưa giới hạn** `[ASSUMPTION]` |
 
 ## 16. Vòng đời đơn hàng
 
@@ -481,7 +488,7 @@ PENDING_PAYMENT ──(webhook PAID)──▶ CONFIRMED
 
 Lưu ý: **nút "Tôi đã nhận được quà" trên trang QR không đổi trạng thái đơn** `[CONFIRMED]` D-41 — tránh hai nguồn sự thật cho DELIVERED (xem I-19a, Q-18).
 
-`[BA DECISION REQUIRED]` Q-20: hủy đơn đã thanh toán ở IN_PRODUCTION/PACKED có hoàn 100% không?
+`[BA DECISION REQUIRED]` Q-20: hủy đơn đã thanh toán ở IN_PRODUCTION/PACKED có hoàn 100% không? — Hiện thực: đơn huỷ khi đã trả tiền chuyển sang `refund_pending`; **số tiền hoàn do admin tự quyết khi chuyển khoản** (web chỉ ghi nhận đã hoàn) `[ASSUMPTION]`.
 
 ## 17. Vận chuyển (phần web)
 
@@ -717,30 +724,44 @@ Kênh hỗ trợ người thật (Q-31): admin nhập tại cấu hình Mây (3 
 
 - Trang công khai phải render sẵn HTML (pre-render hoặc SSR). **SSR trong Express** — một server Node phục vụ cả web và API, mỗi request render với dữ liệu mới nhất từ DB `[CONFIRMED]` D-49.
 - URL riêng mỗi ngôn ngữ + `hreflang` + sitemap + meta title/description theo trang và ngôn ngữ.
-- Structured data sản phẩm phải khớp cách hiển thị giá (I-04): JSON-LD `Product` có `Offer` giá **chưa VAT** kèm `valueAddedTaxIncluded: false` `[CONFIRMED]` D-50 — `[LEGAL]` I-04 vẫn chờ pháp chế; nếu kết luận khác phải sửa cùng lúc cách hiển thị giá và JSON-LD.
+- Structured data sản phẩm phải khớp cách hiển thị giá: JSON-LD `Product` có `Offer` giá **đã gồm VAT** kèm `valueAddedTaxIncluded: true` `[CONFIRMED]` D-68 (thay D-50). Đổi cách hiển thị giá thì phải sửa JSON-LD cùng lúc.
 - `noindex`: trang QR lời chúc, dashboard, giỏ hàng, checkout, admin, trang lô (D-44), trang đăng nhập/đăng ký/quên & đặt lại mật khẩu, trang 404.
 
-**Hiện thực (v0.4)**
+**Hiện thực (v0.19)**
 
 | Trang | SSR | Index | Ghi chú |
 |---|---|---|---|
-| Trang chủ `/`, `/en`, `/zh` | Có | Có | title/description theo ngôn ngữ, canonical + hreflang (vi, en, zh-Hans, x-default = vi) |
-| Chi tiết sản phẩm | Có | Có (chỉ Published) | title "{tên} — Mộc…", JSON-LD Product (D-50); Draft/Hidden/không có → 404 |
-| Trang QR lô `/lo/:code` | Có | Không (D-44) | Không có trong sitemap |
-| Đăng nhập, đăng ký, quên/đặt lại mật khẩu, tài khoản, admin | Không — chỉ khung HTML `[DERIVED]` (nội dung phụ thuộc phiên ở trình duyệt) | Không | Header `X-Robots-Tag: noindex` |
+| Trang chủ `/`, `/en`, `/zh` | Có | Có | title/description theo ngôn ngữ, canonical + hreflang (vi, en, zh-Hans, x-default = vi); JSON-LD `Organization` + `WebSite` |
+| Chi tiết sản phẩm | Có | Có (chỉ Published) | title "{tên} — LAMVI…", JSON-LD `Product` (D-68) + `BreadcrumbList`; `og:image` là ảnh sản phẩm nếu có (D-77); Draft/Hidden/không có → 404 |
+| Trang QR lô `/lo/:code` | Có | Không (D-44) | Không có trong sitemap. Vẫn được CDN giữ (công khai, không phụ thuộc phiên) |
+| Đăng nhập, đăng ký, quên/đặt lại mật khẩu, tài khoản, giỏ, checkout, chi tiết đơn, admin | Không — chỉ khung HTML `[DERIVED]` (nội dung phụ thuộc phiên ở trình duyệt) | Không | Header `X-Robots-Tag: noindex`, `Cache-Control: private, no-store` |
 | Đường dẫn không tồn tại | Có | Không | HTTP 404 |
 
+- Phân loại trang **không phân biệt hoa/thường** (React Router cũng vậy): `/ADMIN`, `/Account` vẫn là trang riêng tư `[DERIVED]`.
 - `sitemap.xml`: trang chủ + sản phẩm Published × 3 ngôn ngữ, kèm `xhtml:link` hreflang và `lastmod` `[DERIVED]`.
 - `robots.txt`: chỉ `Disallow` `/api/` và `/admin`; các trang riêng tư dùng `noindex` (để bot đọc được noindex) `[ASSUMPTION]`.
-- Open Graph: `og:title`, `og:description`, `og:url`, `og:type`, `og:locale`. Chưa có ảnh chia sẻ (`og:image`) vì chưa có ảnh sản phẩm thật `[ASSUMPTION]` (G-23).
+- Open Graph: `og:title`, `og:description`, `og:url`, `og:type`, `og:locale`, `og:site_name`, `og:image` (1200×630) + thẻ Twitter `summary_large_image`. Ảnh mặc định `public/images/og/default.png` dựng từ ảnh CC0 `[ASSUMPTION]` — thay khi có ảnh sản phẩm thật.
+- Cache: trang công khai `public, s-maxage=60, stale-while-revalidate=300` (SSR trang công khai không phụ thuộc phiên đăng nhập); `sitemap.xml` 1 giờ; `robots.txt` 1 ngày `[DERIVED]`.
 - Câu meta description trang chủ và mẫu tiêu đề sản phẩm do đội dev soạn — chờ Marketing duyệt `[ASSUMPTION]` (G-14).
-- URL gốc trong canonical/sitemap lấy từ biến môi trường `PUBLIC_SITE_URL` `[DERIVED]`.
+- URL gốc trong canonical/sitemap lấy từ biến môi trường `PUBLIC_SITE_URL`, tự cắt dấu `/` thừa ở cuối `[DERIVED]`.
 
 ### 23.3 Google Analytics
 
-- Sự kiện đề xuất `[CONFIRMED]` D-41: `view_item`, `add_to_cart`, `begin_checkout`, `purchase`, `cancel_order`, `open_qr_gift`, `confirm_gift_received`, `open_qr_batch`, `mascot_open`, `mascot_tour_complete`, `mascot_error`.
+- Sự kiện `[CONFIRMED]` D-41: `view_item`, `add_to_cart`, `begin_checkout`, `purchase`, `cancel_order`, `open_qr_gift`, `confirm_gift_received`, `open_qr_batch`, `mascot_open`, `mascot_tour_complete`, `mascot_error`.
 - Không gửi token QR (URL trang QR phải được làm sạch trước khi gửi), không gửi dữ liệu cá nhân (NFR-PRV-002).
-- `[LEGAL]` Q-32: có cần banner xin đồng ý cookie/theo dõi không?
+- `[CONFIRMED]` D-72 (chốt `[LEGAL]` Q-32): **không có banner xin đồng ý cookie** — GA chạy ngay khi vào web; việc dùng GA nêu trong Chính sách riêng tư.
+
+**Hiện thực (v0.19)**
+
+| Chủ đề | Quy tắc |
+|---|---|
+| Bật/tắt | Chỉ nhúng khi có `GA_MEASUREMENT_ID` (dạng `G-…`); ID sai định dạng bị bỏ qua. Đặt **chỉ ở Production**, không ở Preview |
+| Trang không đo | `/admin`, `/it` (trang nội bộ) không nhúng GA |
+| page_view | SPA nên tắt `send_page_view` tự động; client gửi tay ở mỗi lần điều hướng |
+| Làm sạch (NFR-PRV-002) | Bỏ query + hash; thay đoạn bí mật của đường dẫn bằng nhãn cố định (`/qr/:token`, `/reset-password/:token`, không phân biệt hoa/thường, gộp `//`); **mọi** sự kiện tự mang đường dẫn đã làm sạch để GA không tự đọc URL thật |
+| Tham số sự kiện | Danh sách tên sự kiện **đóng** (ngoài danh sách bị bỏ qua); tham số chỉ nhận số/boolean/chuỗi ≤ 100 ký tự, bỏ object/mảng |
+| Sự kiện đã nối | `view_item`, `add_to_cart`, `begin_checkout`, `purchase`, `cancel_order`, `open_qr_batch`, `mascot_open`, `mascot_tour_complete`, `mascot_error`. Còn `open_qr_gift`, `confirm_gift_received` — chờ trang QR lời chúc |
+| Lỗi GA | GA bị chặn/hỏng không được ném lỗi ra ứng dụng (NFR-AVL-001) |
 
 ---
 
@@ -749,9 +770,9 @@ Kênh hỗ trợ người thật (Q-31): admin nhập tại cấu hình Mây (3 
 | ID | Quy tắc | Nguồn |
 |---|---|---|
 | BR-ACC-001 | Chỉ người dùng đã đăng nhập mới tạo được đơn hàng. | D-36 |
-| BR-PRC-001 | Tổng = Σ(giá chưa VAT × SL) − giảm giá + phí ship + VAT; tính phía server. | D-03 |
+| BR-PRC-001 | Tổng = Σ(giá đã gồm VAT × SL) − giảm giá + phí ship; VAT tách ngược từ tổng. Tính phía server. | D-68, D-69 |
 | BR-PRC-002 | Giá dòng hàng được chốt tại thời điểm tạo đơn; thay đổi giá sau đó không ảnh hưởng đơn. | `[CONFIRMED]` D-41 |
-| BR-PRC-003 | Mọi nơi hiển thị giá phải có chú thích "chưa gồm VAT". | D-03, `[LEGAL]` |
+| BR-PRC-003 | Mọi nơi hiển thị giá phải có chú thích "đã gồm VAT". | D-68 |
 | BR-CPN-001 | Coupon chỉ áp được khi thỏa điều kiện hợp lệ ở §14. | D-21 |
 | BR-CPN-002 | Coupon được kiểm tra lại ngay lúc tạo đơn; không hợp lệ thì không tạo đơn và báo khách. | `[CONFIRMED]` D-41 |
 | BR-CPN-003 | Mỗi đơn dùng tối đa 1 coupon. | `[CONFIRMED]` D-41 C-4 |
@@ -769,7 +790,7 @@ Kênh hỗ trợ người thật (Q-31): admin nhập tại cấu hình Mây (3 
 | BR-MSG-003 | Lời chúc dạng chữ lưu vô thời hạn. | D-12 |
 | BR-MSG-004 | Giọng nói/video bị xóa sau 30 ngày kể từ lúc người nhận bấm "Tôi đã nhận được quà" lần đầu. | D-26 |
 | BR-MSG-005 | Trang QR hiện bản gốc; bản dịch chỉ hiện khi bấm "Dịch tự động". | D-27 |
-| BR-MSG-006 | Nếu không ai xác nhận, media được xử lý theo [Q-26]. | `[BA DECISION REQUIRED]` |
+| BR-MSG-006 | Không ai xác nhận: giọng nói/video vẫn bị xoá 90 ngày kể từ khi đơn giao thành công. | D-75 |
 | BR-MSG-007 | Lượt mở trang QR trước khi bấm xác nhận không bắt đầu đếm ngược. | D-26 |
 | BR-QR-001 | QR đơn hàng chỉ chứa token ngẫu nhiên; không chứa dữ liệu cá nhân dạng đọc được. | D-29, I-01 |
 | BR-QR-002 | QR đèn trỏ tới video lô; video lô không bị xóa. | D-10 |
@@ -999,29 +1020,22 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | ID | Câu hỏi | Ảnh hưởng |
 |---|---|---|
 | Q-05 | Ba đèn trong bộ Sum Vầy là sản phẩm nào, giá lẻ bao nhiêu? | Catalog, data model |
-| Q-09 | Thuế suất VAT? VAT có tính trên phí ship? | Tính giá |
-| Q-11 | Công thức phí ship? | Checkout |
-| Q-10, C-1…C-3, C-5 | Thiết kế coupon (C-4 đã chốt: 1 coupon/đơn, D-41) | Data model, tính giá |
-| Q-15 | Hạn link thanh toán payOS? | Vòng đời đơn |
-| Q-16 | Hoàn tiền payOS: tự động hay thủ công? | Thanh toán |
-| Q-08 | Soạn lời chúc lúc nào; chưa soạn khi tới hạn khóa thì sao? | Checkout, lời chúc |
-| Q-26 | Media lưu bao lâu nếu không ai xác nhận? | Lưu trữ |
-| I-04 | `[LEGAL]` niêm yết giá chưa VAT (I-14 đã duyệt — D-67) | Pháp lý |
+
+*(v0.19: Q-09, Q-11, Q-10/C-1…C-3/C-5/C-6/C-8, Q-15, Q-16, Q-08, Q-26 và `[LEGAL]` I-04 đã được PO chốt — xem D-68…D-77.)*
 
 ### P1 — trước khi làm tính năng liên quan
 | ID | Câu hỏi |
 |---|---|
 | Q-06 | Hoàn tiền khi trả một đèn trong bộ |
-| Q-12 | Thiệp/lời chúc có tính phí? |
+| Q-12 | Thiệp/lời chúc có tính phí? (hiện hiện thực là miễn phí `[ASSUMPTION]`) |
 | Q-14 | Admin có xem/kiểm duyệt lời chúc? |
 | Q-19 | Thời hạn đổi trả, tính từ mốc nào |
-| Q-20 | Hoàn bao nhiêu khi hủy đơn đã PAID ở IN_PRODUCTION/PACKED |
+| Q-20 | Hoàn bao nhiêu khi hủy đơn đã PAID ở IN_PRODUCTION/PACKED (hiện admin tự quyết khi chuyển khoản `[ASSUMPTION]`) |
 | Q-22 | Lý do đổi trả hợp lệ; hoàn tiền hay làm lại |
 | Q-24 | Kênh thông báo (email/SMS/Zalo) |
 | Q-25 | QR của đơn tự mua không có lời chúc dẫn tới đâu |
 | Q-27 | Người mua xem trước trang QR? |
 | Q-29 | Lời chúc không phải tiếng Việt → thiệp viết tay xử lý thế nào |
-| Q-32 | `[LEGAL]` Banner đồng ý cookie/GA |
 | Q-33 | Có cần lớp bảo vệ thêm (PIN) cho trang lời chúc? |
 | I-15 | `[LEGAL]` Quyền xóa lịch sử chat |
 | Q-35 | Đăng ký bằng email đã tồn tại hiện "Email này đã được đăng ký" (tiện cho khách nhưng cho phép dò email có tài khoản), hay luôn báo "kiểm tra email" giống quên mật khẩu? Hiện code báo "đã đăng ký" `[ASSUMPTION]` |
@@ -1030,7 +1044,9 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 ### P2 — có thể quyết định sau
 | ID | Câu hỏi |
 |---|---|
-| Q-07 | Giới hạn số lượng / "tạm hết hàng" |
+| Q-07 | Giới hạn số lượng / "tạm hết hàng" (hiện chưa có tồn kho; đơn không bị chặn vì hết hàng) |
+| Q-37 | Giới hạn giá trị đơn COD? Hiện **không giới hạn** `[ASSUMPTION]` (§15.2) |
+| Q-38 | Ngưỡng chống dò/spam (G-20): hiện đăng nhập 10 lần/5 phút, đăng ký 20/giờ, quên mật khẩu 5/giờ, tạo đơn 20/giờ — theo cả IP và email `[ASSUMPTION]` |
 | Q-21 | Phiếu giao hàng không in giá |
 | Q-23 | Testimonial thật hay placeholder (gồm câu "…quá trình đèn được làm cho riêng mình" — `testimonials.items[2]` trong `src/i18n/messages/*`) |
 | — | KPI; chỉ số hiệu năng; giữ hay bỏ form newsletter (G-11) |
@@ -1061,35 +1077,43 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 |---|---|---|---|---|
 | G-01 | Catalog từ DB, giá dạng số | Bảng `products`, giá số nguyên VND; `GET /api/products` (`server/routes/catalog.js`) | — | **Đã xử lý** (v0.2) |
 | G-02 | Giỏ hàng | `/cart`, `/api/cart/*`, thêm vào giỏ ở thẻ + trang chi tiết (FR-CART-001, D-59…D-61) | — | **Đã xử lý** (v0.7) |
-| G-03 | Tài khoản, checkout, thanh toán, đơn | Đã có backend Express + Supabase, routing, tài khoản (FR-ACC-001). Chưa có checkout, thanh toán, đơn | Missing | **Một phần** |
+| G-03 | Tài khoản, checkout, thanh toán, đơn | Đã có đủ: tài khoản (FR-ACC-001/002), checkout (`/checkout`), thanh toán payOS + COD, đơn hàng và huỷ đơn, admin đơn | — | **Đã xử lý** (v0.19) |
 | G-04 | Trang QR lời chúc, QR đèn | Trang QR lô đèn `/lo/:code` (FR-QR-006) đã có. Trang QR lời chúc chưa có | Missing | **Một phần** |
 | G-05 | AI Mây | Chat (OpenAI function calling, mặc định tắt — D-55), FAQ offline, tour, hạn mức, ngân sách, lịch sử, cấu hình admin (`server/may/*`, `src/may/*`, `/admin/may`). Chưa có tra đơn (FR-AI-004) | Missing | **Một phần** (v0.6) |
 | G-06 | Admin (sản phẩm, đơn, lô, coupon, FAQ, Mây) | `/admin` + `/api/admin/*` (v0.3): sản phẩm, FAQ, lô & video lô. Chưa có: đơn, coupon, cấu hình Mây, đổi trả (chưa có nghiệp vụ tương ứng); tài khoản admin cấp bằng tay trong Supabase (`profiles.role`) | Missing | **Một phần** (v0.3) |
 | G-07 | FAQ từ DB (để Mây đọc) | Bảng `faq_entries`, `GET /api/faq` | — | **Đã xử lý** (v0.2) |
 | G-08 | Đa ngôn ngữ | vi/en/zh cho giao diện, sản phẩm, FAQ, trang lô; URL `/`, `/en`, `/zh` (D-37) | — | **Đã xử lý** (v0.2) — bản dịch chờ duyệt (G-14) |
-| G-09 | Chú thích "chưa gồm VAT" | Component `Price` luôn kèm chú thích (BR-PRC-003) | — | **Đã xử lý** (v0.2) — vẫn chờ `[LEGAL]` I-04 |
-| G-10 | Theo dõi đơn, chính sách đổi trả | Link footer vẫn `href="#"` (`src/components/SiteFooter.jsx`) | Missing | **Còn thiếu** — chưa có đơn và nội dung chính sách |
+| G-09 | Chú thích VAT | Component `Price` luôn kèm chú thích "đã gồm VAT" (BR-PRC-003) | — | **Đã xử lý** (v0.19) — I-04 đã chốt bằng D-68 |
+| G-10 | Theo dõi đơn, chính sách đổi trả | Đã có theo dõi đơn (`/account?tab=orders`, `/don-hang/:code`) nhưng link footer vẫn `href="#"`; chưa có nội dung chính sách đổi trả và **Chính sách riêng tư** (bắt buộc vì D-72 nêu GA ở đó) | Missing | 🟡 **Một phần** (v0.19) |
 | G-11 | Newsletter | Form vẫn bỏ email (`src/components/SiteFooter.jsx`) | Incorrect | **Còn thiếu** — chờ PO giữ/bỏ (§30 P2) |
 | G-12 | SEO | SSR trong Express (D-49): trang công khai có HTML đầy đủ, `lang` và title đúng ngôn ngữ (`server/ssr.js`, `src/entry-server.jsx`) | — | **Đã xử lý** (v0.4) |
-| G-13 | Google Analytics | Không có | Missing | **Còn thiếu** |
+| G-13 | Google Analytics | GA4 (`src/analytics/*`, nhúng ở `server/ssr.js`), 9/11 sự kiện §23.3 đã nối; không banner cookie (D-72) | — | **Đã xử lý** (v0.19) — còn `open_qr_gift`, `confirm_gift_received` chờ trang QR lời chúc |
 | G-14 | Bản dịch en/zh | Do đội dev soạn (`src/i18n/messages/*`, `server/data/seed.js`) | Chưa duyệt | **Mới** — chờ PO duyệt `[ASSUMPTION]` |
 | G-15 | SEO đa ngôn ngữ | `hreflang`, canonical, meta description theo trang/ngôn ngữ (`src/seo/*`), `/sitemap.xml`, `/robots.txt` | — | **Đã xử lý** (v0.4) |
 | G-16 | Cấu hình Supabase Auth | Cần đặt Site URL `https://lamvi.vercel.app` và Redirect URLs (`/reset-password` × 3 ngôn ngữ). Xác nhận email: đã bỏ (D-63) | Cấu hình | 🟡 Một phần (v0.11) — xem `docs/knowledge/deploy-vercel.md` |
 | G-17 | Lưu phiên đăng nhập | Token ở `localStorage` (T-10) — rủi ro XSS | Technical debt | **Mới** — xem lại trước go-live |
-| G-18 | Đặt lại mật khẩu | `POST /api/auth/reset-password` nhận mọi access token hợp lệ, không riêng token khôi phục; chưa có chức năng đổi mật khẩu (có hỏi mật khẩu cũ) | Security | **Mới** — cần kiểm tra token khôi phục trước go-live |
+| G-18 | Đặt lại mật khẩu | Chỉ nhận token khôi phục (claim `amr` của Supabase); thêm `POST /api/auth/change-password` yêu cầu mật khẩu hiện tại và thu hồi mọi phiên | Security | **Đã xử lý** (v0.19) |
 | G-19 | Khoá tài khoản | §7 có trạng thái User "bị khóa" nhưng chưa có cơ chế khoá | Missing | **Mới** — làm cùng admin (G-06) |
-| G-20 | Chống dò/spam đăng nhập, đăng ký, quên mật khẩu | Chỉ dựa vào giới hạn của Supabase; chưa có giới hạn theo IP ở tầng app | Security | **Mới** |
-| G-21 | Nhật ký thay đổi của admin | Sửa sản phẩm/FAQ/lô chưa ghi log (NFR-AUD-001 chỉ bắt buộc cho đơn, coupon, hoàn tiền) | Missing | **Mới** (v0.3) — bắt buộc khi làm coupon/đơn |
-| G-23 | Ảnh chia sẻ mạng xã hội / ảnh sản phẩm | Chưa có ảnh sản phẩm thật (thẻ sản phẩm dùng hình đèn SVG) nên chưa có `og:image`, JSON-LD không có `image` (Google khuyến nghị có) | Missing | **Mới** (v0.4) |
+| G-20 | Chống dò/spam | `server/middleware/rateLimit.js`: giới hạn đăng nhập, đăng ký, quên/đổi mật khẩu, tạo đơn theo cả IP và email; đếm trong DB (serverless), khoá đếm là băm với `MAY_HASH_SALT` | Security | **Đã xử lý** (v0.19) — ngưỡng `[ASSUMPTION]` Q-38 |
+| G-21 | Nhật ký thay đổi của admin | Bảng `audit_log`: đã ghi cho **đơn** (tạo, đổi trạng thái, hoàn tiền) và **coupon** (tạo/sửa/xoá) — đủ NFR-AUD-001. Sản phẩm/FAQ/lô vẫn chưa ghi | Missing | 🟡 **Một phần** (v0.19) |
+| G-23 | Ảnh chia sẻ mạng xã hội / ảnh sản phẩm | Admin tải ảnh sản phẩm (D-77); `og:image` mặc định 1200×630 dựng từ ảnh CC0 (`npm run gen:og`), trang sản phẩm dùng ảnh riêng nếu có; JSON-LD có `image` | — | **Đã xử lý** (v0.19) — ảnh sản phẩm **thật** vẫn chưa có, xem G-33 |
 | G-24 | Dashboard IT | `/it` + `/api/it/*` (FR-IT-001…004) | — | **Đã xử lý** (v0.5) |
 | G-25 | Cảnh báo chủ động | Dashboard chỉ xem; chưa gửi cảnh báo khi lỗi 5xx tăng hay tích hợp lỗi (kênh thông báo chờ Q-24) | Missing | **Mới** (v0.5) |
 | G-26 | Giám sát payOS webhook, chi phí OpenAI (NFR-OBS-001) | Chưa có vì chưa tích hợp payOS/OpenAI; dashboard chỉ báo đã cấu hình biến môi trường chưa | Missing | **Mới** (v0.5) |
 | G-27 | Nhật ký bật/tắt bảo trì | Chỉ lưu người/thời điểm đổi lần cuối (`app_settings`) + log server; chưa có lịch sử đầy đủ | Missing | **Mới** (v0.5) |
-| G-28 | Nội dung lỗi 5xx lưu cho IT | Lưu thông điệp lỗi nội bộ (có thể chứa chi tiết DB); chưa lọc dữ liệu cá nhân | Privacy | **Mới** (v0.5) |
-| G-29 | Mây tra đơn (FR-AI-004, US-008) | Chưa có đơn hàng nên chưa có `get_my_orders` / `lookup_order` và chống dò mã đơn | Missing | **Mới** (v0.6) — làm cùng đơn hàng |
+| G-28 | Nội dung lỗi 5xx lưu cho IT | Che email, SĐT và chuỗi giống token trong thông điệp; che đoạn bí mật trong đường dẫn (`redactSecrets` + `sanitizePath` ở `server/monitoring/metrics.js`) | — | **Đã xử lý** (v0.19) |
+| G-29 | Mây tra đơn (FR-AI-004, US-008) | Đã có đơn hàng nhưng Mây **chưa** có `get_my_orders` / `lookup_order` và chống dò mã đơn (BR-AI-002) | Missing | **Còn thiếu** (v0.19) — làm được ngay |
 | G-30 | Mây — quyền xoá lịch sử chat, xoá khi xoá tài khoản | Chưa có — chờ `[LEGAL]` I-15 | Missing | **Mới** (v0.6) |
 | G-31 | Nút "Dịch tự động" dùng chung ngân sách Mây (§22.4) | Chưa có trang QR lời chúc nên chưa có | Missing | **Mới** (v0.6) |
 | G-32 | Giỏ hàng trên Supabase | Giới hạn 50 dòng và gộp giỏ là đọc-rồi-ghi, hai thao tác đồng thời có thể vượt 50 dòng / lệch số lượng; bảng `cart_items` bật RLS không có policy (chỉ server dùng service role truy cập) | Rủi ro thấp | **Mới** (v0.7) |
+| G-48 | Phiên bắt nguồn từ link khôi phục giữ quyền đổi mật khẩu | Claim `amr: recovery` của Supabase tồn tại qua vòng đời refresh token, nên một phiên mở từ link "Quên mật khẩu" vẫn đổi được mật khẩu mà không cần mật khẩu cũ cho tới khi đăng xuất. Chưa kiểm chứng được trên project thật | Security | **Mới** (v0.19) — kiểm trước go-live |
+| G-49 | Mã đơn còn trong đường dẫn của nhật ký lỗi 5xx | Có chủ đích để IT lần lỗi (`/api/orders/LV2610-…`); email/SĐT/token/query đã được che. Nếu coi mã đơn là dữ liệu cần bảo vệ thì phải che thêm | Privacy | **Mới** (v0.19) — chấp nhận `[ASSUMPTION]` |
+| G-42 | Lời chúc & trang QR lời chúc (FR-MSG-001, FR-QR-001…005) | Đơn đã có cờ `has_message` và `qr_lang` (D-76) nhưng **chưa có** bảng lời chúc, trang soạn, token QR, trang người nhận, đếm 90 ngày (D-75), nút "Dịch tự động" | Missing | **Mới** (v0.19) — phần lớn nhất còn lại |
+| G-43 | BR-ORD-002 không kiểm chứng được | "Đơn chỉ chuyển SHIPPED khi video lô của mọi dòng hàng đã xuất bản" — `order_items` **không có** liên kết tới `batches` nên không kiểm được. Cần quyết: gắn lô vào dòng hàng lúc sản xuất, hay bỏ quy tắc | Missing | **Mới** (v0.19) |
+| G-44 | Tồn kho | Chưa có tồn kho: đặt được số lượng bất kỳ (tối đa 10/dòng), không có "tạm hết hàng" (Q-07) | Missing | **Mới** (v0.19) |
+| G-45 | Thông báo đơn hàng | §20 yêu cầu thông báo khi đơn đổi trạng thái; chưa gửi gì (chờ Q-24 chọn kênh). Khách phải tự vào web xem | Missing | **Mới** (v0.19) |
+| G-46 | Địa chỉ VN dạng tự do | Form checkout nhập tỉnh/quận/phường bằng ô chữ, không có danh mục hành chính → dữ liệu không chuẩn hoá, khó nối với hãng vận chuyển | Technical debt | **Mới** (v0.19) |
+| G-47 | Cron quét đơn quá hạn chưa kiểm chứng thật | `vercel.json` đã khai báo `crons`, endpoint có bảo vệ bằng `CRON_SECRET`, nhưng chưa chạy trên Vercel thật (gói Free giới hạn số cron/ngày) | Chưa kiểm chứng | **Mới** (v0.19) |
 | G-33 | Hình minh hoạ thay cho ảnh thật | Đèn, chân dung nghệ nhân (khung "ảnh cũ"), hoạ tiết đều là SVG minh hoạ; chân dung không phải ảnh thật của nghệ nhân. Khi có ảnh thật phải thay, và không trình bày minh hoạ như ảnh tư liệu | Content | **Mới** (v0.6) — liên quan G-23 |
 | G-34 | Nội dung khi chưa chạy JS | Các khối có hiệu ứng xuất hiện nằm trong HTML SSR (máy tìm kiếm đọc được) nhưng `opacity: 0` tới khi JS chạy. Đã giảm: màn hình đầu (tiêu đề, LCP) chạy bằng CSS nên hiện ngay; trình duyệt tắt JS được CSS `@media (scripting: none)` ép hiện. Còn lại: JS tải chậm thì các khối dưới màn hình đầu chờ hydrate mới hiện | Technical debt | 🟡 Một phần (v0.6) |
 | G-35 | Số liệu API trên Vercel (T-18) | Flush bằng timer/SIGTERM; instance serverless có thể bị đóng trước khi flush nên dashboard IT có thể thiếu số liệu | Technical debt | **Mới** (v0.9) |
@@ -1116,7 +1140,7 @@ Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.j
 | `src/App.jsx:300-301` | Thiệp + QR chỉ nhắc cho đơn Mua tặng | `products.giftCopy` / `products.selfCopy`: thêm thiệp cảm ơn có mã QR; đơn tự mua quét mã trên đèn + ô "Thêm lời chúc" | D-01, D-14, D-28 | ✅ Đã sửa |
 | `src/App.jsx:360` | "Theo dõi đèn của bạn từng bước" | `process.title`: "Theo dõi đơn của bạn qua từng công đoạn" | D-01, C-11 | ✅ Đã sửa |
 | `src/components/Marquee.jsx:5` | "LƯU GIỮ KÝ ỨC VĨNH VIỄN" | `marquee[3]`: "MỖI LỜI CHÚC, MỘT KỶ NIỆM" | D-26 | ✅ Đã sửa |
-| `src/App.jsx:20-42` | Giá không có chú thích VAT | Component `Price` + "chưa gồm VAT" ở mọi nơi hiển thị giá | D-03, BR-PRC-003 | ✅ Đã sửa — vẫn chờ `[LEGAL]` I-04 |
+| `src/App.jsx:20-42` | Giá không có chú thích VAT | Component `Price` + "đã gồm VAT" ở mọi nơi hiển thị giá | D-68, BR-PRC-003 | ✅ Đã sửa (đổi sang "đã gồm VAT" ở v0.19) |
 | `src/App.jsx:220` | "1 — câu chuyện riêng mỗi đèn" | `story.statStory`: "lời chúc riêng cho mỗi món quà" | D-01, D-45 | ✅ Đã sửa |
 | `src/App.jsx:426` | Mock điện thoại "Hành trình chiếc đèn của bạn" | `qr.phoneCaption`: "Hành trình mẻ đèn của bạn" | D-01, D-45 | ✅ Đã sửa |
 | `src/App.jsx:209-212` | "…câu chuyện của gia đình bạn cũng được lưu giữ theo cách bền bỉ như vậy" | `story.text`: "…được thắp lên từ chính chất liệu bền bỉ ấy" | D-26 | ✅ Đã sửa (phát hiện ở v0.2) — câu do dev soạn `[ASSUMPTION]`, chờ Marketing |
@@ -1147,6 +1171,7 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 - `[ASSUMPTION]` Tham khảo web Trung Quốc chỉ ở mức nguyên tắc trình bày (nét, khung, khoảng trắng); không dùng chữ Hán, rồng, mái cung điện để web vẫn mang bản sắc Việt.
 - ~~`[ASSUMPTION]` Giữ thương hiệu MỘC~~ — thay bởi D-62: tên web và thương hiệu là **LAMVI**.
 - Khoảng trống mới: G-33, G-34 (§31.2). Deploy Vercel: G-35, G-36. Dashboard tài khoản: G-40.
+- **v0.19**: trang `/checkout` và `/don-hang/:code` dựng theo đúng hệ khung này (tranh bồi cho từng bước, thiếp thư cho tóm tắt đơn và trang cảm ơn, sợi chỉ son cho tiến độ, cảnh nền `Scene`). Chi tiết ở `design-rules.md` §11a. `.account-card` đổi sang khung tranh bồi nên giỏ hàng, admin và dashboard IT cũng đồng bộ theo.
 
 ---
 
@@ -1156,7 +1181,7 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 |---|---|---|
 | D-01 | Video quá trình làm đèn theo lô, không riêng từng đèn | Hiệu lực |
 | D-02 | Người mua chọn giao cho bản thân hoặc người nhận | Hiệu lực |
-| D-03 | Giá chưa gồm VAT | Hiệu lực |
+| D-03 | Giá chưa gồm VAT | **Bị thay bởi D-68** (v0.19) |
 | D-04 | Chưa có coupon/giảm giá | **Bị thay bởi D-21** |
 | D-05 | Có SEO và Google Analytics | Hiệu lực |
 | D-06 | Khách được hủy trước khi gửi hàng | Hiệu lực |
@@ -1203,7 +1228,7 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 | D-47 | Lô đã xuất bản video: được thay video; không được gỡ xuất bản, xoá lô, đổi mã lô | Hiệu lực (v0.3) |
 | D-48 | Giao diện admin chỉ tiếng Việt (`/admin`); nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh | Hiệu lực (v0.3) |
 | D-49 | SEO: SSR trong Express — một server Node phục vụ web + API (không dùng hosting tĩnh) | Hiệu lực (v0.4) |
-| D-50 | JSON-LD sản phẩm có giá chưa VAT, ghi `valueAddedTaxIncluded: false` (PO chọn; `[LEGAL]` I-04 vẫn chờ pháp chế) | Hiệu lực (v0.4) |
+| D-50 | JSON-LD sản phẩm có giá chưa VAT, ghi `valueAddedTaxIncluded: false` | **Bị thay bởi D-68** (v0.19) |
 | D-51 | Thêm vai trò IT: dashboard riêng `/it`; IT có cả quyền Admin; Admin không vào `/it` | Hiệu lực (v0.5) |
 | D-52 | Dashboard IT gồm: số liệu API, trạng thái tích hợp, bật/tắt chế độ bảo trì | Hiệu lực (v0.5) |
 | D-53 | Số liệu API lưu Supabase | Hiệu lực (v0.5) |
@@ -1214,10 +1239,20 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 | D-58 | Ngân sách OpenAI mặc định 20 USD/tháng (admin sửa được) | Hiệu lực (v0.6) |
 | D-59 | Q-13: khách vãng lai có giỏ (lưu trình duyệt), gộp vào giỏ tài khoản khi đăng nhập | Hiệu lực (v0.7) |
 | D-60 | Tối đa 10 sản phẩm mỗi dòng giỏ | Hiệu lực (v0.7) |
-| D-61 | Khi chưa có checkout: nút Thanh toán bắt đăng nhập rồi báo "sắp ra mắt" | Hiệu lực (v0.7) |
+| D-61 | Khi chưa có checkout: nút Thanh toán bắt đăng nhập rồi báo "sắp ra mắt" | **Hết hiệu lực** (v0.19) — đã có checkout; nút dẫn thẳng sang `/checkout` |
 | D-62 | Tên web và thương hiệu là **LAMVI** (viết liền, không dấu) ở mọi nơi — logo, tiêu đề trang, câu văn, bản dịch en/zh; không dùng "MỘC" hay "LÂM VỊ" | Hiệu lực (v0.10) |
 | D-63 | Bỏ xác nhận email sau khi đăng ký (dự án dùng Supabase gói Free): tài khoản dùng được ngay, không gửi thư xác nhận | Hiệu lực (v0.11) |
 | D-64 | Dashboard tài khoản khách dạng tab dọc, không dùng header (và footer) của trang giới thiệu; tối ưu trải nghiệm người dùng | Hiệu lực (v0.12) |
 | D-65 | Dashboard tài khoản: phong cách kính mờ (glassmorphism), nền có dải màu như mây khói lơ lửng và đèn trời bay lên khi mới vào trang, thêm giao diện tối | Hiệu lực (v0.14) |
 | D-66 | Trang chủ và các trang công khai (sản phẩm, giỏ, đăng nhập/đăng ký, trang lô, 404) có ảnh nền thật cùng chủ đề (đèn trời, sương mây, khói, trời đêm) nhưng khác bộ ảnh của dashboard; không dùng hoạ tiết SVG tự vẽ làm nền | Hiệu lực (v0.16) |
 | D-67 | PO duyệt `[LEGAL]` I-14 (gửi nội dung chat của Mây sang OpenAI, máy chủ ngoài VN). Cờ OpenAI của Mây **mặc định bật**; admin vẫn tắt được; không gửi SĐT/email/địa chỉ (NFR-PRV-001) | Hiệu lực (v0.17) |
+| D-68 | PO chốt `[LEGAL]` I-04: **giá niêm yết là giá ĐÃ gồm VAT** (Luật Giá 2023 — giá bán lẻ cho người tiêu dùng là giá cuối cùng). Mọi nơi hiển thị giá ghi "đã gồm VAT"; JSON-LD `valueAddedTaxIncluded: true`; bảng giá checkout và đơn tách riêng dòng VAT | Hiệu lực (v0.19) — **thay D-03 và D-50** |
+| D-69 | Q-09: thuế suất VAT **10%**, tính trên **cả phí vận chuyển**; VAT tách ngược từ tổng đơn và **làm tròn một lần ở tổng** (không làm tròn theo dòng). Thuế suất sửa được trong cấu hình, không hard-code | Hiệu lực (v0.19) |
+| D-70 | Q-11: phí vận chuyển **đồng giá 30.000đ toàn quốc**, **miễn phí khi tạm tính sau giảm giá ≥ 1.000.000đ**. Phí và ngưỡng sửa được trong cấu hình | Hiệu lực (v0.19) |
+| D-71 | C-1/C-2/C-3/C-5/C-6/C-8: coupon có **3 loại** (giảm %, giảm số tiền, miễn phí ship); **giảm trước VAT**; **áp được cho sản phẩm cụ thể**; có **tổng lượt dùng**, **lượt mỗi khách** và **trần giảm** cho loại %; **huỷ đơn trả lại lượt** (cả lượt tổng và lượt theo khách); đổi trả một phần phân bổ giảm giá theo tỉ lệ giá trị dòng hàng | Hiệu lực (v0.19) |
+| D-72 | Q-32 `[LEGAL]`: **không có banner xin đồng ý cookie** — Google Analytics chạy ngay khi vào web; việc dùng GA nêu trong Chính sách riêng tư. Không gửi token QR và dữ liệu cá nhân sang GA (NFR-PRV-002) | Hiệu lực (v0.19) |
+| D-73 | Q-15: **link thanh toán payOS có hiệu lực 15 phút**. Hết hạn → đơn CANCELLED, trả lượt coupon (BR-PAY-003) | Hiệu lực (v0.19) |
+| D-74 | Q-16: **hoàn tiền thủ công** — admin chuyển khoản qua ngân hàng rồi ghi nhận trên web (có nhật ký NFR-AUD-001). Không tích hợp API hoàn tiền của payOS | Hiệu lực (v0.19) |
+| D-75 | Q-26: nếu người nhận không bấm "Tôi đã nhận được quà", giọng nói/video lời chúc vẫn bị xoá **90 ngày kể từ khi đơn giao thành công**; phần chữ lưu vĩnh viễn | Hiệu lực (v0.19) |
+| D-76 | Q-08: khách **soạn lời chúc sau khi đặt hàng** (trang cảm ơn và mục Đơn hàng trong tài khoản), tới hạn khoá theo BR-MSG-001/008. Tới hạn mà chưa soạn → **in thiệp không có lời chúc**, QR vẫn dẫn tới trang xem video mẻ đèn; có nhắc trước khi khoá | Hiệu lực (v0.19) |
+| D-77 | G-23: ảnh sản phẩm do admin tải lên (JPG/PNG/WebP, không nhận SVG) qua signed upload URL; dùng cho thẻ sản phẩm, trang chi tiết, `og:image` và JSON-LD. Chưa có ảnh thật thì web vẫn dùng hình đèn minh hoạ | Hiệu lực (v0.19) |

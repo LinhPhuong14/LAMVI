@@ -28,7 +28,7 @@ vi.mock('./MayChat.jsx', async (importOriginal) => {
 const base = {
   'GET /products': () => ({ body: { items: [] } }),
   'GET /faq': () => ({ body: { items: [] } }),
-  'GET /products/den-vong': () => ({ body: { item: { slug: 'den-vong', name: 'Đèn Vọng', priceExclVat: 1050000, currency: 'VND' } } }),
+  'GET /products/den-vong': () => ({ body: { item: { slug: 'den-vong', name: 'Đèn Vọng', price: 1050000, currency: 'VND' } } }),
   'GET /batches/L-01': () => ({ status: 404, body: { error: { code: 'NOT_FOUND' } } }),
 }
 const TOUR = { name: 'Tour cùng Mây' }

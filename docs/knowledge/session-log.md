@@ -1,5 +1,42 @@
 # Nhật ký phiên
 
+## 2026-09-30 — Production: giá đã gồm VAT, checkout/đơn/thanh toán, GA + SEO, gia cố (nhánh `feat/production-checkout-seo-ga`)
+
+**Mục tiêu người dùng**: "tiếp tục build theo BA document nhưng theo level production, thêm cả analysis gg và seo cho web".
+
+**Quyết định từ người dùng** (chốt toàn bộ P0 còn lại — spec v0.19, D-68…D-77)
+
+- D-68 (chốt `[LEGAL]` I-04): **giá niêm yết đã gồm VAT** — thay D-03 và D-50.
+- D-69 (Q-09): VAT 10%, tính cả trên phí ship, làm tròn một lần ở tổng đơn.
+- D-70 (Q-11): phí ship đồng giá 30.000đ, miễn phí từ 1.000.000đ.
+- D-71 (C-1…C-3, C-5, C-6, C-8): coupon 3 loại, giảm trước VAT, áp được cho sản phẩm cụ thể, có trần giảm và giới hạn lượt; huỷ đơn trả lượt.
+- D-72 (chốt `[LEGAL]` Q-32): **không banner đồng ý cookie**, GA chạy ngay.
+- D-73 (Q-15): link payOS 15 phút. D-74 (Q-16): hoàn tiền thủ công.
+- D-75 (Q-26): media lời chúc xoá sau 90 ngày kể từ khi giao xong. D-76 (Q-08): soạn lời chúc sau khi đặt; chưa soạn thì thiệp để trống.
+- D-77 (G-23): ảnh sản phẩm tải trong admin, ảnh OG tạo trước.
+
+**Đã làm** (mỗi tính năng có subagent kiểm thử độc lập, T-11)
+
+1. **Giá đã gồm VAT**: đổi `price_excl_vat` → `price`, `server/domain/pricing.js` làm nguồn sự thật duy nhất về tiền, cấu hình thuế/ship ở `app_settings`, sửa câu chữ vi/en/zh và JSON-LD. *Subagent phát hiện*: Mây vẫn báo `priceNote: 'excl. VAT'` cho OpenAI (ngược với D-68 vừa chốt, và test cũ đang khoá hành vi sai này); coupon có `type` lạ bị hiểu thành "giảm số tiền"; coupon thiếu `value` làm cả bảng giá thành `NaN`.
+2. **GA4 + SEO production + security headers (T-37)**: danh sách sự kiện đóng, làm sạch đường dẫn/tham số; og:image 1200×630, JSON-LD Organization/WebSite/Breadcrumb; CSP, HSTS, cache CDN. *Subagent phát hiện*: `classifyPath`/`isInternalPath` phân biệt hoa/thường trong khi React Router thì không → `/ADMIN`, `/Account` lọt index, lọt cache CDN dùng chung và bị nhúng GA; **CSP nonce vô nghĩa khi response được CDN phát lại cho nhiều người** → chuyển sang hash (T-37); `sanitizePath` lọt token với `/QR/…` và `//qr/…`; `PUBLIC_SITE_URL` có `/` cuối sinh URL hai gạch chéo.
+3. **Ảnh sản phẩm trong admin** (D-77): bucket riêng, signed upload URL, kiểm kiểu file thật, không nhận SVG.
+4. **Checkout → đơn hàng → thanh toán** (backend + giao diện): bảng giá một nguồn (T-40), khoá lạc quan cho chuyển trạng thái (T-41), webhook payOS xác minh chữ ký, lượt coupon nguyên tử trong DB, nhật ký kiểm toán. *Subagent phát hiện*: **huỷ đơn chỉ trả lượt coupon tổng, không xoá bản ghi lượt theo khách** → `per_user_limit` bị tiêu vĩnh viễn dù đơn đã huỷ; webhook về sau hạn cho kết quả khác nhau tuỳ cron đã chạy hay chưa; admin huỷ đơn không huỷ link payOS; `expectedTotal` sai kiểu âm thầm bỏ bước chốt giá; mã đơn 6 ký tự va chạm ở quy mô ~20.000 mã (đã nâng lên 7 và bỏ lệch modulo).
+5. **Admin đơn hàng và coupon**; thêm `POST /orders/:code/payment` để lấy lại liên kết thanh toán (trước đó lỗi cổng payOS làm khách kẹt với đơn không trả được).
+6. **Gia cố trước go-live**: G-18 (đặt lại mật khẩu chỉ nhận token khôi phục + đổi mật khẩu có xác minh mật khẩu cũ), G-20 (chống dò/spam đếm trong DB — T-38), G-28 (che dữ liệu cá nhân trong nhật ký lỗi 5xx).
+7. **Hạ tầng test**: nới timeout vitest và testing-library, giới hạn số worker (`maxWorkers: '50%'`) — trước đó bộ test fail giả và OOM khi chạy song song.
+
+**Kiểm chứng thật**: chạy bản build production trong trình duyệt — đặt đơn COD hoàn chỉnh từ giỏ → checkout → trang cảm ơn; GA bắn đúng `view_item`, `begin_checkout`, `purchase`; CSP hash không chặn script nào; admin đổi trạng thái đơn và ghi nhật ký; tải ảnh sản phẩm hiện trên trang chi tiết.
+
+**Còn lại / cần người dùng**
+
+- **Lời chúc & trang QR lời chúc (G-42)** là phần nghiệp vụ lớn nhất chưa làm; quyết định đã đủ để làm ngay.
+- Mây tra đơn (G-29); nội dung Chính sách riêng tư + đổi trả (G-10, bắt buộc vì D-72 nêu GA ở đó).
+- Chưa thử với **payOS thật** và **Supabase thật** (G-36): cần chạy migration 001→008 + seed, đặt `SUPABASE_*`, `PAYOS_*`, `GA_MEASUREMENT_ID`, `CRON_SECRET`, `MAY_HASH_SALT`, `TRUST_PROXY=1`.
+- Khoảng trống mới ghi vào spec: G-42…G-47 (lời chúc, BR-ORD-002 không kiểm được, tồn kho, thông báo, danh mục địa chỉ, cron chưa kiểm chứng).
+- Câu hỏi mới: Q-37 (giới hạn giá trị COD), Q-38 (ngưỡng chống dò/spam).
+
+---
+
 Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm · còn lại.
 
 ---

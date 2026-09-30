@@ -5,6 +5,8 @@ import { createMetrics } from './monitoring/metrics.js'
 import { createMaintenance } from './monitoring/maintenance.js'
 import { createMayService } from './may/service.js'
 import { createOpenAiClient } from './adapters/openai.js'
+import { createPayosClient } from './adapters/payos.js'
+import { createOrderService } from './orders/service.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { loadConfig } from './config.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
@@ -56,6 +58,11 @@ const may = createMayService({
   priceOutPer1M: config.openai.priceOutPer1M,
   hashSalt: config.mayHashSalt,
 })
+// FR-PAY-001: thiếu khoá payOS → client null, checkout chỉ cho COD
+const payos = createPayosClient(config.payos)
+if (!payos) console.warn('[api] Thiếu biến PAYOS_* — chỉ nhận thanh toán COD')
+const orders = createOrderService({ repo, payos })
+
 const web = process.env.API_ONLY === '1' ? undefined : await createWeb({ repo, config, dev, maintenance })
 
 metrics.start()
@@ -67,7 +74,7 @@ for (const sig of ['SIGTERM', 'SIGINT']) {
   })
 }
 
-export const app = createApp({ repo, auth, storage, web, config, metrics, maintenance, may })
+export const app = createApp({ repo, auth, storage, web, config, metrics, maintenance, may, payos, orders, dev })
 
 // T-33: trên Vercel, `api/index.js` dùng `app` làm hàm serverless — không tự listen
 if (!process.env.VERCEL) {

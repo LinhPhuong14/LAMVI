@@ -2649,3 +2649,12 @@
     border-radius: 20px;
   }
 }
+
+/* Ảnh sản phẩm thật (G-23). Cắt vuông để lưới không lệch; bo góc mềm và viền mảnh theo
+   design-rules §3 (nét mảnh, không bóng cứng). Chưa có ảnh → component vẽ đèn SVG (G-33). */
+.product-photo {
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--hair-soft);
+  background: var(--diep-light);
+}

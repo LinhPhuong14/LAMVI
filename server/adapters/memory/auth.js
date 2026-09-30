@@ -11,11 +11,13 @@ export function createMemoryAuth({ requireEmailConfirmation = false, accessTtlMs
   const refresh = new Map() // token → userId
   const outbox = [] // email đã "gửi" (để test)
 
-  const issue = (user) => {
+  // G-18: token cấp qua link "Quên mật khẩu" được đánh dấu recovery — chỉ token này mới đổi được
+  // mật khẩu mà không cần mật khẩu cũ.
+  const issue = (user, { recovery = false } = {}) => {
     const accessToken = token()
     const refreshToken = token()
     const expiresAt = now() + accessTtlMs
-    access.set(accessToken, { userId: user.id, expiresAt })
+    access.set(accessToken, { userId: user.id, expiresAt, recovery })
     refresh.set(refreshToken, user.id)
     return { accessToken, refreshToken, expiresAt: Math.floor(expiresAt / 1000), user: { id: user.id, email: user.email } }
   }
@@ -62,7 +64,7 @@ export function createMemoryAuth({ requireEmailConfirmation = false, accessTtlMs
       const s = access.get(accessToken)
       if (!s || s.expiresAt <= now()) return null
       const u = byId(s.userId)
-      return u ? { id: u.id, email: u.email } : null
+      return u ? { id: u.id, email: u.email, isRecovery: Boolean(s.recovery) } : null
     },
 
     async signOut(accessToken) {
@@ -75,7 +77,7 @@ export function createMemoryAuth({ requireEmailConfirmation = false, accessTtlMs
     async sendPasswordReset(email, redirectTo) {
       const u = users.get(email)
       if (!u) return // không tiết lộ email có tồn tại hay không
-      const recovery = issue(u)
+      const recovery = issue(u, { recovery: true })
       outbox.push({ type: 'recovery', email, redirectTo, accessToken: recovery.accessToken })
     },
 
@@ -84,6 +86,14 @@ export function createMemoryAuth({ requireEmailConfirmation = false, accessTtlMs
       if (!u) throw new AuthError('UNAUTHORIZED')
       u.salt = randomBytes(16)
       u.hash = hash(password, u.salt)
+    },
+
+    // G-18: đổi mật khẩu khi đang đăng nhập phải nhập lại mật khẩu hiện tại
+    async verifyPassword(userId, password) {
+      const u = byId(userId)
+      if (!u) return false
+      const attempt = hash(password, u.salt)
+      return attempt.length === u.hash.length && timingSafeEqual(u.hash, attempt)
     },
   }
 }

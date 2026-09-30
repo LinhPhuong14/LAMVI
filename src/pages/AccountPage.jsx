@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../components/Field'
 import Lantern from '../components/Lantern'
-import { GiftArt, HeroScene, LetterArt, StepArt } from '../components/DashArt'
+import { GiftArt, HeroScene, LetterArt } from '../components/DashArt'
 import DashSky from '../components/DashSky'
 import Price from '../components/Price'
 import { Lotus, Seal } from '../components/Motifs'
@@ -13,6 +13,9 @@ import Seo from '../seo/Seo.jsx'
 import { useAuth } from '../auth/context.js'
 import { useCart } from '../cart/context.js'
 import { useSubmit } from '../auth/useForm.js'
+import { useMyOrders } from '../orders/useOrders.js'
+import { StatusBadge } from '../orders/OrderStatus.jsx'
+import { formatVnd } from '../lib/money.js'
 
 // Ngày giờ theo giờ Việt Nam (như tháng ngân sách Mây) — [ASSUMPTION] ghi ở spec §5.2
 const TZ = 'Asia/Ho_Chi_Minh'
@@ -225,53 +228,49 @@ function Card({ title, id, tag, action, className = '', children }) {
   )
 }
 
-// FR-ACC-002/003 chưa có (chờ checkout) — chỉ báo trước những gì sẽ có, không hiện đơn giả
-function OrdersPanel() {
-  const { t, path } = useI18n()
-  const features = t('account.ordersFeatures')
-  // Bốn công đoạn (C-11) dùng lại câu chữ đã duyệt ở trang chủ — chỉ minh hoạ, không phải đơn thật
-  const steps = t('process.steps')
+// FR-ACC-002: đơn hàng của tôi. Dữ liệu do trang cha nạp một lần (dùng chung với ô số liệu).
+function OrdersPanel({ status, items, error }) {
+  const { t, lang, path } = useI18n()
+
   return (
-    <Card title={t('account.orders')} id="dash-orders-title" tag={t('account.soon')} className="dash-wide">
-      <div className="dash-orders">
-        <div className="dash-orders-art" aria-hidden="true">
-          <Lantern size={88} tone="dusk" swing />
+    <Card title={t('account.orders')} id="dash-orders-title" className="dash-wide">
+      {status === 'loading' && <p>{t('orders.loading')}</p>}
+      {status === 'error' && (
+        <p className="notice error" role="alert">
+          {t(`errors.${error}`)}
+        </p>
+      )}
+      {status === 'ok' && items.length === 0 && (
+        <div className="dash-orders">
+          <div className="dash-orders-art" aria-hidden="true">
+            <Lantern size={88} tone="dusk" swing />
+          </div>
+          <div>
+            <p>{t('orders.empty')}</p>
+            <Link to={{ pathname: path('/'), hash: '#products' }} className="btn btn-ghost btn-compact">
+              {t('cart.continue')}
+            </Link>
+          </div>
         </div>
-        <div>
-          <p>{t('account.ordersSoon')}</p>
-          {Array.isArray(features) && (
-            <ul className="dash-features">
-              {features.map((f) => (
-                <li key={f}>
-                  <Lotus />
-                  {f}
-                </li>
-              ))}
-            </ul>
-          )}
-          <Link to={{ pathname: path('/'), hash: '#products' }} className="btn btn-ghost btn-compact">
-            {t('cart.continue')}
-          </Link>
-        </div>
-      </div>
-      {Array.isArray(steps) && (
-        <section className="dash-journey" aria-labelledby="dash-journey-title">
-          <h3 id="dash-journey-title">{t('process.title')}</h3>
-          <ol>
-            {steps.map((st, i) => (
-              <li key={st.label}>
-                <span className="dash-journey-art">
-                  <StepArt step={i} size={56} />
+      )}
+      {status === 'ok' && items.length > 0 && (
+        <ul className="order-list">
+          {items.map((o) => (
+            <li key={o.code} className="order-row">
+              <div>
+                <Link to={path(`/don-hang/${o.code}`)} className="product-link">
+                  <strong>{o.code}</strong>
+                </Link>
+                <span className="field-hint">
+                  {new Date(o.createdAt).toLocaleDateString(lang === 'zh' ? 'zh-Hans' : lang)} ·{' '}
+                  {o.items.map((i) => `${i.name} × ${i.quantity}`).join(', ')}
                 </span>
-                <span className="dash-journey-no" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <strong>{st.label}</strong>
-                <span className="dash-muted">{st.note}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
+              </div>
+              <StatusBadge status={o.status} />
+              <span className="order-row-total">{formatVnd(o.total)}</span>
+            </li>
+          ))}
+        </ul>
       )}
     </Card>
   )
@@ -314,7 +313,7 @@ function ProfilePanel({ state, setState }) {
   )
 }
 
-function Overview({ cart, mayItems, profile, go }) {
+function Overview({ cart, mayItems, profile, orders, go }) {
   const { t, path } = useI18n()
   const asked = mayItems?.filter((m) => m.role === 'user').length
   const count = cart?.itemCount
@@ -330,7 +329,7 @@ function Overview({ cart, mayItems, profile, go }) {
           <span className="dash-stat-label">{t('account.statCart')}</span>
           <strong className="dash-stat-value">{count ?? '–'}</strong>
           <span className="dash-stat-sub">
-            {count ? <Price amount={cart.subtotalExclVat} className="dash-stat-price" /> : t('account.cartEmpty')}
+            {count ? <Price amount={cart.subtotal} className="dash-stat-price" /> : t('account.cartEmpty')}
           </span>
           <Link to={path('/cart')} className="dash-stat-link">
             {t('cart.view')} <span aria-hidden="true">→</span>
@@ -341,8 +340,10 @@ function Overview({ cart, mayItems, profile, go }) {
             <GiftArt size={52} />
           </span>
           <span className="dash-stat-label">{t('account.orders')}</span>
-          <strong className="dash-stat-value dash-stat-word">{t('account.soon')}</strong>
-          <span className="dash-stat-sub">{t('account.ordersSoonShort')}</span>
+          <strong className="dash-stat-value">{orders?.length ?? '–'}</strong>
+          <span className="dash-stat-sub">
+            {orders?.length ? t(`orders.statuses.${orders[0].status}`) : t('orders.empty')}
+          </span>
           <button type="button" className="dash-stat-link" onClick={() => go('orders')} aria-label={`${t('account.viewMore')}: ${t('account.orders')}`}>
             {t('account.viewMore')} <span aria-hidden="true">→</span>
           </button>
@@ -428,6 +429,7 @@ export default function AccountPage() {
   const { t, path } = useI18n()
   const { user, authedApi, logout } = useAuth()
   const { cart } = useCart()
+  const myOrders = useMyOrders()
   const location = useLocation()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
@@ -491,7 +493,9 @@ export default function AccountPage() {
   const email = profile?.email ?? user.email
   const asked = mayItems?.filter((m) => m.role === 'user').length
   const cartCount = cart?.itemCount ?? 0
-  const badges = { orders: t('account.soonShort'), may: asked || null }
+  // FR-ACC-002: số đơn thật trên huy hiệu tab và ô số liệu (thay chỗ chờ G-40)
+  const orders = myOrders.status === 'ok' ? myOrders.items : null
+  const badges = { orders: orders?.length || null, may: asked || null }
 
   return (
     <div className="dash" data-theme={theme}>
@@ -589,8 +593,8 @@ export default function AccountPage() {
         )}
 
         <div className="dash-panel" key={tab}>
-          {tab === 'overview' && <Overview cart={cart} mayItems={mayItems} profile={profile} go={go} />}
-          {tab === 'orders' && <OrdersPanel />}
+          {tab === 'overview' && <Overview cart={cart} mayItems={mayItems} profile={profile} orders={orders} go={go} />}
+          {tab === 'orders' && <OrdersPanel status={myOrders.status} items={myOrders.items} error={myOrders.error} />}
           {tab === 'may' && <MayPanel items={mayItems} />}
           {tab === 'profile' && <ProfilePanel state={state} setState={setState} />}
         </div>

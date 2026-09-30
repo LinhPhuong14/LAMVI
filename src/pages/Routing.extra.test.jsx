@@ -176,7 +176,7 @@ describe('D-37 — link nội bộ giữ tiền tố ngôn ngữ', () => {
 describe('BR-PRC-003 — mọi chỗ hiển thị giá có chú thích VAT', () => {
   for (const lang of ['vi', 'en', 'zh']) {
     const p = PREFIX[lang]
-    const note = MESSAGES[lang].price.exclVat
+    const note = MESSAGES[lang].price.inclVat
 
     it(`${lang}: mỗi thẻ sản phẩm có giá VND số nguyên + "${note}"`, async () => {
       mockApi(handlers)

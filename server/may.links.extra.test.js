@@ -29,7 +29,7 @@ describe('toPlainText', () => {
 
   it('giữ nguyên văn bản thường, xuống dòng và tiếng Trung', () => {
     expect(toPlainText('Chào bạn!\nMây giúp gì được nè?')).toBe('Chào bạn!\nMây giúp gì được nè?')
-    expect(toPlainText('月灯价格为 890.000 越南盾（不含增值税）')).toBe('月灯价格为 890.000 越南盾（不含增值税）')
+    expect(toPlainText('月灯价格为 890.000 越南盾（含增值税）')).toBe('月灯价格为 890.000 越南盾（含增值税）')
   })
 })
 

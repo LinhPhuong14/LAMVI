@@ -5,6 +5,7 @@ import { splitLocale } from '../i18n/core.js'
 import MayAvatar from './MayAvatar.jsx'
 import Tour from './Tour.jsx'
 import { markTourDone, tourDone } from './storage.js'
+import { track } from '../analytics/index.js'
 
 // Khung chat tải khi mở (không làm nặng trang)
 const MayChat = lazy(() => import('./MayChat.jsx'))
@@ -38,9 +39,11 @@ function MayInner() {
     return () => clearTimeout(id)
   }, [isHome])
 
-  const closeTour = useCallback(() => {
+  // §23.3: mascot_tour_complete — `completed` phân biệt xem hết tour hay bỏ giữa chừng
+  const closeTour = useCallback((completed = false) => {
     markTourDone()
     setTouring(false)
+    track('mascot_tour_complete', { completed })
   }, [])
 
   // I-21: mở lại tour qua nút Mây; ở trang khác thì về trang chủ (trang công khai)
@@ -58,7 +61,17 @@ function MayInner() {
           <MayChat onClose={() => setOpen(false)} onTour={startTour} />
         </Suspense>
       )}
-      <button type="button" className="may-fab" onClick={() => setOpen((o) => !o)} aria-label={t('may.open')} aria-expanded={open}>
+      <button
+        type="button"
+        className="may-fab"
+        onClick={() => {
+          // Gửi sự kiện NGOÀI hàm updater: StrictMode gọi updater hai lần ở bản dev → đếm đôi
+          if (!open) track('mascot_open')
+          setOpen((o) => !o)
+        }}
+        aria-label={t('may.open')}
+        aria-expanded={open}
+      >
         <MayAvatar size={60} />
       </button>
     </>

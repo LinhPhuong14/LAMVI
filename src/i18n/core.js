@@ -29,7 +29,9 @@ export function localePath(lang, path = '/') {
 }
 
 export function splitLocale(pathname) {
-  const m = pathname.match(/^\/(en|zh)(?=\/|$)(.*)$/)
+  // React Router khớp route không phân biệt hoa/thường → `/EN/...` vẫn mở trang tiếng Anh.
+  // Nếu ở đây phân biệt thì phân loại trang (riêng tư/noindex) sẽ sai (xem classifyPath).
+  const m = pathname.match(/^\/(en|zh)(?=\/|$)(.*)$/i)
   if (!m) return { lang: DEFAULT_LOCALE, rest: pathname || '/' }
-  return { lang: m[1], rest: m[2] || '/' }
+  return { lang: m[1].toLowerCase(), rest: m[2] || '/' }
 }

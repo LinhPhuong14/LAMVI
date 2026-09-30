@@ -41,14 +41,14 @@ export function createCartService({ repo }) {
           kind: hideName ? null : p.kind,
           tone: hideName ? null : p.tone,
           badge: hideName ? null : p.badge,
-          priceExclVat: available ? p.priceExclVat : null,
+          price: available ? p.price : null,
         },
-        lineTotalExclVat: available ? p.priceExclVat * quantity : null,
+        lineTotal: available ? p.price * quantity : null,
       }
     })
     return {
       items,
-      subtotalExclVat: items.reduce((s, i) => s + (i.lineTotalExclVat ?? 0), 0),
+      subtotal: items.reduce((s, i) => s + (i.lineTotal ?? 0), 0),
       currency: 'VND',
       itemCount: items.filter((i) => i.available).reduce((s, i) => s + i.quantity, 0),
       hasUnavailable: items.some((i) => !i.available),

@@ -4,6 +4,7 @@ import { useAuth } from '../auth/context.js'
 import { useI18n } from '../i18n/index.js'
 import MayAvatar from './MayAvatar.jsx'
 import { getSessionId, loadGuestChat, saveGuestChat } from './storage.js'
+import { track } from '../analytics/index.js'
 
 const MAX = 500
 
@@ -51,6 +52,8 @@ export default function MayChat({ onClose, onTour }) {
     } catch (err) {
       // NFR-AVL-001: lỗi Mây không chặn web; báo lỗi ngay trong khung chat
       setMessages((m) => [...m, { role: 'assistant', kind: 'error', content: t(`errors.${err.code ?? 'NETWORK_ERROR'}`) }])
+      // §23.3: chỉ gửi mã lỗi, không gửi nội dung câu hỏi của khách (NFR-PRV-002)
+      track('mascot_error', { error_code: err.code ?? 'NETWORK_ERROR' })
     } finally {
       setPending(false)
     }

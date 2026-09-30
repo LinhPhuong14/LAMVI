@@ -238,15 +238,14 @@ describe('Thanh toán (D-61, US-001 AC-003)', () => {
     expect(screen.getAllByText('Sản phẩm này hiện không còn bán — vui lòng xoá khỏi giỏ.')).toHaveLength(2)
   })
 
-  it('đã đăng nhập: bấm Thanh toán → báo sắp ra mắt, không điều hướng', async () => {
+  it('đã đăng nhập: bấm Thanh toán → sang trang checkout (FR-CHK-001)', async () => {
     localStorage.setItem('moc.session', JSON.stringify(session))
     const srv = fakeServer()
     await srv.cart.setQuantity('u1', 'den-nguyet', 1, 'vi')
     mockApi(srv.handlers)
     renderAt('/cart')
     fireEvent.click(await screen.findByRole('button', { name: 'Thanh toán' }))
-    expect(await screen.findByText('Thanh toán trực tuyến sẽ sớm ra mắt. Giỏ hàng của bạn đã được lưu.')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Giỏ hàng' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Thanh toán', level: 1 })).toBeInTheDocument()
   })
 })
 

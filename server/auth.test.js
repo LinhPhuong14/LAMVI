@@ -5,7 +5,9 @@ import { createMemoryRepo } from './adapters/memory/repo.js'
 import { createMemoryAuth } from './adapters/memory/auth.js'
 
 let app, auth, repo
-const config = { publicSiteUrl: 'https://moc.test' }
+// G-20: tắt rate limit trong bộ test chức năng (nhiều test đăng ký/đăng nhập liên tiếp từ cùng
+// một IP). Hành vi giới hạn được kiểm riêng ở server/rateLimit.extra.test.js.
+const config = { publicSiteUrl: 'https://moc.test', rateLimit: { enabled: false } }
 const valid = { email: 'An@Example.com', password: 'matkhau123', fullName: 'Nguyễn An', phone: '090 123 4567' }
 
 function setup(opts) {
@@ -168,13 +170,67 @@ describe('Quên / đặt lại mật khẩu', () => {
   })
 
   it('mật khẩu mới quá ngắn → 400', async () => {
+    await request(app).post('/api/auth/register').send(valid)
+    await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
+    const res = await request(app)
+      .post('/api/auth/reset-password')
+      .set('Authorization', `Bearer ${auth.outbox[0].accessToken}`)
+      .send({ password: 'ngan' })
+    expect(res.status).toBe(400)
+    expect(res.body.error.fields.password).toBe('PASSWORD_TOO_SHORT')
+  })
+
+  // G-18: trước đây mọi access token hợp lệ đều đổi được mật khẩu
+  it('token đăng nhập thường KHÔNG đặt lại được mật khẩu, phải là token từ link email', async () => {
     const token = await registerAndLogin()
     const res = await request(app)
       .post('/api/auth/reset-password')
       .set('Authorization', `Bearer ${token}`)
-      .send({ password: 'ngan' })
+      .send({ password: 'matkhaumoi1' })
+    expect(res.status).toBe(403)
+    expect(res.body.error.code).toBe('RECOVERY_TOKEN_REQUIRED')
+    // Mật khẩu cũ vẫn dùng được
+    expect((await request(app).post('/api/auth/login').send(valid)).status).toBe(200)
+  })
+})
+
+// G-18: đổi mật khẩu khi đang đăng nhập
+describe('Đổi mật khẩu', () => {
+  const change = (token, body) =>
+    request(app).post('/api/auth/change-password').set('Authorization', `Bearer ${token}`).send(body)
+
+  it('đúng mật khẩu hiện tại → đổi được, mọi phiên bị thu hồi', async () => {
+    const token = await registerAndLogin()
+    const res = await change(token, { currentPassword: valid.password, password: 'matkhaumoi1' })
+    expect(res.status).toBe(204)
+    // Phiên cũ hết hiệu lực
+    expect((await request(app).get('/api/me').set('Authorization', `Bearer ${token}`)).status).toBe(401)
+    expect((await request(app).post('/api/auth/login').send(valid)).status).toBe(401)
+    expect((await request(app).post('/api/auth/login').send({ ...valid, password: 'matkhaumoi1' })).status).toBe(200)
+  })
+
+  it('sai mật khẩu hiện tại → 400, mật khẩu không đổi', async () => {
+    const token = await registerAndLogin()
+    const res = await change(token, { currentPassword: 'saibetnhe', password: 'matkhaumoi1' })
     expect(res.status).toBe(400)
+    expect(res.body.error.fields.currentPassword).toBe('INVALID_CREDENTIALS')
+    expect((await request(app).post('/api/auth/login').send(valid)).status).toBe(200)
+  })
+
+  it('thiếu mật khẩu hiện tại → 400 theo trường', async () => {
+    const token = await registerAndLogin()
+    const res = await change(token, { password: 'matkhaumoi1' })
+    expect(res.body.error.fields.currentPassword).toBe('REQUIRED')
+  })
+
+  it('mật khẩu mới quá ngắn → 400, kiểm tra trước khi đụng tới mật khẩu cũ', async () => {
+    const token = await registerAndLogin()
+    const res = await change(token, { currentPassword: valid.password, password: 'ngan' })
     expect(res.body.error.fields.password).toBe('PASSWORD_TOO_SHORT')
+  })
+
+  it('chưa đăng nhập → 401', async () => {
+    expect((await request(app).post('/api/auth/change-password').send({ currentPassword: 'a', password: 'b' })).status).toBe(401)
   })
 })
 

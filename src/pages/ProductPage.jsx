@@ -1,14 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import Lantern from '../components/Lantern'
+import ProductImage from '../components/ProductImage.jsx'
 import Price from '../components/Price'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
 import Seo from '../seo/Seo.jsx'
 import AddToCart from '../cart/AddToCart.jsx'
 import QuantityInput from '../cart/QuantityInput.jsx'
-import { productJsonLd } from '../seo/head.js'
+import { breadcrumbJsonLd, productJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
+import { track } from '../analytics/index.js'
+
+// FR-GA-001 §23.3: view_item. Component riêng để hook không nằm sau nhánh return sớm ở trên.
+function TrackViewItem({ slug, name, price }) {
+  useEffect(() => {
+    track('view_item', { item_id: slug, item_name: name, value: price, currency: 'VND' })
+  }, [slug, name, price])
+  return null
+}
 
 // FR-CAT-001: chi tiết sản phẩm
 export default function ProductPage() {
@@ -50,19 +59,27 @@ export default function ProductPage() {
         description={p.description ?? t('meta.description')}
         path={pagePath}
         type="product"
-        jsonLd={productJsonLd(p, `${siteUrl}${path(pagePath)}`)}
+        image={p.image?.url}
+        jsonLd={[
+          productJsonLd(p, `${siteUrl}${path(pagePath)}`, siteUrl),
+          breadcrumbJsonLd(siteUrl, lang, [
+            { name: t('nav.home'), path: '/' },
+            { name: p.name, path: pagePath },
+          ]),
+        ]}
       />
+      <TrackViewItem slug={p.slug} name={p.name} price={p.price} />
       {back}
       <div className="product-detail-grid">
         <div className="product-detail-art">
-          <Lantern size={220} tone={p.tone} />
+          <ProductImage image={p.image} size={220} tone={p.tone} name={p.name} priority />
         </div>
         <div className="product-detail-copy">
           {p.kind === 'set' && <span className="eyebrow">{t('products.setBadge')}</span>}
           {p.badge && <span className="product-badge static">{p.badge}</span>}
           <h1 className="page-title">{p.name}</h1>
           <p className="product-detail-desc">{p.description}</p>
-          <Price amount={p.priceExclVat} className="product-price large" />
+          <Price amount={p.price} className="product-price large" />
           {/* FR-CART-001 */}
           <div className="product-buy">
             <QuantityInput value={qty} onChange={setQty} />

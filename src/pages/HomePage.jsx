@@ -34,7 +34,10 @@ import {
 } from '../lib/motion.js'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
+import ProductImage from '../components/ProductImage.jsx'
 import Seo from '../seo/Seo.jsx'
+import { organizationJsonLd, webSiteJsonLd } from '../seo/head.js'
+import { useSiteUrl } from '../seo/context.js'
 import AddToCart from '../cart/AddToCart.jsx'
 
 const TONES = ['amber', 'dusk', 'dawn', 'moss', 'dusk']
@@ -347,7 +350,7 @@ function ProductGrid({ intent }) {
           {p.badge && <Seal className="product-badge lift">{p.badge}</Seal>}
           <div className="product-art worn">
             <div className="lift">
-              <Lantern size={112} tone={p.tone} swing />
+              <ProductImage image={p.image} size={112} tone={p.tone} name={p.name} swing />
             </div>
           </div>
           <div className="product-body">
@@ -358,7 +361,7 @@ function ProductGrid({ intent }) {
             </h3>
             <p className="product-desc">{p.description}</p>
             <div className="product-foot">
-              <Price amount={p.priceExclVat} />
+              <Price amount={p.price} />
               {/* FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002) */}
               <AddToCart slug={p.slug} label={intent === 'gift' ? t('cart.giftAdd') : t('cart.add')} />
             </div>
@@ -371,12 +374,21 @@ function ProductGrid({ intent }) {
 
 export default function HomePage() {
   const [intent, setIntent] = useState('gift')
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
+  const siteUrl = useSiteUrl()
   useScrollToHash()
 
   return (
     <>
-      <Seo title={t('meta.title')} description={t('meta.description')} path="/" />
+      <Seo
+        title={t('meta.title')}
+        description={t('meta.description')}
+        path="/"
+        jsonLd={[
+          organizationJsonLd(siteUrl),
+          webSiteJsonLd(siteUrl, { lang, name: t('meta.title'), description: t('meta.description') }),
+        ]}
+      />
       <ScrollProgress />
 
       <Hero />

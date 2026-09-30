@@ -22,7 +22,7 @@ export default function Tour({ onClose }) {
   }, [i])
 
   useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose()
+    const onKey = (e) => e.key === 'Escape' && onClose(false)
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
@@ -35,7 +35,7 @@ export default function Tour({ onClose }) {
         <small>{t('may.tour.step', { n: i + 1, total: steps.length })}</small>
         <p>{steps[i]}</p>
         <div className="tour-actions">
-          <button type="button" className="btn btn-small btn-ghost" onClick={onClose}>
+          <button type="button" className="btn btn-small btn-ghost" onClick={() => onClose(false)}>
             {t('may.tour.skip')}
           </button>
           {i > 0 && (
@@ -43,7 +43,7 @@ export default function Tour({ onClose }) {
               {t('may.tour.prev')}
             </button>
           )}
-          <button type="button" className="btn btn-small" onClick={() => (last ? onClose() : setI(i + 1))}>
+          <button type="button" className="btn btn-small" onClick={() => (last ? onClose(true) : setI(i + 1))}>
             {last ? t('may.tour.done') : t('may.tour.next')}
           </button>
         </div>

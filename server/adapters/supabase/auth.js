@@ -61,7 +61,9 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
     async getUser(accessToken) {
       const { data, error } = await admin.auth.getUser(accessToken)
       if (error || !data?.user) return null
-      return { id: data.user.id, email: data.user.email }
+      // G-18: chỉ token đến từ link "Quên mật khẩu" mới được đổi mật khẩu mà không cần mật khẩu cũ.
+      // Token đã được Supabase xác minh ở trên; ở đây chỉ đọc claim `amr` để biết cách đăng nhập.
+      return { id: data.user.id, email: data.user.email, isRecovery: isRecoveryToken(accessToken) }
     },
 
     async signOut(accessToken) {
@@ -81,5 +83,38 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
       const { error } = await admin.auth.admin.updateUserById(userId, { password })
       if (error) throw mapError(error)
     },
+
+    /**
+     * G-18: xác minh mật khẩu hiện tại bằng cách thử đăng nhập trên một client riêng (không đụng
+     * tới phiên đang dùng). Trả false khi sai, ném lỗi khi Supabase trục trặc.
+     */
+    async verifyPassword(userId, password) {
+      const { data, error } = await admin.auth.admin.getUserById(userId)
+      if (error || !data?.user?.email) return false
+      const client = makePublicClient()
+      const res = await client.auth.signInWithPassword({ email: data.user.email, password })
+      if (res.error) return false
+      // Thu hồi ngay phiên vừa tạo. PHẢI dùng scope 'local': mặc định của Supabase là 'global',
+      // tức là đăng xuất khách khỏi mọi thiết bị chỉ vì vừa xác minh mật khẩu — và nếu bước đổi
+      // mật khẩu ngay sau đó thất bại thì khách mất phiên mà mật khẩu không đổi.
+      await client.auth.signOut({ scope: 'local' }).catch(() => {})
+      return true
+    },
+  }
+}
+
+
+/**
+ * Đọc claim `amr` của access token Supabase để biết token đến từ luồng khôi phục mật khẩu.
+ * KHÔNG dùng để xác thực — token đã được `admin.auth.getUser()` xác minh trước đó; ở đây chỉ
+ * đọc phần payload đã được ký. Không đọc được → coi như không phải token khôi phục (an toàn hơn).
+ */
+export function isRecoveryToken(accessToken) {
+  try {
+    const payload = JSON.parse(Buffer.from(accessToken.split('.')[1], 'base64url').toString('utf8'))
+    const amr = Array.isArray(payload.amr) ? payload.amr : []
+    return amr.some((m) => m?.method === 'recovery')
+  } catch {
+    return false
   }
 }

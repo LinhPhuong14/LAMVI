@@ -18,6 +18,10 @@ export function createMemoryRepo(data = {}) {
     carts: new Map(), // userId → Map(productId → { quantity, addedAt })
     mayCounters: new Map(), // key → { count, expiresAt }
     mayUsage: new Map(), // month → usage
+    coupons: clone(data.coupons ?? []),
+    orders: clone(data.orders ?? []), // mỗi đơn kèm items
+    couponRedemptions: [],
+    auditLog: [],
   }
 
   const now = () => new Date().toISOString()
@@ -212,6 +216,121 @@ export function createMemoryRepo(data = {}) {
     async getBatchByCode(code) {
       const b = state.batches.find((x) => x.code === code)
       return b ? clone(b) : null
+    },
+
+    // --- Coupon (FR-CPN-001/002)
+    async listCoupons() {
+      return clone([...state.coupons].sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? '')))
+    },
+    async getCouponById(id) {
+      const c = byId(state.coupons, id)
+      return c ? clone(c) : null
+    },
+    async getCouponByCode(code) {
+      const c = state.coupons.find((x) => x.code === code)
+      return c ? clone(c) : null
+    },
+    async createCoupon(row) {
+      return create(state.coupons, { usedCount: 0, status: 'active', value: 0, ...row }, 'code')
+    },
+    async updateCoupon(id, patch) {
+      return update(state.coupons, id, patch, 'code')
+    },
+    async deleteCoupon(id) {
+      return remove(state.coupons, id)
+    },
+    async countCouponUsesByUser(couponId, userId) {
+      return state.couponRedemptions.filter((r) => r.couponId === couponId && r.userId === userId).length
+    },
+    async claimCoupon(couponId) {
+      const c = byId(state.coupons, couponId)
+      if (!c || c.status !== 'active') return null
+      if (c.usageLimit != null && c.usedCount >= c.usageLimit) return null
+      c.usedCount += 1
+      return c.usedCount
+    },
+    // C-8: trả cả lượt tổng và lượt theo khách (xoá bản ghi lượt dùng của đơn)
+    async releaseCoupon(couponId, orderId) {
+      const c = byId(state.coupons, couponId)
+      if (c) c.usedCount = Math.max(0, c.usedCount - 1)
+      if (orderId) state.couponRedemptions = state.couponRedemptions.filter((r) => r.orderId !== orderId)
+    },
+
+    // --- Đơn hàng (FR-CHK-*, FR-ORD-*)
+    async createOrder(order, items, redemption) {
+      if (state.orders.some((o) => o.code === order.code)) throw new RepoError('CONFLICT', 'code')
+      const row = {
+        id: randomUUID(),
+        createdAt: now(),
+        updatedAt: now(),
+        paymentFlag: null,
+        trackingCode: null,
+        cancelledAt: null,
+        cancelReason: null,
+        ...order,
+        items: items.map((i) => ({ id: randomUUID(), ...i })),
+      }
+      state.orders.push(row)
+      if (redemption) {
+        state.couponRedemptions.push({ ...redemption, orderId: row.id, createdAt: now() })
+      }
+      return clone(row)
+    },
+    async getOrderById(id) {
+      const o = byId(state.orders, id)
+      return o ? clone(o) : null
+    },
+    async getOrderByCode(code) {
+      const o = state.orders.find((x) => x.code === code)
+      return o ? clone(o) : null
+    },
+    async getOrderByPayosCode(payosOrderCode) {
+      const o = state.orders.find((x) => x.payosOrderCode === payosOrderCode)
+      return o ? clone(o) : null
+    },
+    async listOrdersByUser(userId, { limit = 50 } = {}) {
+      return clone(
+        state.orders
+          .filter((o) => o.userId === userId)
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+          .slice(0, limit),
+      )
+    },
+    async listOrders({ status, limit = 100 } = {}) {
+      return clone(
+        state.orders
+          .filter((o) => !status || o.status === status)
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+          .slice(0, limit),
+      )
+    },
+    async listExpiredPendingOrders(nowIso) {
+      return clone(
+        state.orders.filter((o) => o.status === 'pending_payment' && o.paymentExpiresAt && o.paymentExpiresAt < nowIso),
+      )
+    },
+    async updateOrder(id, values) {
+      return update(state.orders, id, values)
+    },
+    async updateOrderIfStatus(id, expectedStatus, values) {
+      const o = byId(state.orders, id)
+      if (!o || o.status !== expectedStatus) return null
+      return update(state.orders, id, values)
+    },
+
+    // --- NFR-AUD-001
+    async appendAuditLog(entries) {
+      for (const e of entries) {
+        state.auditLog.push({ id: state.auditLog.length + 1, at: now(), ...clone(e) })
+      }
+    },
+    async listAuditLog({ entity, entityId, limit = 100 } = {}) {
+      return clone(
+        state.auditLog
+          .filter((e) => (!entity || e.entity === entity) && (!entityId || e.entityId === entityId))
+          .sort((a, b) => b.id - a.id)
+          .slice(0, limit),
+      )
     },
 
     async getProfile(userId) {
