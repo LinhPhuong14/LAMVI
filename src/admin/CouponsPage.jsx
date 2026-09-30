@@ -5,6 +5,7 @@ import { useAuth } from '../auth/context.js'
 import { useSubmit } from '../auth/useForm.js'
 import { useI18n } from '../i18n/index.js'
 import { useAdminList } from './useAdminList.js'
+import PageHead from './PageHead.jsx'
 import { S } from './strings.js'
 
 const EMPTY = {
@@ -211,14 +212,13 @@ export default function CouponsPage() {
 
   return (
     <section>
-      <header className="admin-head">
-        <h1>{S.coupons.title}</h1>
+      <PageHead title={S.coupons.title}>
         {!editing && (
           <button className="btn btn-primary" type="button" onClick={() => setEditing({})}>
             {S.common.create}
           </button>
         )}
-      </header>
+      </PageHead>
       <p className="field-hint">{S.coupons.note}</p>
       {editing && (
         <CouponForm

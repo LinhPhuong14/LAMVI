@@ -2,8 +2,20 @@ import { useEffect, useState } from 'react'
 import { Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import { useAuth } from '../auth/context.js'
+import { Seal } from '../components/Motifs'
 import Seo from '../seo/Seo.jsx'
+import { BatchesIcon, CouponsIcon, FaqIcon, ItIcon, MayIcon, OrdersIcon, ProductsIcon, SiteIcon } from './NavIcons.jsx'
 import { S } from './strings.js'
+
+// Thứ tự theo tần suất dùng hằng ngày: đơn hàng trước, cấu hình sau
+const NAV = [
+  ['/admin/orders', 'orders', OrdersIcon],
+  ['/admin/products', 'products', ProductsIcon],
+  ['/admin/faq', 'faq', FaqIcon],
+  ['/admin/batches', 'batches', BatchesIcon],
+  ['/admin/coupons', 'coupons', CouponsIcon],
+  ['/admin/may', 'may', MayIcon],
+]
 
 // BR-SEO-001: admin noindex
 function Gate() {
@@ -50,20 +62,31 @@ function Gate() {
     <div className="admin">
       {seo}
       <aside className="admin-nav">
-        <span className="nav-mark">LAMVI</span>
-        <strong>{S.title}</strong>
-        <nav>
-          <NavLink to="/admin/orders">{S.nav.orders}</NavLink>
-          <NavLink to="/admin/products">{S.nav.products}</NavLink>
-          <NavLink to="/admin/faq">{S.nav.faq}</NavLink>
-          <NavLink to="/admin/batches">{S.nav.batches}</NavLink>
-          <NavLink to="/admin/coupons">{S.nav.coupons}</NavLink>
-          <NavLink to="/admin/may">{S.nav.may}</NavLink>
+        <div className="admin-brand">
+          <Seal>LAMVI</Seal>
+          <strong>{S.title}</strong>
+        </div>
+        <nav aria-label={S.title}>
+          {NAV.map(([to, key, Icon]) => (
+            <NavLink key={to} to={to}>
+              <Icon />
+              {S.nav[key]}
+            </NavLink>
+          ))}
         </nav>
-        {state.role === 'it' && <NavLink to="/it">{S.nav.it}</NavLink>}
-        <a href="/" className="admin-back">
-          {S.nav.site}
-        </a>
+        <div className="admin-side-foot">
+          {/* D-51: chỉ IT mới vào được /it */}
+          {state.role === 'it' && (
+            <NavLink to="/it" className="admin-back">
+              <ItIcon />
+              {S.nav.it}
+            </NavLink>
+          )}
+          <a href="/" className="admin-back">
+            <SiteIcon />
+            {S.nav.site}
+          </a>
+        </div>
       </aside>
       <main className="admin-main">
         <Outlet />

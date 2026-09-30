@@ -6,6 +6,7 @@ import { useSubmit } from '../auth/useForm.js'
 import { useI18n } from '../i18n/index.js'
 import I18nInput from './I18nInput.jsx'
 import { useAdminList } from './useAdminList.js'
+import PageHead from './PageHead.jsx'
 import { S, fmt } from './strings.js'
 import { uploadFile } from './uploadFile.js'
 
@@ -201,14 +202,13 @@ export default function ProductsPage() {
 
   return (
     <section>
-      <header className="admin-head">
-        <h1>{S.products.title}</h1>
+      <PageHead title={S.products.title}>
         {!editing && (
           <button className="btn btn-primary" type="button" onClick={() => setEditing({})}>
             {S.common.create}
           </button>
         )}
-      </header>
+      </PageHead>
       {editing && (
         <ProductForm
           key={editing.id ?? 'new'}

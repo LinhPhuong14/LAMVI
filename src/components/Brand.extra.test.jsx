@@ -171,16 +171,17 @@ describe('D-62: admin & IT dashboard hiển thị LAMVI', () => {
     localStorage.clear()
   })
 
-  it('admin: nav-mark "LAMVI", tiêu đề "Quản trị LAMVI", không có tên cũ', async () => {
+  it('admin: ấn triện "LAMVI", tiêu đề "Quản trị LAMVI", không có tên cũ', async () => {
     mockApi({ 'GET /me': me('admin'), 'GET /admin/products': () => ({ body: { items: [] } }) })
     const { container } = renderAt('/admin/products')
     expect(await screen.findByText('Quản trị LAMVI')).toBeInTheDocument()
-    expect(container.querySelector('.admin-nav .nav-mark').textContent).toBe('LAMVI')
+    // Thanh bên dùng ấn triện son như dashboard tài khoản (design-rules §12)
+    expect(container.querySelector('.admin-brand .seal').textContent).toBe('LAMVI')
     expect(container.innerHTML.normalize('NFC')).not.toMatch(OLD_BRAND)
     await waitFor(() => expect(document.title).toContain('LAMVI'))
   })
 
-  it('IT dashboard: nav-mark "LAMVI", không có tên cũ', async () => {
+  it('IT dashboard: ấn triện "LAMVI", không có tên cũ', async () => {
     mockApi({
       'GET /me': me('it'),
       'GET /it/health': () => ({
@@ -195,8 +196,8 @@ describe('D-62: admin & IT dashboard hiển thị LAMVI', () => {
       'GET /it/errors': () => ({ body: { items: [] } }),
     })
     const { container } = renderAt('/it')
-    await waitFor(() => expect(container.querySelector('.admin-nav .nav-mark')).not.toBeNull())
-    expect(container.querySelector('.admin-nav .nav-mark').textContent).toBe('LAMVI')
+    await waitFor(() => expect(container.querySelector('.admin-brand .seal')).not.toBeNull())
+    expect(container.querySelector('.admin-brand .seal').textContent).toBe('LAMVI')
     expect(container.innerHTML.normalize('NFC')).not.toMatch(OLD_BRAND)
   })
 })

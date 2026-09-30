@@ -5,6 +5,7 @@ import { useSubmit } from '../auth/useForm.js'
 import { useI18n } from '../i18n/index.js'
 import I18nInput from './I18nInput.jsx'
 import { useAdminList } from './useAdminList.js'
+import PageHead from './PageHead.jsx'
 import { S } from './strings.js'
 
 function FaqForm({ initial, onDone, onCancel }) {
@@ -79,14 +80,13 @@ export default function FaqPage() {
 
   return (
     <section>
-      <header className="admin-head">
-        <h1>{S.faq.title}</h1>
+      <PageHead title={S.faq.title}>
         {!editing && (
           <button className="btn btn-primary" type="button" onClick={() => setEditing({})}>
             {S.common.create}
           </button>
         )}
-      </header>
+      </PageHead>
       {editing && (
         <FaqForm
           key={editing.id ?? 'new'}

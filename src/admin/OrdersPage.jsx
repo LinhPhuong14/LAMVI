@@ -5,6 +5,7 @@ import { formatVnd } from '../lib/money.js'
 import { useAuth } from '../auth/context.js'
 import { useI18n } from '../i18n/index.js'
 import { useAdminList } from './useAdminList.js'
+import PageHead from './PageHead.jsx'
 import { S, fmt } from './strings.js'
 
 // Nhãn trạng thái dùng chung với phía khách (i18n) để hai bên không lệch chữ
@@ -102,10 +103,9 @@ function OrderDetail({ code }) {
       <Link to="/admin/orders" className="back-link">
         {S.orders.back}
       </Link>
-      <header className="admin-head">
-        <h1>{o.code}</h1>
+      <PageHead title={o.code} eyebrow={S.orders.title}>
         <span className={`order-status order-status-${o.status}`}>{label.status(o.status)}</span>
-      </header>
+      </PageHead>
 
       {o.paymentFlag && (
         <p className="notice error" role="alert">
@@ -251,8 +251,7 @@ export default function OrdersPage() {
 
   return (
     <section>
-      <header className="admin-head">
-        <h1>{S.orders.title}</h1>
+      <PageHead title={S.orders.title}>
         <Field as="select" label={S.orders.colStatus} value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">{S.orders.all}</option>
           {STATUSES.map((s) => (
@@ -261,7 +260,7 @@ export default function OrdersPage() {
             </option>
           ))}
         </Field>
-      </header>
+      </PageHead>
       {list.status === 'loading' && <p>{S.common.loading}</p>}
       {list.status === 'error' && (
         <p className="notice error" role="alert">

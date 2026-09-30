@@ -302,65 +302,218 @@
 }
 
 /* Admin (D-48) */
+/* ---------- Trang nội bộ: quản trị (D-48) và dashboard IT (D-51) ----------
+   Dùng ngôn ngữ "trang ứng dụng" của dashboard tài khoản (design-rules §12, T-34): nền giấy sáng,
+   chỉ nét 1px, KHÔNG bóng đổ, nhiều khoảng trắng, một điểm nhấn son, vạch son trước tiêu đề mục.
+   Cố ý KHÔNG lấy phần trang trí của /account (ảnh trời, đèn bay, kính mờ): đây là công cụ dùng
+   cả ngày — nền ảnh làm rối mắt và tốn tài nguyên mà không giúp việc gì (§9). */
 .admin {
+  --dash-line: rgba(122, 93, 60, 0.18);
+  --dash-soft: rgba(122, 93, 60, 0.07);
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 252px minmax(0, 1fr);
   min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--diep);
 }
 
+/* ----- Thanh bên ----- */
 .admin-nav {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 28px 20px;
-  background: var(--cream);
-  border-right: 1px solid var(--brown-line);
+  gap: 28px;
+  padding: 30px 20px 24px;
+  overflow-y: auto;
+  background: var(--diep-light);
+  border-right: 1px solid var(--dash-line);
+  scrollbar-width: none;
+}
+
+.admin-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Ấn triện giữ đúng bề rộng chữ, không kéo hết thanh bên */
+.admin-brand .seal {
+  align-self: flex-start;
+}
+
+.admin-brand .seal-inner {
+  font-size: 0.86rem;
+}
+
+/* Nhãn khu vực làm việc: chữ thưa, sepia — không cạnh tranh với logo */
+.admin-brand strong {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sepia);
 }
 
 .admin-nav nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 16px;
+  gap: 2px;
 }
 
+/* Mục điều hướng: biểu tượng nét mảnh + nhãn ngắn; mục đang mở có vạch son ở mép thanh bên */
 .admin-nav nav a,
 .admin-back {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
   text-decoration: none;
-  color: var(--ink-soft);
-  padding: 8px 10px;
-  border-radius: 8px;
+  color: var(--than-soft);
+  font-size: 0.92rem;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.admin-nav nav a:hover,
+.admin-back:hover {
+  color: var(--than);
+  background: var(--dash-soft);
+}
+
+.admin-nav nav a:focus-visible,
+.admin-back:focus-visible {
+  outline: 2px solid var(--son);
+  outline-offset: 1px;
 }
 
 .admin-nav nav a.active {
-  background: var(--paper-deep);
-  color: var(--brown-deep);
+  color: var(--than);
+  background: var(--dash-soft);
   font-weight: 600;
 }
 
-.admin-back {
+.admin-nav nav a.active::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  width: 2px;
+  height: 18px;
+  transform: translateY(-50%);
+  background: var(--son);
+}
+
+.admin-nav-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--sepia);
+}
+
+.admin-nav nav a.active .admin-nav-icon {
+  color: var(--than);
+}
+
+.admin-side-foot {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 16px;
+  border-top: 1px solid var(--dash-line);
+}
+
+.admin-back {
   font-size: 0.85rem;
+  color: var(--sepia);
 }
 
+/* ----- Vùng nội dung: căn giữa trong phần còn lại, không dồn trái (§12) ----- */
 .admin-main {
-  padding: 32px 40px 80px;
-  max-width: 1100px;
+  min-width: 0;
+  padding: 48px 56px 88px;
 }
 
+.admin-main > * {
+  max-width: 1240px;
+  margin-inline: auto;
+}
+
+/* Đầu trang: eyebrow + tiêu đề + một nét mảnh bên dưới, như đầu vùng nội dung của /account */
 .admin-head {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 20px;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--dash-line);
+}
+
+.admin-head h1 {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 500;
+  margin: 0;
+}
+
+.admin-eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sepia);
+  margin-bottom: 6px;
+}
+
+/* Ô lọc/nút ở đầu trang không kéo cao hàng tiêu đề */
+.admin-head .field {
+  margin-bottom: 0;
+}
+
+/* ----- Thẻ trong trang nội bộ: nét mảnh, bo 20px, không bóng (§12) -----
+   Ghi đè khung tranh bồi của .account-card — khung đó dành cho trang công khai. */
+.admin .account-card {
+  padding: 26px 28px;
+  border: 1px solid var(--dash-line);
+  border-radius: 20px;
+  background: var(--diep-light);
+  box-shadow: none;
+  margin-bottom: 24px;
+}
+
+.admin .account-card::before {
+  display: none;
+}
+
+.admin .account-card h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* Vạch son 3px trước tiêu đề mục (§12) */
+.admin .account-card h2::before {
+  width: 3px;
+  height: 15px;
+  margin-right: 12px;
+  border-radius: 1px;
 }
 
 .admin-form {
-  padding: 24px;
-  border-radius: 16px;
-  background: var(--cream);
-  box-shadow: var(--shadow-soft);
-  margin-bottom: 24px;
+  padding: 26px 28px;
+  border: 1px solid var(--dash-line);
+  border-radius: 20px;
+  background: var(--diep-light);
+  box-shadow: none;
+  margin-bottom: 28px;
 }
 
 .admin-grid {
@@ -373,47 +526,112 @@
 .admin-row-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
+/* Thao tác trong hàng bảng: nét mảnh thay vì mảng tối, để mắt đọc dữ liệu trước (§11) */
+.admin-row-actions .btn {
+  border-color: var(--dash-line);
+  background: transparent;
+  color: var(--than);
+  box-shadow: none;
+}
+
+.admin-row-actions .btn:hover {
+  border-color: var(--hair);
+  background: var(--dash-soft);
+  box-shadow: none;
+}
+
+.admin-row-actions .btn-danger {
+  color: var(--son-deep);
+}
+
+.admin-row-actions .btn-danger:hover {
+  border-color: var(--son);
+  background: color-mix(in srgb, var(--son) 6%, transparent);
+}
+
+.admin-actions {
+  margin-top: 20px;
+}
+
+/* ----- Bảng: chỉ nét ngang mảnh, đầu bảng chữ thưa ----- */
 .admin-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.92rem;
 }
 
-.admin-table th,
+.admin-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sepia);
+  border-bottom: 1px solid var(--dash-line);
+}
+
 .admin-table td {
   text-align: left;
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--brown-line);
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--dash-line);
   vertical-align: middle;
 }
 
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-table tbody tr:hover td {
+  background: var(--dash-soft);
+}
+
+/* Số tiền trong bảng: Fraunces số kiểu cổ, như dải số liệu ở dashboard */
+.admin-table td:has(+ td) code,
+.admin-table code {
+  font-family: var(--sans);
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+}
+
+/* Nhãn trạng thái: viên chữ nhỏ, chỉ nét — không tô mảng màu đậm (§11) */
 .status {
-  font-size: 0.78rem;
-  padding: 3px 8px;
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  padding: 3px 10px;
+  border: 1px solid var(--hair-soft);
   border-radius: 999px;
-  background: var(--paper-deep);
+  color: var(--than-soft);
+  background: transparent;
 }
 
 .status-published,
 .status-video_published {
-  background: #e8efd9;
-  color: #3d5220;
+  border-color: var(--la);
+  color: var(--la);
 }
 
 .status-hidden {
-  background: #f1e2dc;
-  color: #7a2e1a;
+  border-color: var(--hair);
+  color: var(--sepia);
 }
 
+/* Thao tác nguy hiểm (xoá, bật bảo trì): son đậm — dùng token, không mã màu cứng */
 .btn-danger {
-  background: #9b3b22;
-  color: var(--white);
+  background: var(--son-deep);
+  color: var(--diep-light);
+}
+
+.btn-danger:hover {
+  background: var(--son);
 }
 
 .i18n-input {
-  border: 1px solid var(--brown-line);
+  border: 1px solid var(--dash-line);
   border-radius: 12px;
   padding: 12px 14px;
   display: flex;
@@ -442,10 +660,16 @@
 .i18n-row input,
 .i18n-row textarea {
   font: inherit;
-  padding: 8px 12px;
-  border: 1px solid var(--brown-line);
-  border-radius: 8px;
-  background: var(--white);
+  padding: 9px 12px;
+  border: 1px solid var(--dash-line);
+  border-radius: 10px;
+  background: var(--diep-light);
+}
+
+.i18n-row input:focus,
+.i18n-row textarea:focus {
+  outline: 2px solid var(--son);
+  outline-offset: 1px;
 }
 
 .checkbox {
@@ -460,24 +684,92 @@
   margin-bottom: 12px;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 960px) {
+  /* Thanh bên tách ra: đầu trang → hàng tab ngang dính trên cùng → nội dung (§12) */
   .admin {
     grid-template-columns: 1fr;
   }
+
+  .admin-nav {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    padding: 16px 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--dash-line);
+  }
+
+  .admin-brand {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .admin-nav nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+
+  .admin-nav nav a {
+    padding: 8px 12px;
+  }
+
+  /* Vạch son chuyển xuống chân mục đang mở */
+  .admin-nav nav a.active::before {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 2px;
+    width: auto;
+    height: 2px;
+    transform: none;
+  }
+
+  .admin-side-foot {
+    margin-top: 0;
+    flex-direction: row;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .admin-main {
+    padding: 32px 24px 72px;
+  }
+
   .admin-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* Dashboard IT (D-51) */
-.it-main {
-  max-width: 1280px;
+@media (max-width: 640px) {
+  .admin-nav-icon {
+    display: none;
+  }
+
+  .admin-main {
+    padding: 24px 16px 64px;
+  }
+
+  .admin-table {
+    font-size: 0.86rem;
+  }
+}
+
+/* ---------- Dashboard IT (D-51) ----------
+   Cùng ngôn ngữ với trang quản trị: thẻ nét mảnh, dải số liệu ngăn bằng nét dọc, vạch son trước
+   tiêu đề mục. Trạng thái dùng nét màu, không tô mảng (§11). */
+.it-main > * {
+  max-width: 1320px;
 }
 
 .it-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  gap: 24px;
   align-items: start;
 }
 
@@ -485,34 +777,45 @@
   grid-column: 1 / -1;
 }
 
-.it-card h2 {
-  margin-bottom: 8px;
-}
-
 .it-card h3 {
-  font-size: 1.1rem;
-  margin: 16px 0 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sepia);
+  margin: 24px 0 10px;
 }
 
+/* Kết luận sức khoẻ: chữ lớn, chấm màu phía trước thay cho mảng nền */
 .it-overall {
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.it-overall::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .it-overall.it-ok {
-  color: #3d5220;
+  color: var(--la);
 }
 
 .it-overall.it-degraded {
-  color: #9b3b22;
+  color: var(--son);
 }
 
 .it-checks {
   list-style: none;
   padding: 0;
-  margin: 12px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  margin: 16px 0 0;
 }
 
 .it-check {
@@ -520,42 +823,62 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--brown-line);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--dash-line);
+}
+
+.it-check:last-child {
+  border-bottom: 0;
 }
 
 .it-check strong {
-  min-width: 170px;
+  min-width: 160px;
+  font-weight: 500;
+}
+
+.it-check small {
+  color: var(--than-soft);
+  font-size: 0.8rem;
 }
 
 .status-ok {
-  background: #e8efd9;
-  color: #3d5220;
+  border-color: var(--la);
+  color: var(--la);
 }
 
 .status-error {
-  background: #f6dcd2;
-  color: #7a2e1a;
+  border-color: var(--son);
+  color: var(--son-deep);
 }
 
+.status-disabled,
+.status-not_configured,
+.status-not_integrated {
+  border-color: var(--hair-soft);
+  color: var(--sepia);
+}
+
+/* Thông tin máy chủ: hai cột nhãn/giá trị, nhãn chữ nhỏ sepia */
 .it-system {
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: 4px 16px;
+  gap: 8px 20px;
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
 .it-system dt {
-  color: var(--ink-soft);
+  color: var(--sepia);
 }
 
 .it-system dd {
   margin: 0;
+  font-variant-numeric: tabular-nums;
 }
 
-.it-maintenance-on {
-  outline: 2px solid #9b3b22;
+/* Bảo trì đang bật: viền son thay cho outline cứng */
+.admin .account-card.it-maintenance-on {
+  border-color: var(--son);
 }
 
 .it-ranges {
@@ -565,53 +888,77 @@
 
 .it-ranges .btn[aria-pressed='false'] {
   background: transparent;
-  color: var(--brown-deep);
-  border: 1px solid var(--brown-line);
+  color: var(--than-soft);
+  border: 1px solid var(--dash-line);
+  box-shadow: none;
 }
 
+/* Dải số liệu: ngăn bằng nét dọc, số Fraunces mảnh kiểu cổ (§12) */
 .it-kpis {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+  margin: 20px 0 24px;
 }
 
 .it-kpis div {
   display: flex;
   flex-direction: column;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: var(--paper);
+  gap: 4px;
+  padding: 4px 22px;
+}
+
+.it-kpis div + div {
+  border-left: 1px solid var(--dash-line);
+}
+
+.it-kpis div:first-child {
+  padding-left: 0;
 }
 
 .it-kpis span {
-  font-size: 0.8rem;
-  color: var(--ink-soft);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sepia);
 }
 
 .it-kpis strong {
-  font-size: 1.4rem;
   font-family: var(--serif);
+  font-size: 2.1rem;
+  font-weight: 300;
+  line-height: 1.1;
+  font-variant-numeric: oldstyle-nums;
 }
 
 .it-table-wrap {
   overflow-x: auto;
 }
 
-.it-row-error td {
-  background: #fbeee8;
+/* Hàng có lỗi 5xx: vạch son ở mép trái, không tô nền cả hàng */
+.it-row-error td:first-child {
+  box-shadow: inset 2px 0 0 var(--son);
 }
 
-@media (max-width: 960px) {
-  .it-grid,
+.it-row-error td {
+  background: color-mix(in srgb, var(--son) 4%, transparent);
+}
+
+@media (max-width: 1100px) {
   .it-kpis {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 0;
+  }
+
+  .it-kpis div:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
   }
 }
 
-.status-disabled,
-.status-not_configured {
-  background: var(--paper-deep);
+@media (max-width: 960px) {
+  .it-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Mây (FR-AI-001) */

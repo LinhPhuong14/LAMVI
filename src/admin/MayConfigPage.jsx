@@ -4,6 +4,7 @@ import { useAuth } from '../auth/context.js'
 import { useSubmit } from '../auth/useForm.js'
 import { useI18n } from '../i18n/index.js'
 import I18nInput from './I18nInput.jsx'
+import PageHead from './PageHead.jsx'
 import { S, fmt } from './strings.js'
 
 const LANGS = ['vi', 'en', 'zh']
@@ -86,9 +87,7 @@ export default function MayConfigPage() {
 
   return (
     <section>
-      <header className="admin-head">
-        <h1>{S.may.title}</h1>
-      </header>
+      <PageHead title={S.may.title} />
       {usage && <Usage usage={usage} />}
       <form className="form admin-form" onSubmit={onSubmit} noValidate>
         <label className="checkbox">

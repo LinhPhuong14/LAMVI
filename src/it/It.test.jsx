@@ -86,6 +86,6 @@ describe('Dashboard IT (D-51, D-52)', () => {
     mockApi({ 'GET /me': me('it'), 'GET /admin/products': () => ({ body: { items: [] } }) })
     renderAt('/admin/products')
     expect(await screen.findByRole('heading', { name: 'Sản phẩm' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Dashboard IT →' })).toHaveAttribute('href', '/it')
+    expect(screen.getByRole('link', { name: 'Dashboard IT' })).toHaveAttribute('href', '/it')
   })
 })

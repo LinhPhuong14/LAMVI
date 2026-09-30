@@ -3,6 +3,8 @@ import { Link, Navigate, useLocation } from 'react-router-dom'
 import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import { useI18n } from '../i18n/index.js'
 import { useAuth } from '../auth/context.js'
+import { Seal } from '../components/Motifs'
+import { ItIcon, OrdersIcon, SiteIcon } from '../admin/NavIcons.jsx'
 import Seo from '../seo/Seo.jsx'
 import { S, fmt, formatDuration } from './strings.js'
 
@@ -270,10 +272,12 @@ function Dashboard() {
   return (
     <main className="admin-main it-main">
       <header className="admin-head">
-        <h1>{S.title}</h1>
+        <div>
+          <h1>{S.title}</h1>
+        </div>
         <div className="admin-actions">
           <span className="field-hint">{S.autoRefresh}</span>
-          <button className="btn btn-small" type="button" onClick={refresh}>
+          <button className="btn btn-small btn-ghost" type="button" onClick={refresh}>
             {S.refresh}
           </button>
         </div>
@@ -330,14 +334,27 @@ function Gate() {
     <div className="admin">
       {seo}
       <aside className="admin-nav">
-        <span className="nav-mark">LAMVI</span>
-        <strong>{S.title}</strong>
-        <nav>
-          <Link to="/admin">{S.nav.admin}</Link>
+        <div className="admin-brand">
+          <Seal>LAMVI</Seal>
+          <strong>{S.title}</strong>
+        </div>
+        <nav aria-label={S.title}>
+          {/* Trang hiện tại luôn là dashboard IT → đánh dấu active bằng tay */}
+          <a href="/it" className="active" aria-current="page">
+            <ItIcon />
+            {S.title}
+          </a>
+          <Link to="/admin">
+            <OrdersIcon />
+            {S.nav.admin}
+          </Link>
         </nav>
-        <a href="/" className="admin-back">
-          {S.nav.site}
-        </a>
+        <div className="admin-side-foot">
+          <a href="/" className="admin-back">
+            <SiteIcon />
+            {S.nav.site}
+          </a>
+        </div>
       </aside>
       <Dashboard />
     </div>

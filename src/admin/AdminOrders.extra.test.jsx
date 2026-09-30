@@ -325,7 +325,7 @@ describe('Admin — quyền truy cập (D-38, D-51)', () => {
     })
     renderAt('/admin/orders')
     expect(await screen.findByText('Chưa có đơn nào.')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Dashboard IT →' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Dashboard IT' })).toBeInTheDocument()
   })
 })
 

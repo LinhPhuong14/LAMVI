@@ -230,6 +230,29 @@ Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệ
 | Giao diện tối (v0.14) | "Đêm hội đèn": `--diep` #141c27, `--diep-light` #1b2533, chữ `--than` #efe6d6 (12,5:1), `--than-soft` #c7b9a3 (8:1), `--sepia` #c9ab82 (7:1), `--son` #e27a5f / `--son-deep` #f0937a (link 6,7:1); nút chính giữ son đậm #b3402a chữ sáng (5,3:1). Khai báo lại bí danh cũ (`--ink-soft`, `--cream`…) trong `.dash[data-theme='dark']`. Minh hoạ nét mực đặt trên đĩa giấy sáng có quầng như đèn thắp. Nút chuyển ở hàng logo, lưu `moc.dashTheme` |
 | Minh hoạ (v0.13) | SVG tự vẽ ở `src/components/DashArt.jsx`, lối khắc gỗ nét 1,5px cùng bảng màu: cảnh đầu trang (dây 3 đèn trước trống đồng mờ, mây), hộp quà, phong thư ấn son, 4 công đoạn (giấy dó, khung tre, phơi nắng, đóng gói QR); kèm đèn và Mây có sẵn. Hình đặt trong nền tròn `--diep`. **Không** dùng ảnh tư liệu trong dashboard (§7.2) |
 
+## 12a. Trang nội bộ: quản trị (`/admin`) và dashboard IT (`/it`) — v0.19
+
+Cùng là **trang ứng dụng** như `/account`, nên dùng lại ngôn ngữ ở §12 chứ không phải khung tranh
+bồi của trang công khai. Cả hai chia sẻ `.admin` / `.admin-nav` / `.admin-main` nên sửa một lần
+là cả hai theo.
+
+| Phần | Cách trình bày |
+|---|---|
+| Nét | `--dash-line` (sepia 18%) cho mọi đường kẻ, `--dash-soft` (7%) cho nền hover/mục đang mở. Không `--print`, không khung viền đôi, không góc triện |
+| Thanh bên (252px, dính, cao 100dvh) | Ấn triện `Seal` + nhãn khu vực chữ thưa sepia; mục điều hướng có biểu tượng nét 1,2px (`src/admin/NavIcons.jsx`); mục đang mở: nền `--dash-soft`, chữ đậm, vạch son 2px ở mép thanh bên. Chân thanh bên tách bằng một nét mảnh |
+| Vùng nội dung | Tối đa 1240px (IT: 1320px), **căn giữa** trong phần còn lại — không dồn trái |
+| Đầu trang (`PageHead`) | Tiêu đề Fraunces 500 + một nét mảnh bên dưới; hành động (nút, ô lọc) căn phải. **Chỉ đặt eyebrow khi nó nói thêm điều gì** (trang chi tiết đơn: eyebrow "Đơn hàng" + tiêu đề là mã đơn). Trang cấp một không đặt — thanh bên đã cho biết đang ở đâu |
+| Thẻ | `.admin .account-card` ghi đè khung tranh bồi: nét `--dash-line`, bo 20px, **không bóng**; tiêu đề mục có vạch son 3px phía trước |
+| Bảng | Đầu bảng chữ hoa thưa sepia; chỉ nét ngang mảnh; hàng cuối không kẻ; hover nền `--dash-soft`. Nút thao tác trong hàng dùng nét mảnh, không mảng tối |
+| Nhãn trạng thái | Viên chữ nhỏ **chỉ nét**, màu theo nghĩa (`--la` tốt, `--son` lỗi, `--sepia` chưa cấu hình) — không tô mảng màu đậm |
+| Dải số liệu IT | Ngăn bằng nét dọc; số Fraunces **300** 2,1rem `oldstyle-nums`; nhãn chữ hoa thưa |
+| Hàng lỗi 5xx | Vạch son ở mép trái + nền son 4% — không tô đỏ cả hàng |
+| Màn ≤960px | Thanh bên thành hàng tab ngang trên cùng, vạch son chuyển xuống chân mục đang mở; ≤640px ẩn biểu tượng |
+
+**Cố ý không lấy** phần trang trí của `/account` (ảnh trời `DashSky`, đèn trời bay lên, kính mờ):
+đây là công cụ dùng cả ngày — nền ảnh làm rối mắt và tốn tài nguyên mà không giúp gì cho việc
+(§9). Điểm nhấn son chỉ dùng cho: vạch mục đang mở, vạch trước tiêu đề mục, nút chính.
+
 ## 13. Checklist khi thêm thành phần
 
 1. Dùng token màu; kiểm tra tương phản nếu có chữ.

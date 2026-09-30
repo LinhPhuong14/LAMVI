@@ -1,7 +1,7 @@
 // D-48: giao diện admin chỉ tiếng Việt. Nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh.
 export const S = {
   title: 'Quản trị LAMVI',
-  nav: { orders: 'Đơn hàng', products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', coupons: 'Mã giảm giá', may: 'Mây (AI)', it: 'Dashboard IT →', site: '← Về trang web' },
+  nav: { orders: 'Đơn hàng', products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', coupons: 'Mã giảm giá', may: 'Mây (AI)', it: 'Dashboard IT', site: 'Về trang web' },
   common: {
     loading: 'Đang tải…',
     save: 'Lưu',

@@ -1,7 +1,7 @@
 // D-51: dashboard IT — giao diện chỉ tiếng Việt (như admin, D-48) [ASSUMPTION]
 export const S = {
   title: 'Dashboard IT',
-  nav: { admin: '← Quản trị nội dung', site: 'Về trang web' },
+  nav: { admin: 'Quản trị nội dung', site: 'Về trang web' },
   loading: 'Đang tải…',
   refresh: 'Làm mới',
   autoRefresh: 'Tự làm mới mỗi 30 giây',
