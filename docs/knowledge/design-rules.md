@@ -187,6 +187,24 @@ Quy tắc:
 | Hoạ tiết Việt | Tự vẽ chữ Hán, rồng, mái cung điện Trung Hoa lên giao diện |
 | Hiệu ứng tắt khi giảm chuyển động | Animation bằng `filter`/`box-shadow` lặp liên tục |
 
+## 11a. Checkout và trang đơn hàng (v0.19)
+
+Hai trang mới dùng lại đúng hệ khung có sẵn, không tạo kiểu riêng:
+
+| Thành phần | Cách làm |
+|---|---|
+| Mỗi bước checkout | Khung **tranh bồi** (`.account-card`): nền `--diep-light`, góc 2px, đường chỉ `inset 6px`, bóng `--print` |
+| Nhãn bước | Kiểu eyebrow (son, chữ hoa, `letter-spacing .18em`) + số thứ tự trong **ấn son vuông** + hoa sen |
+| Nút chọn (loại đơn, người nhận) | Thẻ giấy nét mảnh; thẻ đang chọn viền son + vạch son dưới đáy. `aria-pressed` cho trình đọc màn hình |
+| Tóm tắt đơn, trang cảm ơn | Khung **thiếp thư**: bốn góc hoa văn triện `--corner-*`, khung trong `inset 16px`, bóng `--print-lg` |
+| Dòng tổng | Đường kẻ đôi `3px double var(--hair)`; nhãn cỡ thân bài, số tiền Fraunces 1.5rem `oldstyle-nums` |
+| Tiến độ đơn (C-11) | 5 mốc nối bằng **sợi chỉ**: nét `--hair-soft`, đoạn đã qua chuyển sang son; chấm tròn 11px |
+| Cảnh nền | `Scene` như các trang công khai khác: `/checkout` → `mist-terraces`, `/don-hang/:code` → `golden-clouds` + 3 đèn trời bay lên |
+| Motion | `Reveal` cho từng bước và từng thẻ; tự tắt khi bật giảm chuyển động |
+
+`.account-card` (dùng chung với giỏ hàng, admin, dashboard IT) đã đổi từ khung bo 18px + bóng mềm
+của bản trước T-25 sang khung tranh bồi — nên các trang đó cũng đồng bộ theo.
+
 ## 12. Dashboard tài khoản (`/account`)
 
 Trang dạng ứng dụng: `LocaleLayout` bỏ header/footer trang giới thiệu (`APP_PAGES`, class `.page-app`, bỏ cả viền tối quanh khung nhìn). Style ở mục "Dashboard tài khoản" cuối `pages.css`. Tinh thần **thanh thoát**, bo góc mềm, có minh hoạ cho sinh động; lấy nguyên tắc từ dashboard Trung Quốc (T-34): nhiều khoảng trắng, nền giấy sáng, chỉ nét 1px, không bóng đổ, một điểm nhấn son.

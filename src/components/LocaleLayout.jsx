@@ -17,6 +17,8 @@ function pageScene(rest) {
   if (AUTH_PAGES.has(rest)) return 'auth'
   if (rest.startsWith('/products/')) return 'product'
   if (rest === '/cart') return 'cart'
+  if (rest === '/checkout') return 'checkout'
+  if (rest.startsWith('/don-hang/')) return 'order'
   if (rest.startsWith('/lo/')) return 'batch'
   return null
 }

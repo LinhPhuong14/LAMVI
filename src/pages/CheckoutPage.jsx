@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Field from '../components/Field'
+import { Reveal } from '../components/Reveal'
+import { Lotus } from '../components/Motifs'
 import Seo from '../seo/Seo.jsx'
 import { LOCALES, useI18n } from '../i18n/index.js'
 import { useAuth } from '../auth/context.js'
@@ -33,6 +35,19 @@ function Row({ label, children, strong = false }) {
       <span>{label}</span>
       <span>{children}</span>
     </div>
+  )
+}
+
+/** Nhãn bước checkout: số trong ấn son + hoa sen, cùng kiểu eyebrow của các phần ở trang chủ. */
+function StepLegend({ n, children }) {
+  return (
+    <legend>
+      <span className="step-no" aria-hidden="true">
+        {n}
+      </span>
+      <Lotus />
+      {children}
+    </legend>
   )
 }
 
@@ -188,8 +203,8 @@ export default function CheckoutPage() {
       <form className="form checkout-form" onSubmit={onSubmit} noValidate>
         <div className="checkout-main">
           {/* FR-CHK-002 (C-02) */}
-          <fieldset className="account-card">
-            <legend>{t('checkout.kindLegend')}</legend>
+          <Reveal as="fieldset" className="account-card">
+            <StepLegend n={1}>{t('checkout.kindLegend')}</StepLegend>
             <div className="choice-row">
               {['gift', 'self'].map((k) => (
                 <button
@@ -236,11 +251,11 @@ export default function CheckoutPage() {
                 </Field>
               </>
             )}
-          </fieldset>
+          </Reveal>
 
           {/* FR-CHK-004 (D-02, BR-SHP-001) */}
-          <fieldset className="account-card">
-            <legend>{t('checkout.recipientLegend')}</legend>
+          <Reveal as="fieldset" className="account-card">
+            <StepLegend n={2}>{t('checkout.recipientLegend')}</StepLegend>
             <div className="choice-row">
               <button
                 type="button"
@@ -295,11 +310,11 @@ export default function CheckoutPage() {
               />
             </div>
             <Field as="textarea" rows={2} label={t('checkout.note')} value={form.note} onChange={set('note')} error={fields.note} />
-          </fieldset>
+          </Reveal>
 
           {/* FR-CHK-007 (D-35) */}
-          <fieldset className="account-card">
-            <legend>{t('checkout.paymentLegend')}</legend>
+          <Reveal as="fieldset" className="account-card">
+            <StepLegend n={3}>{t('checkout.paymentLegend')}</StepLegend>
             <label className="check-row">
               <input
                 type="radio"
@@ -329,12 +344,12 @@ export default function CheckoutPage() {
               </span>
             </label>
             {fields.paymentMethod && <p className="field-error">{t(`errors.${fields.paymentMethod}`)}</p>}
-          </fieldset>
+          </Reveal>
         </div>
 
         {/* FR-CHK-006, FR-CHK-008 */}
         <aside className="checkout-aside">
-          <div className="account-card">
+          <div className="order-summary">
             <h2>{t('checkout.summary')}</h2>
             <ul className="sum-items">
               {quote.items.map((i) => (
@@ -385,13 +400,16 @@ export default function CheckoutPage() {
               {formatVnd(quote.total)}
             </Row>
             {/* D-68: giá đã gồm VAT — tách dòng VAT cho minh bạch hoá đơn */}
-            <p className="field-hint">
+            <p className="sum-note">
               {t('checkout.totalNote')} {t('checkout.vatIncluded', { rate: Math.round(quote.vatRate * 100) })}:{' '}
               {formatVnd(quote.vatAmount)}
+              {!quote.freeShipping && quote.freeShippingFrom > 0 && (
+                <>
+                  <br />
+                  {t('checkout.freeShippingHint', { amount: formatVnd(quote.freeShippingFrom) })}
+                </>
+              )}
             </p>
-            {!quote.freeShipping && quote.freeShippingFrom > 0 && (
-              <p className="field-hint">{t('checkout.freeShippingHint', { amount: formatVnd(quote.freeShippingFrom) })}</p>
-            )}
 
             {priceChanged && (
               <p className="notice error" role="alert">

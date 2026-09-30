@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Reveal } from '../components/Reveal'
 import Seo from '../seo/Seo.jsx'
 import { useI18n } from '../i18n/index.js'
 import { useAuth } from '../auth/context.js'
@@ -111,7 +112,7 @@ export default function OrderPage() {
 
   if (error && !order) {
     return (
-      <section className="page-section narrow">
+      <section className="page-section medium">
         {head}
         <h1 className="page-title">{t('orders.detailTitle', { code })}</h1>
         <p className="notice error" role="alert">
@@ -126,7 +127,7 @@ export default function OrderPage() {
 
   if (!order) {
     return (
-      <section className="page-section narrow">
+      <section className="page-section medium">
         {head}
         <p>{t('orders.loading')}</p>
       </section>
@@ -136,18 +137,18 @@ export default function OrderPage() {
   const canCancel = ['pending_payment', 'confirmed', 'in_production', 'packed'].includes(order.status)
 
   return (
-    <section className="page-section narrow order-page">
+    <section className="page-section medium order-page">
       {head}
       {isNew && (
-        <div className="account-card order-thanks">
+        <Reveal as="div" className="account-card order-thanks">
           <h1 className="page-title">{t('orders.thanksTitle')}</h1>
           <p>{t('orders.thanksText', { code: order.code })}</p>
           {order.hasMessage && <p className="field-hint">{t('orders.thanksMessage')}</p>}
-        </div>
+        </Reveal>
       )}
       {!isNew && <h1 className="page-title">{t('orders.detailTitle', { code: order.code })}</h1>}
 
-      <div className="account-card">
+      <Reveal as="div" className="account-card">
         <div className="order-head">
           <StatusBadge status={order.status} />
           <span className="field-hint">
@@ -207,7 +208,7 @@ export default function OrderPage() {
           <span>{t('checkout.total')}</span>
           <span>{formatVnd(order.total)}</span>
         </div>
-        <p className="field-hint">
+        <p className="sum-note">
           {t('checkout.totalNote')} {t('checkout.vatIncluded', { rate: Math.round(order.vatRate * 100) })}:{' '}
           {formatVnd(order.vatAmount)}
         </p>
@@ -234,7 +235,7 @@ export default function OrderPage() {
             {cancelling ? t('orders.cancelling') : t('orders.cancel')}
           </button>
         )}
-      </div>
+      </Reveal>
 
       <Link to={`${path('/account')}?tab=orders`} className="back-link">
         ← {t('orders.title')}

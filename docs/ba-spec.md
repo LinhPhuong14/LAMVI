@@ -1171,6 +1171,7 @@ Theo yêu cầu khách hàng: "nghệ thuật dân gian, cổ xưa hoài niệm,
 - `[ASSUMPTION]` Tham khảo web Trung Quốc chỉ ở mức nguyên tắc trình bày (nét, khung, khoảng trắng); không dùng chữ Hán, rồng, mái cung điện để web vẫn mang bản sắc Việt.
 - ~~`[ASSUMPTION]` Giữ thương hiệu MỘC~~ — thay bởi D-62: tên web và thương hiệu là **LAMVI**.
 - Khoảng trống mới: G-33, G-34 (§31.2). Deploy Vercel: G-35, G-36. Dashboard tài khoản: G-40.
+- **v0.19**: trang `/checkout` và `/don-hang/:code` dựng theo đúng hệ khung này (tranh bồi cho từng bước, thiếp thư cho tóm tắt đơn và trang cảm ơn, sợi chỉ son cho tiến độ, cảnh nền `Scene`). Chi tiết ở `design-rules.md` §11a. `.account-card` đổi sang khung tranh bồi nên giỏ hàng, admin và dashboard IT cũng đồng bộ theo.
 
 ---
 

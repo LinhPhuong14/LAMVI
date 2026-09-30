@@ -18,6 +18,8 @@ const SCENES = {
   auth: { photo: 'cloud-sea', rise: 4 },
   product: { photo: 'golden-sky' },
   cart: { photo: 'lake-village' },
+  checkout: { photo: 'mist-terraces' },
+  order: { photo: 'golden-clouds', rise: 3 },
   batch: { photo: 'valley-light' },
   notFound: { photo: 'starry', dark: true, rise: 5 },
 }
