@@ -11,5 +11,5 @@
     }
   },
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
-  "crons": [{ "path": "/api/internal/expire-orders", "schedule": "*/5 * * * *" }]
+  "crons": [{ "path": "/api/internal/expire-orders", "schedule": "0 18 * * *" }]
 }
