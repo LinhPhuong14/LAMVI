@@ -134,11 +134,39 @@ describe('Đầu trang', () => {
 
 // design-rules §12: trang ứng dụng dùng nét 1px, không bóng đổ, không khung viền đôi / góc triện
 describe('CSS trang nội bộ theo design-rules §12', () => {
-  it('thẻ dùng nét mảnh và KHÔNG có bóng đổ', () => {
-    expect(ADMIN_CSS).toMatch(/\.admin \.account-card \{[^}]*box-shadow: none/s)
-    expect(ADMIN_CSS).toMatch(/\.admin \.account-card \{[^}]*border: 1px solid var\(--dash-line\)/s)
+  it('thẻ là mặt kính: nét mảnh + nền trong + làm mờ hậu cảnh', () => {
+    expect(ADMIN_CSS).toMatch(/\.admin \.account-card,\n\.admin-form \{[^}]*border: 1px solid var\(--dash-line\)/s)
+    expect(ADMIN_CSS).toMatch(/\.admin \.account-card,\n\.admin-form \{[^}]*background: var\(--glass\)/s)
+    expect(ADMIN_CSS).toMatch(/\.admin \.account-card,\n\.admin-form \{[^}]*backdrop-filter: var\(--glass-blur\)/s)
     // Khung tranh bồi (đường chỉ inset) của trang công khai bị tắt trong trang nội bộ
     expect(ADMIN_CSS).toMatch(/\.admin \.account-card::before \{\s*display: none/)
+  })
+
+  it('bảng danh sách luôn nằm trên mặt kính, không nằm thẳng trên ảnh nền', () => {
+    expect(ADMIN_CSS).toMatch(/\.admin-panel \{[^}]*background: var\(--glass\)/s)
+    expect(ADMIN_CSS).toMatch(/\.admin-panel \{[^}]*backdrop-filter: var\(--glass-blur\)/s)
+  })
+
+  it('§9: phần tử dính (thanh bên) chỉ dùng nền trong, KHÔNG làm mờ hậu cảnh', () => {
+    const side = ADMIN_CSS.slice(ADMIN_CSS.indexOf('.admin-nav {'), ADMIN_CSS.indexOf('.admin-brand'))
+    expect(side).toMatch(/background: var\(--glass-side\)/)
+    expect(side).not.toMatch(/backdrop-filter/)
+  })
+
+  it('có dự phòng khi trình duyệt không hỗ trợ backdrop-filter', () => {
+    expect(ADMIN_CSS).toMatch(/@supports not \(\(backdrop-filter[\s\S]*?\.admin-panel[\s\S]*?background-color: var\(--diep-light\)/)
+  })
+
+  it('nền không khí: ảnh cố định, mờ nhạt, không có đèn trời như /account', () => {
+    expect(ADMIN_CSS).toMatch(/\.admin-atmo \{[^}]*position: fixed/s)
+    const photo = ADMIN_CSS.slice(ADMIN_CSS.indexOf('.admin-atmo-photo'), ADMIN_CSS.indexOf('.admin-atmo-ink'))
+    // Đủ mờ để bảng số liệu dày chữ vẫn đọc được
+    expect(Number(photo.match(/opacity: ([\d.]+)/)[1])).toBeLessThanOrEqual(0.2)
+    expect(ADMIN_CSS).not.toMatch(/rise-lantern|sky-lantern/)
+  })
+
+  it('chuyển động nền tắt khi người dùng bật giảm chuyển động (NFR-A11Y-001)', () => {
+    expect(ADMIN_CSS).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\s*\.admin-atmo-ink \{\s*animation: none/)
   })
 
   it('không dùng bóng in của trang công khai, không góc hoa văn triện', () => {
@@ -148,8 +176,11 @@ describe('CSS trang nội bộ theo design-rules §12', () => {
 
   it('không viền dày, không bóng đổ lệch cứng, không mã màu cứng (§11)', () => {
     expect(ADMIN_CSS).not.toMatch(/border(-\w+)?:\s*[2-9]px/)
-    expect(ADMIN_CSS).not.toMatch(/box-shadow:\s*\d+px\s+\d+px\s+0/)
-    expect(ADMIN_CSS).not.toMatch(/#[0-9a-f]{3,6}\b/i)
+    // Bóng của kính là quầng mềm; cấm bóng in lệch cứng kiểu "4px 4px 0"
+    expect(ADMIN_CSS).not.toMatch(/box-shadow:\s*\d+px\s+\d+px\s+0[^a-z]/)
+    // #000 trong mask-image là khuôn che (alpha), không phải chọn màu → bỏ qua dòng đó
+    const colours = ADMIN_CSS.split('\n').filter((l) => !l.includes('mask-image')).join('\n')
+    expect(colours).not.toMatch(/#[0-9a-f]{3,6}\b/i)
   })
 
   it('dùng token nét riêng của trang ứng dụng, không dùng bí danh cũ', () => {

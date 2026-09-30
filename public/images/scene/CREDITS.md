@@ -20,3 +20,9 @@ Chỉ là nền không khí — **không** phải ảnh sản phẩm, ảnh ngh�
 | `smoke-ember.webp` | Abstract smoke background | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/5919527/photo-image-background-public-domain-abstract | Nền đen → trong suốt theo độ sáng, làm mờ mép |
 | `smoke-ink.webp` | Blue smoke background | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/5919539/photo-image-background-public-domain-blue | Nền trắng → trong suốt theo độ đậm, tô màu mực sepia, làm mờ mép |
 | `sky-lantern-glow.webp` | Festive lattern, festivity lamp | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/6026859/photo-image-light-public-domain-celebration | Cắt chiếc đèn, nền đen → trong suốt theo độ sáng |
+
+## Dùng lại ở trang nội bộ (v0.19)
+
+Hai ảnh trong bộ này còn dùng cho nền trang quản trị và dashboard IT, nhưng xử lý khác hẳn dashboard
+tài khoản (xem `docs/knowledge/design-rules.md` §12a): mây biển làm nền cố định tông lạnh mờ 16%,
+và khói mực làm một vệt trôi rất chậm, làm mờ mạnh. Nguồn và giấy phép không đổi — xem bảng trên.

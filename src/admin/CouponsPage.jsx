@@ -246,48 +246,50 @@ export default function CouponsPage() {
         (list.items.length === 0 ? (
           <p>{S.coupons.empty}</p>
         ) : (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>{S.coupons.colCode}</th>
-                <th>{S.coupons.colType}</th>
-                <th>{S.coupons.colValue}</th>
-                <th>{S.coupons.colUsed}</th>
-                <th>{S.coupons.colPeriod}</th>
-                <th>{S.coupons.colStatus}</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {list.items.map((c) => (
-                <tr key={c.id}>
-                  <td>
-                    <code>{c.code}</code>
-                  </td>
-                  <td>{S.coupons.types[c.type]}</td>
-                  <td>{valueLabel(c)}</td>
-                  <td>
-                    {c.usedCount}
-                    {c.usageLimit ? ` / ${c.usageLimit}` : ` / ${S.coupons.unlimited}`}
-                  </td>
-                  <td>{period(c)}</td>
-                  <td>
-                    <span className={`status status-${c.status === 'active' ? 'published' : 'hidden'}`}>
-                      {S.coupons.statuses[c.status]}
-                    </span>
-                  </td>
-                  <td className="admin-row-actions">
-                    <button type="button" className="btn btn-small" onClick={() => setEditing(c)}>
-                      {S.common.edit}
-                    </button>
-                    <button type="button" className="btn btn-small btn-danger" onClick={() => remove(c)}>
-                      {S.common.delete}
-                    </button>
-                  </td>
+          <div className="admin-panel">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>{S.coupons.colCode}</th>
+                  <th>{S.coupons.colType}</th>
+                  <th>{S.coupons.colValue}</th>
+                  <th>{S.coupons.colUsed}</th>
+                  <th>{S.coupons.colPeriod}</th>
+                  <th>{S.coupons.colStatus}</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {list.items.map((c) => (
+                  <tr key={c.id}>
+                    <td>
+                      <code>{c.code}</code>
+                    </td>
+                    <td>{S.coupons.types[c.type]}</td>
+                    <td>{valueLabel(c)}</td>
+                    <td>
+                      {c.usedCount}
+                      {c.usageLimit ? ` / ${c.usageLimit}` : ` / ${S.coupons.unlimited}`}
+                    </td>
+                    <td>{period(c)}</td>
+                    <td>
+                      <span className={`status status-${c.status === 'active' ? 'published' : 'hidden'}`}>
+                        {S.coupons.statuses[c.status]}
+                      </span>
+                    </td>
+                    <td className="admin-row-actions">
+                      <button type="button" className="btn btn-small" onClick={() => setEditing(c)}>
+                        {S.common.edit}
+                      </button>
+                      <button type="button" className="btn btn-small btn-danger" onClick={() => remove(c)}>
+                        {S.common.delete}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ))}
     </section>
   )

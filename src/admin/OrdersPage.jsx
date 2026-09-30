@@ -271,41 +271,43 @@ export default function OrdersPage() {
         (list.items.length === 0 ? (
           <p>{S.orders.empty}</p>
         ) : (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>{S.orders.colCode}</th>
-                <th>{S.orders.colDate}</th>
-                <th>{S.orders.colRecipient}</th>
-                <th>{S.orders.colTotal}</th>
-                <th>{S.orders.colStatus}</th>
-                <th>{S.orders.colPayment}</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {list.items.map((o) => (
-                <tr key={o.code}>
-                  <td>
-                    <code>{o.code}</code>
-                    {o.paymentFlag && <span className="status status-draft"> ⚑</span>}
-                  </td>
-                  <td>{date(o.createdAt)}</td>
-                  <td>{o.recipientName}</td>
-                  <td>{formatVnd(o.total)}</td>
-                  <td>
-                    <span className={`order-status order-status-${o.status}`}>{label.status(o.status)}</span>
-                  </td>
-                  <td>{label.payment(o.paymentStatus)}</td>
-                  <td className="admin-row-actions">
-                    <Link to={`/admin/orders/${o.code}`} className="btn btn-small">
-                      {S.orders.detail}
-                    </Link>
-                  </td>
+          <div className="admin-panel">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>{S.orders.colCode}</th>
+                  <th>{S.orders.colDate}</th>
+                  <th>{S.orders.colRecipient}</th>
+                  <th>{S.orders.colTotal}</th>
+                  <th>{S.orders.colStatus}</th>
+                  <th>{S.orders.colPayment}</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {list.items.map((o) => (
+                  <tr key={o.code}>
+                    <td>
+                      <code>{o.code}</code>
+                      {o.paymentFlag && <span className="status status-draft"> ⚑</span>}
+                    </td>
+                    <td>{date(o.createdAt)}</td>
+                    <td>{o.recipientName}</td>
+                    <td>{formatVnd(o.total)}</td>
+                    <td>
+                      <span className={`order-status order-status-${o.status}`}>{label.status(o.status)}</span>
+                    </td>
+                    <td>{label.payment(o.paymentStatus)}</td>
+                    <td className="admin-row-actions">
+                      <Link to={`/admin/orders/${o.code}`} className="btn btn-small">
+                        {S.orders.detail}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ))}
     </section>
   )

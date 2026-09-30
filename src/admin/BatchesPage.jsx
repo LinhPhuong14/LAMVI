@@ -191,41 +191,43 @@ export default function BatchesPage() {
         </p>
       )}
       {list.status === 'ok' && (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>{S.batches.colCode}</th>
-              <th>{S.batches.colDate}</th>
-              <th>{S.batches.colVideo}</th>
-              <th>{S.batches.colStatus}</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {list.items.map((b) => (
-              <tr key={b.id}>
-                <td>
-                  <code>{b.code}</code>
-                </td>
-                <td>{b.producedOn ?? '—'}</td>
-                <td>{b.videoUrl ? S.batches.hasVideo : '—'}</td>
-                <td>
-                  <span className={`status status-${b.status}`}>{S.batches.statuses[b.status]}</span>
-                </td>
-                <td className="admin-row-actions">
-                  <button type="button" className="btn btn-small" onClick={() => setEditing(b)}>
-                    {S.common.edit}
-                  </button>
-                  {!isPublished(b) && (
-                    <button type="button" className="btn btn-small btn-danger" onClick={() => remove(b)}>
-                      {S.common.delete}
-                    </button>
-                  )}
-                </td>
+        <div className="admin-panel">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>{S.batches.colCode}</th>
+                <th>{S.batches.colDate}</th>
+                <th>{S.batches.colVideo}</th>
+                <th>{S.batches.colStatus}</th>
+                <th />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {list.items.map((b) => (
+                <tr key={b.id}>
+                  <td>
+                    <code>{b.code}</code>
+                  </td>
+                  <td>{b.producedOn ?? '—'}</td>
+                  <td>{b.videoUrl ? S.batches.hasVideo : '—'}</td>
+                  <td>
+                    <span className={`status status-${b.status}`}>{S.batches.statuses[b.status]}</span>
+                  </td>
+                  <td className="admin-row-actions">
+                    <button type="button" className="btn btn-small" onClick={() => setEditing(b)}>
+                      {S.common.edit}
+                    </button>
+                    {!isPublished(b) && (
+                      <button type="button" className="btn btn-small btn-danger" onClick={() => remove(b)}>
+                        {S.common.delete}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   )

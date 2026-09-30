@@ -4,6 +4,7 @@ import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import { useI18n } from '../i18n/index.js'
 import { useAuth } from '../auth/context.js'
 import { Seal } from '../components/Motifs'
+import AdminAtmosphere from '../admin/AdminAtmosphere.jsx'
 import { ItIcon, OrdersIcon, SiteIcon } from '../admin/NavIcons.jsx'
 import Seo from '../seo/Seo.jsx'
 import { S, fmt, formatDuration } from './strings.js'
@@ -333,6 +334,7 @@ function Gate() {
   return (
     <div className="admin">
       {seo}
+      <AdminAtmosphere />
       <aside className="admin-nav">
         <div className="admin-brand">
           <Seal>LAMVI</Seal>

@@ -3,6 +3,7 @@ import { Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import { useAuth } from '../auth/context.js'
 import { Seal } from '../components/Motifs'
+import AdminAtmosphere from './AdminAtmosphere.jsx'
 import Seo from '../seo/Seo.jsx'
 import { BatchesIcon, CouponsIcon, FaqIcon, ItIcon, MayIcon, OrdersIcon, ProductsIcon, SiteIcon } from './NavIcons.jsx'
 import { S } from './strings.js'
@@ -61,6 +62,7 @@ function Gate() {
   return (
     <div className="admin">
       {seo}
+      <AdminAtmosphere />
       <aside className="admin-nav">
         <div className="admin-brand">
           <Seal>LAMVI</Seal>

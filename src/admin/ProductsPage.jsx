@@ -236,41 +236,43 @@ export default function ProductsPage() {
         </p>
       )}
       {list.status === 'ok' && (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>{S.products.colName}</th>
-              <th>{S.products.slug}</th>
-              <th>{S.products.colPrice}</th>
-              <th>{S.products.colStatus}</th>
-              <th>{S.products.colImage}</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {list.items.map((p) => (
-              <tr key={p.id}>
-                <td>{p.name?.vi}</td>
-                <td>
-                  <code>{p.slug}</code>
-                </td>
-                <td>{formatVnd(p.price)}</td>
-                <td>
-                  <span className={`status status-${p.status}`}>{S.products.statuses[p.status]}</span>
-                </td>
-                <td>{p.imageUrl ? S.products.hasImage : '—'}</td>
-                <td className="admin-row-actions">
-                  <button type="button" className="btn btn-small" onClick={() => setEditing(p)}>
-                    {S.common.edit}
-                  </button>
-                  <button type="button" className="btn btn-small btn-danger" onClick={() => remove(p)}>
-                    {S.common.delete}
-                  </button>
-                </td>
+        <div className="admin-panel">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>{S.products.colName}</th>
+                <th>{S.products.slug}</th>
+                <th>{S.products.colPrice}</th>
+                <th>{S.products.colStatus}</th>
+                <th>{S.products.colImage}</th>
+                <th />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {list.items.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.name?.vi}</td>
+                  <td>
+                    <code>{p.slug}</code>
+                  </td>
+                  <td>{formatVnd(p.price)}</td>
+                  <td>
+                    <span className={`status status-${p.status}`}>{S.products.statuses[p.status]}</span>
+                  </td>
+                  <td>{p.imageUrl ? S.products.hasImage : '—'}</td>
+                  <td className="admin-row-actions">
+                    <button type="button" className="btn btn-small" onClick={() => setEditing(p)}>
+                      {S.common.edit}
+                    </button>
+                    <button type="button" className="btn btn-small btn-danger" onClick={() => remove(p)}>
+                      {S.common.delete}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   )

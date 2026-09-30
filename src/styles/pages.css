@@ -310,11 +310,69 @@
 .admin {
   --dash-line: rgba(122, 93, 60, 0.18);
   --dash-soft: rgba(122, 93, 60, 0.07);
+  /* Kính của trang nội bộ đặc hơn và ít làm mờ hơn /account (58% / blur 18px): bảng số liệu dày
+     chữ phải đọc được, nên ưu tiên nền rõ hơn là hiệu ứng mạnh. Viền là nét sepia mảnh thay cho
+     viền trắng, để cùng hệ nét với phần còn lại của trang. */
+  --glass: rgba(251, 247, 239, 0.82);
+  --glass-side: rgba(251, 247, 239, 0.88);
+  --glass-blur: blur(10px) saturate(115%);
+  --glass-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 18px 36px -28px rgba(96, 62, 28, 0.32);
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 252px minmax(0, 1fr);
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--diep);
+}
+
+/* ----- Nền không khí: ảnh CỐ ĐỊNH sau toàn khung nhìn (khác /account: ảnh cuộn theo trang) ----- */
+.admin-atmo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Ảnh mây biển: hình mềm, không có vật thể rõ nét để tranh chỗ với bảng số liệu.
+   Làm mờ nhẹ + giảm bão hoà + độ mờ thấp → chỉ còn là "không khí", không phải phong cảnh. */
+.admin-atmo-photo {
+  position: absolute;
+  inset: -20px;
+  background: url('/images/scene/cloud-sea-1280.webp') center 42% / cover no-repeat;
+  /* Tông lạnh — ngược với lối ấm sepia của dashboard tài khoản */
+  filter: saturate(0.34) brightness(1.16) contrast(0.86) blur(3px);
+  opacity: 0.16;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.3) 58%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.3) 58%, transparent 100%);
+}
+
+/* Một dải khói mực trôi rất chậm ở góc dưới — thay cho 3 lớp khói vàng + đèn trời của /account */
+.admin-atmo-ink {
+  position: absolute;
+  right: -6%;
+  bottom: -14%;
+  width: min(46vw, 620px);
+  opacity: 0.09;
+  /* Làm mờ mạnh: chỉ còn là vệt không khí, không nhận ra hình dạng nào tranh chỗ với nội dung */
+  filter: saturate(0.3) blur(14px);
+  animation: admin-ink-drift 90s ease-in-out infinite alternate;
+}
+
+@keyframes admin-ink-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-4%, -3%, 0) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-atmo-ink {
+    animation: none;
+  }
 }
 
 /* ----- Thanh bên ----- */
@@ -328,7 +386,8 @@
   gap: 28px;
   padding: 30px 20px 24px;
   overflow-y: auto;
-  background: var(--diep-light);
+  /* §9: phần tử dính chỉ dùng nền trong, không backdrop-filter (tránh vẽ lại liên tục khi cuộn) */
+  background: var(--glass-side);
   border-right: 1px solid var(--dash-line);
   scrollbar-width: none;
 }
@@ -480,12 +539,15 @@
 
 /* ----- Thẻ trong trang nội bộ: nét mảnh, bo 20px, không bóng (§12) -----
    Ghi đè khung tranh bồi của .account-card — khung đó dành cho trang công khai. */
-.admin .account-card {
+.admin .account-card,
+.admin-form {
   padding: 26px 28px;
   border: 1px solid var(--dash-line);
   border-radius: 20px;
-  background: var(--diep-light);
-  box-shadow: none;
+  background: var(--glass);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   margin-bottom: 24px;
 }
 
@@ -505,15 +567,6 @@
   height: 15px;
   margin-right: 12px;
   border-radius: 1px;
-}
-
-.admin-form {
-  padding: 26px 28px;
-  border: 1px solid var(--dash-line);
-  border-radius: 20px;
-  background: var(--diep-light);
-  box-shadow: none;
-  margin-bottom: 28px;
 }
 
 .admin-grid {
@@ -556,15 +609,35 @@
   margin-top: 20px;
 }
 
+/* Tấm kính bọc bảng danh sách — dữ liệu không bao giờ nằm trực tiếp trên ảnh nền.
+   Bảng nhiều cột rộng hơn màn hình thì cuộn NGANG TRONG tấm kính; cả trang không được cuộn ngang. */
+.admin-panel {
+  overflow-x: auto;
+  padding: 6px 16px;
+  border: 1px solid var(--dash-line);
+  border-radius: 20px;
+  background: var(--glass);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
 /* ----- Bảng: chỉ nét ngang mảnh, đầu bảng chữ thưa ----- */
 .admin-table {
   width: 100%;
+  min-width: 640px;
   border-collapse: collapse;
   font-size: 0.92rem;
 }
 
+/* Bảng trong thẻ (nhật ký đơn, số liệu IT) tự cuộn bằng vùng bao riêng */
+.account-card .admin-table {
+  min-width: 0;
+}
+
 .admin-table th {
   text-align: left;
+  white-space: nowrap;
   padding: 10px 12px;
   font-size: 0.72rem;
   font-weight: 600;
@@ -597,9 +670,19 @@
   letter-spacing: 0.02em;
 }
 
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .admin .account-card,
+  .admin-form,
+  .admin-panel,
+  .admin-nav {
+    background-color: var(--diep-light);
+  }
+}
+
 /* Nhãn trạng thái: viên chữ nhỏ, chỉ nét — không tô mảng màu đậm (§11) */
 .status {
   display: inline-block;
+  white-space: nowrap;
   font-size: 0.75rem;
   letter-spacing: 0.03em;
   padding: 3px 10px;
@@ -1372,7 +1455,8 @@
   gap: 36px;
   padding: 32px 24px 28px;
   overflow-y: auto;
-  background: var(--diep-light);
+  /* §9: phần tử dính chỉ dùng nền trong, không backdrop-filter (tránh vẽ lại liên tục khi cuộn) */
+  background: var(--glass-side);
   border-right: 1px solid var(--dash-line);
   scrollbar-width: none;
 }
@@ -3337,6 +3421,7 @@
 /* ---------- Trạng thái đơn ---------- */
 .order-status {
   display: inline-block;
+  white-space: nowrap;
   padding: 4px 14px;
   border: 1px solid var(--hair-soft);
   border-radius: 2px;

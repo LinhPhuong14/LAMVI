@@ -249,9 +249,33 @@ là cả hai theo.
 | Hàng lỗi 5xx | Vạch son ở mép trái + nền son 4% — không tô đỏ cả hàng |
 | Màn ≤960px | Thanh bên thành hàng tab ngang trên cùng, vạch son chuyển xuống chân mục đang mở; ≤640px ẩn biểu tượng |
 
-**Cố ý không lấy** phần trang trí của `/account` (ảnh trời `DashSky`, đèn trời bay lên, kính mờ):
-đây là công cụ dùng cả ngày — nền ảnh làm rối mắt và tốn tài nguyên mà không giúp gì cho việc
-(§9). Điểm nhấn son chỉ dùng cho: vạch mục đang mở, vạch trước tiêu đề mục, nút chính.
+### Nền không khí và kính mờ (v0.19)
+
+Dùng **cùng bộ ảnh CC0** với các trang khác (`public/images/scene/`) nhưng dựng **khác hẳn**
+dashboard tài khoản, để hai nơi không bị nhầm là một:
+
+| | `/account` (`DashSky`) | Trang nội bộ (`AdminAtmosphere`) |
+|---|---|---|
+| Bố cục | Ảnh trời phủ đầu trang, **cuộn đi** khi kéo xuống | Ảnh **cố định** sau toàn khung nhìn |
+| Ảnh | `dash/mist-mountain` (núi sương) | `scene/cloud-sea` (mây biển) — hình mềm, không có vật thể rõ nét tranh chỗ với bảng số liệu |
+| Tông | Ấm sepia, sáng lên, mờ 38% | **Lạnh**, giảm bão hoà, làm mờ 3px, mờ **16%** |
+| Chuyển động | 3 lớp khói vàng trôi + 8 đèn trời bay lên | **Một** vệt khói mực, làm mờ 14px, trôi 90 giây; **không đèn trời** (đây là công cụ, không phải trang hội) |
+| Kính | 58% giấy, `blur(18px) saturate(150%)`, viền trắng, quầng vàng | **82%** giấy, `blur(10px) saturate(115%)`, viền nét sepia — đặc hơn và ít mờ hơn vì bảng số liệu dày chữ phải đọc được |
+
+Quy tắc bắt buộc:
+
+- **Dữ liệu không bao giờ nằm trực tiếp trên ảnh nền.** Bảng danh sách phải bọc trong `.admin-panel`
+  (tấm kính); thẻ dùng `.account-card` / `.admin-form` (cũng là kính).
+- `.admin-panel` có `overflow-x: auto` và bảng có `min-width: 640px`: bảng nhiều cột cuộn ngang
+  **trong tấm kính**, cả trang không bao giờ cuộn ngang.
+- §9: thanh bên và thanh tab mobile là phần tử dính → chỉ dùng nền trong (`--glass-side`),
+  **không** `backdrop-filter`.
+- Có `@supports not (backdrop-filter)` tăng độ đục cho trình duyệt không hỗ trợ.
+- Chuyển động của khói tắt khi bật giảm chuyển động (NFR-A11Y-001).
+- Tương phản đã đo với giả định điểm ảnh tối nhất của ảnh nền: chữ chính 14,2:1 trên kính và
+  12,0:1 trên nền; chữ phụ 7,6:1 / 6,4:1; nhãn nhỏ sepia 5,5:1 — đều đạt AA trở lên.
+
+Điểm nhấn son chỉ dùng cho: vạch mục đang mở, vạch trước tiêu đề mục, nút chính.
 
 ## 13. Checklist khi thêm thành phần
 

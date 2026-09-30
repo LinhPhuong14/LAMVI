@@ -345,11 +345,13 @@ describe('CSS giao diện tối', () => {
   })
 
   it('có @supports dự phòng khi không hỗ trợ backdrop-filter, tăng độ đục', () => {
-    const m = pages.match(/@supports\s+not\s*\(([\s\S]*?)\)\s*\{([\s\S]*?)\n\}/)
-    expect(m).not.toBeNull()
+    // pages.css có nhiều khối @supports (dashboard tài khoản và trang nội bộ) — lấy đúng khối của
+    // dashboard tài khoản, tức khối có nhắc .dash-card
+    const blocks = [...pages.matchAll(/@supports\s+not\s*\(([\s\S]*?)\)\s*\{([\s\S]*?)\n\}/g)]
+    const m = blocks.find((b) => b[2].includes('.dash-card'))
+    expect(m, 'không tìm thấy khối @supports của dashboard tài khoản').toBeDefined()
     expect(m[1]).toMatch(/backdrop-filter/)
     expect(m[1]).toMatch(/-webkit-backdrop-filter/)
-    expect(m[2]).toMatch(/\.dash-card/)
     expect(m[2]).toMatch(/background(-color)?:\s*var\(--glass-strong\)/)
   })
 

@@ -110,33 +110,35 @@ export default function FaqPage() {
         </p>
       )}
       {list.status === 'ok' && (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>{S.faq.colQuestion}</th>
-              <th>{S.faq.colPublished}</th>
-              <th>{S.common.sortOrder}</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {list.items.map((f) => (
-              <tr key={f.id}>
-                <td>{f.question?.vi}</td>
-                <td>{f.isPublished ? S.faq.yes : S.faq.no}</td>
-                <td>{f.sortOrder}</td>
-                <td className="admin-row-actions">
-                  <button type="button" className="btn btn-small" onClick={() => setEditing(f)}>
-                    {S.common.edit}
-                  </button>
-                  <button type="button" className="btn btn-small btn-danger" onClick={() => remove(f)}>
-                    {S.common.delete}
-                  </button>
-                </td>
+        <div className="admin-panel">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>{S.faq.colQuestion}</th>
+                <th>{S.faq.colPublished}</th>
+                <th>{S.common.sortOrder}</th>
+                <th />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {list.items.map((f) => (
+                <tr key={f.id}>
+                  <td>{f.question?.vi}</td>
+                  <td>{f.isPublished ? S.faq.yes : S.faq.no}</td>
+                  <td>{f.sortOrder}</td>
+                  <td className="admin-row-actions">
+                    <button type="button" className="btn btn-small" onClick={() => setEditing(f)}>
+                      {S.common.edit}
+                    </button>
+                    <button type="button" className="btn btn-small btn-danger" onClick={() => remove(f)}>
+                      {S.common.delete}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   )
