@@ -4,7 +4,7 @@
 
 **Mục tiêu người dùng**: "thêm báo cáo GA xem realtime vào Admin dashboard".
 
-**Đã làm**: `GET /api/admin/analytics/realtime` (GA4 Data API, service account, T-42), trang `/admin/analytics` (người online, biểu đồ 30 phút, top trang/quốc gia/thiết bị, tự làm mới 30 giây), mục điều hướng mới. Subagent kiểm thử độc lập (T-11). Spec v0.20: `[ASSUMPTION]` §23.3, G-50.
+**Đã làm**: `GET /api/admin/analytics/realtime` (GA4 Data API, service account, T-43), trang `/admin/analytics` (người online, biểu đồ 30 phút, top trang/quốc gia/thiết bị, tự làm mới 30 giây), mục điều hướng mới. Subagent kiểm thử độc lập (T-11). Spec v0.20: `[ASSUMPTION]` §23.3, G-50.
 
 **Phát hiện khi viết**: 5 báo cáo chạy song song đổi token 5 lần → dùng chung một promise.
 
