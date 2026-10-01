@@ -356,14 +356,16 @@ describe('CSS giao diện tối', () => {
   })
 
   it('không phần tử position: fixed/sticky nào có backdrop-filter trong src/styles và index.css', () => {
+    // Ngoại lệ có chủ đích (D-80, T-46): thanh điều hướng `.nav` kính mờ theo yêu cầu PO
+    const exempt = (sel) => sel.split(',').every((x) => x.trim() === '.nav')
     for (const m of allCss.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
-      if (/backdrop-filter/.test(m[2])) expect(m[2]).not.toMatch(/position:\s*(fixed|sticky)/)
+      if (/backdrop-filter/.test(m[2]) && !exempt(m[1])) expect(m[2]).not.toMatch(/position:\s*(fixed|sticky)/)
     }
     // Và các selector được làm mờ không được đặt fixed/sticky ở bất kỳ quy tắc nào khác
     const blurred = new Set()
     for (const m of allCss.matchAll(/([^{}]+)\{[^{}]*backdrop-filter[^{}]*\}/g)) for (const s of m[1].split(',')) blurred.add(s.trim())
     for (const m of allCss.matchAll(/([^{}]+)\{([^{}]*position:\s*(?:fixed|sticky)[^{}]*)\}/g)) {
-      for (const s of m[1].split(',')) expect(blurred.has(s.trim())).toBe(false)
+      for (const s of m[1].split(',')) if (s.trim() !== '.nav') expect(blurred.has(s.trim())).toBe(false)
     }
   })
 })

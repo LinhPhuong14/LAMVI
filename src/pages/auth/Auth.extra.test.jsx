@@ -188,12 +188,31 @@ describe('Header & URL ngôn ngữ (D-37)', () => {
     ['/', 'Tài khoản', '/account'],
     ['/en', 'Account', '/en/account'],
     ['/zh', '账户', '/zh/account'],
-    ['/en/login', 'Account', '/en/account'],
   ])('trên %s link header "%s" trỏ tới %s', async (path, name, href) => {
     mockApi(base)
     renderAt(path)
     const link = await screen.findByRole('link', { name })
     expect(link).toHaveAttribute('href', href)
+  })
+
+  // D-80: trang auth có header riêng — không link tới các phần của landing
+  it.each([
+    ['/login', '/', '/register'],
+    ['/en/login', '/en', '/en/register'],
+    ['/register', '/', '/login'],
+    ['/zh/forgot-password', '/zh', '/zh/login'],
+  ])('trên %s header riêng: logo → %s, nút chuyển → %s, không có link neo landing', async (path, home, cta) => {
+    mockApi(base)
+    const { container } = renderAt(path)
+    await screen.findByRole('heading', { level: 1 })
+    const header = container.querySelector('header.nav-auth')
+    expect(header).not.toBeNull()
+    expect(header.querySelector('a.nav-mark')).toHaveAttribute('href', home)
+    expect(header.querySelector('a.nav-cta')).toHaveAttribute('href', cta)
+    expect(header.querySelector('.nav-links')).toBeNull()
+    expect(header.querySelector('a[href*="#"]')).toBeNull()
+    expect(container.querySelector('footer.footer')).toBeNull()
+    expect(container.querySelector('footer.auth-foot')).not.toBeNull()
   })
 
   it('chưa đăng nhập vào /zh/account → /zh/login?next=/zh/account', async () => {
@@ -213,7 +232,8 @@ describe('Header & URL ngôn ngữ (D-37)', () => {
     renderAt('/en/account')
     fireEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
     await waitFor(() => expect(screen.queryByRole('heading', { name: 'My account' })).toBeNull())
-    expect(screen.getByRole('link', { name: 'Account' })).toHaveAttribute('href', '/en/account')
+    // Trong lúc chờ API đăng xuất, trang tài khoản có thể chuyển qua /login trước khi về /en — chờ tới khi về trang chủ
+    expect(await screen.findByRole('link', { name: 'Account' })).toHaveAttribute('href', '/en/account')
     expect(localStorage.getItem('moc.session')).toBeNull()
   })
 

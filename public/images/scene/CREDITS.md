@@ -26,3 +26,14 @@ Chỉ là nền không khí — **không** phải ảnh sản phẩm, ảnh ngh�
 Hai ảnh trong bộ này còn dùng cho nền trang quản trị và dashboard IT, nhưng xử lý khác hẳn dashboard
 tài khoản (xem `docs/knowledge/design-rules.md` §12a): mây biển làm nền cố định tông lạnh mờ 16%,
 và khói mực làm một vệt trôi rất chậm, làm mờ mạnh. Nguồn và giấy phép không đổi — xem bảng trên.
+
+## Ảnh phong cảnh phủ mảng xanh navy (v0.23, D-80)
+
+Tải ngày 2026-10-01 qua Openverse (lọc CC0 1.0). Dùng làm lớp phủ độ đậm thấp (20–34%) trên hai mảng nền chàm của trang chủ (Di sản, Lookbook). Không có người nhận diện được; thuyền buồm nhỏ ở Hạ Long chỉ là phong cảnh.
+
+| File | Ảnh gốc | Tác giả / nguồn | Giấy phép | Trang gốc | Xử lý |
+|---|---|---|---|---|---|
+| `bay-green-1280.webp`, `bay-green-640.webp` | Halong Bay, Vietnam | Reyes Martínez / WordPress Photo Directory | CC0 1.0 | https://wordpress.org/photos/photo/99162aa53d/ | Nén WebP 1280px và 640px |
+| `hills-gold-1280.webp`, `hills-gold-640.webp` | Foggy mountain Vietnam (đồi sương lúc bình minh) | — / rawpixel (bản gốc từ Wikimedia Commons) | CC0 1.0 | https://www.rawpixel.com/image/3289307/free-photo-image-brown-background-cc0-countryside | Nén WebP; bản gốc 1024px nên bản 1280px là phóng nhẹ (chỉ dùng độ đậm thấp) |
+
+`halong-mist-*` và `lanterns-night-*` không còn dùng ở trang chủ (giữ lại trong thư mục).

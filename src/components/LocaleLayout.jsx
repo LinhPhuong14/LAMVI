@@ -2,6 +2,8 @@ import { useOutlet, useLocation } from 'react-router-dom'
 import { LazyMotion, MotionConfig, domAnimation } from 'framer-motion'
 import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import { splitLocale } from '../i18n/index.js'
+import AuthHeader from './AuthHeader'
+import AuthFooter from './AuthFooter'
 import SiteHeader from './SiteHeader'
 import SiteFooter from './SiteFooter'
 import PageTransition from './PageTransition'
@@ -30,6 +32,7 @@ export default function LocaleLayout({ lang }) {
   const { rest } = splitLocale(pathname)
   const clean = rest.replace(/\/+$/, '') || '/'
   const app = APP_PAGES.has(clean)
+  const auth = AUTH_PAGES.has(clean)
   const scene = app ? null : pageScene(clean)
   return (
     <LocaleProvider lang={lang}>
@@ -38,7 +41,7 @@ export default function LocaleLayout({ lang }) {
         <MotionConfig reducedMotion="user">
           <CartProvider>
             <div className={app ? 'page page-app' : 'page'}>
-              {!app && <SiteHeader />}
+              {!app && (auth ? <AuthHeader /> : <SiteHeader />)}
               <PageTransition
                 pageKey={`${lang}${clean}`}
                 className={scene ? `has-motifs page-scene-main page-scene-${scene}` : undefined}
@@ -46,7 +49,7 @@ export default function LocaleLayout({ lang }) {
                 {scene && <Scene name={scene} className="page-scene" />}
                 {outlet}
               </PageTransition>
-              {!app && <SiteFooter />}
+              {!app && (auth ? <AuthFooter /> : <SiteFooter />)}
               <May />
             </div>
           </CartProvider>

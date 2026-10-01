@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from 'vitest'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { mockApi, renderAt } from '../../test/renderApp.jsx'
 import { productsVi } from '../../test/fixtures.js'
 
@@ -105,7 +105,7 @@ describe('AuthCallbackPage', () => {
     renderAt('/auth/callback')
     expect(await screen.findByRole('alert')).toHaveTextContent('Không đăng nhập được bằng Google')
     expect(localStorage.getItem('moc.session')).toBeNull()
-    fireEvent.click(screen.getByRole('link', { name: /đăng nhập/i }))
+    fireEvent.click(within(screen.getByRole('main')).getByRole('link', { name: /đăng nhập/i }))
     expect(await screen.findByRole('heading', { name: 'Đăng nhập' })).toBeInTheDocument()
   })
 })

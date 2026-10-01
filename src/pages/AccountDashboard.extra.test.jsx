@@ -59,7 +59,8 @@ const tab = (name) => within(tablist()).getByRole('tab', { name: new RegExp(name
 const panel = () => screen.getByRole('tabpanel')
 const selected = () => within(tablist()).getAllByRole('tab').filter((t) => t.getAttribute('aria-selected') === 'true')
 const header = () => document.querySelector('header.nav')
-const footer = () => document.querySelector('footer.footer')
+// /login và /register dùng AuthFooter (D-80)
+const footer = () => document.querySelector('footer.footer, footer.auth-foot')
 
 describe('Layout — không header/footer trang giới thiệu trên /account', () => {
   it.each(['/account', '/en/account', '/zh/account/', '/account/?tab=may'])('%s: không có SiteHeader/SiteFooter, có page-app', async (p) => {
