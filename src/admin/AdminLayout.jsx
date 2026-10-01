@@ -5,7 +5,7 @@ import { useAuth } from '../auth/context.js'
 import { Seal } from '../components/Motifs'
 import AdminAtmosphere from './AdminAtmosphere.jsx'
 import Seo from '../seo/Seo.jsx'
-import { BatchesIcon, CouponsIcon, FaqIcon, ItIcon, MayIcon, OrdersIcon, ProductsIcon, SiteIcon } from './NavIcons.jsx'
+import { AnalyticsIcon, BatchesIcon, CouponsIcon, FaqIcon, ItIcon, MayIcon, OrdersIcon, ProductsIcon, SiteIcon } from './NavIcons.jsx'
 import { S } from './strings.js'
 
 // Thứ tự theo tần suất dùng hằng ngày: đơn hàng trước, cấu hình sau
@@ -15,6 +15,7 @@ const NAV = [
   ['/admin/faq', 'faq', FaqIcon],
   ['/admin/batches', 'batches', BatchesIcon],
   ['/admin/coupons', 'coupons', CouponsIcon],
+  ['/admin/analytics', 'analytics', AnalyticsIcon],
   ['/admin/may', 'may', MayIcon],
 ]
 

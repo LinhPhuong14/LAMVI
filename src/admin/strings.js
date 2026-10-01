@@ -1,7 +1,7 @@
 // D-48: giao diện admin chỉ tiếng Việt. Nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh.
 export const S = {
   title: 'Quản trị LAMVI',
-  nav: { orders: 'Đơn hàng', products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', coupons: 'Mã giảm giá', may: 'Mây (AI)', it: 'Dashboard IT', site: 'Về trang web' },
+  nav: { orders: 'Đơn hàng', products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', coupons: 'Mã giảm giá', analytics: 'Truy cập (GA)', may: 'Mây (AI)', it: 'Dashboard IT', site: 'Về trang web' },
   common: {
     loading: 'Đang tải…',
     save: 'Lưu',
@@ -189,6 +189,33 @@ export const S = {
     colStatus: 'Trạng thái',
     colVideo: 'Video',
     hasVideo: 'Có',
+  },
+}
+
+export const ANALYTICS = {
+  title: 'Truy cập thời gian thực',
+  autoRefresh: 'Tự làm mới mỗi 30 giây · số liệu của Google Analytics, trễ vài giây',
+  refresh: 'Làm mới',
+  updated: 'Cập nhật lúc {time}',
+  activeUsers: 'Đang online (30 phút qua)',
+  pageViews: 'Lượt xem trang',
+  chart: 'Người dùng theo từng phút',
+  chartHint: 'Phút gần nhất ở bên phải.',
+  minutesAgo: '{n} phút trước',
+  now: 'Hiện tại',
+  pages: 'Trang đang xem',
+  countries: 'Quốc gia',
+  devices: 'Thiết bị',
+  colName: 'Tên',
+  colUsers: 'Người dùng',
+  empty: 'Chưa có ai truy cập trong 30 phút qua.',
+  notConfigured: 'Chưa cấu hình báo cáo GA realtime.',
+  setup: 'Đặt các biến môi trường GA_PROPERTY_ID và GA_SERVICE_ACCOUNT_JSON (hoặc GA_CLIENT_EMAIL + GA_PRIVATE_KEY) ở Vercel, rồi thêm email service account vào GA với vai trò Viewer. Xem docs/knowledge/deploy-vercel.md.',
+  errors: {
+    GA_AUTH: 'Google từ chối khoá service account. Kiểm tra khoá và quyền Viewer của nó trên property GA.',
+    GA_QUOTA: 'Vượt hạn mức của GA Data API. Thử lại sau ít phút.',
+    GA_UPSTREAM: 'Không lấy được số liệu từ Google Analytics. Thử lại sau.',
+    default: 'Không tải được báo cáo.',
   },
 }
 

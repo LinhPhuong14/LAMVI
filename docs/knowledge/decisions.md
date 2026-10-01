@@ -210,3 +210,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Quyết định**: `src/main.jsx` gọi `inject()` của `@vercel/analytics` ở client; `beforeSend` đưa URL qua `sanitizePath` (bỏ query/hash, che token QR) như GA.
 - **Lý do**: số liệu truy cập không cookie, không cần đổi CSP (script và kết nối đều cùng origin); NFR-PRV-002 vẫn giữ.
 - **Hệ quả**: phải bật Web Analytics trong dashboard Vercel của project; chưa bật thì `/_vercel/insights/script.js` trả 404 (vô hại).
+
+### T-43 — Báo cáo GA realtime gọi GA4 Data API bằng `fetch` + JWT tự ký
+- **Bối cảnh**: yêu cầu thêm báo cáo GA realtime vào admin. Mã đo `G-…` chỉ để gửi sự kiện; đọc số liệu cần GA Data API với OAuth.
+- **Quyết định**: `server/adapters/gaRealtime.js` ký JWT RS256 bằng `node:crypto` (service account), đổi lấy access token, gọi `properties/{id}:runRealtimeReport` bằng `fetch` — không thêm SDK `googleapis` (nặng, cùng lý do T-29). Token giữ trong bộ nhớ (promise dùng chung để 5 báo cáo song song chỉ đổi token một lần), kết quả cache 15 giây. Test dùng `fetchImpl` giả.
+- **Cấu hình**: `GA_PROPERTY_ID` + `GA_SERVICE_ACCOUNT_JSON` (JSON hoặc base64) hoặc `GA_CLIENT_EMAIL` + `GA_PRIVATE_KEY`. Thiếu → `configured:false`. Khoá chỉ ở server; lỗi Google đổi sang mã `GA_*`, không chuyển nguyên văn cho client.
+- **Hệ quả**: cache theo từng instance serverless nên hiệu quả giảm khi có nhiều instance — chấp nhận, hạn mức realtime của GA đủ rộng cho vài admin.

@@ -196,6 +196,7 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | POST | `/api/admin/batches/:id/publish` | Admin | 409 `VIDEO_REQUIRED` |
 | POST | `/api/admin/products/:id/image-upload` | Admin | `{ contentType, size }` → `{ path, uploadUrl, headers }` (D-77) |
 | POST/DELETE | `/api/admin/products/:id/image` | Admin | Gắn / gỡ ảnh sản phẩm; gắn ảnh mới thì xoá object cũ |
+| GET | `/api/admin/analytics/realtime` | Admin, IT | GA realtime (T-43): `{configured:false}` hoặc người online, lượt xem, 30 phút theo phút, top trang/quốc gia/thiết bị; lỗi GA → 502 `GA_*` |
 | GET/POST | `/api/admin/coupons` | Admin | Danh sách / tạo (§14, D-71) |
 | GET/PATCH/DELETE | `/api/admin/coupons/:id` | Admin | Xoá coupon đã dùng → 409 `COUPON_IN_USE` |
 | GET | `/api/admin/orders?status=` | Admin | Danh sách đơn, kèm `nextStatuses` và `paymentFlag` |

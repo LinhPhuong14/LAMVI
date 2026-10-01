@@ -17,6 +17,7 @@ import {
 import { PRODUCT_IMAGE_BUCKET } from '../adapters/supabase/storage.js'
 import { validateCoupon } from '../domain/couponValidate.js'
 import { ORDER_STATUSES, adminNextStatuses } from '../domain/order.js'
+import { GaError } from '../adapters/gaRealtime.js'
 import { presentOrder } from './orders.js'
 
 const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {})
@@ -46,11 +47,23 @@ const found = (row) => {
 const isPublished = (b) => b.status === 'video_published'
 
 // Admin: sản phẩm (FR-CAT-004), FAQ (G-07), lô & video lô (FR-QR-007, D-46, D-47)
-export function adminRouter({ repo, auth, storage, config, orders = null }) {
+export function adminRouter({ repo, auth, storage, config, orders = null, gaRealtime = null }) {
   const r = Router()
   r.use('/admin', requireAdmin(auth, repo))
   const maxVideoBytes = (config.maxVideoMb ?? 500) * 1024 * 1024
   const maxImageBytes = (config.maxImageMb ?? 5) * 1024 * 1024
+
+  // --- Báo cáo GA realtime. Thiếu cấu hình → 200 { configured: false } để trang hướng dẫn cài đặt.
+  r.get('/admin/analytics/realtime', async (req, res) => {
+    if (!gaRealtime) return res.json({ configured: false })
+    try {
+      res.json(await gaRealtime.snapshot())
+    } catch (err) {
+      if (!(err instanceof GaError)) throw err
+      // Không lộ nội dung lỗi của Google; mã đủ để trang chỉ cách xử lý
+      throw new HttpError(502, `GA_${err.code}`, `GA_${err.code}`)
+    }
+  })
 
   // --- Sản phẩm
   r.get('/admin/products', async (req, res) => {

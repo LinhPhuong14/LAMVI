@@ -45,7 +45,7 @@ beforeEach(() => {
 })
 
 describe('Thanh bên trang nội bộ', () => {
-  it('admin: ấn triện + nhãn khu vực + 6 mục có biểu tượng, mục đang mở được đánh dấu', async () => {
+  it('admin: ấn triện + nhãn khu vực + 7 mục có biểu tượng, mục đang mở được đánh dấu', async () => {
     mockApi({ 'GET /me': me('admin'), 'GET /admin/products': () => ({ body: { items: [] } }) })
     const { container } = renderAt('/admin/products')
     await screen.findByRole('heading', { name: 'Sản phẩm', level: 1 })
@@ -58,6 +58,7 @@ describe('Thanh bên trang nội bộ', () => {
       'Hỏi đáp',
       'Lô đèn',
       'Mã giảm giá',
+      'Truy cập (GA)',
       'Mây (AI)',
     ])
     // Biểu tượng là trang trí; nhãn chữ mới là nội dung cho trình đọc màn hình
