@@ -14,6 +14,8 @@ Chỉ dùng các tiền tố sau khi tạo nhánh mới:
 
 - **Không thêm Claude làm contributor**: không dùng trailer `Co-Authored-By: Claude …`, `Claude-Session: …`, và không thêm dòng "Generated with Claude Code" vào commit message hay mô tả PR. Tác giả commit là người dùng.
 
+- **Tự merge vào nhánh chính**: sau khi push nhánh `feat/`, `fix/`, `docs/`, nếu không có conflict với `master` (nhánh chính của repo) và `npm run lint`, `npm test`, `npm run build` đều xanh thì merge luôn vào `master` rồi push. Có conflict thì dừng lại và hỏi người dùng.
+
 ## Knowledge base
 
 Đầu mỗi phiên đọc `docs/knowledge/README.md` (quy trình phiên, quyết định kỹ thuật `T-xx`, kiến trúc, quy ước, tiến độ, nhật ký). Mỗi tính năng phải có subagent kiểm thử độc lập trước khi commit (T-11). Cuối phiên cập nhật `progress.md` và `session-log.md`.
