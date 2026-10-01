@@ -12,6 +12,17 @@ export default function AuthShell({ eyebrow, title, lead, children, footer }) {
       <Seo title={title} noindex />
       <div className="auth-card">
         <aside className="auth-aside" aria-hidden="true">
+          {/* Ảnh riêng của trang auth (D-81), không dùng chung với landing */}
+          <img
+            className="auth-aside-photo"
+            src="/images/auth/lantern-river-1024.webp"
+            srcSet="/images/auth/lantern-river-640.webp 640w, /images/auth/lantern-river-1024.webp 1024w"
+            sizes="(max-width: 760px) 100vw, 420px"
+            width="1024"
+            height="684"
+            alt=""
+            decoding="async"
+          />
           <Link to={path('/')} className="auth-aside-mark" tabIndex={-1}>
             <Seal>LAMVI</Seal>
           </Link>

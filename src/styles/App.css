@@ -2629,6 +2629,34 @@
     var(--cham-deep);
 }
 
+.auth-aside-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 74%;
+  object-fit: cover;
+  object-position: 52% 45%;
+  z-index: 0;
+  /* Ảnh tan dần về nền chàm ở chân để câu chữ nằm trên mảng tối, không đè lên đèn */
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent);
+}
+
+/* Tối nhẹ ở đầu để ấn LAMVI đọc rõ */
+.auth-aside::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(to bottom, rgba(26, 39, 53, 0.55), rgba(26, 39, 53, 0) 30%);
+}
+
+.auth-aside > :not(.auth-aside-photo) {
+  position: relative;
+  z-index: 1;
+}
+
 .auth-aside-mark {
   align-self: flex-start;
   text-decoration: none;
@@ -2751,8 +2779,16 @@
     gap: 16px;
     padding: 24px 24px 20px;
   }
+  .auth-aside {
+    min-height: 150px;
+  }
+  .auth-aside-photo {
+    height: 100%;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
   .auth-aside-quote {
-    font-size: 1.1rem;
+    display: none;
   }
   .auth-aside-note {
     display: none;
