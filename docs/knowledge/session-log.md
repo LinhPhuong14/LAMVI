@@ -1,5 +1,13 @@
 # Nhật ký phiên
 
+## 2026-10-01 — Ảnh riêng cho trang auth (nhánh `feat/auth-photo`)
+
+**Mục tiêu người dùng**: đổi ảnh ở phần auth sang ảnh đẹp hơn, không dùng ảnh của landing.
+
+**Đã làm**: D-81. Tải 1 ảnh CC0 (Openverse/rawpixel): đèn lụa Hội An phản chiếu trên sông đêm; đặt ở nửa trái thiếp đăng nhập, mask tan về chàm; bộ `public/images/auth` có CREDITS riêng.
+
+**Lưu ý**: ảnh gốc 1024px (không phóng to). Nửa trái chỉ dùng một ảnh cho cả 4 trang auth.
+
 ## 2026-10-01 — Header kính mờ, header auth riêng, nền mới (nhánh `feat/header-glass-backgrounds`)
 
 **Mục tiêu người dùng**: header cũng kính mờ; trang auth có header khác (không link sang landing); đổi background, tải asset đẹp hơn hoặc nền trơn; mảng navy phủ ảnh cảnh vật độ đậm thấp.
