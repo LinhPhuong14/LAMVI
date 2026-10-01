@@ -205,3 +205,8 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Quyết định**: mọi thay đổi trạng thái đơn đi qua `repo.updateOrderIfStatus(id, trạngThaiKỳVọng, giáTrịMới)` — chỉ ghi khi trạng thái hiện tại đúng như lúc đọc.
 - **Lý do**: khách bấm huỷ đúng lúc webhook payOS báo đã trả tiền là tình huống có thật; không có khoá thì cả hai cùng "thành công" và đơn rơi vào trạng thái mâu thuẫn.
 - **Hệ quả**: nơi gọi phải xử lý trường hợp trả `null` (trạng thái vừa đổi) — trả 409 cho client, không ghi đè.
+
+### T-42 — Vercel Web Analytics bên cạnh GA
+- **Quyết định**: `src/main.jsx` gọi `inject()` của `@vercel/analytics` ở client; `beforeSend` đưa URL qua `sanitizePath` (bỏ query/hash, che token QR) như GA.
+- **Lý do**: số liệu truy cập không cookie, không cần đổi CSP (script và kết nối đều cùng origin); NFR-PRV-002 vẫn giữ.
+- **Hệ quả**: phải bật Web Analytics trong dashboard Vercel của project; chưa bật thì `/_vercel/insights/script.js` trả 404 (vô hại).
