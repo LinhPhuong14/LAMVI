@@ -4,6 +4,31 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 
 ---
 
+## 2026-10-01 (phiên 7) — Checkout, đơn hàng, coupon, payOS (nhánh `feat/checkout`, từ `master`)
+
+**Quyết định từ người dùng**
+
+- D-62 (Q-09): VAT 10%, không tính trên ship. D-63 (Q-11): ship đồng giá + miễn phí từ mức (30.000₫ / 1.500.000₫, admin sửa).
+- D-64 (Q-08): lời chúc tuỳ chọn ở checkout, soạn sau được. D-72 (Q-12): lời chúc miễn phí.
+- D-65…D-68 (C-1…C-3, C-5, C-6, C-8): coupon %/số tiền/miễn ship; trước VAT; toàn đơn hoặc danh sách sản phẩm, % có trần; giới hạn tổng + mỗi khách; huỷ trả lượt.
+- D-69 (Q-15): link payOS 15 phút. D-70 (Q-16): hoàn tiền thủ công, ghi nhận trên web. D-71: trần COD do admin đặt (mặc định 5.000.000₫).
+
+**Đã làm**
+
+1. Server: `server/orders/*` (tính giá, coupon, tạo đơn, payOS, webhook, hết hạn, huỷ, admin, nhật ký), `server/payments/*` (payOS thật + giả lập — T-25), migration `20261001000006_orders.sql` (RPC `create_order`), bảo trì cho phép webhook + `checkout/quote`.
+2. Frontend: `/checkout`, `/account/orders/:id`, danh sách đơn ở trang tài khoản; admin `/admin/orders`, `/admin/coupons`, `/admin/shop` (mặc định `/admin` mở Đơn hàng). Nút Thanh toán ở giỏ dẫn tới checkout (D-61 hết hiệu lực).
+3. NFR-AUD-001: `audit_log` cho đơn, coupon, cấu hình phí (G-21).
+4. Spec v0.8: D-62…D-72, gỡ Q-08/Q-09/Q-10/Q-11/Q-12/Q-15/Q-16/C-1…C-3/C-5 khỏi §30, thêm Q-36, C-8b; G-03 đã xử lý; G-33…G-36 mới.
+5. Subagent kiểm thử server (102 test) phát hiện: hai request payOS cùng `clientKey` chạy xen kẽ → request thua trả đơn không có link thanh toán → đã sửa (chờ link). Đã xử lý thêm: gửi lại khoá của lần payOS lỗi trả 502 thay vì đơn đã huỷ; `PUT /admin/shop` thiếu trường không còn âm thầm tắt mức miễn ship/trần COD; bảo trì cho phép `checkout/quote`; trang admin không hỏi payOS mỗi lần mở; dọn bộ đếm đối soát; RPC kiểm tra lại trạng thái/hạn coupon.
+
+**Còn lại / cần người dùng**
+
+- Chạy migration `20261001000006_orders.sql`; cấu hình `PAYOS_*` + đăng ký webhook (G-33).
+- Pháp chế: C-2 giảm trước VAT, I-04. Q-20 (hoàn bao nhiêu khi huỷ đơn đã làm).
+- Lời chúc: Q-36, Q-14, Q-29, Q-25, Q-26. Thông báo: Q-24.
+
+---
+
 ## 2026-09-29 (phiên 6) — Giỏ hàng (nhánh `feat/cart`, từ `master`), gộp vào `master`
 
 **Quyết định từ người dùng**

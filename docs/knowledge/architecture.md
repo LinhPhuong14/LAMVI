@@ -23,13 +23,16 @@ server/
   monitoring/              metrics.js (số liệu API), maintenance.js (bảo trì), health.js (kiểm tra tích hợp)
   may/                     config.js (cấu hình mặc định + validate), guard.js (PII, kiểm tra số, FAQ offline), tools.js (hàm backend cho Mây), service.js
   cart/service.js          Giỏ hàng: tính giá, gộp, giới hạn (D-59, D-60)
+  orders/                  pricing.js (VAT, ship, COD — D-62, D-63, D-71), coupons.js (D-65…D-68), domain.js (checkout, trạng thái),
+                           service.js (quote, tạo đơn, payOS, webhook, hết hạn, huỷ), admin.js (thao tác admin), audit.js (NFR-AUD-001)
+  payments/                payos.js (payOS thật), fakePayos.js (giả lập dev/test — T-25)
   app.js                   createApp({ repo, auth, config }) — dùng trong test
   config.js                Đọc biến môi trường
   errors.js                HttpError + errorHandler (định dạng lỗi thống nhất)
   i18n.js                  normalizeLang, pick (D-40), localePath (D-37)
   domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
-  routes/                  catalog.js, auth.js, admin.js, it.js, may.js, cart.js, seo.js (sitemap, robots)
+  routes/                  catalog.js, auth.js, admin.js, it.js, may.js, cart.js, orders.js, adminShop.js, seo.js (sitemap, robots)
   adapters/openai.js       Chat Completions qua fetch (T-21)
   domain/admin.js          Kiểm tra dữ liệu admin (sản phẩm, FAQ, lô, video)
   adapters/
@@ -52,12 +55,12 @@ src/
   auth/                    AuthProvider.jsx, context.js (useAuth, phiên), useForm.js
   hooks/useNoIndex.js      meta robots noindex (BR-SEO-001, D-44)
   components/              SiteHeader, SiteFooter, LocaleLayout, Price, Field, Faq, Marquee, Lantern…
-  pages/                   HomePage, ProductPage, BatchPage, AccountPage, NotFoundPage, auth/*
-  admin/                   AdminLayout, ProductsPage, FaqPage, BatchesPage, I18nInput, strings.js (D-48)
+  pages/                   HomePage, ProductPage, BatchPage, AccountPage, CartPage, CheckoutPage, OrderPage (+ OrderList), NotFoundPage, auth/*
+  admin/                   AdminLayout, OrdersPage, CouponsPage, ShopPage, ProductsPage, FaqPage, BatchesPage, MayConfigPage, I18nInput, strings.js (D-48)
   it/                      ItDashboard.jsx, strings.js (D-51)
   may/                     May.jsx (nút, tour), MayChat.jsx, Tour.jsx, MayAvatar.jsx, storage.js
   cart/                    CartProvider.jsx, context.js (useCart), AddToCart.jsx, QuantityInput.jsx
-  lib/money.js             formatVnd
+  lib/                     money.js (formatVnd), date.js (formatDateTime, giờ VN)
   styles/                  App.css (landing), pages.css (trang mới)
   test/                    renderApp.jsx (mockApi, renderAt), fixtures.js
 scripts/gen-seed-sql.js
@@ -100,6 +103,19 @@ Auth provider và storage có thêm `ping()`.
 | `getCart(userId)` | `[{ productId, quantity, addedAt }]` theo thứ tự thêm |
 | `setCartItem(userId, productId, quantity)`, `removeCartItem(userId, productId)` | |
 
+### Đơn hàng, coupon, nhật ký (repository)
+
+| Phương thức | Ghi chú |
+|---|---|
+| `listCoupons()`, `getCouponById`, `getCouponByCode(code)`, `createCoupon`, `updateCoupon`, `deleteCoupon` | Xoá coupon đã có đơn → `RepoError('IN_USE')` |
+| `countCouponUses(couponId, userId?)` | `{ total, byUser }` — đơn chưa `CANCELLED` (D-68) |
+| `createOrder(order, items)` | Nguyên tử: kiểm tra lại coupon (trạng thái, hạn, lượt) → `RepoError('COUPON_INVALID'\|'COUPON_USED_UP'\|'COUPON_USER_LIMIT')`; trùng `clientKey` → `CONFLICT` |
+| `getOrderById`, `getOrderByCode`, `getOrderByClientKey(userId, key)`, `listOrdersByUser`, `listOrders({ status })`, `listExpiredPendingOrders(beforeIso)` | Đơn kèm `items` |
+| `updateOrder(id, patch, fromStatuses?)` | Compare-and-set theo trạng thái; `null` nếu trạng thái đã đổi |
+| `updateOrderItem(orderId, itemId, patch)` | Gán lô |
+| `recordPaymentEvent({ provider, reference, … })` → `true/false`, `deletePaymentEvent` | Chống xử lý webhook trùng (BR-PAY-002) |
+| `appendAudit(row)`, `listAudit({ entity, entityId })` | NFR-AUD-001 |
+
 ### Mây (repository)
 
 | Phương thức | Ghi chú |
@@ -141,8 +157,13 @@ Lỗi chung: `RATE_LIMITED`.
 | `profiles` | `id` → `auth.users`, `full_name`, `phone`, `preferred_locale`, `role` customer/admin/it | D-38, D-42, D-51 |
 | `api_metrics` | PK (`bucket` phút, `method`, `route`, `status`); `count`, `total_ms`, `max_ms`, histogram `le_50…gt_2500` | D-53; ghi qua RPC `record_api_metrics` |
 | `api_errors` | `at`, `method`, `route`, `path`, `status`, `code`, `message` | Lỗi 5xx |
-| `app_settings` | `key`, `value` jsonb, `updated_by`, `updated_at` | `maintenance` (D-54), `may` (cấu hình Mây) |
+| `app_settings` | `key`, `value` jsonb, `updated_by`, `updated_at` | `maintenance` (D-54), `may` (cấu hình Mây), `shop` (phí ship, mức miễn ship, trần COD — D-63, D-71) |
 | `cart_items` | PK (`user_id`, `product_id`), `quantity` 1..10 | Giỏ người đã đăng nhập (D-41, D-60) |
+| `coupons` | `code` unique, `status`, `type` percent/amount/free_shipping, `value`, `max_discount`, `min_order`, `starts_at`, `ends_at`, `usage_limit`, `per_user_limit`, `product_ids uuid[]` | D-65…D-68 |
+| `orders` | `code` bigint (sequence, dùng làm orderCode payOS), `user_id`, unique (`user_id`, `client_key`), `status` (§16), `production_stage` 1–4, `order_type`, `has_message`, `qr_lang`, `recipient_type`, `recipient` jsonb, `payment_method`, `payment_status`, giá chốt (`subtotal`, `discount`, `shipping_fee`, `vat`, `total`), `payment_expires_at`, `checkout_url`, `paid_*`, `flags text[]`, `tracking_code`, `cancel_*`, `refund_*` | Tạo qua RPC `create_order(p_order, p_items)` |
+| `order_items` | `order_id`, `product_id` (set null khi xoá sản phẩm), `product_slug`, `product_name` jsonb, `unit_price`, `quantity`, `line_total`, `batch_id` | BR-PRC-002, §21.6 |
+| `payment_events` | unique (`provider`, `reference`) | BR-PAY-002 |
+| `audit_log` | `at`, `actor_id`, `actor_role`, `entity` (order/coupon/shop), `entity_id`, `action`, `old_value`, `new_value` | NFR-AUD-001 |
 | `chat_messages` | `user_id`, `session_id`, `role`, `kind`, `content`, `lang` | Lịch sử chat người đã đăng nhập (D-19) |
 | `may_counters` | `key` (đã băm), `count`, `expires_at` | Hạn mức §22.4; RPC `may_increment` |
 | `may_usage` | `month`, `requests`, tokens, `cost_usd` | Ngân sách (D-58); RPC `may_add_usage` |
@@ -181,6 +202,20 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET | `/api/cart?lang=` | Bearer | Giỏ tài khoản |
 | PUT/DELETE | `/api/cart/items/:slug` | Bearer | `{ quantity }` 1..10 |
 | POST | `/api/cart/merge` | Bearer | Gộp giỏ trình duyệt (D-59) |
+| POST | `/api/checkout/quote?lang=` | Bearer | `{ couponCode?, recipientType }` → `{ items, pricing, coupon, couponError, cod, payosAvailable, shop }` |
+| POST | `/api/orders?lang=` | Bearer | `{ orderType, addMessage?, qrLang?, recipientType, recipient, paymentMethod, couponCode?, clientKey, expectedTotal }` → 201 `{ order, checkoutUrl }`; 409 `PRICE_CHANGED`, `CART_EMPTY`, `CART_HAS_UNAVAILABLE`, `COUPON_*`, `COD_*`, `PAYOS_UNAVAILABLE`; 502 `PAYMENT_UNAVAILABLE` |
+| GET | `/api/orders?lang=`, `/api/orders/:id?lang=` | Bearer | Đơn của mình (đơn chờ thanh toán được đối soát payOS) |
+| POST | `/api/orders/:id/cancel`, `/api/orders/:id/pay` | Bearer | Huỷ trước SHIPPED / lấy lại link thanh toán |
+| POST | `/api/payments/payos/webhook` | Chữ ký payOS | Nguồn sự thật xác nhận đơn (BR-PAY-001); được phép khi bảo trì |
+| GET/POST | `/api/dev/payos/:orderCode[/pay\|/cancel]` | – | Chỉ khi dùng payOS giả lập (T-25) |
+| GET/PUT | `/api/admin/shop` | Admin | `{ shippingFee, freeShippingFrom, codMaxTotal }` (null = tắt) |
+| GET/POST | `/api/admin/coupons` | Admin | 409 `COUPON_CODE_TAKEN` |
+| PATCH/DELETE | `/api/admin/coupons/:id` | Admin | Xoá coupon đã dùng: 409 `COUPON_IN_USE` |
+| GET | `/api/admin/coupons/:id/history` | Admin | Nhật ký coupon |
+| GET | `/api/admin/orders?status=\|flagged=1` | Admin | Danh sách (tối đa 200) |
+| GET | `/api/admin/orders/:id` | Admin | `{ item, history }` |
+| POST | `/api/admin/orders/:id/actions/:action` | Admin | `start_production`, `set_stage {stage}`, `pack`, `ship {trackingCode}`, `set_tracking`, `deliver`, `delivery_failed`, `cancel`, `cod_collected`, `refund {amount, note}` |
+| PUT | `/api/admin/orders/:id/items/:itemId/batch` | Admin | `{ batchId \| null }` |
 | POST | `/api/may/chat` | Tuỳ chọn | `{ message, lang, sessionId, history }` → `{ reply: { kind: answer\|resting\|tired\|sick\|unknown, text, faq? } }` |
 | GET | `/api/may/history` | Bearer | Lịch sử chat của mình |
 | GET/PUT | `/api/admin/may/config` | Admin, IT | Cấu hình Mây |

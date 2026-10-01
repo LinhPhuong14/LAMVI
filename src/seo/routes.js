@@ -2,7 +2,7 @@
 import { splitLocale } from '../i18n/core.js'
 
 // Trang riêng tư: không SSR nội dung, chỉ trả khung HTML + noindex (BR-SEO-001)
-const PRIVATE = ['/login', '/register', '/forgot-password', '/reset-password', '/account', '/cart']
+const PRIVATE = ['/login', '/register', '/forgot-password', '/reset-password', '/account', '/cart', '/checkout']
 
 const seg = (s) => {
   try {
@@ -17,7 +17,7 @@ export function classifyPath(pathname) {
   if (/^\/(admin|it)(\/|$)/.test(pathname)) return { kind: 'private', lang: 'vi' }
   const { lang, rest } = splitLocale(pathname)
   const path = rest.length > 1 ? rest.replace(/\/+$/, '') : rest
-  if (PRIVATE.includes(path)) return { kind: 'private', lang }
+  if (PRIVATE.includes(path) || path.startsWith('/account/')) return { kind: 'private', lang }
   if (path === '/') return { kind: 'home', lang }
   let m = path.match(/^\/products\/([^/]+)$/)
   if (m) return seg(m[1]) === null ? { kind: 'invalid', lang } : { kind: 'product', lang, slug: seg(m[1]) }

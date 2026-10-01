@@ -4,6 +4,9 @@ import { createWeb } from './ssr.js'
 import { createMetrics } from './monitoring/metrics.js'
 import { createMaintenance } from './monitoring/maintenance.js'
 import { createMayService } from './may/service.js'
+import { createOrderService } from './orders/service.js'
+import { createPayos } from './payments/payos.js'
+import { createFakePayos } from './payments/fakePayos.js'
 import { createOpenAiClient } from './adapters/openai.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { loadConfig } from './config.js'
@@ -56,9 +59,16 @@ const may = createMayService({
   priceOutPer1M: config.openai.priceOutPer1M,
   hashSalt: config.mayHashSalt,
 })
+const payosReady = Boolean(config.payos.clientId && config.payos.apiKey && config.payos.checksumKey)
+// Thiếu PAYOS_*: dev → payOS giả lập (T-25); production → tắt payOS, chỉ còn COD
+if (!payosReady) console.warn(dev ? '[api] Thiếu PAYOS_* — dùng payOS giả lập tại /api/dev/payos/:mã đơn' : '[api] Thiếu PAYOS_* — tắt thanh toán payOS')
+const payments = payosReady ? createPayos(config.payos) : dev ? createFakePayos({ publicSiteUrl: config.publicSiteUrl }) : null
+const orders = createOrderService({ repo, payments, publicSiteUrl: config.publicSiteUrl })
 const web = process.env.API_ONLY === '1' ? undefined : await createWeb({ repo, config, dev, maintenance })
 
 metrics.start()
+// BR-PAY-003: dọn đơn payOS quá hạn mỗi phút
+setInterval(() => orders.sweepExpired().catch((err) => console.error('[orders] sweep', err?.message ?? err)), 60_000).unref()
 // Ghi nốt số liệu chưa flush khi tắt server
 for (const sig of ['SIGTERM', 'SIGINT']) {
   process.once(sig, async () => {
@@ -67,6 +77,6 @@ for (const sig of ['SIGTERM', 'SIGINT']) {
   })
 }
 
-createApp({ repo, auth, storage, web, config, metrics, maintenance, may }).listen(config.port, () => {
+createApp({ repo, auth, storage, web, config, metrics, maintenance, may, payments, orders }).listen(config.port, () => {
   console.log(`[web+api] http://localhost:${config.port}`)
 })

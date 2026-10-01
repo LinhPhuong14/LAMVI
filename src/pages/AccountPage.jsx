@@ -5,6 +5,7 @@ import { LOCALES, useI18n } from '../i18n/index.js'
 import Seo from '../seo/Seo.jsx'
 import { useAuth } from '../auth/context.js'
 import { useSubmit } from '../auth/useForm.js'
+import { OrderList } from './OrderPage.jsx'
 
 function ProfileForm({ profile, onSaved, initiallySaved = false }) {
   const { t } = useI18n()
@@ -91,7 +92,7 @@ function MayHistory() {
   )
 }
 
-// FR-ACC-001/002: trang tài khoản (dashboard); đơn hàng làm ở giai đoạn sau
+// FR-ACC-001/002: trang tài khoản (dashboard)
 export default function AccountPage() {
   const { t, path } = useI18n()
   const { user, authedApi, logout } = useAuth()
@@ -144,7 +145,7 @@ export default function AccountPage() {
       </div>
       <div className="account-card">
         <h2>{t('account.orders')}</h2>
-        <p>{t('account.ordersSoon')}</p>
+        <OrderList />
       </div>
       <MayHistory />
       <button className="btn btn-ghost" type="button" onClick={onLogout}>

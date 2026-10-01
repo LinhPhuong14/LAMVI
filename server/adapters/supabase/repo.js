@@ -51,6 +51,47 @@ const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', priceExclVa
 const FAQ_COLS = { sortOrder: 'sort_order', isPublished: 'is_published', question: 'question', answer: 'answer' }
 const BATCH_COLS = { code: 'code', status: 'status', videoUrl: 'video_url', videoPath: 'video_path', producedOn: 'produced_on', title: 'title', story: 'story' }
 
+const COUPON_COLS = {
+  code: 'code', status: 'status', type: 'type', value: 'value', maxDiscount: 'max_discount', minOrder: 'min_order',
+  startsAt: 'starts_at', endsAt: 'ends_at', usageLimit: 'usage_limit', perUserLimit: 'per_user_limit', productIds: 'product_ids', note: 'note',
+}
+const ORDER_COLS = {
+  userId: 'user_id', clientKey: 'client_key', status: 'status', productionStage: 'production_stage', orderType: 'order_type',
+  hasMessage: 'has_message', qrLang: 'qr_lang', recipientType: 'recipient_type', recipient: 'recipient', paymentMethod: 'payment_method',
+  paymentStatus: 'payment_status', couponId: 'coupon_id', couponCode: 'coupon_code', subtotal: 'subtotal', discount: 'discount',
+  shippingFee: 'shipping_fee', vat: 'vat', total: 'total', paymentExpiresAt: 'payment_expires_at', paymentLinkId: 'payment_link_id',
+  checkoutUrl: 'checkout_url', paidAt: 'paid_at', paidAmount: 'paid_amount', paymentRef: 'payment_ref', flags: 'flags',
+  trackingCode: 'tracking_code', cancelledAt: 'cancelled_at', cancelReason: 'cancel_reason', codCollectedAt: 'cod_collected_at',
+  refundedAt: 'refunded_at', refundedAmount: 'refunded_amount', refundNote: 'refund_note',
+}
+const ITEM_COLS = { productId: 'product_id', productSlug: 'product_slug', productName: 'product_name', unitPrice: 'unit_price', quantity: 'quantity', lineTotal: 'line_total', batchId: 'batch_id' }
+
+// timestamptz của Postgres → ISO (so sánh chuỗi với thời điểm của server)
+const isoOrNull = (v) => (v ? new Date(v).toISOString() : null)
+const fromRow = (r, cols) => {
+  const o = {}
+  for (const [k, col] of Object.entries(cols)) o[k] = r[col] ?? null
+  return o
+}
+const toCoupon = (r) => {
+  const c = { id: r.id, ...fromRow(r, COUPON_COLS), createdAt: r.created_at, updatedAt: r.updated_at }
+  c.startsAt = isoOrNull(c.startsAt)
+  c.endsAt = isoOrNull(c.endsAt)
+  return c
+}
+const toItem = (r) => ({ id: r.id, orderId: r.order_id, ...fromRow(r, ITEM_COLS) })
+const toOrder = (r) => {
+  const o = { id: r.id, code: Number(r.code), ...fromRow(r, ORDER_COLS), createdAt: isoOrNull(r.created_at), updatedAt: isoOrNull(r.updated_at) }
+  for (const k of ['paymentExpiresAt', 'paidAt', 'cancelledAt', 'codCollectedAt', 'refundedAt']) o[k] = isoOrNull(o[k])
+  o.flags = o.flags ?? []
+  o.hasMessage = Boolean(o.hasMessage)
+  o.items = (r.order_items ?? []).map(toItem)
+  return o
+}
+const ORDER_SELECT = '*, order_items(*)'
+// Lỗi nghiệp vụ do create_order() raise
+const ORDER_RPC_ERRORS = ['COUPON_INVALID', 'COUPON_USED_UP', 'COUPON_USER_LIMIT']
+
 const toUsage = (r) => ({
   month: r.month,
   requests: r.requests,
@@ -66,10 +107,14 @@ function toRow(obj, cols) {
 }
 
 // 23505 = unique_violation của Postgres
-const UNIQUE_FIELD = { products_slug_key: 'slug', batches_code_key: 'code' }
+const UNIQUE_FIELD = { products_slug_key: 'slug', batches_code_key: 'code', coupons_code_key: 'code', orders_user_id_client_key_key: 'clientKey' }
 
 function unwrap({ data, error }) {
   if (error) {
+    const rpc = ORDER_RPC_ERRORS.find((c) => error.message === c)
+    if (rpc) throw new RepoError(rpc)
+    // 23503 = foreign_key_violation (vd xoá coupon đã có đơn)
+    if (error.code === '23503') throw new RepoError('IN_USE')
     if (error.code === '23505') {
       const constraint = Object.keys(UNIQUE_FIELD).find((c) => error.message?.includes(c))
       throw new RepoError('CONFLICT', UNIQUE_FIELD[constraint])
@@ -148,6 +193,103 @@ export function createSupabaseRepo(client) {
     },
     async removeCartItem(userId, productId) {
       unwrap(await client.from('cart_items').delete().eq('user_id', userId).eq('product_id', productId))
+    },
+
+    // --- Nhật ký (NFR-AUD-001)
+    async appendAudit(r) {
+      unwrap(
+        await client.from('audit_log').insert({
+          at: r.at, actor_id: r.actorId, actor_role: r.actorRole, entity: r.entity, entity_id: r.entityId, action: r.action, old_value: r.oldValue, new_value: r.newValue,
+        }),
+      )
+    },
+    async listAudit({ entity, entityId, limit = 200 }) {
+      const rows = unwrap(
+        await client.from('audit_log').select('*').eq('entity', entity).eq('entity_id', entityId).order('at', { ascending: false }).order('id', { ascending: false }).limit(limit),
+      )
+      return rows.map((r) => ({
+        id: r.id, at: new Date(r.at).toISOString(), actorId: r.actor_id, actorRole: r.actor_role, entity: r.entity, entityId: r.entity_id, action: r.action, oldValue: r.old_value, newValue: r.new_value,
+      }))
+    },
+
+    // --- Coupon (§14)
+    async listCoupons() {
+      return unwrap(await client.from('coupons').select('*').order('created_at', { ascending: false })).map(toCoupon)
+    },
+    getCouponById: (id) => one('coupons', id, toCoupon),
+    async getCouponByCode(code) {
+      const row = unwrap(await client.from('coupons').select('*').eq('code', code).maybeSingle())
+      return row ? toCoupon(row) : null
+    },
+    createCoupon: (c) => insert('coupons', toRow(c, COUPON_COLS), toCoupon),
+    updateCoupon: (id, c) => patch('coupons', id, toRow(c, COUPON_COLS), toCoupon),
+    deleteCoupon: (id) => del('coupons', id),
+    // D-68: lượt đã dùng = đơn chưa huỷ có coupon
+    async countCouponUses(couponId, userId) {
+      const base = () => client.from('orders').select('id', { count: 'exact', head: true }).eq('coupon_id', couponId).neq('status', 'CANCELLED')
+      const total = (await base()).count
+      const byUser = userId ? (await base().eq('user_id', userId)).count : 0
+      for (const r of [total, byUser]) if (r === null || r === undefined) throw new Error('countCouponUses failed')
+      return { total, byUser }
+    },
+
+    // --- Đơn hàng (§16)
+    async createOrder(order, items) {
+      const id = unwrap(
+        await client.rpc('create_order', {
+          p_order: toRow(order, ORDER_COLS),
+          p_items: items.map((i) => toRow(i, ITEM_COLS)),
+        }),
+      )
+      return toOrder(unwrap(await client.from('orders').select(ORDER_SELECT).eq('id', id).single()))
+    },
+    async getOrderById(id) {
+      const r = unwrap(await client.from('orders').select(ORDER_SELECT).eq('id', id).maybeSingle())
+      return r ? toOrder(r) : null
+    },
+    async getOrderByCode(code) {
+      const r = unwrap(await client.from('orders').select(ORDER_SELECT).eq('code', code).maybeSingle())
+      return r ? toOrder(r) : null
+    },
+    async getOrderByClientKey(userId, clientKey) {
+      const r = unwrap(await client.from('orders').select(ORDER_SELECT).eq('user_id', userId).eq('client_key', clientKey).maybeSingle())
+      return r ? toOrder(r) : null
+    },
+    async listOrdersByUser(userId) {
+      return unwrap(
+        await client.from('orders').select(ORDER_SELECT).eq('user_id', userId).order('created_at', { ascending: false }).order('code', { ascending: false }),
+      ).map(toOrder)
+    },
+    async listOrders({ status, limit = 200 } = {}) {
+      let q = client.from('orders').select(ORDER_SELECT).order('created_at', { ascending: false }).order('code', { ascending: false }).limit(limit)
+      if (status) q = q.eq('status', status)
+      return unwrap(await q).map(toOrder)
+    },
+    async listExpiredPendingOrders(before) {
+      return unwrap(
+        await client.from('orders').select(ORDER_SELECT).eq('status', 'PENDING_PAYMENT').lte('payment_expires_at', before).limit(100),
+      ).map(toOrder)
+    },
+    // Cập nhật có điều kiện theo trạng thái hiện tại (compare-and-set)
+    async updateOrder(id, values, fromStatuses) {
+      let q = client.from('orders').update(toRow(values, ORDER_COLS)).eq('id', id)
+      if (fromStatuses) q = q.in('status', fromStatuses)
+      const rows = unwrap(await q.select('id'))
+      if (!rows.length) return null
+      return toOrder(unwrap(await client.from('orders').select(ORDER_SELECT).eq('id', id).single()))
+    },
+    async updateOrderItem(orderId, itemId, values) {
+      const rows = unwrap(await client.from('order_items').update(toRow(values, ITEM_COLS)).eq('id', itemId).eq('order_id', orderId).select('*'))
+      return rows.length ? toItem(rows[0]) : null
+    },
+    async recordPaymentEvent({ provider, reference, orderCode, payload }) {
+      const { error } = await client.from('payment_events').insert({ provider, reference, order_code: orderCode ?? null, payload })
+      if (error?.code === '23505') return false
+      if (error) throw error
+      return true
+    },
+    async deletePaymentEvent(provider, reference) {
+      unwrap(await client.from('payment_events').delete().eq('provider', provider).eq('reference', reference))
     },
 
     // --- Mây (FR-AI-*)

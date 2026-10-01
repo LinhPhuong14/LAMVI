@@ -180,8 +180,8 @@ describe('Header và ngôn ngữ', () => {
   })
 })
 
-describe('Thanh toán (D-61, US-001 AC-003)', () => {
-  it('chưa đăng nhập: /en/cart → login?next=/en/cart → đăng nhập → quay lại /en/cart, giỏ được gộp', async () => {
+describe('Thanh toán (FR-CHK-001, US-001 AC-003)', () => {
+  it('chưa đăng nhập: /en/cart → login?next=/en/checkout → đăng nhập → vào checkout, giỏ được gộp', async () => {
     localStorage.setItem('moc.cart', JSON.stringify([{ slug: 'den-nguyet', quantity: 2 }]))
     const srv = fakeServer()
     await srv.cart.setQuantity('u1', 'den-nguyet', 1, 'en')
@@ -190,11 +190,11 @@ describe('Thanh toán (D-61, US-001 AC-003)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Checkout' }))
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
     // Liên kết Đăng ký giữ next
-    expect(screen.getByRole('link', { name: /create|register|sign up/i }).getAttribute('href')).toContain('next=%2Fen%2Fcart')
+    expect(screen.getByRole('link', { name: /create|register|sign up/i }).getAttribute('href')).toContain('next=%2Fen%2Fcheckout')
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'an@moc.test' } })
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'matkhau123' } })
     fireEvent.click(screen.getByRole('button', { name: 'Sign in' }))
-    expect(await screen.findByRole('heading', { name: 'Cart' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Checkout' })).toBeInTheDocument()
     expect(await screen.findByRole('link', { name: 'Cart (3)' })).toHaveAttribute('href', '/en/cart')
     expect(srv.log.filter((l) => l.key === 'merge').map((l) => l.body)).toEqual([{ items: [{ slug: 'den-nguyet', quantity: 2 }] }])
     expect(srv.log.find((l) => l.key === 'merge').url).toContain('lang=en')
@@ -238,15 +238,15 @@ describe('Thanh toán (D-61, US-001 AC-003)', () => {
     expect(screen.getAllByText('Sản phẩm này hiện không còn bán — vui lòng xoá khỏi giỏ.')).toHaveLength(2)
   })
 
-  it('đã đăng nhập: bấm Thanh toán → báo sắp ra mắt, không điều hướng', async () => {
+  it('đã đăng nhập: bấm Thanh toán → sang trang checkout', async () => {
     localStorage.setItem('moc.session', JSON.stringify(session))
     const srv = fakeServer()
     await srv.cart.setQuantity('u1', 'den-nguyet', 1, 'vi')
     mockApi(srv.handlers)
     renderAt('/cart')
     fireEvent.click(await screen.findByRole('button', { name: 'Thanh toán' }))
-    expect(await screen.findByText('Thanh toán trực tuyến sẽ sớm ra mắt. Giỏ hàng của bạn đã được lưu.')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Giỏ hàng' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Thanh toán' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Giỏ hàng' })).toBeNull()
   })
 })
 

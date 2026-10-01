@@ -53,6 +53,9 @@ function Gate() {
         <span className="nav-mark">MỘC</span>
         <strong>{S.title}</strong>
         <nav>
+          <NavLink to="/admin/orders">{S.nav.orders}</NavLink>
+          <NavLink to="/admin/coupons">{S.nav.coupons}</NavLink>
+          <NavLink to="/admin/shop">{S.nav.shop}</NavLink>
           <NavLink to="/admin/products">{S.nav.products}</NavLink>
           <NavLink to="/admin/faq">{S.nav.faq}</NavLink>
           <NavLink to="/admin/batches">{S.nav.batches}</NavLink>

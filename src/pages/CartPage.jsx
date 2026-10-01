@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Lantern from '../components/Lantern'
 import Price from '../components/Price'
@@ -14,12 +13,11 @@ export default function CartPage() {
   const { user } = useAuth()
   const { cart, error, setQuantity, remove } = useCart()
   const navigate = useNavigate()
-  const [soon, setSoon] = useState(false)
 
-  // D-61: chưa đăng nhập → đăng nhập rồi quay lại giỏ (US-001 AC-003); đã đăng nhập → báo sắp ra mắt
+  // FR-CHK-001, US-001 AC-003: chưa đăng nhập → đăng nhập rồi vào checkout, giỏ còn nguyên
   function onCheckout() {
-    if (!user) return navigate(`${path('/login')}?next=${encodeURIComponent(path('/cart'))}`)
-    setSoon(true)
+    if (!user) return navigate(`${path('/login')}?next=${encodeURIComponent(path('/checkout'))}`)
+    navigate(path('/checkout'))
   }
 
   const head = (
@@ -102,14 +100,9 @@ export default function CartPage() {
         </div>
         <p className="field-hint">{t('cart.shippingNote')}</p>
         {!user && <p className="field-hint">{t('cart.guestNote')}</p>}
-        <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0}>
+        <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0 || cart.hasUnavailable}>
           {t('cart.checkout')}
         </button>
-        {soon && (
-          <p className="notice" role="status">
-            {t('cart.checkoutSoon')}
-          </p>
-        )}
       </div>
     </section>
   )

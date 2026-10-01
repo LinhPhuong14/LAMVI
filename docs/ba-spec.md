@@ -2,10 +2,10 @@
 
 | Mục | Giá trị |
 |---|---|
-| Phiên bản | v0.7 (bản nháp) |
-| Ngày | 2026-09-29 |
+| Phiên bản | v0.8 (bản nháp) |
+| Ngày | 2026-10-01 |
 | Trạng thái | PO đã duyệt toàn bộ `[PROPOSAL]`/`[ASSUMPTION]` của v0.1 (D-41). Còn chờ PO các mục `[BA DECISION REQUIRED]`; giả định phát sinh từ v0.2 gắn `[ASSUMPTION]` |
-| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng |
+| Lịch sử | v0.2 (nhánh `fix/web-copy-ba-spec`): sửa câu chữ web theo §31.3, đợt 1. v0.2 (nhánh `feat/foundation-web`): D-37…D-44, nền tảng (catalog, FAQ, i18n, tài khoản, trang QR lô). v0.3: gộp hai nhánh v0.2, D-45…D-48, admin sản phẩm/FAQ/lô. v0.4: D-49, D-50, SEO (SSR, hreflang, sitemap, JSON-LD). v0.5: D-51…D-54, vai trò IT + dashboard IT (sức khoẻ, số liệu API, bảo trì). v0.6: D-55…D-58, AI Mây (chat, FAQ offline, tour, cấu hình). v0.7: D-59…D-61, giỏ hàng. v0.8: D-62…D-72, checkout, đơn hàng, coupon, payOS, admin đơn/coupon/phí ship, nhật ký kiểm toán |
 | Phạm vi | **Chỉ hệ thống web** (storefront, tài khoản, trang QR, AI Mây, admin). Vận hành xưởng, kho, vận chuyển nằm ngoài phạm vi (D-34). |
 
 **Quy ước nhãn**
@@ -313,8 +313,8 @@ Vận hành xưởng ngoài phạm vi (D-34). Ở tầng web chỉ cần một q
 | Số lượng tối đa mỗi dòng | **10** `[CONFIRMED]` D-60. Tối đa 50 dòng mỗi giỏ `[ASSUMPTION]` |
 | Lưu giỏ | Giỏ của user đã đăng nhập lưu trên server, đồng bộ giữa các thiết bị `[CONFIRMED]` D-41 |
 | Giá giỏ của vãng lai | Server tính lại từ mã sản phẩm + số lượng; không nhận giá từ trình duyệt `[DERIVED]` §12 |
-| Tạm tính | Σ(giá hiện hành chưa VAT × số lượng) của dòng còn bán; ghi "Phí vận chuyển và VAT được tính ở bước thanh toán" (chờ Q-09, Q-11) `[ASSUMPTION]` |
-| Nút Thanh toán (chưa có checkout) | Chưa đăng nhập → đăng nhập rồi quay lại giỏ, giỏ còn nguyên (US-001 AC-003); đã đăng nhập → báo "Thanh toán trực tuyến sẽ sớm ra mắt" `[CONFIRMED]` D-61 |
+| Tạm tính | Σ(giá hiện hành chưa VAT × số lượng) của dòng còn bán; ghi "Phí vận chuyển và VAT được tính ở bước thanh toán" (VAT D-62, phí ship D-63 tính ở checkout) `[ASSUMPTION]` |
+| Nút Thanh toán | Chưa đăng nhập → đăng nhập rồi vào checkout, giỏ còn nguyên (US-001 AC-003); đã đăng nhập → vào `/checkout`. Giỏ có sản phẩm không còn bán → nút bị khoá tới khi xoá dòng đó (v0.8, thay D-61) `[ASSUMPTION]` |
 | Trang giỏ | `noindex` (BR-SEO-001); không SSR nội dung (phụ thuộc trình duyệt/phiên) `[DERIVED]` D-49 |
 | Bảo trì (D-54) | Thêm/sửa/xoá giỏ trả 503; xem giỏ và tính giá giỏ vãng lai vẫn chạy `[ASSUMPTION]` . Người đã đăng nhập còn giỏ trình duyệt: gộp bị 503 thì vẫn hiện giỏ tài khoản, giữ giỏ trình duyệt để gộp lần sau `[ASSUMPTION]` |
 | Sản phẩm nháp / ẩn trong giỏ vãng lai | Sản phẩm nháp bị bỏ khỏi giỏ (coi như không tồn tại, D-39); sản phẩm đã ẩn hiện "Sản phẩm không còn bán" **không kèm tên/ảnh** `[ASSUMPTION]` |
@@ -348,25 +348,40 @@ Giỏ hàng
 | Thanh toán | payOS / COD | BR-PAY-004 (COD và đơn giao người khác) | — |
 | Tạo đơn | toàn bộ trên | Kiểm tra lại giá, coupon, trạng thái sản phẩm ngay lúc tạo | Nếu giá/coupon đổi: hiện bảng giá mới, yêu cầu xác nhận lại `[CONFIRMED]` D-41 |
 
-**Thời điểm soạn lời chúc** `[BA DECISION REQUIRED]` Q-08: bắt buộc soạn trong checkout, hay cho soạn sau trong dashboard (đến hạn khóa BR-MSG-001/008)? Nếu đến lúc khóa mà chưa soạn thì sao?
+**Thời điểm soạn lời chúc** `[CONFIRMED]` D-64: tuỳ chọn ở checkout, được soạn sau trong trang đơn tới hạn khoá (BR-MSG-008 phần chữ khi PACKED, BR-MSG-001 toàn bộ khi SHIPPED). Quá hạn mà chưa soạn → đơn giao không kèm lời chúc. v0.8 chưa có trình soạn lời chúc (G-34): checkout chỉ ghi "đơn có lời chúc" + ngôn ngữ trang QR.
+
+**Quy tắc checkout bổ sung (v0.8)**
+
+| Chủ đề | Quy tắc |
+|---|---|
+| Đơn Tặng | Luôn có lời chúc (FR-CHK-003 chỉ có ô "Thêm lời chúc" cho đơn Tự mua) `[DERIVED]` BR-MSG-002 |
+| Người nhận = bản thân | Vẫn nhập tên, SĐT, địa chỉ giao; web điền sẵn tên/SĐT từ hồ sơ `[ASSUMPTION]` |
+| Địa chỉ | Bốn ô nhập tự do: tỉnh/thành, quận/huyện, phường/xã, số nhà-đường (chưa có danh mục hành chính) `[ASSUMPTION]` |
+| SĐT người nhận | Di động VN, chuẩn hoá về dạng 0xxxxxxxxx (cùng quy tắc hồ sơ) `[ASSUMPTION]` |
+| Bấm đặt hàng hai lần | Mỗi lần mở trang checkout có một khoá; gửi lại cùng khoá trả về đơn đã tạo, không tạo đơn thứ hai `[ASSUMPTION]` |
+| Giá đổi giữa chừng | Trình duyệt gửi tổng đã thấy; khác tổng tính lại ở server → báo "giá đã thay đổi", hiện bảng giá mới, khách bấm đặt lại (D-41) |
+| Sau khi tạo đơn | Các dòng đã mua bị bỏ khỏi giỏ. payOS lỗi khi tạo link → đơn bị huỷ (`payment_error`), giỏ giữ nguyên `[ASSUMPTION]` |
+| Mã coupon | Khách nhập không phân biệt hoa thường; khoảng trắng hai đầu bị bỏ `[ASSUMPTION]` |
+| Bảo trì (D-54) | Không tạo/huỷ đơn được (503); xem bảng giá checkout, xem đơn và webhook payOS vẫn chạy `[ASSUMPTION]` |
 
 ## 13. Tính giá
 
 ```text
 Tạm tính          = Σ (đơn giá chưa VAT × số lượng)
-− Giảm giá coupon  (áp trước hay sau VAT: Q-10)
-+ Phí vận chuyển   (Q-11)
-+ VAT              (thuế suất: Q-09)
+− Giảm giá coupon  (trước VAT — D-66)
++ Phí vận chuyển   (D-63; coupon miễn ship → 0)
++ VAT              (10% × (tạm tính − giảm giá), không tính trên ship — D-62)
 = Tổng thanh toán
 ```
 
 | Chủ đề | Quy tắc |
 |---|---|
 | Tiền tệ | VND, số nguyên đồng (D-32) |
-| Làm tròn | `[BA DECISION REQUIRED]` làm tròn VAT theo dòng hay theo tổng đơn |
+| Làm tròn | VAT tính một lần trên tổng đơn, làm tròn tới đồng (nửa đồng làm tròn lên); giảm % làm tròn tới đồng `[ASSUMPTION]` |
 | Hiển thị giá chưa VAT | `[LEGAL]` I-04: xác nhận quy định niêm yết giá bán lẻ; nếu được phép, mọi nơi hiện giá phải có chú thích "chưa gồm VAT" |
-| Phí vận chuyển | `[BA DECISION REQUIRED]` Q-11: cố định, theo vùng, hay miễn phí từ mức nào? Web cần công thức để tính trước khi thanh toán |
-| Giá thiệp/lời chúc | `[BA DECISION REQUIRED]` Q-12: miễn phí hay tính phí? |
+| VAT | **10%**, không tính trên phí ship `[CONFIRMED]` D-62 |
+| Phí vận chuyển | Đồng giá **30.000₫**/đơn, **miễn phí khi tạm tính ≥ 1.500.000₫**; admin sửa hai con số tại `/admin/shop` `[CONFIRMED]` D-63. Mức miễn phí so với tạm tính **trước** giảm giá `[ASSUMPTION]`. Để trống mức = không miễn phí theo mức |
+| Giá thiệp/lời chúc | **Miễn phí** `[CONFIRMED]` D-72 |
 
 ## 14. Coupon
 
@@ -387,17 +402,25 @@ Các thuộc tính sau cần PO chốt trước khi thiết kế data model:
 
 | # | Câu hỏi | Trạng thái |
 |---|---|---|
-| C-1 | Loại: giảm %, giảm số tiền, miễn phí ship? | `[BA DECISION REQUIRED]` |
-| C-2 | Giảm trước VAT hay sau VAT? | `[BA DECISION REQUIRED]` + `[LEGAL]` |
-| C-3 | Phạm vi: toàn đơn / sản phẩm cụ thể / có áp vào phí ship? | `[BA DECISION REQUIRED]` |
+| C-1 | Loại: giảm %, giảm số tiền, miễn phí ship? | **Cả ba** `[CONFIRMED]` D-65 |
+| C-2 | Giảm trước VAT hay sau VAT? | **Trước VAT** `[CONFIRMED]` D-66 — `[LEGAL]` vẫn chờ pháp chế xác nhận |
+| C-3 | Phạm vi: toàn đơn / sản phẩm cụ thể / có áp vào phí ship? | Admin chọn toàn đơn hoặc danh sách sản phẩm; giảm %/số tiền chỉ trừ vào tiền hàng của dòng áp dụng, không trừ phí ship (chỉ loại miễn ship đưa ship về 0) `[CONFIRMED]` D-67 |
 | C-4 | Mỗi đơn dùng tối đa mấy coupon? | **1** `[CONFIRMED]` D-41 |
-| C-5 | Giới hạn tổng và giới hạn mỗi user? | `[BA DECISION REQUIRED]` (vì bắt buộc tài khoản, đếm theo user là khả thi) |
-| C-6 | Có mức giảm tối đa (cho loại %)? | `[BA DECISION REQUIRED]` |
-| C-8 | Hủy đơn có trả lại lượt dùng? Đổi trả một phần thì phân bổ giảm giá thế nào? | `[BA DECISION REQUIRED]` |
+| C-5 | Giới hạn tổng và giới hạn mỗi user? | Hai giới hạn tuỳ chọn do admin đặt (trống = không giới hạn) `[CONFIRMED]` D-68 |
+| C-6 | Có mức giảm tối đa (cho loại %)? | Có, tuỳ chọn `[CONFIRMED]` D-67 |
+| C-8 | Hủy đơn có trả lại lượt dùng? Đổi trả một phần thì phân bổ giảm giá thế nào? | Huỷ đơn **trả lại lượt** (lượt = số đơn chưa huỷ dùng coupon) `[CONFIRMED]` D-68. Phân bổ khi đổi trả một phần: `[BA DECISION REQUIRED]` (làm cùng đổi trả) |
 | C-9 | Sửa/tắt coupon đang chạy ảnh hưởng đơn đang checkout thế nào? | Đề xuất: kiểm tra lại lúc tạo đơn (BR-CPN-002) `[CONFIRMED]` D-41 |
 | C-10 | Mây có được nhắc tới coupon không? | Đề xuất: **không** `[CONFIRMED]` D-41 (BR-AI-005) |
 
 **Thời điểm tính là đã dùng coupon** `[CONFIRMED]` D-41: khi đơn được tạo thành công. Đơn payOS hết hạn thanh toán thì trả lại lượt dùng.
+
+**Giả định khi làm coupon (v0.8)** `[ASSUMPTION]`:
+- Mã: chữ in hoa, số, gạch nối, tối đa 30 ký tự; mã không tồn tại và mã đang tắt báo cùng một lỗi "không hợp lệ" (không dò được mã).
+- Mức tối thiểu (`min_order`) so với tạm tính cả đơn, trước giảm giá.
+- Coupon theo danh sách sản phẩm mà giỏ không có sản phẩm nào trong danh sách → "không áp dụng"; loại miễn ship theo sản phẩm cũng cần ít nhất một sản phẩm thuộc danh sách.
+- Coupon miễn ship vẫn tính một lượt dùng kể cả khi đơn đã được miễn ship theo mức.
+- Coupon đã có đơn dùng thì không xoá được, chỉ tắt.
+- Thời gian bắt đầu/kết thúc admin nhập theo giờ máy của admin (giả định giờ Việt Nam).
 
 ## 15. Thanh toán
 
@@ -417,10 +440,12 @@ PAID → REFUND_PENDING → REFUNDED
 | Nguồn sự thật | **Webhook payOS (đã xác minh chữ ký)** là nguồn duy nhất để chuyển đơn sang CONFIRMED. Trang return URL chỉ để hiển thị, không cập nhật trạng thái. |
 | Webhook trùng | Xử lý idempotent theo mã giao dịch; lần hai không đổi gì |
 | Webhook đến chậm | Trang cảm ơn hiện "Đang chờ xác nhận thanh toán"; backend chủ động hỏi trạng thái payOS nếu quá thời gian `[CONFIRMED]` D-41 |
-| Hạn link thanh toán | `[BA DECISION REQUIRED]` Q-15 (ví dụ 15 phút?). Hết hạn → đơn CANCELLED, trả lượt coupon |
+| Hạn link thanh toán | **15 phút** `[CONFIRMED]` D-69. Hết hạn → đơn CANCELLED, trả lượt coupon. Server dọn đơn quá hạn mỗi phút và khi khách/admin mở đơn; trước khi huỷ hỏi lại payOS |
 | Thanh toán sau khi đơn đã hết hạn/hủy | Ghi nhận PAID, gắn cờ cho admin **hoàn tiền thủ công** `[CONFIRMED]` D-41 |
-| Số tiền nhận khác số tiền đơn | Không xác nhận đơn, gắn cờ cho admin `[CONFIRMED]` D-41 |
-| Hoàn tiền | `[BA DECISION REQUIRED]` Q-16: hoàn tự động qua payOS hay admin chuyển khoản thủ công rồi ghi nhận trên web? |
+| Số tiền nhận khác số tiền đơn | Không xác nhận đơn, gắn cờ cho admin `[CONFIRMED]` D-41. Đơn bị huỷ (`payment_mismatch`), chờ admin hoàn tiền; trả thừa cũng tính là lệch `[ASSUMPTION]` |
+| Hoàn tiền | **Admin chuyển khoản thủ công** rồi ghi nhận trên web (số tiền ≤ số đã nhận + ghi chú bắt buộc); web không gọi API hoàn tiền `[CONFIRMED]` D-70. Số tiền hoàn khi huỷ đơn đã làm vẫn chờ Q-20 |
+| Khách thoát trang payOS | Đơn vẫn chờ tới hết hạn; khách thanh toán lại hoặc huỷ trong trang đơn `[ASSUMPTION]` |
+| Chưa cấu hình payOS | Production: tắt thanh toán payOS, chỉ còn COD. Dev: payOS giả lập (T-25) `[ASSUMPTION]` |
 
 Chi tiết API (tên trạng thái, cơ chế chữ ký, hạn link) theo tài liệu payOS — tech lead xác nhận.
 
@@ -432,7 +457,7 @@ Chi tiết API (tên trạng thái, cơ chế chữ ký, hạn link) theo tài l
 | Ghi nhận thu tiền | Admin đánh dấu "Đã thu COD" khi giao thành công |
 | Giao thất bại / từ chối nhận | Admin chuyển đơn sang DELIVERY_FAILED `[CONFIRMED]` D-41 — xử lý tiếp là vận hành |
 | COD + giao cho người khác (quà) | **Chặn COD** khi người nhận là người khác (BR-PAY-004) `[CONFIRMED]` D-41 |
-| Giới hạn giá trị COD | `[BA DECISION REQUIRED]` |
+| Giới hạn giá trị COD | Admin đặt mức tối đa tổng đơn (mặc định 5.000.000₫; trống = không giới hạn) `[CONFIRMED]` D-71 |
 
 ## 16. Vòng đời đơn hàng
 
@@ -469,14 +494,23 @@ PENDING_PAYMENT ──(webhook PAID)──▶ CONFIRMED
 
 Lưu ý: **nút "Tôi đã nhận được quà" trên trang QR không đổi trạng thái đơn** `[CONFIRMED]` D-41 — tránh hai nguồn sự thật cho DELIVERED (xem I-19a, Q-18).
 
-`[BA DECISION REQUIRED]` Q-20: hủy đơn đã thanh toán ở IN_PRODUCTION/PACKED có hoàn 100% không?
+`[BA DECISION REQUIRED]` Q-20: hủy đơn đã thanh toán ở IN_PRODUCTION/PACKED có hoàn 100% không? (v0.8: đơn chuyển "chờ hoàn tiền", admin nhập số tiền thực hoàn — D-70.)
+
+**Quy tắc admin chuyển trạng thái (v0.8)** `[ASSUMPTION]`:
+- CONFIRMED → IN_PRODUCTION (công đoạn 1) → cập nhật công đoạn 1–4 (đi lùi được) → PACKED (không bắt buộc đang ở công đoạn 4) → SHIPPED (bắt buộc mã vận đơn 4–40 ký tự, chữ/số/gạch nối, và mọi dòng đã gán lô có video xuất bản — BR-ORD-002) → DELIVERED hoặc DELIVERY_FAILED.
+- Gán lô cho dòng hàng được từ CONFIRMED tới PACKED; lô đã gán cho đơn không xoá được.
+- Sửa mã vận đơn được khi SHIPPED/DELIVERY_FAILED. "Đã thu COD" khi SHIPPED/DELIVERED.
+- DELIVERY_FAILED chưa có thao tác tiếp (giao lại/huỷ là vận hành).
+- Hai người cùng đổi một đơn: thao tác đến sau báo "trạng thái vừa thay đổi".
+- Mọi thay đổi trạng thái đơn, thanh toán, hoàn tiền, gán lô, coupon, cấu hình phí ghi nhật ký (NFR-AUD-001): ai, khi nào, giá trị cũ/mới.
+- Đơn là chứng từ: tài khoản có đơn không bị xoá dây chuyền đơn.
 
 ## 17. Vận chuyển (phần web)
 
 - Chỉ giao trong Việt Nam (D-32). Form địa chỉ theo cấu trúc tỉnh/quận/phường VN `[CONFIRMED]` D-41.
 - Người nhận = bản thân hoặc người khác (D-02). Đơn giao người khác: **không in giá trong kiện** `[BA DECISION REQUIRED]` Q-21 — việc in là vận hành, nhưng web có thể cần tạo phiếu không giá.
 - Mã vận đơn: admin nhập tay, khách xem trong dashboard `[CONFIRMED]` D-41.
-- Phí ship: Q-11.
+- Phí ship: D-63.
 
 ## 18. Đổi trả & hoàn tiền
 
@@ -509,7 +543,7 @@ Ngoài phạm vi. **Lưu ý**: phần testimonial trên trang chủ (`src/App.js
 |---|---|---|---|
 | Đơn được xác nhận | Người mua | `[BA DECISION REQUIRED]` Q-24 | Ngay |
 | Thanh toán payOS thất bại/hết hạn | Người mua | Q-24 | Ngay |
-| Nhắc soạn lời chúc (nếu chưa soạn) | Người mua | Q-24 | Q-08 |
+| Nhắc soạn lời chúc (nếu chưa soạn) | Người mua | Q-24 | Trước PACKED (D-64) |
 | Nhắc khóa lời chúc sắp đến (PACKED/SHIPPED) | Người mua | Q-24 | `[BA DECISION REQUIRED]` |
 | Đơn đã gửi (kèm mã vận đơn) | Người mua | Q-24 | Ngay |
 | Đơn bị hủy / hoàn tiền | Người mua | Q-24 | Ngay |
@@ -789,7 +823,7 @@ Là người mua, tôi muốn thanh toán qua payOS để đơn được xác nh
 - AC-001: Given đơn PENDING_PAYMENT, When payOS gửi webhook PAID hợp lệ với số tiền khớp, Then đơn chuyển CONFIRMED đúng một lần.
 - AC-002: Given khách quay về return URL trước khi có webhook, Then trang hiện "Đang chờ xác nhận thanh toán", đơn vẫn PENDING_PAYMENT.
 - AC-003: Given webhook đến hai lần cùng mã giao dịch, Then lần hai không đổi trạng thái, không gửi thông báo lần hai.
-- AC-004: Given quá hạn thanh toán (Q-15), Then đơn CANCELLED và lượt coupon được trả lại.
+- AC-004: Given quá hạn thanh toán (15 phút — D-69), Then đơn CANCELLED và lượt coupon được trả lại.
 
 **US-003 — Soạn lời chúc**
 Là người mua, tôi muốn ghi lời chúc bằng chữ, giọng nói hoặc video để người nhận xem khi quét QR.
@@ -911,7 +945,7 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | Thanh toán | COD, người nhận là người khác | Chặn COD | BR-PAY-004, D-41 |
 | Đơn | Khách hủy cùng lúc admin chuyển SHIPPED | Thao tác đến sau bị từ chối | `[DERIVED]` |
 | Đơn | Hủy đơn đã PAID đang IN_PRODUCTION | Hoàn bao nhiêu? | Q-20 |
-| Lời chúc | Chưa soạn lời chúc khi đơn tới PACKED/SHIPPED | ? | Q-08 |
+| Lời chúc | Chưa soạn lời chúc khi đơn tới PACKED/SHIPPED | Giao không kèm lời chúc | `[CONFIRMED]` D-64 |
 | Lời chúc | Sửa chữ sau khi thiệp đã viết | Chặn từ PACKED | `[CONFIRMED]` D-41 BR-MSG-008 |
 | QR | Nhân viên/người mua quét thử | Không bắt đầu đếm ngược (chưa bấm xác nhận) | D-26 |
 | QR | App chat tự mở link để tạo preview | Không bắt đầu đếm ngược (cần bấm nút) | D-26 |
@@ -986,20 +1020,15 @@ Là khách, tôi muốn hỏi Mây tình trạng đơn của mình.
 | ID | Câu hỏi | Ảnh hưởng |
 |---|---|---|
 | Q-05 | Ba đèn trong bộ Sum Vầy là sản phẩm nào, giá lẻ bao nhiêu? | Catalog, data model |
-| Q-09 | Thuế suất VAT? VAT có tính trên phí ship? | Tính giá |
-| Q-11 | Công thức phí ship? | Checkout |
-| Q-10, C-1…C-3, C-5 | Thiết kế coupon (C-4 đã chốt: 1 coupon/đơn, D-41) | Data model, tính giá |
-| Q-15 | Hạn link thanh toán payOS? | Vòng đời đơn |
-| Q-16 | Hoàn tiền payOS: tự động hay thủ công? | Thanh toán |
-| Q-08 | Soạn lời chúc lúc nào; chưa soạn khi tới hạn khóa thì sao? | Checkout, lời chúc |
 | Q-26 | Media lưu bao lâu nếu không ai xác nhận? | Lưu trữ |
-| I-04, I-14 | `[LEGAL]` niêm yết giá chưa VAT; chuyển dữ liệu sang OpenAI | Pháp lý |
+| I-04, I-14, C-2 | `[LEGAL]` niêm yết giá chưa VAT; chuyển dữ liệu sang OpenAI; giảm giá trước VAT (D-66) | Pháp lý |
 
 ### P1 — trước khi làm tính năng liên quan
 | ID | Câu hỏi |
 |---|---|
 | Q-06 | Hoàn tiền khi trả một đèn trong bộ |
-| Q-12 | Thiệp/lời chúc có tính phí? |
+| C-8b | Đổi trả một phần: phân bổ giảm giá coupon thế nào |
+| Q-36 | Giới hạn ký tự lời chúc, thời lượng/dung lượng giọng nói/video (§21.5) — cần để làm trình soạn lời chúc (D-64) |
 | Q-14 | Admin có xem/kiểm duyệt lời chúc? |
 | Q-19 | Thời hạn đổi trả, tính từ mốc nào |
 | Q-20 | Hoàn bao nhiêu khi hủy đơn đã PAID ở IN_PRODUCTION/PACKED |
@@ -1047,14 +1076,14 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 |---|---|---|---|---|
 | G-01 | Catalog từ DB, giá dạng số | Bảng `products`, giá số nguyên VND; `GET /api/products` (`server/routes/catalog.js`) | — | **Đã xử lý** (v0.2) |
 | G-02 | Giỏ hàng | `/cart`, `/api/cart/*`, thêm vào giỏ ở thẻ + trang chi tiết (FR-CART-001, D-59…D-61) | — | **Đã xử lý** (v0.7) |
-| G-03 | Tài khoản, checkout, thanh toán, đơn | Đã có backend Express + Supabase, routing, tài khoản (FR-ACC-001). Chưa có checkout, thanh toán, đơn | Missing | **Một phần** |
+| G-03 | Tài khoản, checkout, thanh toán, đơn | `/checkout`, `/account/orders/:id`, `/api/checkout/quote`, `/api/orders/*`, webhook payOS, đơn hết hạn, huỷ đơn (FR-CHK-*, FR-ACC-002, FR-PAY-*, FR-ORD-*; D-62…D-72) | — | **Đã xử lý** (v0.8) — chưa thử payOS thật (G-33) |
 | G-04 | Trang QR lời chúc, QR đèn | Trang QR lô đèn `/lo/:code` (FR-QR-006) đã có. Trang QR lời chúc chưa có | Missing | **Một phần** |
 | G-05 | AI Mây | Chat (OpenAI function calling, mặc định tắt — D-55), FAQ offline, tour, hạn mức, ngân sách, lịch sử, cấu hình admin (`server/may/*`, `src/may/*`, `/admin/may`). Chưa có tra đơn (FR-AI-004) | Missing | **Một phần** (v0.6) |
-| G-06 | Admin (sản phẩm, đơn, lô, coupon, FAQ, Mây) | `/admin` + `/api/admin/*` (v0.3): sản phẩm, FAQ, lô & video lô. Chưa có: đơn, coupon, cấu hình Mây, đổi trả (chưa có nghiệp vụ tương ứng); tài khoản admin cấp bằng tay trong Supabase (`profiles.role`) | Missing | **Một phần** (v0.3) |
+| G-06 | Admin (sản phẩm, đơn, lô, coupon, FAQ, Mây) | `/admin` + `/api/admin/*`: sản phẩm, FAQ, lô & video lô (v0.3), Mây (v0.6), đơn hàng + coupon + phí ship/COD (v0.8). Chưa có: đổi trả (chờ Q-19, Q-22); tài khoản admin cấp bằng tay trong Supabase (`profiles.role`) | Missing | **Một phần** (v0.8) |
 | G-07 | FAQ từ DB (để Mây đọc) | Bảng `faq_entries`, `GET /api/faq` | — | **Đã xử lý** (v0.2) |
 | G-08 | Đa ngôn ngữ | vi/en/zh cho giao diện, sản phẩm, FAQ, trang lô; URL `/`, `/en`, `/zh` (D-37) | — | **Đã xử lý** (v0.2) — bản dịch chờ duyệt (G-14) |
 | G-09 | Chú thích "chưa gồm VAT" | Component `Price` luôn kèm chú thích (BR-PRC-003) | — | **Đã xử lý** (v0.2) — vẫn chờ `[LEGAL]` I-04 |
-| G-10 | Theo dõi đơn, chính sách đổi trả | Link footer vẫn `href="#"` (`src/components/SiteFooter.jsx`) | Missing | **Còn thiếu** — chưa có đơn và nội dung chính sách |
+| G-10 | Theo dõi đơn, chính sách đổi trả | Link footer vẫn `href="#"` (`src/components/SiteFooter.jsx`). Đã có trang đơn `/account/orders/:id` (v0.8) nhưng chưa nối link "Theo dõi đơn hàng"; chưa có nội dung chính sách đổi trả | Missing | **Còn thiếu** |
 | G-11 | Newsletter | Form vẫn bỏ email (`src/components/SiteFooter.jsx`) | Incorrect | **Còn thiếu** — chờ PO giữ/bỏ (§30 P2) |
 | G-12 | SEO | SSR trong Express (D-49): trang công khai có HTML đầy đủ, `lang` và title đúng ngôn ngữ (`server/ssr.js`, `src/entry-server.jsx`) | — | **Đã xử lý** (v0.4) |
 | G-13 | Google Analytics | Không có | Missing | **Còn thiếu** |
@@ -1065,16 +1094,20 @@ Cập nhật v0.2. Trạng thái: **Đã xử lý** / **Một phần** / **Còn 
 | G-18 | Đặt lại mật khẩu | `POST /api/auth/reset-password` nhận mọi access token hợp lệ, không riêng token khôi phục; chưa có chức năng đổi mật khẩu (có hỏi mật khẩu cũ) | Security | **Mới** — cần kiểm tra token khôi phục trước go-live |
 | G-19 | Khoá tài khoản | §7 có trạng thái User "bị khóa" nhưng chưa có cơ chế khoá | Missing | **Mới** — làm cùng admin (G-06) |
 | G-20 | Chống dò/spam đăng nhập, đăng ký, quên mật khẩu | Chỉ dựa vào giới hạn của Supabase; chưa có giới hạn theo IP ở tầng app | Security | **Mới** |
-| G-21 | Nhật ký thay đổi của admin | Sửa sản phẩm/FAQ/lô chưa ghi log (NFR-AUD-001 chỉ bắt buộc cho đơn, coupon, hoàn tiền) | Missing | **Mới** (v0.3) — bắt buộc khi làm coupon/đơn |
+| G-21 | Nhật ký thay đổi của admin | Bảng `audit_log`: đơn (tạo, thanh toán, chuyển trạng thái, gán lô, huỷ, hoàn tiền), coupon, cấu hình phí ship/COD (v0.8). Sản phẩm/FAQ/lô vẫn chưa ghi (NFR-AUD-001 không bắt buộc) | Missing | **Một phần** (v0.8) |
 | G-23 | Ảnh chia sẻ mạng xã hội / ảnh sản phẩm | Chưa có ảnh sản phẩm thật (thẻ sản phẩm dùng hình đèn SVG) nên chưa có `og:image`, JSON-LD không có `image` (Google khuyến nghị có) | Missing | **Mới** (v0.4) |
 | G-24 | Dashboard IT | `/it` + `/api/it/*` (FR-IT-001…004) | — | **Đã xử lý** (v0.5) |
 | G-25 | Cảnh báo chủ động | Dashboard chỉ xem; chưa gửi cảnh báo khi lỗi 5xx tăng hay tích hợp lỗi (kênh thông báo chờ Q-24) | Missing | **Mới** (v0.5) |
-| G-26 | Giám sát payOS webhook, chi phí OpenAI (NFR-OBS-001) | Chưa có vì chưa tích hợp payOS/OpenAI; dashboard chỉ báo đã cấu hình biến môi trường chưa | Missing | **Mới** (v0.5) |
+| G-26 | Giám sát payOS webhook, chi phí OpenAI (NFR-OBS-001) | Chi phí OpenAI có từ v0.6. Webhook payOS (v0.8) chỉ có số liệu API chung (`POST /api/payments/payos/webhook`) + log; chưa có màn riêng cho webhook lỗi | Missing | **Một phần** (v0.8) |
 | G-27 | Nhật ký bật/tắt bảo trì | Chỉ lưu người/thời điểm đổi lần cuối (`app_settings`) + log server; chưa có lịch sử đầy đủ | Missing | **Mới** (v0.5) |
 | G-28 | Nội dung lỗi 5xx lưu cho IT | Lưu thông điệp lỗi nội bộ (có thể chứa chi tiết DB); chưa lọc dữ liệu cá nhân | Privacy | **Mới** (v0.5) |
-| G-29 | Mây tra đơn (FR-AI-004, US-008) | Chưa có đơn hàng nên chưa có `get_my_orders` / `lookup_order` và chống dò mã đơn | Missing | **Mới** (v0.6) — làm cùng đơn hàng |
+| G-29 | Mây tra đơn (FR-AI-004, US-008) | Đã có đơn hàng (v0.8); chưa có tool `get_my_orders` / `lookup_order` và chống dò mã đơn | Missing | **Còn thiếu** — làm tiếp sau checkout |
 | G-30 | Mây — quyền xoá lịch sử chat, xoá khi xoá tài khoản | Chưa có — chờ `[LEGAL]` I-15 | Missing | **Mới** (v0.6) |
 | G-31 | Nút "Dịch tự động" dùng chung ngân sách Mây (§22.4) | Chưa có trang QR lời chúc nên chưa có | Missing | **Mới** (v0.6) |
+| G-33 | payOS thật | Adapter `server/payments/payos.js` viết theo tài liệu payOS (tạo link, chữ ký, webhook, hỏi trạng thái, huỷ link) nhưng mới kiểm thử bằng payOS giả lập; cần tài khoản payOS thử + đăng ký webhook URL | Chưa kiểm chứng | **Mới** (v0.8) |
+| G-34 | Trình soạn lời chúc (US-003) | Đơn chỉ lưu "có lời chúc" + ngôn ngữ QR; chưa có nơi soạn chữ/giọng nói/video — chờ Q-36, Q-14, Q-29 | Missing | **Mới** (v0.8) |
+| G-35 | Thông báo đơn hàng (§20) | Chưa gửi email/SMS khi đơn xác nhận, hết hạn, gửi hàng, huỷ, hoàn tiền — chờ Q-24 | Missing | **Mới** (v0.8) |
+| G-36 | `create_order` trên Postgres | Kiểm tra lượt coupon trong RPC có khoá dòng coupon; chưa chạy thử trên Postgres thật (chuyển `jsonb` → `text[]`/`jsonb`, thông điệp lỗi PostgREST) | Chưa kiểm chứng | **Mới** (v0.8) |
 | G-32 | Giỏ hàng trên Supabase | Giới hạn 50 dòng và gộp giỏ là đọc-rồi-ghi, hai thao tác đồng thời có thể vượt 50 dòng / lệch số lượng; bảng `cart_items` bật RLS không có policy (chỉ server dùng service role truy cập) | Rủi ro thấp | **Mới** (v0.7) |
 | G-22 | Tải video lô bằng signed upload URL | Đã kiểm thử bằng adapter bộ nhớ; chưa thử với Supabase thật. Giới hạn dung lượng file của gói Supabase có thể nhỏ hơn `MAX_VIDEO_MB` (500) — phải chỉnh một trong hai cho khớp | Chưa kiểm chứng | **Mới** (v0.3) |
 
@@ -1165,4 +1198,15 @@ Cập nhật v0.3. Nội dung đã chuyển sang `src/i18n/messages/{vi,en,zh}.j
 | D-58 | Ngân sách OpenAI mặc định 20 USD/tháng (admin sửa được) | Hiệu lực (v0.6) |
 | D-59 | Q-13: khách vãng lai có giỏ (lưu trình duyệt), gộp vào giỏ tài khoản khi đăng nhập | Hiệu lực (v0.7) |
 | D-60 | Tối đa 10 sản phẩm mỗi dòng giỏ | Hiệu lực (v0.7) |
-| D-61 | Khi chưa có checkout: nút Thanh toán bắt đăng nhập rồi báo "sắp ra mắt" | Hiệu lực (v0.7) |
+| D-61 | Khi chưa có checkout: nút Thanh toán bắt đăng nhập rồi báo "sắp ra mắt" | Hết hiệu lực (v0.8) — đã có checkout |
+| D-62 | Q-09: VAT 10%, không tính trên phí ship; VAT = 10% × (tạm tính − giảm giá) | Hiệu lực (v0.8) |
+| D-63 | Q-11: phí ship đồng giá + miễn phí từ mức tạm tính; mặc định 30.000₫ / 1.500.000₫, admin sửa được | Hiệu lực (v0.8) |
+| D-64 | Q-08: lời chúc tuỳ chọn ở checkout, soạn sau được tới hạn khoá; quá hạn chưa soạn → giao không kèm lời chúc | Hiệu lực (v0.8) |
+| D-65 | C-1: coupon giảm %, giảm số tiền, miễn phí ship | Hiệu lực (v0.8) |
+| D-66 | C-2 / Q-10: giảm giá áp trước VAT (`[LEGAL]` vẫn chờ pháp chế) | Hiệu lực (v0.8) |
+| D-67 | C-3 / C-6: admin chọn toàn đơn hoặc danh sách sản phẩm; loại % có mức giảm tối đa tuỳ chọn; giảm giá không trừ vào phí ship | Hiệu lực (v0.8) |
+| D-68 | C-5 / C-8: giới hạn tổng lượt và lượt mỗi khách (tuỳ chọn); huỷ đơn trả lại lượt | Hiệu lực (v0.8) |
+| D-69 | Q-15: link thanh toán payOS hết hạn sau 15 phút | Hiệu lực (v0.8) |
+| D-70 | Q-16: hoàn tiền payOS do admin chuyển khoản thủ công rồi ghi nhận trên web | Hiệu lực (v0.8) |
+| D-71 | Giới hạn COD: admin đặt tổng đơn tối đa (mặc định 5.000.000₫) | Hiệu lực (v0.8) |
+| D-72 | Q-12: lời chúc / thiệp miễn phí | Hiệu lực (v0.8) |

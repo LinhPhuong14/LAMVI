@@ -20,6 +20,8 @@ async function write(fn) {
       const code = err.field === 'code' ? 'BATCH_CODE_TAKEN' : 'SLUG_TAKEN'
       throw new HttpError(409, code, code, err.field ? { [err.field]: code } : undefined)
     }
+    // Lô đã gán cho dòng hàng của đơn
+    if (err instanceof RepoError && err.code === 'IN_USE') throw new HttpError(409, 'BATCH_IN_USE', 'Lô đã gán cho đơn hàng')
     throw err
   }
 }
@@ -108,7 +110,7 @@ export function adminRouter({ repo, auth, storage, config }) {
   r.delete('/admin/batches/:id', async (req, res) => {
     const batch = found(await repo.getBatchById(req.params.id))
     if (isPublished(batch)) throw new HttpError(409, 'BATCH_PUBLISHED', 'Lô đã xuất bản không được xoá')
-    await repo.deleteBatch(batch.id)
+    await write(() => repo.deleteBatch(batch.id))
     res.status(204).end()
   })
 

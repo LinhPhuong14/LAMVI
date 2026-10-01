@@ -8,6 +8,11 @@ import { mayRouter } from './routes/may.js'
 import { createMayService } from './may/service.js'
 import { cartRouter } from './routes/cart.js'
 import { createCartService } from './cart/service.js'
+import { ordersRouter } from './routes/orders.js'
+import { adminShopRouter } from './routes/adminShop.js'
+import { createOrderService } from './orders/service.js'
+import { createAdminOrderService } from './orders/admin.js'
+import { createFakePayos } from './payments/fakePayos.js'
 import { createMetrics } from './monitoring/metrics.js'
 import { createMaintenance } from './monitoring/maintenance.js'
 import { classifyPath } from '../src/seo/routes.js'
@@ -23,6 +28,8 @@ export function createApp({
   metrics = createMetrics({ repo, classify: classifyPath }),
   maintenance = createMaintenance({ repo }),
   may = createMayService({ repo, openai: null }),
+  payments = createFakePayos({ publicSiteUrl: config.publicSiteUrl }),
+  orders = createOrderService({ repo, payments, publicSiteUrl: config.publicSiteUrl }),
 }) {
   const app = express()
   app.disable('x-powered-by')
@@ -42,6 +49,8 @@ export function createApp({
   if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may }))
   if (auth) api.use(mayRouter({ repo, auth, may }))
   if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))
+  if (auth) api.use(ordersRouter({ auth, orders, payments }))
+  if (auth) api.use(adminShopRouter({ repo, auth, adminOrders: createAdminOrderService({ repo, orders }), audit: orders.audit }))
   // Storage bộ nhớ (dev/test) tự phục vụ tải lên/đọc file
   if (storage?.router) api.use(storage.router)
   api.use(() => {
@@ -55,5 +64,6 @@ export function createApp({
   app.use(errorHandler)
   app.locals.metrics = metrics
   app.locals.maintenance = maintenance
+  app.locals.orders = orders
   return app
 }

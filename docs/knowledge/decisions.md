@@ -27,6 +27,8 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-22 | 2026-09-28 | Luật của Mây thực thi ở server, không dựa vào prompt: danh sách tool cố định chỉ đọc, che PII, kiểm tra số (BR-AI-003), hạn mức, ngân sách, timeout | Hiệu lực |
 | T-23 | 2026-09-28 | Cấu hình Mây lưu `app_settings` key `may`, gộp với mặc định trong `server/may/config.js` | Hiệu lực |
 | T-24 | 2026-09-29 | Giỏ hàng: server luôn tính giá (`server/cart/service.js#present`); giỏ vãng lai lưu `localStorage` `moc.cart` và lấy giá qua `POST /api/cart/quote`; `CartProvider` nằm trong `LocaleLayout`, chỉ đọc storage trong effect (không lệch hydrate) | Hiệu lực |
+| T-25 | 2026-10-01 | payOS qua adapter (`server/payments/payos.js`); thiếu `PAYOS_*` → dev dùng payOS giả lập (`fakePayos.js`, trang `/api/dev/payos/:mã`, gửi webhook có chữ ký thật vào chính server), production tắt payOS (chỉ COD) | Hiệu lực |
+| T-26 | 2026-10-01 | Đơn hàng: `updateOrder` compare-and-set theo trạng thái; tạo đơn qua RPC `create_order` (khoá coupon); `clientKey` chống tạo trùng; mọi thay đổi ghi `audit_log` qua `server/orders/audit.js` (lỗi ghi log không làm hỏng thao tác); dọn đơn quá hạn mỗi phút trong `server/index.js` | Hiệu lực |
 | T-17 | 2026-09-28 | Dữ liệu SSR truyền qua `window.__INITIAL_DATA__` (key `useApi`: `path\|lang`); `useApi` dùng khi hydrate, `AppShell` xoá sau hydrate | Hiệu lực |
 
 ---
@@ -79,3 +81,10 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - Luồng một lượt (`server/may/service.js#chat`): kiểm tra độ dài → hạn mức (`incrementMayCounter`) → cờ OpenAI/khoá/ngân sách (offline nếu không đạt) → vòng gọi OpenAI + tool (≤ 4 vòng, `AbortController` 15 giây) → ghi chi phí → kiểm tra số → lưu lịch sử nếu đã đăng nhập.
 - Thêm tool mới: khai báo trong `MAY_TOOLS` và `runTool` (`server/may/tools.js`); chỉ trả trường cần thiết, không có thao tác ghi (BR-AI-006). Khi làm đơn hàng: thêm `get_my_orders` (dùng `user` của phiên, không nhận user từ model) và `lookup_order` có chống dò.
 - Frontend: `src/may/May.jsx` (nút + tour, lazy-load khung chat, error boundary). Tour chỉ tự bật ở trang chủ.
+
+### T-25 / T-26 — Checkout, đơn hàng, payOS
+- **Tính giá** chỉ ở `server/orders/pricing.js#priceOrder` (VAT D-62, ship D-63, coupon D-65…D-67). Checkout gửi `expectedTotal`; server tính lại, lệch → 409 `PRICE_CHANGED` (D-41).
+- **Tạo đơn**: kiểm tra giỏ/coupon/COD → `repo.createOrder` (RPC nguyên tử) → payOS `createPaymentLink` (orderCode = `orders.code`) → bỏ các dòng đã mua khỏi giỏ. payOS lỗi → huỷ đơn (`payment_error`), 502.
+- **Thanh toán**: webhook (đã xác minh chữ ký) → `payment_events` (chống trùng) → `applyPaid`: khớp số tiền → CONFIRMED; lệch → huỷ + chờ hoàn tiền + cờ `AMOUNT_MISMATCH`; đơn đã huỷ → chờ hoàn tiền + cờ `PAID_AFTER_CANCEL`. Đơn chờ thanh toán được đối soát khi xem (tối đa 10 giây/lần) và khi quá hạn.
+- **Thử payOS thật** (G-33): đặt `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`; đăng ký webhook `https://<tên miền>/api/payments/payos/webhook` trong trang payOS; `PUBLIC_SITE_URL` phải đúng để returnUrl/cancelUrl đúng.
+- **Thêm thao tác admin trên đơn**: thêm vào `ADMIN_ACTIONS` + `switch` trong `server/orders/admin.js`, luôn qua `transition()` để có compare-and-set và nhật ký.

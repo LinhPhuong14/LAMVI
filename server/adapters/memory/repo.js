@@ -18,6 +18,11 @@ export function createMemoryRepo(data = {}) {
     carts: new Map(), // userId → Map(productId → { quantity, addedAt })
     mayCounters: new Map(), // key → { count, expiresAt }
     mayUsage: new Map(), // month → usage
+    coupons: [],
+    orders: [],
+    paymentEvents: new Set(), // `${provider}|${reference}`
+    auditLog: [],
+    nextOrderCode: 100001,
   }
 
   const now = () => new Date().toISOString()
@@ -111,6 +116,122 @@ export function createMemoryRepo(data = {}) {
       state.carts.get(userId)?.delete(productId)
     },
 
+    // --- Nhật ký (NFR-AUD-001)
+    async appendAudit(row) {
+      state.auditLog.push({ id: state.auditLog.length + 1, ...clone(row) })
+    },
+    async listAudit({ entity, entityId, limit = 200 }) {
+      return clone(
+        state.auditLog
+          .filter((r) => r.entity === entity && r.entityId === entityId)
+          .sort((a, b) => b.at.localeCompare(a.at) || b.id - a.id)
+          .slice(0, limit),
+      )
+    },
+
+    // --- Coupon (§14)
+    async listCoupons() {
+      return clone([...state.coupons].sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
+    },
+    async getCouponById(id) {
+      const c = byId(state.coupons, id)
+      return c ? clone(c) : null
+    },
+    async getCouponByCode(code) {
+      const c = state.coupons.find((x) => x.code === code)
+      return c ? clone(c) : null
+    },
+    async createCoupon(row) {
+      return create(state.coupons, { status: 'active', value: 0, maxDiscount: null, minOrder: null, startsAt: null, endsAt: null, usageLimit: null, perUserLimit: null, productIds: null, note: null, ...row }, 'code')
+    },
+    async updateCoupon(id, patch) {
+      return update(state.coupons, id, patch, 'code')
+    },
+    async deleteCoupon(id) {
+      if (state.orders.some((o) => o.couponId === id)) throw new RepoError('IN_USE')
+      return remove(state.coupons, id)
+    },
+    // D-68: lượt đã dùng = đơn chưa huỷ có coupon
+    async countCouponUses(couponId, userId) {
+      const used = state.orders.filter((o) => o.couponId === couponId && o.status !== 'CANCELLED')
+      return { total: used.length, byUser: used.filter((o) => o.userId === userId).length }
+    },
+
+    // --- Đơn hàng (§16)
+    async createOrder(order, items) {
+      if (state.orders.some((o) => o.userId === order.userId && o.clientKey === order.clientKey)) throw new RepoError('CONFLICT', 'clientKey')
+      // Giống create_order() trong Postgres: kiểm tra lượt coupon ngay lúc ghi
+      if (order.couponId) {
+        const c = byId(state.coupons, order.couponId)
+        const at = now()
+        if (!c || c.status !== 'active' || (c.startsAt && at < c.startsAt) || (c.endsAt && at >= c.endsAt)) throw new RepoError('COUPON_INVALID')
+        const used = state.orders.filter((o) => o.couponId === c.id && o.status !== 'CANCELLED')
+        if (c.usageLimit != null && used.length >= c.usageLimit) throw new RepoError('COUPON_USED_UP')
+        if (c.perUserLimit != null && used.filter((o) => o.userId === order.userId).length >= c.perUserLimit) throw new RepoError('COUPON_USER_LIMIT')
+      }
+      const id = randomUUID()
+      const full = {
+        productionStage: null, paymentLinkId: null, checkoutUrl: null, paidAt: null, paidAmount: null, paymentRef: null,
+        trackingCode: null, cancelledAt: null, cancelReason: null, codCollectedAt: null, refundedAt: null, refundedAmount: null, refundNote: null,
+        ...clone(order),
+        id,
+        code: state.nextOrderCode++,
+        createdAt: now(),
+        updatedAt: now(),
+        items: items.map((i) => ({ id: randomUUID(), orderId: id, batchId: null, ...clone(i) })),
+      }
+      state.orders.push(full)
+      return clone(full)
+    },
+    async getOrderById(id) {
+      const o = byId(state.orders, id)
+      return o ? clone(o) : null
+    },
+    async getOrderByCode(code) {
+      const o = state.orders.find((x) => x.code === code)
+      return o ? clone(o) : null
+    },
+    async getOrderByClientKey(userId, clientKey) {
+      const o = state.orders.find((x) => x.userId === userId && x.clientKey === clientKey)
+      return o ? clone(o) : null
+    },
+    async listOrdersByUser(userId) {
+      return clone(state.orders.filter((o) => o.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.code - a.code))
+    },
+    async listOrders({ status, limit = 200 } = {}) {
+      return clone(
+        state.orders
+          .filter((o) => !status || o.status === status)
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.code - a.code)
+          .slice(0, limit),
+      )
+    },
+    async listExpiredPendingOrders(before) {
+      return clone(state.orders.filter((o) => o.status === 'PENDING_PAYMENT' && o.paymentExpiresAt && o.paymentExpiresAt <= before))
+    },
+    // Cập nhật có điều kiện: chỉ khi trạng thái hiện tại thuộc fromStatuses (tránh ghi đè khi hai bên cùng đổi)
+    async updateOrder(id, patch, fromStatuses) {
+      const o = byId(state.orders, id)
+      if (!o || (fromStatuses && !fromStatuses.includes(o.status))) return null
+      Object.assign(o, clone(patch), { updatedAt: now() })
+      return clone(o)
+    },
+    async updateOrderItem(orderId, itemId, patch) {
+      const item = byId(state.orders, orderId)?.items.find((i) => i.id === itemId)
+      if (!item) return null
+      Object.assign(item, clone(patch))
+      return clone(item)
+    },
+    async recordPaymentEvent({ provider, reference }) {
+      const k = `${provider}|${reference}`
+      if (state.paymentEvents.has(k)) return false
+      state.paymentEvents.add(k)
+      return true
+    },
+    async deletePaymentEvent(provider, reference) {
+      state.paymentEvents.delete(`${provider}|${reference}`)
+    },
+
     // --- Mây (FR-AI-*)
     async incrementMayCounter(key, ttlSeconds, at = Date.now()) {
       const c = state.mayCounters.get(key)
@@ -185,6 +306,7 @@ export function createMemoryRepo(data = {}) {
       return update(state.batches, id, patch, 'code')
     },
     async deleteBatch(id) {
+      if (state.orders.some((o) => o.items.some((i) => i.batchId === id))) throw new RepoError('IN_USE')
       return remove(state.batches, id)
     },
 

@@ -19,6 +19,12 @@ export function loadConfig(env = process.env) {
       priceInPer1M: Number(env.OPENAI_PRICE_INPUT_PER_1M) || 0.15,
       priceOutPer1M: Number(env.OPENAI_PRICE_OUTPUT_PER_1M) || 0.6,
     },
+    // payOS (D-35). Thiếu một trong ba → payOS giả lập (chỉ dev, T-25)
+    payos: {
+      clientId: env.PAYOS_CLIENT_ID || null,
+      apiKey: env.PAYOS_API_KEY || null,
+      checksumKey: env.PAYOS_CHECKSUM_KEY || null,
+    },
     mayHashSalt: env.MAY_HASH_SALT || env.SUPABASE_URL || 'moc-dev',
     supabase,
     useSupabase: Boolean(supabase.url && supabase.anonKey && supabase.serviceRoleKey),

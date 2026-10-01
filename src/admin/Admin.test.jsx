@@ -29,10 +29,10 @@ describe('Admin — phân quyền (D-38, D-48)', () => {
     expect(fetchMock.mock.calls.some(([u]) => String(u).includes('/api/admin/'))).toBe(false)
   })
 
-  it('/admin → chuyển tới Sản phẩm; trang noindex', async () => {
-    mockApi({ 'GET /me': me('admin'), 'GET /admin/products': () => ({ body: { items: products } }) })
+  it('/admin → chuyển tới Đơn hàng; trang noindex', async () => {
+    mockApi({ 'GET /me': me('admin'), 'GET /admin/orders': () => ({ body: { items: [] } }) })
     renderAt('/admin')
-    expect(await screen.findByRole('heading', { name: 'Sản phẩm' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Đơn hàng' })).toBeInTheDocument()
     expect(document.head.querySelector('meta[name="robots"]')?.content).toBe('noindex')
   })
 })

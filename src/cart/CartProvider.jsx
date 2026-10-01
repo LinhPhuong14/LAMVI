@@ -12,6 +12,8 @@ export default function CartProvider({ children }) {
   // SSR + lần render đầu: chưa đọc localStorage (tránh lệch hydrate)
   const [cart, setCart] = useState(null)
   const [error, setError] = useState(null)
+  // Tăng để nạp lại giỏ từ server (vd sau khi đặt hàng)
+  const [version, setVersion] = useState(0)
   const localRef = useRef([])
   // Mỗi lần nạp/đổi giỏ tăng mã; kết quả của yêu cầu cũ (vd quote chậm về sau khi đã đăng nhập) bị bỏ
   const seq = useRef(0)
@@ -66,7 +68,7 @@ export default function CartProvider({ children }) {
     }
     // Effect chạy lại (đổi user/lang) tăng mã mới → kết quả lần nạp này tự bị bỏ
     load().catch((err) => id === seq.current && setError(err.code ?? 'INTERNAL_ERROR'))
-  }, [user, authedApi, lang, quoteLocal, apply])
+  }, [user, authedApi, lang, quoteLocal, apply, version])
 
   const setQuantity = useCallback(
     (slug, quantity) =>
@@ -110,6 +112,7 @@ export default function CartProvider({ children }) {
     [user, authedApi, lang, quoteLocal, run, apply],
   )
 
-  const value = useMemo(() => ({ cart, error, add, setQuantity, remove }), [cart, error, add, setQuantity, remove])
+  const reload = useCallback(() => setVersion((v) => v + 1), [])
+  const value = useMemo(() => ({ cart, error, add, setQuantity, remove, reload }), [cart, error, add, setQuantity, remove, reload])
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

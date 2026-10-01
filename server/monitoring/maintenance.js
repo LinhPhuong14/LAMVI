@@ -2,8 +2,9 @@
 const KEY = 'maintenance'
 const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 // Vẫn cho phép khi bảo trì: đăng nhập (để IT vào tắt) và API IT [ASSUMPTION]
-// /api/cart/quote chỉ tính giá (không ghi) nên vẫn chạy khi bảo trì
-const ALLOWED = [/^\/api\/it(\/|$)/i, /^\/api\/auth\/(login|refresh|logout)\/?$/i, /^\/api\/cart\/quote\/?$/i]
+// /api/cart/quote, /api/checkout/quote chỉ tính giá (không ghi) nên vẫn chạy khi bảo trì
+// Webhook payOS vẫn nhận khi bảo trì để không lỡ tiền về [ASSUMPTION]
+const ALLOWED = [/^\/api\/it(\/|$)/i, /^\/api\/auth\/(login|refresh|logout)\/?$/i, /^\/api\/cart\/quote\/?$/i, /^\/api\/checkout\/quote\/?$/i, /^\/api\/payments\/payos\/webhook\/?$/i]
 
 export function createMaintenance({ repo, ttlMs = 15_000, now = () => Date.now() }) {
   let cache = null
