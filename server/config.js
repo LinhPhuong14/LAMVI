@@ -1,5 +1,6 @@
 import { isValidMeasurementId } from '../src/analytics/ga.js'
 import { normalizeSiteUrl } from '../src/seo/head.js'
+import { parseServiceAccount } from './adapters/gaRealtime.js'
 
 /**
  * Muối băm dự phòng khi thiếu MAY_HASH_SALT (chỉ hợp lệ ở dev). Môi trường thật BẮT BUỘC đặt
@@ -28,6 +29,8 @@ export function loadConfig(env = process.env) {
     // FR-GA-001, D-72: Google Analytics 4. Không đặt → không nhúng GA (dev/test, Preview).
     // Giá trị hỏng bị bỏ qua vì được nhúng vào <script> nội tuyến (xem isValidMeasurementId).
     gaMeasurementId: isValidMeasurementId(env.GA_MEASUREMENT_ID) ? env.GA_MEASUREMENT_ID : null,
+    // Báo cáo GA realtime ở /admin/analytics (GA Data API). Thiếu bất kỳ biến nào → trang báo "chưa cấu hình".
+    gaRealtime: { propertyId: env.GA_PROPERTY_ID || null, ...parseServiceAccount(env) },
     /**
      * G-20: chống dò/spam ở tầng ứng dụng. Ngưỡng [ASSUMPTION] — đủ rộng cho người gõ nhầm vài
      * lần và cho nhiều người dùng chung một IP (văn phòng, quán), đủ chặt để không dò được.

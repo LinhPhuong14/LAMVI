@@ -19,6 +19,7 @@ import ProductsPage from './admin/ProductsPage'
 import FaqPage from './admin/FaqPage'
 import BatchesPage from './admin/BatchesPage'
 import ItDashboard from './it/ItDashboard'
+import AnalyticsPage from './admin/AnalyticsPage'
 import MayConfigPage from './admin/MayConfigPage'
 
 // Các trang con dùng chung cho mọi ngôn ngữ
@@ -56,6 +57,7 @@ export default function AppRoutes() {
         <Route path="products" element={<ProductsPage />} />
         <Route path="faq" element={<FaqPage />} />
         <Route path="batches" element={<BatchesPage />} />
+        <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="may" element={<MayConfigPage />} />
       </Route>
       <Route path="/en" element={<LocaleLayout lang="en" />}>

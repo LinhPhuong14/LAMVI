@@ -3615,3 +3615,33 @@
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
 }
+
+/* ---------- Báo cáo GA realtime (/admin/analytics) ---------- */
+.ga-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 120px;
+  margin: 8px 0;
+}
+
+.ga-col {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--dash-line);
+}
+
+.ga-col span {
+  display: block;
+  width: 100%;
+  min-height: 1px;
+  border-radius: 3px 3px 0 0;
+  background: var(--son);
+}
+
+.admin-main > .it-grid {
+  margin-top: 24px;
+}

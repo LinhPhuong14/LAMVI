@@ -1,5 +1,15 @@
 # Nhật ký phiên
 
+## 2026-10-01 — Báo cáo GA realtime trong admin (nhánh `feat/admin-ga-realtime`)
+
+**Mục tiêu người dùng**: "thêm báo cáo GA xem realtime vào Admin dashboard".
+
+**Đã làm**: `GET /api/admin/analytics/realtime` (GA4 Data API, service account, T-42), trang `/admin/analytics` (người online, biểu đồ 30 phút, top trang/quốc gia/thiết bị, tự làm mới 30 giây), mục điều hướng mới. Subagent kiểm thử độc lập (T-11). Spec v0.20: `[ASSUMPTION]` §23.3, G-50.
+
+**Phát hiện khi viết**: 5 báo cáo chạy song song đổi token 5 lần → dùng chung một promise.
+
+**Còn lại / cần người dùng**: tạo service account + bật Data API + thêm làm Viewer của property GA, đặt `GA_PROPERTY_ID` và `GA_SERVICE_ACCOUNT_JSON` ở Vercel; thử với property thật (chưa kiểm chứng). Nhánh theo CLAUDE.md là `feat/…`, không phải `claude/…` như môi trường gợi ý.
+
 ## 2026-09-30 — Production: giá đã gồm VAT, checkout/đơn/thanh toán, GA + SEO, gia cố (nhánh `feat/production-checkout-seo-ga`)
 
 **Mục tiêu người dùng**: "tiếp tục build theo BA document nhưng theo level production, thêm cả analysis gg và seo cho web".

@@ -75,3 +75,11 @@ export const SiteIcon = () => (
     <path d="M4 12h12" />
   </svg>
 )
+
+/** Truy cập: cột biểu đồ */
+export const AnalyticsIcon = () => (
+  <svg {...base}>
+    <path d="M4 20h16" />
+    <path d="M7 20v-7M12 20V6M17 20v-10" />
+  </svg>
+)

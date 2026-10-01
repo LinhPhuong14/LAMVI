@@ -205,3 +205,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Quyết định**: mọi thay đổi trạng thái đơn đi qua `repo.updateOrderIfStatus(id, trạngThaiKỳVọng, giáTrịMới)` — chỉ ghi khi trạng thái hiện tại đúng như lúc đọc.
 - **Lý do**: khách bấm huỷ đúng lúc webhook payOS báo đã trả tiền là tình huống có thật; không có khoá thì cả hai cùng "thành công" và đơn rơi vào trạng thái mâu thuẫn.
 - **Hệ quả**: nơi gọi phải xử lý trường hợp trả `null` (trạng thái vừa đổi) — trả 409 cho client, không ghi đè.
+
+### T-42 — Báo cáo GA realtime gọi GA4 Data API bằng `fetch` + JWT tự ký
+- **Bối cảnh**: yêu cầu thêm báo cáo GA realtime vào admin. Mã đo `G-…` chỉ để gửi sự kiện; đọc số liệu cần GA Data API với OAuth.
+- **Quyết định**: `server/adapters/gaRealtime.js` ký JWT RS256 bằng `node:crypto` (service account), đổi lấy access token, gọi `properties/{id}:runRealtimeReport` bằng `fetch` — không thêm SDK `googleapis` (nặng, cùng lý do T-29). Token giữ trong bộ nhớ (promise dùng chung để 5 báo cáo song song chỉ đổi token một lần), kết quả cache 15 giây. Test dùng `fetchImpl` giả.
+- **Cấu hình**: `GA_PROPERTY_ID` + `GA_SERVICE_ACCOUNT_JSON` (JSON hoặc base64) hoặc `GA_CLIENT_EMAIL` + `GA_PRIVATE_KEY`. Thiếu → `configured:false`. Khoá chỉ ở server; lỗi Google đổi sang mã `GA_*`, không chuyển nguyên văn cho client.
+- **Hệ quả**: cache theo từng instance serverless nên hiệu quả giảm khi có nhiều instance — chấp nhận, hạn mức realtime của GA đủ rộng cho vài admin.

@@ -11,6 +11,7 @@ import { ordersRouter } from './routes/orders.js'
 import { createOrderService } from './orders/service.js'
 import { createCartService } from './cart/service.js'
 import { createMetrics } from './monitoring/metrics.js'
+import { createGaRealtime } from './adapters/gaRealtime.js'
 import { createMaintenance } from './monitoring/maintenance.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { errorHandler, notFound } from './errors.js'
@@ -28,6 +29,7 @@ export function createApp({
   may = createMayService({ repo, openai: null }),
   payos = null,
   orders = createOrderService({ repo, payos }),
+  gaRealtime = createGaRealtime(config.gaRealtime ?? {}),
   dev = false,
 }) {
   const app = express()
@@ -52,7 +54,7 @@ export function createApp({
   api.get('/health', (req, res) => res.json({ ok: true }))
   api.use(catalogRouter({ repo }))
   if (auth) api.use(authRouter({ repo, auth, config }))
-  if (auth && storage) api.use(adminRouter({ repo, auth, storage, config, orders }))
+  if (auth && storage) api.use(adminRouter({ repo, auth, storage, config, orders, gaRealtime }))
   if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may }))
   if (auth) api.use(mayRouter({ repo, auth, may }))
   if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))
