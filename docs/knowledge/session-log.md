@@ -20,6 +20,7 @@ Mới nhất ở trên. Mỗi mục: mục tiêu · quyết định · đã làm
 3. NFR-AUD-001: `audit_log` cho đơn, coupon, cấu hình phí (G-21).
 4. Spec v0.8: D-62…D-72, gỡ Q-08/Q-09/Q-10/Q-11/Q-12/Q-15/Q-16/C-1…C-3/C-5 khỏi §30, thêm Q-36, C-8b; G-03 đã xử lý; G-33…G-36 mới.
 5. Subagent kiểm thử server (102 test) phát hiện: hai request payOS cùng `clientKey` chạy xen kẽ → request thua trả đơn không có link thanh toán → đã sửa (chờ link). Đã xử lý thêm: gửi lại khoá của lần payOS lỗi trả 502 thay vì đơn đã huỷ; `PUT /admin/shop` thiếu trường không còn âm thầm tắt mức miễn ship/trần COD; bảo trì cho phép `checkout/quote`; trang admin không hỏi payOS mỗi lần mở; dọn bộ đếm đối soát; RPC kiểm tra lại trạng thái/hạn coupon.
+6. Subagent kiểm thử frontend (98 test) phát hiện: lỗi coupon khi đặt hàng hiện chữ `{min}` thô (và lặp ba lần) → đã sửa (để bảng giá tải lại hiện lý do). Đã xử lý thêm: ô phí ship trống không còn ngầm thành 0₫; trang đơn chờ quá 2 phút hướng dẫn tải lại; lỗi thao tác không ăn vào lượt hỏi lại; chặn gửi form checkout khi đang gửi.
 
 **Còn lại / cần người dùng**
 

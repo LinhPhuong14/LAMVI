@@ -311,6 +311,7 @@ export default {
     placed: 'Your order has been placed. Thank you!',
     paid: 'Payment received. Thank you!',
     waitingPayment: 'Waiting for payment confirmation…',
+    waitingLong: 'Payment confirmation has not arrived yet. Please reload in a few minutes; if you have paid, the order will update automatically.',
     pendingPayment: 'Awaiting payment (due {time}).',
     paymentCancelled: 'You left the payment page. You can pay again before it expires or cancel the order.',
     pay: 'Pay now',

@@ -298,6 +298,7 @@ export default {
     placed: '下单成功，谢谢！',
     paid: '支付成功，谢谢！',
     waitingPayment: '正在等待支付确认…',
+    waitingLong: '尚未收到支付确认。请稍后刷新页面；如已付款，订单会自动更新。',
     pendingPayment: '订单待支付（截止 {time}）。',
     paymentCancelled: '您已离开支付页面。可在过期前重新支付或取消订单。',
     pay: '去支付',

@@ -326,6 +326,7 @@ export default {
     placed: 'Đặt hàng thành công. Cảm ơn bạn!',
     paid: 'Thanh toán thành công. Cảm ơn bạn!',
     waitingPayment: 'Đang chờ xác nhận thanh toán…',
+    waitingLong: 'Chưa nhận được xác nhận thanh toán. Vui lòng tải lại trang sau ít phút; nếu đã trả tiền, đơn sẽ tự cập nhật.',
     pendingPayment: 'Đơn đang chờ thanh toán (hạn {time}).',
     paymentCancelled: 'Bạn đã thoát trang thanh toán. Bạn có thể thanh toán lại trước khi hết hạn hoặc huỷ đơn.',
     pay: 'Thanh toán',

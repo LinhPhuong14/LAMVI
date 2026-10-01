@@ -105,7 +105,7 @@ export default function CheckoutPage() {
 
   async function onSubmit(e) {
     e.preventDefault()
-    if (!quote) return
+    if (!quote || submit.pending) return
     setPriceChanged(false)
     setSubmit({ pending: true, error: null, fields: {} })
     try {
@@ -132,7 +132,9 @@ export default function CheckoutPage() {
       navigate(path(`/account/orders/${res.order.id}?placed=1`))
     } catch (err) {
       const code = err.code ?? 'INTERNAL_ERROR'
-      setSubmit({ pending: false, error: code, fields: err.fields ?? {} })
+      // Lỗi coupon: bảng giá tải lại sẽ hiện lý do (kèm số tiền) ở ô mã — không lặp ở chỗ khác
+      if (code.startsWith('COUPON_')) setSubmit({ pending: false, error: null, fields: {} })
+      else setSubmit({ pending: false, error: code, fields: err.fields ?? {} })
       // D-41: giá/coupon đổi → hiện bảng giá mới, khách xác nhận lại
       if (code === 'PRICE_CHANGED' || code.startsWith('COUPON_') || code.startsWith('COD_') || code.startsWith('CART_')) {
         if (code === 'PRICE_CHANGED') setPriceChanged(true)

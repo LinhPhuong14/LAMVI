@@ -30,7 +30,8 @@ export default function ShopPage() {
   async function onSubmit(e) {
     e.preventDefault()
     setSaved(false)
-    const body = { shippingFee: Number(form.shippingFee), freeShippingFrom: toNumber(form.freeShippingFrom), codMaxTotal: toNumber(form.codMaxTotal) }
+    // Ô phí ship trống → gửi null để server báo lỗi (không ngầm thành 0₫)
+    const body = { shippingFee: toNumber(form.shippingFee), freeShippingFrom: toNumber(form.freeShippingFrom), codMaxTotal: toNumber(form.codMaxTotal) }
     if (await run(() => authedApi('/admin/shop', { method: 'PUT', body }))) setSaved(true)
   }
 

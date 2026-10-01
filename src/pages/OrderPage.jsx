@@ -46,8 +46,9 @@ export default function OrderPage() {
   const location = useLocation()
   const [state, setState] = useState({ status: 'loading' })
   const [action, setAction] = useState({ pending: false, error: null })
-  // Mỗi lần tăng = nạp lại đơn (hỏi lại khi chờ thanh toán, sau thao tác lỗi)
+  // Số lần hỏi lại khi chờ webhook; reloads: nạp lại sau thao tác lỗi
   const [polls, setPolls] = useState(0)
+  const [reloads, setReloads] = useState(0)
   const returned = params.get('payment') === 'return'
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export default function OrderPage() {
     return () => {
       alive = false
     }
-  }, [user, authedApi, id, lang, polls])
+  }, [user, authedApi, id, lang, polls, reloads])
 
   // Quay về từ payOS mà chưa có webhook → hỏi lại định kỳ
   const pending = state.order?.status === 'PENDING_PAYMENT'
@@ -80,7 +81,7 @@ export default function OrderPage() {
       setAction({ pending: false, error: null })
     } catch (err) {
       setAction({ pending: false, error: err.code ?? 'INTERNAL_ERROR' })
-      setPolls((n) => n + 1)
+      setReloads((n) => n + 1)
     }
   }
 
@@ -131,7 +132,11 @@ export default function OrderPage() {
       )}
       {pending && (
         <p className="notice" role="status">
-          {returned ? t('orders.waitingPayment') : t('orders.pendingPayment', { time: formatDate(o.paymentExpiresAt, lang) })}
+          {!returned
+            ? t('orders.pendingPayment', { time: formatDate(o.paymentExpiresAt, lang) })
+            : polls >= POLL_MAX
+              ? t('orders.waitingLong')
+              : t('orders.waitingPayment')}
         </p>
       )}
       {returned && o.status === 'CONFIRMED' && o.paymentMethod === 'payos' && (

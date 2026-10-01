@@ -229,7 +229,7 @@ export function OrderDetail() {
             </p>
           )}
           {o.paymentStatus === 'REFUNDED' && (
-            <p className="field-hint">{S.orders.refundDone.replace('{amount}', formatVnd(o.refundedAmount)).replace('{note}', o.refundNote)}</p>
+            <p className="field-hint">{S.orders.refundDone.replace('{amount}', formatVnd(o.refundedAmount)).replace('{note}', o.refundNote ?? '')}</p>
           )}
         </div>
 
