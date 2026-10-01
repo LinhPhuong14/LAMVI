@@ -1,5 +1,13 @@
 # Nhật ký phiên
 
+## 2026-10-01 — Trang auth v2 (nhánh `feat/auth-redesign-v2`)
+
+**Mục tiêu người dùng**: thiết kế lại trang auth cho đẹp hơn, tham khảo Pinterest/Behance.
+
+**Đã làm**: D-82, T-47 — sân khấu ảnh toàn màn hình, thẻ kính, lời dẫn serif lớn, viên thuốc chuyển tab, hiện/ẩn mật khẩu, quầng bokeh. Sửa 3 test gắn với link cuối form cũ.
+
+**Hạn chế**: Behance trả 403 và Pinterest không tải được, chỉ đọc được bài tổng hợp xu hướng 2026 (Liquid Glass, heritage, chữ serif biểu cảm) — chưa tham khảo trực tiếp ảnh mẫu. Cần PO xem lại và gửi ảnh mẫu nếu muốn sát hơn.
+
 ## 2026-10-01 — Ảnh riêng cho trang auth (nhánh `feat/auth-photo`)
 
 **Mục tiêu người dùng**: đổi ảnh ở phần auth sang ảnh đẹp hơn, không dùng ảnh của landing.

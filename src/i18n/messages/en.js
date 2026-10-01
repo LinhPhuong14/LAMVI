@@ -222,6 +222,12 @@ export default {
     toHome: 'Discover LAMVI',
   },
   auth: {
+    heroLine1: 'Light a lantern',
+    heroLine2: 'for what you want to say',
+    heroLead: 'Handmade giấy dó lanterns with a personal message — follow every stage from the workshop to the one who receives it.',
+    show: 'Show',
+    hide: 'Hide',
+    tabsLabel: 'Choose sign in or create account',
     loginEyebrow: 'Welcome back',
     loginLead: 'Sign in to see your orders and your messages.',
     registerEyebrow: 'Step inside',

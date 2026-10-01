@@ -52,6 +52,7 @@ export default function ResetPasswordPage() {
           label={t('auth.newPassword')}
           type="password"
           autoComplete="new-password"
+          toggle
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}

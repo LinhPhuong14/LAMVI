@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { readFileSync } from 'node:fs'
 import { useEffect } from 'react'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { Link, MemoryRouter, Route, Routes, useLocation, useNavigate, useOutlet, useSearchParams } from 'react-router-dom'
 import { LazyMotion, MotionConfig, domAnimation } from 'framer-motion'
 import { describe, expect, it, vi } from 'vitest'
@@ -77,10 +77,10 @@ describe('PageTransition extra (T-45)', () => {
     mockApi({})
     renderAt('/login')
     await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: viMsg.auth.loginTitle })).toBeInTheDocument(), WAIT)
-    fireEvent.click(screen.getByText(viMsg.auth.toRegister))
+    fireEvent.click(within(screen.getByRole('navigation', { name: viMsg.auth.tabsLabel })).getByRole('link', { name: viMsg.auth.registerTitle }))
     await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: viMsg.auth.registerTitle })).toBeInTheDocument(), WAIT)
     expect(screen.queryByRole('heading', { level: 1, name: viMsg.auth.loginTitle })).toBeNull()
-    fireEvent.click(screen.getByText(viMsg.auth.toLogin))
+    fireEvent.click(within(screen.getByRole('navigation', { name: viMsg.auth.tabsLabel })).getByRole('link', { name: viMsg.auth.loginTitle }))
     await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: viMsg.auth.loginTitle })).toBeInTheDocument(), WAIT)
     fireEvent.click(screen.getByText(viMsg.auth.toForgot))
     await waitFor(() => expect(screen.getByRole('heading', { level: 1, name: viMsg.auth.forgotTitle })).toBeInTheDocument(), WAIT)
@@ -236,10 +236,11 @@ describe('PageTransition extra (T-45)', () => {
       expect(index).toMatch(new RegExp(`${tok}\\s*:`))
     })
     it('App.css có @supports not cho thẻ kính', () => {
-      const m = app.match(/@supports not[^{]*backdrop-filter[^{]*\{([\s\S]*?)\n\}/)
-      expect(m).not.toBeNull()
-      expect(m[1]).toMatch(/\.product-card/)
-      expect(m[1]).toMatch(/var\(--g-bg-strong\)/)
+      // Có nhiều khối @supports not (thẻ kính, trang auth, header) — thẻ sản phẩm nằm ở một trong số đó
+      const blocks = [...app.matchAll(/@supports not[^{]*backdrop-filter[^{]*\{([\s\S]*?)\n\}/g)].map((x) => x[1])
+      const card = blocks.find((x) => /\.product-card/.test(x))
+      expect(card).toBeDefined()
+      expect(card).toMatch(/var\(--g-bg-strong\)/)
     })
   })
 })

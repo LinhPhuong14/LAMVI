@@ -235,6 +235,12 @@ export default {
     toHome: 'Khám phá LAMVI',
   },
   auth: {
+    heroLine1: 'Thắp một ngọn đèn',
+    heroLine2: 'cho điều bạn muốn gửi',
+    heroLead: 'Đèn giấy dó làm tay, kèm lời chúc riêng — theo dõi từng công đoạn từ xưởng tới tay người nhận.',
+    show: 'Hiện',
+    hide: 'Ẩn',
+    tabsLabel: 'Chọn đăng nhập hoặc tạo tài khoản',
     loginEyebrow: 'Chào mừng trở lại',
     loginLead: 'Đăng nhập để xem đơn hàng và lời chúc của bạn.',
     registerEyebrow: 'Vào gian đèn',
