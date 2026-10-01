@@ -50,7 +50,7 @@ export default function RegisterPage() {
       eyebrow={t('auth.registerEyebrow')}
       title={t('auth.registerTitle')}
       lead={t('auth.registerLead')}
-      footer={loginLink}
+      tab="register"
     >
       <GoogleButton next={params.get('next') ? safeNext(params.get('next'), undefined) : undefined} />
       <form className="form" onSubmit={onSubmit} noValidate>
@@ -60,6 +60,7 @@ export default function RegisterPage() {
           label={t('auth.password')}
           type="password"
           autoComplete="new-password"
+          toggle
           required
           value={form.password}
           onChange={set('password')}

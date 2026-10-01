@@ -77,12 +77,12 @@ describe('Ảnh trang auth (D-81)', () => {
     expect(t).toContain('lantern-river')
   })
 
-  it('CSS: object-fit cover và quy tắc ≤760px ẩn câu trích', () => {
+  it('CSS: object-fit cover và quy tắc ≤640px ẩn câu trích', () => {
     const css = fs.readFileSync(path.join(root, 'src/styles/App.css'), 'utf8')
     const m = css.match(/\.auth-aside-photo\s*\{([^}]*)\}/)
     expect(m).not.toBeNull()
     expect(m[1]).toMatch(/object-fit:\s*cover/)
-    const media = css.split('@media (max-width: 760px)').slice(1)
+    const media = css.split('@media (max-width: 640px)').slice(1)
     const hit = media.some((blk) => /\.auth-aside-quote\s*\{[^}]*display:\s*none/.test(blk))
     expect(hit).toBe(true)
     expect(css).toMatch(/\.auth-aside::before/)

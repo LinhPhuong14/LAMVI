@@ -2591,93 +2591,107 @@
     linear-gradient(180deg, var(--diep-light), var(--diep));
 }
 
-.auth-shell {
-  max-width: 960px;
-  min-height: 0;
-  padding: 56px 24px 72px;
-}
-
-.auth-card {
+/* ---------- Trang auth v2 (D-81, D-82): sân khấu ảnh + thẻ kính ---------- */
+.auth-stage {
   position: relative;
-  display: grid;
-  grid-template-columns: 5fr 7fr;
-  border-radius: var(--r-lg);
+  isolation: isolate;
   overflow: hidden;
-  background: var(--diep-light);
-  box-shadow: var(--print-lg);
-}
-
-/* Đường chỉ mảnh trong mép như tranh bồi */
-.auth-card::after {
-  content: '';
-  position: absolute;
-  inset: 8px;
-  border: 1px solid var(--hair-soft);
-  pointer-events: none;
-}
-
-.auth-aside {
-  position: relative;
+  min-height: calc(100svh - 150px);
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 40px;
-  padding: 44px 36px;
-  color: var(--diep);
-  background:
-    radial-gradient(circle at 80% 0%, rgba(191, 138, 58, 0.28), transparent 55%),
-    var(--cham-deep);
+  align-items: center;
+  padding: 56px 32px 64px;
+  background: var(--cham-deep);
+}
+
+.auth-stage-inner {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 440px);
+  gap: 72px;
+  align-items: center;
+}
+
+/* Ảnh + phủ chàm nằm sau cả sân khấu (aside không có position nên ảnh tựa vào .auth-stage) */
+.auth-aside {
+  color: var(--diep-light);
 }
 
 .auth-aside-photo {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
+  z-index: -3;
   width: 100%;
-  height: 74%;
+  height: 100%;
   object-fit: cover;
-  object-position: 52% 45%;
-  z-index: 0;
-  /* Ảnh tan dần về nền chàm ở chân để câu chữ nằm trên mảng tối, không đè lên đèn */
-  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
-  mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  object-position: 62% 48%;
+  transform: scale(1.04);
+  filter: saturate(1.1);
 }
 
-/* Tối nhẹ ở đầu để ấn LAMVI đọc rõ */
 .auth-aside::before {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 0;
-  background: linear-gradient(to bottom, rgba(26, 39, 53, 0.55), rgba(26, 39, 53, 0) 30%);
+  z-index: -2;
+  background:
+    linear-gradient(90deg, rgba(14, 22, 32, 0.86) 0%, rgba(14, 22, 32, 0.55) 48%, rgba(14, 22, 32, 0.25) 100%),
+    linear-gradient(to bottom, rgba(14, 22, 32, 0.45), transparent 30%, rgba(14, 22, 32, 0.6));
 }
 
-.auth-aside > :not(.auth-aside-photo) {
-  position: relative;
-  z-index: 1;
+/* Quầng sáng bokeh trôi chậm — chỉ trang trí, tắt khi giảm chuyển động */
+.auth-orb {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(226, 198, 143, 0.5), rgba(226, 198, 143, 0) 68%);
+  animation: auth-drift 16s ease-in-out infinite alternate;
 }
 
-.auth-aside-mark {
-  align-self: flex-start;
-  text-decoration: none;
+.auth-orb-a {
+  width: 340px;
+  height: 340px;
+  left: 6%;
+  top: 8%;
 }
 
-.auth-aside-quote {
-  margin: 0;
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 1.45rem;
-  line-height: 1.4;
-  text-wrap: balance;
+.auth-orb-b {
+  width: 220px;
+  height: 220px;
+  right: 34%;
+  bottom: 10%;
+  animation-duration: 21s;
+  animation-delay: -6s;
+}
+
+.auth-orb-c {
+  width: 150px;
+  height: 150px;
+  right: 8%;
+  top: 14%;
+  background: radial-gradient(circle, rgba(201, 127, 102, 0.42), rgba(201, 127, 102, 0) 68%);
+  animation-duration: 18s;
+  animation-delay: -11s;
+}
+
+@keyframes auth-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(28px, -22px, 0) scale(1.12);
+  }
 }
 
 .auth-aside-note {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0;
+  margin: 0 0 22px;
   font-size: 0.78rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--hoe-light);
 }
@@ -2687,37 +2701,175 @@
   color: var(--hoe-light);
 }
 
-.auth-main {
-  padding: 48px 48px 40px;
+.auth-aside-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 600;
+  font-size: clamp(2.4rem, 4.6vw, 4.2rem);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  color: var(--diep-light);
+  text-wrap: balance;
 }
 
-.auth-main .page-title {
-  margin: 0 0 8px;
+.auth-aside-title span,
+.auth-aside-title em {
+  display: block;
+}
+
+.auth-aside-title em {
+  font-weight: 500;
+  color: var(--hoe-light);
+}
+
+.auth-aside-quote {
+  max-width: 30em;
+  margin: 24px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(251, 247, 239, 0.8);
+}
+
+.auth-aside-seal {
+  margin-top: 36px;
+}
+
+/* Thẻ kính (Liquid Glass): nền giấy trong, blur mạnh, viền sáng, đường sáng ở mép trên */
+.auth-panel {
+  position: relative;
+  padding: 36px 40px 32px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(160deg, rgba(255, 250, 240, 0.9), rgba(247, 238, 222, 0.82));
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 40px 80px -32px rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(26px) saturate(165%);
+  backdrop-filter: blur(26px) saturate(165%);
+  animation: auth-rise 0.7s var(--ease-out) both;
+}
+
+@keyframes auth-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .auth-panel {
+    background: rgba(251, 247, 239, 0.96);
+  }
+}
+
+/* Viên thuốc chuyển đăng nhập ↔ đăng ký */
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 26px;
+  border-radius: 999px;
+  background: rgba(122, 93, 60, 0.12);
+}
+
+.auth-tabs a {
+  padding: 9px 12px;
+  border-radius: 999px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--than-soft);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.auth-tabs a:hover {
+  color: var(--than);
+}
+
+.auth-tabs a[aria-current='page'] {
+  background: var(--diep-light);
+  color: var(--son-deep);
+  box-shadow: 0 1px 2px rgba(60, 40, 20, 0.12), 0 6px 14px -8px rgba(60, 40, 20, 0.4);
 }
 
 .auth-eyebrow {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+.auth-panel .page-title {
+  margin: 0 0 6px;
+  font-size: clamp(1.9rem, 3vw, 2.4rem);
 }
 
 .auth-lead {
-  margin: 0 0 24px;
+  margin: 0 0 22px;
   color: var(--than-soft);
+  font-size: 0.95rem;
 }
 
-.auth-main .field input,
-.auth-main .field select {
-  border-color: var(--hair);
+.auth-panel .field input,
+.auth-panel .field select {
+  border-color: rgba(122, 93, 60, 0.3);
   border-radius: var(--r-sm);
-  background: var(--diep);
+  background: rgba(255, 255, 255, 0.7);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
-.auth-main .field input:focus,
-.auth-main .field select:focus {
+.auth-panel .field input:focus,
+.auth-panel .field select:focus {
+  outline: none;
+  border-color: var(--son);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(163, 50, 31, 0.16);
+}
+
+.auth-panel .form .btn-primary {
+  margin-top: 6px;
+  padding: 14px 24px;
+}
+
+/* Ô mật khẩu: nút Hiện/Ẩn nằm trong ô */
+.field-pw {
+  position: relative;
+  display: flex;
+}
+
+.field-pw input {
+  flex: 1;
+  padding-right: 64px;
+}
+
+.field-pw-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--r-xs);
+  background: transparent;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--son-deep);
+  cursor: pointer;
+}
+
+.field-pw-toggle:hover {
+  background: rgba(163, 50, 31, 0.08);
+}
+
+.field-pw-toggle:focus-visible {
   outline: 2px solid var(--son);
-}
-
-.auth-main .form .btn-primary {
-  margin-top: 4px;
 }
 
 .btn-google {
@@ -2726,7 +2878,8 @@
   gap: 12px;
   color: var(--than);
   background: #fff;
-  border-color: var(--hair);
+  border-color: rgba(122, 93, 60, 0.3);
+  border-radius: var(--r-sm);
 }
 
 .btn-google:hover {
@@ -2739,8 +2892,8 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  margin: 20px 0 4px;
-  font-size: 0.78rem;
+  margin: 18px 0 4px;
+  font-size: 0.76rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--than-soft);
@@ -2758,8 +2911,8 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px 24px;
-  margin-top: 28px;
-  padding-top: 18px;
+  margin-top: 22px;
+  padding-top: 16px;
   border-top: 1px solid var(--hair-soft);
   font-size: 0.9rem;
 }
@@ -2768,33 +2921,43 @@
   color: var(--son-deep);
 }
 
-@media (max-width: 760px) {
-  .auth-shell {
-    padding: 24px 16px 48px;
+@media (max-width: 960px) {
+  .auth-stage {
+    min-height: 0;
+    padding: 32px 16px 48px;
   }
-  .auth-card {
+  .auth-stage-inner {
     grid-template-columns: 1fr;
+    gap: 28px;
   }
-  .auth-aside {
-    gap: 16px;
-    padding: 24px 24px 20px;
+  .auth-aside-title {
+    font-size: clamp(2rem, 8vw, 2.8rem);
   }
-  .auth-aside {
-    min-height: 150px;
+  .auth-aside-seal {
+    display: none;
   }
-  .auth-aside-photo {
-    height: 100%;
-    -webkit-mask-image: none;
-    mask-image: none;
+  .auth-panel {
+    padding: 28px 22px 26px;
   }
+}
+
+@media (max-width: 640px) {
   .auth-aside-quote {
     display: none;
   }
   .auth-aside-note {
-    display: none;
+    margin-bottom: 14px;
   }
-  .auth-main {
-    padding: 28px 24px 28px;
+  .auth-orb-a {
+    width: 220px;
+    height: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-orb,
+  .auth-panel {
+    animation: none;
   }
 }
 
@@ -2846,8 +3009,7 @@
 .testimonial-card,
 .account-card,
 .order-summary,
-.product-detail-art,
-.auth-main {
+.product-detail-art {
   background: var(--g-bg);
   border: 1px solid var(--g-border);
   box-shadow: var(--g-shadow);
@@ -2855,25 +3017,9 @@
   backdrop-filter: var(--g-blur);
 }
 
-.auth-card {
-  background: var(--g-bg-strong);
-  border: 1px solid var(--g-border);
-  -webkit-backdrop-filter: var(--g-blur);
-  backdrop-filter: var(--g-blur);
-}
-
-.auth-main {
-  border: 0;
-  box-shadow: none;
-  background: transparent;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
 .product-card::before,
 .account-card::before,
-.product-detail-art::before,
-.auth-card::after {
+.product-detail-art::before {
   border-radius: calc(var(--r-md) - 6px);
 }
 

@@ -241,3 +241,11 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Auth**: `LocaleLayout` chọn `AuthHeader`/`AuthFooter` khi đường dẫn thuộc `AUTH_PAGES`. Header chỉ có logo, `LanguageSwitcher`, nút chuyển đăng nhập ↔ đăng ký; không có `.nav-links`, không link neo. Scene `auth` không còn ảnh, nền là `radial-gradient` hoè/son/chàm mờ.
 - **Ảnh**: `bay-green` (Di sản, 20%, giảm bão hoà) và `hills-gold` (Lookbook, 34%, ảnh ở nửa dưới) thay `halong-mist`/`lanterns-night`; nguồn CC0 ghi ở `public/images/scene/CREDITS.md`. `hills-gold` gốc 1024px nên bản 1280px là phóng nhẹ — chấp nhận vì độ đậm thấp.
 - **Ảnh auth (D-81)**: `AuthShell` đặt `public/images/auth/lantern-river-{640,1024}.webp` trong `.auth-aside` (chiếm 74% chiều cao, tan dần về chàm đêm bằng mask để câu chữ nằm trên mảng tối). ≤760px: ảnh phủ cả dải đầu thẻ, ẩn câu trích. Bộ ảnh `auth` tách riêng khỏi `scene` và `dash`.
+
+### T-47 — Trang auth v2: sân khấu ảnh + thẻ kính
+
+- **Bố cục**: `AuthShell` = `.auth-stage` (toàn chiều rộng, nền chàm đêm) > `.auth-stage-inner` (lưới 1,15fr | 440px). `aside.auth-aside` không có `position` nên ảnh (`.auth-aside-photo`, z −3) và lớp phủ chàm (`::before`, z −2) tựa vào `.auth-stage` và phủ kín sân khấu; chữ dẫn ở trong cùng aside. Thẻ form `.auth-panel` là kính (blur 26px, nền giấy 82–90%). ≤960px xếp dọc; ≤640px ẩn đoạn dẫn.
+- **Thanh chuyển** `.auth-tabs` (chỉ login/register, `tab` prop) thay link cuối form; giữ `?next=`. Link "Quên mật khẩu?" ở lại footer của form.
+- **Field `toggle`**: ô mật khẩu có nút Hiện/Ẩn (`aria-pressed`), chỉ bật ở trang auth.
+- **Chuyển động**: quầng bokeh `auth-orb` trôi chậm, thẻ trồi lên 0,7s; tắt khi `prefers-reduced-motion`.
+- **Hệ quả**: các test cũ dùng link "Chưa có tài khoản?" chuyển sang `tab()`.

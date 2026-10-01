@@ -1,11 +1,15 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { useState } from 'react'
 import { mockApi, renderAt } from '../../test/renderApp.jsx'
 import { productsVi } from '../../test/fixtures.js'
 import AuthProvider from '../../auth/AuthProvider.jsx'
 import { useAuth } from '../../auth/context.js'
+
+// Thanh chuyển đăng nhập ↔ đăng ký (D-82) thay cho link cuối form
+const tab = (name) => within(screen.getByRole('navigation', { name: /Chọn đăng nhập/ })).getByRole('link', { name })
+
 
 // Test bổ sung độc lập cho FR-ACC-001 phía giao diện
 const base = {
@@ -172,10 +176,10 @@ describe('SEO — noindex (BR-SEO-001)', () => {
     mockApi(base)
     renderAt('/login')
     await screen.findByRole('heading', { name: 'Đăng nhập' })
-    fireEvent.click(screen.getByRole('link', { name: 'Chưa có tài khoản? Tạo tài khoản' }))
+    fireEvent.click(tab('Tạo tài khoản'))
     await screen.findByRole('heading', { name: 'Tạo tài khoản' })
     expect(robots()).toHaveLength(1)
-    fireEvent.click(screen.getByRole('link', { name: 'Đã có tài khoản? Đăng nhập' }))
+    fireEvent.click(tab('Đăng nhập'))
     await screen.findByRole('heading', { name: 'Đăng nhập' })
     fireEvent.click(screen.getByRole('link', { name: 'Quên mật khẩu?' }))
     await screen.findByRole('heading', { name: 'Quên mật khẩu' })
@@ -280,7 +284,7 @@ describe('Đăng ký thành công', () => {
       'POST /auth/login': () => ({ body: session }),
     })
     renderAt('/login?next=%2Fproducts%2Fden-nguyet')
-    const link = await screen.findByRole('link', { name: 'Chưa có tài khoản? Tạo tài khoản' })
+    const link = await screen.findByRole('navigation', { name: /Chọn đăng nhập/ }).then(() => tab('Tạo tài khoản'))
     expect(link.getAttribute('href')).toBe('/register?next=%2Fproducts%2Fden-nguyet')
     fireEvent.click(link)
     await screen.findByRole('heading', { name: 'Tạo tài khoản' })

@@ -209,6 +209,12 @@ export default {
     toHome: '探索 LAMVI',
   },
   auth: {
+    heroLine1: '点亮一盏灯',
+    heroLine2: '寄托你想说的话',
+    heroLead: '手工宣纸灯笼，附上专属祝福——从工坊到收礼人，每道工序都可追踪。',
+    show: '显示',
+    hide: '隐藏',
+    tabsLabel: '选择登录或创建账户',
     loginEyebrow: '欢迎回来',
     loginLead: '登录后可查看订单和祝福。',
     registerEyebrow: '走进灯坊',

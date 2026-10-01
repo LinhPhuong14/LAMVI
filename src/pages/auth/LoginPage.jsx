@@ -24,7 +24,6 @@ export default function LoginPage() {
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
-  const registerTo = { pathname: path('/register'), search: params.get('next') ? `?next=${encodeURIComponent(next)}` : '' }
   const urlError = params.get('error')
 
   return (
@@ -32,12 +31,8 @@ export default function LoginPage() {
       eyebrow={t('auth.loginEyebrow')}
       title={t('auth.loginTitle')}
       lead={t('auth.loginLead')}
-      footer={
-        <>
-          <Link to={path('/forgot-password')}>{t('auth.toForgot')}</Link>
-          <Link to={registerTo}>{t('auth.toRegister')}</Link>
-        </>
-      }
+      tab="login"
+      footer={<Link to={path('/forgot-password')}>{t('auth.toForgot')}</Link>}
     >
       {urlError && (
         <p className="notice error" role="alert">
@@ -51,6 +46,7 @@ export default function LoginPage() {
           label={t('auth.password')}
           type="password"
           autoComplete="current-password"
+          toggle
           required
           value={form.password}
           onChange={set('password')}
