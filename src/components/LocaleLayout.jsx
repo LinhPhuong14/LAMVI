@@ -12,7 +12,7 @@ import CartProvider from '../cart/CartProvider.jsx'
 const APP_PAGES = new Set(['/account'])
 
 // Cảnh nền ảnh thật ở đầu các trang công khai (D-66); trang chủ có cảnh riêng từng phần, 404 tự vẽ khung đêm
-const AUTH_PAGES = new Set(['/login', '/register', '/forgot-password', '/reset-password'])
+const AUTH_PAGES = new Set(['/login', '/register', '/forgot-password', '/reset-password', '/auth/callback'])
 function pageScene(rest) {
   if (AUTH_PAGES.has(rest)) return 'auth'
   if (rest.startsWith('/products/')) return 'product'

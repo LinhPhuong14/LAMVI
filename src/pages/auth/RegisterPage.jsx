@@ -3,7 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../../components/Field'
 import { api } from '../../api/client.js'
 import { LOCALES, useI18n } from '../../i18n/index.js'
-import Seo from '../../seo/Seo.jsx'
+import AuthShell from './AuthShell'
+import GoogleButton from './GoogleButton'
 import { safeNext, useAuth } from '../../auth/context.js'
 import { useSubmit } from '../../auth/useForm.js'
 
@@ -32,25 +33,26 @@ export default function RegisterPage() {
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
+  const loginLink = <Link to={path('/login')}>{t('auth.toLogin')}</Link>
+
   if (confirmSent) {
     return (
-      <section className="page-section narrow">
-        <Seo title={t('auth.registerTitle')} noindex />
-        <h1 className="page-title">{t('auth.registerTitle')}</h1>
+      <AuthShell title={t('auth.registerTitle')} footer={loginLink}>
         <p className="notice success" role="status">
           {t('auth.registeredConfirm')}
         </p>
-        <div className="form-links">
-          <Link to={path('/login')}>{t('auth.toLogin')}</Link>
-        </div>
-      </section>
+      </AuthShell>
     )
   }
 
   return (
-    <section className="page-section narrow">
-        <Seo title={t('auth.registerTitle')} noindex />
-      <h1 className="page-title">{t('auth.registerTitle')}</h1>
+    <AuthShell
+      eyebrow={t('auth.registerEyebrow')}
+      title={t('auth.registerTitle')}
+      lead={t('auth.registerLead')}
+      footer={loginLink}
+    >
+      <GoogleButton next={params.get('next') ? safeNext(params.get('next'), undefined) : undefined} />
       <form className="form" onSubmit={onSubmit} noValidate>
         <Field label={t('auth.fullName')} autoComplete="name" required value={form.fullName} onChange={set('fullName')} error={fields.fullName} />
         <Field label={t('auth.email')} type="email" autoComplete="email" required value={form.email} onChange={set('email')} error={fields.email} />
@@ -87,9 +89,6 @@ export default function RegisterPage() {
           {pending ? t('auth.submitting') : t('auth.submitRegister')}
         </button>
       </form>
-      <div className="form-links">
-        <Link to={path('/login')}>{t('auth.toLogin')}</Link>
-      </div>
-    </section>
+    </AuthShell>
   )
 }

@@ -40,6 +40,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-34 | 2026-09-29 | Dashboard tài khoản thanh thoát theo nguyên tắc dashboard Trung Quốc (khoảng trắng, nét 1px, một điểm nhấn son) | Hiệu lực |
 | T-35 | 2026-09-29 | Dashboard kính mờ, nền ảnh thật, giao diện tối trong phạm vi `.dash` | Hiệu lực |
 | T-36 | 2026-09-29 | Cảnh nền ảnh thật CC0 (`Scene`) cho trang chủ và các trang công khai, thay hoạ tiết SVG T-28 | Hiệu lực |
+| T-44 | 2026-10-01 | Đăng nhập Google bằng OAuth 2.0 authorization code trực tiếp với Google (không dùng provider Google của Supabase); khung auth hai nửa `AuthShell` | Hiệu lực |
 
 ---
 
@@ -216,3 +217,10 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Quyết định**: `server/adapters/gaRealtime.js` ký JWT RS256 bằng `node:crypto` (service account), đổi lấy access token, gọi `properties/{id}:runRealtimeReport` bằng `fetch` — không thêm SDK `googleapis` (nặng, cùng lý do T-29). Token giữ trong bộ nhớ (promise dùng chung để 5 báo cáo song song chỉ đổi token một lần), kết quả cache 15 giây. Test dùng `fetchImpl` giả.
 - **Cấu hình**: `GA_PROPERTY_ID` + `GA_SERVICE_ACCOUNT_JSON` (JSON hoặc base64) hoặc `GA_CLIENT_EMAIL` + `GA_PRIVATE_KEY`. Thiếu → `configured:false`. Khoá chỉ ở server; lỗi Google đổi sang mã `GA_*`, không chuyển nguyên văn cho client.
 - **Hệ quả**: cache theo từng instance serverless nên hiệu quả giảm khi có nhiều instance — chấp nhận, hạn mức realtime của GA đủ rộng cho vài admin.
+
+### T-44 — Đăng nhập Google: OAuth trực tiếp, state trong cookie ký
+
+- **Bối cảnh**: PO yêu cầu dùng cấu hình OAuth của Google Cloud, không dùng provider Google có sẵn của Supabase (D-78).
+- **Quyết định**: server tự làm luồng authorization code: `GET /api/auth/google/start` (đặt cookie `lamvi_gauth` HttpOnly, SameSite=Lax, Secure khi https, ký HMAC bằng `MAY_HASH_SALT`, chứa state + nonce + next + lang, hạn 10 phút — không giữ trạng thái trong bộ nhớ vì serverless) → Google → `GET /api/auth/google/callback` đổi code lấy `id_token` qua TLS (kiểm `aud`, `iss`, `exp`, `nonce`, `email_verified`; không cần kiểm chữ ký vì nhận trực tiếp từ endpoint token của Google). Cấp phiên cho email đã xác minh bằng `auth.signInVerifiedEmail`: Supabase = `admin.generateLink({type:'magiclink'})` (tạo user nếu chưa có, không gửi email) + `verifyOtp(token_hash)`; adapter bộ nhớ tự tạo user. Phiên trả về trình duyệt qua **fragment** (`/auth/callback#s=…`) để không vào log máy chủ; trang `AuthCallbackPage` lưu phiên (`acceptSession`) rồi xoá fragment.
+- **Cấu hình**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`; redirect URI `{PUBLIC_SITE_URL}/api/auth/google/callback`. Thiếu → `/api/auth/providers` trả `google:false`, nút ẩn.
+- **Hệ quả**: không phụ thuộc cài đặt provider của Supabase; rate limit dùng nhóm `login`. Tài khoản tạo bằng Google không có mật khẩu đã biết.

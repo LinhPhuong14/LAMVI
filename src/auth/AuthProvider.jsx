@@ -24,6 +24,9 @@ export default function AuthProvider({ children }) {
     [update],
   )
 
+  // D-78: phiên do server cấp sau khi đăng nhập Google (trang /auth/callback)
+  const acceptSession = useCallback((s) => update(pickSession(s)), [update])
+
   // Gộp các lần refresh đồng thời thành một
   const refresh = useCallback(() => {
     const current = sessionRef.current
@@ -70,8 +73,8 @@ export default function AuthProvider({ children }) {
   }, [update])
 
   const value = useMemo(
-    () => ({ session, user: session?.user ?? null, login, logout, authedApi }),
-    [session, login, logout, authedApi],
+    () => ({ session, user: session?.user ?? null, login, acceptSession, logout, authedApi }),
+    [session, login, acceptSession, logout, authedApi],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

@@ -39,6 +39,20 @@
   color: var(--brown-deep);
 }
 
+.nav-logout {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.nav-logout:hover {
+  color: var(--son);
+}
+
 /* Giá + chú thích VAT (BR-PRC-003) */
 .price {
   display: inline-flex;
@@ -275,7 +289,8 @@
   .product-detail-grid {
     grid-template-columns: 1fr;
   }
-  .nav-account {
+  .nav-account,
+  .nav-logout {
     display: none;
   }
 }

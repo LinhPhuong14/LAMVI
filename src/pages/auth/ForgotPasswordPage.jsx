@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Field from '../../components/Field'
 import { api } from '../../api/client.js'
 import { useI18n } from '../../i18n/index.js'
-import Seo from '../../seo/Seo.jsx'
+import AuthShell from './AuthShell'
 import { useSubmit } from '../../auth/useForm.js'
 
 export default function ForgotPasswordPage() {
@@ -21,9 +21,11 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <section className="page-section narrow">
-        <Seo title={t('auth.forgotTitle')} noindex />
-      <h1 className="page-title">{t('auth.forgotTitle')}</h1>
+    <AuthShell
+      title={t('auth.forgotTitle')}
+      lead={t('auth.forgotLead')}
+      footer={<Link to={path('/login')}>{t('auth.toLogin')}</Link>}
+    >
       {sent ? (
         <p className="notice success" role="status">
           {t('auth.forgotSent')}
@@ -49,9 +51,6 @@ export default function ForgotPasswordPage() {
           </button>
         </form>
       )}
-      <div className="form-links">
-        <Link to={path('/login')}>{t('auth.toLogin')}</Link>
-      </div>
-    </section>
+    </AuthShell>
   )
 }

@@ -4,6 +4,7 @@ import { AuthError } from '../adapters/authErrors.js'
 import { requireAuth } from '../middleware/auth.js'
 import { byIpAndEmail, rateLimit } from '../middleware/rateLimit.js'
 import { DEFAULT_HASH_SALT } from '../config.js'
+import { COOKIE, authorizeUrl, exchangeCode, googleEnabled, newFlow, openState, readCookie, sealState } from '../google.js'
 import { localePath, normalizeLang } from '../i18n.js'
 import {
   normalizeEmail,
@@ -107,6 +108,46 @@ export function authRouter({ repo, auth, config }) {
       throw new HttpError(401, 'INVALID_CREDENTIALS', 'Sai email hoặc mật khẩu')
     }
     res.json(await call(() => auth.signIn({ email, password: b.password })))
+  })
+
+  // D-78: đăng nhập Google. Nút chỉ hiện khi có GOOGLE_CLIENT_ID/SECRET.
+  r.get('/auth/providers', (req, res) => res.json({ google: googleEnabled(config) }))
+
+  const secret = config.mayHashSalt ?? DEFAULT_HASH_SALT
+  const googleLimit = limit('login', undefined, { name: 'google' })
+  const cookieAttrs = `Path=/api/auth/google; HttpOnly; SameSite=Lax${config.publicSiteUrl.startsWith('https:') ? '; Secure' : ''}`
+  const loginUrl = (lang, query = '') => siteUrl(lang, `/login${query}`)
+
+  r.get('/auth/google/start', googleLimit, (req, res) => {
+    const lang = normalizeLang(req.query.lang)
+    if (!googleEnabled(config)) return res.redirect(302, loginUrl(lang, '?error=GOOGLE_UNAVAILABLE'))
+    const next = typeof req.query.next === 'string' && /^\/(?!\/)/.test(req.query.next) ? req.query.next : null
+    const flow = newFlow({ next, lang })
+    res.setHeader('Set-Cookie', `${COOKIE}=${sealState(flow, secret)}; Max-Age=600; ${cookieAttrs}`)
+    res.redirect(302, authorizeUrl(config, flow))
+  })
+
+  r.get('/auth/google/callback', googleLimit, async (req, res) => {
+    const flow = openState(readCookie(req, COOKIE), secret)
+    res.setHeader('Set-Cookie', `${COOKIE}=; Max-Age=0; ${cookieAttrs}`)
+    const lang = flow?.lang ?? normalizeLang(req.query.lang)
+    const fail = (code) => res.redirect(302, loginUrl(lang, `?error=${code}`))
+    if (!flow || !googleEnabled(config) || req.query.state !== flow.state) return fail('GOOGLE_FAILED')
+    if (req.query.error || typeof req.query.code !== 'string') return fail('GOOGLE_CANCELLED')
+    try {
+      const g = await exchangeCode(config, req.query.code, flow)
+      const email = normalizeEmail(g.email)
+      const session = await call(() => auth.signInVerifiedEmail(email))
+      if (!(await repo.getProfile(session.user.id))) {
+        await repo.upsertProfile({ id: session.user.id, fullName: g.name, preferredLocale: lang })
+      }
+      // Phiên đi trong fragment (không gửi lên server, không vào log); trang /auth/callback lưu rồi chuyển hướng
+      const payload = Buffer.from(JSON.stringify({ session, next: flow.next })).toString('base64url')
+      res.redirect(302, siteUrl(lang, '/auth/callback') + `#s=${payload}`)
+    } catch (err) {
+      console.error('[auth] google', err.message)
+      fail('GOOGLE_FAILED')
+    }
   })
 
   r.post('/auth/refresh', async (req, res) => {
