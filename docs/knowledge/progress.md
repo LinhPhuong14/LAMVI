@@ -49,3 +49,5 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 - `[LEGAL]` Q-36 (ảnh tư liệu CC0), I-15 (xoá lịch sử chat).
 - Tài khoản payOS thật (`PAYOS_*`) và khoá GA (`GA_MEASUREMENT_ID`).
 - Ảnh sản phẩm thật (G-33, G-23).
+
+- Vercel Web Analytics (T-42): `@vercel/analytics` nhúng ở `src/main.jsx`, URL đã làm sạch. Cần bật Analytics trên dashboard Vercel.

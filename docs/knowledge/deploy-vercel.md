@@ -54,3 +54,7 @@ curl -i localhost:5180/en
 ```
 
 Chưa kiểm chứng trên một deployment Vercel thật (G-36) — phiên đầu tiên deploy phải kiểm tra §Quy tắc 4.
+
+## Vercel Web Analytics (T-42)
+
+Gói `@vercel/analytics` được nhúng ở `src/main.jsx`. Bật **Analytics** trong dashboard Vercel của project để có số liệu; không cần biến môi trường hay đổi CSP.
