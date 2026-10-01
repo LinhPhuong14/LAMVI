@@ -9,6 +9,7 @@ import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderPage from './pages/OrderPage'
 import LoginPage from './pages/auth/LoginPage'
+import AuthCallbackPage from './pages/auth/AuthCallbackPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
@@ -33,6 +34,7 @@ function localeChildren() {
       <Route path="checkout" element={<CheckoutPage />} />
       <Route path="don-hang/:code" element={<OrderPage />} />
       <Route path="login" element={<LoginPage />} />
+      <Route path="auth/callback" element={<AuthCallbackPage />} />
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<ForgotPasswordPage />} />
       <Route path="reset-password" element={<ResetPasswordPage />} />

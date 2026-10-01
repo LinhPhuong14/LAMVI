@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useMotionValueEvent, useScroll } from 'framer-motion'
 import { LOCALES, localePath, splitLocale, useI18n } from '../i18n/index.js'
+import { AuthContext } from '../auth/context.js'
 import { useCart } from '../cart/context.js'
 import { Seal } from './Motifs'
 
@@ -56,6 +57,7 @@ function useHeaderState() {
 export default function SiteHeader() {
   const { t, path } = useI18n()
   const { hidden, scrolled } = useHeaderState()
+  const auth = useContext(AuthContext)
   return (
     <header className={`nav${hidden ? ' is-hidden' : ''}${scrolled ? ' is-scrolled' : ''}`}>
       <Link to={path('/')} className="nav-mark" aria-label="LAMVI">
@@ -74,6 +76,11 @@ export default function SiteHeader() {
         <Link to={path('/account')} className="nav-account">
           {t('nav.account')}
         </Link>
+        {auth?.user && (
+          <button type="button" className="nav-logout" onClick={() => auth.logout()}>
+            {t('nav.logout')}
+          </button>
+        )}
         <Link to={{ pathname: path('/'), hash: '#products' }} className="nav-cta thread">
           {t('nav.cta')}
         </Link>

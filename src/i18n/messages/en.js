@@ -7,6 +7,7 @@ export default {
       'Handmade dó paper lanterns as gifts, with a QR-linked message and the story of how they were made.',
   },
   nav: {
+    logout: 'Sign out',
     home: 'Home',
     story: 'Story',
     artisan: 'Artisan',
@@ -221,6 +222,15 @@ export default {
     toHome: 'Discover LAMVI',
   },
   auth: {
+    loginEyebrow: 'Welcome back',
+    loginLead: 'Sign in to see your orders and your messages.',
+    registerEyebrow: 'Step inside',
+    registerLead: 'One account to order lanterns, send a message and follow every stage of the making.',
+    forgotLead: 'Enter your email and LAMVI will send a link to reset your password.',
+    google: 'Continue with Google',
+    or: 'or use email',
+    asideQuote: 'Every lantern is a fold of paper, a stroke of bamboo, a message to give.',
+    asideNote: 'Handmade lanterns by LAMVI',
     loginTitle: 'Sign in',
     registerTitle: 'Create an account',
     forgotTitle: 'Forgot password',
@@ -289,6 +299,9 @@ export default {
     mayHint: 'Tap Mây in the corner of the screen to ask about lanterns, messages or delivery.',
   },
   errors: {
+    GOOGLE_FAILED: 'Could not sign in with Google. Please try again.',
+    GOOGLE_CANCELLED: 'You cancelled the Google sign-in.',
+    GOOGLE_UNAVAILABLE: 'Google sign-in is not available right now.',
     NETWORK_ERROR: 'Could not reach the server. Please try again.',
     INTERNAL_ERROR: 'Something went wrong. Please try again later.',
     VALIDATION_ERROR: 'Please check your details.',

@@ -6,6 +6,7 @@ export default {
     description: '手工纸灯礼物，附带二维码祝福和制灯过程视频。',
   },
   nav: {
+    logout: '退出登录',
     home: '首页',
     story: '故事',
     artisan: '匠人',
@@ -208,6 +209,15 @@ export default {
     toHome: '探索 LAMVI',
   },
   auth: {
+    loginEyebrow: '欢迎回来',
+    loginLead: '登录后可查看订单和祝福。',
+    registerEyebrow: '走进灯坊',
+    registerLead: '一个账户即可订购灯笼、送出祝福，并跟进每一道工序。',
+    forgotLead: '输入邮箱，LAMVI 将发送重置密码的链接。',
+    google: '使用 Google 继续',
+    or: '或使用邮箱',
+    asideQuote: '每一盏灯，都是一道纸褶、一笔竹骨、一句寄语。',
+    asideNote: 'LAMVI 手作灯笼',
     loginTitle: '登录',
     registerTitle: '创建账户',
     forgotTitle: '忘记密码',
@@ -276,6 +286,9 @@ export default {
     mayHint: '点击屏幕角落的 Mây，询问灯、祝福或配送相关问题。',
   },
   errors: {
+    GOOGLE_FAILED: '无法使用 Google 登录，请重试。',
+    GOOGLE_CANCELLED: '您已取消 Google 登录。',
+    GOOGLE_UNAVAILABLE: 'Google 登录暂不可用。',
     NETWORK_ERROR: '无法连接服务器，请重试。',
     INTERNAL_ERROR: '出现错误，请稍后再试。',
     VALIDATION_ERROR: '请检查您填写的信息。',

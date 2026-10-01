@@ -17,6 +17,7 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 1. **Bắt buộc có Supabase ở Preview/Production.** Thiếu `SUPABASE_*` server rơi về adapter bộ nhớ (T-04) — trên serverless mỗi instance một bản dữ liệu, mất khi instance tắt. Không được deploy kiểu đó.
 2. **Biến môi trường** đặt ở Vercel (Project → Settings → Environment Variables), theo từng môi trường; không commit `.env`, không đưa key vào frontend (T-05). Danh sách: xem [`../../.env.example`](../../.env.example). Riêng Vercel:
    - `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_…`), `SUPABASE_SECRET_KEY` (`sb_secret_…`) (bắt buộc; secret key chỉ ở server). Tên cũ `SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` vẫn nhận nếu không có tên mới.
+   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (tuỳ chọn, T-44): OAuth client Web ở Google Cloud; Authorized redirect URI = `{PUBLIC_SITE_URL}/api/auth/google/callback`. Thiếu → ẩn nút "Tiếp tục với Google".
    - `PUBLIC_SITE_URL` = URL công khai thật (dùng cho link đặt lại mật khẩu, sitemap, hreflang) — Production đặt domain chính; Preview không dùng link đặt lại mật khẩu để kiểm thử thật. Thêm URL này vào Redirect URLs của Supabase (G-16).
    - `TRUST_PROXY=1` (Vercel đứng trước hàm; nếu không, hạn mức Mây theo IP và IP trong log sai).
    - `MAY_HASH_SALT` đặt giá trị bí mật riêng; `OPENAI_*`, `PAYOS_*` khi tích hợp. Không đặt `DEV_ADMIN_*`/`DEV_IT_*` trên Vercel.

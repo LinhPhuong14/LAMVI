@@ -1,5 +1,15 @@
 # Nhật ký phiên
 
+## 2026-10-01 — Làm lại auth + đăng nhập Google (nhánh `feat/auth-redesign-google`)
+
+**Mục tiêu người dùng**: khảo sát mẫu Behance/Pinterest cùng vibe LAMVI, chỉnh lại layout đăng nhập/đăng ký/đăng xuất, thêm đăng nhập Google; sau đó yêu cầu dùng cấu hình OAuth của Google Cloud, không dùng Google provider của Supabase.
+
+**Đã làm**: khung `AuthShell` thiếp thư hai nửa (mảng chàm đêm + giấy điệp) cho 4 trang auth; nút Google + dải "hoặc" kẻ đôi; luồng OAuth trực tiếp (T-44, D-78); `/auth/callback`; nút đăng xuất ở header; i18n vi/en/zh.
+
+**Lưu ý**: không xem trực tiếp được ảnh Behance/Pinterest (trang chặn/không tải được) — bố cục dựa trên design-rules (thiếp thư, tranh bồi) và mẫu split-card phổ biến; cần PO xem lại.
+
+**Còn lại / cần người dùng**: tạo OAuth client ở Google Cloud, đặt `GOOGLE_CLIENT_ID/SECRET` + redirect URI (G-51); `[LEGAL]` nội dung quyền riêng tư cho dữ liệu Google.
+
 ## 2026-10-01 — Báo cáo GA realtime trong admin (nhánh `feat/admin-ga-realtime`)
 
 **Mục tiêu người dùng**: "thêm báo cáo GA xem realtime vào Admin dashboard".

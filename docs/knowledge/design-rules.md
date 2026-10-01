@@ -117,7 +117,8 @@ Người dùng không muốn nền tự vẽ bằng SVG → mỗi phần trang c
 | QR | Mây hoàng hôn (từ phải, mờ về trái) |
 | Lời khách | Hồ sương bình minh |
 | Hỏi đáp | Biển mây (dưới) |
-| Đăng nhập/đăng ký/quên, đặt lại mật khẩu | Biển mây rõ hơn + 4 đèn bay; form trong thẻ kính mờ |
+| Đăng nhập/đăng ký/quên, đặt lại mật khẩu | Biển mây rõ hơn + 4 đèn bay; form trong thiếp thư hai nửa (xem dòng dưới) |
+| Đăng nhập/đăng ký/quên/đặt lại | (cập nhật v0.21) Form là **thiếp thư hai nửa** (`AuthShell`): trái mảng `--cham-deep` với ấn LAMVI, câu nghiêng Fraunces và nhãn hoa sen; phải giấy `--diep-light`, đường chỉ `inset 8px`, góc 3px. Nút Google nền trắng nét `--hair` (không phải điểm nhấn son), tách khỏi form bằng dải kẻ đôi "hoặc". Mobile: mảng chàm thu thành dải đầu thẻ |
 | Chi tiết sản phẩm · Giỏ hàng · Trang lô | Dải ảnh đầu trang mờ dần: trời mây vàng · hồ sương làng · thung lũng sương |
 | 404 | Khung trời sao chàm đêm bo 24px + 5 đèn bay |
 

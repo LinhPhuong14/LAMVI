@@ -59,6 +59,9 @@ export function loadConfig(env = process.env) {
       priceInPer1M: Number(env.OPENAI_PRICE_INPUT_PER_1M) || 0.15,
       priceOutPer1M: Number(env.OPENAI_PRICE_OUTPUT_PER_1M) || 0.6,
     },
+    // Đăng nhập Google (D-78): OAuth 2.0 trực tiếp với Google Cloud, không dùng provider Google của
+    // Supabase. Thiếu một trong hai → ẩn nút "Đăng nhập với Google".
+    google: { clientId: env.GOOGLE_CLIENT_ID || null, clientSecret: env.GOOGLE_CLIENT_SECRET || null },
     mayHashSalt: env.MAY_HASH_SALT || env.SUPABASE_URL || DEFAULT_HASH_SALT,
     supabase,
     useSupabase: Boolean(supabase.url && supabase.anonKey && supabase.serviceRoleKey),

@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../../components/Field'
 import { useI18n } from '../../i18n/index.js'
-import Seo from '../../seo/Seo.jsx'
+import AuthShell from './AuthShell'
+import GoogleButton from './GoogleButton'
 import { safeNext, useAuth } from '../../auth/context.js'
 import { useSubmit } from '../../auth/useForm.js'
 
@@ -23,10 +24,27 @@ export default function LoginPage() {
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
+  const registerTo = { pathname: path('/register'), search: params.get('next') ? `?next=${encodeURIComponent(next)}` : '' }
+  const urlError = params.get('error')
+
   return (
-    <section className="page-section narrow">
-        <Seo title={t('auth.loginTitle')} noindex />
-      <h1 className="page-title">{t('auth.loginTitle')}</h1>
+    <AuthShell
+      eyebrow={t('auth.loginEyebrow')}
+      title={t('auth.loginTitle')}
+      lead={t('auth.loginLead')}
+      footer={
+        <>
+          <Link to={path('/forgot-password')}>{t('auth.toForgot')}</Link>
+          <Link to={registerTo}>{t('auth.toRegister')}</Link>
+        </>
+      }
+    >
+      {urlError && (
+        <p className="notice error" role="alert">
+          {t(`errors.${urlError}`)}
+        </p>
+      )}
+      <GoogleButton next={params.get('next') ? next : undefined} />
       <form className="form" onSubmit={onSubmit} noValidate>
         <Field label={t('auth.email')} type="email" autoComplete="email" required value={form.email} onChange={set('email')} />
         <Field
@@ -46,12 +64,6 @@ export default function LoginPage() {
           {pending ? t('auth.submitting') : t('auth.submitLogin')}
         </button>
       </form>
-      <div className="form-links">
-        <Link to={path('/forgot-password')}>{t('auth.toForgot')}</Link>
-        <Link to={{ pathname: path('/register'), search: params.get('next') ? `?next=${encodeURIComponent(next)}` : '' }}>
-          {t('auth.toRegister')}
-        </Link>
-      </div>
-    </section>
+    </AuthShell>
   )
 }

@@ -8,6 +8,7 @@ export default {
       'Đèn giấy dó thủ công làm quà tặng, kèm lời chúc gắn mã QR và video hành trình làm đèn.',
   },
   nav: {
+    logout: 'Đăng xuất',
     home: 'Trang chủ',
     story: 'Câu chuyện',
     artisan: 'Nghệ nhân',
@@ -234,6 +235,15 @@ export default {
     toHome: 'Khám phá LAMVI',
   },
   auth: {
+    loginEyebrow: 'Chào mừng trở lại',
+    loginLead: 'Đăng nhập để xem đơn hàng và lời chúc của bạn.',
+    registerEyebrow: 'Vào gian đèn',
+    registerLead: 'Một tài khoản để đặt đèn, gửi lời chúc và theo dõi từng công đoạn.',
+    forgotLead: 'Nhập email, LAMVI sẽ gửi liên kết đặt lại mật khẩu.',
+    google: 'Tiếp tục với Google',
+    or: 'hoặc dùng email',
+    asideQuote: 'Mỗi chiếc đèn là một nếp giấy, một nét tre, một lời gửi trao.',
+    asideNote: 'Đèn thủ công LAMVI',
     loginTitle: 'Đăng nhập',
     registerTitle: 'Tạo tài khoản',
     forgotTitle: 'Quên mật khẩu',
@@ -304,6 +314,9 @@ export default {
     mayHint: 'Bấm vào Mây ở góc màn hình để hỏi về đèn, lời chúc hay giao hàng.',
   },
   errors: {
+    GOOGLE_FAILED: 'Không đăng nhập được bằng Google. Vui lòng thử lại.',
+    GOOGLE_CANCELLED: 'Bạn đã huỷ đăng nhập bằng Google.',
+    GOOGLE_UNAVAILABLE: 'Đăng nhập bằng Google hiện chưa khả dụng.',
     NETWORK_ERROR: 'Không kết nối được máy chủ. Vui lòng thử lại.',
     INTERNAL_ERROR: 'Có lỗi xảy ra. Vui lòng thử lại sau.',
     VALIDATION_ERROR: 'Vui lòng kiểm tra lại thông tin.',

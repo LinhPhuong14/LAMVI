@@ -53,6 +53,17 @@ export function createMemoryAuth({ requireEmailConfirmation = false, accessTtlMs
       return issue(u)
     },
 
+    // D-78: email đã được Google xác minh → tìm hoặc tạo user (không mật khẩu) rồi cấp phiên
+    async signInVerifiedEmail(email) {
+      let u = users.get(email)
+      if (!u) {
+        const salt = randomBytes(16)
+        u = { id: randomUUID(), email, salt, hash: hash(randomBytes(24).toString('hex'), salt), confirmed: true }
+        users.set(email, u)
+      }
+      return issue(u)
+    },
+
     async refresh(refreshToken) {
       const userId = refresh.get(refreshToken)
       if (!userId) throw new AuthError('UNAUTHORIZED')

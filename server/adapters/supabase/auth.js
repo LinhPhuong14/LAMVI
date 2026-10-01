@@ -51,6 +51,19 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
       return toSession(data.session, data.user)
     },
 
+    // D-78: email đã được Google xác minh (OAuth trực tiếp, không qua provider Google của Supabase).
+    // generateLink tạo user nếu chưa có và không gửi email; verifyOtp đổi token băm lấy phiên.
+    async signInVerifiedEmail(email) {
+      const { data: link, error } = await admin.auth.admin.generateLink({ type: 'magiclink', email })
+      if (error) throw mapError(error)
+      const { data, error: err2 } = await makePublicClient().auth.verifyOtp({
+        token_hash: link.properties.hashed_token,
+        type: 'magiclink',
+      })
+      if (err2) throw mapError(err2)
+      return toSession(data.session, data.user)
+    },
+
     async refresh(refreshToken) {
       const { data, error } = await makePublicClient().auth.refreshSession({ refresh_token: refreshToken })
       if (error) throw mapError(error)

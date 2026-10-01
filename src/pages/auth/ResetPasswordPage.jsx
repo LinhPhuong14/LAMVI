@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Field from '../../components/Field'
 import { api } from '../../api/client.js'
 import { useI18n } from '../../i18n/index.js'
-import Seo from '../../seo/Seo.jsx'
+import AuthShell from './AuthShell'
 import { useSubmit } from '../../auth/useForm.js'
 
 // Link email của Supabase trả token khôi phục trong #hash (type=recovery)
@@ -71,13 +71,8 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <section className="page-section narrow">
-        <Seo title={t('auth.resetTitle')} noindex />
-      <h1 className="page-title">{t('auth.resetTitle')}</h1>
+    <AuthShell title={t('auth.resetTitle')} footer={<Link to={path('/login')}>{t('auth.toLogin')}</Link>}>
       {content}
-      <div className="form-links">
-        <Link to={path('/login')}>{t('auth.toLogin')}</Link>
-      </div>
-    </section>
+    </AuthShell>
   )
 }
