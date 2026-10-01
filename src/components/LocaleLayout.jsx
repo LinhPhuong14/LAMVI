@@ -1,9 +1,10 @@
-import { Outlet, useLocation } from 'react-router-dom'
+import { useOutlet, useLocation } from 'react-router-dom'
 import { LazyMotion, MotionConfig, domAnimation } from 'framer-motion'
 import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import { splitLocale } from '../i18n/index.js'
 import SiteHeader from './SiteHeader'
 import SiteFooter from './SiteFooter'
+import PageTransition from './PageTransition'
 import Scene from './Scene'
 import May from '../may/May.jsx'
 import CartProvider from '../cart/CartProvider.jsx'
@@ -24,7 +25,9 @@ function pageScene(rest) {
 }
 
 export default function LocaleLayout({ lang }) {
-  const { rest } = splitLocale(useLocation().pathname)
+  const { pathname } = useLocation()
+  const outlet = useOutlet()
+  const { rest } = splitLocale(pathname)
   const clean = rest.replace(/\/+$/, '') || '/'
   const app = APP_PAGES.has(clean)
   const scene = app ? null : pageScene(clean)
@@ -36,10 +39,13 @@ export default function LocaleLayout({ lang }) {
           <CartProvider>
             <div className={app ? 'page page-app' : 'page'}>
               {!app && <SiteHeader />}
-              <main className={scene ? `has-motifs page-scene-main page-scene-${scene}` : undefined}>
+              <PageTransition
+                pageKey={`${lang}${clean}`}
+                className={scene ? `has-motifs page-scene-main page-scene-${scene}` : undefined}
+              >
                 {scene && <Scene name={scene} className="page-scene" />}
-                <Outlet />
-              </main>
+                {outlet}
+              </PageTransition>
               {!app && <SiteFooter />}
               <May />
             </div>

@@ -1,5 +1,15 @@
 # Nhật ký phiên
 
+## 2026-10-01 — Bo góc, kính mờ, chuyển trang (nhánh `feat/ui-glass-transitions`)
+
+**Mục tiêu người dùng**: "bo góc các component, làm kiểu glass morphism, làm motion khi chuyển tiếp giữa các trang".
+
+**Đã làm**: token `--r-*` và `--g-*`; bo góc nút/ô nhập/thẻ/khung; kính mờ cho thẻ công khai; `PageTransition` (T-45); design-rules cập nhật (thay quy tắc góc 2–3px).
+
+**Phát hiện khi viết**: trang đang thoát đọc location mới của router → `<Navigate>` lặp vô hạn (cả bộ test treo); sửa bằng `Frozen`. Test cấp ứng dụng phải chờ qua thời gian thoát.
+
+**Còn lại**: thanh điều hướng dính chưa có kính (giữ nền đặc theo design-rules §9) — PO quyết nếu muốn đổi; góc lõm ở ảnh sản phẩm (`.product-art::after`) chưa bo theo.
+
 ## 2026-10-01 — Làm lại auth + đăng nhập Google (nhánh `feat/auth-redesign-google`)
 
 **Mục tiêu người dùng**: khảo sát mẫu Behance/Pinterest cùng vibe LAMVI, chỉnh lại layout đăng nhập/đăng ký/đăng xuất, thêm đăng nhập Google; sau đó yêu cầu dùng cấu hình OAuth của Google Cloud, không dùng Google provider của Supabase.

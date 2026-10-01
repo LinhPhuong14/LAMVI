@@ -151,7 +151,7 @@
   align-items: center;
   justify-content: center;
   padding: 14px 30px;
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   text-decoration: none;
   font-size: 0.96rem;
   font-weight: 600;
@@ -304,7 +304,7 @@
   color: var(--diep-light);
   font-weight: 600;
   padding: 9px 20px;
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   font-size: 0.9rem;
   box-shadow:
     inset 0 0 0 2px var(--son),
@@ -996,7 +996,7 @@
   flex-direction: column;
   padding: 12px;
   background: var(--diep-light);
-  border-radius: 2px;
+  border-radius: var(--r-md);
   box-shadow: var(--print-lg);
   text-align: center;
   transition: box-shadow 0.4s var(--ease-out), translate 0.4s var(--ease-out);
@@ -1520,7 +1520,7 @@
   width: 100%;
   background: var(--diep-light);
   border: 1px solid var(--hair-soft);
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   padding: 12px 14px;
   text-align: left;
 }
@@ -1568,7 +1568,7 @@
     var(--corner-bl) left 10px bottom 10px / 28px no-repeat,
     var(--corner-br) right 10px bottom 10px / 28px no-repeat,
     var(--diep-light);
-  border-radius: 2px;
+  border-radius: var(--r-md);
   box-shadow: var(--print-lg);
   padding: 44px 38px 36px;
   margin: 0;
@@ -2011,7 +2011,7 @@
   display: inline-block;
   margin-bottom: 14px;
   padding: 4px 12px;
-  border-radius: 6px;
+  border-radius: var(--r-xs);
   background: var(--son);
   color: var(--diep-light);
   font-size: 0.8rem;
@@ -2596,7 +2596,7 @@
   position: relative;
   display: grid;
   grid-template-columns: 5fr 7fr;
-  border-radius: 3px;
+  border-radius: var(--r-lg);
   overflow: hidden;
   background: var(--diep-light);
   box-shadow: var(--print-lg);
@@ -2674,7 +2674,7 @@
 .auth-main .field input,
 .auth-main .field select {
   border-color: var(--hair);
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   background: var(--diep);
 }
 
@@ -2792,7 +2792,66 @@
    design-rules §3 (nét mảnh, không bóng cứng). Chưa có ảnh → component vẽ đèn SVG (G-33). */
 .product-photo {
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--hair-soft);
   background: var(--diep-light);
+}
+
+/* ---------- Kính mờ + bo góc (T-45) ----------
+   Thẻ trên giấy/cảnh nền: nền trong mờ, viền sáng 1px, đường sáng ở mép trên. Đường chỉ bồi tranh
+   bo theo thẻ (bán kính thẻ − khoảng lùi). Chỉ thẻ cuộn cùng trang dùng blur; thanh điều hướng dính
+   giữ nền đặc (design-rules §9). */
+.product-card,
+.testimonial-card,
+.account-card,
+.order-summary,
+.product-detail-art,
+.auth-main {
+  background: var(--g-bg);
+  border: 1px solid var(--g-border);
+  box-shadow: var(--g-shadow);
+  -webkit-backdrop-filter: var(--g-blur);
+  backdrop-filter: var(--g-blur);
+}
+
+.auth-card {
+  background: var(--g-bg-strong);
+  border: 1px solid var(--g-border);
+  -webkit-backdrop-filter: var(--g-blur);
+  backdrop-filter: var(--g-blur);
+}
+
+.auth-main {
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.product-card::before,
+.account-card::before,
+.product-detail-art::before,
+.auth-card::after {
+  border-radius: calc(var(--r-md) - 6px);
+}
+
+.testimonial-card::after,
+.order-summary::before {
+  border-radius: calc(var(--r-md) - 16px);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .product-card,
+  .testimonial-card,
+  .account-card,
+  .order-summary,
+  .product-detail-art {
+    background: var(--g-bg-strong);
+  }
+}
+
+/* ---------- Chuyển trang (T-45) ---------- */
+.page-frame {
+  will-change: opacity, transform;
 }

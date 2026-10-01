@@ -118,10 +118,11 @@ async function clientNavigate(to) {
   })
 }
 
+// Đủ lâu để chuyển trang (T-45: trang cũ thoát ~0,22 s rồi trang mới mới render) hoàn tất
 async function flush() {
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 8; i++) {
     await act(async () => {
-      await new Promise((r) => setTimeout(r, 10))
+      await new Promise((r) => setTimeout(r, 50))
     })
   }
 }

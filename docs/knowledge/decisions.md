@@ -41,6 +41,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-35 | 2026-09-29 | Dashboard kính mờ, nền ảnh thật, giao diện tối trong phạm vi `.dash` | Hiệu lực |
 | T-36 | 2026-09-29 | Cảnh nền ảnh thật CC0 (`Scene`) cho trang chủ và các trang công khai, thay hoạ tiết SVG T-28 | Hiệu lực |
 | T-44 | 2026-10-01 | Đăng nhập Google bằng OAuth 2.0 authorization code trực tiếp với Google (không dùng provider Google của Supabase); khung auth hai nửa `AuthShell` | Hiệu lực |
+| T-45 | 2026-10-01 | Token bo góc `--r-*`, kính mờ `--g-*`, chuyển trang bằng `PageTransition` (AnimatePresence, trang thoát đóng băng router context) | Hiệu lực |
 
 ---
 
@@ -224,3 +225,11 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Quyết định**: server tự làm luồng authorization code: `GET /api/auth/google/start` (đặt cookie `lamvi_gauth` HttpOnly, SameSite=Lax, Secure khi https, ký HMAC bằng `MAY_HASH_SALT`, chứa state + nonce + next + lang, hạn 10 phút — không giữ trạng thái trong bộ nhớ vì serverless) → Google → `GET /api/auth/google/callback` đổi code lấy `id_token` qua TLS (kiểm `aud`, `iss`, `exp`, `nonce`, `email_verified`; không cần kiểm chữ ký vì nhận trực tiếp từ endpoint token của Google). Cấp phiên cho email đã xác minh bằng `auth.signInVerifiedEmail`: Supabase = `admin.generateLink({type:'magiclink'})` (tạo user nếu chưa có, không gửi email) + `verifyOtp(token_hash)`; adapter bộ nhớ tự tạo user. Phiên trả về trình duyệt qua **fragment** (`/auth/callback#s=…`) để không vào log máy chủ; trang `AuthCallbackPage` lưu phiên (`acceptSession`) rồi xoá fragment.
 - **Cấu hình**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`; redirect URI `{PUBLIC_SITE_URL}/api/auth/google/callback`. Thiếu → `/api/auth/providers` trả `google:false`, nút ẩn.
 - **Hệ quả**: không phụ thuộc cài đặt provider của Supabase; rate limit dùng nhóm `login`. Tài khoản tạo bằng Google không có mật khẩu đã biết.
+
+### T-45 — Bo góc, kính mờ, chuyển trang
+
+- **Token** (`src/index.css`): `--r-xs 8 / --r-sm 12 / --r-md 20 / --r-lg 28px`; kính `--g-bg`, `--g-bg-strong`, `--g-border`, `--g-blur`, `--g-shadow`. Thẻ (`.product-card`, `.testimonial-card`, `.account-card`, `.order-summary`, `.product-detail-art`, `.auth-card`) dùng kính; đường chỉ bồi tranh (`::before/::after`) bo theo `bán kính thẻ − khoảng lùi`. Có `@supports not (backdrop-filter)` tăng độ đục.
+- **Chuyển trang**: `LocaleLayout` bọc `<main>` bằng `PageTransition` (`AnimatePresence mode="wait"`, key = ngôn ngữ + đường dẫn không dấu `/` cuối). Thoát 0,22 s (mờ + trôi lên 10px), vào 0,5 s (trồi từ 18px). Dùng đối tượng animate trực tiếp, không dùng tên biến thể, để không lan xuống `m.*` bên trong. Về đầu trang sau khi trang mới bắt đầu vào (trừ khi URL có `#neo`).
+- **Bẫy đã gặp**: trang đang thoát vẫn nằm trong cây React nên đọc location mới của router; `<Navigate>` của trang cũ chạy lại mỗi lần đổi đường dẫn → vòng lặp vô hạn (test treo). `Frozen` đóng băng `LocationContext`/`RouteContext` khi `useIsPresent()` là false.
+- **Giảm chuyển động / SSR**: `useReducedMotionConfig()` → render `<main>` thường; lần vào đầu `initial={false}` nên HTML SSR hiện đủ nội dung.
+- **Hệ quả**: nội dung trang mới chỉ render sau ~0,22 s → test cấp ứng dụng phải chờ đủ lâu (đã nới `flush` ở `Seo.extra.test.jsx`).

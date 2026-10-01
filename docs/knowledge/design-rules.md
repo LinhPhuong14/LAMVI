@@ -82,7 +82,7 @@ Font tự host (T-21), preload 6 file. Không thêm font thứ ba.
 - **Không** dùng viền dày (≥2px) màu mực, **không** bóng đổ lệch cứng (`4px 4px 0`) — đã bỏ ở T-25.
 - Viền: `1px solid var(--hair)`; đường kẻ đôi `3px double var(--hair)` cho thanh điều hướng, dải hoành phi, danh sách.
 - Bóng: `--print` (thẻ nhỏ), `--print-lg` (tranh treo, thẻ sản phẩm).
-- Góc: 2–3px cho khung/nút; tròn cho chỉ số và avatar; vòm (`999px 999px 16px 16px`) chỉ cho lookbook.
+- Góc (T-45, D-79): token `--r-xs` 8px (nhãn, ô lang), `--r-sm` 12px (nút, ô nhập, ảnh nhỏ), `--r-md` 20px (thẻ), `--r-lg` 28px (khung lớn như thiếp đăng nhập); tròn cho chỉ số và avatar; ấn triện giữ góc nhỏ như con dấu; vòm (`999px 999px 16px 16px`) chỉ cho lookbook.
 - Khung có sẵn:
   - **Tranh bồi**: nền lụa `--diep-light`, đệm 12px, đường chỉ `inset 6px` (`--hair-soft`) — thẻ sản phẩm, khung ảnh chi tiết, phòng tranh.
   - **Ô hộc góc lõm**: `.product-art::after` khoét 4 góc.
@@ -162,11 +162,13 @@ Quy tắc:
 | Lặp nền | CSS transform/opacity: đèn đung đưa 5.5s, trống đồng 140s, marquee 34s, đèn trời 22–30s |
 | Theo con trỏ (T-24) | Chỉ khi `useFinePointer()` và không giảm chuyển động; qua motion value, không re-render |
 | Màn hình đầu | Animation CSS (không chờ JS) |
+| Chuyển trang (T-45) | `PageTransition`: trang cũ mờ + trôi lên 10px (0,22s, `EASE_IN`), trang mới trồi từ 18px (0,5s, `EASE_OUT`), tuần tự (`mode="wait"`) |
 | Giảm chuyển động | Tắt mọi animation lặp và dịch chuyển; nội dung, số liệu hiện ngay |
 
 ## 9. Hiệu năng
 
 - Ngân sách `[ASSUMPTION]` (NFR-PERF-001): LCP ≤ 2,5s, CLS ≤ 0,1.
+- Kính mờ (T-45): thẻ công khai dùng `--g-*` (nền trong 62%, blur 14px, viền trắng 70%, đường sáng mép trên). Thanh điều hướng dính giữ nền đặc.
 - Không lớp phủ `position: fixed` có `mix-blend-mode`/`backdrop-filter`. `backdrop-filter` chỉ dùng cho phần tử cuộn cùng trang (dashboard, T-35), không cho phần tử dính/cố định.
 - Texture là data-URI SVG nhỏ trong biến CSS.
 - Ảnh: WebP, lazy, có kích thước; tổng ảnh tư liệu trên trang chủ < 600 KB ở desktop.
