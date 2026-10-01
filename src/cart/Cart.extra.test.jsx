@@ -190,7 +190,7 @@ describe('Thanh toán (D-61, US-001 AC-003)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Checkout' }))
     expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
     // Liên kết Đăng ký giữ next
-    expect(screen.getByRole('link', { name: /create|register|sign up/i }).getAttribute('href')).toContain('next=%2Fen%2Fcart')
+    expect(within(screen.getByRole('main')).getByRole('link', { name: /create|register|sign up/i }).getAttribute('href')).toContain('next=%2Fen%2Fcart')
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'an@moc.test' } })
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'matkhau123' } })
     fireEvent.click(screen.getByRole('button', { name: 'Sign in' }))

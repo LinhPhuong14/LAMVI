@@ -109,16 +109,16 @@ Người dùng không muốn nền tự vẽ bằng SVG → mỗi phần trang c
 | Nơi | Ảnh |
 |---|---|
 | Hero | Ruộng bậc thang trong sương + khói mực + 7 đèn trời bay lên một lượt khi vào |
-| Di sản (chàm) | Hòn đá trong sương (xám, 11%) + khói hương trắng ngà |
+| Di sản (chàm) | (v0.23) Vịnh Hạ Long `bay-green` 20% giảm bão hoà + khói hương trắng ngà |
 | Nghệ nhân | Khói mực ở góc |
 | Sản phẩm | Trời mây vàng (dải trên, mờ dần) |
-| Lookbook (đêm) | Trời đêm đầy đèn trời + khói lửa; đèn trời bay lên là ảnh đèn thật tách nền |
+| Lookbook (đêm) | (v0.23) Đồi sương bình minh `hills-gold` 34% ở nửa dưới + khói lửa; đèn trời bay lên là ảnh đèn thật tách nền |
 | Công đoạn | Thung lũng sương có nắng |
 | QR | Mây hoàng hôn (từ phải, mờ về trái) |
 | Lời khách | Hồ sương bình minh |
 | Hỏi đáp | Biển mây (dưới) |
 | Đăng nhập/đăng ký/quên, đặt lại mật khẩu | Biển mây rõ hơn + 4 đèn bay; form trong thiếp thư hai nửa (xem dòng dưới) |
-| Đăng nhập/đăng ký/quên/đặt lại | (cập nhật v0.21) Form là **thiếp thư hai nửa** (`AuthShell`): trái mảng `--cham-deep` với ấn LAMVI, câu nghiêng Fraunces và nhãn hoa sen; phải giấy `--diep-light`, đường chỉ `inset 8px`, góc 3px. Nút Google nền trắng nét `--hair` (không phải điểm nhấn son), tách khỏi form bằng dải kẻ đôi "hoặc". Mobile: mảng chàm thu thành dải đầu thẻ |
+| Đăng nhập/đăng ký/quên/đặt lại | (cập nhật v0.23) Nền trơn có quầng màu (không ảnh), header/footer riêng (`AuthHeader`/`AuthFooter`, không link landing). (v0.21) Form là **thiếp thư hai nửa** (`AuthShell`): trái mảng `--cham-deep` với ấn LAMVI, câu nghiêng Fraunces và nhãn hoa sen; phải giấy `--diep-light`, đường chỉ `inset 8px`, góc 3px. Nút Google nền trắng nét `--hair` (không phải điểm nhấn son), tách khỏi form bằng dải kẻ đôi "hoặc". Mobile: mảng chàm thu thành dải đầu thẻ |
 | Chi tiết sản phẩm · Giỏ hàng · Trang lô | Dải ảnh đầu trang mờ dần: trời mây vàng · hồ sương làng · thung lũng sương |
 | 404 | Khung trời sao chàm đêm bo 24px + 5 đèn bay |
 
@@ -168,8 +168,8 @@ Quy tắc:
 ## 9. Hiệu năng
 
 - Ngân sách `[ASSUMPTION]` (NFR-PERF-001): LCP ≤ 2,5s, CLS ≤ 0,1.
-- Kính mờ (T-45): thẻ công khai dùng `--g-*` (nền trong 62%, blur 14px, viền trắng 70%, đường sáng mép trên). Thanh điều hướng dính giữ nền đặc.
-- Không lớp phủ `position: fixed` có `mix-blend-mode`/`backdrop-filter`. `backdrop-filter` chỉ dùng cho phần tử cuộn cùng trang (dashboard, T-35), không cho phần tử dính/cố định.
+- Kính mờ (T-45): thẻ công khai dùng `--g-*` (nền trong 62%, blur 14px, viền trắng 70%, đường sáng mép trên). Thanh điều hướng `.nav` cũng kính mờ (T-46, D-80) — **ngoại lệ duy nhất** của quy tắc dưới đây.
+- Không lớp phủ `position: fixed` có `mix-blend-mode`/`backdrop-filter` (ngoại lệ: `.nav`, T-46). `backdrop-filter` chỉ dùng cho phần tử cuộn cùng trang (dashboard, T-35), không cho phần tử dính/cố định.
 - Texture là data-URI SVG nhỏ trong biến CSS.
 - Ảnh: WebP, lazy, có kích thước; tổng ảnh tư liệu trên trang chủ < 600 KB ở desktop.
 

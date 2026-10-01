@@ -2428,10 +2428,10 @@
 }
 
 .scene-story .scene-photo {
-  opacity: 0.11;
-  filter: grayscale(1) brightness(1.25);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 70%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 70%, transparent);
+  opacity: 0.2;
+  filter: saturate(0.6) brightness(0.95);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 72%, transparent);
 }
 
 .scene-products .scene-photo,
@@ -2442,9 +2442,11 @@
 }
 
 .scene-lookbook .scene-photo {
-  opacity: 0.4;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+  opacity: 0.34;
+  object-position: center 70%;
+  filter: saturate(0.85);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 6%, #000 55%, #000 90%, transparent);
+  mask-image: linear-gradient(to bottom, transparent 6%, #000 55%, #000 90%, transparent);
 }
 
 .scene-qr .scene-photo {
@@ -2580,10 +2582,13 @@
   mask-image: linear-gradient(to bottom, #000 30%, transparent);
 }
 
-/* Đăng nhập/đăng ký: ảnh biển mây rõ hơn; form là thiếp thư hai nửa (chàm đêm | giấy điệp) */
-.page-scene-auth .page-scene .scene-photo {
-  opacity: 0.55;
-  filter: sepia(0.2) saturate(0.95);
+/* Đăng nhập/đăng ký: nền trơn có vài quầng màu mờ (hoè, son nhạt, chàm) cho thẻ kính có cái để làm mờ */
+.scene-auth {
+  background:
+    radial-gradient(60% 50% at 12% 18%, rgba(191, 138, 58, 0.22), transparent 70%),
+    radial-gradient(50% 45% at 88% 24%, rgba(163, 50, 31, 0.13), transparent 70%),
+    radial-gradient(70% 55% at 70% 92%, rgba(38, 55, 74, 0.2), transparent 70%),
+    linear-gradient(180deg, var(--diep-light), var(--diep));
 }
 
 .auth-shell {
@@ -2854,4 +2859,44 @@
 /* ---------- Chuyển trang (T-45) ---------- */
 .page-frame {
   will-change: opacity, transform;
+}
+
+/* ---------- Header kính mờ (T-46, D-80) ----------
+   Phá quy tắc cũ "phần tử dính không blur" theo yêu cầu PO; chỉ thanh điều hướng, blur vừa phải. */
+.nav {
+  background: rgba(244, 237, 224, 0.62);
+  border-bottom: 1px solid var(--g-border);
+  -webkit-backdrop-filter: var(--g-blur);
+  backdrop-filter: var(--g-blur);
+}
+
+.nav::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  border-bottom: 1px solid var(--hair-soft);
+  pointer-events: none;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav {
+    background: var(--diep);
+  }
+}
+
+.nav-auth {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.auth-foot {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px 16px 36px;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--than-soft);
 }

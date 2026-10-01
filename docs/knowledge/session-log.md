@@ -1,5 +1,13 @@
 # Nhật ký phiên
 
+## 2026-10-01 — Header kính mờ, header auth riêng, nền mới (nhánh `feat/header-glass-backgrounds`)
+
+**Mục tiêu người dùng**: header cũng kính mờ; trang auth có header khác (không link sang landing); đổi background, tải asset đẹp hơn hoặc nền trơn; mảng navy phủ ảnh cảnh vật độ đậm thấp.
+
+**Đã làm**: T-46, D-80. Tải 2 ảnh CC0 qua Openverse (Hạ Long, đồi sương) — ghi CREDITS; nền auth bằng CSS; sửa 5 test mã hoá hành vi cũ (header auth, `.nav` blur, link trùng tên).
+
+**Lưu ý**: ảnh `hills-gold` gốc 1024px. Các phần nền giấy khác của trang chủ (hero, sản phẩm…) vẫn dùng ảnh cũ — PO chưa yêu cầu đổi.
+
 ## 2026-10-01 — Bo góc, kính mờ, chuyển trang (nhánh `feat/ui-glass-transitions`)
 
 **Mục tiêu người dùng**: "bo góc các component, làm kiểu glass morphism, làm motion khi chuyển tiếp giữa các trang".

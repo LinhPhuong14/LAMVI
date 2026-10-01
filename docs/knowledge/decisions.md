@@ -42,6 +42,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-36 | 2026-09-29 | Cảnh nền ảnh thật CC0 (`Scene`) cho trang chủ và các trang công khai, thay hoạ tiết SVG T-28 | Hiệu lực |
 | T-44 | 2026-10-01 | Đăng nhập Google bằng OAuth 2.0 authorization code trực tiếp với Google (không dùng provider Google của Supabase); khung auth hai nửa `AuthShell` | Hiệu lực |
 | T-45 | 2026-10-01 | Token bo góc `--r-*`, kính mờ `--g-*`, chuyển trang bằng `PageTransition` (AnimatePresence, trang thoát đóng băng router context) | Hiệu lực |
+| T-46 | 2026-10-01 | Header kính mờ (ngoại lệ có chủ đích của quy tắc "dính không blur"), `AuthHeader`/`AuthFooter` riêng cho trang auth, nền auth bằng CSS, ảnh phong cảnh phủ mảng navy | Hiệu lực |
 
 ---
 
@@ -233,3 +234,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Bẫy đã gặp**: trang đang thoát vẫn nằm trong cây React nên đọc location mới của router; `<Navigate>` của trang cũ chạy lại mỗi lần đổi đường dẫn → vòng lặp vô hạn (test treo). `Frozen` đóng băng `LocationContext`/`RouteContext` khi `useIsPresent()` là false.
 - **Giảm chuyển động / SSR**: `useReducedMotionConfig()` → render `<main>` thường; lần vào đầu `initial={false}` nên HTML SSR hiện đủ nội dung.
 - **Hệ quả**: nội dung trang mới chỉ render sau ~0,22 s → test cấp ứng dụng phải chờ đủ lâu (đã nới `flush` ở `Seo.extra.test.jsx`).
+
+### T-46 — Header kính mờ, header riêng cho auth, ảnh phủ mảng navy
+
+- **Header kính mờ**: `.nav` dùng `--g-blur` (blur 14px) dù `position: sticky`. Đây là ngoại lệ có chủ đích của design-rules §9, do PO yêu cầu (D-80); chỉ `.nav`. Test `AccountTheme.extra.test.jsx` cho phép riêng `.nav`. Rủi ro: vẽ lại khi cuộn trên máy yếu — nếu có báo cáo giật, hạ blur xuống 8px hoặc quay lại nền đặc.
+- **Auth**: `LocaleLayout` chọn `AuthHeader`/`AuthFooter` khi đường dẫn thuộc `AUTH_PAGES`. Header chỉ có logo, `LanguageSwitcher`, nút chuyển đăng nhập ↔ đăng ký; không có `.nav-links`, không link neo. Scene `auth` không còn ảnh, nền là `radial-gradient` hoè/son/chàm mờ.
+- **Ảnh**: `bay-green` (Di sản, 20%, giảm bão hoà) và `hills-gold` (Lookbook, 34%, ảnh ở nửa dưới) thay `halong-mist`/`lanterns-night`; nguồn CC0 ghi ở `public/images/scene/CREDITS.md`. `hills-gold` gốc 1024px nên bản 1280px là phóng nhẹ — chấp nhận vì độ đậm thấp.

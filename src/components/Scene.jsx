@@ -6,16 +6,16 @@ const DIR = '/images/scene/'
 // photo: ảnh nền (có bản 640 và 1280) · smoke: lớp khói tách nền · rise: số đèn trời bay lên một lượt khi vào
 const SCENES = {
   hero: { photo: 'mist-terraces', eager: true, smoke: [{ src: 'smoke-ink', x: '58%', y: '-10%', w: '46%' }], rise: 7 },
-  story: { photo: 'halong-mist', dark: true, smoke: [{ src: 'incense-smoke', x: '84%', y: '4%', w: '14%' }] },
+  story: { photo: 'bay-green', dark: true, smoke: [{ src: 'incense-smoke', x: '84%', y: '4%', w: '14%' }] },
   artisan: { smoke: [{ src: 'smoke-ink', x: '-6%', y: '-6%', w: '42%' }] },
   products: { photo: 'golden-sky' },
-  lookbook: { photo: 'lanterns-night', dark: true, smoke: [{ src: 'smoke-ember', x: '-8%', y: '52%', w: '50%' }] },
+  lookbook: { photo: 'hills-gold', dark: true, smoke: [{ src: 'smoke-ember', x: '-8%', y: '52%', w: '50%' }] },
   process: { photo: 'valley-light' },
   qr: { photo: 'golden-clouds' },
   testimonials: { photo: 'dawn-lake' },
   faq: { photo: 'cloud-sea' },
   // Trang khác (PageScene)
-  auth: { photo: 'cloud-sea', rise: 4 },
+  auth: {}, // nền trơn có quầng màu (CSS), không dùng ảnh — để thẻ kính có thứ để làm mờ
   product: { photo: 'golden-sky' },
   cart: { photo: 'lake-village' },
   checkout: { photo: 'mist-terraces' },
