@@ -165,8 +165,8 @@ export async function createWeb({ repo, config, dev, maintenance }) {
       express.static(`${root}/dist/client`, {
         index: false,
         maxAge: '1h',
-        setHeaders(res, file) {
-          if (file.includes('/assets/')) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
+        setHeaders(res) {
+          if (res.req.path.startsWith('/assets/')) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
         },
       }),
     )
