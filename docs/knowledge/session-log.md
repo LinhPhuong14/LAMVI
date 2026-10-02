@@ -1,5 +1,13 @@
 # Nhật ký phiên
 
+## 2026-10-02 — Chi tiết sản phẩm v2 (nhánh `feat/product-detail-v2`)
+
+**Mục tiêu người dùng**: thiết kế lại trang sản phẩm chi tiết giống phong cách shop.
+
+**Đã làm**: D-87, T-53 — tấm tranh lớn + khung mua hàng kính + "Có thể bạn cũng thích"; breadcrumb có "Cửa hàng"; sửa 2 test.
+
+**Bẫy**: con dấu nhãn bị kéo giãn cả chiều rộng khi chỉ đặt `left` (class gốc có `right: 26px`).
+
 ## 2026-10-02 — Rà RLS và độ trễ Mây (nhánh `fix/rls-openai-latency`)
 
 **Đã làm**: T-51 — migration `20261002000009_harden_rls.sql`; song song hoá DB/tool trong `server/may/service.js`; `max_tokens` 350; test `server/may.latency.extra.test.js`.

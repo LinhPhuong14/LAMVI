@@ -124,7 +124,7 @@ export default {
     empty: '暂无产品。',
     setBadge: '套装',
     orderingSoon: '在线订购即将上线。',
-    backToCollection: '← 返回系列',
+    backToCollection: '← 返回商店',
     notFound: '未找到该产品。',
   },
   price: {
@@ -456,6 +456,11 @@ export default {
       refunded: '已退款',
     },
     methods: { payos: '银行转账（payOS）', cod: '货到付款' },
+  },
+  pdp: {
+    related: '您可能还喜欢',
+    viewAll: '查看全部',
+    checkoutNote: '在结账时选择“送礼”或“自用”。',
   },
   shop: {
     eyebrow: '商店',

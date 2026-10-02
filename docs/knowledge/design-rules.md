@@ -190,6 +190,14 @@ Quy tắc:
 | Hoạ tiết Việt | Tự vẽ chữ Hán, rồng, mái cung điện Trung Hoa lên giao diện |
 | Hiệu ứng tắt khi giảm chuyển động | Animation bằng `filter`/`box-shadow` lặp liên tục |
 
+## 11d. Chi tiết sản phẩm (v0.30, T-53)
+
+| Thành phần | Quy tắc |
+|---|---|
+| Tấm tranh | Bo 28px, nền ánh sáng giữa + màu tông đèn, đường chỉ trắng `inset 10px`, con dấu nhãn góc trên trái |
+| Khung mua hàng | Thẻ kính sticky (không blur); tên Fraunces lớn, giá, mô tả có đường kẻ đôi phía trên, số lượng + nút son, ba viên thuốc đặc điểm xếp dọc |
+| Liên quan | "Có thể bạn cũng thích" dùng đúng thẻ của Cửa hàng; không thêm kiểu thẻ mới |
+
 ## 11c. Cửa hàng và navbar (v0.29, T-52)
 
 | Thành phần | Quy tắc |

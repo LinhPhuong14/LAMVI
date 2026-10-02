@@ -47,6 +47,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-48 | 2026-10-02 | Phản hồi thêm vào giỏ: huy hiệu + tooltip trên navbar (`CartBubble`, `lastAdded` trong `CartProvider`); giỏ hàng v2; dashboard v2; khung chat Mây v2 | Hiệu lực |
 | T-49 | 2026-10-02 | Auth production không cần Supabase Pro/Twilio: thư do server gửi (Resend/Brevo), token đặt lại mật khẩu một lần, refresh token ở cookie HttpOnly, chặn mật khẩu đã lộ (HIBP) | Hiệu lực |
 | T-52 | 2026-10-02 | Trang Cửa hàng `/shop` + `ProductCards` dùng chung; navbar luôn ghim, thu nhỏ 20% khi cuộn (`transform`, không đổi layout) | Hiệu lực |
+| T-53 | 2026-10-02 | Trang chi tiết sản phẩm `ProductPage` v2 (lưới `pdp-*`), khối `Related` dùng lại `ProductCards` | Hiệu lực |
 
 ---
 
@@ -290,3 +291,10 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Shop**: route `shop` (`ShopPage`), dữ liệu từ `useApi('/products')` nên SSR dùng chung khoá `/products` đã nạp sẵn cho footer (classifyPath giữ `other`). Lọc theo `p.kind` (`single`/`set`), nút lọc chỉ hiện loại có trong dữ liệu; sắp xếp phía client. `ProductCards` tách ra dùng chung với phần bộ sưu tập ở landing. Sitemap thêm `/shop` × 3 ngôn ngữ. Scene `shop` dùng `golden-sky`.
 - **Liên kết**: `#products` còn lại chỉ dành cho tour Mây (`TOUR_TARGETS`) trên landing; các nút "xem đèn" khác dùng `path('/shop')`.
 - **Navbar**: bỏ `is-hidden` và `:focus-within`. `.nav.is-scrolled` = `transform: translateY(10px) scale(0.8)` quanh đỉnh giữa + `border-radius: 9999px` (transition 0,45s); dùng transform nên không làm xô bố cục. Tooltip giỏ hàng bên trong được phóng lại 125% để chữ không nhỏ đi. Blur của `.nav` vẫn là ngoại lệ T-46.
+
+### T-53 — Trang chi tiết sản phẩm cùng phong cách Cửa hàng
+
+- **Bố cục**: `.pdp-grid` hai cột (1,05fr | 0,95fr; ≤960px xếp dọc). `.pdp-art` nền `radial-gradient` ánh sáng + màu theo `tone-*` (tái dùng biến `--tone` của thẻ sản phẩm), con dấu `.product-badge` đặt `left` nên phải đặt `right: auto` (class gốc có `right: 26px`, nếu không con dấu bị kéo giãn cả chiều rộng). `.pdp-buy` là thẻ kính sticky nên **không** blur.
+- **Related**: lấy `/products` (khoá đã được SSR nạp sẵn cho footer), loại sản phẩm hiện tại, dùng `ProductCards`; lưới `auto-fit` để 2 thẻ vẫn lấp đầy hàng.
+- **Điều hướng**: nhãn nút quay lại đổi thành "Về cửa hàng"; breadcrumb JSON-LD thêm "Cửa hàng" (3 cấp). Test trang sản phẩm phải khoanh vùng vào `.pdp-buy` vì bên dưới còn các thẻ có nút thêm vào giỏ.
+- CSS `product-detail-*` cũ đã gỡ.

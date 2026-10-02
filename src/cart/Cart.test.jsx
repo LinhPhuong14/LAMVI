@@ -128,7 +128,8 @@ describe('Giỏ tài khoản (D-41, D-59, D-61)', () => {
     renderAt('/products/den-nguyet')
     await screen.findByRole('link', { name: 'Giỏ hàng (1)' })
     fireEvent.click(screen.getByRole('button', { name: 'Tăng số lượng' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Thêm vào giỏ' }))
+    // Nút chính nằm trong khung mua hàng; phía dưới còn thẻ "Có thể bạn cũng thích" cũng có nút thêm vào giỏ
+    fireEvent.click(within(document.querySelector('.pdp-buy')).getByRole('button', { name: 'Thêm vào giỏ' }))
     expect(await screen.findByText(/Mây đã bỏ/)).toBeInTheDocument()
     expect(puts).toEqual([{ quantity: 3 }])
   })
