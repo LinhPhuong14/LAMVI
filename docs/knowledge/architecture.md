@@ -32,6 +32,9 @@ server/
   i18n.js                  normalizeLang, pick (D-40), localePath (D-37)
   domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js, pricing.js, order.js, coupon.js, couponValidate.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
+  middleware/sessionCookie.js  cookie refresh token HttpOnly (`lamvi_rt`), `sameOriginOnly` chống CSRF (T-49)
+  mail/{mailer,templates}.js   thư giao dịch qua Resend/Brevo (HTTPS), mẫu thư vi/en/zh (T-49)
+  security/pwned.js        kiểm mật khẩu đã lộ (HIBP k-anonymity, fail-open) (T-49)
   middleware/security.js   Security headers + CSP hash (T-37)
   middleware/rateLimit.js  Chống dò/spam, đếm trong DB (T-38, G-20)
   routes/                  catalog.js, auth.js, admin.js, it.js, may.js, cart.js, orders.js, seo.js (sitemap, robots)
@@ -177,11 +180,11 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET | `/api/faq?lang=` | – | FAQ `is_published` |
 | GET | `/api/batches/:code?lang=` | – | 404 nếu chưa có video |
 | POST | `/api/auth/register?lang=` | – | `{ email, password, fullName, phone?, preferredLocale? }` → 201 |
-| POST | `/api/auth/login` | – | → phiên |
-| POST | `/api/auth/refresh` | – | `{ refreshToken }` → phiên mới |
-| POST | `/api/auth/logout` | Bearer | 204 |
+| POST | `/api/auth/login` | – | → phiên `{ accessToken, expiresAt, user }` + cookie `lamvi_rt` (HttpOnly). Không có `refreshToken` trong body (T-49) |
+| POST | `/api/auth/refresh` | Cookie `lamvi_rt` + kiểm Origin | → phiên mới, xoay vòng cookie; cookie bị từ chối → xoá cookie, 401 |
+| POST | `/api/auth/logout` | Bearer hoặc cookie + kiểm Origin | 204; luôn xoá cookie, thu hồi mọi phiên (cả khi access token đã hết hạn) |
 | POST | `/api/auth/forgot-password?lang=` | – | Luôn 202 |
-| POST | `/api/auth/reset-password` | Bearer (**chỉ** token khôi phục) | `{ password }` → 204, vô hiệu token. Token đăng nhập thường → 403 `RECOVERY_TOKEN_REQUIRED` (G-18) |
+| POST | `/api/auth/reset-password` | – (token một lần trong body) | `{ token, password }` → 204, thu hồi mọi phiên, thư báo đổi. Token sai/hết hạn/đã dùng → 400 `INVALID_RESET_TOKEN`; mật khẩu yếu/đã lộ → 400 (token chưa bị tiêu thụ) |
 | POST | `/api/auth/change-password` | Bearer | `{ currentPassword, password }` → 204, thu hồi mọi phiên (G-18) |
 | GET | `/api/me` | Bearer | Hồ sơ |
 | PATCH | `/api/me` | Bearer | `{ fullName?, phone?, preferredLocale? }` |
@@ -229,11 +232,15 @@ Quyền: `requireRole` đọc `profiles.role` ở server mỗi request. `/api/ad
 
 Bảo trì (D-54): `maintenance.apiGuard` chặn API ghi; `renderPage` trả trang bảo trì 503 cho trang công khai.
 
-## Luồng đặt lại mật khẩu (Supabase)
+## Luồng đặt lại mật khẩu (T-49, không dùng SMTP của Supabase)
 
-1. `POST /api/auth/forgot-password` → Supabase gửi email, link về `PUBLIC_SITE_URL/[lang/]reset-password#access_token=…&type=recovery`.
-2. `ResetPasswordPage` đọc token trong hash, xoá khỏi URL, gửi `POST /api/auth/reset-password` với `Authorization: Bearer <token>`.
-3. Server `getUser(token)` → kiểm `isRecovery` (G-18) → `updatePassword` → `signOut(token)`.
+1. `POST /api/auth/forgot-password` → `auth.createRecoveryToken(email)` (Supabase `generateLink` type recovery, không gửi thư; email không có → bỏ qua) → mailer gửi `PUBLIC_SITE_URL/[lang/]reset-password#t=<token>`. Luôn trả 202.
+2. `ResetPasswordPage` đọc `#t=`, xoá hash khỏi URL, gửi `POST /api/auth/reset-password { token, password }`.
+3. Server kiểm mật khẩu (độ dài + HIBP) → `auth.resetPassword` (`verifyOtp` tiêu thụ token → `updateUserById` → `signOut global`) → xoá cookie, ghi `audit_log`, gửi thư báo đổi.
+
+## Luồng phiên (T-49)
+
+`login`/Google callback đặt cookie `lamvi_rt` (HttpOnly). Client giữ access token; hết hạn (401) → `POST /api/auth/refresh` (cookie, không body) → token mới + cookie mới. Đăng xuất gọi `/auth/logout` rồi xoá `localStorage`.
 
 ## Luồng đặt hàng và thanh toán
 
@@ -261,4 +268,4 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 - Admin: `/admin/{products,faq,batches}` — chỉ tiếng Việt, ngoài `LocaleLayout` (D-48).
 - IT: `/it` — chỉ tiếng Việt (D-51).
 - Trang con: `/` · `/products/:slug` · `/lo/:code` · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
-- `AuthProvider`: phiên trong `localStorage` (`moc.session`), `authedApi` tự refresh một lần khi gặp 401.
+- `AuthProvider`: access token + user trong `localStorage` (`moc.session`, không có refresh token — T-49), `authedApi` tự gọi `/auth/refresh` (cookie) một lần khi gặp 401.

@@ -307,6 +307,8 @@ export default {
     INVALID_EMAIL: '邮箱无效。',
     PASSWORD_TOO_SHORT: '密码至少 8 个字符。',
     PASSWORD_TOO_LONG: '密码过长。',
+    PASSWORD_BREACHED: '该密码出现在公开的数据泄露中，请更换其他密码。',
+    INVALID_RESET_TOKEN: '重置链接无效或已过期。',
     REQUIRED: '请填写此项。',
     INVALID_PHONE: '越南电话号码无效。',
     TOO_LONG: '内容过长。',

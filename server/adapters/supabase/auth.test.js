@@ -4,6 +4,7 @@ import { createSupabaseAuth } from './auth.js'
 import { AuthError } from '../authErrors.js'
 import { createApp } from '../../app.js'
 import { createMemoryRepo } from '../memory/repo.js'
+import { createMemoryMailer } from '../../mail/mailer.js'
 
 // Client Supabase giả: mỗi hàm trả { data, error } theo cấu hình test
 function fakePublic(overrides = {}) {
@@ -20,7 +21,10 @@ function fakePublic(overrides = {}) {
         data: { user: { id: 'u1', email: 'an@example.com' }, session: { access_token: 'a2', refresh_token: 'r2', expires_at: 456 } },
         error: null,
       })),
-      resetPasswordForEmail: vi.fn(async () => ({ data: {}, error: null })),
+      verifyOtp: vi.fn(async () => ({
+        data: { user: { id: 'u1', email: 'an@example.com' }, session: { access_token: 'rec-a', refresh_token: 'rec-r', expires_at: 1 } },
+        error: null,
+      })),
       ...overrides,
     },
   }
@@ -33,6 +37,7 @@ function fakeAdmin(overrides = {}) {
       admin: {
         signOut: vi.fn(async () => ({ data: null, error: null })),
         updateUserById: vi.fn(async () => ({ data: {}, error: null })),
+        generateLink: vi.fn(async () => ({ data: { properties: { hashed_token: 'hash123' } }, error: null })),
         createUser: vi.fn(async () => ({ data: { user: { id: 'u1', email: 'an@example.com' } }, error: null })),
         ...overrides.admin,
       },
@@ -158,7 +163,7 @@ describe('createSupabaseAuth — phiên & client', () => {
     await auth.signIn({ email: 'an@example.com', password: 'x' })
     await auth.signIn({ email: 'an@example.com', password: 'x' })
     await auth.refresh('r1')
-    await auth.sendPasswordReset('an@example.com', 'https://moc.test/reset-password')
+    await auth.resetPassword({ token: 'hash123', password: 'matkhaumoi1' })
     expect(makePublicClient).toHaveBeenCalledTimes(4)
     expect(new Set(clients).size).toBe(4)
     clients.forEach((c) => {
@@ -169,8 +174,7 @@ describe('createSupabaseAuth — phiên & client', () => {
 
   it('getUser/signOut/updatePassword dùng client admin, không tạo client public', async () => {
     const { auth, makePublicClient, admin } = make()
-    // G-18: kèm cờ token khôi phục (đọc từ claim amr); token giả trong test không phải recovery
-    expect(await auth.getUser('tok')).toEqual({ id: 'u1', email: 'an@example.com', isRecovery: false })
+    expect(await auth.getUser('tok')).toEqual({ id: 'u1', email: 'an@example.com' })
     await auth.signOut('tok')
     await auth.updatePassword('u1', 'matkhaumoi1')
     expect(makePublicClient).not.toHaveBeenCalled()
@@ -201,24 +205,54 @@ describe('createSupabaseAuth — phiên & client', () => {
   })
 })
 
-describe('createSupabaseAuth — sendPasswordReset', () => {
-  it('gửi đúng email + redirectTo', async () => {
-    const { auth, clients } = make()
-    await auth.sendPasswordReset('an@example.com', 'https://moc.test/en/reset-password')
-    expect(clients[0].auth.resetPasswordForEmail).toHaveBeenCalledWith('an@example.com', { redirectTo: 'https://moc.test/en/reset-password' })
+describe('createSupabaseAuth — đặt lại mật khẩu không qua SMTP của Supabase (T-49)', () => {
+  it('createRecoveryToken: generateLink type recovery (không gửi thư), trả hashed_token', async () => {
+    const { auth, admin, makePublicClient } = make()
+    expect(await auth.createRecoveryToken('an@example.com')).toBe('hash123')
+    expect(admin.auth.admin.generateLink).toHaveBeenCalledWith({ type: 'recovery', email: 'an@example.com' })
+    expect(makePublicClient).not.toHaveBeenCalled()
   })
 
-  it.each([err('user_not_found', 404), err('unexpected_failure', 500), err('email_address_invalid', 400), { message: 'fetch failed', status: 0 }])(
-    'lỗi khác (%o) không ném ra ngoài',
+  it('createRecoveryToken: user_not_found → null; lỗi khác → ném', async () => {
+    const a = make({ admin: { admin: { generateLink: async () => ({ data: null, error: err('user_not_found', 404) }) } } })
+    expect(await a.auth.createRecoveryToken('khong@co.vn')).toBeNull()
+    const b = make({ admin: { admin: { generateLink: async () => ({ data: null, error: err('unexpected_failure', 500) }) } } })
+    await expect(b.auth.createRecoveryToken('a@b.cd')).rejects.toBeTruthy()
+  })
+
+  it('resetPassword: verifyOtp → đặt mật khẩu → thu hồi mọi phiên (kể cả phiên verifyOtp tạo ra)', async () => {
+    const { auth, admin, clients } = make()
+    const out = await auth.resetPassword({ token: 'hash123', password: 'matkhaumoi1' })
+    expect(out).toEqual({ user: { id: 'u1', email: 'an@example.com' } })
+    expect(clients[0].auth.verifyOtp).toHaveBeenCalledWith({ token_hash: 'hash123', type: 'recovery' })
+    expect(admin.auth.admin.updateUserById).toHaveBeenCalledWith('u1', { password: 'matkhaumoi1' })
+    expect(admin.auth.admin.signOut).toHaveBeenCalledWith('rec-a', 'global')
+  })
+
+  it.each([err('otp_expired', 403), err('otp_disabled', 400), err('validation_failed', 422)])(
+    'resetPassword: token hết hạn/sai (%o) → INVALID_RESET_TOKEN, không đổi mật khẩu',
     async (e) => {
-      const { auth } = make({ pub: { resetPasswordForEmail: async () => ({ data: null, error: e }) } })
-      await expect(auth.sendPasswordReset('a@b.cd', 'x')).resolves.toBeUndefined()
+      const { auth, admin } = make({ pub: { verifyOtp: async () => ({ data: { user: null, session: null }, error: e }) } })
+      await rejectsCode(auth.resetPassword({ token: 'x', password: 'matkhaumoi1' }), 'INVALID_RESET_TOKEN')
+      expect(admin.auth.admin.updateUserById).not.toHaveBeenCalled()
     },
   )
 
-  it('429 theo từng user cũng không ném (chống dò email bằng cách gửi hai lần)', async () => {
-    const { auth } = make({ pub: { resetPasswordForEmail: async () => ({ data: null, error: err('over_email_send_rate_limit', 429) }) } })
-    await expect(auth.sendPasswordReset('a@b.cd', 'x')).resolves.toBeUndefined()
+  it('resetPassword: verifyOtp lỗi 5xx → ném lỗi hệ thống (không báo link hỏng)', async () => {
+    const { auth } = make({ pub: { verifyOtp: async () => ({ data: {}, error: err('unexpected_failure', 500) }) } })
+    const e = await auth.resetPassword({ token: 'x', password: 'matkhaumoi1' }).catch((x) => x)
+    expect(e).not.toBeInstanceOf(AuthError)
+  })
+
+  it('resetPassword: thu hồi phiên lỗi sau khi đã đổi mật khẩu → vẫn thành công, ghi log', async () => {
+    const { auth } = make({ admin: { admin: { signOut: async () => ({ error: err('unexpected_failure', 500) }) } } })
+    await expect(auth.resetPassword({ token: 'x', password: 'matkhaumoi1' })).resolves.toMatchObject({ user: { id: 'u1' } })
+    expect(consoleError).toHaveBeenCalled()
+  })
+
+  it('updateUserById lỗi (weak_password) → PASSWORD_TOO_SHORT', async () => {
+    const { auth } = make({ admin: { admin: { updateUserById: async () => ({ error: err('weak_password', 422) }) } } })
+    await rejectsCode(auth.resetPassword({ token: 'x', password: 'x' }), 'PASSWORD_TOO_SHORT')
   })
 })
 
@@ -252,24 +286,27 @@ describe('Route + adapter Supabase: không lộ thông điệp lỗi gốc', () 
     expect(res.text).not.toContain('Database')
   })
 
-  it('forgot-password: lỗi gốc của Supabase (vd user_not_found) vẫn trả 202 giống email tồn tại', async () => {
+  it('forgot-password: lỗi gốc của Supabase (vd user_not_found) vẫn trả 202 giống email tồn tại, thư chỉ gửi khi có user', async () => {
     let fail = false
     const { auth } = make({
-      pub: { resetPasswordForEmail: async () => ({ data: null, error: fail ? err('user_not_found', 404, secret) : null }) },
+      admin: { admin: { generateLink: async () => ({ data: fail ? null : { properties: { hashed_token: 'h' } }, error: fail ? err('user_not_found', 404, secret) : null }) } },
     })
-    const app = createApp({ repo: createMemoryRepo(), auth, config })
+    const mailer = createMemoryMailer()
+    const app = createApp({ repo: createMemoryRepo(), auth, config, mailer })
     const ok = await request(app).post('/api/auth/forgot-password').send({ email: 'an@example.com' })
     fail = true
     const ko = await request(app).post('/api/auth/forgot-password').send({ email: 'khong@example.com' })
     expect(ok.status).toBe(202)
     expect(ko.status).toBe(202)
     expect(ko.text).toBe(ok.text)
+    expect(mailer.outbox).toHaveLength(1)
+    expect(mailer.outbox[0].text).toContain('/reset-password#t=h')
   })
 
   it('refresh_token_already_used → 401 UNAUTHORIZED qua API', async () => {
     const { auth } = make({ pub: { refreshSession: async () => ({ data: { session: null }, error: err('refresh_token_already_used', 400, secret) }) } })
     const app = createApp({ repo: createMemoryRepo(), auth, config })
-    const res = await request(app).post('/api/auth/refresh').send({ refreshToken: 'r0' })
+    const res = await request(app).post('/api/auth/refresh').set('Cookie', 'lamvi_rt=r0')
     expect(res.status).toBe(401)
     expect(res.body.error.code).toBe('UNAUTHORIZED')
     expect(res.text).not.toContain('Database')

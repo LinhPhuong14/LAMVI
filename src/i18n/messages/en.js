@@ -320,6 +320,8 @@ export default {
     INVALID_EMAIL: 'Invalid email.',
     PASSWORD_TOO_SHORT: 'Password must be at least 8 characters.',
     PASSWORD_TOO_LONG: 'Password is too long.',
+    PASSWORD_BREACHED: 'This password appears in public data breaches. Please choose a different one.',
+    INVALID_RESET_TOKEN: 'The reset link is invalid or has expired.',
     REQUIRED: 'This field is required.',
     INVALID_PHONE: 'Invalid Vietnamese phone number.',
     TOO_LONG: 'Too long.',

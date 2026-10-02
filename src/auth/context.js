@@ -31,5 +31,5 @@ export function saveSession(session) {
 
 // Chỉ cho phép quay lại đường dẫn nội bộ (chống open redirect)
 export function safeNext(next, fallback) {
-  return typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') ? next : fallback
+  return typeof next === 'string' && /^\/(?![/\\])[^\t\r\n]*$/.test(next) ? next : fallback
 }

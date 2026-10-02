@@ -49,6 +49,8 @@ export async function runHealthChecks({ repo, auth, storage, config, may, env = 
     { name: 'auth', provider: supabase, ...authCheck },
     { name: 'storage', provider: supabase, ...storageCheck },
     integration('payos', Boolean(env.PAYOS_CLIENT_ID && env.PAYOS_API_KEY && env.PAYOS_CHECKSUM_KEY)),
+    // T-49: thư giao dịch — chỉ báo đã cấu hình chưa, không trả khoá
+    { name: 'mail', status: 'not_integrated', configured: Boolean(config.mail?.from && (config.mail.resendApiKey || config.mail.brevoApiKey)) },
     await openaiCheck(may, env),
   ]
   const mem = process.memoryUsage()

@@ -6,20 +6,17 @@ import { useI18n } from '../../i18n/index.js'
 import AuthShell from './AuthShell'
 import { useSubmit } from '../../auth/useForm.js'
 
-// Link email của Supabase trả token khôi phục trong #hash (type=recovery)
-function readRecoveryToken() {
-  const params = new URLSearchParams(window.location.hash.slice(1))
-  const token = params.get('access_token')
-  if (token) {
-    // Xoá token khỏi thanh địa chỉ/lịch sử
-    window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
-  }
-  return token && params.get('type') === 'recovery' ? token : null
+// T-49: link trong thư là /reset-password#t=<token một lần>. Fragment không gửi lên server, nên
+// token không vào log hay header Referer; đọc xong xoá khỏi thanh địa chỉ/lịch sử.
+function readResetToken() {
+  const token = new URLSearchParams(window.location.hash.slice(1)).get('t')
+  if (window.location.hash) window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
+  return token || null
 }
 
 export default function ResetPasswordPage() {
   const { t, path } = useI18n()
-  const [token] = useState(readRecoveryToken)
+  const [token] = useState(readResetToken)
   const [password, setPassword] = useState('')
   const [done, setDone] = useState(false)
   const { pending, error, fields, run } = useSubmit()
@@ -27,7 +24,7 @@ export default function ResetPasswordPage() {
   async function onSubmit(e) {
     e.preventDefault()
     await run(async () => {
-      await api('/auth/reset-password', { method: 'POST', body: { password }, token })
+      await api('/auth/reset-password', { method: 'POST', body: { token, password } })
       setDone(true)
     })
   }
@@ -39,7 +36,7 @@ export default function ResetPasswordPage() {
         {t('auth.resetDone')}
       </p>
     )
-  } else if (!token || error === 'UNAUTHORIZED') {
+  } else if (!token || error === 'INVALID_RESET_TOKEN') {
     content = (
       <p className="notice error" role="alert">
         {t('auth.resetInvalid')}

@@ -330,32 +330,26 @@ describe('G-20 — tác dụng phụ lên người dùng hợp lệ', () => {
     expect(res.status).toBe(201)
   })
 
-  it('reset-password: request không token KHÔNG chặn được token khôi phục thật', async () => {
-    await register('an@example.com')
-    await request(app).post('/api/auth/forgot-password').send({ email: 'an@example.com' })
-    const rec = auth.outbox.at(-1).accessToken
-    for (let i = 0; i < 5; i += 1) {
-      expect((await request(app).post('/api/auth/reset-password').send({ password: 'matkhaumoi1' })).status).toBe(401)
-    }
-    const res = await request(app).post('/api/auth/reset-password').set('Authorization', `Bearer ${rec}`).send({ password: 'matkhaumoi1' })
-    expect(res.status).toBe(204)
+  // Trước T-49 bộ giới hạn đổi/đặt lại mật khẩu truyền keys `() => []` nên thực tế không đếm gì.
+  it('reset-password: đoán token bị chặn theo IP sau ngưỡng (kể cả token sai)', async () => {
+    const guess = () => request(app).post('/api/auth/reset-password').send({ token: 'doan-bua', password: 'matkhaumoi1' })
+    expect((await guess()).status).toBe(400)
+    expect((await guess()).status).toBe(400)
+    const blocked = await guess()
+    expect(blocked.status).toBe(429)
+    expect(blocked.body.error.code).toBe('RATE_LIMITED')
   })
 
-  it('reset-password và change-password đếm riêng, không chặn lẫn nhau', async () => {
+  it('change-password: đếm theo tài khoản — thử mật khẩu hiện tại liên tục bị chặn, không ảnh hưởng reset-password', async () => {
     const token = await customerToken()
-    await register('an@example.com')
-    // Dùng hết hạn mức của luồng đặt lại mật khẩu
-    await request(app).post('/api/auth/forgot-password').send({ email: 'an@example.com' })
-    const rec = auth.outbox.at(-1).accessToken
-    for (let i = 0; i < 2; i += 1) {
-      await request(app).post('/api/auth/reset-password').set('Authorization', `Bearer ${rec}`).send({ password: `matkhaumoi${i}` })
-    }
-    // Luồng đổi mật khẩu vẫn dùng được
-    const res = await request(app)
-      .post('/api/auth/change-password')
-      .set('Authorization', token)
-      .send({ currentPassword: 'matkhau123', password: 'matkhaumoi9' })
-    expect(res.status).toBe(204)
+    const change = (currentPassword) =>
+      request(app).post('/api/auth/change-password').set('Authorization', token).send({ currentPassword, password: 'matkhaumoi9' })
+    expect((await change('sai-1')).status).toBe(400)
+    expect((await change('sai-2')).status).toBe(400)
+    expect((await change('matkhau123')).status).toBe(429)
+    // Luồng đặt lại mật khẩu có bộ đếm riêng nên vẫn dùng được
+    const reset = await request(app).post('/api/auth/reset-password').send({ token: 'x', password: 'matkhaumoi1' })
+    expect(reset.status).toBe(400)
   })
 })
 

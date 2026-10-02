@@ -335,6 +335,8 @@ export default {
     INVALID_EMAIL: 'Email không hợp lệ.',
     PASSWORD_TOO_SHORT: 'Mật khẩu tối thiểu 8 ký tự.',
     PASSWORD_TOO_LONG: 'Mật khẩu quá dài.',
+    PASSWORD_BREACHED: 'Mật khẩu này đã xuất hiện trong các vụ rò rỉ dữ liệu công khai. Vui lòng chọn mật khẩu khác.',
+    INVALID_RESET_TOKEN: 'Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.',
     REQUIRED: 'Vui lòng nhập trường này.',
     INVALID_PHONE: 'Số điện thoại Việt Nam không hợp lệ.',
     TOO_LONG: 'Nội dung quá dài.',

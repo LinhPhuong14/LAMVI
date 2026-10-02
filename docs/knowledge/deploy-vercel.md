@@ -18,6 +18,8 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 2. **Biến môi trường** đặt ở Vercel (Project → Settings → Environment Variables), theo từng môi trường; không commit `.env`, không đưa key vào frontend (T-05). Danh sách: xem [`../../.env.example`](../../.env.example). Riêng Vercel:
    - `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_…`), `SUPABASE_SECRET_KEY` (`sb_secret_…`) (bắt buộc; secret key chỉ ở server). Tên cũ `SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` vẫn nhận nếu không có tên mới.
    - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (tuỳ chọn, T-44): OAuth client Web ở Google Cloud; Authorized redirect URI = `{PUBLIC_SITE_URL}/api/auth/google/callback`. Thiếu → ẩn nút "Tiếp tục với Google".
+   - **Thư giao dịch (T-49, bắt buộc ở Production)**: `MAIL_FROM` (vd `LAMVI <no-reply@tên-miền-của-bạn>`) + **một** trong `RESEND_API_KEY` hoặc `BREVO_API_KEY`. Thiếu → "Quên mật khẩu" vẫn trả 202 nhưng không có thư (dashboard IT hiện `mail` chưa cấu hình). Resend (3.000 thư/tháng, 100/ngày): thêm tên miền, đặt DNS SPF/DKIM, `MAIL_FROM` phải thuộc tên miền đó. Brevo (300 thư/ngày): xác minh một địa chỉ gửi đơn lẻ là đủ, nhưng dễ vào thư rác hơn. **Không cần** SMTP của Supabase.
+   - `PWNED_CHECK=0` tắt kiểm mật khẩu đã lộ (mặc định bật; gọi `api.pwnedpasswords.com`, lỗi thì cho qua). Chỉ tắt khi mạng ra ngoài bị chặn.
    - `PUBLIC_SITE_URL` = URL công khai thật (dùng cho link đặt lại mật khẩu, sitemap, hreflang) — Production đặt domain chính; Preview không dùng link đặt lại mật khẩu để kiểm thử thật. Thêm URL này vào Redirect URLs của Supabase (G-16).
    - `TRUST_PROXY=1` (Vercel đứng trước hàm; nếu không, hạn mức Mây theo IP và IP trong log sai).
    - `MAY_HASH_SALT` đặt giá trị bí mật riêng; `OPENAI_*`, `PAYOS_*` khi tích hợp. Không đặt `DEV_ADMIN_*`/`DEV_IT_*` trên Vercel.
@@ -43,8 +45,9 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 1. **Tạo bảng trước**: Supabase → SQL Editor, chạy lần lượt `supabase/migrations/*.sql` rồi `supabase/seed.sql`. Đặt biến ở bước 2 khi DB chưa có bảng → mọi API trả 500 (`PGRST205`).
 2. **Vercel → Settings → Environment Variables** (Production): `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `PUBLIC_SITE_URL=https://lamvi.vercel.app`, `TRUST_PROXY=1`, `MAY_HASH_SALT` (chuỗi ngẫu nhiên).
 3. **Redeploy** Production (biến mới chỉ áp dụng cho lần deploy sau).
-4. **Supabase → Authentication → URL Configuration**: Site URL `https://lamvi.vercel.app`; Redirect URLs `https://lamvi.vercel.app/**` (link đặt lại mật khẩu, G-16). Xác nhận email đã bỏ ở tầng app (D-63) — không cần chỉnh "Confirm email".
-5. Kiểm tra: `/api/products` 200; đăng ký tài khoản mới → vào thẳng `/account`; Supabase → Authentication → Users thấy user mới.
+4. **Supabase → Authentication → URL Configuration**: Site URL `https://lamvi.vercel.app`. Link đặt lại mật khẩu nay do server tự tạo và gửi (T-49) nên **không** cần Redirect URLs hay SMTP của Supabase. Giữ "OTP expiry" ở 3600 giây (link đặt lại mật khẩu hết hạn sau từng ấy). Xác nhận email đã bỏ ở tầng app (D-63) — không cần chỉnh "Confirm email".
+5. Cookie phiên `lamvi_rt` là `Secure` khi `PUBLIC_SITE_URL` là https — Production phải đặt đúng https, nếu không trình duyệt không lưu cookie ở trang https. Preview (domain `*.vercel.app` khác `PUBLIC_SITE_URL`) vẫn đăng nhập được vì kiểm Origin chấp nhận cùng Host.
+6. Kiểm tra: `/api/products` 200; đăng ký tài khoản mới → vào thẳng `/account`; Supabase → Authentication → Users thấy user mới.
 
 ## Kiểm thử cục bộ giống Vercel
 

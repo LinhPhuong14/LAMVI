@@ -41,6 +41,8 @@ export function loadConfig(env = process.env) {
       login: { max: 10, windowSec: 300 },
       register: { max: 20, windowSec: 3600 },
       forgot: { max: 5, windowSec: 3600 },
+      // /auth/refresh chạy mỗi lần mở tab/hết hạn token; theo IP nên để rộng (nhiều người chung IP)
+      refresh: { max: 120, windowSec: 300 },
       password: { max: 10, windowSec: 3600 },
       order: { max: 20, windowSec: 3600 },
     },
@@ -62,6 +64,15 @@ export function loadConfig(env = process.env) {
     // Đăng nhập Google (D-78): OAuth 2.0 trực tiếp với Google Cloud, không dùng provider Google của
     // Supabase. Thiếu một trong hai → ẩn nút "Đăng nhập với Google".
     google: { clientId: env.GOOGLE_CLIENT_ID || null, clientSecret: env.GOOGLE_CLIENT_SECRET || null },
+    // T-49: thư giao dịch (đặt lại mật khẩu, báo đổi mật khẩu) qua API HTTPS có gói miễn phí.
+    // Cần MAIL_FROM + một trong hai khoá. Thiếu → không gửi được thư, "Quên mật khẩu" không hoạt động.
+    mail: {
+      from: env.MAIL_FROM || null,
+      resendApiKey: env.RESEND_API_KEY || null,
+      brevoApiKey: env.BREVO_API_KEY || null,
+    },
+    // T-49: chặn mật khẩu đã lộ (HIBP). PWNED_CHECK=0 để tắt (test/mạng chặn api.pwnedpasswords.com).
+    pwnedCheck: env.PWNED_CHECK !== '0',
     mayHashSalt: env.MAY_HASH_SALT || env.SUPABASE_URL || DEFAULT_HASH_SALT,
     supabase,
     useSupabase: Boolean(supabase.url && supabase.anonKey && supabase.serviceRoleKey),

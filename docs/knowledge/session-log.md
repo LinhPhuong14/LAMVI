@@ -1,5 +1,17 @@
 # Nhật ký phiên
 
+## 2026-10-02 — Auth chuẩn production không cần Supabase Pro/Twilio (nhánh `feat/auth-production`)
+
+**Yêu cầu**: thiết kế phần auth chuẩn production cho web không có Supabase Pro và Twilio.
+
+**Phát hiện**: auth đã có nhiều thứ (email+mật khẩu, Google, rate limit, đổi mật khẩu). Lỗ hổng thật khi không có gói trả phí: (1) thư đặt lại mật khẩu đi qua SMTP dùng chung của Supabase Free — chỉ tới thành viên nhóm, vài thư/giờ → "Quên mật khẩu" hỏng ở production; (2) refresh token ở `localStorage` (G-17); (3) bộ giới hạn `reset`/`change` mật khẩu truyền `keys = () => []` nên không đếm gì; (4) không chặn mật khẩu đã lộ.
+
+**Đã làm** (T-49): mailer HTTPS Resend/Brevo + mẫu thư vi/en/zh; đặt lại mật khẩu bằng token một lần (`generateLink` + `verifyOtp`), link `#t=`; refresh token cookie HttpOnly + `sameOriginOnly`; Google callback không để token trên URL; HIBP k-anonymity (fail-open); thư báo đổi mật khẩu + `audit_log`; sửa giới hạn tốc độ; thêm `mail` vào health IT. Cập nhật test cũ theo cơ chế mới, thêm test mailer/pwned/sessionCookie; subagent kiểm thử độc lập (T-11).
+
+**Quyết định không tự đưa ra**: xác minh email khi đăng ký (đảo D-63) → Q-39 chờ PO. Không làm SMS/OTP điện thoại, không làm TOTP admin (chưa có yêu cầu).
+
+**Còn lại / cần người dùng**: đặt `MAIL_FROM` + `RESEND_API_KEY`/`BREVO_API_KEY` (và DNS SPF/DKIM nếu dùng Resend) ở Vercel (G-52); thử luồng quên mật khẩu trên Supabase thật; trả lời Q-39; rủi ro G-53, G-54.
+
 ## 2026-10-02 — Rà soát CI/CD, bảo mật, hiệu năng (nhánh `fix/devops-hardening`)
 
 **Phát hiện**: repo chưa có CI; `npm audit` sạch; header bảo mật/CSP/rate limit đã đủ; `immutable 1 năm` áp cho cả tệp không băm; ảnh `public/` chỉ có cache mặc định của Vercel; `CRON_SECRET` so sánh bằng `!==`; `probe2.tmp.mjs` bị commit; `deploy-vercel.md` ghi CSP nonce trong khi code dùng hash.
