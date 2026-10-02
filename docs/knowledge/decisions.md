@@ -249,3 +249,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Field `toggle`**: ô mật khẩu có nút Hiện/Ẩn (`aria-pressed`), chỉ bật ở trang auth.
 - **Chuyển động**: quầng bokeh `auth-orb` trôi chậm, thẻ trồi lên 0,7s; tắt khi `prefers-reduced-motion`.
 - **Hệ quả**: các test cũ dùng link "Chưa có tài khoản?" chuyển sang `tab()`.
+
+### T-48 — CI, cache tĩnh, so sánh bí mật
+
+- **CI**: `.github/workflows/ci.yml` (lint, test, build, `npm audit --omit=dev --audit-level=high`) + Dependabot hằng tuần. Trước đó repo không có CI nào, việc "xanh trước khi merge" chỉ dựa vào chạy tay.
+- **Cache**: `immutable 1 năm` chỉ cho `dist/client/assets/*` (tên băm nội dung); tệp khác 1 giờ. `public/images/*` + favicon: 1 ngày + stale-while-revalidate 7 ngày, đặt ở `vercel.json`.
+- **Bảo mật**: `CRON_SECRET` so sánh bằng `timingSafeEqual` (trên SHA-256 của hai vế). Xoá `probe2.tmp.mjs` (tệp thăm dò tạm bị commit nhầm).

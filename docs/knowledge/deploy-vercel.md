@@ -9,7 +9,7 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
   - `buildCommand: npm run build` → `dist/client` + `dist/server`.
   - `functions["api/index.js"].includeFiles: "dist/**"` — bắt buộc, vì `server/ssr.js` đọc `dist/client/index.html` và `dist/server/entry-server.js` lúc chạy.
   - `rewrites: /(.*) → /api` — mọi đường dẫn (trang, `/api/*`, `/sitemap.xml`, `/robots.txt`) đi qua Express; Express giữ nguyên URL gốc.
-  - `outputDirectory: "public"` — cố ý **không** trỏ `dist/client`, nếu không CDN sẽ trả thẳng `index.html` rỗng cho `/` và bỏ qua SSR (T-15, SEO). File trong `public/` do CDN phục vụ; `dist/client/assets` do Express phục vụ (cache 1 năm).
+  - `outputDirectory: "public"` — cố ý **không** trỏ `dist/client`, nếu không CDN sẽ trả thẳng `index.html` rỗng cho `/` và bỏ qua SSR (T-15, SEO). File trong `public/` do CDN phục vụ; `dist/client/assets` do Express phục vụ (cache 1 năm, immutable; tệp khác trong `dist/client` 1 giờ). `public/images/*` và favicon có `Cache-Control` 1 ngày + SWR 7 ngày đặt ở `vercel.json` → `headers`.
 - Node 22 (`engines`), vì script dev dùng `--env-file-if-exists`.
 
 ## Quy tắc
@@ -33,7 +33,7 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 5. **Production = `master`.** Không deploy tay từ máy (`vercel --prod`) trừ khi người dùng yêu cầu; không dùng token Vercel trong repo. Thư mục `.vercel/` đã ở `.gitignore`.
 6. **Thay đổi cấu hình deploy** (`vercel.json`, `api/`, biến môi trường bắt buộc mới) → cập nhật file này, `.env.example` và `decisions.md` cùng lúc.
 7. Mỗi lần thêm route/tệp đọc lúc chạy ngoài `dist/**` (ví dụ thư mục dữ liệu, template) → thêm vào `includeFiles`.
-8. **Security headers (T-37)** do `server/middleware/security.js` đặt cho mọi response, không cấu hình ở `vercel.json` (để một chỗ duy nhất quyết định). CSP dùng `nonce` sinh mỗi request và **chỉ bật khi `NODE_ENV=production`** — ở dev Vite chèn script nội tuyến riêng. Thêm host bên ngoài (CDN ảnh, dịch vụ mới) → phải mở đúng host đó trong `buildCsp`, không dùng `*`. HSTS chỉ gửi khi `x-forwarded-proto: https`.
+8. **Security headers (T-37)** do `server/middleware/security.js` đặt cho mọi response, không cấu hình ở `vercel.json` (để một chỗ duy nhất quyết định). CSP dùng **hash** của script nội tuyến (không dùng nonce vì trang được CDN chia sẻ) và **chỉ bật khi `NODE_ENV=production`** — ở dev Vite chèn script nội tuyến riêng. Thêm host bên ngoài (CDN ảnh, dịch vụ mới) → phải mở đúng host đó trong `buildCsp`, không dùng `*`. HSTS chỉ gửi khi `x-forwarded-proto: https`.
 9. **Cron quét đơn quá hạn (BR-PAY-003)**: `vercel.json` → `crons`. **Gói Hobby chỉ cho cron chạy MỘT LẦN MỖI NGÀY** — đặt lịch dày hơn (ví dụ `*/5 * * * *`) thì Vercel **từ chối cả bản deploy**, không chỉ bỏ qua cron; trang lỗi trỏ tới `vercel.com/docs/cron-jobs/usage-and-pricing`. Hiện đặt `0 18 * * *` (01:00 giờ Việt Nam, giờ vắng khách). Đúng đắn về nghiệp vụ không phụ thuộc cron: đơn quá hạn còn được huỷ ngay khi khách mở đơn hoặc mở danh sách đơn (`expireIfDue`); cron chỉ để trả lượt coupon của những đơn không ai mở. Lên gói Pro thì mới tăng tần suất được.
 10. **Chống dò/spam (G-20)** bật mặc định; ngưỡng ở `server/config.js`. Đếm bằng `app_settings`-style counter trong DB (không dùng bộ nhớ tiến trình vì serverless), khoá đếm là **băm** của IP/email với `MAY_HASH_SALT` → không lưu IP hay email thô. **Không đặt `RATE_LIMIT=0` ở Preview/Production.** `TRUST_PROXY=1` là bắt buộc, nếu không mọi request đều mang IP của Vercel và một người bị chặn sẽ chặn cả site.
 11. **Cache headers**: trang công khai `s-maxage=60, stale-while-revalidate=300` (CDN Vercel giữ bản chung — SSR trang công khai không phụ thuộc phiên đăng nhập); trang riêng tư `private, no-store`; `sitemap.xml` `s-maxage=3600`; `robots.txt` `s-maxage=86400`. Đổi SSR sang phụ thuộc phiên (ví dụ render tên người dùng ở server) thì **phải** bỏ `s-maxage` cùng lúc.
@@ -60,3 +60,4 @@ Chưa kiểm chứng trên một deployment Vercel thật (G-36) — phiên đ�
 ## Vercel Web Analytics (T-42)
 
 Gói `@vercel/analytics` được nhúng ở `src/main.jsx`. Bật **Analytics** trong dashboard Vercel của project để có số liệu; không cần biến môi trường hay đổi CSP.
+12. **CI (T-48)**: `.github/workflows/ci.yml` chạy `lint`, `test`, `build` (Node 22) và `npm audit --omit=dev --audit-level=high` cho mọi PR và push `master`; `.github/dependabot.yml` mở PR cập nhật npm/Actions hằng tuần. Nên bật branch protection yêu cầu job `lint · test · build` xanh trước khi gộp vào `master`. Cron secret so sánh bằng `timingSafeEqual`.

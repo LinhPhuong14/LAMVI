@@ -1,5 +1,13 @@
 # Nhật ký phiên
 
+## 2026-10-02 — Rà soát CI/CD, bảo mật, hiệu năng (nhánh `fix/devops-hardening`)
+
+**Phát hiện**: repo chưa có CI; `npm audit` sạch; header bảo mật/CSP/rate limit đã đủ; `immutable 1 năm` áp cho cả tệp không băm; ảnh `public/` chỉ có cache mặc định của Vercel; `CRON_SECRET` so sánh bằng `!==`; `probe2.tmp.mjs` bị commit; `deploy-vercel.md` ghi CSP nonce trong khi code dùng hash.
+
+**Đã làm**: T-48 — CI + Dependabot, cache tĩnh đúng loại, `timingSafeEqual`, xoá tệp tạm, sửa tài liệu.
+
+**Còn lại / cần người dùng**: bật branch protection yêu cầu job `lint · test · build`; xem xét RLS Supabase bằng `supabase` MCP khi đã uỷ quyền (phiên này chưa xác thực được).
+
 ## 2026-10-01 — Trang auth v2 (nhánh `feat/auth-redesign-v2`)
 
 **Mục tiêu người dùng**: thiết kế lại trang auth cho đẹp hơn, tham khảo Pinterest/Behance.

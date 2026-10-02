@@ -160,7 +160,16 @@ export async function createWeb({ repo, config, dev, maintenance }) {
   } else {
     prodTemplate = readFileSync(`${root}/dist/client/index.html`, 'utf8')
     prodRender = (await import(`${root}/dist/server/entry-server.js`)).render
-    router.use(express.static(`${root}/dist/client`, { index: false, maxAge: '1y', immutable: true }))
+    // Chỉ /assets có tên băm nội dung mới cache vĩnh viễn; tệp khác (favicon…) giữ 1 giờ
+    router.use(
+      express.static(`${root}/dist/client`, {
+        index: false,
+        maxAge: '1h',
+        setHeaders(res) {
+          if (res.req.path.startsWith('/assets/')) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
+        },
+      }),
+    )
   }
 
   router.get(/.*/, async (req, res) => {
