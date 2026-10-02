@@ -255,3 +255,8 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **CI**: `.github/workflows/ci.yml` (lint, test, build, `npm audit --omit=dev --audit-level=high`) + Dependabot hằng tuần. Trước đó repo không có CI nào, việc "xanh trước khi merge" chỉ dựa vào chạy tay.
 - **Cache**: `immutable 1 năm` chỉ cho `dist/client/assets/*` (tên băm nội dung); tệp khác 1 giờ. `public/images/*` + favicon: 1 ngày + stale-while-revalidate 7 ngày, đặt ở `vercel.json`.
 - **Bảo mật**: `CRON_SECRET` so sánh bằng `timingSafeEqual` (trên SHA-256 của hai vế). Xoá `probe2.tmp.mjs` (tệp thăm dò tạm bị commit nhầm).
+
+### T-49 — Rà RLS Supabase và giảm độ trễ Mây
+
+- **RLS**: rà từ các migration (MCP Supabase chưa được uỷ quyền nên chưa đối chiếu DB thật). 15/15 bảng `public` đã bật RLS, không policy (T-05). Vá bằng `20261002000009_harden_rls.sql`: thu hồi EXECUTE của `claim_coupon`/`release_coupon` (trước đó PUBLIC gọi được RPC), thu hồi quyền bảng/hàm/sequence mặc định của `anon`/`authenticated` (kèm default privileges), tạo bucket `product-images` (trước chỉ tạo tay). **Phải chạy migration và chạy lại advisor bảo mật trên project thật.**
+- **Mây (OpenAI)**: hai bộ đếm hạn mức chạy song song; đọc chi phí tháng song song với kiểm hạn mức; các tool trong cùng một lượt gọi song song (giữ thứ tự `tool_call_id`); `max_tokens` 600 → 350 (câu trả lời ≤ ~80 từ). Chưa làm: streaming, cache catalog theo instance, gpt nhỏ hơn.

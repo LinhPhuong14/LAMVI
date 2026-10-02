@@ -6,7 +6,7 @@ export function createOpenAiClient({ apiKey, model, baseUrl = 'https://api.opena
       const res = await fetchImpl(`${baseUrl}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({ model, messages, tools, tool_choice: 'auto', temperature: 0.3, max_tokens: 600 }),
+        body: JSON.stringify({ model, messages, tools, tool_choice: 'auto', temperature: 0.3, max_tokens: 350 }),
         signal,
       })
       if (!res.ok) {

@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-02 — Rà RLS và độ trễ Mây (nhánh `fix/rls-openai-latency`)
+
+**Đã làm**: T-49 — migration `20261002000009_harden_rls.sql`; song song hoá DB/tool trong `server/may/service.js`; `max_tokens` 350; test `server/may.latency.extra.test.js`.
+
+**Còn lại / cần người dùng**: chạy migration trên Supabase; uỷ quyền Supabase MCP để chạy advisor và đối chiếu RLS thật; đo p50/p95 `/api/may/chat` trước/sau ở dashboard IT.
+
 ## 2026-10-02 — Rà soát CI/CD, bảo mật, hiệu năng (nhánh `fix/devops-hardening`)
 
 **Phát hiện**: repo chưa có CI; `npm audit` sạch; header bảo mật/CSP/rate limit đã đủ; `immutable 1 năm` áp cho cả tệp không băm; ảnh `public/` chỉ có cache mặc định của Vercel; `CRON_SECRET` so sánh bằng `!==`; `probe2.tmp.mjs` bị commit; `deploy-vercel.md` ghi CSP nonce trong khi code dùng hash.
