@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-02 — Rà RLS và độ trễ Mây (nhánh `fix/rls-openai-latency`)
+
+**Đã làm**: T-51 — migration `20261002000009_harden_rls.sql`; song song hoá DB/tool trong `server/may/service.js`; `max_tokens` 350; test `server/may.latency.extra.test.js`.
+
+**Còn lại / cần người dùng**: chạy migration trên Supabase; uỷ quyền Supabase MCP để chạy advisor và đối chiếu RLS thật; đo p50/p95 `/api/may/chat` trước/sau ở dashboard IT.
+
 ## 2026-10-02 — Trang Cửa hàng và navbar thu nhỏ (nhánh `feat/shop-navbar`)
 
 **Mục tiêu người dùng**: thiết kế trang shop riêng, mọi nút xem đèn đi tới shop thay vì section; thêm "Xem thêm" ở bộ sưu tập; navbar luôn ở đầu trang, cuộn xuống thì thu nhỏ 20% và bo góc.
@@ -32,7 +38,7 @@
 
 **Phát hiện**: repo chưa có CI; `npm audit` sạch; header bảo mật/CSP/rate limit đã đủ; `immutable 1 năm` áp cho cả tệp không băm; ảnh `public/` chỉ có cache mặc định của Vercel; `CRON_SECRET` so sánh bằng `!==`; `probe2.tmp.mjs` bị commit; `deploy-vercel.md` ghi CSP nonce trong khi code dùng hash.
 
-**Đã làm**: T-48 — CI + Dependabot, cache tĩnh đúng loại, `timingSafeEqual`, xoá tệp tạm, sửa tài liệu.
+**Đã làm**: T-50 — CI + Dependabot, cache tĩnh đúng loại, `timingSafeEqual`, xoá tệp tạm, sửa tài liệu.
 
 **Còn lại / cần người dùng**: bật branch protection yêu cầu job `lint · test · build`; xem xét RLS Supabase bằng `supabase` MCP khi đã uỷ quyền (phiên này chưa xác thực được).
 

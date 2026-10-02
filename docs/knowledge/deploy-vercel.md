@@ -63,4 +63,4 @@ Chưa kiểm chứng trên một deployment Vercel thật (G-36) — phiên đ�
 ## Vercel Web Analytics (T-42)
 
 Gói `@vercel/analytics` được nhúng ở `src/main.jsx`. Bật **Analytics** trong dashboard Vercel của project để có số liệu; không cần biến môi trường hay đổi CSP.
-12. **CI (T-48)**: `.github/workflows/ci.yml` chạy `lint`, `test`, `build` (Node 22) và `npm audit --omit=dev --audit-level=high` cho mọi PR và push `master`; `.github/dependabot.yml` mở PR cập nhật npm/Actions hằng tuần. Nên bật branch protection yêu cầu job `lint · test · build` xanh trước khi gộp vào `master`. Cron secret so sánh bằng `timingSafeEqual`.
+12. **CI (T-50)**: `.github/workflows/ci.yml` chạy `lint`, `test`, `build` (Node 22) và `npm audit --omit=dev --audit-level=high` cho mọi PR và push `master`; `.github/dependabot.yml` mở PR cập nhật npm/Actions hằng tuần. Nên bật branch protection yêu cầu job `lint · test · build` xanh trước khi gộp vào `master`. Cron secret so sánh bằng `timingSafeEqual`.

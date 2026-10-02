@@ -76,9 +76,11 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
     const day = vnDay(t)
     const lim = config.limits
     if (user) return (await repo.incrementMayCounter(`u:${user.id}:${day}`, 2 * 86400)) > lim.userPerDay
-    const s = await repo.incrementMayCounter(`s:${hash(sessionId, hashSalt)}`, 86400)
-    // Không lưu IP thô
-    const i = await repo.incrementMayCounter(`ip:${hash(ip, hashSalt)}:${day}`, 2 * 86400)
+    // Hai bộ đếm độc lập → chạy song song (bớt một vòng DB). Không lưu IP thô.
+    const [s, i] = await Promise.all([
+      repo.incrementMayCounter(`s:${hash(sessionId, hashSalt)}`, 86400),
+      repo.incrementMayCounter(`ip:${hash(ip, hashSalt)}:${day}`, 2 * 86400),
+    ])
     return s > lim.guestPerSession || i > lim.guestPerDayIp
   }
 
@@ -108,17 +110,22 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
         const calls = msg.tool_calls ?? []
         if (!calls.length) return { text: toPlainText(msg.content ?? ''), toolOutputs, usage }
         messages.push({ role: 'assistant', content: msg.content ?? null, tool_calls: calls })
-        for (const call of calls) {
-          let args = {}
-          try {
-            args = JSON.parse(call.function?.arguments || '{}')
-          } catch {
-            args = {}
-          }
-          const out = await withSignal(runTool(call.function?.name, args, { repo, lang }), ctrl.signal)
-          toolOutputs.push(out)
-          messages.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(out) })
-        }
+        // Các tool chỉ đọc, độc lập nhau → gọi song song; Promise.all giữ nguyên thứ tự kết quả
+        const outs = await Promise.all(
+          calls.map((call) => {
+            let args = {}
+            try {
+              args = JSON.parse(call.function?.arguments || '{}')
+            } catch {
+              args = {}
+            }
+            return withSignal(runTool(call.function?.name, args, { repo, lang }), ctrl.signal)
+          }),
+        )
+        calls.forEach((call, idx) => {
+          toolOutputs.push(outs[idx])
+          messages.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(outs[idx]) })
+        })
       }
       return { text: '', toolOutputs, usage }
     } finally {
@@ -148,14 +155,20 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
       message = text
       let reply
 
-      if (await overLimit(config, { user, sessionId, ip })) {
+      // Đọc chi phí tháng song song với kiểm hạn mức (cả hai đều cần trước khi gọi OpenAI)
+      const canCallOpenai = config.openaiEnabled && openai
+      const usageP = canCallOpenai
+        ? soft('usage', () => repo.getMayUsage(vnMonth(now())), { costUsd: Infinity })
+        : null
+      const limited = await overLimit(config, { user, sessionId, ip })
+      if (limited) {
         reply = { kind: 'tired', text: canned(config, lang, 'tired') }
-      } else if (!config.openaiEnabled || !openai) {
+      } else if (!canCallOpenai) {
         // D-55/D-67: admin tắt OpenAI hoặc thiếu khoá → FAQ offline
         reply = await offline(config, lang, message)
       } else if (
         // Không đọc được chi phí → coi như hết ngân sách (không gọi OpenAI khi không kiểm soát được chi phí)
-        (await soft('usage', () => repo.getMayUsage(vnMonth(now())), { costUsd: Infinity })).costUsd >= config.monthlyBudgetUsd
+        (await usageP).costUsd >= config.monthlyBudgetUsd
       ) {
         // US-009 AC-002: hết ngân sách → FAQ offline, không gọi OpenAI
         reply = await offline(config, lang, message)
