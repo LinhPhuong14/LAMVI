@@ -31,6 +31,15 @@ describe('Tài khoản (FR-ACC-001)', () => {
     expect(JSON.parse(localStorage.getItem('moc.session')).accessToken).toBe('a1')
   })
 
+  // T-49: refresh token chỉ ở cookie HttpOnly — không bao giờ nằm trong localStorage
+  it('phiên cũ có refreshToken trong localStorage bị dọn khi khởi động', async () => {
+    localStorage.setItem('moc.session', JSON.stringify(session))
+    mockApi({ ...base, 'GET /me': () => ({ body: { profile } }) })
+    renderAt('/en/account')
+    await screen.findByRole('heading', { name: 'My account' })
+    expect(JSON.parse(localStorage.getItem('moc.session'))).not.toHaveProperty('refreshToken')
+  })
+
   it('sai mật khẩu → thông báo lỗi', async () => {
     mockApi({ ...base, 'POST /auth/login': () => ({ status: 401, body: { error: { code: 'INVALID_CREDENTIALS' } } }) })
     renderAt('/login')
@@ -116,23 +125,24 @@ describe('Đặt lại mật khẩu', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('không hợp lệ')
   })
 
-  it('có token recovery trong hash → đổi mật khẩu bằng token đó', async () => {
-    window.history.replaceState(null, '', '/reset-password#access_token=rec1&type=recovery')
+  it('có token một lần trong #t= → gửi token + mật khẩu mới, xoá token khỏi URL', async () => {
+    window.history.replaceState(null, '', '/reset-password#t=tok1')
     const fetchMock = mockApi({ ...base, 'POST /auth/reset-password': () => ({ status: 204 }) })
     renderAt('/reset-password')
     type('Mật khẩu mới', 'matkhaumoi1')
     fireEvent.click(screen.getByRole('button', { name: 'Lưu mật khẩu mới' }))
     expect(await screen.findByRole('status')).toHaveTextContent('Đã đổi mật khẩu')
     const call = fetchMock.mock.calls.find(([u]) => String(u).includes('/auth/reset-password'))
-    expect(call[1].headers.Authorization).toBe('Bearer rec1')
+    expect(JSON.parse(call[1].body)).toEqual({ token: 'tok1', password: 'matkhaumoi1' })
+    expect(call[1].headers.Authorization).toBeUndefined()
     expect(window.location.hash).toBe('')
   })
 })
 
 describe('Hồi quy phiên', () => {
-  it('phiên thiếu refreshToken + 401 → xoá phiên, về đăng nhập', async () => {
-    localStorage.setItem('moc.session', JSON.stringify({ ...session, refreshToken: undefined }))
-    mockApi({ ...base, 'GET /me': () => ({ status: 401, body: {} }) })
+  it('401 và cookie refresh bị từ chối → xoá phiên, về đăng nhập', async () => {
+    localStorage.setItem('moc.session', JSON.stringify(session))
+    mockApi({ ...base, 'GET /me': () => ({ status: 401, body: {} }), 'POST /auth/refresh': () => ({ status: 401, body: {} }) })
     renderAt('/account')
     expect(await screen.findByRole('heading', { name: 'Đăng nhập' })).toBeInTheDocument()
     expect(localStorage.getItem('moc.session')).toBeNull()

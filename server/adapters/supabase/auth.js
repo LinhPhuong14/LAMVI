@@ -12,7 +12,7 @@ function mapError(error) {
   if (code === 'email_not_confirmed') return new AuthError('EMAIL_NOT_CONFIRMED')
   if (code === 'weak_password') return new AuthError('PASSWORD_TOO_SHORT')
   if (code === 'email_address_invalid') return new AuthError('INVALID_EMAIL')
-  if (code === 'refresh_token_not_found' || code === 'refresh_token_already_used' || code === 'session_not_found') {
+  if (code === 'refresh_token_not_found' || code === 'session_expired' || code === 'refresh_token_already_used' || code === 'session_not_found') {
     return new AuthError('UNAUTHORIZED')
   }
   // Lỗi chưa map (vd not_admin khi sai SUPABASE_SECRET_KEY) là lỗi server: bỏ status 4xx gốc để
@@ -74,9 +74,7 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
     async getUser(accessToken) {
       const { data, error } = await admin.auth.getUser(accessToken)
       if (error || !data?.user) return null
-      // G-18: chỉ token đến từ link "Quên mật khẩu" mới được đổi mật khẩu mà không cần mật khẩu cũ.
-      // Token đã được Supabase xác minh ở trên; ở đây chỉ đọc claim `amr` để biết cách đăng nhập.
-      return { id: data.user.id, email: data.user.email, isRecovery: isRecoveryToken(accessToken) }
+      return { id: data.user.id, email: data.user.email }
     },
 
     async signOut(accessToken) {
@@ -85,11 +83,37 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
       if (error && error.status !== 401 && error.status !== 404) throw mapError(error)
     },
 
-    async sendPasswordReset(email, redirectTo) {
-      const { error } = await makePublicClient().auth.resetPasswordForEmail(email, { redirectTo })
-      // Không ném lỗi nào (kể cả 429 theo từng user của Supabase) — nếu không, gửi hai lần
-      // liên tiếp sẽ dò được email có tồn tại hay không
-      if (error) console.error('[auth] resetPasswordForEmail', error.code ?? error.message)
+    /**
+     * T-49: tạo token đặt lại mật khẩu mà KHÔNG nhờ Supabase gửi thư (SMTP mặc định của gói Free chỉ
+     * gửi tới thành viên nhóm, ~vài thư/giờ). Server tự gửi thư bằng mailer. Trả hashed_token (dùng
+     * một lần, hạn theo cài đặt OTP expiry của Auth, mặc định 1 giờ); email không có → null.
+     */
+    async createRecoveryToken(email) {
+      const { data, error } = await admin.auth.admin.generateLink({ type: 'recovery', email })
+      if (error) {
+        if (error.code === 'user_not_found') return null
+        throw mapError(error)
+      }
+      return data.properties.hashed_token
+    },
+
+    /**
+     * T-49: đổi token lấy quyền đặt mật khẩu: verifyOtp (tiêu thụ token) → đặt mật khẩu → thu hồi
+     * mọi phiên. Phiên do verifyOtp tạo ra cũng bị thu hồi, không trả cho client.
+     */
+    async resetPassword({ token, password }) {
+      const { data, error } = await makePublicClient().auth.verifyOtp({ token_hash: token, type: 'recovery' })
+      if (error || !data?.user || !data.session) {
+        // Hết hạn/đã dùng/sai → lỗi của khách; 5xx/mạng → để errorHandler trả 500
+        if (!error || (error.status >= 400 && error.status < 500)) throw new AuthError('INVALID_RESET_TOKEN')
+        throw mapError(error)
+      }
+      const { error: updateErr } = await admin.auth.admin.updateUserById(data.user.id, { password })
+      // Lỗi đặt mật khẩu: vẫn thu hồi phiên do verifyOtp tạo ra (token đã cháy, khách xin link mới)
+      const { error: outErr } = await admin.auth.admin.signOut(data.session.access_token, 'global')
+      if (updateErr) throw mapError(updateErr)
+      if (outErr && outErr.status !== 401 && outErr.status !== 404) console.error('[auth] signOut sau đặt lại mật khẩu', outErr.code ?? outErr.message)
+      return { user: { id: data.user.id, email: data.user.email } }
     },
 
     async updatePassword(userId, password) {
@@ -113,21 +137,5 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
       await client.auth.signOut({ scope: 'local' }).catch(() => {})
       return true
     },
-  }
-}
-
-
-/**
- * Đọc claim `amr` của access token Supabase để biết token đến từ luồng khôi phục mật khẩu.
- * KHÔNG dùng để xác thực — token đã được `admin.auth.getUser()` xác minh trước đó; ở đây chỉ
- * đọc phần payload đã được ký. Không đọc được → coi như không phải token khôi phục (an toàn hơn).
- */
-export function isRecoveryToken(accessToken) {
-  try {
-    const payload = JSON.parse(Buffer.from(accessToken.split('.')[1], 'base64url').toString('utf8'))
-    const amr = Array.isArray(payload.amr) ? payload.amr : []
-    return amr.some((m) => m?.method === 'recovery')
-  } catch {
-    return false
   }
 }

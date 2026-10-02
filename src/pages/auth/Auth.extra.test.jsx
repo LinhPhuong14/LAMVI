@@ -57,7 +57,8 @@ describe('AuthProvider — refresh gộp & phiên', () => {
     fireEvent.click(screen.getByRole('button', { name: 'go' }))
     expect(await screen.findByText('Nguyễn An,Nguyễn An,Nguyễn An')).toBeInTheDocument()
     expect(calls(fetchMock, '/auth/refresh')).toHaveLength(1)
-    expect(JSON.parse(calls(fetchMock, '/auth/refresh')[0][1].body)).toEqual({ refreshToken: 'r1' })
+    // T-49: refresh dựa vào cookie HttpOnly — không gửi token trong body
+    expect(calls(fetchMock, '/auth/refresh')[0][1].body).toBeUndefined()
     expect(JSON.parse(localStorage.getItem('moc.session')).accessToken).toBe('a1')
   })
 
@@ -82,7 +83,7 @@ describe('AuthProvider — refresh gộp & phiên', () => {
     renderAt('/account')
     expect(await screen.findByRole('alert')).toHaveTextContent('Không kết nối được máy chủ')
     expect(screen.queryByRole('heading', { name: 'Đăng nhập' })).toBeNull()
-    expect(JSON.parse(localStorage.getItem('moc.session'))?.refreshToken).toBe('r1')
+    expect(JSON.parse(localStorage.getItem('moc.session'))?.accessToken).toBe('het-han')
   })
 
   it.each(['{hỏng', 'undefined', '"chuoi"', '123', '[]', 'null'])('localStorage hỏng (%s) không làm vỡ app → coi như chưa đăng nhập', async (raw) => {
@@ -427,7 +428,7 @@ describe('Hồ sơ — PATCH /me', () => {
     const fetchMock = mockApi({
       ...base,
       'GET /me': () => ({ body: { profile } }),
-      'POST /auth/refresh': () => ({ body: { ...session, accessToken: 'a2', refreshToken: 'r2' } }),
+      'POST /auth/refresh': () => ({ body: { ...session, accessToken: 'a2' } }),
       'PATCH /me': (url, init) => (expired && init.headers.Authorization === 'Bearer a1' ? { status: 401, body: {} } : { body: { profile } }),
     })
     renderAt('/account?tab=profile')
@@ -436,13 +437,14 @@ describe('Hồ sơ — PATCH /me', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
     expect(await screen.findByRole('status')).toHaveTextContent('Đã lưu.')
     expect(calls(fetchMock, '/auth/refresh')).toHaveLength(1)
-    expect(JSON.parse(localStorage.getItem('moc.session')).refreshToken).toBe('r2')
+    expect(JSON.parse(localStorage.getItem('moc.session'))).toMatchObject({ accessToken: 'a2' })
+    expect(JSON.parse(localStorage.getItem('moc.session'))).not.toHaveProperty('refreshToken')
   })
 })
 
 describe('Đặt lại mật khẩu — giao diện', () => {
-  it('hash có access_token nhưng type khác recovery → báo không hợp lệ và vẫn xoá token khỏi URL', async () => {
-    window.history.replaceState(null, '', '/reset-password#access_token=tok&type=signup')
+  it('hash không có #t= (vd link kiểu cũ #access_token=…) → báo không hợp lệ và vẫn xoá hash khỏi URL', async () => {
+    window.history.replaceState(null, '', '/reset-password#access_token=tok&type=recovery')
     mockApi(base)
     renderAt('/reset-password')
     expect(await screen.findByRole('alert')).toHaveTextContent('không hợp lệ')
@@ -450,8 +452,8 @@ describe('Đặt lại mật khẩu — giao diện', () => {
   })
 
   it('token khôi phục hết hạn (401) → báo liên kết không hợp lệ', async () => {
-    window.history.replaceState(null, '', '/en/reset-password#access_token=old&type=recovery')
-    mockApi({ ...base, 'POST /auth/reset-password': () => ({ status: 401, body: { error: { code: 'UNAUTHORIZED' } } }) })
+    window.history.replaceState(null, '', '/en/reset-password#t=old')
+    mockApi({ ...base, 'POST /auth/reset-password': () => ({ status: 400, body: { error: { code: 'INVALID_RESET_TOKEN' } } }) })
     renderAt('/en/reset-password')
     type('New password', 'matkhaumoi1')
     fireEvent.click(screen.getByRole('button', { name: 'Save new password' }))
@@ -459,7 +461,7 @@ describe('Đặt lại mật khẩu — giao diện', () => {
   })
 
   it('mật khẩu mới quá ngắn → lỗi cạnh trường', async () => {
-    window.history.replaceState(null, '', '/reset-password#access_token=rec&type=recovery')
+    window.history.replaceState(null, '', '/reset-password#t=rec')
     mockApi({
       ...base,
       'POST /auth/reset-password': () => ({ status: 400, body: { error: { code: 'VALIDATION_ERROR', fields: { password: 'PASSWORD_TOO_SHORT' } } } }),

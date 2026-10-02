@@ -13,7 +13,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-07 | 2026-09-28 | Mã ngôn ngữ trong code/URL: `vi`, `en`, `zh` (thuộc tính `lang` HTML: `vi`, `en`, `zh-Hans`) | Hiệu lực |
 | T-08 | 2026-09-28 | Test: Vitest (server: môi trường node + supertest; frontend: jsdom + Testing Library) | Hiệu lực |
 | T-09 | 2026-09-28 | Tiền: số nguyên VND, không dùng số thực; định dạng bằng `Intl.NumberFormat('vi-VN')` | Hiệu lực |
-| T-10 | 2026-09-28 | Token phiên lưu ở `localStorage` phía trình duyệt, gửi qua header `Authorization: Bearer` | Hiệu lực |
+| T-10 | 2026-09-28 | Token phiên lưu ở `localStorage` phía trình duyệt, gửi qua header `Authorization: Bearer` | Thay một phần bởi T-49 (refresh token ra khỏi `localStorage`; access token vẫn gửi qua Bearer) |
 | T-11 | 2026-09-28 | Mỗi tính năng phải có subagent kiểm thử độc lập trước khi commit | Hiệu lực |
 | T-12 | 2026-09-28 | Video lô: server cấp signed upload URL của Supabase Storage, trình duyệt PUT thẳng (không đi qua Express) | Hiệu lực |
 | T-13 | 2026-09-28 | Adapter storage (Supabase + bộ nhớ); bộ nhớ tự phục vụ `/api/dev-storage/*` cho dev/test | Hiệu lực |
@@ -45,6 +45,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-46 | 2026-10-01 | Header kính mờ (ngoại lệ có chủ đích của quy tắc "dính không blur"), `AuthHeader`/`AuthFooter` riêng cho trang auth, nền auth bằng CSS, ảnh phong cảnh phủ mảng navy | Hiệu lực |
 | T-47 | 2026-10-01 | Trang auth v2: sân khấu ảnh toàn màn hình + thẻ kính, tab chuyển, hiện/ẩn mật khẩu | Hiệu lực |
 | T-48 | 2026-10-02 | Phản hồi thêm vào giỏ: huy hiệu + tooltip trên navbar (`CartBubble`, `lastAdded` trong `CartProvider`); giỏ hàng v2; dashboard v2; khung chat Mây v2 | Hiệu lực |
+| T-49 | 2026-10-02 | Auth production không cần Supabase Pro/Twilio: thư do server gửi (Resend/Brevo), token đặt lại mật khẩu một lần, refresh token ở cookie HttpOnly, chặn mật khẩu đã lộ (HIBP) | Hiệu lực |
 | T-50 | 2026-10-02 | Trang Cửa hàng `/shop` + `ProductCards` dùng chung; navbar luôn ghim, thu nhỏ 20% khi cuộn (`transform`, không đổi layout) | Hiệu lực |
 
 ---
@@ -265,6 +266,19 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Vị trí**: tooltip `position: absolute` dưới nút; ≤640px trải ngang bám theo `.nav` (đã định vị). Không dùng `position: fixed` vì `.cart-bubble` có `backdrop-filter` (test CSS cấm fixed + blur; ngoại lệ duy nhất là `.nav`).
 - **Giỏ hàng**: `CartPage` v2 (`Steps`, `.cart-layout`, `.cart-summary` sticky **không** blur). **Dashboard**: ghi đè trong `@media (min-width: 961px)`; thanh bên sticky không blur; `.dash-stat` cho phép blur (cuộn cùng trang). **Chat**: `MayChat` thêm `may-chips`, ô soạn `.may-compose`, nút gửi icon (`aria-label` = "Gửi"); panel cố định nên không blur.
 - **Bẫy**: `.cart-bubble` có `position: fixed` ở media hẹp + blur làm test CSS hỏng; tooltip nay luôn `absolute`.
+### T-49 — Auth production trên gói miễn phí (không Supabase Pro, không Twilio)
+
+- **Bối cảnh**: gói Free của Supabase gửi thư xác thực/đặt lại mật khẩu bằng SMTP dùng chung — chỉ tới thành viên nhóm và vài thư/giờ, nên "Quên mật khẩu" không dùng được ở production; SMS/OTP điện thoại cần Twilio (trả phí). Token phiên ở `localStorage` (T-10, G-17) lộ khi có XSS.
+- **Quyết định**:
+  1. **Thư giao dịch do server gửi** qua HTTPS API (`server/mail/mailer.js`: Resend hoặc Brevo, chỉ `fetch`, không thêm thư viện). Cấu hình `MAIL_FROM` + `RESEND_API_KEY`|`BREVO_API_KEY`. Dev (bộ nhớ) in thư ra console. Lỗi gửi chỉ ghi log, không đổi phản hồi (chống dò email).
+  2. **Đặt lại mật khẩu không qua SMTP Supabase**: `admin.generateLink({type:'recovery'})` lấy `hashed_token` (không gửi thư); server gửi link `/reset-password#t=<token>`; `POST /api/auth/reset-password {token,password}` → `verifyOtp` → `updateUserById` → thu hồi mọi phiên. Token dùng một lần; kiểm mật khẩu **trước** khi tiêu thụ token. Bỏ hẳn phiên "recovery" của Supabase và cờ `isRecovery`.
+  3. **Refresh token ở cookie `lamvi_rt`** (`HttpOnly; Secure; SameSite=Lax; Path=/api/auth; 30 ngày`). Body không còn `refreshToken`; `/auth/refresh` đọc cookie và xoay vòng. Google callback đặt cookie rồi chuyển về `/auth/callback?next=` (không token trên URL); trang gọi `/auth/refresh`. `localStorage` chỉ giữ access token (≤1 giờ) + user; phiên cũ có `refreshToken` bị dọn khi khởi động.
+  4. **CSRF** cho endpoint dùng cookie (`/auth/refresh`, `/auth/logout`): `sameOriginOnly` — Origin phải = `PUBLIC_SITE_URL` hoặc cùng Host (chạy được ở domain Preview); không có Origin thì dựa `Sec-Fetch-Site`. Thêm lớp `SameSite=Lax`.
+  5. **Mật khẩu đã lộ** bị từ chối (HIBP Pwned Passwords, k-anonymity, `Add-Padding`, timeout 1,5 s, **fail-open**). `PWNED_CHECK=0` để tắt.
+  6. **Thư báo đổi mật khẩu** + `audit_log` (`account`/`password_changed`) sau đặt lại/đổi.
+  7. Sửa lỗi cũ: giới hạn `reset`/`change` mật khẩu truyền `keys = () => []` nên **không đếm gì**; nay `reset` theo IP, `change` theo user id. Thêm nhóm `refresh` (120/5 phút/IP).
+- **Không làm** (có chủ đích): SMS/OTP điện thoại (không có kênh gửi); xác minh email khi đăng ký (PO giữ D-63 → D-85); TOTP 2FA cho admin (Supabase MFA TOTP miễn phí nhưng chưa có yêu cầu nghiệp vụ).
+- **Hệ quả**: thêm biến `MAIL_FROM`, `RESEND_API_KEY`/`BREVO_API_KEY`, `PWNED_CHECK` (xem `deploy-vercel.md`). Không còn cần cấu hình Redirect URLs/SMTP cho luồng đặt lại mật khẩu. Rủi ro còn lại: G-52…G-54 trong `ba-spec.md`.
 
 ### T-50 — Trang Cửa hàng và navbar thu nhỏ khi cuộn
 

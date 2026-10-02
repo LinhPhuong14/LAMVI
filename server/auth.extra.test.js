@@ -4,9 +4,10 @@ import { createApp } from './app.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
 import { createMemoryAuth } from './adapters/memory/auth.js'
 import { normalizeVnPhone } from './domain/account.js'
+import { createMemoryMailer } from './mail/mailer.js'
 
 // Test bổ sung độc lập cho FR-ACC-001 (D-36, D-38, D-42)
-let app, auth, repo, clock
+let app, auth, repo, clock, mailer
 // G-20: tắt rate limit trong bộ test chức năng (nhiều test đăng ký/đăng nhập liên tiếp từ cùng
 // một IP). Hành vi giới hạn được kiểm riêng ở server/rateLimit.extra.test.js.
 const config = { publicSiteUrl: 'https://moc.test', rateLimit: { enabled: false } }
@@ -16,8 +17,14 @@ function setup(opts = {}) {
   clock = { t: Date.UTC(2026, 8, 1) }
   repo = createMemoryRepo()
   auth = createMemoryAuth({ now: () => clock.t, ...opts })
-  app = createApp({ repo, auth, config })
+  mailer = createMemoryMailer()
+  app = createApp({ repo, auth, config, mailer })
 }
+
+// T-49: refresh token ở cookie HttpOnly — lấy từ Set-Cookie để gửi lại thủ công
+const cookieOf = (res) => (res.headers['set-cookie'] ?? []).find((c) => c.startsWith('lamvi_rt='))?.split(';')[0]
+const resetToken = (i = -1) => decodeURIComponent(mailer.outbox.at(i).text.match(/#t=(\S+)/)[1])
+const refresh = (cookie) => request(app).post('/api/auth/refresh').set('Cookie', cookie)
 
 const register = (data = {}, q = '') => request(app).post(`/api/auth/register${q}`).send({ ...valid, ...data })
 const login = (data = {}) => request(app).post('/api/auth/login').send({ email: valid.email, password: valid.password, ...data })
@@ -26,7 +33,7 @@ const me = (token) => request(app).get('/api/me').set('Authorization', `Bearer $
 async function registerAndLogin(data = {}) {
   await register(data).expect(201)
   const res = await login({ email: data.email ?? valid.email, password: data.password ?? valid.password }).expect(200)
-  return res.body
+  return { ...res.body, cookie: cookieOf(res) }
 }
 
 beforeEach(() => setup())
@@ -134,12 +141,6 @@ describe('Đăng ký — kiểm tra đầu vào (FR-ACC-001, D-42)', () => {
     expect((await repo.getProfile(none.body.user.id)).preferredLocale).toBe('vi')
     const explicit = await register({ email: 'l4@example.com', preferredLocale: 'en' }, '?lang=zh')
     expect((await repo.getProfile(explicit.body.user.id)).preferredLocale).toBe('en')
-  })
-
-  it('link xác nhận email theo ngôn ngữ (D-37)', async () => {
-    setup({ requireEmailConfirmation: true })
-    await register({}, '?lang=zh').expect(201)
-    expect(auth.outbox[0]).toMatchObject({ type: 'confirm', redirectTo: 'https://moc.test/zh/login' })
   })
 
   it('body là mảng → 400 VALIDATION_ERROR; chuỗi / null / JSON hỏng → 400, không 500', async () => {
@@ -265,7 +266,7 @@ describe('Header Authorization', () => {
 
   it('refresh token dùng làm access token → 401', async () => {
     const s = await login()
-    expect((await me(s.body.refreshToken)).status).toBe(401)
+    expect((await me(decodeURIComponent(cookieOf(s).split('=')[1]))).status).toBe(401)
   })
 })
 
@@ -313,49 +314,59 @@ describe('Phiên (access token hết hạn, refresh, đăng xuất)', () => {
     const expired = await me(s.accessToken)
     expect(expired.status).toBe(401)
     expect(expired.body.error.code).toBe('UNAUTHORIZED')
-    const r = await request(app).post('/api/auth/refresh').send({ refreshToken: s.refreshToken })
+    const r = await refresh(s.cookie)
     expect(r.status).toBe(200)
     expect(r.body.expiresAt).toBe(Math.floor((clock.t + 60_000) / 1000))
     expect((await me(r.body.accessToken)).status).toBe(200)
   })
 
-  it('token hết hạn không dùng được để đăng xuất / đổi mật khẩu', async () => {
+  it('token hết hạn không đổi được mật khẩu; đăng xuất vẫn xoá cookie và thu hồi phiên', async () => {
     setup({ accessTtlMs: 1000 })
     const s = await registerAndLogin()
     clock.t += 1000
-    expect((await request(app).post('/api/auth/logout').set('Authorization', `Bearer ${s.accessToken}`)).status).toBe(401)
-    const reset = await request(app)
-      .post('/api/auth/reset-password')
+    const change = await request(app)
+      .post('/api/auth/change-password')
       .set('Authorization', `Bearer ${s.accessToken}`)
-      .send({ password: 'matkhaumoi1' })
-    expect(reset.status).toBe(401)
+      .send({ currentPassword: valid.password, password: 'matkhaumoi1' })
+    expect(change.status).toBe(401)
+    const out = await request(app).post('/api/auth/logout').set('Authorization', `Bearer ${s.accessToken}`).set('Cookie', s.cookie)
+    expect(out.status).toBe(204)
+    expect(out.headers['set-cookie'].join(';')).toMatch(/lamvi_rt=; Max-Age=0/)
+    expect((await refresh(s.cookie)).status).toBe(401)
   })
 
-  it('refreshToken thiếu / không phải chuỗi / body mảng → 401 UNAUTHORIZED', async () => {
-    for (const b of [{}, { refreshToken: 123 }, { refreshToken: '' }, [{ refreshToken: 'x' }], { refreshToken: 'khong-ton-tai' }]) {
-      const res = await request(app).post('/api/auth/refresh').send(b)
+  it('cookie refresh thiếu / rỗng / sai → 401 UNAUTHORIZED; refreshToken trong body bị bỏ qua', async () => {
+    for (const cookie of [undefined, 'lamvi_rt=', 'lamvi_rt=khong-ton-tai', 'khac=1']) {
+      const req = request(app).post('/api/auth/refresh').send({ refreshToken: 'x' })
+      const res = await (cookie ? req.set('Cookie', cookie) : req)
       expect(res.status).toBe(401)
       expect(res.body.error.code).toBe('UNAUTHORIZED')
     }
+    const s = await registerAndLogin()
+    const viaBody = await request(app).post('/api/auth/refresh').send({ refreshToken: decodeURIComponent(s.cookie.split('=')[1]) })
+    expect(viaBody.status).toBe(401)
   })
 
   it('đăng xuất vô hiệu mọi access/refresh token của user (nhiều thiết bị), không ảnh hưởng user khác', async () => {
     const d1 = await registerAndLogin()
-    const d2 = (await login()).body
+    const d2res = await login()
+    const d2 = { ...d2res.body, cookie: cookieOf(d2res) }
     const other = await registerAndLogin({ email: 'b@example.com' })
     await request(app).post('/api/auth/logout').set('Authorization', `Bearer ${d1.accessToken}`).expect(204)
     expect((await me(d1.accessToken)).status).toBe(401)
     expect((await me(d2.accessToken)).status).toBe(401)
-    expect((await request(app).post('/api/auth/refresh').send({ refreshToken: d1.refreshToken })).status).toBe(401)
-    expect((await request(app).post('/api/auth/refresh').send({ refreshToken: d2.refreshToken })).status).toBe(401)
+    expect((await refresh(d1.cookie)).status).toBe(401)
+    expect((await refresh(d2.cookie)).status).toBe(401)
     expect((await me(other.accessToken)).status).toBe(200)
   })
 
-  it('đăng xuất không có token → 401; gọi lần 2 bằng token cũ → 401', async () => {
-    expect((await request(app).post('/api/auth/logout')).status).toBe(401)
+  it('đăng xuất không cần token (luôn xoá cookie) và idempotent', async () => {
+    const none = await request(app).post('/api/auth/logout')
+    expect(none.status).toBe(204)
+    expect(none.headers['set-cookie'].join(';')).toMatch(/lamvi_rt=; Max-Age=0/)
     const s = await registerAndLogin()
     await request(app).post('/api/auth/logout').set('Authorization', `Bearer ${s.accessToken}`).expect(204)
-    expect((await request(app).post('/api/auth/logout').set('Authorization', `Bearer ${s.accessToken}`)).status).toBe(401)
+    await request(app).post('/api/auth/logout').set('Authorization', `Bearer ${s.accessToken}`).expect(204)
   })
 
   it('GET /me tự tạo hồ sơ customer nếu tài khoản chưa có hồ sơ', async () => {
@@ -389,8 +400,8 @@ describe('Quên / đặt lại mật khẩu — bảo mật', () => {
     expect(a.headers['content-length']).toBe(b.headers['content-length'])
     expect(a.headers['content-type']).toBe(b.headers['content-type'])
     // email hoa thường/khoảng trắng vẫn gửi đúng người
-    expect(auth.outbox).toHaveLength(1)
-    expect(auth.outbox[0].email).toBe('an@example.com')
+    expect(mailer.outbox).toHaveLength(1)
+    expect(mailer.outbox[0].to).toBe('an@example.com')
   })
 
   it('forgot-password: thời gian phản hồi không chênh lệch lớn giữa email có/không tồn tại', async () => {
@@ -424,34 +435,47 @@ describe('Quên / đặt lại mật khẩu — bảo mật', () => {
     await register().expect(201)
     await request(app).post('/api/auth/forgot-password?lang=zh').send({ email: valid.email }).expect(202)
     await request(app).post('/api/auth/forgot-password?lang=xx').send({ email: valid.email }).expect(202)
-    expect(auth.outbox.map((m) => m.redirectTo)).toEqual(['https://moc.test/zh/reset-password', 'https://moc.test/reset-password'])
+    expect(mailer.outbox.map((m) => m.text.match(/https:\/\/\S+?#/)[0])).toEqual([
+      'https://moc.test/zh/reset-password#',
+      'https://moc.test/reset-password#',
+    ])
   })
 
-  it('reset-password vô hiệu token khôi phục và mọi phiên cũ của user', async () => {
+  it('reset-password vô hiệu token và mọi phiên cũ (access + refresh) của user', async () => {
     const s = await registerAndLogin()
     await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
-    const rec = auth.outbox[0].accessToken
-    await request(app).post('/api/auth/reset-password').set('Authorization', `Bearer ${rec}`).send({ password: 'matkhaumoi1' }).expect(204)
-    expect((await me(rec)).status).toBe(401)
+    const rec = resetToken()
+    await request(app).post('/api/auth/reset-password').send({ token: rec, password: 'matkhaumoi1' }).expect(204)
     expect((await me(s.accessToken)).status).toBe(401)
-    expect((await request(app).post('/api/auth/refresh').send({ refreshToken: s.refreshToken })).status).toBe(401)
+    expect((await refresh(s.cookie)).status).toBe(401)
+    expect((await request(app).post('/api/auth/reset-password').send({ token: rec, password: 'matkhaumoi2' })).status).toBe(400)
   })
 
-  it('reset-password: mật khẩu mới quá dài / thiếu → 400 và token khôi phục vẫn còn dùng được', async () => {
+  it('reset-password: mật khẩu mới quá dài / thiếu → 400 và token vẫn còn dùng được', async () => {
     await register().expect(201)
     await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
-    const rec = auth.outbox[0].accessToken
-    const long = await request(app).post('/api/auth/reset-password').set('Authorization', `Bearer ${rec}`).send({ password: 'x'.repeat(73) })
+    const token = resetToken()
+    const long = await request(app).post('/api/auth/reset-password').send({ token, password: 'x'.repeat(73) })
     expect(long.status).toBe(400)
     expect(long.body.error.fields.password).toBe('PASSWORD_TOO_LONG')
-    const missing = await request(app).post('/api/auth/reset-password').set('Authorization', `Bearer ${rec}`).send({})
+    const missing = await request(app).post('/api/auth/reset-password').send({ token })
     expect(missing.body.error.fields.password).toBe('REQUIRED')
-    await request(app).post('/api/auth/reset-password').set('Authorization', `Bearer ${rec}`).send({ password: 'matkhaumoi1' }).expect(204)
+    await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhaumoi1' }).expect(204)
   })
 
-  it('reset-password không có token → 401', async () => {
+  it('reset-password: token hết hạn sau 1 giờ → 400', async () => {
+    await register().expect(201)
+    await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
+    clock.t += 3600_000
+    const res = await request(app).post('/api/auth/reset-password').send({ token: resetToken(), password: 'matkhaumoi1' })
+    expect(res.status).toBe(400)
+    expect(res.body.error.code).toBe('INVALID_RESET_TOKEN')
+  })
+
+  it('reset-password không gửi token → 400 INVALID_RESET_TOKEN', async () => {
     const res = await request(app).post('/api/auth/reset-password').send({ password: 'matkhaumoi1' })
-    expect(res.status).toBe(401)
+    expect(res.status).toBe(400)
+    expect(res.body.error.code).toBe('INVALID_RESET_TOKEN')
   })
 })
 
@@ -521,23 +545,6 @@ describe('G-18 — /auth/change-password: biên và tác dụng phụ', () => {
       .send([{ currentPassword: valid.password, password: 'matkhaumoi1' }])
     expect(res.status).toBe(400)
     expect((await login()).status).toBe(200)
-  })
-
-  it('đổi mật khẩu vô hiệu luôn token khôi phục đã phát trước đó', async () => {
-    const s = await registerAndLogin()
-    await request(app).post('/api/auth/forgot-password').send({ email: valid.email }).expect(202)
-    const rec = auth.outbox[0].accessToken
-    await change(s.accessToken, { currentPassword: valid.password, password: 'matkhaumoi1' }).expect(204)
-    const after = await request(app).post('/api/auth/reset-password').set('Authorization', `Bearer ${rec}`).send({ password: 'matkhaumoi2' })
-    expect(after.status).toBe(401)
-  })
-
-  it('token khôi phục cũng đổi được mật khẩu qua change-password nếu biết mật khẩu hiện tại', async () => {
-    await register().expect(201)
-    await request(app).post('/api/auth/forgot-password').send({ email: valid.email }).expect(202)
-    const rec = auth.outbox[0].accessToken
-    await change(rec, { currentPassword: valid.password, password: 'matkhaumoi1' }).expect(204)
-    expect((await login({ password: 'matkhaumoi1' })).status).toBe(200)
   })
 
   it('xin quên mật khẩu KHÔNG làm mất phiên đang đăng nhập', async () => {

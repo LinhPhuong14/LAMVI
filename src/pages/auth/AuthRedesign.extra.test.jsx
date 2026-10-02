@@ -132,7 +132,7 @@ describe('nút hiện/ẩn mật khẩu', () => {
   })
 
   it('reset-password có nút ở ô mật khẩu mới', () => {
-    window.location.hash = '#access_token=tok&type=recovery'
+    window.location.hash = '#t=tok'
     mockApi(base)
     renderAt('/en/reset-password')
     expect(toggles()).toHaveLength(1)
