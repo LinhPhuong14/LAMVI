@@ -236,17 +236,33 @@
     box-shadow 0.3s ease;
 }
 
-/* Cuộn xuống: thanh điều hướng lui lên; cuộn lên hoặc Tab vào: hiện lại */
-.nav.is-hidden {
-  transform: translateY(-110%);
-}
-
-.nav:focus-within {
-  transform: none;
+/* Cuộn xuống (D-85): thu nhỏ 20% quanh đỉnh giữa, bo tròn thành viên thuốc nổi, luôn ghim ở đầu trang.
+   Dùng transform nên không làm xô bố cục trang bên dưới. */
+.nav {
+  transform-origin: 50% 0;
+  transition:
+    transform 0.45s var(--ease-out),
+    border-radius 0.45s var(--ease-out),
+    box-shadow 0.3s ease,
+    background-color 0.3s ease;
 }
 
 .nav.is-scrolled {
-  box-shadow: 0 10px 24px -18px rgba(60, 40, 20, 0.45);
+  transform: translateY(10px) scale(0.8);
+  border-radius: 9999px;
+  border-bottom-color: transparent;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.7) inset,
+    0 18px 40px -18px rgba(60, 40, 20, 0.55);
+}
+
+.nav.is-scrolled::after {
+  display: none;
+}
+
+/* Tooltip giỏ hàng nằm trong thanh đã thu nhỏ → phóng lại 125% để chữ không bị nhỏ đi */
+.nav.is-scrolled .cart-bubble {
+  transform: scale(1.25);
 }
 
 .nav-mark {

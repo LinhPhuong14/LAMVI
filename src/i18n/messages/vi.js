@@ -2,12 +2,15 @@
 // Các câu đánh dấu §31.3 là câu thay thế đề xuất — chờ PO/Marketing duyệt.
 export default {
   meta: {
+    shopTitle: 'Cửa hàng — LAMVI · đèn giấy dó thủ công',
+    shopDescription: 'Toàn bộ đèn giấy dó thủ công LAMVI: lọc theo loại, kèm thiệp lời chúc gắn mã QR và video hành trình làm đèn.',
     productTitle: '{name} — LAMVI · đèn giấy dó thủ công',
     title: 'LAMVI — Đèn Giấy Dó Thủ Công',
     description:
       'Đèn giấy dó thủ công làm quà tặng, kèm lời chúc gắn mã QR và video hành trình làm đèn.',
   },
   nav: {
+    shop: 'Cửa hàng',
     logout: 'Đăng xuất',
     home: 'Trang chủ',
     story: 'Câu chuyện',
@@ -122,6 +125,7 @@ export default {
     made: 'chiếc đèn đã ra lò',
   },
   products: {
+    viewAll: 'Xem thêm',
     eyebrow: 'Bộ sưu tập',
     title: 'Chọn chiếc đèn bạn muốn thắp',
     collectionCopy:
@@ -476,6 +480,28 @@ export default {
     },
     methods: { payos: 'Chuyển khoản (payOS)', cod: 'Thanh toán khi nhận hàng' },
   },
+  shop: {
+    eyebrow: 'Cửa hàng',
+    title: 'Đèn giấy dó thủ công',
+    lead: 'Chọn chiếc đèn bạn muốn thắp — cho chính mình hoặc gửi tặng người thương. Bạn chọn mua tặng hay mua cho mình ở bước thanh toán.',
+    perks: ['Thiệp cảm ơn có mã QR mở lời chúc', 'Mã QR khắc trên đèn mở video mẻ đèn', 'Giá đã gồm VAT, giao trong nước'],
+    filterLabel: 'Lọc theo loại',
+    filters: {
+      all: 'Tất cả',
+      single: 'Đèn lẻ',
+      set: 'Bộ đèn',
+    },
+    sortLabel: 'Sắp xếp',
+    sorts: {
+      featured: 'Nổi bật',
+      priceAsc: 'Giá tăng dần',
+      priceDesc: 'Giá giảm dần',
+      name: 'Tên A–Z',
+    },
+    count: '{n} sản phẩm',
+    help: 'Chưa biết chọn đèn nào? Xem các câu hỏi thường gặp hoặc hỏi Mây ở góc màn hình.',
+    helpLink: 'Hỏi đáp',
+  },
   cart: {
     eyebrow: 'Giỏ quà của bạn',
     stepsLabel: 'Các bước đặt hàng',
@@ -541,7 +567,7 @@ export default {
       step: 'Bước {n}/{total}',
       steps: [
         'Chào mừng bạn đến với LAMVI! Mây dẫn bạn đi một vòng nhé: đây là đèn giấy dó thủ công làm quà tặng kể chuyện.',
-        'Đây là bộ sưu tập. Bấm vào đèn để xem chi tiết, thêm vào giỏ — Mây sẽ nhắc bạn ngay ở góc này. Giá hiển thị đã gồm VAT.',
+        'Đây là bộ sưu tập. Bấm “Xem thêm” để vào Cửa hàng xem toàn bộ đèn; bấm vào một chiếc đèn để xem chi tiết và thêm vào giỏ. Giá hiển thị đã gồm VAT.',
         'Mỗi món quà có hai mã QR: mã trên thiệp cảm ơn mở lời chúc của bạn, mã khắc trên đèn mở video hành trình làm ra mẻ đèn.',
         'Còn thắc mắc gì, bạn xem phần hỏi đáp này nha.',
         'Mây luôn ở góc này. Bấm vào Mây để hỏi bất cứ lúc nào, hoặc xem lại tour.',

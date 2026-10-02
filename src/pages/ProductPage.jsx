@@ -28,7 +28,7 @@ export default function ProductPage() {
   const pagePath = `/products/${encodeURIComponent(slug)}`
   const [qty, setQty] = useState(1)
   const back = (
-    <Link to={{ pathname: path('/'), hash: '#products' }} className="back-link">
+    <Link to={path('/shop')} className="back-link">
       {t('products.backToCollection')}
     </Link>
   )

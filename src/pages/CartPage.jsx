@@ -74,7 +74,7 @@ export default function CartPage() {
           </div>
           <p className="cart-empty-title">{t('cart.empty')}</p>
           <p className="cart-empty-copy">{t('cart.emptyCopy')}</p>
-          <Link to={{ pathname: path('/'), hash: '#products' }} className="btn btn-primary">
+          <Link to={path('/shop')} className="btn btn-primary">
             {t('cart.continue')}
           </Link>
         </div>
@@ -158,7 +158,7 @@ export default function CartPage() {
           <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0}>
             {t('cart.checkout')}
           </button>
-          <Link to={{ pathname: path('/'), hash: '#products' }} className="cart-continue">
+          <Link to={path('/shop')} className="cart-continue">
             {t('cart.continue')}
           </Link>
         </aside>

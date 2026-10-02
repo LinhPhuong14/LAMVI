@@ -15,10 +15,9 @@ import Particles from '../components/Particles'
 import Faq from '../components/Faq'
 import FolkGallery from '../components/FolkGallery'
 import Scene from '../components/Scene'
-import Price from '../components/Price'
 import { CountUp, Reveal } from '../components/Reveal'
-import { PointerGlow, TiltCard } from '../components/Effects'
-import { Cloud, DrumSun, Lotus, OldPhoto, Seal, VerticalSeal } from '../components/Motifs'
+import { PointerGlow } from '../components/Effects'
+import { Cloud, DrumSun, Lotus, OldPhoto, VerticalSeal } from '../components/Motifs'
 import {
   EASE_IN,
   EASE_OUT,
@@ -33,11 +32,10 @@ import {
 } from '../lib/motion.js'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
-import ProductImage from '../components/ProductImage.jsx'
 import Seo from '../seo/Seo.jsx'
 import { organizationJsonLd, webSiteJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
-import AddToCart from '../cart/AddToCart.jsx'
+import ProductCards from '../components/ProductCards'
 
 const TONES = ['amber', 'dusk', 'dawn', 'moss', 'dusk']
 const SIZES = ['tall', 'short', 'short', 'tall', 'short']
@@ -225,7 +223,7 @@ function ProcessTimeline({ steps }) {
 }
 
 function Hero() {
-  const { t } = useI18n()
+  const { t, path } = useI18n()
   const reduce = useReducedMotionConfig()
   const { scrollY } = useScroll()
   // Rời màn hình đầu: chữ mờ dần và lui lên; đèn bay lên như thả đèn trời; trống đồng chìm xuống
@@ -262,9 +260,9 @@ function Hero() {
             {t('hero.sub')}
           </p>
           <div className="hero-actions intro" style={introDelay(6)}>
-            <a href="#products" className="btn btn-primary thread">
+            <Link to={path('/shop')} className="btn btn-primary thread">
               {t('hero.explore')}
-            </a>
+            </Link>
             <a href="#story" className="btn btn-ghost">
               {t('hero.story')}
             </a>
@@ -343,31 +341,15 @@ function ProductGrid() {
   if (res.data.items.length === 0) return <p className="products-status">{t('products.empty')}</p>
 
   return (
-    <Reveal className="product-grid" variants={group} margin="-8% 0px -8% 0px">
-      {res.data.items.map((p, i) => (
-        <TiltCard className={`product-card tone-${p.tone}`} key={p.slug} variants={stamp} custom={i}>
-          {p.badge && <Seal className="product-badge lift">{p.badge}</Seal>}
-          <div className="product-art worn">
-            <div className="lift">
-              <ProductImage image={p.image} size={112} tone={p.tone} name={p.name} swing />
-            </div>
-          </div>
-          <div className="product-body">
-            <h3>
-              <Link to={path(`/products/${p.slug}`)} className="product-link">
-                {p.name}
-              </Link>
-            </h3>
-            <p className="product-desc">{p.description}</p>
-            <div className="product-foot">
-              <Price amount={p.price} />
-              {/* FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002, D-83) */}
-              <AddToCart slug={p.slug} />
-            </div>
-          </div>
-        </TiltCard>
-      ))}
-    </Reveal>
+    <>
+      <ProductCards items={res.data.items} />
+      {/* D-85: đi tới trang Cửa hàng để xem toàn bộ đèn */}
+      <div className="products-more">
+        <Link to={path('/shop')} className="btn btn-ghost">
+          {t('products.viewAll')} <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+    </>
   )
 }
 

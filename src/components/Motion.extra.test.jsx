@@ -93,12 +93,12 @@ describe('Header — logo con dấu và tự ẩn khi cuộn', () => {
 
   // jsdom không có document.scrollingElement → framer useScroll() không gắn listener (noop).
   // Giả lập bằng documentElement để mô phỏng cuộn trang.
-  it('cuộn xuống quá 240px → is-hidden; cuộn lên → hiện lại', async () => {
+  it('cuộn xuống → header thu nhỏ (is-scrolled) và KHÔNG bao giờ ẩn đi; về đầu trang thì trở lại (D-85)', async () => {
     Object.defineProperty(document, 'scrollingElement', { value: document.documentElement, configurable: true })
     mockApi(handlers)
     const { container } = renderAt('/')
     const header = container.querySelector('header.nav')
-    expect(header).not.toHaveClass('is-hidden')
+    expect(header).not.toHaveClass('is-scrolled')
 
     const scrollTo = async (y) => {
       window.scrollY = y
@@ -110,19 +110,24 @@ describe('Header — logo con dấu và tự ẩn khi cuộn', () => {
       })
     }
     await scrollTo(100)
+    await waitFor(() => expect(header).toHaveClass('is-scrolled'))
     await scrollTo(600)
-    await waitFor(() => expect(header).toHaveClass('is-hidden'))
     expect(header).toHaveClass('is-scrolled')
+    expect(header).not.toHaveClass('is-hidden')
     await scrollTo(400)
-    await waitFor(() => expect(header).not.toHaveClass('is-hidden'))
+    expect(header).not.toHaveClass('is-hidden')
     await scrollTo(0)
     await waitFor(() => expect(header).not.toHaveClass('is-scrolled'))
     delete document.scrollingElement
   })
 
-  it('CSS: header có :focus-within để luôn hiện khi dùng bàn phím', () => {
+  it('CSS: .nav.is-scrolled thu nhỏ 20% và bo tròn; không còn .is-hidden', () => {
     const css = readFileSync(join(process.cwd(), 'src/styles/App.css'), 'utf8')
-    expect(css).toMatch(/\.nav\.is-hidden:not\(:focus-within\)|\.nav:focus-within|\.nav\.is-hidden:focus-within/)
+    const m = css.match(/\.nav\.is-scrolled\s*\{([^}]*)\}/)
+    expect(m).not.toBeNull()
+    expect(m[1]).toMatch(/scale\(0\.8\)/)
+    expect(m[1]).toMatch(/border-radius:\s*9999px/)
+    expect(css).not.toMatch(/\.nav\.is-hidden/)
   })
 })
 

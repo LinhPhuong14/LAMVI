@@ -1,11 +1,14 @@
 // 简体中文。Bản dịch do đội dev soạn — chờ PO duyệt (ba-spec §31.2 G-14).
 export default {
   meta: {
+    shopTitle: '商店 — LAMVI · 手工宣纸灯笼',
+    shopDescription: 'LAMVI 全部手工宣纸灯笼：按类型筛选，附带二维码祝福感谢卡和制作视频。',
     productTitle: '{name} — LAMVI · 手工纸灯',
     title: 'LAMVI — 手工纸灯',
     description: '手工纸灯礼物，附带二维码祝福和制灯过程视频。',
   },
   nav: {
+    shop: '商店',
     logout: '退出登录',
     home: '首页',
     story: '故事',
@@ -110,6 +113,7 @@ export default {
     made: '盏灯已出炉',
   },
   products: {
+    viewAll: '查看更多',
     eyebrow: '系列',
     title: '选择您想点亮的那盏灯',
     collectionCopy:
@@ -451,6 +455,28 @@ export default {
     },
     methods: { payos: '银行转账（payOS）', cod: '货到付款' },
   },
+  shop: {
+    eyebrow: '商店',
+    title: '手工宣纸灯笼',
+    lead: '选择您想点亮的灯笼——自用或送给心上人。在结账时选择“送礼”或“自用”。',
+    perks: ['印有二维码的感谢卡，可打开您的祝福', '灯上刻有二维码，可观看制作视频', '价格已含增值税，仅限越南境内配送'],
+    filterLabel: '按类型筛选',
+    filters: {
+      all: '全部',
+      single: '单盏灯笼',
+      set: '套装',
+    },
+    sortLabel: '排序',
+    sorts: {
+      featured: '精选',
+      priceAsc: '价格从低到高',
+      priceDesc: '价格从高到低',
+      name: '名称 A–Z',
+    },
+    count: '共 {n} 件商品',
+    help: '不知道选哪盏？看看常见问题，或在屏幕角落问问云云。',
+    helpLink: '常见问题',
+  },
   cart: {
     eyebrow: '您的礼物篮',
     stepsLabel: '下单步骤',
@@ -516,7 +542,7 @@ export default {
       step: '第 {n}/{total} 步',
       steps: [
         '欢迎来到 LAMVI！让 Mây 带您逛一圈：这里是作为讲故事礼物的手工纸灯。',
-        '这是系列展示。点击灯笼查看详情并加入购物车——云云会在这个角落提醒您。显示价格已含增值税。',
+        '这是系列展示。点击“查看更多”进入商店浏览全部灯笼；点击灯笼查看详情并加入购物车。显示价格已含增值税。',
         '每份礼物有两个二维码：感谢卡上的二维码打开您的祝福，灯上刻的二维码打开这批灯的制作视频。',
         '还有疑问？看看这里的常见问题吧。',
         'Mây 一直在这个角落。点击 Mây 随时提问或重看导览。',

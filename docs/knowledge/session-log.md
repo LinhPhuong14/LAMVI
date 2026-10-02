@@ -1,5 +1,13 @@
 # Nhật ký phiên
 
+## 2026-10-02 — Trang Cửa hàng và navbar thu nhỏ (nhánh `feat/shop-navbar`)
+
+**Mục tiêu người dùng**: thiết kế trang shop riêng, mọi nút xem đèn đi tới shop thay vì section; thêm "Xem thêm" ở bộ sưu tập; navbar luôn ở đầu trang, cuộn xuống thì thu nhỏ 20% và bo góc.
+
+**Đã làm**: D-85, T-49. `/shop` (lọc, sắp xếp, SSR, sitemap), `ProductCards` dùng chung, đổi link `#products` → `/shop`, nút "Xem thêm", navbar `scale(0.8)` + viên thuốc, bỏ tự ẩn khi cuộn. Sửa test sitemap, header tự ẩn, link `#products`.
+
+**Diễn giải**: "bo góc 50%" làm thành bo tròn hoàn toàn (9999px) — bo 50% theo chiều rộng sẽ thành hình elip. PO xem lại nếu muốn khác.
+
 ## 2026-10-02 — Giỏ hàng, bộ sưu tập, tooltip giỏ, dashboard, chat Mây (nhánh `feat/cart-collection-may-dashboard`)
 
 **Mục tiêu người dùng**: thiết kế lại trang giỏ hàng; bỏ hai tab Mua tặng/Mua cho mình ở bộ sưu tập; thay dòng link giỏ hàng trên thẻ sản phẩm bằng phản hồi tốt hơn; thiết kế lại dashboard và khung chat Mây. Giữa chừng PO đổi ý về vị trí phản hồi: không gắn vào Mây, mà ở navbar có huy hiệu + tooltip.

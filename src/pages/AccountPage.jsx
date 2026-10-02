@@ -247,7 +247,7 @@ function OrdersPanel({ status, items, error }) {
           </div>
           <div>
             <p>{t('orders.empty')}</p>
-            <Link to={{ pathname: path('/'), hash: '#products' }} className="btn btn-ghost btn-compact">
+            <Link to={path('/shop')} className="btn btn-ghost btn-compact">
               {t('cart.continue')}
             </Link>
           </div>
@@ -553,7 +553,7 @@ export default function AccountPage() {
           ))}
         </div>
 
-        <Link to={{ pathname: path('/'), hash: '#products' }} className="dash-promo">
+        <Link to={path('/shop')} className="dash-promo">
           <span className="dash-promo-art" aria-hidden="true">
             <Lantern size={60} tone="dusk" swing flicker />
           </span>
@@ -584,7 +584,7 @@ export default function AccountPage() {
             <p className="dash-top-sub">{t(`account.subtitle.${tab}`)}</p>
             {tab === 'overview' && (
               <div className="dash-actions">
-                <Link to={{ pathname: path('/'), hash: '#products' }} className="btn btn-primary btn-small">
+                <Link to={path('/shop')} className="btn btn-primary btn-small">
                   {t('cart.continue')}
                 </Link>
                 <button type="button" className="btn btn-ghost btn-small" onClick={() => go('may')}>

@@ -17,6 +17,7 @@ const SCENES = {
   // Trang khác (PageScene)
   auth: {}, // nền trơn có quầng màu (CSS), không dùng ảnh — để thẻ kính có thứ để làm mờ
   product: { photo: 'golden-sky' },
+  shop: { photo: 'golden-sky' },
   cart: { photo: 'lake-village' },
   checkout: { photo: 'mist-terraces' },
   order: { photo: 'golden-clouds', rise: 3 },

@@ -190,6 +190,14 @@ Quy tắc:
 | Hoạ tiết Việt | Tự vẽ chữ Hán, rồng, mái cung điện Trung Hoa lên giao diện |
 | Hiệu ứng tắt khi giảm chuyển động | Animation bằng `filter`/`box-shadow` lặp liên tục |
 
+## 11c. Cửa hàng và navbar (v0.27, T-49)
+
+| Thành phần | Quy tắc |
+|---|---|
+| Trang Cửa hàng | Đầu trang: eyebrow + h1 + lời dẫn + ba viên thuốc đặc điểm; thanh công cụ viên thuốc kính (lọc dạng segmented son, ô sắp xếp, đếm); lưới `ProductCards` (cùng thẻ với landing) |
+| Navbar | Luôn ghim đầu trang. Cuộn xuống: `scale(0.8)` + bo tròn 9999px + cách mép trên 10px, nền kính, bóng mềm. Không tự ẩn |
+| Liên kết "xem đèn" | Luôn tới `/shop`; phần bộ sưu tập ở landing có nút "Xem thêm" |
+
 ## 11b. Giỏ hàng, tooltip, dashboard, chat Mây (v0.26, T-48)
 
 | Thành phần | Quy tắc |

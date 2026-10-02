@@ -16,12 +16,12 @@ const base = { 'GET /products': () => ({ body: productsVi }), 'GET /faq': () => 
 beforeEach(() => localStorage.setItem('moc.tour.done', '1'))
 
 describe('CartPage v2', () => {
-  it('trống → empty state + CTA về #products', async () => {
+  it('trống → empty state + CTA về trang Cửa hàng', async () => {
     mockApi({ ...base, 'POST /cart/quote': () => ({ body: { ...cartOf(), items: [], subtotal: 0, itemCount: 0 } }) })
     renderAt('/cart')
     expect(await screen.findByText('Giỏ hàng đang trống.')).toBeInTheDocument()
     const cta = document.querySelector('.cart-empty a.btn-primary')
-    expect(cta.getAttribute('href')).toBe('/#products')
+    expect(cta.getAttribute('href')).toBe('/shop')
     expect(document.querySelector('.cart-steps')).toBeNull()
   })
 
