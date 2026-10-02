@@ -37,9 +37,9 @@ export default function MayChat({ onClose, onTour }) {
 
   useEffect(() => inputRef.current?.focus(), [])
 
-  async function send(e) {
+  async function send(e, preset) {
     e.preventDefault()
-    const message = text.trim()
+    const message = (preset ?? text).trim()
     if (!message || pending) return
     const history = messages.filter((m) => m.role === 'user' || m.kind === 'answer').map(({ role, content }) => ({ role, content }))
     setMessages((m) => [...m, { role: 'user', content: message }])
@@ -59,10 +59,15 @@ export default function MayChat({ onClose, onTour }) {
     }
   }
 
+  const started = messages.some((m) => m.role === 'user')
+
   return (
     <section className="may-panel" role="dialog" aria-label={t('may.title')}>
       <header className="may-head">
-        <MayAvatar size={40} />
+        <span className="may-head-avatar">
+          <MayAvatar size={44} />
+          <i className="may-online" aria-hidden="true" />
+        </span>
         <div>
           <strong>{t('may.title')}</strong>
           <span>{t('may.subtitle')}</span>
@@ -91,28 +96,49 @@ export default function MayChat({ onClose, onTour }) {
             )}
           </li>
         ))}
-        {pending && <li className="may-msg may-assistant may-typing">{t('may.sending')}</li>}
+        {pending && (
+          <li className="may-msg may-assistant may-typing">
+            <span className="sr-only">{t('may.sending')}</span>
+            <i aria-hidden="true" />
+            <i aria-hidden="true" />
+            <i aria-hidden="true" />
+          </li>
+        )}
       </ol>
+      {/* Gợi ý câu hỏi cho lần mở đầu: bấm là gửi, đỡ phải gõ */}
+      {!started && !pending && (
+        <div className="may-chips" role="group" aria-label={t('may.suggestTitle')}>
+          {t('may.suggestions').map((q) => (
+            <button key={q} type="button" className="may-chip" onClick={(e) => send(e, q)}>
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
       <form className="may-form" onSubmit={send}>
-        <textarea
-          ref={inputRef}
-          value={text}
-          maxLength={MAX}
-          rows={2}
-          placeholder={t('may.placeholder')}
-          aria-label={t('may.placeholder')}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) send(e)
-          }}
-        />
+        <div className="may-compose">
+          <textarea
+            ref={inputRef}
+            value={text}
+            maxLength={MAX}
+            rows={1}
+            placeholder={t('may.placeholder')}
+            aria-label={t('may.placeholder')}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) send(e)
+            }}
+          />
+          <button type="submit" className="may-send" aria-label={t('may.send')} disabled={pending || !text.trim()}>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
         <div className="may-form-foot">
           <small>{t('may.counter', { n: text.length, max: MAX })}</small>
-          <button type="button" className="btn btn-small btn-ghost" onClick={onTour}>
+          <button type="button" className="may-tour" onClick={onTour}>
             {t('may.startTour')}
-          </button>
-          <button type="submit" className="btn btn-small" disabled={pending || !text.trim()}>
-            {t('may.send')}
           </button>
         </div>
         <small className="may-save-note">{user ? t('may.historyNote') : t('may.guestNote')}</small>

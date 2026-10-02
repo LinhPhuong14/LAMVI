@@ -126,36 +126,21 @@ describe('Header — logo con dấu và tự ẩn khi cuộn', () => {
   })
 })
 
-describe('Mua tặng / Mua cho mình', () => {
-  it.each(['vi', 'en', 'zh'])('%s: aria-pressed đổi đúng, mô tả đổi sang selfCopy và ngược lại', async (lang) => {
+describe('Bộ sưu tập một mạch (D-83)', () => {
+  it.each(['vi', 'en', 'zh'])('%s: không còn tab Mua tặng / Mua cho mình; chỉ một đoạn mô tả chung', async (lang) => {
     mockApi(handlers)
     renderAt(PREFIX[lang])
     const p = MESSAGES[lang].products
-    const gift = screen.getByRole('button', { name: p.gift })
-    const self = screen.getByRole('button', { name: p.self })
-    expect(gift).toHaveAttribute('aria-pressed', 'true')
-    expect(self).toHaveAttribute('aria-pressed', 'false')
-    expect(screen.getByText(p.giftCopy)).toBeInTheDocument()
-
-    fireEvent.click(self)
-    expect(self).toHaveAttribute('aria-pressed', 'true')
-    expect(gift).toHaveAttribute('aria-pressed', 'false')
-    expect(await screen.findByText(p.selfCopy)).toBeInTheDocument()
-    await waitFor(() => expect(screen.queryByText(p.giftCopy)).toBeNull())
-
-    fireEvent.click(gift)
-    expect(gift).toHaveAttribute('aria-pressed', 'true')
-    expect(await screen.findByText(p.giftCopy)).toBeInTheDocument()
-    await waitFor(() => expect(screen.queryByText(p.selfCopy)).toBeNull())
+    expect(document.querySelector('.intent-toggle')).toBeNull()
+    expect(screen.queryByRole('button', { name: /Mua tặng|Mua cho mình/ })).toBeNull()
+    expect(screen.getByText(p.collectionCopy)).toBeInTheDocument()
   })
 
-  it('nút thêm vào giỏ đổi nhãn theo intent đang chọn (FR-CART-001)', async () => {
+  it('nút thêm vào giỏ chỉ có một nhãn (FR-CART-001)', async () => {
     mockApi(handlers)
     renderAt('/')
     await screen.findAllByText(productsVi.items[0].name)
-    fireEvent.click(screen.getByRole('button', { name: viMsg.products.self }))
     expect(screen.getAllByRole('button', { name: viMsg.cart.add })[0]).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: viMsg.cart.giftAdd })).toBeNull()
   })
 })
 

@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
-  AnimatePresence,
   m,
   useMotionValueEvent,
   useReducedMotionConfig,
@@ -330,7 +329,7 @@ function Hero() {
   )
 }
 
-function ProductGrid({ intent }) {
+function ProductGrid() {
   const { t, lang, path } = useI18n()
   const res = useApi('/products', lang)
 
@@ -362,8 +361,8 @@ function ProductGrid({ intent }) {
             <p className="product-desc">{p.description}</p>
             <div className="product-foot">
               <Price amount={p.price} />
-              {/* FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002) */}
-              <AddToCart slug={p.slug} label={intent === 'gift' ? t('cart.giftAdd') : t('cart.add')} />
+              {/* FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002, D-83) */}
+              <AddToCart slug={p.slug} />
             </div>
           </div>
         </TiltCard>
@@ -373,7 +372,6 @@ function ProductGrid({ intent }) {
 }
 
 export default function HomePage() {
-  const [intent, setIntent] = useState('gift')
   const { t, lang } = useI18n()
   const siteUrl = useSiteUrl()
   useScrollToHash()
@@ -473,37 +471,13 @@ export default function HomePage() {
         <Scene name="products" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('products.eyebrow')} title={t('products.title')}>
-            <m.div className={`intent-toggle is-${intent}`} role="group" variants={rise}>
-              <span className="intent-pill" aria-hidden="true" />
-              {['gift', 'self'].map((key) => (
-                <button
-                  key={key}
-                  className={intent === key ? 'active' : ''}
-                  aria-pressed={intent === key}
-                  onClick={() => setIntent(key)}
-                >
-                  {t(`products.${key}`)}
-                </button>
-              ))}
-            </m.div>
-            <div className="intent-copy-wrap">
-              <AnimatePresence mode="wait" initial={false}>
-                <m.p
-                  key={intent}
-                  className="intent-copy"
-                  initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-                  transition={{ duration: 0.3, ease: EASE_OUT }}
-                >
-                  {intent === 'gift' ? t('products.giftCopy') : t('products.selfCopy')}
-                </m.p>
-              </AnimatePresence>
-            </div>
+            <m.p className="intent-copy" variants={rise}>
+              {t('products.collectionCopy')}
+            </m.p>
           </SectionHead>
         </Reveal>
 
-        <ProductGrid intent={intent} />
+        <ProductGrid />
       </section>
 
       <section id="lookbook" className="lookbook has-motifs">
