@@ -236,7 +236,7 @@
     box-shadow 0.3s ease;
 }
 
-/* Cuộn xuống (D-85): thu nhỏ 20% quanh đỉnh giữa, bo tròn thành viên thuốc nổi, luôn ghim ở đầu trang.
+/* Cuộn xuống (D-86): thu nhỏ 20% quanh đỉnh giữa, bo tròn thành viên thuốc nổi, luôn ghim ở đầu trang.
    Dùng transform nên không làm xô bố cục trang bên dưới. */
 .nav {
   transform-origin: 50% 0;

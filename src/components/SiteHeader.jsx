@@ -7,7 +7,7 @@ import { useCart } from '../cart/context.js'
 import CartBubble from '../cart/CartBubble.jsx'
 import { Seal } from './Motifs'
 
-// 'shop' dẫn tới trang Cửa hàng riêng (D-85); các mục còn lại là phần trên trang chủ
+// 'shop' dẫn tới trang Cửa hàng riêng (D-86); các mục còn lại là phần trên trang chủ
 const SECTIONS = ['story', 'artisan', 'shop', 'lookbook', 'qr', 'faq']
 
 export function LanguageSwitcher() {
@@ -52,7 +52,7 @@ function CartLink() {
   )
 }
 
-// Thanh điều hướng luôn nằm ở đầu trang. Cuộn xuống thì thu nhỏ 20% và bo tròn thành viên thuốc nổi (D-85)
+// Thanh điều hướng luôn nằm ở đầu trang. Cuộn xuống thì thu nhỏ 20% và bo tròn thành viên thuốc nổi (D-86)
 function useHeaderScrolled() {
   const { scrollY } = useScroll()
   const [scrolled, setScrolled] = useState(false)

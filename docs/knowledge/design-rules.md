@@ -190,7 +190,7 @@ Quy tắc:
 | Hoạ tiết Việt | Tự vẽ chữ Hán, rồng, mái cung điện Trung Hoa lên giao diện |
 | Hiệu ứng tắt khi giảm chuyển động | Animation bằng `filter`/`box-shadow` lặp liên tục |
 
-## 11c. Cửa hàng và navbar (v0.27, T-49)
+## 11c. Cửa hàng và navbar (v0.29, T-50)
 
 | Thành phần | Quy tắc |
 |---|---|

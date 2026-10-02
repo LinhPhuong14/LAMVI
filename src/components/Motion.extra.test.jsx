@@ -93,7 +93,7 @@ describe('Header — logo con dấu và tự ẩn khi cuộn', () => {
 
   // jsdom không có document.scrollingElement → framer useScroll() không gắn listener (noop).
   // Giả lập bằng documentElement để mô phỏng cuộn trang.
-  it('cuộn xuống → header thu nhỏ (is-scrolled) và KHÔNG bao giờ ẩn đi; về đầu trang thì trở lại (D-85)', async () => {
+  it('cuộn xuống → header thu nhỏ (is-scrolled) và KHÔNG bao giờ ẩn đi; về đầu trang thì trở lại (D-86)', async () => {
     Object.defineProperty(document, 'scrollingElement', { value: document.documentElement, configurable: true })
     mockApi(handlers)
     const { container } = renderAt('/')

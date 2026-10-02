@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// Kiểm thử độc lập trang Cửa hàng /shop (T-49, D-85)
+// Kiểm thử độc lập trang Cửa hàng /shop (T-50, D-86)
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
@@ -163,7 +163,7 @@ describe.each(['vi', 'en', 'zh'])('liên kết và nhãn (%s)', (lang) => {
   })
 })
 
-describe('Navbar cuộn (D-85)', () => {
+describe('Navbar cuộn (D-86)', () => {
   it('is-scrolled bật khi scrollY>12, tắt khi về đầu; không bao giờ is-hidden (kể cả ở /shop)', async () => {
     Object.defineProperty(document, 'scrollingElement', { value: document.documentElement, configurable: true })
     try {

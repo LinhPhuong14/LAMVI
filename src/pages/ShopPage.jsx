@@ -11,7 +11,7 @@ import { useSiteUrl } from '../seo/context.js'
 const FILTERS = ['all', 'single', 'set']
 const SORTS = ['featured', 'priceAsc', 'priceDesc', 'name']
 
-// Trang Cửa hàng riêng (D-85): xem toàn bộ đèn, lọc theo loại, sắp xếp. Landing chỉ giới thiệu
+// Trang Cửa hàng riêng (D-86): xem toàn bộ đèn, lọc theo loại, sắp xếp. Landing chỉ giới thiệu
 // bộ sưu tập và dẫn về đây; mọi nút "xem đèn" trong web đều đi tới trang này.
 export default function ShopPage() {
   const { t, lang, path } = useI18n()

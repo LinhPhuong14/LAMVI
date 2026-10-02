@@ -343,7 +343,7 @@ function ProductGrid() {
   return (
     <>
       <ProductCards items={res.data.items} />
-      {/* D-85: đi tới trang Cửa hàng để xem toàn bộ đèn */}
+      {/* D-86: đi tới trang Cửa hàng để xem toàn bộ đèn */}
       <div className="products-more">
         <Link to={path('/shop')} className="btn btn-ghost">
           {t('products.viewAll')} <span aria-hidden="true">→</span>

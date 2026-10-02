@@ -8,7 +8,7 @@ import { group, stamp } from '../lib/motion.js'
 import { useI18n } from '../i18n/index.js'
 import AddToCart from '../cart/AddToCart.jsx'
 
-// Lưới thẻ sản phẩm dùng chung cho bộ sưu tập ở trang chủ và trang Cửa hàng (D-85).
+// Lưới thẻ sản phẩm dùng chung cho bộ sưu tập ở trang chủ và trang Cửa hàng (D-86).
 // FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002, D-83).
 export default function ProductCards({ items, className = '' }) {
   const { path } = useI18n()
