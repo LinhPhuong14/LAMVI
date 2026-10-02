@@ -322,7 +322,7 @@ function Overview({ cart, mayItems, profile, orders, go }) {
   return (
     <>
       <ul className="dash-stats" aria-label={t('account.overview')}>
-        <li className="dash-stat" style={{ '--i': 0 }}>
+        <li className="dash-stat" data-tone="amber" style={{ '--i': 0 }}>
           <span className="dash-stat-art" aria-hidden="true">
             <Lantern size={46} tone="amber" swing />
           </span>
@@ -335,7 +335,7 @@ function Overview({ cart, mayItems, profile, orders, go }) {
             {t('cart.view')} <span aria-hidden="true">→</span>
           </Link>
         </li>
-        <li className="dash-stat" style={{ '--i': 1 }}>
+        <li className="dash-stat" data-tone="son" style={{ '--i': 1 }}>
           <span className="dash-stat-art" aria-hidden="true">
             <GiftArt size={52} />
           </span>
@@ -348,7 +348,7 @@ function Overview({ cart, mayItems, profile, orders, go }) {
             {t('account.viewMore')} <span aria-hidden="true">→</span>
           </button>
         </li>
-        <li className="dash-stat" style={{ '--i': 2 }}>
+        <li className="dash-stat" data-tone="cham" style={{ '--i': 2 }}>
           <span className="dash-stat-art" aria-hidden="true">
             <MayAvatar size={52} />
           </span>
@@ -582,6 +582,16 @@ export default function AccountPage() {
             </p>
             <h1 className="page-title">{t('account.title')}</h1>
             <p className="dash-top-sub">{t(`account.subtitle.${tab}`)}</p>
+            {tab === 'overview' && (
+              <div className="dash-actions">
+                <Link to={{ pathname: path('/'), hash: '#products' }} className="btn btn-primary btn-small">
+                  {t('cart.continue')}
+                </Link>
+                <button type="button" className="btn btn-ghost btn-small" onClick={() => go('may')}>
+                  {t('account.tabs.may')}
+                </button>
+              </div>
+            )}
           </div>
           <HeroScene />
         </header>

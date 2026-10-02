@@ -3082,3 +3082,193 @@
   letter-spacing: 0.04em;
   color: var(--than-soft);
 }
+
+/* ---------- Giỏ hàng trên navbar: huy hiệu + tooltip xác nhận (D-83) ---------- */
+.nav-cart-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.nav-cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Huy hiệu số lượng; nảy lên mỗi lần thêm (key đổi → phần tử mới → animation chạy lại) */
+.nav-cart-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--son);
+  color: var(--diep-light);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  animation: nav-badge-pop 0.6s var(--ease-out);
+}
+
+@keyframes nav-badge-pop {
+  from {
+    transform: scale(0.4);
+  }
+  55% {
+    transform: scale(1.35);
+  }
+}
+
+/* Tooltip dưới nút giỏ hàng: mũi tên chỉ lên huy hiệu */
+.cart-bubble {
+  position: absolute;
+  right: -12px;
+  top: calc(100% + 16px);
+  z-index: 60;
+  width: min(340px, calc(100vw - 24px));
+  padding: 14px 16px 16px;
+  border-radius: var(--r-md);
+  background: linear-gradient(160deg, rgba(255, 250, 240, 0.97), rgba(247, 238, 222, 0.92));
+  border: 1px solid var(--g-border);
+  box-shadow: var(--g-shadow), 0 18px 40px -20px rgba(60, 40, 20, 0.5);
+  -webkit-backdrop-filter: var(--g-blur);
+  backdrop-filter: var(--g-blur);
+  text-align: left;
+  white-space: normal;
+  transform-origin: calc(100% - 28px) 0;
+  animation: cart-bubble-pop 0.45s var(--ease-out) both;
+}
+
+/* Mũi tên chỉ lên huy hiệu giỏ hàng */
+.cart-bubble::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: 17px;
+  width: 14px;
+  height: 14px;
+  background: rgba(255, 250, 240, 0.98);
+  border-left: 1px solid var(--g-border);
+  border-top: 1px solid var(--g-border);
+  transform: rotate(45deg);
+}
+
+@keyframes cart-bubble-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.9);
+  }
+}
+
+.cart-bubble-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--than-soft);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cart-bubble-close:hover {
+  background: rgba(122, 93, 60, 0.12);
+}
+
+.cart-bubble-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 20px;
+}
+
+.cart-bubble-thumb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-sm);
+  background: radial-gradient(circle at 50% 40%, rgba(226, 198, 143, 0.5), rgba(233, 223, 203, 0.7));
+  overflow: hidden;
+}
+
+.cart-bubble-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.3;
+  color: var(--than);
+}
+
+.cart-bubble-sum {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: var(--than-soft);
+}
+
+.cart-bubble-actions {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+
+.cart-bubble-actions .btn {
+  flex: 1;
+}
+
+.cart-bubble-timer {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 6px;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--hoe), var(--son));
+  transform-origin: left;
+  animation: cart-bubble-timer linear forwards;
+}
+
+@keyframes cart-bubble-timer {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Nút thêm vào giỏ: chuyển xanh lá nhạt ngắn khi thêm xong */
+.btn.is-added {
+  background: var(--la);
+  color: var(--diep-light);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Màn hẹp: tooltip trải theo chiều ngang màn hình, ngay dưới header */
+@media (max-width: 640px) {
+  .nav-cart-wrap {
+    position: static;
+  }
+  .cart-bubble::before {
+    display: none;
+  }
+  .cart-bubble {
+    /* .nav là phần tử dính (đã định vị) nên tooltip bám theo header, không cần position: fixed */
+    left: 12px;
+    right: 12px;
+    top: calc(100% + 8px);
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-bubble,
+  .cart-bubble-timer {
+    animation: none;
+  }
+}

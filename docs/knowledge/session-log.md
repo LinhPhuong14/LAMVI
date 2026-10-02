@@ -1,5 +1,13 @@
 # Nhật ký phiên
 
+## 2026-10-02 — Giỏ hàng, bộ sưu tập, tooltip giỏ, dashboard, chat Mây (nhánh `feat/cart-collection-may-dashboard`)
+
+**Mục tiêu người dùng**: thiết kế lại trang giỏ hàng; bỏ hai tab Mua tặng/Mua cho mình ở bộ sưu tập; thay dòng link giỏ hàng trên thẻ sản phẩm bằng phản hồi tốt hơn; thiết kế lại dashboard và khung chat Mây. Giữa chừng PO đổi ý về vị trí phản hồi: không gắn vào Mây, mà ở navbar có huy hiệu + tooltip.
+
+**Đã làm**: D-83, D-84, T-48. Tooltip + huy hiệu trên navbar; giỏ hàng v2; dashboard v2; chat Mây v2 (chip gợi ý, bong bóng, ô soạn). Sửa/xoá các test gắn với tab intent, link "Xem giỏ hàng" trên thẻ, văn bản "Giỏ hàng (n)".
+
+**Hạn chế**: Behance/Pinterest vẫn không xem được ảnh mẫu. Dark theme của dashboard chưa kiểm tra bằng mắt sau khi đổi thanh bên/tab.
+
 ## 2026-10-02 — Rà soát CI/CD, bảo mật, hiệu năng (nhánh `fix/devops-hardening`)
 
 **Phát hiện**: repo chưa có CI; `npm audit` sạch; header bảo mật/CSP/rate limit đã đủ; `immutable 1 năm` áp cho cả tệp không băm; ảnh `public/` chỉ có cache mặc định của Vercel; `CRON_SECRET` so sánh bằng `!==`; `probe2.tmp.mjs` bị commit; `deploy-vercel.md` ghi CSP nonce trong khi code dùng hash.

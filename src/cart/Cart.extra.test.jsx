@@ -84,7 +84,7 @@ describe('SSR trang chủ + giỏ trong localStorage (D-49)', () => {
     }
     const { html } = ssrRender('/', { initialData: data, siteUrl: 'http://localhost' })
     // SSR không biết giỏ trình duyệt
-    expect(html).toContain('>Giỏ hàng</a>')
+    expect(html).toContain('Giỏ hàng</span></a>')
     expect(html).not.toMatch(/Giỏ hàng \(\d+\)/)
 
     document.body.innerHTML = ''
@@ -107,7 +107,7 @@ describe('SSR trang chủ + giỏ trong localStorage (D-49)', () => {
     await flush()
     expect(recoverable).toEqual([])
     expect(errors.filter((e) => /hydrat|did not match|mismatch/i.test(e))).toEqual([])
-    expect(root.querySelector('.nav-cart').textContent).toBe('Giỏ hàng (3)')
+    expect(root.querySelector('.nav-cart').getAttribute('aria-label')).toBe('Giỏ hàng (3)')
     act(() => r.unmount())
   })
 })
@@ -138,8 +138,8 @@ describe('localStorage hỏng / bị chặn', () => {
     mockApi(fakeServer().handlers)
     renderAt('/')
     const card = (await screen.findByText('Đèn Nguyệt', { selector: '.product-card a' })).closest('.product-card')
-    fireEvent.click(within(card).getByRole('button', { name: 'Tặng ngay' }))
-    expect(await within(card).findByText('Đã thêm vào giỏ.')).toBeInTheDocument()
+    fireEvent.click(within(card).getByRole('button', { name: 'Thêm vào giỏ' }))
+    expect(await screen.findByText(/Mây đã bỏ/)).toBeInTheDocument()
     expect(await screen.findByRole('link', { name: 'Giỏ hàng (1)' })).toBeInTheDocument()
   })
 
@@ -222,7 +222,7 @@ describe('Thanh toán (D-61, US-001 AC-003)', () => {
     expect(await screen.findByRole('link', { name: 'Giỏ hàng (5)' })).toBeInTheDocument()
     await act(async () => release())
     await flush()
-    expect(screen.getByRole('link', { name: /^Giỏ hàng/ }).textContent).toBe('Giỏ hàng (5)')
+    expect(screen.getByRole('link', { name: /^Giỏ hàng/ })).toHaveAttribute('aria-label', 'Giỏ hàng (5)')
   })
 
   it('mọi dòng đều không còn bán → nút Thanh toán bị vô hiệu', async () => {
@@ -260,7 +260,7 @@ describe('Lỗi mạng', () => {
     f.mockImplementation(async () => {
       throw new TypeError('Failed to fetch')
     })
-    fireEvent.click(within(card).getByRole('button', { name: 'Tặng ngay' }))
+    fireEvent.click(within(card).getByRole('button', { name: 'Thêm vào giỏ' }))
     expect(await within(card).findByText('Không kết nối được máy chủ. Vui lòng thử lại.')).toBeInTheDocument()
     const saved = JSON.parse(localStorage.getItem('moc.cart'))
     expect(saved).toEqual(expect.arrayContaining([{ slug: 'den-vong', quantity: 1 }]))
@@ -274,7 +274,7 @@ describe('Lỗi mạng', () => {
     renderAt('/')
     const card = (await screen.findByText('Đèn Nguyệt', { selector: '.product-card a' })).closest('.product-card')
     await screen.findByRole('link', { name: 'Giỏ hàng (2)' })
-    fireEvent.click(within(card).getByRole('button', { name: 'Tặng ngay' }))
+    fireEvent.click(within(card).getByRole('button', { name: 'Thêm vào giỏ' }))
     expect(await within(card).findByText(/Vui lòng thử lại/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Giỏ hàng (2)' })).toBeInTheDocument()
   })

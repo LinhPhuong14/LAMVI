@@ -12,6 +12,8 @@ export default function CartProvider({ children }) {
   // SSR + lần render đầu: chưa đọc localStorage (tránh lệch hydrate)
   const [cart, setCart] = useState(null)
   const [error, setError] = useState(null)
+  // Sự kiện "vừa thêm" cho bong bóng của Mây (D-83); `id` tăng mỗi lần để thêm cùng món vẫn hiện lại
+  const [lastAdded, setLastAdded] = useState(null)
   const localRef = useRef([])
   // Mỗi lần nạp/đổi giỏ tăng mã; kết quả của yêu cầu cũ (vd quote chậm về sau khi đã đăng nhập) bị bỏ
   const seq = useRef(0)
@@ -93,12 +95,16 @@ export default function CartProvider({ children }) {
   )
 
   const add = useCallback(
-    (slug, quantity = 1) => {
+    async (slug, quantity = 1) => {
       const current = cart?.items.find((i) => i.slug === slug)?.quantity ?? localRef.current.find((i) => i.slug === slug)?.quantity ?? 0
-      return setQuantity(slug, current + quantity)
+      const ok = await setQuantity(slug, current + quantity)
+      if (ok) setLastAdded((prev) => ({ slug, quantity, id: (prev?.id ?? 0) + 1 }))
+      return ok
     },
     [cart, setQuantity],
   )
+
+  const dismissAdded = useCallback(() => setLastAdded(null), [])
 
   const remove = useCallback(
     (slug) =>
@@ -116,8 +122,8 @@ export default function CartProvider({ children }) {
   )
 
   const value = useMemo(
-    () => ({ cart, error, add, setQuantity, remove, reload: load }),
-    [cart, error, add, setQuantity, remove, load],
+    () => ({ cart, error, add, setQuantity, remove, reload: load, lastAdded, dismissAdded }),
+    [cart, error, add, setQuantity, remove, load, lastAdded, dismissAdded],
   )
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
