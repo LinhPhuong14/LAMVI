@@ -253,7 +253,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Chuyển động**: quầng bokeh `auth-orb` trôi chậm, thẻ trồi lên 0,7s; tắt khi `prefers-reduced-motion`.
 - **Hệ quả**: các test cũ dùng link "Chưa có tài khoản?" chuyển sang `tab()`.
 
-### T-48 — CI, cache tĩnh, so sánh bí mật
+### T-50 — CI, cache tĩnh, so sánh bí mật
 
 - **CI**: `.github/workflows/ci.yml` (lint, test, build, `npm audit --omit=dev --audit-level=high`) + Dependabot hằng tuần. Trước đó repo không có CI nào, việc "xanh trước khi merge" chỉ dựa vào chạy tay.
 - **Cache**: `immutable 1 năm` chỉ cho `dist/client/assets/*` (tên băm nội dung); tệp khác 1 giờ. `public/images/*` + favicon: 1 ngày + stale-while-revalidate 7 ngày, đặt ở `vercel.json`.
@@ -278,3 +278,8 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
   7. Sửa lỗi cũ: giới hạn `reset`/`change` mật khẩu truyền `keys = () => []` nên **không đếm gì**; nay `reset` theo IP, `change` theo user id. Thêm nhóm `refresh` (120/5 phút/IP).
 - **Không làm** (có chủ đích): SMS/OTP điện thoại (không có kênh gửi); xác minh email khi đăng ký (PO giữ D-63 → D-85); TOTP 2FA cho admin (Supabase MFA TOTP miễn phí nhưng chưa có yêu cầu nghiệp vụ).
 - **Hệ quả**: thêm biến `MAIL_FROM`, `RESEND_API_KEY`/`BREVO_API_KEY`, `PWNED_CHECK` (xem `deploy-vercel.md`). Không còn cần cấu hình Redirect URLs/SMTP cho luồng đặt lại mật khẩu. Rủi ro còn lại: G-52…G-54 trong `ba-spec.md`.
+
+### T-51 — Rà RLS Supabase và giảm độ trễ Mây
+
+- **RLS**: rà từ các migration (MCP Supabase chưa được uỷ quyền nên chưa đối chiếu DB thật). 15/15 bảng `public` đã bật RLS, không policy (T-05). Vá bằng `20261002000009_harden_rls.sql`: thu hồi EXECUTE của `claim_coupon`/`release_coupon` (trước đó PUBLIC gọi được RPC), thu hồi quyền bảng/hàm/sequence mặc định của `anon`/`authenticated` (kèm default privileges), tạo bucket `product-images` (trước chỉ tạo tay). **Phải chạy migration và chạy lại advisor bảo mật trên project thật.**
+- **Mây (OpenAI)**: hai bộ đếm hạn mức chạy song song; đọc chi phí tháng song song với kiểm hạn mức; các tool trong cùng một lượt gọi song song (giữ thứ tự `tool_call_id`); `max_tokens` 600 → 350 (câu trả lời ≤ ~80 từ). Chưa làm: streaming, cache catalog theo instance, gpt nhỏ hơn.
