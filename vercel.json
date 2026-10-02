@@ -10,6 +10,16 @@
       "maxDuration": 30
     }
   },
+  "headers": [
+    {
+      "source": "/images/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    },
+    {
+      "source": "/(favicon.svg|icons.svg)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
   "crons": [{ "path": "/api/internal/expire-orders", "schedule": "0 18 * * *" }]
 }

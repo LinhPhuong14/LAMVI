@@ -1,3 +1,4 @@
+import { createHash, timingSafeEqual } from 'node:crypto'
 import { Router } from 'express'
 import { HttpError, notFound } from '../errors.js'
 import { normalizeLang } from '../i18n.js'
@@ -6,6 +7,10 @@ import { validateCheckout } from '../domain/order.js'
 import { parseWebhook } from '../adapters/payos.js'
 import { rateLimit } from '../middleware/rateLimit.js'
 import { DEFAULT_HASH_SALT } from '../config.js'
+
+// So sánh bí mật không lộ độ dài/thời gian (băm về cùng độ dài rồi timingSafeEqual)
+const sha = (v) => createHash('sha256').update(v).digest()
+const safeEqual = (a, b) => timingSafeEqual(sha(a), sha(b))
 
 const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {})
 
@@ -151,7 +156,7 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
     const secret = config.cronSecret
     if (!secret) throw new HttpError(404, 'NOT_FOUND', 'Không tìm thấy')
     const given = req.get('authorization')
-    if (given !== `Bearer ${secret}`) throw new HttpError(401, 'UNAUTHORIZED', 'Chưa xác thực')
+    if (!safeEqual(given ?? '', `Bearer ${secret}`)) throw new HttpError(401, 'UNAUTHORIZED', 'Chưa xác thực')
     const cancelled = await orders.expirePendingOrders()
     res.json({ cancelled: cancelled.length })
   })
