@@ -132,38 +132,6 @@
 }
 
 /* Chi tiết sản phẩm */
-.product-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: center;
-  margin-top: 24px;
-}
-
-.product-detail-art {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  padding: 40px;
-  border-radius: var(--r-md);
-  background: var(--cream);
-  box-shadow: var(--print-lg);
-}
-
-/* Bồi tranh: đường chỉ mảnh trong mép, như thẻ sản phẩm ở trang chủ */
-.product-detail-art::before {
-  content: '';
-  position: absolute;
-  inset: 8px;
-  border: 1px solid var(--hair-soft);
-  pointer-events: none;
-}
-
-.product-detail-desc {
-  color: var(--ink-soft);
-  margin-bottom: 24px;
-}
-
 .product-badge.static {
   position: static;
   display: inline-block;
@@ -286,9 +254,6 @@
 }
 
 @media (max-width: 960px) {
-  .product-detail-grid {
-    grid-template-columns: 1fr;
-  }
   .nav-account,
   .nav-logout {
     display: none;
@@ -4031,6 +3996,164 @@
   .shop-filters button {
     flex: 1;
     white-space: nowrap;
+  }
+}
+
+/* ---------- Chi tiết sản phẩm cùng phong cách Cửa hàng (D-87) ---------- */
+.page-section.pdp {
+  max-width: 1240px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border: 1px solid var(--g-border);
+  border-radius: 999px;
+  background: var(--g-bg);
+  box-shadow: var(--g-shadow);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.back-link:hover {
+  background: var(--g-bg-strong);
+}
+
+.pdp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 40px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+/* Tấm tranh lớn: nền theo tông của đèn (như thẻ ở Cửa hàng), bo 28px, ánh sáng ở giữa */
+.pdp-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 520px;
+  border: 1px solid var(--g-border);
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(circle at 50% 52%, rgba(255, 244, 207, 0.9) 0 18%, transparent 58%),
+    var(--tone, var(--hoe));
+  box-shadow: var(--g-shadow);
+  overflow: hidden;
+}
+
+.pdp-art::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: calc(var(--r-lg) - 10px);
+  pointer-events: none;
+}
+
+.pdp-art .product-badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  right: auto;
+  z-index: 1;
+}
+
+.pdp-art-stage {
+  display: grid;
+  place-items: center;
+  padding: 40px;
+}
+
+/* Khung mua hàng: thẻ kính, dính khi cuộn (không blur vì là phần tử dính) */
+.pdp-buy {
+  position: sticky;
+  top: 96px;
+  padding: 32px 34px 28px;
+  border: 1px solid var(--g-border);
+  border-radius: var(--r-lg);
+  background: linear-gradient(160deg, rgba(255, 250, 240, 0.92), rgba(247, 238, 222, 0.82));
+  box-shadow: var(--g-shadow);
+}
+
+.pdp-buy .eyebrow {
+  margin-bottom: 6px;
+}
+
+.pdp-buy .page-title {
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 3.4vw, 2.8rem);
+}
+
+.pdp-desc {
+  margin: 16px 0 0;
+  padding-top: 16px;
+  border-top: 3px double var(--hair);
+  color: var(--than-soft);
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.pdp-buy .product-buy {
+  margin-top: 24px;
+}
+
+.pdp-buy .product-buy .btn-primary {
+  min-width: 190px;
+  padding: 14px 24px;
+}
+
+.pdp-note {
+  margin: 10px 0 0;
+  font-size: 0.84rem;
+  color: var(--than-soft);
+}
+
+.pdp-perks {
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+.pdp-related {
+  margin-top: 72px;
+}
+
+.pdp-related-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pdp-related-head .btn {
+  gap: 8px;
+}
+
+.pdp-related .product-grid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.pdp-related-head h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+}
+
+@media (max-width: 960px) {
+  .pdp-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .pdp-art {
+    min-height: 360px;
+  }
+  .pdp-buy {
+    position: static;
+    padding: 26px 22px 24px;
   }
 }
 

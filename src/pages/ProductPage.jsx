@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import ProductCards from '../components/ProductCards'
 import ProductImage from '../components/ProductImage.jsx'
+import { Lotus, Seal } from '../components/Motifs'
 import Price from '../components/Price'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
@@ -19,7 +21,26 @@ function TrackViewItem({ slug, name, price }) {
   return null
 }
 
-// FR-CAT-001: chi tiết sản phẩm
+// Các đèn khác để khách xem tiếp, cùng thẻ với trang Cửa hàng (D-87)
+function Related({ slug }) {
+  const { t, lang, path } = useI18n()
+  const res = useApi('/products', lang)
+  const items = res.status === 'ok' ? res.data.items.filter((p) => p.slug !== slug) : []
+  if (items.length === 0) return null
+  return (
+    <section className="pdp-related" aria-labelledby="pdp-related-title">
+      <div className="pdp-related-head">
+        <h2 id="pdp-related-title">{t('pdp.related')}</h2>
+        <Link to={path('/shop')} className="btn btn-ghost btn-small">
+          {t('pdp.viewAll')} <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+      <ProductCards items={items} />
+    </section>
+  )
+}
+
+// FR-CAT-001: chi tiết sản phẩm — cùng phong cách với trang Cửa hàng (D-87)
 export default function ProductPage() {
   const { slug } = useParams()
   const { t, lang, path } = useI18n()
@@ -53,7 +74,7 @@ export default function ProductPage() {
 
   const p = res.data.item
   return (
-    <section className="page-section product-detail">
+    <section className="page-section product-detail pdp">
       <Seo
         title={t('meta.productTitle', { name: p.name })}
         description={p.description ?? t('meta.description')}
@@ -64,29 +85,41 @@ export default function ProductPage() {
           productJsonLd(p, `${siteUrl}${path(pagePath)}`, siteUrl),
           breadcrumbJsonLd(siteUrl, lang, [
             { name: t('nav.home'), path: '/' },
+            { name: t('nav.shop'), path: '/shop' },
             { name: p.name, path: pagePath },
           ]),
         ]}
       />
       <TrackViewItem slug={p.slug} name={p.name} price={p.price} />
       {back}
-      <div className="product-detail-grid">
-        <div className="product-detail-art">
-          <ProductImage image={p.image} size={220} tone={p.tone} name={p.name} priority />
+      <div className="pdp-grid">
+        <div className={`pdp-art tone-${p.tone}`}>
+          {p.badge && <Seal className="product-badge">{p.badge}</Seal>}
+          <div className="pdp-art-stage">
+            <ProductImage image={p.image} size={300} tone={p.tone} name={p.name} priority swing />
+          </div>
         </div>
-        <div className="product-detail-copy">
-          {p.kind === 'set' && <span className="eyebrow">{t('products.setBadge')}</span>}
-          {p.badge && <span className="product-badge static">{p.badge}</span>}
+        <div className="pdp-buy">
+          <p className="eyebrow">
+            <Lotus /> {p.kind === 'set' ? t('products.setBadge') : t('shop.filters.single')}
+          </p>
           <h1 className="page-title">{p.name}</h1>
-          <p className="product-detail-desc">{p.description}</p>
           <Price amount={p.price} className="product-price large" />
+          <p className="pdp-desc">{p.description}</p>
           {/* FR-CART-001 */}
           <div className="product-buy">
             <QuantityInput value={qty} onChange={setQty} />
             <AddToCart slug={p.slug} quantity={qty} className="btn btn-primary" />
           </div>
+          <p className="pdp-note">{t('pdp.checkoutNote')}</p>
+          <ul className="shop-perks pdp-perks">
+            {t('shop.perks').map((x) => (
+              <li key={x}>{x}</li>
+            ))}
+          </ul>
         </div>
       </div>
+      <Related slug={p.slug} />
     </section>
   )
 }

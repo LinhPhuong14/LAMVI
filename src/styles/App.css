@@ -3024,8 +3024,7 @@
 .product-card,
 .testimonial-card,
 .account-card,
-.order-summary,
-.product-detail-art {
+.order-summary {
   background: var(--g-bg);
   border: 1px solid var(--g-border);
   box-shadow: var(--g-shadow);
@@ -3034,8 +3033,7 @@
 }
 
 .product-card::before,
-.account-card::before,
-.product-detail-art::before {
+.account-card::before {
   border-radius: calc(var(--r-md) - 6px);
 }
 
@@ -3048,8 +3046,7 @@
   .product-card,
   .testimonial-card,
   .account-card,
-  .order-summary,
-  .product-detail-art {
+  .order-summary {
     background: var(--g-bg-strong);
   }
 }

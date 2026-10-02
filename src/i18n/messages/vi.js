@@ -136,7 +136,7 @@ export default {
     empty: 'Chưa có sản phẩm.',
     setBadge: 'Bộ sản phẩm',
     orderingSoon: 'Đặt hàng trực tuyến sẽ sớm ra mắt.',
-    backToCollection: '← Về bộ sưu tập',
+    backToCollection: '← Về cửa hàng',
     notFound: 'Không tìm thấy sản phẩm.',
   },
   price: {
@@ -481,6 +481,11 @@ export default {
       refunded: 'Đã hoàn tiền',
     },
     methods: { payos: 'Chuyển khoản (payOS)', cod: 'Thanh toán khi nhận hàng' },
+  },
+  pdp: {
+    related: 'Có thể bạn cũng thích',
+    viewAll: 'Xem tất cả',
+    checkoutNote: 'Bạn chọn mua tặng hay mua cho mình ở bước thanh toán.',
   },
   shop: {
     eyebrow: 'Cửa hàng',

@@ -100,9 +100,11 @@ describe('Ảnh chia sẻ & dữ liệu có cấu trúc (G-23, §23.2)', () => {
     const blocks = ldBlocks((await page('/products/den-nguyet')).html)
     expect(blocks.map((b) => b['@type'])).toEqual(['Product', 'BreadcrumbList'])
     const crumbs = blocks[1].itemListElement
-    expect(crumbs).toHaveLength(2)
+    // Trang chủ → Cửa hàng → sản phẩm (D-87)
+    expect(crumbs).toHaveLength(3)
     expect(crumbs[0]).toMatchObject({ position: 1, item: 'https://lamvi.test/' })
-    expect(crumbs[1]).toMatchObject({ position: 2, item: 'https://lamvi.test/products/den-nguyet' })
+    expect(crumbs[1]).toMatchObject({ position: 2, item: 'https://lamvi.test/shop' })
+    expect(crumbs[2]).toMatchObject({ position: 3, item: 'https://lamvi.test/products/den-nguyet' })
   })
 
   it('trang noindex không có og:image (không cần chia sẻ)', async () => {

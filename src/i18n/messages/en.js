@@ -132,7 +132,7 @@ export default {
     empty: 'No products yet.',
     setBadge: 'Set',
     orderingSoon: 'Online ordering is coming soon.',
-    backToCollection: '← Back to the collection',
+    backToCollection: '← Back to the shop',
     notFound: 'Product not found.',
   },
   price: {
@@ -467,6 +467,11 @@ export default {
       refunded: 'Refunded',
     },
     methods: { payos: 'Bank transfer (payOS)', cod: 'Cash on delivery' },
+  },
+  pdp: {
+    related: 'You may also like',
+    viewAll: 'View all',
+    checkoutNote: 'You pick “gift” or “for myself” at checkout.',
   },
   shop: {
     eyebrow: 'Shop',
