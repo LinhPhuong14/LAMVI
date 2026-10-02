@@ -16,9 +16,9 @@
 
 **Đã làm** (T-49): mailer HTTPS Resend/Brevo + mẫu thư vi/en/zh; đặt lại mật khẩu bằng token một lần (`generateLink` + `verifyOtp`), link `#t=`; refresh token cookie HttpOnly + `sameOriginOnly`; Google callback không để token trên URL; HIBP k-anonymity (fail-open); thư báo đổi mật khẩu + `audit_log`; sửa giới hạn tốc độ; thêm `mail` vào health IT. Cập nhật test cũ theo cơ chế mới, thêm test mailer/pwned/sessionCookie; subagent kiểm thử độc lập (T-11).
 
-**Quyết định không tự đưa ra**: xác minh email khi đăng ký (đảo D-63) → Q-39 chờ PO. Không làm SMS/OTP điện thoại, không làm TOTP admin (chưa có yêu cầu).
+**Quyết định không tự đưa ra**: xác minh email khi đăng ký (đảo D-63) → Q-39; PO chốt giữ D-63 (D-85, phiên sau). Không làm SMS/OTP điện thoại, không làm TOTP admin (chưa có yêu cầu).
 
-**Còn lại / cần người dùng**: đặt `MAIL_FROM` + `RESEND_API_KEY`/`BREVO_API_KEY` (và DNS SPF/DKIM nếu dùng Resend) ở Vercel (G-52); thử luồng quên mật khẩu trên Supabase thật; trả lời Q-39; rủi ro G-53, G-54.
+**Còn lại / cần người dùng**: đặt `MAIL_FROM` + `RESEND_API_KEY`/`BREVO_API_KEY` (và DNS SPF/DKIM nếu dùng Resend) ở Vercel (G-52); thử luồng quên mật khẩu trên Supabase thật; rủi ro G-53, G-54.
 
 ## 2026-10-02 — Rà soát CI/CD, bảo mật, hiệu năng (nhánh `fix/devops-hardening`)
 

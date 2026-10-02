@@ -276,5 +276,5 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
   5. **Mật khẩu đã lộ** bị từ chối (HIBP Pwned Passwords, k-anonymity, `Add-Padding`, timeout 1,5 s, **fail-open**). `PWNED_CHECK=0` để tắt.
   6. **Thư báo đổi mật khẩu** + `audit_log` (`account`/`password_changed`) sau đặt lại/đổi.
   7. Sửa lỗi cũ: giới hạn `reset`/`change` mật khẩu truyền `keys = () => []` nên **không đếm gì**; nay `reset` theo IP, `change` theo user id. Thêm nhóm `refresh` (120/5 phút/IP).
-- **Không làm** (có chủ đích): SMS/OTP điện thoại (không có kênh gửi); xác minh email khi đăng ký (đảo D-63 → Q-39, chờ PO); TOTP 2FA cho admin (Supabase MFA TOTP miễn phí nhưng chưa có yêu cầu nghiệp vụ).
+- **Không làm** (có chủ đích): SMS/OTP điện thoại (không có kênh gửi); xác minh email khi đăng ký (PO giữ D-63 → D-85); TOTP 2FA cho admin (Supabase MFA TOTP miễn phí nhưng chưa có yêu cầu nghiệp vụ).
 - **Hệ quả**: thêm biến `MAIL_FROM`, `RESEND_API_KEY`/`BREVO_API_KEY`, `PWNED_CHECK` (xem `deploy-vercel.md`). Không còn cần cấu hình Redirect URLs/SMTP cho luồng đặt lại mật khẩu. Rủi ro còn lại: G-52…G-54 trong `ba-spec.md`.
