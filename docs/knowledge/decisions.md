@@ -46,7 +46,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-47 | 2026-10-01 | Trang auth v2: sân khấu ảnh toàn màn hình + thẻ kính, tab chuyển, hiện/ẩn mật khẩu | Hiệu lực |
 | T-48 | 2026-10-02 | Phản hồi thêm vào giỏ: huy hiệu + tooltip trên navbar (`CartBubble`, `lastAdded` trong `CartProvider`); giỏ hàng v2; dashboard v2; khung chat Mây v2 | Hiệu lực |
 | T-49 | 2026-10-02 | Auth production không cần Supabase Pro/Twilio: thư do server gửi (Resend/Brevo), token đặt lại mật khẩu một lần, refresh token ở cookie HttpOnly, chặn mật khẩu đã lộ (HIBP) | Hiệu lực |
-| T-50 | 2026-10-02 | Trang Cửa hàng `/shop` + `ProductCards` dùng chung; navbar luôn ghim, thu nhỏ 20% khi cuộn (`transform`, không đổi layout) | Hiệu lực |
+| T-52 | 2026-10-02 | Trang Cửa hàng `/shop` + `ProductCards` dùng chung; navbar luôn ghim, thu nhỏ 20% khi cuộn (`transform`, không đổi layout) | Hiệu lực |
 
 ---
 
@@ -280,7 +280,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Không làm** (có chủ đích): SMS/OTP điện thoại (không có kênh gửi); xác minh email khi đăng ký (PO giữ D-63 → D-85); TOTP 2FA cho admin (Supabase MFA TOTP miễn phí nhưng chưa có yêu cầu nghiệp vụ).
 - **Hệ quả**: thêm biến `MAIL_FROM`, `RESEND_API_KEY`/`BREVO_API_KEY`, `PWNED_CHECK` (xem `deploy-vercel.md`). Không còn cần cấu hình Redirect URLs/SMTP cho luồng đặt lại mật khẩu. Rủi ro còn lại: G-52…G-54 trong `ba-spec.md`.
 
-### T-50 — Trang Cửa hàng và navbar thu nhỏ khi cuộn
+### T-52 — Trang Cửa hàng và navbar thu nhỏ khi cuộn
 
 - **Shop**: route `shop` (`ShopPage`), dữ liệu từ `useApi('/products')` nên SSR dùng chung khoá `/products` đã nạp sẵn cho footer (classifyPath giữ `other`). Lọc theo `p.kind` (`single`/`set`), nút lọc chỉ hiện loại có trong dữ liệu; sắp xếp phía client. `ProductCards` tách ra dùng chung với phần bộ sưu tập ở landing. Sitemap thêm `/shop` × 3 ngôn ngữ. Scene `shop` dùng `golden-sky`.
 - **Liên kết**: `#products` còn lại chỉ dành cho tour Mây (`TOUR_TARGETS`) trên landing; các nút "xem đèn" khác dùng `path('/shop')`.

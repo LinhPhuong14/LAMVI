@@ -1,4 +1,4 @@
-// Kiểm thử độc lập trang Cửa hàng /shop: SSR qua createWeb thật + sitemap (T-50, D-86)
+// Kiểm thử độc lập trang Cửa hàng /shop: SSR qua createWeb thật + sitemap (T-52, D-86)
 import { describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { createApp } from './app.js'

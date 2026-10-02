@@ -4,7 +4,7 @@
 
 **Mục tiêu người dùng**: thiết kế trang shop riêng, mọi nút xem đèn đi tới shop thay vì section; thêm "Xem thêm" ở bộ sưu tập; navbar luôn ở đầu trang, cuộn xuống thì thu nhỏ 20% và bo góc.
 
-**Đã làm**: D-86, T-50. `/shop` (lọc, sắp xếp, SSR, sitemap), `ProductCards` dùng chung, đổi link `#products` → `/shop`, nút "Xem thêm", navbar `scale(0.8)` + viên thuốc, bỏ tự ẩn khi cuộn. Sửa test sitemap, header tự ẩn, link `#products`.
+**Đã làm**: D-86, T-52. `/shop` (lọc, sắp xếp, SSR, sitemap), `ProductCards` dùng chung, đổi link `#products` → `/shop`, nút "Xem thêm", navbar `scale(0.8)` + viên thuốc, bỏ tự ẩn khi cuộn. Sửa test sitemap, header tự ẩn, link `#products`.
 
 **Diễn giải**: "bo góc 50%" làm thành bo tròn hoàn toàn (9999px) — bo 50% theo chiều rộng sẽ thành hình elip. PO xem lại nếu muốn khác.
 
