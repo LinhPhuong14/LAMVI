@@ -1,5 +1,13 @@
 # Nhật ký phiên
 
+## 2026-10-02 — Giỏ hàng, bộ sưu tập, tooltip giỏ, dashboard, chat Mây (nhánh `feat/cart-collection-may-dashboard`)
+
+**Mục tiêu người dùng**: thiết kế lại trang giỏ hàng; bỏ hai tab Mua tặng/Mua cho mình ở bộ sưu tập; thay dòng link giỏ hàng trên thẻ sản phẩm bằng phản hồi tốt hơn; thiết kế lại dashboard và khung chat Mây. Giữa chừng PO đổi ý về vị trí phản hồi: không gắn vào Mây, mà ở navbar có huy hiệu + tooltip.
+
+**Đã làm**: D-83, D-84, T-48. Tooltip + huy hiệu trên navbar; giỏ hàng v2; dashboard v2; chat Mây v2 (chip gợi ý, bong bóng, ô soạn). Sửa/xoá các test gắn với tab intent, link "Xem giỏ hàng" trên thẻ, văn bản "Giỏ hàng (n)".
+
+**Hạn chế**: Behance/Pinterest vẫn không xem được ảnh mẫu. Dark theme của dashboard chưa kiểm tra bằng mắt sau khi đổi thanh bên/tab.
+
 ## 2026-10-02 — Auth chuẩn production không cần Supabase Pro/Twilio (nhánh `feat/auth-production`)
 
 **Yêu cầu**: thiết kế phần auth chuẩn production cho web không có Supabase Pro và Twilio.

@@ -43,6 +43,8 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-44 | 2026-10-01 | Đăng nhập Google bằng OAuth 2.0 authorization code trực tiếp với Google (không dùng provider Google của Supabase); khung auth hai nửa `AuthShell` | Hiệu lực |
 | T-45 | 2026-10-01 | Token bo góc `--r-*`, kính mờ `--g-*`, chuyển trang bằng `PageTransition` (AnimatePresence, trang thoát đóng băng router context) | Hiệu lực |
 | T-46 | 2026-10-01 | Header kính mờ (ngoại lệ có chủ đích của quy tắc "dính không blur"), `AuthHeader`/`AuthFooter` riêng cho trang auth, nền auth bằng CSS, ảnh phong cảnh phủ mảng navy | Hiệu lực |
+| T-47 | 2026-10-01 | Trang auth v2: sân khấu ảnh toàn màn hình + thẻ kính, tab chuyển, hiện/ẩn mật khẩu | Hiệu lực |
+| T-48 | 2026-10-02 | Phản hồi thêm vào giỏ: huy hiệu + tooltip trên navbar (`CartBubble`, `lastAdded` trong `CartProvider`); giỏ hàng v2; dashboard v2; khung chat Mây v2 | Hiệu lực |
 | T-49 | 2026-10-02 | Auth production không cần Supabase Pro/Twilio: thư do server gửi (Resend/Brevo), token đặt lại mật khẩu một lần, refresh token ở cookie HttpOnly, chặn mật khẩu đã lộ (HIBP) | Hiệu lực |
 
 ---
@@ -257,6 +259,12 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Cache**: `immutable 1 năm` chỉ cho `dist/client/assets/*` (tên băm nội dung); tệp khác 1 giờ. `public/images/*` + favicon: 1 ngày + stale-while-revalidate 7 ngày, đặt ở `vercel.json`.
 - **Bảo mật**: `CRON_SECRET` so sánh bằng `timingSafeEqual` (trên SHA-256 của hai vế). Xoá `probe2.tmp.mjs` (tệp thăm dò tạm bị commit nhầm).
 
+### T-48 — Giỏ hàng, tooltip navbar, dashboard và chat Mây v2
+
+- **Phản hồi thêm vào giỏ**: `CartProvider.add` đặt `lastAdded = {slug, quantity, id}` khi thành công (`id` tăng để thêm cùng món vẫn hiện lại); `dismissAdded` xoá. `CartBubble` (trong `CartLink` ở `SiteHeader`) đọc món từ `cart.items` — nên server `cart/service.js` trả thêm `product.image`. Huy hiệu `.nav-cart-badge` có `key={lastAdded.id}` để animation nảy chạy lại. `SiteHeader` không cho header lui đi (`is-hidden`) khi `lastAdded` còn. Accessible name của link giỏ hàng là `aria-label` "Giỏ hàng (n)".
+- **Vị trí**: tooltip `position: absolute` dưới nút; ≤640px trải ngang bám theo `.nav` (đã định vị). Không dùng `position: fixed` vì `.cart-bubble` có `backdrop-filter` (test CSS cấm fixed + blur; ngoại lệ duy nhất là `.nav`).
+- **Giỏ hàng**: `CartPage` v2 (`Steps`, `.cart-layout`, `.cart-summary` sticky **không** blur). **Dashboard**: ghi đè trong `@media (min-width: 961px)`; thanh bên sticky không blur; `.dash-stat` cho phép blur (cuộn cùng trang). **Chat**: `MayChat` thêm `may-chips`, ô soạn `.may-compose`, nút gửi icon (`aria-label` = "Gửi"); panel cố định nên không blur.
+- **Bẫy**: `.cart-bubble` có `position: fixed` ở media hẹp + blur làm test CSS hỏng; tooltip nay luôn `absolute`.
 ### T-49 — Auth production trên gói miễn phí (không Supabase Pro, không Twilio)
 
 - **Bối cảnh**: gói Free của Supabase gửi thư xác thực/đặt lại mật khẩu bằng SMTP dùng chung — chỉ tới thành viên nhóm và vài thư/giờ, nên "Quên mật khẩu" không dùng được ở production; SMS/OTP điện thoại cần Twilio (trả phí). Token phiên ở `localStorage` (T-10, G-17) lộ khi có XSS.

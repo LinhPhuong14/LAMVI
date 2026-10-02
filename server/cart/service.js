@@ -41,6 +41,7 @@ export function createCartService({ repo }) {
           kind: hideName ? null : p.kind,
           tone: hideName ? null : p.tone,
           badge: hideName ? null : p.badge,
+          image: hideName ? null : (p.image ?? null),
           price: available ? p.price : null,
         },
         lineTotal: available ? p.price * quantity : null,

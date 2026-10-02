@@ -190,6 +190,15 @@ Quy tắc:
 | Hoạ tiết Việt | Tự vẽ chữ Hán, rồng, mái cung điện Trung Hoa lên giao diện |
 | Hiệu ứng tắt khi giảm chuyển động | Animation bằng `filter`/`box-shadow` lặp liên tục |
 
+## 11b. Giỏ hàng, tooltip, dashboard, chat Mây (v0.26, T-48)
+
+| Thành phần | Quy tắc |
+|---|---|
+| Thêm vào giỏ | Không chèn link vào thẻ sản phẩm. Nút đổi "✓ Đã thêm" 1,8s; huy hiệu số lượng trên navbar nảy lên; tooltip dưới nút giỏ hàng (kính, mũi tên chỉ lên, thanh đếm ngược 6s) |
+| Trang giỏ hàng | 3 bước dạng viên thuốc; mỗi món một thẻ kính (ảnh trên nền quầng hoè); tóm tắt đơn sticky bên phải (không blur); khối "Mây nhắc nhỏ" nét đứt |
+| Dashboard (≥961px) | Thanh bên nổi bo 28px, tab chọn = viên thuốc son đặc (điểm nhấn son duy nhất); hero có hai nút; ba thẻ số liệu rời, dải tông mép trên (hoè / son / chàm) |
+| Chat Mây | Cửa sổ bo 28px; bong bóng khách = gradient son, Mây = giấy trắng; gợi ý câu hỏi dạng chip; ô soạn viên thuốc + nút gửi tròn; "đang soạn" = ba chấm |
+
 ## 11a. Checkout và trang đơn hàng (v0.19)
 
 Hai trang mới dùng lại đúng hệ khung có sẵn, không tạo kiểu riêng:

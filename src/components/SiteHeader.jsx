@@ -4,6 +4,7 @@ import { useMotionValueEvent, useScroll } from 'framer-motion'
 import { LOCALES, localePath, splitLocale, useI18n } from '../i18n/index.js'
 import { AuthContext } from '../auth/context.js'
 import { useCart } from '../cart/context.js'
+import CartBubble from '../cart/CartBubble.jsx'
 import { Seal } from './Motifs'
 
 const SECTIONS = ['story', 'artisan', 'products', 'lookbook', 'qr', 'faq']
@@ -30,14 +31,23 @@ export function LanguageSwitcher() {
   )
 }
 
+// Giỏ hàng trên navbar: huy hiệu số lượng (nảy lên khi thêm món) + tooltip xác nhận gắn dưới nút (D-83)
 function CartLink() {
   const { t, path } = useI18n()
-  const { cart } = useCart()
+  const { cart, lastAdded } = useCart()
   const n = cart?.itemCount ?? 0
   return (
-    <Link to={path('/cart')} className="nav-cart">
-      {n > 0 ? t('cart.navCount', { n }) : t('cart.nav')}
-    </Link>
+    <span className="nav-cart-wrap">
+      <Link to={path('/cart')} className="nav-cart" aria-label={n > 0 ? t('cart.navCount', { n }) : t('cart.nav')}>
+        <span aria-hidden="true">{t('cart.nav')}</span>
+        {n > 0 && (
+          <span key={lastAdded?.id ?? 0} className="nav-cart-badge" aria-hidden="true">
+            {n}
+          </span>
+        )}
+      </Link>
+      <CartBubble />
+    </span>
   )
 }
 
@@ -56,7 +66,10 @@ function useHeaderState() {
 
 export default function SiteHeader() {
   const { t, path } = useI18n()
-  const { hidden, scrolled } = useHeaderState()
+  const { hidden: scrolledAway, scrolled } = useHeaderState()
+  const { lastAdded } = useCart()
+  // Đang hiện tooltip giỏ hàng thì không để header lui đi, nếu không tooltip biến mất cùng header
+  const hidden = scrolledAway && !lastAdded
   const auth = useContext(AuthContext)
   return (
     <header className={`nav${hidden ? ' is-hidden' : ''}${scrolled ? ' is-scrolled' : ''}`}>

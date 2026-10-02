@@ -12,7 +12,7 @@ import { faqVi, productsVi } from '../test/fixtures.js'
 import Lantern from './Lantern.jsx'
 import { VerticalSeal } from './Motifs.jsx'
 
-const MESSAGES = { vi: viMsg, en: enMsg, zh: zhMsg }
+const _MESSAGES = { vi: viMsg, en: enMsg, zh: zhMsg }
 const PREFIX = { vi: '/', en: '/en', zh: '/zh' }
 const handlers = {
   'GET /products': () => ({ body: productsVi }),
@@ -204,21 +204,6 @@ describe('Trang chủ sau đổi giao diện', () => {
     expect(container.querySelector('.story-cloud')).toBeNull()
     expect(container.querySelector('#story .folk-cloud')).toBeNull()
     expect(container.querySelector('[class*="postmark"]')).toBeNull()
-  })
-
-  it.each(['vi', 'en', 'zh'])('%s: Mua tặng / Mua cho mình aria-pressed + .intent-pill', async (lang) => {
-    mockApi(handlers)
-    const { container } = renderAt(PREFIX[lang])
-    const p = MESSAGES[lang].products
-    const pill = container.querySelector('.intent-toggle .intent-pill')
-    expect(pill).toHaveAttribute('aria-hidden', 'true')
-    const gift = screen.getByRole('button', { name: p.gift })
-    const self = screen.getByRole('button', { name: p.self })
-    expect(gift).toHaveAttribute('aria-pressed', 'true')
-    fireEvent.click(self)
-    expect(self).toHaveAttribute('aria-pressed', 'true')
-    expect(gift).toHaveAttribute('aria-pressed', 'false')
-    expect(container.querySelector('.intent-toggle.is-self')).not.toBeNull()
   })
 
   it('FAQ vẫn đúng aria-expanded', async () => {

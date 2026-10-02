@@ -334,7 +334,7 @@ describe('CSS giao diện tối', () => {
   })
 
   it('backdrop-filter không bao giờ trên .dash-side/.dash-tabs và chỉ trên phần tử cuộn cùng trang', () => {
-    const allowed = /^\.dash-(top|stats|card|promo)$/
+    const allowed = /^\.dash-(top|stats|stat|card|promo)( \+ \.dash-stat)?$/
     for (const m of allCss.matchAll(/([^{}]+)\{[^{}]*backdrop-filter[^{}]*\}/g)) {
       const sels = m[1].split(',').map((s) => s.trim())
       for (const s of sels) {
