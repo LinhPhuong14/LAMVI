@@ -137,8 +137,8 @@ describe('D-37 — link nội bộ giữ tiền tố ngôn ngữ', () => {
       const card = cardLink.closest('.product-card')
       const header = document.querySelector('header')
       expect(hrefOf(cardLink)).toBe(`${p}/products/den-nguyet`)
-      // FR-CART-001: nút trên thẻ là "Tặng ngay/Thêm vào giỏ"; link chi tiết là tên sản phẩm
-      expect(within(card).getByRole('button', { name: MESSAGES[lang].cart.giftAdd })).toBeInTheDocument()
+      // FR-CART-001: nút trên thẻ là "Thêm vào giỏ" (D-83: không còn phân Tặng/Mua cho mình ở bộ sưu tập); link chi tiết là tên sản phẩm
+      expect(within(card).getByRole('button', { name: MESSAGES[lang].cart.add })).toBeInTheDocument()
       expect(hrefOf(within(header).getByRole('link', { name: MESSAGES[lang].cart.nav }))).toBe(`${p}/cart`)
 
       expect(hrefOf(header.querySelector('.nav-mark'))).toBe(home)
@@ -162,12 +162,13 @@ describe('D-37 — link nội bộ giữ tiền tố ngôn ngữ', () => {
     })
   }
 
-  it('lưới sản phẩm: chuyển Mua cho mình → nút đổi thành "Thêm vào giỏ", link tên giữ tiền tố', async () => {
+  it('lưới sản phẩm: một bộ sưu tập duy nhất (không tab Tặng/Mua cho mình), link tên giữ tiền tố', async () => {
     mockApi(handlers)
     renderAt('/en')
     const link = await screen.findByText('Đèn Nguyệt EN', { selector: '.product-card a' })
     const card = link.closest('.product-card')
-    fireEvent.click(screen.getByRole('button', { name: enMsg.products.self }))
+    expect(document.querySelector('.intent-toggle')).toBeNull()
+    expect(screen.getByText(enMsg.products.collectionCopy)).toBeInTheDocument()
     expect(within(card).getByRole('button', { name: enMsg.cart.add })).toBeInTheDocument()
     expect(hrefOf(link)).toBe('/en/products/den-nguyet')
   })

@@ -9,6 +9,7 @@ import { createPayosClient } from './adapters/payos.js'
 import { createOrderService } from './orders/service.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { loadConfig } from './config.js'
+import { createConsoleMailer, createMailer } from './mail/mailer.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
 import { createMemoryAuth } from './adapters/memory/auth.js'
 import { createSupabaseRepo } from './adapters/supabase/repo.js'
@@ -63,6 +64,10 @@ const payos = createPayosClient(config.payos)
 if (!payos) console.warn('[api] Thiếu biến PAYOS_* — chỉ nhận thanh toán COD')
 const orders = createOrderService({ repo, payos })
 
+// T-49: thư giao dịch. Production phải có MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY; dev (bộ nhớ) in ra console.
+const mailer = createMailer(config.mail) ?? (config.useSupabase ? null : createConsoleMailer())
+if (!mailer) console.warn('[api] Thiếu MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY — "Quên mật khẩu" không gửi được thư')
+
 const web = process.env.API_ONLY === '1' ? undefined : await createWeb({ repo, config, dev, maintenance })
 
 metrics.start()
@@ -74,7 +79,7 @@ for (const sig of ['SIGTERM', 'SIGINT']) {
   })
 }
 
-export const app = createApp({ repo, auth, storage, web, config, metrics, maintenance, may, payos, orders, dev })
+export const app = createApp({ repo, auth, storage, web, config, metrics, maintenance, may, payos, orders, mailer, dev })
 
 // T-33: trên Vercel, `api/index.js` dùng `app` làm hàm serverless — không tự listen
 if (!process.env.VERCEL) {

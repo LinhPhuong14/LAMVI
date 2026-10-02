@@ -2,15 +2,35 @@
 
 ## 2026-10-02 — Rà RLS và độ trễ Mây (nhánh `fix/rls-openai-latency`)
 
-**Đã làm**: T-49 — migration `20261002000009_harden_rls.sql`; song song hoá DB/tool trong `server/may/service.js`; `max_tokens` 350; test `server/may.latency.extra.test.js`.
+**Đã làm**: T-51 — migration `20261002000009_harden_rls.sql`; song song hoá DB/tool trong `server/may/service.js`; `max_tokens` 350; test `server/may.latency.extra.test.js`.
 
 **Còn lại / cần người dùng**: chạy migration trên Supabase; uỷ quyền Supabase MCP để chạy advisor và đối chiếu RLS thật; đo p50/p95 `/api/may/chat` trước/sau ở dashboard IT.
+
+## 2026-10-02 — Giỏ hàng, bộ sưu tập, tooltip giỏ, dashboard, chat Mây (nhánh `feat/cart-collection-may-dashboard`)
+
+**Mục tiêu người dùng**: thiết kế lại trang giỏ hàng; bỏ hai tab Mua tặng/Mua cho mình ở bộ sưu tập; thay dòng link giỏ hàng trên thẻ sản phẩm bằng phản hồi tốt hơn; thiết kế lại dashboard và khung chat Mây. Giữa chừng PO đổi ý về vị trí phản hồi: không gắn vào Mây, mà ở navbar có huy hiệu + tooltip.
+
+**Đã làm**: D-83, D-84, T-48. Tooltip + huy hiệu trên navbar; giỏ hàng v2; dashboard v2; chat Mây v2 (chip gợi ý, bong bóng, ô soạn). Sửa/xoá các test gắn với tab intent, link "Xem giỏ hàng" trên thẻ, văn bản "Giỏ hàng (n)".
+
+**Hạn chế**: Behance/Pinterest vẫn không xem được ảnh mẫu. Dark theme của dashboard chưa kiểm tra bằng mắt sau khi đổi thanh bên/tab.
+
+## 2026-10-02 — Auth chuẩn production không cần Supabase Pro/Twilio (nhánh `feat/auth-production`)
+
+**Yêu cầu**: thiết kế phần auth chuẩn production cho web không có Supabase Pro và Twilio.
+
+**Phát hiện**: auth đã có nhiều thứ (email+mật khẩu, Google, rate limit, đổi mật khẩu). Lỗ hổng thật khi không có gói trả phí: (1) thư đặt lại mật khẩu đi qua SMTP dùng chung của Supabase Free — chỉ tới thành viên nhóm, vài thư/giờ → "Quên mật khẩu" hỏng ở production; (2) refresh token ở `localStorage` (G-17); (3) bộ giới hạn `reset`/`change` mật khẩu truyền `keys = () => []` nên không đếm gì; (4) không chặn mật khẩu đã lộ.
+
+**Đã làm** (T-49): mailer HTTPS Resend/Brevo + mẫu thư vi/en/zh; đặt lại mật khẩu bằng token một lần (`generateLink` + `verifyOtp`), link `#t=`; refresh token cookie HttpOnly + `sameOriginOnly`; Google callback không để token trên URL; HIBP k-anonymity (fail-open); thư báo đổi mật khẩu + `audit_log`; sửa giới hạn tốc độ; thêm `mail` vào health IT. Cập nhật test cũ theo cơ chế mới, thêm test mailer/pwned/sessionCookie; subagent kiểm thử độc lập (T-11).
+
+**Quyết định không tự đưa ra**: xác minh email khi đăng ký (đảo D-63) → Q-39; PO chốt giữ D-63 (D-85, phiên sau). Không làm SMS/OTP điện thoại, không làm TOTP admin (chưa có yêu cầu).
+
+**Còn lại / cần người dùng**: đặt `MAIL_FROM` + `RESEND_API_KEY`/`BREVO_API_KEY` (và DNS SPF/DKIM nếu dùng Resend) ở Vercel (G-52); thử luồng quên mật khẩu trên Supabase thật; rủi ro G-53, G-54.
 
 ## 2026-10-02 — Rà soát CI/CD, bảo mật, hiệu năng (nhánh `fix/devops-hardening`)
 
 **Phát hiện**: repo chưa có CI; `npm audit` sạch; header bảo mật/CSP/rate limit đã đủ; `immutable 1 năm` áp cho cả tệp không băm; ảnh `public/` chỉ có cache mặc định của Vercel; `CRON_SECRET` so sánh bằng `!==`; `probe2.tmp.mjs` bị commit; `deploy-vercel.md` ghi CSP nonce trong khi code dùng hash.
 
-**Đã làm**: T-48 — CI + Dependabot, cache tĩnh đúng loại, `timingSafeEqual`, xoá tệp tạm, sửa tài liệu.
+**Đã làm**: T-50 — CI + Dependabot, cache tĩnh đúng loại, `timingSafeEqual`, xoá tệp tạm, sửa tài liệu.
 
 **Còn lại / cần người dùng**: bật branch protection yêu cầu job `lint · test · build`; xem xét RLS Supabase bằng `supabase` MCP khi đã uỷ quyền (phiên này chưa xác thực được).
 

@@ -74,7 +74,7 @@ describe('Google OAuth (D-78)', () => {
     expect(res.headers.location).toBe('https://moc.test/login?error=GOOGLE_UNAVAILABLE')
   })
 
-  it('callback hợp lệ: tạo tài khoản + hồ sơ, chuyển về /auth/callback kèm phiên trong fragment', async () => {
+  it('callback hợp lệ: tạo tài khoản + hồ sơ, đặt cookie phiên, chuyển về /auth/callback (không token trên URL)', async () => {
     const app = makeApp()
     const { url, cookie } = await start(app, '&next=/checkout')
     stubGoogle()
@@ -84,14 +84,20 @@ describe('Google OAuth (D-78)', () => {
     expect(res.status).toBe(302)
     const loc = new URL(res.headers.location)
     expect(loc.pathname).toBe('/en/auth/callback')
-    const { session, next } = JSON.parse(Buffer.from(loc.hash.slice(3), 'base64url').toString())
-    expect(next).toBe('/checkout')
-    expect(session.user.email).toBe('lan@example.com')
+    // T-49: không có token trên URL; chỉ `next`
+    expect(loc.hash).toBe('')
+    expect(loc.search).toBe('?next=%2Fcheckout')
     expect(stubGoogle.last.body).toContain('client_secret=secret')
-    const me = await request(app).get('/api/me').set('Authorization', `Bearer ${session.accessToken}`)
+    // cookie flow bị xoá sau khi dùng; cookie phiên HttpOnly được đặt
+    const cookies = res.headers['set-cookie']
+    expect(cookies.find((c) => c.startsWith('lamvi_gauth='))).toContain('Max-Age=0')
+    const rt = cookies.find((c) => c.startsWith('lamvi_rt='))
+    expect(rt).toMatch(/HttpOnly; SameSite=Lax; Secure/)
+    // trang /auth/callback đổi cookie lấy access token
+    const session = await request(app).post('/api/auth/refresh').set('Cookie', rt.split(';')[0])
+    expect(session.body.user.email).toBe('lan@example.com')
+    const me = await request(app).get('/api/me').set('Authorization', `Bearer ${session.body.accessToken}`)
     expect(me.body.profile.fullName).toBe('Lan Phạm')
-    // cookie bị xoá sau khi dùng
-    expect(res.headers['set-cookie'][0]).toContain('Max-Age=0')
   })
 
   it('đăng nhập lại cùng email → cùng tài khoản, không ghi đè hồ sơ', async () => {
@@ -102,7 +108,8 @@ describe('Google OAuth (D-78)', () => {
       const res = await request(app)
         .get(`/api/auth/google/callback?code=abc&state=${url.searchParams.get('state')}`)
         .set('Cookie', cookie)
-      return JSON.parse(Buffer.from(new URL(res.headers.location).hash.slice(3), 'base64url').toString()).session.user.id
+      const rt = res.headers['set-cookie'].find((c) => c.startsWith('lamvi_rt=')).split(';')[0]
+      return (await request(app).post('/api/auth/refresh').set('Cookie', rt)).body.user.id
     }
     expect(await run()).toBe(await run())
   })
@@ -155,7 +162,6 @@ describe('Google OAuth (D-78)', () => {
     const res = await request(app)
       .get(`/api/auth/google/callback?code=a&state=${url.searchParams.get('state')}`)
       .set('Cookie', cookie)
-    const { next } = JSON.parse(Buffer.from(new URL(res.headers.location).hash.slice(3), 'base64url').toString())
-    expect(next).toBeNull()
+    expect(new URL(res.headers.location).search).toBe('')
   })
 })

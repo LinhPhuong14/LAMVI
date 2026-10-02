@@ -2,10 +2,20 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { api, ApiError } from '../api/client.js'
 import { AuthContext, loadSession, saveSession } from './context.js'
 
-const pickSession = (s) => ({ accessToken: s.accessToken, refreshToken: s.refreshToken, expiresAt: s.expiresAt, user: s.user })
+// T-49: refresh token nằm trong cookie HttpOnly của server — JavaScript không bao giờ giữ nó
+const pickSession = (s) => ({ accessToken: s.accessToken, expiresAt: s.expiresAt, user: s.user })
+
+// Phiên cũ (trước T-49) có refreshToken trong localStorage: bỏ đi ngay
+function initialSession() {
+  const s = loadSession()
+  if (!s?.refreshToken) return s
+  const clean = pickSession(s)
+  saveSession(clean)
+  return clean
+}
 
 export default function AuthProvider({ children }) {
-  const [session, setSession] = useState(loadSession)
+  const [session, setSession] = useState(initialSession)
   const sessionRef = useRef(session)
   const refreshing = useRef(null)
 
@@ -24,17 +34,9 @@ export default function AuthProvider({ children }) {
     [update],
   )
 
-  // D-78: phiên do server cấp sau khi đăng nhập Google (trang /auth/callback)
-  const acceptSession = useCallback((s) => update(pickSession(s)), [update])
-
-  // Gộp các lần refresh đồng thời thành một
+  // Gộp các lần refresh đồng thời thành một. Server đọc refresh token từ cookie HttpOnly.
   const refresh = useCallback(() => {
-    const current = sessionRef.current
-    if (!current?.refreshToken) {
-      if (current) update(null)
-      return Promise.reject(new ApiError(401, 'UNAUTHORIZED'))
-    }
-    refreshing.current ??= api('/auth/refresh', { method: 'POST', body: { refreshToken: current.refreshToken } })
+    refreshing.current ??= api('/auth/refresh', { method: 'POST' })
       .then((s) => {
         update(pickSession(s))
         return s
@@ -69,12 +71,13 @@ export default function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     const token = sessionRef.current?.accessToken
     update(null)
-    if (token) await api('/auth/logout', { method: 'POST', token }).catch(() => {})
+    // Luôn gọi: cookie HttpOnly chỉ server xoá được, kể cả khi access token đã hết hạn
+    await api('/auth/logout', { method: 'POST', token }).catch(() => {})
   }, [update])
 
   const value = useMemo(
-    () => ({ session, user: session?.user ?? null, login, acceptSession, logout, authedApi }),
-    [session, login, acceptSession, logout, authedApi],
+    () => ({ session, user: session?.user ?? null, login, refreshSession: refresh, logout, authedApi }),
+    [session, login, refresh, logout, authedApi],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

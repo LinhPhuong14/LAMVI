@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import { HttpError } from '../errors.js'
 import { AuthError } from '../adapters/authErrors.js'
-import { requireAuth } from '../middleware/auth.js'
+import { bearerToken, requireAuth } from '../middleware/auth.js'
+import { clearRefreshCookie, issueSession, readRefreshCookie, sameOriginOnly, setRefreshCookie } from '../middleware/sessionCookie.js'
+import { passwordChangedMail, recoveryMail } from '../mail/templates.js'
 import { byIpAndEmail, rateLimit } from '../middleware/rateLimit.js'
 import { DEFAULT_HASH_SALT } from '../config.js'
 import { COOKIE, authorizeUrl, exchangeCode, googleEnabled, newFlow, openState, readCookie, sealState } from '../google.js'
@@ -22,6 +24,7 @@ const STATUS = {
   RATE_LIMITED: 429,
   PASSWORD_TOO_SHORT: 400,
   INVALID_EMAIL: 400,
+  INVALID_RESET_TOKEN: 400,
 }
 
 const FIELD_ERRORS = { PASSWORD_TOO_SHORT: 'password', INVALID_EMAIL: 'email' }
@@ -47,10 +50,44 @@ function assertValid(errors) {
 const body = (req) => (req.body && typeof req.body === 'object' ? req.body : {})
 
 // FR-ACC-001 (D-36, D-42): đăng ký, đăng nhập, đăng xuất, quên mật khẩu; hồ sơ tài khoản
-export function authRouter({ repo, auth, config }) {
+export function authRouter({ repo, auth, config, mailer = null, pwned = null }) {
   const r = Router()
   const guard = requireAuth(auth)
   const siteUrl = (lang, path) => `${config.publicSiteUrl}${localePath(lang, path)}`
+  const sameOrigin = sameOriginOnly(config)
+
+  // T-49: thư giao dịch là việc phụ — lỗi gửi chỉ ghi log, không làm hỏng thao tác chính và không
+  // để lộ email có tài khoản hay không
+  async function notify(to, mail) {
+    if (!mailer) {
+      console.warn('[mail] Chưa cấu hình MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY — không gửi được thư')
+      return false
+    }
+    try {
+      await mailer.send({ to, ...mail })
+      return true
+    } catch (err) {
+      console.error('[mail]', err.message)
+      return false
+    }
+  }
+
+  // NFR-AUD-001: sự kiện bảo mật của tài khoản (không lưu mật khẩu/token)
+  async function audit(userId, action) {
+    try {
+      await repo.appendAuditLog?.([{ actorId: userId, actorRole: 'user', entity: 'account', entityId: userId, action }])
+    } catch (err) {
+      console.error('[auth] audit', err.message)
+    }
+  }
+
+  // Mật khẩu hợp lệ về độ dài và chưa lộ trong rò rỉ công khai (T-49). Kiểm tra TRƯỚC khi tiêu
+  // thụ token đặt lại để mật khẩu yếu không làm cháy link.
+  async function assertPasswordAcceptable(password) {
+    const err = validatePassword(password)
+    if (err) assertValid({ password: err })
+    if (pwned && (await pwned(password))) assertValid({ password: 'PASSWORD_BREACHED' })
+  }
 
   // G-20: chống dò mật khẩu và spam. Ngưỡng ở config (loadConfig). Đếm theo cả IP và email để
   // một IP đổi email liên tục vẫn không dò được một tài khoản cụ thể.
@@ -69,9 +106,11 @@ export function authRouter({ repo, auth, config }) {
   const registerLimit = limit('register', byIpAndEmail)
   const forgotLimit = limit('forgot', byIpAndEmail)
   // Hai luồng đổi mật khẩu đếm riêng: dùng chung một bộ đếm thì người đặt lại mật khẩu bị chặn
-  // vì người khác cùng IP vừa đổi mật khẩu.
-  const resetLimit = limit('password', () => [], { name: 'reset' })
-  const changeLimit = limit('password', () => [], { name: 'change' })
+  // vì người khác cùng IP vừa đổi mật khẩu. Đổi mật khẩu đếm theo tài khoản (kể cả khi access token
+  // bị lấy cắp, kẻ gian không dò được mật khẩu hiện tại bằng cách thử liên tục).
+  const resetLimit = limit('password', undefined, { name: 'reset' })
+  const changeLimit = limit('password', (req) => [`u:${req.user.id}`], { name: 'change' })
+  const refreshLimit = limit('refresh', undefined, { name: 'refresh' })
 
   r.post('/auth/register', registerLimit, async (req, res) => {
     const b = body(req)
@@ -85,11 +124,10 @@ export function authRouter({ repo, auth, config }) {
     if (emailErr) errors.email = emailErr
     if (pwErr) errors.password = pwErr
     assertValid(errors)
+    await assertPasswordAcceptable(b.password)
 
     const lang = values.preferredLocale
-    const result = await call(() =>
-      auth.signUp({ email, password: b.password, redirectTo: siteUrl(lang, '/login') }),
-    )
+    const result = await call(() => auth.signUp({ email, password: b.password }))
     // Phòng hờ adapter trả lại user đã có — không ghi đè hồ sơ của chủ email
     const existing = await repo.getProfile(result.user.id)
     if (!existing) await repo.upsertProfile({
@@ -107,7 +145,7 @@ export function authRouter({ repo, auth, config }) {
     if (validateEmail(email) || typeof b.password !== 'string' || !b.password) {
       throw new HttpError(401, 'INVALID_CREDENTIALS', 'Sai email hoặc mật khẩu')
     }
-    res.json(await call(() => auth.signIn({ email, password: b.password })))
+    res.json(issueSession(res, config, await call(() => auth.signIn({ email, password: b.password }))))
   })
 
   // D-78: đăng nhập Google. Nút chỉ hiện khi có GOOGLE_CLIENT_ID/SECRET.
@@ -121,15 +159,15 @@ export function authRouter({ repo, auth, config }) {
   r.get('/auth/google/start', googleLimit, (req, res) => {
     const lang = normalizeLang(req.query.lang)
     if (!googleEnabled(config)) return res.redirect(302, loginUrl(lang, '?error=GOOGLE_UNAVAILABLE'))
-    const next = typeof req.query.next === 'string' && /^\/(?!\/)/.test(req.query.next) ? req.query.next : null
+    const next = typeof req.query.next === 'string' && /^\/(?![/\\])[^\t\r\n]*$/.test(req.query.next) ? req.query.next : null
     const flow = newFlow({ next, lang })
-    res.setHeader('Set-Cookie', `${COOKIE}=${sealState(flow, secret)}; Max-Age=600; ${cookieAttrs}`)
+    res.append('Set-Cookie', `${COOKIE}=${sealState(flow, secret)}; Max-Age=600; ${cookieAttrs}`)
     res.redirect(302, authorizeUrl(config, flow))
   })
 
   r.get('/auth/google/callback', googleLimit, async (req, res) => {
     const flow = openState(readCookie(req, COOKIE), secret)
-    res.setHeader('Set-Cookie', `${COOKIE}=; Max-Age=0; ${cookieAttrs}`)
+    res.append('Set-Cookie', `${COOKIE}=; Max-Age=0; ${cookieAttrs}`)
     const lang = flow?.lang ?? normalizeLang(req.query.lang)
     const fail = (code) => res.redirect(302, loginUrl(lang, `?error=${code}`))
     if (!flow || !googleEnabled(config) || req.query.state !== flow.state) return fail('GOOGLE_FAILED')
@@ -141,56 +179,83 @@ export function authRouter({ repo, auth, config }) {
       if (!(await repo.getProfile(session.user.id))) {
         await repo.upsertProfile({ id: session.user.id, fullName: g.name, preferredLocale: lang })
       }
-      // Phiên đi trong fragment (không gửi lên server, không vào log); trang /auth/callback lưu rồi chuyển hướng
-      const payload = Buffer.from(JSON.stringify({ session, next: flow.next })).toString('base64url')
-      res.redirect(302, siteUrl(lang, '/auth/callback') + `#s=${payload}`)
+      // T-49: không đưa token lên URL. Refresh token nằm trong cookie HttpOnly; trang /auth/callback
+      // gọi /auth/refresh để lấy access token. `next` đã được kiểm là đường dẫn nội bộ ở /start.
+      setRefreshCookie(res, config, session.refreshToken)
+      res.redirect(302, siteUrl(lang, '/auth/callback') + (flow.next ? `?next=${encodeURIComponent(flow.next)}` : ''))
     } catch (err) {
       console.error('[auth] google', err.message)
       fail('GOOGLE_FAILED')
     }
   })
 
-  r.post('/auth/refresh', async (req, res) => {
-    const { refreshToken } = body(req)
-    if (typeof refreshToken !== 'string' || !refreshToken) throw new HttpError(401, 'UNAUTHORIZED')
-    res.json(await call(() => auth.refresh(refreshToken)))
+  // T-49: refresh token chỉ đọc từ cookie HttpOnly; trả access token mới và xoay vòng cookie
+  r.post('/auth/refresh', sameOrigin, refreshLimit, async (req, res) => {
+    const refreshToken = readRefreshCookie(req)
+    if (!refreshToken) throw new HttpError(401, 'UNAUTHORIZED')
+    try {
+      res.json(issueSession(res, config, await call(() => auth.refresh(refreshToken))))
+    } catch (err) {
+      // Refresh token bị từ chối → xoá cookie hỏng; lỗi mạng/5xx giữ nguyên để thử lại
+      if (err.status === 401) clearRefreshCookie(res, config)
+      throw err
+    }
   })
 
-  r.post('/auth/logout', guard, async (req, res) => {
-    await call(() => auth.signOut(req.accessToken))
+  // Đăng xuất luôn xoá cookie, kể cả khi access token đã hết hạn (khi đó đổi cookie lấy token để thu hồi)
+  r.post('/auth/logout', sameOrigin, async (req, res) => {
+    clearRefreshCookie(res, config)
+    let token = bearerToken(req)
+    if (!token || !(await auth.getUser(token).catch(() => null))) {
+      const refreshToken = readRefreshCookie(req)
+      token = null
+      if (refreshToken) token = (await auth.refresh(refreshToken).catch(() => null))?.accessToken ?? null
+    }
+    if (token) await call(() => auth.signOut(token))
     res.status(204).end()
   })
 
-  // Luôn trả 202 để không tiết lộ email có tồn tại hay không
+  // Luôn trả 202 để không tiết lộ email có tồn tại hay không. Thư do server gửi (mailer), không
+  // phụ thuộc SMTP của Supabase (T-49).
   r.post('/auth/forgot-password', forgotLimit, async (req, res) => {
     const email = normalizeEmail(body(req).email)
     const emailErr = validateEmail(email)
     if (emailErr) assertValid({ email: emailErr })
     const lang = normalizeLang(req.query.lang)
-    await call(() => auth.sendPasswordReset(email, siteUrl(lang, '/reset-password')))
+    try {
+      const token = await auth.createRecoveryToken(email)
+      if (token) {
+        const url = `${siteUrl(lang, '/reset-password')}#t=${encodeURIComponent(token)}`
+        await notify(email, recoveryMail({ lang, url }))
+      }
+    } catch (err) {
+      console.error('[auth] createRecoveryToken', err.code ?? err.message)
+    }
     res.status(202).json({ ok: true })
   })
 
-  // Token khôi phục (từ link email) gửi qua Authorization: Bearer.
-  // G-18: CHỈ nhận token khôi phục. Trước đây mọi access token hợp lệ đều đổi được mật khẩu, nên
-  // một phiên đang mở (máy dùng chung, token bị lấy cắp) đổi được mật khẩu mà không cần biết mật
-  // khẩu cũ. Muốn đổi mật khẩu khi đang đăng nhập thì dùng /auth/change-password.
-  r.post('/auth/reset-password', guard, resetLimit, async (req, res) => {
-    if (!req.user.isRecovery) {
-      throw new HttpError(403, 'RECOVERY_TOKEN_REQUIRED', 'Cần mở lại link đặt lại mật khẩu trong email')
-    }
-    const pwErr = validatePassword(body(req).password)
-    if (pwErr) assertValid({ password: pwErr })
-    await call(() => auth.updatePassword(req.user.id, body(req).password))
-    await call(() => auth.signOut(req.accessToken))
+  async function afterPasswordChange(user, res) {
+    clearRefreshCookie(res, config)
+    await audit(user.id, 'password_changed')
+    const profile = await repo.getProfile(user.id).catch(() => null)
+    await notify(user.email, passwordChangedMail({ lang: profile?.preferredLocale }))
+  }
+
+  // Token một lần từ link trong thư (#t=…) thay cho phiên khôi phục của Supabase. Mọi phiên bị
+  // thu hồi; khách đăng nhập lại bằng mật khẩu mới.
+  r.post('/auth/reset-password', resetLimit, async (req, res) => {
+    const b = body(req)
+    if (typeof b.token !== 'string' || !b.token) throw new HttpError(400, 'INVALID_RESET_TOKEN', 'Link đặt lại mật khẩu không hợp lệ')
+    await assertPasswordAcceptable(b.password)
+    const { user } = await call(() => auth.resetPassword({ token: b.token, password: b.password }))
+    await afterPasswordChange(user, res)
     res.status(204).end()
   })
 
   // G-18: đổi mật khẩu khi đang đăng nhập — bắt buộc nhập lại mật khẩu hiện tại
   r.post('/auth/change-password', guard, changeLimit, async (req, res) => {
     const b = body(req)
-    const pwErr = validatePassword(b.password)
-    if (pwErr) assertValid({ password: pwErr })
+    await assertPasswordAcceptable(b.password)
     if (typeof b.currentPassword !== 'string' || !b.currentPassword) {
       assertValid({ currentPassword: 'REQUIRED' })
     }
@@ -199,6 +264,7 @@ export function authRouter({ repo, auth, config }) {
     await call(() => auth.updatePassword(req.user.id, b.password))
     // Đổi mật khẩu thu hồi mọi phiên (kể cả phiên hiện tại) — khách đăng nhập lại bằng mật khẩu mới
     await call(() => auth.signOut(req.accessToken))
+    await afterPasswordChange(req.user, res)
     res.status(204).end()
   })
 

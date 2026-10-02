@@ -493,7 +493,8 @@ describe('Chế độ bảo trì — API (D-54)', () => {
     await on()
     const login = await request(app).post('/api/auth/login').send({ email: 'khach@moc.test', password: PW })
     expect(login.status).toBe(200)
-    const ref = await request(app).post('/api/auth/refresh').send({ refreshToken: login.body.refreshToken })
+    const cookie = login.headers['set-cookie'].find((c) => c.startsWith('lamvi_rt=')).split(';')[0]
+    const ref = await request(app).post('/api/auth/refresh').set('Cookie', cookie)
     expect(ref.status).toBe(200)
     const out = await request(app).post('/api/auth/logout').set('Authorization', `Bearer ${ref.body.accessToken}`)
     expect(out.status).toBe(204)

@@ -16,6 +16,8 @@ import { createMaintenance } from './monitoring/maintenance.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { errorHandler, notFound } from './errors.js'
 import { securityHeaders } from './middleware/security.js'
+import { createMailer } from './mail/mailer.js'
+import { isPwnedPassword } from './security/pwned.js'
 
 // T-02: nhận adapter qua tham số để test bằng adapter bộ nhớ
 export function createApp({
@@ -30,6 +32,9 @@ export function createApp({
   payos = null,
   orders = createOrderService({ repo, payos }),
   gaRealtime = createGaRealtime(config.gaRealtime ?? {}),
+  // T-49: thư giao dịch (null → không gửi) và kiểm tra mật khẩu đã lộ (null → bỏ qua)
+  mailer = createMailer(config.mail),
+  pwned = config.pwnedCheck ? isPwnedPassword : null,
   dev = false,
 }) {
   const app = express()
@@ -53,7 +58,7 @@ export function createApp({
   api.use(maintenance.apiGuard)
   api.get('/health', (req, res) => res.json({ ok: true }))
   api.use(catalogRouter({ repo }))
-  if (auth) api.use(authRouter({ repo, auth, config }))
+  if (auth) api.use(authRouter({ repo, auth, config, mailer, pwned }))
   if (auth && storage) api.use(adminRouter({ repo, auth, storage, config, orders, gaRealtime }))
   if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may }))
   if (auth) api.use(mayRouter({ repo, auth, may }))

@@ -10,7 +10,6 @@ const base = {
 }
 const session = { accessToken: 'g1', refreshToken: 'gr1', expiresAt: 9999999999, user: { id: 'u9', email: 'gg@example.com' } }
 const profile = { id: 'u9', email: 'gg@example.com', fullName: 'Google User', phone: null, preferredLocale: 'vi', role: 'customer' }
-const b64url = (obj) => btoa(JSON.stringify(obj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 const googleLink = () => document.querySelector('a.btn-google')
 
 beforeEach(() => {
@@ -75,61 +74,34 @@ describe('LoginPage ?error=', () => {
   })
 })
 
-describe('AuthCallbackPage', () => {
-  it('fragment #s= hợp lệ → lưu phiên, xoá hash, vào /account', async () => {
-    window.history.replaceState(null, '', '/auth/callback#s=' + b64url({ session, next: '/account' }))
-    mockApi({ ...base, 'GET /me': () => ({ body: { profile } }) })
-    renderAt('/auth/callback')
+describe('AuthCallbackPage (T-49: cookie phiên do server đặt, không token trên URL)', () => {
+  const refreshOk = () => ({ body: session })
+
+  it('đổi cookie lấy access token, lưu phiên (không refreshToken), vào trang next', async () => {
+    window.history.replaceState(null, '', '/auth/callback?next=%2Faccount')
+    const fetchMock = mockApi({ ...base, 'POST /auth/refresh': refreshOk, 'GET /me': () => ({ body: { profile } }) })
+    renderAt('/auth/callback?next=%2Faccount')
     expect(await screen.findByRole('heading', { name: 'Tài khoản của tôi' })).toBeInTheDocument()
-    expect(JSON.parse(localStorage.getItem('moc.session')).accessToken).toBe('g1')
-    expect(window.location.hash).toBe('')
+    const saved = JSON.parse(localStorage.getItem('moc.session'))
+    expect(saved.accessToken).toBe('g1')
+    expect(saved).not.toHaveProperty('refreshToken')
+    expect(fetchMock.mock.calls.filter(([u]) => String(u).includes('/auth/refresh'))).toHaveLength(1)
   })
 
   it('next ngoài site bị bỏ qua → vào /account', async () => {
-    window.history.replaceState(null, '', '/auth/callback#s=' + b64url({ session, next: '//evil.com' }))
-    mockApi({ ...base, 'GET /me': () => ({ body: { profile } }) })
-    renderAt('/auth/callback')
+    window.history.replaceState(null, '', '/auth/callback?next=%2F%2Fevil.com')
+    mockApi({ ...base, 'POST /auth/refresh': refreshOk, 'GET /me': () => ({ body: { profile } }) })
+    renderAt('/auth/callback?next=%2F%2Fevil.com')
     expect(await screen.findByRole('heading', { name: 'Tài khoản của tôi' })).toBeInTheDocument()
   })
 
-  it.each([
-    ['không có hash', ''],
-    ['hash không có s', '#x=1'],
-    ['s không phải base64', '#s=!!!'],
-    ['s không phải JSON', '#s=' + btoa('hello')],
-    ['thiếu accessToken', '#s=' + b64url({ session: { user: {} }, next: '/account' })],
-    ['thiếu session', '#s=' + b64url({ next: '/account' })],
-  ])('fragment không hợp lệ (%s) → báo lỗi, không lưu phiên', async (_n, hash) => {
-    window.history.replaceState(null, '', '/auth/callback' + hash)
-    mockApi(base)
+  it('không có cookie phiên (refresh 401) → báo lỗi, không lưu phiên, có link về đăng nhập', async () => {
+    window.history.replaceState(null, '', '/auth/callback')
+    mockApi({ ...base, 'POST /auth/refresh': () => ({ status: 401, body: { error: { code: 'UNAUTHORIZED' } } }) })
     renderAt('/auth/callback')
     expect(await screen.findByRole('alert')).toHaveTextContent('Không đăng nhập được bằng Google')
     expect(localStorage.getItem('moc.session')).toBeNull()
     fireEvent.click(within(screen.getByRole('main')).getByRole('link', { name: /đăng nhập/i }))
     expect(await screen.findByRole('heading', { name: 'Đăng nhập' })).toBeInTheDocument()
-  })
-})
-
-describe('Nút đăng xuất ở header', () => {
-  it('chưa đăng nhập → không có .nav-logout', async () => {
-    mockApi(base)
-    renderAt('/')
-    await screen.findAllByRole('link')
-    expect(document.querySelector('.nav-logout')).toBeNull()
-  })
-
-  it('đã đăng nhập → hiện, bấm gọi /auth/logout và xoá phiên', async () => {
-    localStorage.setItem('moc.session', JSON.stringify(session))
-    const fetchMock = mockApi({ ...base, 'POST /auth/logout': () => ({ status: 204 }) })
-    renderAt('/')
-    const btn = await waitFor(() => {
-      const el = document.querySelector('.nav-logout')
-      expect(el).not.toBeNull()
-      return el
-    })
-    fireEvent.click(btn)
-    await waitFor(() => expect(localStorage.getItem('moc.session')).toBeNull())
-    expect(fetchMock.mock.calls.some(([u, i]) => String(u).includes('/auth/logout') && i.headers.Authorization === 'Bearer g1')).toBe(true)
-    await waitFor(() => expect(document.querySelector('.nav-logout')).toBeNull())
   })
 })

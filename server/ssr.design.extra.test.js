@@ -37,7 +37,7 @@ describe('SSR trang chủ — nội dung chữ thật (không bị ẩn chờ an
     const visible = [...doc.querySelectorAll('strong > [aria-hidden="true"]')].map((s) => s.textContent)
     expect(visible).toEqual(expect.arrayContaining(['100+', '4.000+']))
     expect(doc.querySelector('.nav-mark').getAttribute('href')).toBe(PREFIX[lang])
-    expect(doc.body.textContent).toContain(m.products.giftCopy)
+    expect(doc.body.textContent).toContain(m.products.collectionCopy)
   })
 })
 
