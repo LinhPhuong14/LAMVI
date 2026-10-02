@@ -1,12 +1,15 @@
 // Bản dịch do đội dev soạn — chờ PO duyệt (ba-spec §31.2 G-14).
 export default {
   meta: {
+    shopTitle: 'Shop — LAMVI · handmade dó paper lanterns',
+    shopDescription: 'All LAMVI handmade dó paper lanterns: filter by type, each with a thank-you card QR message and the video of how the batch was made.',
     productTitle: '{name} — LAMVI · handmade dó paper lanterns',
     title: 'LAMVI — Handmade Dó Paper Lanterns',
     description:
       'Handmade dó paper lanterns as gifts, with a QR-linked message and the story of how they were made.',
   },
   nav: {
+    shop: 'Shop',
     logout: 'Sign out',
     home: 'Home',
     story: 'Story',
@@ -118,6 +121,7 @@ export default {
     made: 'lanterns made',
   },
   products: {
+    viewAll: 'View more',
     eyebrow: 'Collection',
     title: 'Choose the lantern you want to light',
     collectionCopy:
@@ -464,6 +468,28 @@ export default {
     },
     methods: { payos: 'Bank transfer (payOS)', cod: 'Cash on delivery' },
   },
+  shop: {
+    eyebrow: 'Shop',
+    title: 'Handmade dó paper lanterns',
+    lead: 'Choose the lantern you want to light — for yourself or for someone you love. You pick “gift” or “for myself” at checkout.',
+    perks: ['A thank-you card with a QR code that opens your message', 'A QR code engraved on the lantern opens the batch video', 'Prices include VAT; delivery within Vietnam'],
+    filterLabel: 'Filter by type',
+    filters: {
+      all: 'All',
+      single: 'Single lanterns',
+      set: 'Sets',
+    },
+    sortLabel: 'Sort by',
+    sorts: {
+      featured: 'Featured',
+      priceAsc: 'Price: low to high',
+      priceDesc: 'Price: high to low',
+      name: 'Name A–Z',
+    },
+    count: '{n} products',
+    help: 'Not sure which one to pick? Read the FAQ or ask Mây in the corner of the screen.',
+    helpLink: 'FAQ',
+  },
   cart: {
     eyebrow: 'Your gift basket',
     stepsLabel: 'Order steps',
@@ -529,7 +555,7 @@ export default {
       step: 'Step {n}/{total}',
       steps: [
         'Welcome to LAMVI! Let Mây show you around: handmade dó paper lanterns, made as story-telling gifts.',
-        'This is the collection. Tap a lantern for details and add it to your cart — Mây will pop up right here to let you know. Prices shown include VAT.',
+        'This is the collection. Tap “View more” to open the Shop with every lantern; tap a lantern for details and to add it to your cart. Prices shown include VAT.',
         'Each gift has two QR codes: the one on the thank-you card opens your message, the one engraved on the lantern opens the video of how its batch was made.',
         'Any other questions? Have a look at the FAQ.',
         'Mây is always here in the corner. Tap Mây to ask anything or replay the tour.',

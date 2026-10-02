@@ -144,7 +144,7 @@ describe('D-37 — link nội bộ giữ tiền tố ngôn ngữ', () => {
       expect(hrefOf(header.querySelector('.nav-mark'))).toBe(home)
       expect(hrefOf(within(header).getByRole('link', { name: MESSAGES[lang].nav.story }))).toBe(`${home}#story`)
       expect(hrefOf(within(header).getByRole('link', { name: MESSAGES[lang].nav.account }))).toBe(`${p}/account`)
-      expect(hrefOf(within(header).getByRole('link', { name: MESSAGES[lang].nav.cta }))).toBe(`${home}#products`)
+      expect(hrefOf(within(header).getByRole('link', { name: MESSAGES[lang].nav.cta }))).toBe(`${p}/shop`)
 
       const footer = document.querySelector('footer')
       await waitFor(() => expect(footer.querySelectorAll('.footer-col a[href*="/products/"]').length).toBe(2))
@@ -158,7 +158,7 @@ describe('D-37 — link nội bộ giữ tiền tố ngôn ngữ', () => {
       mockApi(handlers)
       renderAt(`${p}/products/den-nguyet`)
       const back = await screen.findByRole('link', { name: MESSAGES[lang].products.backToCollection })
-      expect(hrefOf(back)).toBe(`${home}#products`)
+      expect(hrefOf(back)).toBe(`${p}/shop`)
     })
   }
 

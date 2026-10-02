@@ -7,7 +7,8 @@ import { useCart } from '../cart/context.js'
 import CartBubble from '../cart/CartBubble.jsx'
 import { Seal } from './Motifs'
 
-const SECTIONS = ['story', 'artisan', 'products', 'lookbook', 'qr', 'faq']
+// 'shop' dẫn tới trang Cửa hàng riêng (D-86); các mục còn lại là phần trên trang chủ
+const SECTIONS = ['story', 'artisan', 'shop', 'lookbook', 'qr', 'faq']
 
 export function LanguageSwitcher() {
   const { lang, t } = useI18n()
@@ -51,34 +52,29 @@ function CartLink() {
   )
 }
 
-// Thanh điều hướng lui đi khi cuộn xuống đọc, hiện lại ngay khi cuộn lên
-function useHeaderState() {
+// Thanh điều hướng luôn nằm ở đầu trang. Cuộn xuống thì thu nhỏ 20% và bo tròn thành viên thuốc nổi (D-86)
+function useHeaderScrolled() {
   const { scrollY } = useScroll()
-  const [state, setState] = useState({ hidden: false, scrolled: false })
+  const [scrolled, setScrolled] = useState(false)
   useMotionValueEvent(scrollY, 'change', (y) => {
-    const prev = scrollY.getPrevious() ?? 0
-    const hidden = y > 240 && y > prev + 2 ? true : y < prev - 2 ? false : state.hidden
-    const scrolled = y > 12
-    if (hidden !== state.hidden || scrolled !== state.scrolled) setState({ hidden, scrolled })
+    const next = y > 12
+    if (next !== scrolled) setScrolled(next)
   })
-  return state
+  return scrolled
 }
 
 export default function SiteHeader() {
   const { t, path } = useI18n()
-  const { hidden: scrolledAway, scrolled } = useHeaderState()
-  const { lastAdded } = useCart()
-  // Đang hiện tooltip giỏ hàng thì không để header lui đi, nếu không tooltip biến mất cùng header
-  const hidden = scrolledAway && !lastAdded
+  const scrolled = useHeaderScrolled()
   const auth = useContext(AuthContext)
   return (
-    <header className={`nav${hidden ? ' is-hidden' : ''}${scrolled ? ' is-scrolled' : ''}`}>
+    <header className={`nav${scrolled ? ' is-scrolled' : ''}`}>
       <Link to={path('/')} className="nav-mark" aria-label="LAMVI">
         <Seal>LAMVI</Seal>
       </Link>
       <nav className="nav-links">
         {SECTIONS.map((s) => (
-          <Link key={s} to={{ pathname: path('/'), hash: `#${s}` }}>
+          <Link key={s} to={s === 'shop' ? path('/shop') : { pathname: path('/'), hash: `#${s}` }}>
             {t(`nav.${s}`)}
           </Link>
         ))}
@@ -94,7 +90,7 @@ export default function SiteHeader() {
             {t('nav.logout')}
           </button>
         )}
-        <Link to={{ pathname: path('/'), hash: '#products' }} className="nav-cta thread">
+        <Link to={path('/shop')} className="nav-cta thread">
           {t('nav.cta')}
         </Link>
       </div>

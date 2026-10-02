@@ -46,6 +46,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-47 | 2026-10-01 | Trang auth v2: sân khấu ảnh toàn màn hình + thẻ kính, tab chuyển, hiện/ẩn mật khẩu | Hiệu lực |
 | T-48 | 2026-10-02 | Phản hồi thêm vào giỏ: huy hiệu + tooltip trên navbar (`CartBubble`, `lastAdded` trong `CartProvider`); giỏ hàng v2; dashboard v2; khung chat Mây v2 | Hiệu lực |
 | T-49 | 2026-10-02 | Auth production không cần Supabase Pro/Twilio: thư do server gửi (Resend/Brevo), token đặt lại mật khẩu một lần, refresh token ở cookie HttpOnly, chặn mật khẩu đã lộ (HIBP) | Hiệu lực |
+| T-52 | 2026-10-02 | Trang Cửa hàng `/shop` + `ProductCards` dùng chung; navbar luôn ghim, thu nhỏ 20% khi cuộn (`transform`, không đổi layout) | Hiệu lực |
 
 ---
 
@@ -283,3 +284,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 
 - **RLS**: rà từ các migration (MCP Supabase chưa được uỷ quyền nên chưa đối chiếu DB thật). 15/15 bảng `public` đã bật RLS, không policy (T-05). Vá bằng `20261002000009_harden_rls.sql`: thu hồi EXECUTE của `claim_coupon`/`release_coupon` (trước đó PUBLIC gọi được RPC), thu hồi quyền bảng/hàm/sequence mặc định của `anon`/`authenticated` (kèm default privileges), tạo bucket `product-images` (trước chỉ tạo tay). **Phải chạy migration và chạy lại advisor bảo mật trên project thật.**
 - **Mây (OpenAI)**: hai bộ đếm hạn mức chạy song song; đọc chi phí tháng song song với kiểm hạn mức; các tool trong cùng một lượt gọi song song (giữ thứ tự `tool_call_id`); `max_tokens` 600 → 350 (câu trả lời ≤ ~80 từ). Chưa làm: streaming, cache catalog theo instance, gpt nhỏ hơn.
+
+### T-52 — Trang Cửa hàng và navbar thu nhỏ khi cuộn
+
+- **Shop**: route `shop` (`ShopPage`), dữ liệu từ `useApi('/products')` nên SSR dùng chung khoá `/products` đã nạp sẵn cho footer (classifyPath giữ `other`). Lọc theo `p.kind` (`single`/`set`), nút lọc chỉ hiện loại có trong dữ liệu; sắp xếp phía client. `ProductCards` tách ra dùng chung với phần bộ sưu tập ở landing. Sitemap thêm `/shop` × 3 ngôn ngữ. Scene `shop` dùng `golden-sky`.
+- **Liên kết**: `#products` còn lại chỉ dành cho tour Mây (`TOUR_TARGETS`) trên landing; các nút "xem đèn" khác dùng `path('/shop')`.
+- **Navbar**: bỏ `is-hidden` và `:focus-within`. `.nav.is-scrolled` = `transform: translateY(10px) scale(0.8)` quanh đỉnh giữa + `border-radius: 9999px` (transition 0,45s); dùng transform nên không làm xô bố cục. Tooltip giỏ hàng bên trong được phóng lại 125% để chữ không nhỏ đi. Blur của `.nav` vẫn là ngoại lệ T-46.

@@ -3872,6 +3872,168 @@
   }
 }
 
+/* ---------- Cửa hàng (D-86) ---------- */
+.page-section.shop {
+  max-width: 1240px;
+}
+
+.shop-head {
+  max-width: 760px;
+  margin-bottom: 28px;
+}
+
+.shop-head .eyebrow {
+  margin-bottom: 6px;
+}
+
+.shop-head .page-title {
+  margin-bottom: 10px;
+}
+
+.shop-lead {
+  margin: 0 0 18px;
+  color: var(--than-soft);
+  font-size: 1.05rem;
+}
+
+.shop-perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.shop-perks li {
+  padding: 6px 14px;
+  border: 1px solid var(--g-border);
+  border-radius: 999px;
+  background: var(--g-bg);
+  font-size: 0.82rem;
+  color: var(--than-soft);
+}
+
+.shop-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 28px;
+  padding: 8px 10px 8px 8px;
+  border: 1px solid var(--g-border);
+  border-radius: 999px;
+  background: var(--g-bg-strong);
+  box-shadow: var(--g-shadow);
+  -webkit-backdrop-filter: var(--g-blur);
+  backdrop-filter: var(--g-blur);
+}
+
+.shop-filters {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(122, 93, 60, 0.1);
+}
+
+.shop-filters button {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--than-soft);
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.shop-filters button.active {
+  background: var(--son);
+  color: var(--diep-light);
+  box-shadow: 0 8px 16px -10px rgba(124, 38, 23, 0.8);
+}
+
+.shop-filters button:focus-visible {
+  outline: 2px solid var(--son);
+  outline-offset: 2px;
+}
+
+.shop-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 0.86rem;
+  color: var(--than-soft);
+}
+
+.shop-sort select {
+  padding: 8px 32px 8px 14px;
+  border: 1px solid rgba(122, 93, 60, 0.3);
+  border-radius: 999px;
+  background-color: #fff;
+  font: inherit;
+  color: var(--than);
+}
+
+.shop-count {
+  margin: 0 8px 0 0;
+  font-size: 0.86rem;
+  color: var(--than-soft);
+}
+
+.shop-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 20px;
+  margin-top: 48px;
+  padding: 20px 24px;
+  border: 1px dashed var(--hair);
+  border-radius: var(--r-md);
+  text-align: center;
+  color: var(--than-soft);
+}
+
+.shop-foot p {
+  margin: 0;
+}
+
+.products-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 36px;
+}
+
+.products-more .btn {
+  gap: 10px;
+  padding-inline: 32px;
+}
+
+@media (max-width: 760px) {
+  .shop-bar {
+    border-radius: var(--r-lg);
+  }
+  .shop-sort {
+    margin-left: 0;
+  }
+  .shop-filters {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .shop-filters button {
+    flex: 1;
+    white-space: nowrap;
+  }
+}
+
 /* ---------- Checkout & đơn hàng (FR-CHK-*, FR-ORD-*) ----------
    Theo design-rules §5: khung tranh bồi / thiếp thư, nét mảnh sepia, góc 2px, một điểm nhấn son.
    Không tạo khung mới có viền dày hay bóng đổ cứng. */

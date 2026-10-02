@@ -19,6 +19,7 @@ const AUTH_PAGES = new Set(['/login', '/register', '/forgot-password', '/reset-p
 function pageScene(rest) {
   if (AUTH_PAGES.has(rest)) return 'auth'
   if (rest.startsWith('/products/')) return 'product'
+  if (rest === '/shop') return 'shop'
   if (rest === '/cart') return 'cart'
   if (rest === '/checkout') return 'checkout'
   if (rest.startsWith('/don-hang/')) return 'order'
