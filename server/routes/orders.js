@@ -30,6 +30,8 @@ function presentOrder(o, { lang = 'vi' } = {}) {
     ward: o.ward,
     district: o.district,
     province: o.province,
+    provinceCode: o.provinceCode ?? null,
+    wardCode: o.wardCode ?? null,
     note: o.note,
     paymentMethod: o.paymentMethod,
     paymentStatus: o.paymentStatus,

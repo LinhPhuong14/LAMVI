@@ -59,7 +59,7 @@ const CHECKOUT = {
   recipientName: 'Nguyễn Văn A',
   recipientPhone: '0912345678',
   addressLine: '12 Hàng Bông',
-  province: 'Hà Nội',
+  provinceCode: '1', wardCode: '4',
   paymentMethod: 'cod',
 }
 

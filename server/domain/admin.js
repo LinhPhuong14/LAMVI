@@ -70,6 +70,10 @@ export function validateProduct(body, { partial = false } = {}) {
   field(body, 'tone', partial, errors, values, optionalOneOf(TONES))
   field(body, 'sortOrder', partial, errors, values, sortOrder)
   // D-96: thuộc bộ sưu tập nào (slug) và thứ tự trong bộ; null = đèn lẻ
+  // G-44, D-100: null = không theo dõi tồn kho; số nguyên >= 0 = số còn lại (0 = tạm hết hàng)
+  field(body, 'stock', partial, errors, values, (v) =>
+    v === undefined || v === null || v === '' ? { value: null } : isInt(v, 0, 1_000_000) ? { value: v } : { error: 'INVALID_STOCK' },
+  )
   field(body, 'collectionSlug', partial, errors, values, (v) =>
     v === null || v === undefined || v === '' ? { value: null } : typeof v === 'string' && v.length <= 80 && SLUG_RE.test(v) ? { value: v } : { error: 'INVALID_SLUG' },
   )

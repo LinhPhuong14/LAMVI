@@ -27,7 +27,7 @@ describe('Sản phẩm — edge case', () => {
     for (const item of [...list.body.items, detail.body.item]) {
       expect(Object.keys(item).sort()).toEqual(
         // 'image' là { url, alt } — không lộ imagePath (đường dẫn trong Storage)
-        ['badge', 'collection', 'currency', 'description', 'image', 'kind', 'name', 'pieceOrder', 'price', 'slug', 'tone'].sort(),
+        ['badge', 'collection', 'currency', 'description', 'image', 'inStock', 'kind', 'name', 'pieceOrder', 'price', 'slug', 'stockLeft', 'tone'].sort(),
       )
     }
   })

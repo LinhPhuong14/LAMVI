@@ -69,8 +69,7 @@ const CHECKOUT = {
   recipientName: 'Nguyễn Văn A',
   recipientPhone: '0912345678',
   addressLine: '12 Hàng Bông',
-  province: 'Hà Nội',
-  district: 'Hoàn Kiếm',
+  provinceCode: '1', wardCode: '4',
   paymentMethod: 'cod',
 }
 
@@ -259,7 +258,10 @@ describe('Kiểm tra dữ liệu checkout (§12)', () => {
     ['recipientPhone', { recipientPhone: '123' }, 'INVALID_PHONE'],
     ['recipientName', { recipientName: '   ' }, 'REQUIRED'],
     ['addressLine', { addressLine: '' }, 'REQUIRED'],
-    ['province', { province: '' }, 'REQUIRED'],
+    ['provinceCode', { provinceCode: '' }, 'REQUIRED'],
+    ['provinceCode', { provinceCode: '99' }, 'INVALID'],
+    ['wardCode', { wardCode: '' }, 'REQUIRED'],
+    ['wardCode', { wardCode: '999999' }, 'INVALID'],
     ['paymentMethod', { paymentMethod: 'momo' }, 'INVALID'],
     ['orderKind', { orderKind: 'khac' }, 'INVALID'],
   ])('%s sai → 400 theo trường', async (field, over, code) => {

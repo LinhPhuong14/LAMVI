@@ -7,7 +7,8 @@ const clone = (v) => structuredClone(v)
 // Adapter bộ nhớ (T-04) — cùng interface với adapters/supabase/repo.js
 export function createMemoryRepo(data = {}) {
   const state = {
-    products: clone(data.products ?? products),
+    // G-44: sản phẩm mặc định không theo dõi tồn kho (stock null), như cột `stock` NULL ở Supabase
+    products: clone(data.products ?? products).map((p) => ({ stock: null, ...p })),
     collections: clone(data.collections ?? collections),
     faqEntries: clone(data.faqEntries ?? faqEntries),
     batches: clone(data.batches ?? demoBatches),
@@ -260,6 +261,26 @@ export function createMemoryRepo(data = {}) {
       return c.usedCount
     },
     // C-8: trả cả lượt tổng và lượt theo khách (xoá bản ghi lượt dùng của đơn)
+    // G-44, D-100: giữ chỗ tồn kho cho cả đơn (null = giữ được; ngược lại id sản phẩm thiếu hàng)
+    async reserveStock(items) {
+      const need = new Map()
+      for (const i of items) need.set(i.productId, (need.get(i.productId) ?? 0) + i.quantity)
+      for (const [id, qty] of need) {
+        const p = byId(state.products, id)
+        if (p && p.stock !== null && p.stock !== undefined && p.stock < qty) return id
+      }
+      for (const [id, qty] of need) {
+        const p = byId(state.products, id)
+        if (p && p.stock !== null && p.stock !== undefined) p.stock -= qty
+      }
+      return null
+    },
+    async releaseStock(items) {
+      for (const i of items) {
+        const p = byId(state.products, i.productId)
+        if (p && p.stock !== null && p.stock !== undefined) p.stock += i.quantity
+      }
+    },
     async releaseCoupon(couponId, orderId) {
       const c = byId(state.coupons, couponId)
       if (c) c.usedCount = Math.max(0, c.usedCount - 1)

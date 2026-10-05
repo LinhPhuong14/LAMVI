@@ -35,6 +35,9 @@ function api({ quoteBody = quote(), order: orderHandler, extra = {} } = {}) {
     'GET /products': () => ({ body: { items: [] } }),
     'GET /may/history': () => ({ body: { items: [] } }),
     'POST /checkout/quote': () => (typeof quoteBody === 'function' ? quoteBody() : { body: quoteBody }),
+    'GET /geo/provinces': () => ({ body: { items: [{ code: '1', name: 'Thành phố Hà Nội' }, { code: '79', name: 'Thành phố Hồ Chí Minh' }] } }),
+    'GET /geo/provinces/1/wards': () => ({ body: { items: [{ code: '4', name: 'Phường Ba Đình' }, { code: '8', name: 'Phường Ngọc Hà' }] } }),
+    'GET /geo/provinces/79/wards': () => ({ body: { items: [{ code: '26734', name: 'Phường Sài Gòn' }] } }),
     'POST /orders': orderHandler ?? (() => ({ status: 201, body: { order: { code: 'LV2610-ACDEFGH' }, payment: null } })),
     ...extra,
   })
@@ -147,11 +150,14 @@ describe('Mã giảm giá (FR-CHK-006)', () => {
 })
 
 describe('Đặt hàng', () => {
-  const address = () => {
+  const address = async () => {
     fill('Họ tên người nhận', 'Nguyễn Văn A')
     fill('Số điện thoại', '0912345678')
     fill('Địa chỉ (số nhà, đường)', '12 Hàng Bông')
-    fill('Tỉnh / thành phố', 'Hà Nội')
+    await screen.findByRole('option', { name: 'Thành phố Hà Nội' })
+    fill('Tỉnh / thành phố', '1')
+    await screen.findByRole('option', { name: 'Phường Ba Đình' })
+    fill('Phường / xã', '4')
   }
 
   it('gửi đúng dữ liệu kèm tổng khách đã thấy (D-41) rồi sang trang cảm ơn', async () => {
@@ -165,7 +171,7 @@ describe('Đặt hàng', () => {
     })
     renderAt('/checkout')
     await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
-    address()
+    await address()
     fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
     await waitFor(() => expect(posts).toHaveLength(1))
     expect(posts[0]).toMatchObject({
@@ -173,7 +179,8 @@ describe('Đặt hàng', () => {
       hasMessage: false,
       recipientIsSelf: true,
       recipientName: 'Nguyễn Văn A',
-      province: 'Hà Nội',
+      provinceCode: '1',
+      wardCode: '4',
       paymentMethod: 'cod',
       expectedTotal: 1_780_000,
     })
@@ -188,7 +195,7 @@ describe('Đặt hàng', () => {
     })
     renderAt('/checkout')
     await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
-    address()
+    await address()
     fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
     await waitFor(() =>
       expect(screen.getByLabelText('Số điện thoại')).toHaveAccessibleDescription(
@@ -211,7 +218,7 @@ describe('Đặt hàng', () => {
     })
     renderAt('/checkout')
     await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
-    address()
+    await address()
     fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
     expect(await screen.findByText(/Giá vừa thay đổi/)).toBeInTheDocument()
     await waitFor(() => expect(document.querySelector('.order-summary').textContent).toContain('2.000.000'))
@@ -228,7 +235,7 @@ describe('Đặt hàng', () => {
     })
     renderAt('/checkout')
     await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
-    address()
+    await address()
     fireEvent.click(document.querySelector('input[value="payos"]'))
     fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
     await waitFor(() => expect(assign).toHaveBeenCalledWith('https://pay.test/1'))
@@ -258,5 +265,39 @@ describe('Giao diện đồng bộ với các trang khác', () => {
     expect(block).not.toMatch(/box-shadow:\s*\d+px\s+\d+px\s+0/)
     // Dùng token màu, không viết mã màu cứng
     expect(block).not.toMatch(/#[0-9a-f]{3,6}\b/i)
+  })
+})
+
+describe('Địa chỉ: tỉnh/thành → phường/xã (G-46, D-99)', () => {
+  it('phường/xã bị khoá tới khi chọn tỉnh; đổi tỉnh thì xoá phường/xã đã chọn và nạp danh sách mới', async () => {
+    api()
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    expect(screen.getByLabelText('Phường / xã')).toBeDisabled()
+    expect(screen.queryByLabelText('Quận / huyện')).toBeNull()
+    await screen.findByRole('option', { name: 'Thành phố Hà Nội' })
+    fill('Tỉnh / thành phố', '1')
+    await screen.findByRole('option', { name: 'Phường Ngọc Hà' })
+    fill('Phường / xã', '8')
+    expect(screen.getByLabelText('Phường / xã')).toHaveValue('8')
+    fill('Tỉnh / thành phố', '79')
+    await screen.findByRole('option', { name: 'Phường Sài Gòn' })
+    expect(screen.getByLabelText('Phường / xã')).toHaveValue('')
+    expect(screen.queryByRole('option', { name: 'Phường Ngọc Hà' })).toBeNull()
+  })
+
+  it('danh mục lỗi → gợi ý tải lại trang', async () => {
+    api({ extra: { 'GET /geo/provinces': () => ({ status: 500, body: { error: { code: 'INTERNAL_ERROR' } } }) } })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    expect(await screen.findByText(/Chưa tải được danh mục địa chỉ/)).toBeInTheDocument()
+  })
+
+  it('lỗi theo trường của server (provinceCode, wardCode) hiện dưới ô tương ứng', async () => {
+    api({ order: () => ({ status: 400, body: { error: { code: 'VALIDATION_ERROR', fields: { provinceCode: 'REQUIRED', wardCode: 'REQUIRED' } } } }) })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
+    await waitFor(() => expect(screen.getByLabelText('Tỉnh / thành phố')).toHaveAttribute('aria-invalid', 'true'))
   })
 })

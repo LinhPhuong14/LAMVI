@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Field from '../components/Field'
+import AddressSelect from '../components/AddressSelect'
 import { Reveal } from '../components/Reveal'
 import { Lotus } from '../components/Motifs'
 import Seo from '../seo/Seo.jsx'
@@ -22,9 +23,8 @@ const EMPTY = {
   recipientName: '',
   recipientPhone: '',
   addressLine: '',
-  ward: '',
-  district: '',
-  province: '',
+  provinceCode: '',
+  wardCode: '',
   note: '',
   paymentMethod: 'cod',
 }
@@ -298,17 +298,12 @@ export default function CheckoutPage() {
               error={fields.addressLine}
               autoComplete="street-address"
             />
-            <div className="admin-grid">
-              <Field label={t('checkout.ward')} value={form.ward} onChange={set('ward')} error={fields.ward} />
-              <Field label={t('checkout.district')} value={form.district} onChange={set('district')} error={fields.district} />
-              <Field
-                label={t('checkout.province')}
-                value={form.province}
-                onChange={set('province')}
-                error={fields.province}
-                autoComplete="address-level1"
-              />
-            </div>
+            <AddressSelect
+              provinceCode={form.provinceCode}
+              wardCode={form.wardCode}
+              errors={fields}
+              onChange={(v) => setForm((f) => ({ ...f, ...v }))}
+            />
             <Field as="textarea" rows={2} label={t('checkout.note')} value={form.note} onChange={set('note')} error={fields.note} />
           </Reveal>
 
@@ -422,7 +417,7 @@ export default function CheckoutPage() {
               </p>
             )}
 
-            <button className="btn btn-primary btn-block" type="submit" disabled={pending}>
+            <button className="btn btn-primary btn-block" type="submit" disabled={pending || Boolean(quote?.hasShortage)}>
               {pending ? t('checkout.submitting') : t('checkout.submit')}
             </button>
           </div>

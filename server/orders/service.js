@@ -2,6 +2,7 @@
 import { randomBytes } from 'node:crypto'
 import { HttpError } from '../errors.js'
 import { PUBLIC_PRODUCT_STATUSES, presentProduct } from '../domain/catalog.js'
+import { hasStock } from '../domain/stock.js'
 import { PRICING_SETTING_KEY, normalizePricingConfig, quoteOrder } from '../domain/pricing.js'
 import { couponRejectReason, normalizeCouponCode, toPricingCoupon } from '../domain/coupon.js'
 import {
@@ -41,7 +42,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     for (const { productId, quantity } of await repo.getCart(userId)) {
       const product = products.get(productId)
       if (!product) continue
-      lines.push({ product, quantity, available: isPublic(product) })
+      // G-44: `short` = tồn kho không đủ cho số lượng trong giỏ (chỉ báo; giữ chỗ nguyên tử ở createOrder)
+      lines.push({ product, quantity, available: isPublic(product), short: isPublic(product) && !hasStock(product, quantity) })
     }
     return lines
   }
@@ -96,9 +98,20 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
         couponCode: coupon?.code ?? null,
         couponError,
         hasUnavailable: lines.some((l) => !l.available),
+        hasShortage: lines.some((l) => l.short),
         freeShippingFrom: config.freeShippingFrom,
       },
     }
+  }
+
+  const logRestock = (err) => console.error('[stock] không trả được hàng', err?.message ?? err)
+  const outOfStock = (product) =>
+    new HttpError(409, 'OUT_OF_STOCK', 'Sản phẩm không đủ hàng', { slug: 'OUT_OF_STOCK' }, { slug: product?.slug ?? null })
+
+  /** G-44, D-100: đơn huỷ / hết hạn thanh toán → trả hàng về kho. Gọi đúng một lần sau khi chuyển trạng thái thành công. */
+  async function restock(order) {
+    const items = (order.items ?? []).filter((i) => i.productId).map((i) => ({ productId: i.productId, quantity: i.quantity }))
+    if (items.length) await repo.releaseStock(items).catch(logRestock)
   }
 
   /** Mã đơn duy nhất; thử lại vài lần phòng khi trùng (xác suất rất thấp). */
@@ -133,26 +146,37 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     if (lines.some((l) => !l.available)) {
       throw new HttpError(409, 'CART_HAS_UNAVAILABLE', 'Giỏ có sản phẩm không còn bán')
     }
+    // G-44, D-100: báo sớm sản phẩm nào không đủ hàng (kiểm chính thức là giữ chỗ nguyên tử bên dưới)
+    const shortLine = lines.find((l) => l.short)
+    if (shortLine) throw outOfStock(shortLine.product)
     if (checkout.couponCode && couponError) throw new HttpError(409, couponError, 'Mã giảm giá không dùng được')
     // §12: giá đổi giữa chừng → hiện bảng giá mới, yêu cầu xác nhận lại (D-41)
     if (Number.isInteger(expectedTotal) && expectedTotal !== quote.total) {
       throw new HttpError(409, 'PRICE_CHANGED', 'Giá đã thay đổi', undefined, { quote: quote })
     }
 
-    // C-5: giữ lượt coupon trước khi tạo đơn; hết lượt giữa chừng → báo khách
-    let claimed = null
-    if (coupon) {
-      claimed = await repo.claimCoupon(coupon.id)
-      if (claimed === null) {
-        // claimCoupon trả null cho cả hai trường hợp: hết lượt, hoặc admin vừa tắt mã. Đọc lại để
-        // báo đúng lý do cho khách.
-        const fresh = await repo.getCouponById(coupon.id)
-        const reason = fresh && fresh.status !== 'active' ? 'COUPON_INACTIVE' : 'COUPON_USED_UP'
-        throw new HttpError(409, reason, 'Mã giảm giá không dùng được')
-      }
-    }
+    // G-44, D-100: trừ tồn kho nguyên tử cho cả đơn trước khi giữ coupon; hai khách cùng đặt món cuối
+    // thì chỉ một người giữ được. Từ đây mọi đường lỗi/huỷ phải trả hàng (restock).
+    const stockItems = lines.map((l) => ({ productId: l.product.id, quantity: l.quantity }))
+    const shortId = await repo.reserveStock(stockItems)
+    if (shortId) throw outOfStock(lines.find((l) => l.product.id === shortId)?.product)
 
+    // Từ đây mọi lỗi TRƯỚC khi đơn được ghi phải trả lại hàng và lượt coupon; SAU khi đơn đã ghi thì
+    // không được trả (đơn còn đó và đang giữ cả hai) — chỉ báo lỗi cho khách.
+    let claimed = null
+    let created = null
     try {
+      // C-5: giữ lượt coupon trước khi tạo đơn; hết lượt giữa chừng → báo khách
+      if (coupon) {
+        claimed = await repo.claimCoupon(coupon.id)
+        if (claimed === null) {
+          // claimCoupon trả null cho cả hai trường hợp: hết lượt, hoặc admin vừa tắt mã. Đọc lại để
+          // báo đúng lý do cho khách.
+          const fresh = await repo.getCouponById(coupon.id)
+          const reason = fresh && fresh.status !== 'active' ? 'COUPON_INACTIVE' : 'COUPON_USED_UP'
+          throw new HttpError(409, reason, 'Mã giảm giá không dùng được')
+        }
+      }
       const isCod = checkout.paymentMethod === 'cod'
       const createdAt = now()
       const order = {
@@ -184,7 +208,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
         lineTotal: product.price * quantity,
       }))
 
-      const created = await repo.createOrder(
+      created = await repo.createOrder(
         order,
         items,
         coupon ? { couponId: coupon.id, userId } : null,
@@ -208,8 +232,11 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
       if (isCod) await notify('confirmed', created)
       return { order: created, payment }
     } catch (err) {
-      // C-8: tạo đơn hỏng thì trả lại lượt coupon đã giữ
-      if (claimed !== null && coupon) await repo.releaseCoupon(coupon.id).catch(() => {})
+      if (!created) {
+        // C-8: tạo đơn hỏng thì trả lại lượt coupon đã giữ; G-44: và trả hàng về kho
+        if (claimed !== null && coupon) await repo.releaseCoupon(coupon.id).catch(() => {})
+        await repo.releaseStock(stockItems).catch(logRestock)
+      }
       throw err
     }
   }
@@ -331,6 +358,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     })
     if (!updated) return null
     if (order.couponId) await repo.releaseCoupon(order.couponId, order.id)
+    await restock(order)
     if (payos && order.payosOrderCode) {
       await payos.cancelPaymentLink(order.payosOrderCode, 'Hết hạn thanh toán').catch(() => {})
     }
@@ -372,6 +400,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     })
     if (!updated) throw new HttpError(409, 'ORDER_NOT_CANCELLABLE', 'Trạng thái đơn vừa thay đổi')
     if (order.couponId) await repo.releaseCoupon(order.couponId, order.id)
+    await restock(order)
     if (payos && order.payosOrderCode && order.paymentStatus === 'pending') {
       await payos.cancelPaymentLink(order.payosOrderCode, 'Khách huỷ đơn').catch(() => {})
     }
@@ -408,6 +437,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     if (!updated) throw new HttpError(409, 'INVALID_STATUS_TRANSITION', 'Trạng thái đơn vừa thay đổi')
     if (next === 'cancelled') {
       if (order.couponId) await repo.releaseCoupon(order.couponId, order.id)
+      await restock(order)
       // Link thanh toán còn sống tới 15 phút: không huỷ thì khách vẫn trả được vào đơn đã huỷ
       if (payos && order.payosOrderCode && order.paymentStatus === 'pending') {
         await payos.cancelPaymentLink(order.payosOrderCode, 'Admin huỷ đơn').catch(() => {})

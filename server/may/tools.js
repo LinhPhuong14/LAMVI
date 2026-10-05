@@ -73,6 +73,7 @@ const productForMay = (p, lang) => ({
   price: p.price,
   currency: 'VND',
   priceNote: 'VAT included (D-68)',
+  inStock: p.inStock !== false,
   url: localePath(lang, `/products/${encodeURIComponent(p.slug)}`),
 })
 

@@ -102,7 +102,7 @@ describe('Tạo đơn (spam đơn, giữ lượt coupon)', () => {
     recipientName: 'Nguyễn Văn A',
     recipientPhone: '0912345678',
     addressLine: '12 Hàng Bông',
-    province: 'Hà Nội',
+    provinceCode: '1', wardCode: '4',
     paymentMethod: 'cod',
   }
 
@@ -301,7 +301,7 @@ describe('G-20 — tác dụng phụ lên người dùng hợp lệ', () => {
     recipientName: 'Nguyễn Văn A',
     recipientPhone: '0912345678',
     addressLine: '12 Hàng Bông',
-    province: 'Hà Nội',
+    provinceCode: '1', wardCode: '4',
     paymentMethod: 'cod',
   }
 
@@ -409,7 +409,7 @@ describe('G-20 — lấy lại liên kết thanh toán cũng bị giới hạn',
         recipientName: 'Nguyễn Văn A',
         recipientPhone: '0912345678',
         addressLine: '12 Hàng Bông',
-        province: 'Hà Nội',
+        provinceCode: '1', wardCode: '4',
         paymentMethod: 'payos',
       })
     expect(created.status).toBe(201)

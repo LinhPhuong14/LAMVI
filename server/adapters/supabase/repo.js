@@ -16,6 +16,7 @@ const toProduct = (r) => ({
   imageUrl: r.image_url,
   imagePath: r.image_path,
   imageAlt: r.image_alt,
+  stock: r.stock ?? null,
   collectionSlug: r.collection_slug ?? null,
   pieceOrder: r.piece_order ?? 0,
   updatedAt: r.updated_at,
@@ -98,6 +99,8 @@ const toOrder = (r) => ({
   ward: r.ward,
   district: r.district,
   province: r.province,
+  provinceCode: r.province_code ?? null,
+  wardCode: r.ward_code ?? null,
   note: r.note,
   paymentMethod: r.payment_method,
   paymentStatus: r.payment_status,
@@ -152,7 +155,7 @@ const toGiftMessage = (r) => ({
 const GIFT_COLS = { text: 'text', textLang: 'text_lang', voicePath: 'voice_path', voiceType: 'voice_type', videoPath: 'video_path', videoType: 'video_type', confirmedAt: 'confirmed_at', mediaDeletedAt: 'media_deleted_at', translations: 'translations' }
 
 // camelCase → snake_case cho các trường được phép ghi
-const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge', imageUrl: 'image_url', imagePath: 'image_path', imageAlt: 'image_alt', collectionSlug: 'collection_slug', pieceOrder: 'piece_order' }
+const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge', imageUrl: 'image_url', imagePath: 'image_path', imageAlt: 'image_alt', stock: 'stock', collectionSlug: 'collection_slug', pieceOrder: 'piece_order' }
 const FAQ_COLS = { sortOrder: 'sort_order', isPublished: 'is_published', question: 'question', answer: 'answer' }
 const BATCH_COLS = { code: 'code', status: 'status', videoUrl: 'video_url', videoPath: 'video_path', producedOn: 'produced_on', title: 'title', story: 'story' }
 const COUPON_COLS = { code: 'code', type: 'type', value: 'value', maxDiscount: 'max_discount', minOrder: 'min_order', productIds: 'product_ids', usageLimit: 'usage_limit', perUserLimit: 'per_user_limit', startsAt: 'starts_at', endsAt: 'ends_at', status: 'status' }
@@ -325,6 +328,17 @@ export function createSupabaseRepo(client) {
      * C-8: trả lượt khi huỷ đơn. Phải trả cả lượt TỔNG và lượt THEO KHÁCH — xoá bản ghi
      * coupon_redemptions của đơn, nếu không per_user_limit bị tiêu vĩnh viễn dù đơn đã huỷ.
      */
+    /**
+     * G-44, D-100: giữ chỗ tồn kho nguyên tử cho cả đơn. Trả null nếu giữ được, hoặc id sản phẩm
+     * đầu tiên không đủ hàng (khi đó không trừ gì).
+     */
+    async reserveStock(items) {
+      const r = unwrap(await client.rpc('reserve_stock', { p_items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })) }))
+      return r ?? null
+    },
+    async releaseStock(items) {
+      unwrap(await client.rpc('release_stock', { p_items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })) }))
+    },
     async releaseCoupon(couponId, orderId) {
       unwrap(await client.rpc('release_coupon', { p_coupon_id: couponId }))
       if (orderId) unwrap(await client.from('coupon_redemptions').delete().eq('order_id', orderId))
@@ -349,6 +363,8 @@ export function createSupabaseRepo(client) {
             ward: order.ward,
             district: order.district,
             province: order.province,
+            province_code: order.provinceCode ?? null,
+            ward_code: order.wardCode ?? null,
             note: order.note,
             payment_method: order.paymentMethod,
             payment_status: order.paymentStatus,
