@@ -313,3 +313,9 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Đua nhau (không có giao dịch nhiều dòng)**: lời chúc/media kiểm lại trạng thái đơn SAU khi ghi và hoàn tác nếu đơn vừa bị khoá (`stillEditable`); hạ quyền/khoá một IT kiểm lại SAU khi ghi rằng còn ít nhất một IT hoạt động, nếu không thì hoàn tác và trả `LAST_IT` (hai yêu cầu đua nhau có thể cùng bị hoàn tác — an toàn, thử lại được); khoá/mở khoá dùng `lockProfile`/`unlockProfile` có điều kiện (nguyên tử) nên không ghi nhật ký hai lần. Xác nhận lời chúc xoá media quá hạn 90 ngày TRƯỚC khi ghi `confirmed_at`, nếu không bấm xác nhận thẳng sẽ "hồi sinh" thêm 30 ngày.
 - Nhật ký lỗi 5xx của IT che token ở `/api/qr/:token/…` (chung bộ lọc `sanitizePath` với GA).
 
+### T-55 — Header/footer trang auth kính mờ phủ lên ảnh sân khấu
+
+- Bối cảnh: T-46/D-80 đã cho `.nav` kính mờ, nhưng ở trang auth ảnh `.auth-stage` bắt đầu **dưới** header nên không có gì phía sau để `backdrop-filter` làm mờ (trông như nền đặc).
+- `LocaleLayout` gắn `page-auth` cho `AUTH_PAGES`. Với `.page-auth`: sân khấu cao `100svh`, padding trên/dưới 112px; `.nav-auth` giữ `position: sticky` thừa hưởng từ `.nav` và dùng `margin-bottom: -56px` để ảnh trượt lên nằm sau thanh; `.auth-foot` là `position: absolute; bottom: 0` (không blur-fixed/sticky).
+- Kính tối: nền `rgba(14,22,32,.34)`, `blur(18px) saturate(160%)`, viền sáng 18%, chữ sáng; có `@supports not` rơi về nền đặc.
+- **Không dùng `position: fixed` cho phần tử có `backdrop-filter`**: test `AccountTheme.extra.test.jsx` (quy tắc design-rules) cấm; ngoại lệ chỉ là `.nav`. Lần đầu dùng `fixed` làm test hỏng → đổi sang sticky + margin âm. Chiều cao header (~56px) là hằng số ở `margin-bottom`; đổi padding `.nav-auth` thì phải đổi theo.

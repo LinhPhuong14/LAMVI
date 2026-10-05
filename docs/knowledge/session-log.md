@@ -1,5 +1,17 @@
 # Nhật ký phiên
 
+## 2026-10-05 (phiên 2) — Header/footer auth kính mờ (nhánh `fix/glass-header-footer`, `docs/glass-auth-header-footer`)
+
+**Mục tiêu người dùng**: "sửa các phần banner và footer thành dạng glass morphism" (ảnh chụp trang đặt lại mật khẩu).
+
+**Đã làm**: T-55. Thêm class `page-auth`; ảnh sân khấu phủ sau header/footer; kính tối cho `.nav-auth` và `.auth-foot`. Không đổi nghiệp vụ nên không thêm `D-xx` (thuộc D-80).
+
+**Bẫy**: bản đầu dùng `position: fixed` + `backdrop-filter` cho `.nav-auth` → `AccountTheme.extra.test.jsx` hỏng (chỉ `.nav` được miễn). Sửa bằng sticky + `margin-bottom: -56px`, không nới test. Lần chạy `npm test` đầu chỉ thấy 1 test hỏng; chạy lại nguyên bộ mới ra tên.
+
+**Kiểm thử độc lập (T-11)**: subagent đọc diff, thêm `src/components/AuthGlass.extra.test.jsx`.
+
+**Còn lại**: chưa xem bằng mắt trên trình duyệt thật (mobile, trình duyệt không có `backdrop-filter`).
+
 ## 2026-10-05 — Lời chúc & QR, quản lý người dùng, Resend (nhánh `feat/gift-message-admin-users`)
 
 **Mục tiêu người dùng**: kiểm tra production so với BA; rồi "thêm quản lý user vào admin, làm lời chúc và trang QR lời chúc"; "tích hợp luôn Resend, dashboard IT đang báo có config nhưng chưa tích hợp". Người dùng báo đã gắn Supabase thật, Resend, OAuth, OpenAI cho Mây, GA4, Vercel Web Analytics.

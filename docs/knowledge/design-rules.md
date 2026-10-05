@@ -168,7 +168,7 @@ Quy tắc:
 ## 9. Hiệu năng
 
 - Ngân sách `[ASSUMPTION]` (NFR-PERF-001): LCP ≤ 2,5s, CLS ≤ 0,1.
-- Kính mờ (T-45): thẻ công khai dùng `--g-*` (nền trong 62%, blur 14px, viền trắng 70%, đường sáng mép trên). Thanh điều hướng `.nav` cũng kính mờ (T-46, D-80) — **ngoại lệ duy nhất** của quy tắc dưới đây.
+- Kính mờ (T-45): thẻ công khai dùng `--g-*` (nền trong 62%, blur 14px, viền trắng 70%, đường sáng mép trên). Thanh điều hướng `.nav` cũng kính mờ (T-46, D-80) — **ngoại lệ duy nhất** của quy tắc dưới đây. Trang auth (T-55): header/footer kính **tối** (nền 34%, blur 18px) phủ lên ảnh sân khấu toàn màn hình; header vẫn sticky (margin âm kéo ảnh lên sau), footer `absolute` — không `fixed` + blur.
 - Không lớp phủ `position: fixed` có `mix-blend-mode`/`backdrop-filter` (ngoại lệ: `.nav`, T-46). `backdrop-filter` chỉ dùng cho phần tử cuộn cùng trang (dashboard, T-35), không cho phần tử dính/cố định.
 - Texture là data-URI SVG nhỏ trong biến CSS.
 - Ảnh: WebP, lazy, có kích thước; tổng ảnh tư liệu trên trang chủ < 600 KB ở desktop.
