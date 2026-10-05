@@ -41,7 +41,7 @@ export default function LocaleLayout({ lang }) {
       <LazyMotion features={domAnimation} strict>
         <MotionConfig reducedMotion="user">
           <CartProvider>
-            <div className={app ? 'page page-app' : 'page'}>
+            <div className={app ? 'page page-app' : auth ? 'page page-auth' : 'page'}>
               {!app && (auth ? <AuthHeader /> : <SiteHeader />)}
               <PageTransition
                 pageKey={`${lang}${clean}`}

@@ -3285,3 +3285,71 @@
     animation: none;
   }
 }
+
+/* ---------- Trang auth: header + footer kính mờ phủ lên ảnh sân khấu ----------
+   Ảnh nền kéo dài toàn màn hình, header ghim đầu / footer ghim cuối nằm trên ảnh nên backdrop-filter có gì để làm mờ. */
+.page-auth {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-auth > main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-auth .auth-stage {
+  flex: 1;
+  min-height: 100svh;
+  padding-top: 112px;
+  padding-bottom: 112px;
+}
+
+.page-auth .nav-auth,
+.page-auth .auth-foot {
+  background: rgba(14, 22, 32, 0.34);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  color: rgba(248, 239, 217, 0.9);
+}
+
+.page-auth .nav-auth {
+  position: fixed;
+  left: 0;
+  right: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+}
+
+.page-auth .nav-auth::after {
+  display: none;
+}
+
+.page-auth .nav-auth .lang-switch a {
+  color: rgba(248, 239, 217, 0.72);
+}
+
+.page-auth .nav-auth .lang-switch a.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.page-auth .auth-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 22px 16px 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .page-auth .nav-auth,
+  .page-auth .auth-foot {
+    background: rgba(14, 22, 32, 0.82);
+  }
+}
