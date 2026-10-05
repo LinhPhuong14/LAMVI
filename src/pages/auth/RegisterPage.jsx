@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import PasswordRules from '../../components/PasswordRules.jsx'
 import Field from '../../components/Field'
 import { api } from '../../api/client.js'
 import { LOCALES, useI18n } from '../../i18n/index.js'
@@ -65,8 +66,8 @@ export default function RegisterPage() {
           value={form.password}
           onChange={set('password')}
           error={fields.password}
-          hint={t('auth.passwordHint')}
         />
+        <PasswordRules password={form.password} />
         <Field label={t('auth.phone')} type="tel" autoComplete="tel" value={form.phone} onChange={set('phone')} error={fields.phone} />
         <Field
           as="select"

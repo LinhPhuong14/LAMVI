@@ -8,9 +8,9 @@ import { createMemoryStorage } from './adapters/memory/storage.js'
 let app, repo, auth, storage, admin, customer
 
 async function login(email, role) {
-  const { user } = await auth.signUp({ email, password: 'matkhau123' })
+  const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: email, role })
-  const s = await auth.signIn({ email, password: 'matkhau123' })
+  const s = await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })
   return `Bearer ${s.accessToken}`
 }
 

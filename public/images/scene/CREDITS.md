@@ -37,3 +37,8 @@ Tải ngày 2026-10-01 qua Openverse (lọc CC0 1.0). Dùng làm lớp phủ đ�
 | `hills-gold-1280.webp`, `hills-gold-640.webp` | Foggy mountain Vietnam (đồi sương lúc bình minh) | — / rawpixel (bản gốc từ Wikimedia Commons) | CC0 1.0 | https://www.rawpixel.com/image/3289307/free-photo-image-brown-background-cc0-countryside | Nén WebP; bản gốc 1024px nên bản 1280px là phóng nhẹ (chỉ dùng độ đậm thấp) |
 
 `halong-mist-*` và `lanterns-night-*` không còn dùng ở trang chủ (giữ lại trong thư mục).
+
+## Dẫn xuất
+
+- `public/images/mail/banner.jpg` (banner đầu thư, T-56) dựng từ `lanterns-night-1280.webp` bằng `npm run gen:mail-banner` (cần python3 + Pillow): làm mờ, phủ chàm đêm, thêm chữ. Cùng giấy phép với ảnh nguồn; thay bằng ảnh sản phẩm thật khi có (G-33).
+

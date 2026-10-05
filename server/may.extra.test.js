@@ -44,9 +44,9 @@ function build(script, opts = {}) {
 }
 
 async function login(email, role) {
-  const { user } = await auth.signUp({ email, password: 'matkhau123' })
+  const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: email, role })
-  return { id: user.id, email, bearer: `Bearer ${(await auth.signIn({ email, password: 'matkhau123' })).accessToken}` }
+  return { id: user.id, email, bearer: `Bearer ${(await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })).accessToken}` }
 }
 
 const chat = (body, token) => {

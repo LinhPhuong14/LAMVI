@@ -4669,3 +4669,44 @@
   gap: 16px;
   margin-top: 20px;
 }
+
+/* Danh sách quy tắc mật khẩu (D-91) */
+.pw-rules {
+  margin: -4px 0 16px;
+  font-size: 0.9rem;
+}
+
+.pw-rules-title {
+  margin: 0 0 6px;
+  opacity: 0.8;
+}
+
+.pw-rules ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.pw-rules li {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  opacity: 0.85;
+}
+
+.pw-rules li.is-ok {
+  color: var(--la);
+  opacity: 1;
+}
+
+.pw-rules li.is-bad {
+  color: var(--son);
+}
+
+.pw-rules-mark {
+  width: 1em;
+  flex: none;
+  text-align: center;
+}

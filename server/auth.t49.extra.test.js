@@ -11,7 +11,7 @@ import { COOKIE as GOOGLE_COOKIE } from './google.js'
 // T-49 (kiểm thử độc lập): cookie phiên, đặt lại mật khẩu, HIBP, rate limit, CSRF
 let app, auth, repo, mailer
 const config = { publicSiteUrl: 'https://moc.test', rateLimit: { enabled: false } }
-const valid = { email: 'an@example.com', password: 'matkhau123', fullName: 'An' }
+const valid = { email: 'an@example.com', password: 'Gio-Hoa#Sen2026', fullName: 'An' }
 
 function setup({ cfg = config, pwned = null, authWrap } = {}) {
   repo = createMemoryRepo()
@@ -60,7 +60,7 @@ describe('reset-password: đồng thời và kiểu dữ liệu lạ', () => {
     ['true', true],
     ['chuỗi rỗng', ''],
   ])('token kiểu %s → 400 INVALID_RESET_TOKEN, không 500', async (_n, token) => {
-    const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhau-moi-1' })
+    const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Gio#Lanh82' })
     expect(res.status).toBe(400)
     expect(res.body.error.code).toBe('INVALID_RESET_TOKEN')
   })
@@ -78,7 +78,7 @@ describe('reset-password: đồng thời và kiểu dữ liệu lạ', () => {
     const res = await request(app).post('/api/auth/reset-password').send({ token, password })
     expect(res.status).toBe(400)
     expect(res.body.error.code).toBe('VALIDATION_ERROR')
-    await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhau-moi-1' }).expect(204)
+    await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Gio#Lanh82' }).expect(204)
   })
 
   it('token hết hạn (sau 1 giờ) → 400; token của người dùng A không đổi được mật khẩu B', async () => {
@@ -90,7 +90,7 @@ describe('reset-password: đồng thời và kiểu dữ liệu lạ', () => {
     await login()
     const token = await recoveryToken()
     t += 3600_000 + 1
-    const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhau-moi-1' })
+    const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Gio#Lanh82' })
     expect(res.status).toBe(400)
     // đăng nhập bằng mật khẩu cũ vẫn được
     await request(app).post('/api/auth/login').send({ email: valid.email, password: valid.password }).expect(200)
@@ -99,17 +99,17 @@ describe('reset-password: đồng thời và kiểu dữ liệu lạ', () => {
   it('reset thành công: xoá cookie, ghi audit (không lộ mật khẩu/token), gửi thư báo đổi mật khẩu', async () => {
     const { body } = await login()
     const token = await recoveryToken()
-    const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhau-moi-1' })
+    const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Gio#Lanh82' })
     expect(res.status).toBe(204)
     expect(rtCookie(res)).toMatch(/^lamvi_rt=; Max-Age=0; Path=\/api\/auth; HttpOnly/)
     const logs = await repo.listAuditLog({ entity: 'account', entityId: body.user.id })
     expect(logs).toHaveLength(1)
     expect(logs[0]).toMatchObject({ action: 'password_changed', actorId: body.user.id })
-    expect(JSON.stringify(logs)).not.toContain('matkhau-moi-1')
+    expect(JSON.stringify(logs)).not.toContain('Moi-Gio#Lanh82')
     expect(JSON.stringify(logs)).not.toContain(token)
     const last = mailer.outbox.at(-1)
     expect(last.to).toBe(valid.email)
-    expect(last.text + last.html).not.toContain('matkhau-moi-1')
+    expect(last.text + last.html).not.toContain('Moi-Gio#Lanh82')
     expect(last.text + last.html).not.toContain(token)
   })
 
@@ -118,24 +118,24 @@ describe('reset-password: đồng thời và kiểu dữ liệu lạ', () => {
     const token = await recoveryToken()
     repo.appendAuditLog = async () => { throw new Error('db down') }
     mailer.send = async () => { throw new Error('smtp down') }
-    await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhau-moi-1' }).expect(204)
-    await request(app).post('/api/auth/login').send({ email: valid.email, password: 'matkhau-moi-1' }).expect(200)
+    await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Gio#Lanh82' }).expect(204)
+    await request(app).post('/api/auth/login').send({ email: valid.email, password: 'Moi-Gio#Lanh82' }).expect(200)
   })
 
   it('reset không dùng cookie/Origin: gọi từ Origin lạ vẫn phụ thuộc vào token (không phải CSRF-able bằng cookie)', async () => {
-    const res = await request(app).post('/api/auth/reset-password').set('Origin', 'https://evil.test').send({ token: 'sai', password: 'matkhau-moi-1' })
+    const res = await request(app).post('/api/auth/reset-password').set('Origin', 'https://evil.test').send({ token: 'sai', password: 'Moi-Gio#Lanh82' })
     expect(res.status).toBe(400)
   })
 })
 
 describe('forgot-password: enumeration và độ bền', () => {
-  it('thân và mã phản hồi giống hệt cho email có / không có tài khoản', async () => {
+  it('D-92: email có tài khoản → 202; chưa có → 404 EMAIL_NOT_REGISTERED; cả hai không đặt cookie, chỉ gửi thư cho tài khoản thật', async () => {
     await request(app).post('/api/auth/register').send(valid).expect(201)
     const a = await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
     const b = await request(app).post('/api/auth/forgot-password').send({ email: 'khong-co@example.com' })
-    expect(a.status).toBe(b.status)
-    expect(a.body).toEqual(b.body)
-    expect(a.headers['content-type']).toBe(b.headers['content-type'])
+    expect(a.status).toBe(202)
+    expect(b.status).toBe(404)
+    expect(b.body.error.code).toBe('EMAIL_NOT_REGISTERED')
     expect(a.headers['set-cookie']).toBeUndefined()
     expect(b.headers['set-cookie']).toBeUndefined()
     expect(mailer.outbox).toHaveLength(1)
@@ -176,7 +176,7 @@ describe('forgot-password: enumeration và độ bền', () => {
     await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
     await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
     expect(resetToken(0)).not.toBe(resetToken(1))
-    await request(app).post('/api/auth/reset-password').send({ token: resetToken(1), password: 'matkhau-moi-1' }).expect(204)
+    await request(app).post('/api/auth/reset-password').send({ token: resetToken(1), password: 'Moi-Gio#Lanh82' }).expect(204)
   })
 })
 
@@ -422,7 +422,7 @@ describe('HIBP: pwned.js', () => {
   const fetchWith = (text, ok = true) => vi.fn(async () => ({ ok, text: async () => text }))
 
   it('chỉ gửi 5 ký tự đầu của SHA-1, kèm Add-Padding, không gửi mật khẩu/hậu tố', async () => {
-    const pw = 'matkhau123'
+    const pw = 'Gio-Hoa#Sen2026'
     const f = fetchWith('')
     await isPwnedPassword(pw, f)
     const [url, init] = f.mock.calls[0]
@@ -433,7 +433,7 @@ describe('HIBP: pwned.js', () => {
   })
 
   it('khớp hậu tố với count>0 → true; count 0 (đệm) → false; hậu tố khác → false', async () => {
-    const pw = 'matkhau123'
+    const pw = 'Gio-Hoa#Sen2026'
     const suf = sha1(pw).slice(5)
     expect(await isPwnedPassword(pw, fetchWith(`AAAA:3\r\n${suf}:12\r\n`))).toBe(true)
     expect(await isPwnedPassword(pw, fetchWith(`${suf}:0\r\nBBB:5`))).toBe(false)
@@ -470,11 +470,11 @@ describe('HIBP: pwned.js', () => {
 })
 
 describe('mật khẩu bị lộ ở các luồng (thứ tự kiểm tra)', () => {
-  const breached = (pw) => pw === 'matkhau-lo-1'
+  const breached = (pw) => pw === 'Lo-Roi#Mat5517'
   beforeEach(() => setup({ pwned: async (pw) => breached(pw) }))
 
   it('đăng ký → 400 PASSWORD_BREACHED, tài khoản/hồ sơ không được tạo', async () => {
-    const res = await request(app).post('/api/auth/register').send({ ...valid, password: 'matkhau-lo-1' })
+    const res = await request(app).post('/api/auth/register').send({ ...valid, password: 'Lo-Roi#Mat5517' })
     expect(res.status).toBe(400)
     expect(res.body.error.fields).toEqual({ password: 'PASSWORD_BREACHED' })
     await request(app).post('/api/auth/register').send(valid).expect(201)
@@ -483,17 +483,17 @@ describe('mật khẩu bị lộ ở các luồng (thứ tự kiểm tra)', () =
   it('reset với mật khẩu lộ → 400 và token KHÔNG bị tiêu thụ; sau đó mật khẩu tốt dùng cùng token được', async () => {
     await login()
     const token = await recoveryToken()
-    const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhau-lo-1' })
+    const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'Lo-Roi#Mat5517' })
     expect(res.status).toBe(400)
     expect(res.body.error.fields.password).toBe('PASSWORD_BREACHED')
     expect(mailer.outbox).toHaveLength(1) // chưa có thư báo đổi mật khẩu
-    await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhau-moi-1' }).expect(204)
+    await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Gio#Lanh82' }).expect(204)
   })
 
   it('đổi mật khẩu với mật khẩu lộ → 400, mật khẩu cũ và phiên giữ nguyên', async () => {
     const l = await login()
     const res = await request(app).post('/api/auth/change-password').set('Authorization', `Bearer ${l.body.accessToken}`)
-      .send({ currentPassword: valid.password, password: 'matkhau-lo-1' })
+      .send({ currentPassword: valid.password, password: 'Lo-Roi#Mat5517' })
     expect(res.status).toBe(400)
     await request(app).get('/api/me').set('Authorization', `Bearer ${l.body.accessToken}`).expect(200)
   })
@@ -517,7 +517,8 @@ describe('mật khẩu bị lộ ở các luồng (thứ tự kiểm tra)', () =
   it('mật khẩu unicode đúng 72 byte được chấp nhận và chuyển nguyên vẹn cho HIBP; 73 byte bị từ chối', async () => {
     const seen = []
     app = createApp({ repo, auth, config, mailer, pwned: async (p) => { seen.push(p); return false } })
-    const pw72 = 'ệ'.repeat(24)
+    const pw72 = `Ệ1ab${'ệ'.repeat(22)}` // đúng 72 byte, đủ chữ thường/HOA/số
+    expect(Buffer.byteLength(pw72)).toBe(72)
     await request(app).post('/api/auth/register').send({ ...valid, password: pw72 }).expect(201)
     expect(seen).toEqual([pw72])
     await request(app).post('/api/auth/login').send({ email: valid.email, password: pw72 }).expect(200)
@@ -532,7 +533,7 @@ describe('rate limit (sửa lỗi keys rỗng cũ)', () => {
   beforeEach(() => setup({ cfg: { ...config, rateLimit: rl } }))
 
   it('reset-password đếm thật: vượt ngưỡng → 429 kèm Retry-After, kể cả khi token sai', async () => {
-    const go = () => request(app).post('/api/auth/reset-password').send({ token: 'sai', password: 'matkhau-moi-1' })
+    const go = () => request(app).post('/api/auth/reset-password').send({ token: 'sai', password: 'Moi-Gio#Lanh82' })
     expect((await go()).status).toBe(400)
     expect((await go()).status).toBe(400)
     const third = await go()
@@ -543,11 +544,11 @@ describe('rate limit (sửa lỗi keys rỗng cũ)', () => {
 
   it('bộ đếm reset và change tách nhau; change đếm theo user chứ không theo IP', async () => {
     const l = await login()
-    const bad = () => request(app).post('/api/auth/reset-password').send({ token: 'sai', password: 'matkhau-moi-1' })
+    const bad = () => request(app).post('/api/auth/reset-password').send({ token: 'sai', password: 'Moi-Gio#Lanh82' })
     await bad(); await bad(); expect((await bad()).status).toBe(429)
     // reset bị chặn không ảnh hưởng đổi mật khẩu
     const ch = () => request(app).post('/api/auth/change-password').set('Authorization', `Bearer ${l.body.accessToken}`)
-      .send({ currentPassword: 'sai-sai-sai', password: 'matkhau-moi-1' })
+      .send({ currentPassword: 'sai-sai-sai', password: 'Moi-Gio#Lanh82' })
     expect((await ch()).status).toBe(400)
     expect((await ch()).status).toBe(400)
     expect((await ch()).status).toBe(429)
@@ -555,7 +556,7 @@ describe('rate limit (sửa lỗi keys rỗng cũ)', () => {
     await request(app).post('/api/auth/register').send({ ...valid, email: 'b@example.com' })
     const b = await request(app).post('/api/auth/login').send({ email: 'b@example.com', password: valid.password })
     const chB = await request(app).post('/api/auth/change-password').set('Authorization', `Bearer ${b.body.accessToken}`)
-      .send({ currentPassword: 'sai-sai-sai', password: 'matkhau-moi-1' })
+      .send({ currentPassword: 'sai-sai-sai', password: 'Moi-Gio#Lanh82' })
     expect(chB.status).toBe(400)
   })
 

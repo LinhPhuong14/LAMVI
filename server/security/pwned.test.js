@@ -36,8 +36,8 @@ describe('isPwnedPassword — HIBP k-anonymity (T-49)', () => {
 
 describe('Mật khẩu đã lộ bị từ chối ở đăng ký / đặt lại / đổi (T-49)', () => {
   const config = { publicSiteUrl: 'https://moc.test', rateLimit: { enabled: false } }
-  const pwned = vi.fn(async (p) => p === 'matkhaudalo1')
-  const valid = { email: 'an@example.com', password: 'matkhau123', fullName: 'An' }
+  const pwned = vi.fn(async (p) => p === 'Da-Lo#Roi9283')
+  const valid = { email: 'an@example.com', password: 'Gio-Hoa#Sen2026', fullName: 'An' }
   const build = () => {
     const mailer = createMemoryMailer()
     const auth = createMemoryAuth()
@@ -46,10 +46,10 @@ describe('Mật khẩu đã lộ bị từ chối ở đăng ký / đặt lại 
 
   it('register → 400 fields.password = PASSWORD_BREACHED, không tạo tài khoản', async () => {
     const { app } = build()
-    const res = await request(app).post('/api/auth/register').send({ ...valid, password: 'matkhaudalo1' })
+    const res = await request(app).post('/api/auth/register').send({ ...valid, password: 'Da-Lo#Roi9283' })
     expect(res.status).toBe(400)
     expect(res.body.error.fields).toEqual({ password: 'PASSWORD_BREACHED' })
-    expect((await request(app).post('/api/auth/login').send({ ...valid, password: 'matkhaudalo1' })).status).toBe(401)
+    expect((await request(app).post('/api/auth/login').send({ ...valid, password: 'Da-Lo#Roi9283' })).status).toBe(401)
     expect((await request(app).post('/api/auth/register').send(valid)).status).toBe(201)
   })
 
@@ -65,10 +65,10 @@ describe('Mật khẩu đã lộ bị từ chối ở đăng ký / đặt lại 
     await request(app).post('/api/auth/register').send(valid)
     await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
     const token = decodeURIComponent(mailer.outbox[0].text.match(/#t=(\S+)/)[1])
-    const bad = await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhaudalo1' })
+    const bad = await request(app).post('/api/auth/reset-password').send({ token, password: 'Da-Lo#Roi9283' })
     expect(bad.status).toBe(400)
     expect(bad.body.error.fields.password).toBe('PASSWORD_BREACHED')
-    await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhaumoi1' }).expect(204)
+    await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Nang#Xuan71' }).expect(204)
   })
 
   it('change-password → 400, mật khẩu cũ vẫn dùng được', async () => {
@@ -78,7 +78,7 @@ describe('Mật khẩu đã lộ bị từ chối ở đăng ký / đặt lại 
     const res = await request(app)
       .post('/api/auth/change-password')
       .set('Authorization', `Bearer ${body.accessToken}`)
-      .send({ currentPassword: valid.password, password: 'matkhaudalo1' })
+      .send({ currentPassword: valid.password, password: 'Da-Lo#Roi9283' })
     expect(res.status).toBe(400)
     expect(res.body.error.fields.password).toBe('PASSWORD_BREACHED')
     expect((await request(app).post('/api/auth/login').send(valid)).status).toBe(200)

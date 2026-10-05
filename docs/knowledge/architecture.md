@@ -25,6 +25,7 @@ server/
   monitoring/              metrics.js (số liệu API), maintenance.js (bảo trì), health.js (kiểm tra tích hợp)
   may/                     config.js (cấu hình mặc định + validate), guard.js (PII, kiểm tra số, FAQ offline), tools.js (hàm backend cho Mây), service.js
   cart/service.js          Giỏ hàng: tính giá, gộp, giới hạn (D-59, D-60)
+  orders/notify.js         Thông báo đơn hàng qua email (§20, D-93, T-56)
   messages/service.js      Lời chúc: soạn (chữ/giọng nói/video), trang QR người nhận, xác nhận, dịch, xoá media hết hạn (FR-MSG-001, FR-QR-002…005, T-54)
   security/lockedAccounts.js  Bọc auth provider: tài khoản bị khoá không có phiên (G-19, T-54)
   orders/service.js        Checkout → đơn → thanh toán: quoteCart (T-40), createOrder, webhook payOS, huỷ, hết hạn (T-41)
@@ -35,7 +36,7 @@ server/
   domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js, pricing.js, order.js, coupon.js, couponValidate.js, message.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
   middleware/sessionCookie.js  cookie refresh token HttpOnly (`lamvi_rt`), `sameOriginOnly` chống CSRF (T-49)
-  mail/{mailer,templates}.js   thư giao dịch qua Resend/Brevo (HTTPS), mẫu thư vi/en/zh (T-49)
+  mail/{mailer,templates}.js   thư giao dịch qua Resend/Brevo (HTTPS), khung thư dùng chung (banner + bố cục) và mẫu thư vi/en/zh (T-49, T-56)
   security/pwned.js        kiểm mật khẩu đã lộ (HIBP k-anonymity, fail-open) (T-49)
   middleware/security.js   Security headers + CSP hash (T-37)
   middleware/rateLimit.js  Chống dò/spam, đếm trong DB (T-38, G-20)
@@ -62,6 +63,8 @@ src/
   i18n/                    core.js (translate, localePath), index.js (useI18n), LocaleProvider.jsx, messages/{vi,en,zh}.js
   api/                     client.js (api, ApiError), useApi.js
   auth/                    AuthProvider.jsx, context.js (useAuth, phiên), useForm.js
+  lib/password.js          Quy tắc mật khẩu cơ bản, dùng chung server + giao diện (D-91)
+  auth/landing.js          Trang đích sau đăng nhập: admin/IT → /admin (D-94)
   hooks/useNoIndex.js      meta robots noindex (BR-SEO-001, D-44)
   components/              SiteHeader, SiteFooter, LocaleLayout, Price, Field, Faq, Marquee, Lantern…
                            Reveal.jsx (Reveal, CountUp — motion xuất hiện/biến mất), Effects.jsx (TiltCard, PointerGlow, BrandHover — T-24), Motifs.jsx (hoạ tiết SVG: trống đồng, mây, sen, con dấu, dấu bưu điện, ảnh cũ)
@@ -201,8 +204,8 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | POST | `/api/auth/login` | – | → phiên `{ accessToken, expiresAt, user }` + cookie `lamvi_rt` (HttpOnly). Không có `refreshToken` trong body (T-49) |
 | POST | `/api/auth/refresh` | Cookie `lamvi_rt` + kiểm Origin | → phiên mới, xoay vòng cookie; cookie bị từ chối → xoá cookie, 401 |
 | POST | `/api/auth/logout` | Bearer hoặc cookie + kiểm Origin | 204; luôn xoá cookie, thu hồi mọi phiên (cả khi access token đã hết hạn) |
-| POST | `/api/auth/forgot-password?lang=` | – | Luôn 202 |
-| POST | `/api/auth/reset-password` | – (token một lần trong body) | `{ token, password }` → 204, thu hồi mọi phiên, thư báo đổi. Token sai/hết hạn/đã dùng → 400 `INVALID_RESET_TOKEN`; mật khẩu yếu/đã lộ → 400 (token chưa bị tiêu thụ) |
+| POST | `/api/auth/forgot-password?lang=` | – | `{ email }` → 202 và gửi thư; email chưa đăng ký → 404 `EMAIL_NOT_REGISTERED` (D-92) |
+| POST | `/api/auth/reset-password` | – (token một lần trong body) | `{ token, password , confirmPassword? }` → 204, thu hồi mọi phiên, thư báo đổi. Token sai/hết hạn/đã dùng → 400 `INVALID_RESET_TOKEN`; mật khẩu yếu/đã lộ → 400 (token chưa bị tiêu thụ) |
 | POST | `/api/auth/change-password` | Bearer | `{ currentPassword, password }` → 204, thu hồi mọi phiên (G-18) |
 | GET | `/api/me` | Bearer | Hồ sơ |
 | PATCH | `/api/me` | Bearer | `{ fullName?, phone?, preferredLocale? }` |

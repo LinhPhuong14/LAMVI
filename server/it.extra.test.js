@@ -13,7 +13,7 @@ import { runHealthChecks } from './monitoring/health.js'
 import { maintenancePage, renderPage } from './ssr.js'
 import { classifyPath } from '../src/seo/routes.js'
 
-const PW = 'matkhau123'
+const PW = 'Gio-Hoa#Sen2026'
 const UUID = '3f2b9c1e-7a4d-4e5f-9b8a-1c2d3e4f5a6b'
 
 let app, repo, auth, metrics, maintenance, tokens, clock, web
@@ -213,13 +213,13 @@ describe('Nhãn route trong số liệu (D-52)', () => {
       throw new Error('db down')
     }
     await request(app).get('/api/faq?token=qs-bi-mat').set('Authorization', 'Bearer header-bi-mat')
-    await request(app).post('/api/auth/login?x=qs-bi-mat').send({ email: 'it@moc.test', password: 'mat-khau-bi-mat' })
+    await request(app).post('/api/auth/login?x=qs-bi-mat').send({ email: 'it@moc.test', password: 'Bi-Mat#Rat9917k' })
     await metrics.flush()
     const dump = JSON.stringify({
       m: await repo.listApiMetrics({ since: '2000-01-01T00:00:00Z' }),
       e: await repo.listApiErrors({ since: '2000-01-01T00:00:00Z' }),
     })
-    expect(dump).not.toMatch(/qs-bi-mat|header-bi-mat|mat-khau-bi-mat|matkhau123/)
+    expect(dump).not.toMatch(/qs-bi-mat|header-bi-mat|Bi-Mat#Rat9917k|Gio-Hoa#Sen2026/)
     expect(dump).toContain('/api/faq')
   })
 
@@ -596,7 +596,9 @@ describe('Chế độ bảo trì — cache & nhiều instance (D-54)', () => {
       maintenance: createMaintenance({ repo: r, ttlMs: 0 }),
     })
     const res = await request(a).post('/api/auth/forgot-password').send({ email: 'x@moc.test' })
-    expect(res.status).toBe(202)
+    // Email chưa đăng ký → 404 nghiệp vụ (D-92), điều cần kiểm là API KHÔNG bị chặn bảo trì (503)
+    expect(res.status).toBe(404)
+    expect(res.body.error.code).toBe('EMAIL_NOT_REGISTERED')
     err.mockRestore()
   })
 

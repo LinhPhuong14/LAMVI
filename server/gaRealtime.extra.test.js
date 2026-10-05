@@ -222,9 +222,9 @@ describe('GA realtime — không rò bí mật', () => {
     const auth = createMemoryAuth()
     const storage = createMemoryStorage({ maxBytes: 1024 })
     const app = createApp({ repo, auth, storage, config, gaRealtime })
-    const { user } = await auth.signUp({ email: 'a@x.test', password: 'matkhau123' })
+    const { user } = await auth.signUp({ email: 'a@x.test', password: 'Gio-Hoa#Sen2026' })
     await repo.upsertProfile({ id: user.id, fullName: 'A', role: 'admin' })
-    const admin = `Bearer ${(await auth.signIn({ email: 'a@x.test', password: 'matkhau123' })).accessToken}`
+    const admin = `Bearer ${(await auth.signIn({ email: 'a@x.test', password: 'Gio-Hoa#Sen2026' })).accessToken}`
     return { app, admin }
   }
 

@@ -11,9 +11,9 @@ import { loadConfig } from './config.js'
 let app, repo, auth, storage, clock, admin, customer, adminId
 
 async function login(email, role) {
-  const { user } = await auth.signUp({ email, password: 'matkhau123' })
+  const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: email, role })
-  const s = await auth.signIn({ email, password: 'matkhau123' })
+  const s = await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })
   return { header: `Bearer ${s.accessToken}`, id: user.id }
 }
 
@@ -135,9 +135,9 @@ describe('Bảo mật — mọi endpoint /api/admin/* (D-38, §3.2)', () => {
   })
 
   it('người dùng không có hồ sơ (profile) → 403', async () => {
-    const { user } = await auth.signUp({ email: 'noprofile@moc.test', password: 'matkhau123' })
+    const { user } = await auth.signUp({ email: 'noprofile@moc.test', password: 'Gio-Hoa#Sen2026' })
     expect(user.id).toBeTruthy()
-    const s = await auth.signIn({ email: 'noprofile@moc.test', password: 'matkhau123' })
+    const s = await auth.signIn({ email: 'noprofile@moc.test', password: 'Gio-Hoa#Sen2026' })
     expect((await as('get', '/api/admin/products', `Bearer ${s.accessToken}`)).status).toBe(403)
   })
 

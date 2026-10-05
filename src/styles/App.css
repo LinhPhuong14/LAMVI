@@ -3330,16 +3330,6 @@
   backdrop-filter: blur(18px) saturate(140%);
 }
 
-.page-auth .nav-auth {
-  margin-bottom: -56px; /* vẫn sticky từ .nav; kéo sân khấu lên nằm sau thanh kính */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
-}
-
-.page-auth .nav-auth::after {
-  display: none;
-}
-
 .page-auth .nav-auth .lang-switch a {
   color: rgba(248, 239, 217, 0.72);
 }

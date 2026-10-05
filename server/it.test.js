@@ -12,9 +12,9 @@ let app, repo, auth, metrics, maintenance, tokens
 let clock
 
 async function login(email, role) {
-  const { user } = await auth.signUp({ email, password: 'matkhau123' })
+  const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: email, role })
-  return `Bearer ${(await auth.signIn({ email, password: 'matkhau123' })).accessToken}`
+  return `Bearer ${(await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })).accessToken}`
 }
 
 beforeEach(async () => {
@@ -151,7 +151,7 @@ describe('Chế độ bảo trì (D-54)', () => {
     expect((await request(app).post('/api/auth/register').send({})).status).toBe(503)
 
     expect((await request(app).get('/api/products')).status).toBe(200)
-    expect((await request(app).post('/api/auth/login').send({ email: 'it@moc.test', password: 'matkhau123' })).status).toBe(200)
+    expect((await request(app).post('/api/auth/login').send({ email: 'it@moc.test', password: 'Gio-Hoa#Sen2026' })).status).toBe(200)
 
     const off = await request(app).put('/api/it/maintenance').set('Authorization', tokens.it).send({ enabled: false })
     expect(off.body.enabled).toBe(false)

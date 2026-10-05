@@ -26,7 +26,7 @@ const COUPON_ERRORS = new Set([
   'COUPON_NOT_APPLICABLE',
 ])
 
-export function createOrderService({ repo, payos = null, now = () => new Date() }) {
+export function createOrderService({ repo, payos = null, now = () => new Date(), notify = async () => false }) {
   const isPublic = (p) => PUBLIC_PRODUCT_STATUSES.includes(p.status)
 
   async function pricingConfig() {
@@ -204,6 +204,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
 
       let payment = null
       if (!isCod) payment = await startPayosPayment(created, { siteUrl })
+      // §20: đơn COD được xác nhận ngay (D-41) → báo luôn. Đơn payOS báo khi đã trả tiền (webhook).
+      if (isCod) await notify('confirmed', created)
       return { order: created, payment }
     } catch (err) {
       // C-8: tạo đơn hỏng thì trả lại lượt coupon đã giữ
@@ -305,6 +307,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
       oldValue: { status: 'pending_payment' },
       newValue: { status: 'confirmed', paymentStatus: 'paid', reference },
     })
+    // Chỉ tới đây khi chuyển trạng thái thành công → webhook gửi lại không sinh thư thứ hai
+    await notify('confirmed', updated)
     return { handled: true, order: updated }
   }
 
@@ -338,6 +342,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
       oldValue: { status: 'pending_payment' },
       newValue: { status: 'cancelled', reason: 'PAYMENT_EXPIRED' },
     })
+    await notify('payment_expired', updated)
     return updated
   }
 
@@ -379,6 +384,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
       oldValue: { status: order.status },
       newValue: { status: 'cancelled', reason: updated.cancelReason },
     })
+    await notify('cancelled', updated)
     return updated
   }
 
@@ -416,6 +422,9 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
       oldValue: { status: order.status },
       newValue: values,
     })
+    // §20: "đã gửi" (kèm mã vận đơn) và "bị huỷ" báo ngay cho người mua
+    if (next === 'shipped') await notify('shipped', updated)
+    else if (next === 'cancelled') await notify('cancelled', updated)
     return updated
   }
 
@@ -434,6 +443,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
       oldValue: { paymentStatus: 'refund_pending' },
       newValue: { paymentStatus: 'refunded', note: typeof note === 'string' ? note.slice(0, 300) : null },
     })
+    await notify('refunded', updated)
     return updated
   }
 

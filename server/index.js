@@ -7,6 +7,7 @@ import { createMayService } from './may/service.js'
 import { createOpenAiClient } from './adapters/openai.js'
 import { createPayosClient } from './adapters/payos.js'
 import { createOrderService } from './orders/service.js'
+import { createOrderNotifier } from './orders/notify.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { loadConfig } from './config.js'
 import { createConsoleMailer, createMailer } from './mail/mailer.js'
@@ -62,11 +63,16 @@ const may = createMayService({
 // FR-PAY-001: thiếu khoá payOS → client null, checkout chỉ cho COD
 const payos = createPayosClient(config.payos)
 if (!payos) console.warn('[api] Thiếu biến PAYOS_* — chỉ nhận thanh toán COD')
-const orders = createOrderService({ repo, payos })
 
 // T-49: thư giao dịch. Production phải có MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY; dev (bộ nhớ) in ra console.
 const mailer = createMailer(config.mail) ?? (config.useSupabase ? null : createConsoleMailer())
-if (!mailer) console.warn('[api] Thiếu MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY — "Quên mật khẩu" không gửi được thư')
+if (!mailer) console.warn('[api] Thiếu MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY — "Quên mật khẩu" và thông báo đơn hàng không gửi được thư')
+// §20, Q-24 → email (T-56): thông báo đơn hàng cho người mua qua cùng nhà cung cấp thư
+const orders = createOrderService({
+  repo,
+  payos,
+  notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl }),
+})
 
 const web = process.env.API_ONLY === '1' ? undefined : await createWeb({ repo, config, dev, maintenance })
 

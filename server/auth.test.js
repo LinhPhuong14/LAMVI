@@ -9,7 +9,7 @@ let app, auth, repo, mailer
 // G-20: tắt rate limit trong bộ test chức năng (nhiều test đăng ký/đăng nhập liên tiếp từ cùng
 // một IP). Hành vi giới hạn được kiểm riêng ở server/rateLimit.extra.test.js.
 const config = { publicSiteUrl: 'https://moc.test', rateLimit: { enabled: false } }
-const valid = { email: 'An@Example.com', password: 'matkhau123', fullName: 'Nguyễn An', phone: '090 123 4567' }
+const valid = { email: 'An@Example.com', password: 'Gio-Hoa#Sen2026', fullName: 'Nguyễn An', phone: '090 123 4567' }
 
 function setup(opts) {
   repo = createMemoryRepo()
@@ -191,13 +191,13 @@ describe('Đăng xuất, làm mới phiên (T-49: cookie HttpOnly)', () => {
 })
 
 describe('Quên / đặt lại mật khẩu (T-49: thư do server gửi, token một lần)', () => {
-  it('luôn trả 202, không tiết lộ email có tồn tại; chỉ gửi thư khi có tài khoản', async () => {
+  it('D-92: email đã đăng ký → 202 và gửi thư; email chưa từng đăng ký → 404 EMAIL_NOT_REGISTERED, không gửi thư', async () => {
     await request(app).post('/api/auth/register').send(valid)
     const a = await request(app).post('/api/auth/forgot-password').send({ email: 'an@example.com' })
     const b = await request(app).post('/api/auth/forgot-password').send({ email: 'khong@co.vn' })
     expect(a.status).toBe(202)
-    expect(b.status).toBe(202)
-    expect(a.body).toEqual(b.body)
+    expect(b.status).toBe(404)
+    expect(b.body.error.code).toBe('EMAIL_NOT_REGISTERED')
     expect(mailer.outbox).toHaveLength(1)
     expect(mailer.outbox[0].to).toBe('an@example.com')
   })
@@ -219,13 +219,13 @@ describe('Quên / đặt lại mật khẩu (T-49: thư do server gửi, token m
     expect(mail.html).toContain('/en/reset-password#t=')
     expect(mail.subject).toMatch(/Reset/)
 
-    await request(app).post('/api/auth/reset-password').send({ token: resetToken(), password: 'matkhaumoi1' }).expect(204)
+    await request(app).post('/api/auth/reset-password').send({ token: resetToken(), password: 'Moi-Nang#Xuan71' }).expect(204)
     expect((await request(app).post('/api/auth/login').send(valid)).status).toBe(401)
-    expect((await request(app).post('/api/auth/login').send({ ...valid, password: 'matkhaumoi1' })).status).toBe(200)
+    expect((await request(app).post('/api/auth/login').send({ ...valid, password: 'Moi-Nang#Xuan71' })).status).toBe(200)
     // phiên cũ bị thu hồi
     expect((await request(app).get('/api/me').set('Authorization', `Bearer ${token}`)).status).toBe(401)
     // dùng lại token → 400
-    const again = await request(app).post('/api/auth/reset-password').send({ token: resetToken(0), password: 'matkhaumoi2' })
+    const again = await request(app).post('/api/auth/reset-password').send({ token: resetToken(0), password: 'Moi-Nang#Xuan72' })
     expect(again.status).toBe(400)
     expect(again.body.error.code).toBe('INVALID_RESET_TOKEN')
     // thư báo đã đổi mật khẩu + nhật ký
@@ -240,12 +240,12 @@ describe('Quên / đặt lại mật khẩu (T-49: thư do server gửi, token m
     const res = await request(app).post('/api/auth/reset-password').send({ token: t, password: 'ngan' })
     expect(res.status).toBe(400)
     expect(res.body.error.fields.password).toBe('PASSWORD_TOO_SHORT')
-    await request(app).post('/api/auth/reset-password').send({ token: t, password: 'matkhaumoi1' }).expect(204)
+    await request(app).post('/api/auth/reset-password').send({ token: t, password: 'Moi-Nang#Xuan71' }).expect(204)
   })
 
   it('thiếu / sai token → 400 INVALID_RESET_TOKEN', async () => {
     for (const token of [undefined, '', 'sai-token', 123]) {
-      const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhaumoi1' })
+      const res = await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Nang#Xuan71' })
       expect(res.status).toBe(400)
       expect(res.body.error.code).toBe('INVALID_RESET_TOKEN')
     }
@@ -253,7 +253,7 @@ describe('Quên / đặt lại mật khẩu (T-49: thư do server gửi, token m
 
   it('token đăng nhập thường không thay được token đặt lại', async () => {
     const access = await registerAndLogin()
-    const res = await request(app).post('/api/auth/reset-password').send({ token: access, password: 'matkhaumoi1' })
+    const res = await request(app).post('/api/auth/reset-password').send({ token: access, password: 'Moi-Nang#Xuan71' })
     expect(res.status).toBe(400)
     expect((await request(app).post('/api/auth/login').send(valid)).status).toBe(200)
   })
@@ -266,17 +266,17 @@ describe('Đổi mật khẩu', () => {
 
   it('đúng mật khẩu hiện tại → đổi được, mọi phiên bị thu hồi', async () => {
     const token = await registerAndLogin()
-    const res = await change(token, { currentPassword: valid.password, password: 'matkhaumoi1' })
+    const res = await change(token, { currentPassword: valid.password, password: 'Moi-Nang#Xuan71' })
     expect(res.status).toBe(204)
     // Phiên cũ hết hiệu lực
     expect((await request(app).get('/api/me').set('Authorization', `Bearer ${token}`)).status).toBe(401)
     expect((await request(app).post('/api/auth/login').send(valid)).status).toBe(401)
-    expect((await request(app).post('/api/auth/login').send({ ...valid, password: 'matkhaumoi1' })).status).toBe(200)
+    expect((await request(app).post('/api/auth/login').send({ ...valid, password: 'Moi-Nang#Xuan71' })).status).toBe(200)
   })
 
   it('sai mật khẩu hiện tại → 400, mật khẩu không đổi', async () => {
     const token = await registerAndLogin()
-    const res = await change(token, { currentPassword: 'saibetnhe', password: 'matkhaumoi1' })
+    const res = await change(token, { currentPassword: 'saibetnhe', password: 'Moi-Nang#Xuan71' })
     expect(res.status).toBe(400)
     expect(res.body.error.fields.currentPassword).toBe('INVALID_CREDENTIALS')
     expect((await request(app).post('/api/auth/login').send(valid)).status).toBe(200)
@@ -284,7 +284,7 @@ describe('Đổi mật khẩu', () => {
 
   it('thiếu mật khẩu hiện tại → 400 theo trường', async () => {
     const token = await registerAndLogin()
-    const res = await change(token, { password: 'matkhaumoi1' })
+    const res = await change(token, { password: 'Moi-Nang#Xuan71' })
     expect(res.body.error.fields.currentPassword).toBe('REQUIRED')
   })
 

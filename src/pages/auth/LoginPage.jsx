@@ -5,6 +5,7 @@ import { useI18n } from '../../i18n/index.js'
 import AuthShell from './AuthShell'
 import GoogleButton from './GoogleButton'
 import { safeNext, useAuth } from '../../auth/context.js'
+import { landingPath } from '../../auth/landing.js'
 import { useSubmit } from '../../auth/useForm.js'
 
 export default function LoginPage() {
@@ -18,8 +19,10 @@ export default function LoginPage() {
 
   async function onSubmit(e) {
     e.preventDefault()
-    const ok = await run(() => login(form.email, form.password))
-    if (ok) navigate(next, { replace: true })
+    const session = await run(() => login(form.email, form.password))
+    if (!session) return
+    // Có ?next (vd đang đi tới /checkout hay /admin/orders) thì tôn trọng; không có thì admin/IT vào thẳng /admin
+    navigate(params.get('next') ? next : await landingPath(session.accessToken, next), { replace: true })
   }
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })

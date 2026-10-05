@@ -13,6 +13,7 @@ import { qrRouter } from './routes/qr.js'
 import { createMessageService } from './messages/service.js'
 import { withAccountLock } from './security/lockedAccounts.js'
 import { createOrderService } from './orders/service.js'
+import { createOrderNotifier } from './orders/notify.js'
 import { createCartService } from './cart/service.js'
 import { createMetrics } from './monitoring/metrics.js'
 import { createGaRealtime } from './adapters/gaRealtime.js'
@@ -34,10 +35,15 @@ export function createApp({
   maintenance = createMaintenance({ repo }),
   may = createMayService({ repo, openai: null }),
   payos = null,
-  orders = createOrderService({ repo, payos }),
   gaRealtime = createGaRealtime(config.gaRealtime ?? {}),
   // T-49: thư giao dịch (null → không gửi) và kiểm tra mật khẩu đã lộ (null → bỏ qua)
   mailer = createMailer(config.mail),
+  // §20, Q-24 → email: thông báo đơn hàng dùng chung nhà cung cấp thư với đặt lại mật khẩu (T-56)
+  orders = createOrderService({
+    repo,
+    payos,
+    notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl }),
+  }),
   pwned = config.pwnedCheck ? isPwnedPassword : null,
   // FR-MSG-001, FR-QR-*: lời chúc cần storage (bucket riêng tư); thiếu storage → không bật
   messages = storage ? createMessageService({ repo, storage, may }) : null,
