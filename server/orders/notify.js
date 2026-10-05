@@ -4,7 +4,7 @@ import { orderMail } from '../mail/templates.js'
 const DEFAULT_WAIT_MS = 3000
 
 /**
- * Thông báo đơn hàng qua email (§20, Q-24 → email, T-55). Gửi cho NGƯỜI MUA theo ngôn ngữ ưa thích của
+ * Thông báo đơn hàng qua email (§20, Q-24 → email, T-56). Gửi cho NGƯỜI MUA theo ngôn ngữ ưa thích của
  * tài khoản (D-41). Là việc phụ: lỗi/thiếu cấu hình chỉ ghi log, KHÔNG làm hỏng thao tác chính và không
  * để lộ nội dung lỗi (có thể chứa khoá API).
  *

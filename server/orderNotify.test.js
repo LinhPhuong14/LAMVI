@@ -1,4 +1,4 @@
-// Thông báo đơn hàng qua email (§20, Q-24 → email, T-55, D-41).
+// Thông báo đơn hàng qua email (§20, Q-24 → email, T-56, D-41).
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import { createApp } from './app.js'

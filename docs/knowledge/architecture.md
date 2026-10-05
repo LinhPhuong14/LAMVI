@@ -25,7 +25,7 @@ server/
   monitoring/              metrics.js (số liệu API), maintenance.js (bảo trì), health.js (kiểm tra tích hợp)
   may/                     config.js (cấu hình mặc định + validate), guard.js (PII, kiểm tra số, FAQ offline), tools.js (hàm backend cho Mây), service.js
   cart/service.js          Giỏ hàng: tính giá, gộp, giới hạn (D-59, D-60)
-  orders/notify.js         Thông báo đơn hàng qua email (§20, D-93, T-55)
+  orders/notify.js         Thông báo đơn hàng qua email (§20, D-93, T-56)
   messages/service.js      Lời chúc: soạn (chữ/giọng nói/video), trang QR người nhận, xác nhận, dịch, xoá media hết hạn (FR-MSG-001, FR-QR-002…005, T-54)
   security/lockedAccounts.js  Bọc auth provider: tài khoản bị khoá không có phiên (G-19, T-54)
   orders/service.js        Checkout → đơn → thanh toán: quoteCart (T-40), createOrder, webhook payOS, huỷ, hết hạn (T-41)
@@ -36,7 +36,7 @@ server/
   domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js, pricing.js, order.js, coupon.js, couponValidate.js, message.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
   middleware/sessionCookie.js  cookie refresh token HttpOnly (`lamvi_rt`), `sameOriginOnly` chống CSRF (T-49)
-  mail/{mailer,templates}.js   thư giao dịch qua Resend/Brevo (HTTPS), khung thư dùng chung (banner + bố cục) và mẫu thư vi/en/zh (T-49, T-55)
+  mail/{mailer,templates}.js   thư giao dịch qua Resend/Brevo (HTTPS), khung thư dùng chung (banner + bố cục) và mẫu thư vi/en/zh (T-49, T-56)
   security/pwned.js        kiểm mật khẩu đã lộ (HIBP k-anonymity, fail-open) (T-49)
   middleware/security.js   Security headers + CSP hash (T-37)
   middleware/rateLimit.js  Chống dò/spam, đếm trong DB (T-38, G-20)

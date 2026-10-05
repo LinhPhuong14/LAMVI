@@ -40,5 +40,5 @@ Tải ngày 2026-10-01 qua Openverse (lọc CC0 1.0). Dùng làm lớp phủ đ�
 
 ## Dẫn xuất
 
-- `public/images/mail/banner.jpg` (banner đầu thư, T-55) dựng từ `lanterns-night-1280.webp` bằng `npm run gen:mail-banner` (cần python3 + Pillow): làm mờ, phủ chàm đêm, thêm chữ. Cùng giấy phép với ảnh nguồn; thay bằng ảnh sản phẩm thật khi có (G-33).
+- `public/images/mail/banner.jpg` (banner đầu thư, T-56) dựng từ `lanterns-night-1280.webp` bằng `npm run gen:mail-banner` (cần python3 + Pillow): làm mờ, phủ chàm đêm, thêm chữ. Cùng giấy phép với ảnh nguồn; thay bằng ảnh sản phẩm thật khi có (G-33).
 

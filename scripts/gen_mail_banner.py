@@ -1,4 +1,4 @@
-"""Dựng banner đầu thư 1200x400 (hiển thị 600x200 trên thư) cho LAMVI (T-55).
+"""Dựng banner đầu thư 1200x400 (hiển thị 600x200 trên thư) cho LAMVI (T-56).
 
 Nền: ảnh CC0 public/images/scene/lanterns-night-1280.webp (xem CREDITS.md) phủ chàm đêm, giống ảnh og:image.
 Bảng màu theo docs/knowledge/design-rules.md §2.1. Ảnh không chứa thông tin nào quan trọng: thư luôn có

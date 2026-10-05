@@ -33,7 +33,7 @@ const COPY = {
 }
 const copy = (lang) => COPY[LOCALES.includes(lang) ? lang : 'vi']
 
-// ---------- Khung thư dùng chung (banner + bố cục, T-55) ----------
+// ---------- Khung thư dùng chung (banner + bố cục, T-56) ----------
 // Thư điện tử không dùng được CSS hiện đại: dùng bảng, style nội tuyến, màu theo bảng màu web
 // (design-rules §2.1). Nút bấm là bảng có nền để Outlook vẫn hiện đúng. Mọi chữ động đều qua esc().
 const C = { diep: '#f4ede0', diepLight: '#fbf7ef', than: '#2a211b', thanSoft: '#5a4b3e', son: '#a3321f', hoe: '#bf8a3a', hoeLight: '#e2c68f', chamDeep: '#1a2735' }
@@ -142,7 +142,7 @@ export function passwordChangedMail({ lang, siteUrl }) {
   }
 }
 
-// ---------- Thông báo đơn hàng (§20, Q-24 → email, T-55) ----------
+// ---------- Thông báo đơn hàng (§20, Q-24 → email, T-56) ----------
 
 // Nội dung theo ngôn ngữ ưa thích của tài khoản người mua (D-41). {code}, {tracking} được thay lúc dựng.
 const ORDER_COPY = {

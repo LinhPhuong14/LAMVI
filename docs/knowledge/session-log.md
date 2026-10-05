@@ -1,10 +1,22 @@
 # Nhật ký phiên
 
+## 2026-10-05 (phiên 2) — Header/footer auth kính mờ (nhánh `fix/glass-header-footer`, `docs/glass-auth-header-footer`)
+
+**Mục tiêu người dùng**: "sửa các phần banner và footer thành dạng glass morphism" (ảnh chụp trang đặt lại mật khẩu).
+
+**Đã làm**: T-55. Thêm class `page-auth`; ảnh sân khấu phủ sau header/footer; kính tối cho `.nav-auth` và `.auth-foot`. Không đổi nghiệp vụ nên không thêm `D-xx` (thuộc D-80).
+
+**Bẫy**: bản đầu dùng `position: fixed` + `backdrop-filter` cho `.nav-auth` → `AccountTheme.extra.test.jsx` hỏng (chỉ `.nav` được miễn). Sửa bằng sticky + `margin-bottom: -56px`, không nới test. Lần chạy `npm test` đầu chỉ thấy 1 test hỏng; chạy lại nguyên bộ mới ra tên.
+
+**Kiểm thử độc lập (T-11)**: subagent đọc diff, thêm `src/components/AuthGlass.extra.test.jsx`.
+
+**Còn lại**: chưa xem bằng mắt trên trình duyệt thật (mobile, trình duyệt không có `backdrop-filter`).
+
 ## 2026-10-05 (tiếp) — Thông báo đơn hàng, khung thư, mật khẩu, quên mật khẩu, trang đích admin (nhánh `feat/order-notifications`)
 
 **Mục tiêu người dùng**: gửi thông báo đơn hàng qua Resend; thiết kế banner và layout cho thư; đặt lại mật khẩu cần ô nhập lại + quy tắc mật khẩu (sau đó rút gọn: chỉ cần quy tắc cơ bản, không chặn mật khẩu phổ biến/đã lộ); "quên mật khẩu" phải từ chối email chưa từng đăng ký; admin đăng nhập vào thẳng /admin.
 
-**Đã làm**: D-91…D-94, T-55. Notifier + 5 loại thư; `layout()` dùng chung + banner (`npm run gen:mail-banner`) đã xem bằng Chromium desktop/di động ở vi/en/zh; `src/lib/password.js` + `PasswordRules` + ô nhập lại; `EMAIL_NOT_REGISTERED` + link tạo tài khoản; `landingPath` cho đăng nhập và Google callback.
+**Đã làm**: D-91…D-94, T-56. Notifier + 5 loại thư; `layout()` dùng chung + banner (`npm run gen:mail-banner`) đã xem bằng Chromium desktop/di động ở vi/en/zh; `src/lib/password.js` + `PasswordRules` + ô nhập lại; `EMAIL_NOT_REGISTERED` + link tạo tài khoản; `landingPath` cho đăng nhập và Google callback.
 
 **Bẫy**: (1) Đã làm bản mật khẩu khắt khe (danh sách phổ biến, leetspeak, dãy liên tiếp, thông tin cá nhân; 118 test cũ phải đổi mật khẩu thử) rồi PO bảo bỏ — chỉ giữ quy tắc cơ bản; mật khẩu thử trong test nay là `Gio-Hoa#Sen2026` và họ hàng. (2) `useSubmit().run` trả giá trị của hàm truyền vào — viết `run(async () => { x = … })` làm đăng nhập luôn bị coi là thất bại. (3) Test cũ khẳng định đúng hành vi cũ (quên mật khẩu luôn 202, đo thời gian) phải đổi/xoá theo D-92. (4) Banner xem thử bằng `file://` dễ sai đường dẫn: ô tiêu đề hiện chữ `alt` nên lỗi lộ ngay.
 

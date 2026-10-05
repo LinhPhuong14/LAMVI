@@ -67,7 +67,7 @@ if (!payos) console.warn('[api] Thiếu biến PAYOS_* — chỉ nhận thanh to
 // T-49: thư giao dịch. Production phải có MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY; dev (bộ nhớ) in ra console.
 const mailer = createMailer(config.mail) ?? (config.useSupabase ? null : createConsoleMailer())
 if (!mailer) console.warn('[api] Thiếu MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY — "Quên mật khẩu" và thông báo đơn hàng không gửi được thư')
-// §20, Q-24 → email (T-55): thông báo đơn hàng cho người mua qua cùng nhà cung cấp thư
+// §20, Q-24 → email (T-56): thông báo đơn hàng cho người mua qua cùng nhà cung cấp thư
 const orders = createOrderService({
   repo,
   payos,

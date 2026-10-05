@@ -1,4 +1,4 @@
-// Khung thư dùng chung: banner, bố cục, nút bấm, preheader, chân thư (T-55).
+// Khung thư dùng chung: banner, bố cục, nút bấm, preheader, chân thư (T-56).
 import { describe, expect, it } from 'vitest'
 import { MAIL_BANNER_PATH, orderMail, passwordChangedMail, recoveryMail } from './templates.js'
 import { existsSync, statSync } from 'node:fs'

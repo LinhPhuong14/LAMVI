@@ -38,7 +38,7 @@ export function createApp({
   gaRealtime = createGaRealtime(config.gaRealtime ?? {}),
   // T-49: thư giao dịch (null → không gửi) và kiểm tra mật khẩu đã lộ (null → bỏ qua)
   mailer = createMailer(config.mail),
-  // §20, Q-24 → email: thông báo đơn hàng dùng chung nhà cung cấp thư với đặt lại mật khẩu (T-55)
+  // §20, Q-24 → email: thông báo đơn hàng dùng chung nhà cung cấp thư với đặt lại mật khẩu (T-56)
   orders = createOrderService({
     repo,
     payos,
