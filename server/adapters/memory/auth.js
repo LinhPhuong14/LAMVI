@@ -40,6 +40,10 @@ export function createMemoryAuth({ requireEmailConfirmation = false, accessTtlMs
             return { user: { id: user.id, email }, needsConfirmation: requireEmailConfirmation }
     },
 
+    async deleteUser(id) {
+      for (const [email, u] of users) if (u.id === id) users.delete(email)
+    },
+
     // Chỉ dùng trong test: xác nhận email
     confirmEmail(email) {
       const u = users.get(email)

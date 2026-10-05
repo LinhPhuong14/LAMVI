@@ -45,6 +45,12 @@ export function createSupabaseAuth({ admin, makePublicClient }) {
       return { user: { id: data.user.id, email: data.user.email }, needsConfirmation: false }
     },
 
+    // G-38: rollback khi tạo user xong nhưng ghi hồ sơ lỗi. Lỗi → để caller quyết định (chỉ log)
+    async deleteUser(id) {
+      const { error } = await admin.auth.admin.deleteUser(id)
+      if (error) throw mapError(error)
+    },
+
     async signIn({ email, password }) {
       const { data, error } = await makePublicClient().auth.signInWithPassword({ email, password })
       if (error) throw mapError(error)
