@@ -4710,3 +4710,11 @@
   flex: none;
   text-align: center;
 }
+
+/* Trang chính sách (G-10) */
+.policy-page .policy-updated { opacity: 0.7; font-size: 0.9rem; margin: 0 0 16px; }
+.policy-page .policy-intro { font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px; }
+.policy-page .policy-block { margin: 28px 0; }
+.policy-page .policy-block h2 { font-size: 1.25rem; margin: 0 0 10px; }
+.policy-page .policy-block ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; line-height: 1.65; }
+.policy-page .btn { margin-top: 16px; }

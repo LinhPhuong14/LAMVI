@@ -41,9 +41,9 @@ export default function SiteFooter() {
         <div className="footer-col">
           <h3>{t('footer.support')}</h3>
           <Link to={home('#faq')}>{t('footer.faq')}</Link>
-          {/* G-10: chưa có trang chính sách đổi trả và theo dõi đơn */}
-          <a href="#">{t('footer.returns')}</a>
-          <a href="#">{t('footer.tracking')}</a>
+          <Link to={path('/returns')}>{t('footer.returns')}</Link>
+          <Link to={path('/privacy')}>{t('footer.privacy')}</Link>
+          <Link to={path('/account?tab=orders')}>{t('footer.tracking')}</Link>
         </div>
         <div className="footer-col footer-news">
           <h3>{t('footer.newsTitle')}</h3>

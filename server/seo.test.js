@@ -13,7 +13,7 @@ const page = (url, data) =>
   renderPage({ repo: createMemoryRepo(data), config, template, render, url, pathname: url.split('?')[0] })
 
 describe('sitemap.xml & robots.txt (§23.2)', () => {
-  it('sitemap: trang chủ + cửa hàng + sản phẩm Published × 3 ngôn ngữ, có hreflang; không có sản phẩm ẩn, trang lô', async () => {
+  it('sitemap: trang chủ + cửa hàng + chính sách + sản phẩm Published × 3 ngôn ngữ, có hreflang; không có sản phẩm ẩn, trang lô', async () => {
     const data = { products: [products[0], { ...products[1], status: 'hidden' }] }
     const res = await request(createApp({ repo: createMemoryRepo(data), config })).get('/sitemap.xml')
     expect(res.status).toBe(200)
@@ -26,6 +26,12 @@ describe('sitemap.xml & robots.txt (§23.2)', () => {
       'https://moc.test/shop',
       'https://moc.test/en/shop',
       'https://moc.test/zh/shop',
+      'https://moc.test/privacy',
+      'https://moc.test/en/privacy',
+      'https://moc.test/zh/privacy',
+      'https://moc.test/returns',
+      'https://moc.test/en/returns',
+      'https://moc.test/zh/returns',
       'https://moc.test/products/den-nguyet',
       'https://moc.test/en/products/den-nguyet',
       'https://moc.test/zh/products/den-nguyet',

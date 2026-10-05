@@ -213,6 +213,7 @@ export default {
     products: 'Sản phẩm',
     support: 'Hỗ trợ',
     faq: 'Câu hỏi thường gặp',
+    privacy: 'Chính sách riêng tư',
     returns: 'Chính sách đổi trả',
     tracking: 'Theo dõi đơn hàng',
     newsTitle: 'Nhận tin tức',
@@ -679,6 +680,82 @@ export default {
   maintenance: {
     title: 'LAMVI đang bảo trì',
     text: 'Chúng tôi đang nâng cấp hệ thống. Vui lòng quay lại sau ít phút.',
+  },
+  policy: {
+    updated: 'Cập nhật lần cuối: 05/10/2026',
+    back: 'Về trang chủ',
+    privacy: {
+      title: 'Chính sách riêng tư',
+      description: 'LAMVI thu thập, dùng và bảo vệ thông tin cá nhân của bạn như thế nào.',
+      intro: 'LAMVI chỉ thu thập thông tin cần để bán và giao đèn, gửi lời chúc và hỗ trợ bạn. Trang này giải thích thu thập gì, dùng vào việc gì và bạn có quyền gì.',
+      sections: [
+        { h: 'Thông tin chúng tôi thu thập', items: [
+          'Tài khoản: họ tên, email, số điện thoại, ngôn ngữ ưa dùng. Nếu đăng nhập bằng Google, chúng tôi nhận tên và email từ Google; không nhận mật khẩu Google của bạn.',
+          'Đơn hàng: sản phẩm, thông tin người nhận (tên, số điện thoại, địa chỉ giao), ghi chú, phương thức thanh toán, mã giảm giá đã dùng.',
+          'Lời chúc: nội dung chữ, giọng nói hoặc video bạn gửi kèm món quà.',
+          'Trò chuyện với Mây (trợ lý AI): câu bạn gõ. Khi bạn đăng nhập, lịch sử được lưu để bạn xem lại; khách chưa đăng nhập thì không lưu.',
+          'Dữ liệu sử dụng web: trang đã xem, thiết bị, trình duyệt (qua Google Analytics 4), và nhật ký kỹ thuật phục vụ phát hiện lỗi, chống lạm dụng.'
+        ] },
+        { h: 'Chúng tôi dùng thông tin để làm gì', items: [
+          'Xử lý đơn, thanh toán, giao hàng và chăm sóc sau bán.',
+          'Cho người nhận quà xem lời chúc qua mã QR trên thiệp.',
+          'Gửi email về đơn hàng (xác nhận, hết hạn thanh toán, đã gửi, huỷ, hoàn tiền) và email đặt lại mật khẩu.',
+          'Trả lời câu hỏi qua Mây; cải thiện nội dung và độ ổn định của website; ngăn gian lận và dò tìm tài khoản.'
+        ] },
+        { h: 'Bên thứ ba xử lý dữ liệu thay chúng tôi', items: [
+          'Supabase: lưu cơ sở dữ liệu và tệp (video lô đèn, giọng nói, video lời chúc).',
+          'payOS: xử lý thanh toán trực tuyến. Chúng tôi không lưu số thẻ hay thông tin ngân hàng của bạn.',
+          'Resend (hoặc Brevo): gửi email giao dịch.',
+          'OpenAI: xử lý câu hỏi gửi cho Mây tại máy chủ ngoài Việt Nam. Trước khi gửi, chúng tôi che số điện thoại và email trong tin nhắn; chúng tôi không gửi địa chỉ hay thông tin đơn hàng của người khác.',
+          'Google Analytics 4: thống kê lượt truy cập. Website không hiển thị banner đồng ý cookie; bạn có thể chặn qua cài đặt trình duyệt hoặc tiện ích chặn theo dõi.',
+          'Google: nếu bạn chọn đăng nhập bằng Google.'
+        ] },
+        { h: 'Thời gian lưu trữ', items: [
+          'Lời chúc dạng chữ được lưu cùng đơn hàng. Giọng nói và video lời chúc tự động xoá 30 ngày sau khi người nhận xác nhận đã nhận quà, hoặc 90 ngày sau khi đơn được giao nếu không ai xác nhận.',
+          'Thông tin tài khoản và đơn hàng được giữ trong thời gian bạn còn dùng dịch vụ và theo thời hạn lưu chứng từ mà pháp luật yêu cầu.',
+          'Nhật ký lỗi kỹ thuật được giữ ngắn hạn và đã che thông tin cá nhân.'
+        ] },
+        { h: 'Quyền của bạn', items: [
+          'Xem và sửa thông tin cá nhân ngay trong trang Tài khoản.',
+          'Yêu cầu chúng tôi xoá hoặc ngừng xử lý thông tin của bạn bằng cách liên hệ qua kênh hỗ trợ trên website; chúng tôi giữ lại phần pháp luật bắt buộc phải giữ.',
+          'Người nhận quà chỉ xem được lời chúc qua đường dẫn riêng trên thiệp, không cần tạo tài khoản.'
+        ] },
+        { h: 'Bảo mật', items: [
+          'Kết nối được mã hoá (HTTPS). Mật khẩu không được lưu dạng chữ thường và được kiểm tra với danh sách mật khẩu đã bị lộ.',
+          'Phiên đăng nhập dùng cookie bảo mật; quản trị viên chỉ truy cập dữ liệu cần cho công việc và mọi thay đổi quan trọng đều được ghi nhật ký.'
+        ] },
+        { h: 'Thay đổi chính sách', items: [
+          'Khi chính sách thay đổi, chúng tôi cập nhật ngày ở đầu trang này. Nếu có mâu thuẫn giữa các bản dịch, bản tiếng Việt được ưu tiên.'
+        ] }
+      ]
+    },
+    returns: {
+      title: 'Chính sách đổi trả',
+      description: 'Điều kiện, thời hạn và cách gửi yêu cầu đổi trả đèn LAMVI.',
+      intro: 'Mỗi chiếc đèn được làm thủ công. Nếu đèn đến tay bạn bị lỗi, bạn được đổi hoặc hoàn tiền theo các điều kiện dưới đây.',
+      sections: [
+        { h: 'Thời hạn', items: [
+          'Bạn có 7 ngày kể từ ngày đơn được ghi nhận là đã giao để gửi yêu cầu đổi trả.'
+        ] },
+        { h: 'Trường hợp được đổi hoặc hoàn tiền', items: [
+          'Đèn bị lỗi do sản xuất.',
+          'Đèn bị vỡ, hư hỏng trong quá trình vận chuyển.',
+          'Giao sai sản phẩm so với đơn hàng.',
+          'Chúng tôi không nhận đổi trả vì đổi ý, đặc biệt với đèn kèm lời chúc cá nhân hoá.'
+        ] },
+        { h: 'Video khui hàng — bắt buộc', items: [
+          'Yêu cầu đổi trả phải kèm video quay liên tục từ lúc khui hàng đến lúc thấy tình trạng đèn. Không có video, chúng tôi không thể xử lý yêu cầu.',
+          'Nếu đèn là quà tặng, người nhận hãy quay video khi mở hộp. Hướng dẫn này cũng có trên trang QR lời chúc và thiệp cảm ơn.'
+        ] },
+        { h: 'Cách gửi yêu cầu', items: [
+          'Người mua gửi yêu cầu cho đơn của mình; người nhận quà vui lòng nhờ người mua gửi giúp.',
+          'Chức năng gửi yêu cầu trực tuyến trong trang Tài khoản đang được hoàn thiện. Trong thời gian này, vui lòng liên hệ cửa hàng qua kênh hỗ trợ trên website và đính kèm mã đơn cùng video.'
+        ] },
+        { h: 'Kết quả', items: [
+          'Chúng tôi xem xét yêu cầu và phản hồi cho người mua. Nếu được chấp nhận, bạn nhận sản phẩm đổi hoặc được hoàn tiền; nếu bị từ chối, chúng tôi nêu rõ lý do.'
+        ] }
+      ]
+    },
   },
   notFound: {
     title: 'Không tìm thấy trang',

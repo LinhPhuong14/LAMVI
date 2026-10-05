@@ -201,7 +201,8 @@ export default {
     products: 'Products',
     support: 'Support',
     faq: 'FAQ',
-    returns: 'Returns policy',
+    privacy: 'Privacy Policy',
+    returns: 'Return Policy',
     tracking: 'Track your order',
     newsTitle: 'Newsletter',
     newsText: 'Craft-village stories and new offers, once a month.',
@@ -665,6 +666,82 @@ export default {
   maintenance: {
     title: 'LAMVI is under maintenance',
     text: 'We are upgrading our system. Please come back in a few minutes.',
+  },
+  policy: {
+    updated: 'Last updated: 5 Oct 2026',
+    back: 'Back to home',
+    privacy: {
+      title: 'Privacy Policy',
+      description: 'How LAMVI collects, uses and protects your personal information.',
+      intro: 'LAMVI only collects what it needs to sell and deliver lanterns, carry your greetings and support you. This page explains what we collect, why, and your rights.',
+      sections: [
+        { h: 'Information we collect', items: [
+          'Account: name, email, phone number, preferred language. If you sign in with Google we receive your name and email from Google, never your Google password.',
+          'Orders: products, recipient details (name, phone, delivery address), notes, payment method, coupons used.',
+          'Greetings: the text, voice recording or video you attach to a gift.',
+          'Chats with Mây (AI assistant): what you type. When signed in, history is saved so you can review it; guests are not saved.',
+          'Usage data: pages viewed, device and browser (via Google Analytics 4), and technical logs used to detect errors and abuse.'
+        ] },
+        { h: 'How we use it', items: [
+          'Process orders, payments and delivery, and provide after-sales care.',
+          'Let gift recipients see your greeting through the QR code on the card.',
+          'Send order emails (confirmation, payment expired, shipped, cancelled, refunded) and password-reset emails.',
+          'Answer questions through Mây; improve the website and its reliability; prevent fraud and account probing.'
+        ] },
+        { h: 'Third parties that process data for us', items: [
+          'Supabase: database and file storage (batch videos, voice and video greetings).',
+          'payOS: online payments. We never store your card or bank details.',
+          'Resend (or Brevo): transactional email.',
+          'OpenAI: processes questions sent to Mây on servers outside Vietnam. Before sending, we mask phone numbers and emails in your message; we never send addresses or anyone else’s order data.',
+          'Google Analytics 4: visit statistics. The site shows no cookie-consent banner; you can block it in your browser settings or with a tracking blocker.',
+          'Google: if you choose to sign in with Google.'
+        ] },
+        { h: 'How long we keep it', items: [
+          'Text greetings are kept with the order. Voice and video greetings are deleted automatically 30 days after the recipient confirms receiving the gift, or 90 days after the order is delivered if nobody confirms.',
+          'Account and order data are kept while you use the service and for the period the law requires for records.',
+          'Technical error logs are kept briefly and have personal information masked.'
+        ] },
+        { h: 'Your rights', items: [
+          'View and edit your personal information in your Account page.',
+          'Ask us to delete or stop processing your data through the support channel on the website; we keep only what the law requires.',
+          'Gift recipients view a greeting only through the private link on the card, without creating an account.'
+        ] },
+        { h: 'Security', items: [
+          'Connections are encrypted (HTTPS). Passwords are never stored in plain text and are checked against lists of leaked passwords.',
+          'Sessions use secure cookies; administrators only access data needed for their work and important changes are logged.'
+        ] },
+        { h: 'Changes to this policy', items: [
+          'When the policy changes we update the date at the top. If translations differ, the Vietnamese version prevails.'
+        ] }
+      ]
+    },
+    returns: {
+      title: 'Return Policy',
+      description: 'Conditions, deadline and how to request a return for a LAMVI lantern.',
+      intro: 'Every lantern is handmade. If yours arrives faulty, you can get an exchange or a refund under the conditions below.',
+      sections: [
+        { h: 'Deadline', items: [
+          'You have 7 days from the day your order is recorded as delivered to submit a return request.'
+        ] },
+        { h: 'When we exchange or refund', items: [
+          'The lantern has a manufacturing defect.',
+          'The lantern is broken or damaged in transit.',
+          'The wrong product was delivered.',
+          'We do not accept returns for a change of mind, especially for lanterns with a personalised greeting.'
+        ] },
+        { h: 'Unboxing video — required', items: [
+          'A request must include one continuous video from the moment of unboxing until the lantern’s condition is shown. Without a video we cannot process the request.',
+          'If the lantern is a gift, the recipient should film while opening the box. This guidance is also on the gift QR page and the thank-you card.'
+        ] },
+        { h: 'How to submit', items: [
+          'The buyer submits the request for their order; gift recipients should ask the buyer to submit it.',
+          'Online submission from your Account page is still being finished. Until then, please contact the shop through the support channel on the website with your order code and the video.'
+        ] },
+        { h: 'Outcome', items: [
+          'We review the request and reply to the buyer. If accepted, you receive a replacement or a refund; if declined, we explain why.'
+        ] }
+      ]
+    },
   },
   notFound: {
     title: 'Page not found',
