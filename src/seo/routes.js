@@ -30,8 +30,11 @@ export function classifyPath(pathname) {
   // Trang QR lời chúc: token là bí mật (BR-QR-001) → không SSR nội dung, noindex
   if (/^\/qr\/[^/]+$/.test(lower)) return { kind: 'private', lang }
   if (path === '/') return { kind: 'home', lang }
+  if (lower === '/shop') return { kind: 'shop', lang }
   let m = path.match(/^\/products\/([^/]+)$/i)
   if (m) return seg(m[1]) === null ? { kind: 'invalid', lang } : { kind: 'product', lang, slug: seg(m[1]) }
+  m = path.match(/^\/collections\/([^/]+)$/i)
+  if (m) return seg(m[1]) === null ? { kind: 'invalid', lang } : { kind: 'collection', lang, slug: seg(m[1]) }
   m = path.match(/^\/lo\/([^/]+)$/i)
   if (m) return seg(m[1]) === null ? { kind: 'invalid', lang } : { kind: 'batch', lang, code: seg(m[1]) }
   return { kind: 'other', lang }
@@ -42,6 +45,8 @@ export function dataKeysFor(route) {
   const keys = ['/products'] // footer
   if (route.kind === 'home') keys.push('/faq')
   if (route.kind === 'product') keys.push(`/products/${encodeURIComponent(route.slug)}`)
+  if (route.kind === 'collection') keys.push(`/collections/${encodeURIComponent(route.slug)}`)
+  if (route.kind === 'shop') keys.push('/collections')
   if (route.kind === 'batch') keys.push(`/batches/${encodeURIComponent(route.code)}`)
   return keys
 }

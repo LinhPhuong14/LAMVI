@@ -137,14 +137,20 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
     const lang = values.preferredLocale
     const result = await call(() => auth.signUp({ email, password: b.password }))
     // Phòng hờ adapter trả lại user đã có — không ghi đè hồ sơ của chủ email
-    const existing = await repo.getProfile(result.user.id)
-    if (!existing) await repo.upsertProfile({
-      id: result.user.id,
-      fullName: values.fullName,
-      phone: values.phone ?? null,
-      preferredLocale: lang,
-      email,
-    })
+    try {
+      const existing = await repo.getProfile(result.user.id)
+      if (!existing) await repo.upsertProfile({
+        id: result.user.id,
+        fullName: values.fullName,
+        phone: values.phone ?? null,
+        preferredLocale: lang,
+        email,
+      })
+    } catch (err) {
+      // G-38: ghi hồ sơ lỗi thì gỡ user vừa tạo, để khách đăng ký lại được thay vì kẹt "email đã có"
+      await Promise.resolve(auth.deleteUser?.(result.user.id)).catch((e) => console.error('[signup] rollback', e?.message ?? e))
+      throw err
+    }
     res.status(201).json({ user: result.user, needsConfirmation: result.needsConfirmation })
   })
 

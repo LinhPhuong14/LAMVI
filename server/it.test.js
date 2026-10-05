@@ -178,3 +178,16 @@ describe('Chế độ bảo trì (D-54)', () => {
     expect((await m.get()).enabled).toBe(false)
   })
 })
+
+describe('Nhật ký bảo trì (G-27)', () => {
+  it('mỗi lần bật/tắt ghi một dòng audit_log; IT xem được, admin thì không', async () => {
+    const put = (enabled) => request(app).put('/api/it/maintenance').set('Authorization', tokens.it).send({ enabled })
+    await put(true)
+    await put(false)
+    const res = await request(app).get('/api/it/maintenance/log').set('Authorization', tokens.it)
+    expect(res.status).toBe(200)
+    expect(res.body.items.map((e) => e.action).sort()).toEqual(['disable', 'enable'])
+    expect(res.body.items.every((e) => e.entity === 'maintenance' && e.actorRole === 'it')).toBe(true)
+    expect((await request(app).get('/api/it/maintenance/log').set('Authorization', tokens.admin)).status).toBe(403)
+  })
+})

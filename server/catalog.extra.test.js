@@ -27,7 +27,7 @@ describe('Sản phẩm — edge case', () => {
     for (const item of [...list.body.items, detail.body.item]) {
       expect(Object.keys(item).sort()).toEqual(
         // 'image' là { url, alt } — không lộ imagePath (đường dẫn trong Storage)
-        ['badge', 'currency', 'description', 'image', 'kind', 'name', 'price', 'slug', 'tone'].sort(),
+        ['badge', 'collection', 'currency', 'description', 'image', 'kind', 'name', 'pieceOrder', 'price', 'slug', 'tone'].sort(),
       )
     }
   })
@@ -107,7 +107,7 @@ describe('Sản phẩm — edge case', () => {
       expect(Number.isInteger(p.price)).toBe(true)
       expect(p.currency).toBe('VND')
     }
-    expect(res.body.items.map((p) => p.price)).toEqual([890000, 1050000, 1680000])
+    expect(res.body.items.map((p) => p.price)).toEqual([890000, 1050000, 1680000, 760000, 820000, 820000, 840000, 840000])
   })
 })
 
@@ -269,7 +269,7 @@ describe('Adapter bộ nhớ — trả bản sao', () => {
     const one = await repo.getProductBySlug('den-vong')
     one.price = 1
     const again = await repo.listProducts()
-    expect(again).toHaveLength(3)
+    expect(again).toHaveLength(8)
     expect(again[0].name.vi).toBe('Đèn Nguyệt')
     expect(again[0].status).toBe('published')
     expect((await repo.getProductBySlug('den-vong')).price).toBe(1050000)

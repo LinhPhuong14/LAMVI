@@ -13,7 +13,8 @@ export function seoRouter({ repo, config }) {
   r.get('/sitemap.xml', async (req, res) => {
     // Chỉ trang công khai được index: trang chủ + cửa hàng + sản phẩm Published (D-39). Trang lô noindex (D-44)
     const products = await repo.listProducts({ statuses: PUBLIC_PRODUCT_STATUSES })
-    const pages = [{ path: '/' }, { path: '/shop' }, ...products.map((p) => ({ path: `/products/${encodeURIComponent(p.slug)}`, lastmod: p.updatedAt }))]
+    const collections = await repo.listCollections?.({ statuses: PUBLIC_PRODUCT_STATUSES })
+    const pages = [{ path: '/' }, { path: '/shop' }, { path: '/privacy' }, { path: '/returns' }, ...(collections ?? []).map((c) => ({ path: `/collections/${encodeURIComponent(c.slug)}`, lastmod: c.updatedAt })), ...products.map((p) => ({ path: `/products/${encodeURIComponent(p.slug)}`, lastmod: p.updatedAt }))]
     const urls = pages.flatMap(({ path, lastmod }) =>
       LOCALES.map((lang) => {
         const alternates = [

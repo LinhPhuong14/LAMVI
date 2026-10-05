@@ -46,6 +46,12 @@ const found = (row) => {
   return row
 }
 
+// Chỉ giữ các trường bị đổi (giá trị cũ → mới) để nhật ký gọn, không lưu cả bản ghi
+const changed = (before, values) => {
+  const keys = Object.keys(values).filter((k) => JSON.stringify(before?.[k]) !== JSON.stringify(values[k]))
+  return { oldValue: Object.fromEntries(keys.map((k) => [k, before?.[k] ?? null])), newValue: Object.fromEntries(keys.map((k) => [k, values[k]])) }
+}
+
 const isPublished = (b) => b.status === 'video_published'
 
 // Admin: sản phẩm (FR-CAT-004), FAQ (G-07), lô & video lô (FR-QR-007, D-46, D-47)
@@ -77,17 +83,25 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
   r.post('/admin/products', async (req, res) => {
     const { errors, values } = validateProduct(body(req))
     assertValid(errors)
-    res.status(201).json({ item: await write(() => repo.createProduct(values)) })
+    const item = await write(() => repo.createProduct(values))
+    await logAdmin(req, 'product', item.id, 'create', null, { slug: item.slug, status: item.status })
+    res.status(201).json({ item })
   })
   r.patch('/admin/products/:id', async (req, res) => {
     const { errors, values } = validateProduct(body(req), { partial: true })
     assertValid(errors)
-    if (!Object.keys(values).length) return res.json({ item: found(await repo.getProductById(req.params.id)) })
-    res.json({ item: found(await write(() => repo.updateProduct(req.params.id, values))) })
+    const before = found(await repo.getProductById(req.params.id))
+    if (!Object.keys(values).length) return res.json({ item: before })
+    const item = found(await write(() => repo.updateProduct(before.id, values)))
+    const diff = changed(before, values)
+    await logAdmin(req, 'product', before.id, 'update', diff.oldValue, diff.newValue)
+    res.json({ item })
   })
   // §3.2: admin được xoá sản phẩm. Khi có đơn hàng, sản phẩm đã bán phải ẩn thay vì xoá [ASSUMPTION]
   r.delete('/admin/products/:id', async (req, res) => {
-    if (!(await repo.deleteProduct(req.params.id))) throw notFound()
+    const before = found(await repo.getProductById(req.params.id))
+    if (!(await repo.deleteProduct(before.id))) throw notFound()
+    await logAdmin(req, 'product', before.id, 'delete', { slug: before.slug, status: before.status }, null)
     res.status(204).end()
   })
 
@@ -126,6 +140,7 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
       }),
     )
     await removeImageObject(product.imagePath, path)
+    await logAdmin(req, 'product', product.id, 'set_image', { imagePath: product.imagePath ?? null }, { imagePath: path })
     res.json({ item })
   })
 
@@ -135,6 +150,7 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
     if (!product.imagePath) return res.json({ item: product })
     const item = found(await repo.updateProduct(product.id, { imagePath: null, imageUrl: null }))
     await removeImageObject(product.imagePath, null)
+    await logAdmin(req, 'product', product.id, 'remove_image', { imagePath: product.imagePath }, null)
     res.json({ item })
   })
 
@@ -145,16 +161,24 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
   r.post('/admin/faq', async (req, res) => {
     const { errors, values } = validateFaq(body(req))
     assertValid(errors)
-    res.status(201).json({ item: await repo.createFaq(values) })
+    const item = await repo.createFaq(values)
+    await logAdmin(req, 'faq', item.id, 'create', null, { question: item.question, isPublished: item.isPublished ?? null })
+    res.status(201).json({ item })
   })
   r.patch('/admin/faq/:id', async (req, res) => {
     const { errors, values } = validateFaq(body(req), { partial: true })
     assertValid(errors)
-    if (!Object.keys(values).length) return res.json({ item: found(await repo.getFaq(req.params.id)) })
-    res.json({ item: found(await repo.updateFaq(req.params.id, values)) })
+    const before = found(await repo.getFaq(req.params.id))
+    if (!Object.keys(values).length) return res.json({ item: before })
+    const item = found(await repo.updateFaq(before.id, values))
+    const diff = changed(before, values)
+    await logAdmin(req, 'faq', before.id, 'update', diff.oldValue, diff.newValue)
+    res.json({ item })
   })
   r.delete('/admin/faq/:id', async (req, res) => {
-    if (!(await repo.deleteFaq(req.params.id))) throw notFound()
+    const before = found(await repo.getFaq(req.params.id))
+    if (!(await repo.deleteFaq(before.id))) throw notFound()
+    await logAdmin(req, 'faq', before.id, 'delete', { question: before.question }, null)
     res.status(204).end()
   })
 
@@ -168,7 +192,9 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
   r.post('/admin/batches', async (req, res) => {
     const { errors, values } = validateBatch(body(req))
     assertValid(errors)
-    res.status(201).json({ item: await write(() => repo.createBatch(values)) })
+    const item = await write(() => repo.createBatch(values))
+    await logAdmin(req, 'batch', item.id, 'create', null, { code: item.code, status: item.status })
+    res.status(201).json({ item })
   })
   r.patch('/admin/batches/:id', async (req, res) => {
     const { errors, values } = validateBatch(body(req), { partial: true })
@@ -179,13 +205,17 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
       throw new HttpError(409, 'BATCH_CODE_LOCKED', 'Không đổi mã lô đã xuất bản', { code: 'BATCH_CODE_LOCKED' })
     }
     if (!Object.keys(values).length) return res.json({ item: batch })
-    res.json({ item: found(await write(() => repo.updateBatch(batch.id, values))) })
+    const item = found(await write(() => repo.updateBatch(batch.id, values)))
+    const diff = changed(batch, values)
+    await logAdmin(req, 'batch', batch.id, 'update', diff.oldValue, diff.newValue)
+    res.json({ item })
   })
   // D-47: lô đã xuất bản không được xoá
   r.delete('/admin/batches/:id', async (req, res) => {
     const batch = found(await repo.getBatchById(req.params.id))
     if (isPublished(batch)) throw new HttpError(409, 'BATCH_PUBLISHED', 'Lô đã xuất bản không được xoá')
     await repo.deleteBatch(batch.id)
+    await logAdmin(req, 'batch', batch.id, 'delete', { code: batch.code, status: batch.status }, null)
     res.status(204).end()
   })
 
@@ -215,6 +245,7 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
       throw new HttpError(400, 'VALIDATION_ERROR', 'Không phải video', { contentType: 'INVALID_VIDEO_TYPE' })
     }
     const item = await repo.updateBatch(batch.id, { videoPath: path, videoUrl: storage.publicUrl(path) })
+    await logAdmin(req, 'batch', batch.id, 'set_video', { videoPath: batch.videoPath ?? null }, { videoPath: path })
     res.json({ item })
   })
 
@@ -223,7 +254,9 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
     const batch = found(await repo.getBatchById(req.params.id))
     if (!batch.videoUrl) throw new HttpError(409, 'VIDEO_REQUIRED', 'Lô chưa có video')
     if (isPublished(batch)) return res.json({ item: batch })
-    res.json({ item: await repo.updateBatch(batch.id, { status: 'video_published' }) })
+    const item = await repo.updateBatch(batch.id, { status: 'video_published' })
+    await logAdmin(req, 'batch', batch.id, 'publish', { status: batch.status }, { status: 'video_published' })
+    res.json({ item })
   })
 
   // --- Coupon (FR-CPN-001/002, §14). Admin quản lý toàn bộ.

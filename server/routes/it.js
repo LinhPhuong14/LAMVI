@@ -29,9 +29,20 @@ export function itRouter({ repo, auth, storage, config, metrics, maintenance, ma
     if (typeof enabled !== 'boolean') {
       throw new HttpError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', { enabled: 'INVALID' })
     }
+    const before = await maintenance.get()
     const state = await maintenance.set(enabled, req.user.id)
+    // G-27: lịch sử đầy đủ bật/tắt bảo trì (ai, khi nào) trong audit_log
+    await repo
+      .appendAuditLog?.([
+        { actorId: req.user.id, actorRole: req.role ?? 'it', entity: 'maintenance', entityId: null, action: enabled ? 'enable' : 'disable', oldValue: { enabled: Boolean(before?.enabled) }, newValue: { enabled } },
+      ])
+      .catch((err) => console.error('[audit]', err))
     console.warn(`[maintenance] ${enabled ? 'BẬT' : 'TẮT'} bởi ${req.user.email}`)
     res.json(state)
+  })
+
+  r.get('/it/maintenance/log', async (req, res) => {
+    res.json({ items: await repo.listAuditLog({ entity: 'maintenance', limit: 50 }) })
   })
 
   return r

@@ -2,7 +2,7 @@
 // Chạy: npm run db:seed-sql
 import { writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { products, faqEntries } from '../server/data/seed.js'
+import { collections, products, faqEntries } from '../server/data/seed.js'
 
 const lit = (v) => {
   if (v == null) return 'null'
@@ -14,10 +14,18 @@ const lit = (v) => {
 
 export function buildSeedSql() {
   const lines = ['-- Tự sinh bởi scripts/gen-seed-sql.js — không sửa tay.', '']
+  for (const c of collections) {
+    lines.push(
+      `insert into public.collections (id, slug, status, tone, sort_order, name, description, story_title, story) values (${[
+        c.id, c.slug, c.status, c.tone, c.sortOrder, c.name, c.description, c.storyTitle, c.story,
+      ].map(lit).join(', ')}) on conflict (id) do nothing;`,
+    )
+  }
+  lines.push('')
   for (const p of products) {
     lines.push(
-      `insert into public.products (id, slug, kind, status, price, tone, sort_order, name, description, badge) values (${[
-        p.id, p.slug, p.kind, p.status, p.price, p.tone, p.sortOrder, p.name, p.description, p.badge,
+      `insert into public.products (id, slug, kind, status, price, tone, sort_order, name, description, badge, collection_slug, piece_order) values (${[
+        p.id, p.slug, p.kind, p.status, p.price, p.tone, p.sortOrder, p.name, p.description, p.badge, p.collectionSlug ?? null, p.pieceOrder ?? 0,
       ].map(lit).join(', ')}) on conflict (id) do nothing;`,
     )
   }

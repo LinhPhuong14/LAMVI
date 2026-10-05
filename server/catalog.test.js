@@ -10,7 +10,7 @@ describe('GET /api/products', () => {
   it('FR-CAT-001: trả danh sách sản phẩm published, giá số nguyên VND chưa VAT', async () => {
     const res = await request(makeApp()).get('/api/products')
     expect(res.status).toBe(200)
-    expect(res.body.items.map((p) => p.slug)).toEqual(['den-nguyet', 'den-vong', 'den-sum-vay'])
+    expect(res.body.items.map((p) => p.slug)).toEqual(['den-nguyet', 'den-vong', 'den-sum-vay', 'den-tinh', 'den-hoi-xuan', 'den-hoi-ha', 'den-hoi-thu', 'den-hoi-dong'])
     expect(res.body.items[0]).toMatchObject({ name: 'Đèn Nguyệt', price: 890000, currency: 'VND' })
   })
 

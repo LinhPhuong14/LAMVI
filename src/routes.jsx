@@ -6,6 +6,8 @@ import NotFoundPage from './pages/NotFoundPage'
 import AccountPage from './pages/AccountPage'
 import BatchPage from './pages/BatchPage'
 import GiftPage from './pages/GiftPage'
+import PolicyPage from './pages/PolicyPage'
+import CollectionPage from './pages/CollectionPage'
 import ShopPage from './pages/ShopPage'
 import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
@@ -35,6 +37,9 @@ function localeChildren() {
       <Route path="lo/:code" element={<BatchPage />} />
       <Route path="qr/:token" element={<GiftPage />} />
       <Route path="shop" element={<ShopPage />} />
+      <Route path="privacy" element={<PolicyPage kind="privacy" />} />
+      <Route path="returns" element={<PolicyPage kind="returns" />} />
+      <Route path="collections/:slug" element={<CollectionPage />} />
       <Route path="cart" element={<CartPage />} />
       <Route path="checkout" element={<CheckoutPage />} />
       <Route path="don-hang/:code" element={<OrderPage />} />
