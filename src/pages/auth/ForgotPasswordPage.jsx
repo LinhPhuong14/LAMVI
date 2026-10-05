@@ -44,6 +44,13 @@ export default function ForgotPasswordPage() {
           {error && !fields.email && (
             <p className="notice error" role="alert">
               {t(`errors.${error}`)}
+              {/* D-92: email chưa đăng ký → mời đăng ký thay vì để khách bế tắc */}
+              {error === 'EMAIL_NOT_REGISTERED' && (
+                <>
+                  {' '}
+                  <Link to={path('/register')}>{t('auth.registerInstead')}</Link>
+                </>
+              )}
             </p>
           )}
           <button className="btn btn-primary" type="submit" disabled={pending}>

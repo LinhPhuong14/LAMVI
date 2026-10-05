@@ -12,9 +12,9 @@ import { MAX_LINES, parseLine } from './cart/service.js'
 let app, repo, auth, maintenance, token, clock
 
 async function login(email) {
-  const { user } = await auth.signUp({ email, password: 'matkhau123' })
+  const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: email })
-  return `Bearer ${(await auth.signIn({ email, password: 'matkhau123' })).accessToken}`
+  return `Bearer ${(await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })).accessToken}`
 }
 
 beforeEach(async () => {

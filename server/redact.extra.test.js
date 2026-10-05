@@ -119,9 +119,9 @@ describe('G-28 — nhật ký lỗi 5xx từ endpoint đơn hàng', () => {
       config: { publicSiteUrl: 'https://lamvi.test', rateLimit: { enabled: false } },
       metrics,
     })
-    const { user } = await auth.signUp({ email: 'khach@lamvi.test', password: 'matkhau123' })
+    const { user } = await auth.signUp({ email: 'khach@lamvi.test', password: 'Gio-Hoa#Sen2026' })
     await repo.upsertProfile({ id: user.id, fullName: 'A' })
-    const s = await auth.signIn({ email: 'khach@lamvi.test', password: 'matkhau123' })
+    const s = await auth.signIn({ email: 'khach@lamvi.test', password: 'Gio-Hoa#Sen2026' })
     token = `Bearer ${s.accessToken}`
   })
 

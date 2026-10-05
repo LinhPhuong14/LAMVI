@@ -12,9 +12,9 @@ const config = { publicSiteUrl: 'https://lamvi.test', rateLimit: { enabled: fals
 let app, repo, auth, U
 
 async function make(email, role = 'customer', extra = {}) {
-  const { user } = await auth.signUp({ email, password: 'matkhau123' })
+  const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: email.split('@')[0], role, email, ...extra })
-  const s = await auth.signIn({ email, password: 'matkhau123' })
+  const s = await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })
   return { id: user.id, email, token: `Bearer ${s.accessToken}`, refresh: s.refreshToken }
 }
 
@@ -72,7 +72,7 @@ describe('Người bị khoá còn đi được đâu? (G-19)', () => {
       ['post', '/api/orders/LV2610-AAAAAAA/payment', {}],
       ['get', '/api/may/history'],
       ['post', '/api/may/chat', { message: 'xin chào', sessionId: 'abcdefgh12345678' }],
-      ['post', '/api/auth/change-password', { currentPassword: 'matkhau123', password: 'matkhau-moi-456' }],
+      ['post', '/api/auth/change-password', { currentPassword: 'Gio-Hoa#Sen2026', password: 'Moi-Gio#Lanh83' }],
       ['get', '/api/admin/users'],
       ['get', '/api/it/health'],
     ]
@@ -82,7 +82,7 @@ describe('Người bị khoá còn đi được đâu? (G-19)', () => {
       expect(r.status, `${method} ${path}`).toBe(401)
     }
     // mật khẩu không đổi dù gọi đúng mật khẩu hiện tại
-    expect((await request(app).post('/api/auth/login').send({ email: U.cust.email, password: 'matkhau123' })).status).toBe(403)
+    expect((await request(app).post('/api/auth/login').send({ email: U.cust.email, password: 'Gio-Hoa#Sen2026' })).status).toBe(403)
   })
 
   it('admin/IT bị IT khoá: mất quyền ngay (401, không phải 403) ở admin và dashboard IT', async () => {
@@ -96,7 +96,7 @@ describe('Người bị khoá còn đi được đâu? (G-19)', () => {
   })
 
   it('đăng xuất khi đã bị khoá: 204, cookie bị xoá, không cấp phiên mới', async () => {
-    const login = await request(app).post('/api/auth/login').send({ email: U.cust.email, password: 'matkhau123' })
+    const login = await request(app).post('/api/auth/login').send({ email: U.cust.email, password: 'Gio-Hoa#Sen2026' })
     const cookie = login.headers['set-cookie'].find((c) => c.startsWith('lamvi_rt=')).split(';')[0]
     await as('admin', 'post', `/api/admin/users/${U.cust.id}/lock`, {})
     const r = await request(app).post('/api/auth/logout').set('Cookie', cookie).set('Origin', config.publicSiteUrl).set('Authorization', U.cust.token)
@@ -105,21 +105,24 @@ describe('Người bị khoá còn đi được đâu? (G-19)', () => {
     expect(r.headers['set-cookie'].join(';')).not.toMatch(/lamvi_rt=[^;\s]+;/)
   })
 
-  it('quên mật khẩu không lộ tài khoản bị khoá (cùng phản hồi với email không tồn tại)', async () => {
+  it('quên mật khẩu không lộ trạng thái khoá (cùng phản hồi với tài khoản thường); email chưa đăng ký thì 404 (D-92)', async () => {
     await as('admin', 'post', `/api/admin/users/${U.cust.id}/lock`, {})
     const locked = await request(app).post('/api/auth/forgot-password').send({ email: U.cust.email })
+    const normal = await request(app).post('/api/auth/forgot-password').send({ email: U.cust2.email })
+    expect(locked.status).toBe(normal.status)
+    expect(locked.body).toEqual(normal.body)
     const ghost = await request(app).post('/api/auth/forgot-password').send({ email: 'khong-co@lamvi.test' })
-    expect(locked.status).toBe(ghost.status)
-    expect(locked.body).toEqual(ghost.body)
+    expect(ghost.status).toBe(404)
+    expect(ghost.body.error.code).toBe('EMAIL_NOT_REGISTERED')
   })
 
   it('đặt lại mật khẩu không gỡ khoá và không cấp phiên: đăng nhập bằng mật khẩu mới vẫn ACCOUNT_LOCKED', async () => {
     await as('admin', 'post', `/api/admin/users/${U.cust.id}/lock`, {})
     const token = await auth.createRecoveryToken(U.cust.email)
-    const reset = await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhau-moi-456' })
+    const reset = await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Gio#Lanh83' })
     expect(reset.status).toBe(204)
     expect(reset.headers['set-cookie']?.join(';') ?? '').not.toMatch(/lamvi_rt=[^;\s]+;/)
-    const login = await request(app).post('/api/auth/login').send({ email: U.cust.email, password: 'matkhau-moi-456' })
+    const login = await request(app).post('/api/auth/login').send({ email: U.cust.email, password: 'Moi-Gio#Lanh83' })
     expect(login.status).toBe(403)
     expect(login.body.error.code).toBe('ACCOUNT_LOCKED')
     expect((await repo.getProfile(U.cust.id)).lockedAt).toBeTruthy()
@@ -132,20 +135,20 @@ describe('Người bị khoá còn đi được đâu? (G-19)', () => {
     // refresh trước: các cửa kia thu hồi mọi phiên của người này nên refresh token cũ sẽ chết
     await expect(locking.refresh(U.cust.refresh)).rejects.toMatchObject({ code: 'ACCOUNT_LOCKED' })
     await expect(locking.signInVerifiedEmail(U.cust.email)).rejects.toMatchObject({ code: 'ACCOUNT_LOCKED' })
-    await expect(locking.signIn({ email: U.cust.email, password: 'matkhau123' })).rejects.toMatchObject({ code: 'ACCOUNT_LOCKED' })
+    await expect(locking.signIn({ email: U.cust.email, password: 'Gio-Hoa#Sen2026' })).rejects.toMatchObject({ code: 'ACCOUNT_LOCKED' })
     expect(signOut).toHaveBeenCalledTimes(3)
     // người không bị khoá không bị ảnh hưởng
     expect((await locking.signInVerifiedEmail(U.cust2.email)).accessToken).toBeTruthy()
   })
 
   it('người có nhiều phiên: khoá chặn tất cả; mở khoá cho đăng nhập mới được', async () => {
-    const s2 = await auth.signIn({ email: U.cust.email, password: 'matkhau123' })
+    const s2 = await auth.signIn({ email: U.cust.email, password: 'Gio-Hoa#Sen2026' })
     await as('admin', 'post', `/api/admin/users/${U.cust.id}/lock`, {})
     for (const tk of [U.cust.token, `Bearer ${s2.accessToken}`]) {
       expect((await request(app).get('/api/me').set('Authorization', tk)).status).toBe(401)
     }
     await as('admin', 'post', `/api/admin/users/${U.cust.id}/unlock`)
-    const fresh = await request(app).post('/api/auth/login').send({ email: U.cust.email, password: 'matkhau123' })
+    const fresh = await request(app).post('/api/auth/login').send({ email: U.cust.email, password: 'Gio-Hoa#Sen2026' })
     expect(fresh.status).toBe(200)
     expect((await request(app).get('/api/me').set('Authorization', `Bearer ${fresh.body.accessToken}`)).status).toBe(200)
   })

@@ -10,9 +10,9 @@ const config = { publicSiteUrl: 'https://lamvi.test', rateLimit: { enabled: fals
 let app, repo, auth, U
 
 async function make(email, role = 'customer', extra = {}) {
-  const { user } = await auth.signUp({ email, password: 'matkhau123' })
+  const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: email.split('@')[0], role, email, ...extra })
-  const s = await auth.signIn({ email, password: 'matkhau123' })
+  const s = await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })
   return { id: user.id, email, token: `Bearer ${s.accessToken}`, refresh: s.refreshToken }
 }
 
@@ -97,7 +97,7 @@ describe('Khoá / mở khoá (G-19)', () => {
     expect(lock.body.item).toMatchObject({ locked: true, lockedReason: 'gian lận' })
     // Token đang dùng bị từ chối ở request kế tiếp
     expect((await as('cust', 'get', '/api/me')).status).toBe(401)
-    const login = await request(app).post('/api/auth/login').send({ email: 'an@lamvi.test', password: 'matkhau123' })
+    const login = await request(app).post('/api/auth/login').send({ email: 'an@lamvi.test', password: 'Gio-Hoa#Sen2026' })
     expect(login.status).toBe(403)
     expect(login.body.error.code).toBe('ACCOUNT_LOCKED')
     expect(login.headers['set-cookie']?.join('') ?? '').not.toMatch(/lamvi_rt=[^;]/)
@@ -105,7 +105,7 @@ describe('Khoá / mở khoá (G-19)', () => {
   })
 
   it('refresh bằng cookie của người bị khoá → 403 ACCOUNT_LOCKED và xoá cookie (không cấp phiên mới)', async () => {
-    const login = await request(app).post('/api/auth/login').send({ email: 'an@lamvi.test', password: 'matkhau123' })
+    const login = await request(app).post('/api/auth/login').send({ email: 'an@lamvi.test', password: 'Gio-Hoa#Sen2026' })
     const cookie = login.headers['set-cookie'].find((c) => c.startsWith('lamvi_rt=')).split(';')[0]
     await as('admin', 'post', `/api/admin/users/${U.cust.id}/lock`, {})
     const r = await request(app).post('/api/auth/refresh').set('Cookie', cookie).set('Origin', config.publicSiteUrl)
@@ -118,7 +118,7 @@ describe('Khoá / mở khoá (G-19)', () => {
     await as('admin', 'post', `/api/admin/users/${U.cust.id}/lock`, {})
     const un = await as('admin', 'post', `/api/admin/users/${U.cust.id}/unlock`)
     expect(un.body.item).toMatchObject({ locked: false, lockedAt: null, lockedReason: null })
-    const login = await request(app).post('/api/auth/login').send({ email: 'an@lamvi.test', password: 'matkhau123' })
+    const login = await request(app).post('/api/auth/login').send({ email: 'an@lamvi.test', password: 'Gio-Hoa#Sen2026' })
     expect(login.status).toBe(200)
   })
 
@@ -189,7 +189,7 @@ describe('Đổi vai trò (D-38, D-51)', () => {
 
 describe('Email ở hồ sơ', () => {
   it('đăng ký lưu email; GET /me bổ sung email cho hồ sơ cũ', async () => {
-    const reg = await request(app).post('/api/auth/register').send({ email: 'Moi@Lamvi.Test', password: 'matkhau-dai-123', fullName: 'Mới' })
+    const reg = await request(app).post('/api/auth/register').send({ email: 'Moi@Lamvi.Test', password: 'Dai-Hon#Muoi4411', fullName: 'Mới' })
     expect(reg.status).toBe(201)
     expect((await repo.getProfile(reg.body.user.id)).email).toBe('moi@lamvi.test')
     const old = await make('cu@lamvi.test')

@@ -71,8 +71,8 @@ export function loadConfig(env = process.env) {
       resendApiKey: env.RESEND_API_KEY || null,
       brevoApiKey: env.BREVO_API_KEY || null,
     },
-    // T-49: chặn mật khẩu đã lộ (HIBP). PWNED_CHECK=0 để tắt (test/mạng chặn api.pwnedpasswords.com).
-    pwnedCheck: env.PWNED_CHECK !== '0',
+    // T-49: chặn mật khẩu đã lộ (HIBP). Từ D-91 mặc định TẮT (PO chỉ cần quy tắc cơ bản); PWNED_CHECK=1 để bật.
+    pwnedCheck: env.PWNED_CHECK === '1',
     mayHashSalt: env.MAY_HASH_SALT || env.SUPABASE_URL || DEFAULT_HASH_SALT,
     supabase,
     useSupabase: Boolean(supabase.url && supabase.anonKey && supabase.serviceRoleKey),

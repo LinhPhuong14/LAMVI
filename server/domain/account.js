@@ -1,12 +1,13 @@
 import { LOCALES } from '../i18n.js'
+import { PASSWORD_MAX_BYTES, PASSWORD_MIN, checkPassword } from '../../src/lib/password.js'
 
 // D-42: đăng nhập bằng email + mật khẩu; SĐT chỉ lưu trong hồ sơ
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 // SĐT di động VN: 0 hoặc +84, đầu số 3/5/7/8/9, 9 số sau (BR-SHP-002: chỉ trong nước)
 const VN_PHONE_RE = /^(?:\+84|84|0)([35789]\d{8})$/
 
-export const PASSWORD_MIN = 8
-export const PASSWORD_MAX = 72
+export { PASSWORD_MIN }
+export const PASSWORD_MAX = PASSWORD_MAX_BYTES
 export const NAME_MAX = 100
 
 export function normalizeEmail(v) {
@@ -26,12 +27,9 @@ export function validateEmail(email) {
   return null
 }
 
+/** Chính sách mật khẩu cơ bản (D-91) — nguồn duy nhất ở src/lib/password.js, dùng chung với giao diện. */
 export function validatePassword(pw) {
-  if (typeof pw !== 'string' || pw.length === 0) return 'REQUIRED'
-  if (pw.length < PASSWORD_MIN) return 'PASSWORD_TOO_SHORT'
-  // Supabase (bcrypt) giới hạn 72 byte — ký tự có dấu chiếm nhiều byte
-  if (pw.length > PASSWORD_MAX || Buffer.byteLength(pw, 'utf8') > PASSWORD_MAX) return 'PASSWORD_TOO_LONG'
-  return null
+  return checkPassword(pw)
 }
 
 // Kiểm tra các trường hồ sơ; partial=true cho PATCH (chỉ kiểm tra trường có gửi)

@@ -41,9 +41,9 @@ beforeEach(async () => {
   clock = Date.parse('2026-09-29T03:00:00Z')
   repo = createMemoryRepo()
   auth = createMemoryAuth()
-  const { user } = await auth.signUp({ email: 'admin@moc.test', password: 'matkhau123' })
+  const { user } = await auth.signUp({ email: 'admin@moc.test', password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: 'Admin', role: 'admin' })
-  adminBearer = `Bearer ${(await auth.signIn({ email: 'admin@moc.test', password: 'matkhau123' })).accessToken}`
+  adminBearer = `Bearer ${(await auth.signIn({ email: 'admin@moc.test', password: 'Gio-Hoa#Sen2026' })).accessToken}`
   vi.spyOn(console, 'warn').mockImplementation(() => {})
   vi.spyOn(console, 'error').mockImplementation(() => {})
 })

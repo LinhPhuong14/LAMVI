@@ -29,19 +29,19 @@ function make({ verifyOtp, updateUserById, signOut, refreshSession, generateLink
 describe('resetPassword (adapter Supabase)', () => {
   it('verifyOtp trả data không có session (user có, session null) → INVALID_RESET_TOKEN', async () => {
     const { auth, admin } = make({ verifyOtp: vi.fn(async () => ({ data: { user, session: null }, error: null })) })
-    await expect(auth.resetPassword({ token: 't', password: 'matkhau-moi-1' })).rejects.toMatchObject({ code: 'INVALID_RESET_TOKEN' })
+    await expect(auth.resetPassword({ token: 't', password: 'Moi-Gio#Lanh82' })).rejects.toMatchObject({ code: 'INVALID_RESET_TOKEN' })
     expect(admin.auth.admin.updateUserById).not.toHaveBeenCalled()
   })
 
   it('verifyOtp lỗi 429 (Supabase giới hạn tốc độ) → INVALID_RESET_TOKEN theo mã 4xx hiện tại (ghi nhận)', async () => {
     const { auth } = make({ verifyOtp: vi.fn(async () => ({ data: {}, error: err('over_request_rate_limit', 429) })) })
-    const e = await auth.resetPassword({ token: 't', password: 'matkhau-moi-1' }).catch((x) => x)
+    const e = await auth.resetPassword({ token: 't', password: 'Moi-Gio#Lanh82' }).catch((x) => x)
     expect(e.code).toBe('INVALID_RESET_TOKEN')
   })
 
   it('verifyOtp ném (mạng) → lỗi lan ra để errorHandler trả 500, không nuốt thành "link hỏng"', async () => {
     const { auth } = make({ verifyOtp: vi.fn(async () => { throw new Error('ECONNRESET') }) })
-    const e = await auth.resetPassword({ token: 't', password: 'matkhau-moi-1' }).catch((x) => x)
+    const e = await auth.resetPassword({ token: 't', password: 'Moi-Gio#Lanh82' }).catch((x) => x)
     expect(e.code).toBeUndefined()
     expect(e.message).toBe('ECONNRESET')
   })
@@ -62,22 +62,22 @@ describe('resetPassword (adapter Supabase)', () => {
   it('thu hồi phiên lỗi 500 → vẫn thành công và không lộ token vào log', async () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => {})
     const { auth } = make({ signOut: vi.fn(async () => ({ error: err('unexpected_failure', 500) })) })
-    await expect(auth.resetPassword({ token: 'SECRET-T', password: 'matkhau-moi-1' })).resolves.toMatchObject({ user })
+    await expect(auth.resetPassword({ token: 'SECRET-T', password: 'Moi-Gio#Lanh82' })).resolves.toMatchObject({ user })
     expect(JSON.stringify(log.mock.calls)).not.toContain('SECRET-T')
-    expect(JSON.stringify(log.mock.calls)).not.toContain('matkhau-moi-1')
+    expect(JSON.stringify(log.mock.calls)).not.toContain('Moi-Gio#Lanh82')
     log.mockRestore()
   })
 
   it('không trả access/refresh token của phiên khôi phục cho caller', async () => {
     const { auth } = make()
-    const out = await auth.resetPassword({ token: 't', password: 'matkhau-moi-1' })
+    const out = await auth.resetPassword({ token: 't', password: 'Moi-Gio#Lanh82' })
     expect(JSON.stringify(out)).not.toContain('rec-a')
     expect(JSON.stringify(out)).not.toContain('rec-r')
   })
 
   it('gọi verifyOtp với token_hash và type recovery (không type khác)', async () => {
     const { auth, pub } = make()
-    await auth.resetPassword({ token: 'abc', password: 'matkhau-moi-1' })
+    await auth.resetPassword({ token: 'abc', password: 'Moi-Gio#Lanh82' })
     expect(pub.auth.verifyOtp).toHaveBeenCalledWith({ token_hash: 'abc', type: 'recovery' })
   })
 })

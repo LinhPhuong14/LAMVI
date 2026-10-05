@@ -162,9 +162,9 @@ describe('GET /api/it/health end-to-end', () => {
     const app = createApp({ repo, auth, storage: createMemoryStorage(), config, mailer })
     const tokens = {}
     for (const [k, role] of [['it', 'it'], ['admin', 'admin'], ['customer', 'customer']]) {
-      const { user } = await auth.signUp({ email: `${k}@lamvi.test`, password: 'matkhau123' })
+      const { user } = await auth.signUp({ email: `${k}@lamvi.test`, password: 'Gio-Hoa#Sen2026' })
       await repo.upsertProfile({ id: user.id, fullName: k, role, email: `${k}@lamvi.test` })
-      tokens[k] = `Bearer ${(await auth.signIn({ email: `${k}@lamvi.test`, password: 'matkhau123' })).accessToken}`
+      tokens[k] = `Bearer ${(await auth.signIn({ email: `${k}@lamvi.test`, password: 'Gio-Hoa#Sen2026' })).accessToken}`
     }
     return { app, tokens }
   }

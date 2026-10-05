@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useI18n } from '../../i18n/index.js'
 import { safeNext, useAuth } from '../../auth/context.js'
+import { landingPath } from '../../auth/landing.js'
 import AuthShell from './AuthShell'
 
 // D-78, T-49: sau khi Google xác nhận, server đã đặt cookie phiên HttpOnly và chuyển về đây (không
@@ -18,7 +19,11 @@ export default function AuthCallbackPage() {
     started.current = true
     const next = new URLSearchParams(window.location.search).get('next')
     refreshSession().then(
-      () => navigate(safeNext(next, path('/account')), { replace: true }),
+      async (session) => {
+        // Có ?next thì tôn trọng; không có thì admin/IT vào thẳng /admin
+        const target = next ? safeNext(next, path('/account')) : await landingPath(session.accessToken, path('/account'))
+        navigate(target, { replace: true })
+      },
       () => setFailed(true),
     )
   }, [refreshSession, navigate, path])

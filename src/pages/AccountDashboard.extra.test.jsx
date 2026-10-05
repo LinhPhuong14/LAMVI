@@ -93,7 +93,7 @@ describe('Chưa đăng nhập', () => {
     const reg = screen.getAllByRole('link').find((a) => a.getAttribute('href')?.startsWith('/register?next='))
     expect(decodeURIComponent(reg.getAttribute('href').split('next=')[1])).toBe('/account?tab=may')
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'an@example.com' } })
-    fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'matkhau123' } })
+    fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'Gio-Hoa#Sen2026' } })
     fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }))
     expect(await screen.findByRole('heading', { name: 'Lịch sử trò chuyện với Mây' })).toBeInTheDocument()
     expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')

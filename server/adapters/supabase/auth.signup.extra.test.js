@@ -32,7 +32,7 @@ function setup(createUser) {
 const register = (app, body = {}) =>
   request(app)
     .post('/api/auth/register')
-    .send({ email: 'an@example.com', password: 'matkhau123', fullName: 'Nguyễn An', ...body })
+    .send({ email: 'an@example.com', password: 'Gio-Hoa#Sen2026', fullName: 'Nguyễn An', ...body })
 
 let consoleError
 beforeEach(() => {
@@ -47,7 +47,7 @@ describe('POST /api/auth/register — Supabase admin.createUser (D-63)', () => {
     expect(res.status).toBe(201)
     expect(res.body).toEqual({ user: { id: 'u-new', email: 'an@example.com' }, needsConfirmation: false })
     expect(admin.auth.admin.createUser).toHaveBeenCalledTimes(1)
-    expect(admin.auth.admin.createUser).toHaveBeenCalledWith({ email: 'an@example.com', password: 'matkhau123', email_confirm: true })
+    expect(admin.auth.admin.createUser).toHaveBeenCalledWith({ email: 'an@example.com', password: 'Gio-Hoa#Sen2026', email_confirm: true })
     expect(makePublicClient).not.toHaveBeenCalled()
     expect(await repo.getProfile('u-new')).toMatchObject({
       id: 'u-new',
@@ -58,10 +58,18 @@ describe('POST /api/auth/register — Supabase admin.createUser (D-63)', () => {
     })
   })
 
-  it('mật khẩu gửi nguyên văn (không trim) tới createUser', async () => {
+  it('mật khẩu gửi nguyên văn (không trim) tới createUser; dấu cách ở giữa được giữ', async () => {
     const { app, admin } = setup()
-    await register(app, { password: '  matkhau123  ' })
-    expect(admin.auth.admin.createUser.mock.calls[0][0].password).toBe('  matkhau123  ')
+    await register(app, { password: 'Gio Hoa #Sen 2026' })
+    expect(admin.auth.admin.createUser.mock.calls[0][0].password).toBe('Gio Hoa #Sen 2026')
+  })
+
+  it('D-91: dấu cách đầu/cuối bị từ chối (PASSWORD_WHITESPACE), không gọi createUser', async () => {
+    const { app, admin } = setup()
+    const res = await register(app, { password: '  Gio-Hoa#Sen2026  ' })
+    expect(res.status).toBe(400)
+    expect(res.body.error.fields.password).toBe('PASSWORD_WHITESPACE')
+    expect(admin.auth.admin.createUser).not.toHaveBeenCalled()
   })
 
   it('dữ liệu không hợp lệ → 400, không gọi createUser (không tạo user mồ côi)', async () => {

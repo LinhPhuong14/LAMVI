@@ -17,9 +17,9 @@ const DAY = 86_400_000
 let app, repo, auth, storage, may, clock, customer, other, admin
 
 async function login(email, role = 'customer') {
-  const { user } = await auth.signUp({ email, password: 'matkhau123' })
+  const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: email, role })
-  const s = await auth.signIn({ email, password: 'matkhau123' })
+  const s = await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })
   return { token: `Bearer ${s.accessToken}`, id: user.id }
 }
 

@@ -43,7 +43,7 @@ const login = (email, password = 'saibetnhe') => request(app).post('/api/auth/lo
 const register = (email) =>
   request(app)
     .post('/api/auth/register')
-    .send({ email, password: 'matkhau123', fullName: 'A', phone: '0912345678' })
+    .send({ email, password: 'Gio-Hoa#Sen2026', fullName: 'A', phone: '0912345678' })
 
 describe('Đăng nhập (dò mật khẩu)', () => {
   it('quá số lần cho phép → 429 kèm Retry-After, không tiết lộ thêm gì', async () => {
@@ -70,7 +70,7 @@ describe('Đăng nhập (dò mật khẩu)', () => {
     // Hai lần sai cho email khác (chưa tới ngưỡng IP là 3)
     await login('khac@example.com')
     await login('khac@example.com')
-    expect((await request(app).post('/api/auth/login').send({ email: 'an@example.com', password: 'matkhau123' })).status).toBe(200)
+    expect((await request(app).post('/api/auth/login').send({ email: 'an@example.com', password: 'Gio-Hoa#Sen2026' })).status).toBe(200)
   })
 })
 
@@ -81,7 +81,7 @@ describe('Đăng ký (spam tài khoản)', () => {
     const blocked = await register('a3@example.com')
     expect(blocked.status).toBe(429)
     // Tài khoản thứ ba không được tạo → đăng nhập báo sai thông tin, không phải 200
-    expect((await request(app).post('/api/auth/login').send({ email: 'a3@example.com', password: 'matkhau123' })).status).toBe(401)
+    expect((await request(app).post('/api/auth/login').send({ email: 'a3@example.com', password: 'Gio-Hoa#Sen2026' })).status).toBe(401)
   })
 })
 
@@ -108,7 +108,7 @@ describe('Tạo đơn (spam đơn, giữ lượt coupon)', () => {
 
   it('quá ngưỡng → 429', async () => {
     await register('an@example.com')
-    const { body } = await request(app).post('/api/auth/login').send({ email: 'an@example.com', password: 'matkhau123' })
+    const { body } = await request(app).post('/api/auth/login').send({ email: 'an@example.com', password: 'Gio-Hoa#Sen2026' })
     const token = `Bearer ${body.accessToken}`
     const order = async () => {
       await request(app).put('/api/cart/items/den-nguyet').set('Authorization', token).send({ quantity: 1 })
@@ -307,14 +307,14 @@ describe('G-20 — tác dụng phụ lên người dùng hợp lệ', () => {
 
   async function customerToken() {
     await register('khach@example.com')
-    const { body } = await request(app).post('/api/auth/login').send({ email: 'khach@example.com', password: 'matkhau123' })
+    const { body } = await request(app).post('/api/auth/login').send({ email: 'khach@example.com', password: 'Gio-Hoa#Sen2026' })
     return `Bearer ${body.accessToken}`
   }
 
   it('cùng IP: chạm ngưỡng vì người khác dò mật khẩu → người dùng hợp lệ cũng bị chặn (rủi ro NAT/văn phòng)', async () => {
     await register('an@example.com')
     for (let i = 0; i < 3; i += 1) await login(`nanan${i}@example.com`, 'sai')
-    const ok = await request(app).post('/api/auth/login').send({ email: 'an@example.com', password: 'matkhau123' })
+    const ok = await request(app).post('/api/auth/login').send({ email: 'an@example.com', password: 'Gio-Hoa#Sen2026' })
     expect(ok.status).toBe(429)
   })
 
@@ -332,7 +332,7 @@ describe('G-20 — tác dụng phụ lên người dùng hợp lệ', () => {
 
   // Trước T-49 bộ giới hạn đổi/đặt lại mật khẩu truyền keys `() => []` nên thực tế không đếm gì.
   it('reset-password: đoán token bị chặn theo IP sau ngưỡng (kể cả token sai)', async () => {
-    const guess = () => request(app).post('/api/auth/reset-password').send({ token: 'doan-bua', password: 'matkhaumoi1' })
+    const guess = () => request(app).post('/api/auth/reset-password').send({ token: 'doan-bua', password: 'Moi-Nang#Xuan71' })
     expect((await guess()).status).toBe(400)
     expect((await guess()).status).toBe(400)
     const blocked = await guess()
@@ -343,12 +343,12 @@ describe('G-20 — tác dụng phụ lên người dùng hợp lệ', () => {
   it('change-password: đếm theo tài khoản — thử mật khẩu hiện tại liên tục bị chặn, không ảnh hưởng reset-password', async () => {
     const token = await customerToken()
     const change = (currentPassword) =>
-      request(app).post('/api/auth/change-password').set('Authorization', token).send({ currentPassword, password: 'matkhaumoi9' })
+      request(app).post('/api/auth/change-password').set('Authorization', token).send({ currentPassword, password: 'Moi-Nang#Xuan79' })
     expect((await change('sai-1')).status).toBe(400)
     expect((await change('sai-2')).status).toBe(400)
-    expect((await change('matkhau123')).status).toBe(429)
+    expect((await change('Gio-Hoa#Sen2026')).status).toBe(429)
     // Luồng đặt lại mật khẩu có bộ đếm riêng nên vẫn dùng được
-    const reset = await request(app).post('/api/auth/reset-password').send({ token: 'x', password: 'matkhaumoi1' })
+    const reset = await request(app).post('/api/auth/reset-password').send({ token: 'x', password: 'Moi-Nang#Xuan71' })
     expect(reset.status).toBe(400)
   })
 })
@@ -395,9 +395,9 @@ describe('G-20 — lấy lại liên kết thanh toán cũng bị giới hạn',
       payos,
       orders: createOrderService({ repo: repo2, payos }),
     })
-    const { user } = await auth2.signUp({ email: 'khach@example.com', password: 'matkhau123' })
+    const { user } = await auth2.signUp({ email: 'khach@example.com', password: 'Gio-Hoa#Sen2026' })
     await repo2.upsertProfile({ id: user.id, fullName: 'A' })
-    const s = await auth2.signIn({ email: 'khach@example.com', password: 'matkhau123' })
+    const s = await auth2.signIn({ email: 'khach@example.com', password: 'Gio-Hoa#Sen2026' })
     const token = `Bearer ${s.accessToken}`
     await request(app2).put('/api/cart/items/den-nguyet').set('Authorization', token).send({ quantity: 1 })
     const created = await request(app2)

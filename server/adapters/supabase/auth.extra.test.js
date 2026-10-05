@@ -30,8 +30,8 @@ describe('G-18 — verifyPassword (adapter Supabase)', () => {
 
   it('mật khẩu đúng → true', async () => {
     const { auth, clients } = make()
-    expect(await auth.verifyPassword('u1', 'matkhau123')).toBe(true)
-    expect(clients[0].auth.signInWithPassword).toHaveBeenCalledWith({ email: 'an@example.com', password: 'matkhau123' })
+    expect(await auth.verifyPassword('u1', 'Gio-Hoa#Sen2026')).toBe(true)
+    expect(clients[0].auth.signInWithPassword).toHaveBeenCalledWith({ email: 'an@example.com', password: 'Gio-Hoa#Sen2026' })
   })
 
   it('mật khẩu sai → false, không ném lỗi', async () => {

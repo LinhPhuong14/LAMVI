@@ -104,9 +104,9 @@ describe('GET /api/admin/analytics/realtime', () => {
     const storage = createMemoryStorage({ maxBytes: 1024 })
     const app = createApp({ repo, auth, storage, config: { publicSiteUrl: 'https://x.test' }, gaRealtime })
     const login = async (email, role) => {
-      const { user } = await auth.signUp({ email, password: 'matkhau123' })
+      const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
       await repo.upsertProfile({ id: user.id, fullName: email, role })
-      return `Bearer ${(await auth.signIn({ email, password: 'matkhau123' })).accessToken}`
+      return `Bearer ${(await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })).accessToken}`
     }
     return { app, admin: await login('a@x.test', 'admin'), customer: await login('c@x.test', 'customer') }
   }

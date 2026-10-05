@@ -24,9 +24,9 @@ const fakePayos = () => ({
 })
 
 async function login(email, role = 'customer', extra = {}) {
-  const { user } = await auth.signUp({ email, password: 'matkhau123' })
+  const { user } = await auth.signUp({ email, password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: 'Nguyễn An', role, email, preferredLocale: 'vi', ...extra })
-  const s = await auth.signIn({ email, password: 'matkhau123' })
+  const s = await auth.signIn({ email, password: 'Gio-Hoa#Sen2026' })
   return { id: user.id, token: `Bearer ${s.accessToken}` }
 }
 
@@ -274,7 +274,7 @@ describe('Mẫu thư', () => {
   it('escape HTML trong tên sản phẩm, mã vận đơn, tên người nhận thư', () => {
     const m = orderMail({ kind: 'shipped', lang: 'vi', order, siteUrl: SITE, name: '<b>An</b>' })
     expect(m.html).not.toContain('<script>')
-    expect(m.html).not.toContain('<img')
+    expect(m.html).not.toContain('<img src=x') // banner hợp lệ vẫn có thẻ img, chỉ thẻ bị chèn mới sai
     expect(m.html).not.toContain('<b>An</b>')
     expect(m.html).toContain('&lt;script&gt;')
   })

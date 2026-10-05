@@ -11,7 +11,7 @@ let app, auth, repo, clock, mailer
 // G-20: tắt rate limit trong bộ test chức năng (nhiều test đăng ký/đăng nhập liên tiếp từ cùng
 // một IP). Hành vi giới hạn được kiểm riêng ở server/rateLimit.extra.test.js.
 const config = { publicSiteUrl: 'https://moc.test', rateLimit: { enabled: false } }
-const valid = { email: 'an@example.com', password: 'matkhau123', fullName: 'Nguyễn An' }
+const valid = { email: 'an@example.com', password: 'Gio-Hoa#Sen2026', fullName: 'Nguyễn An' }
 
 function setup(opts = {}) {
   clock = { t: Date.UTC(2026, 8, 1) }
@@ -62,12 +62,14 @@ describe('Đăng ký — kiểm tra đầu vào (FR-ACC-001, D-42)', () => {
     expect(res.body.error.fields.email).toBe('REQUIRED')
   })
 
-  it('mật khẩu 8 và 72 ký tự hợp lệ; 7 và 73 ký tự bị từ chối', async () => {
-    expect((await register({ email: 'a8@example.com', password: 'x'.repeat(8) })).status).toBe(201)
-    expect((await register({ email: 'a72@example.com', password: 'x'.repeat(72) })).status).toBe(201)
-    const short = await register({ email: 'a7@example.com', password: 'x'.repeat(7) })
+  it('mật khẩu 8 ký tự và 72 byte hợp lệ; 7 ký tự và 73 byte bị từ chối (D-91)', async () => {
+    const ok72 = `Ab1${'x'.repeat(69)}`
+    expect(Buffer.byteLength(ok72)).toBe(72)
+    expect((await register({ email: 'a8@example.com', password: 'Abcdefg1' })).status).toBe(201)
+    expect((await register({ email: 'a72@example.com', password: ok72 })).status).toBe(201)
+    const short = await register({ email: 'a7@example.com', password: 'Abcdef1' })
     expect(short.body.error.fields.password).toBe('PASSWORD_TOO_SHORT')
-    const long = await register({ email: 'a73@example.com', password: 'x'.repeat(73) })
+    const long = await register({ email: 'a73@example.com', password: `${ok72}x` })
     expect(long.status).toBe(400)
     expect(long.body.error.fields.password).toBe('PASSWORD_TOO_LONG')
   })
@@ -282,7 +284,7 @@ describe('Đăng nhập — không rò rỉ thông tin', () => {
 
   it('body không hợp lệ (mảng, email/mật khẩu không phải chuỗi) → 401 INVALID_CREDENTIALS', async () => {
     await register().expect(201)
-    for (const body of [[valid], { email: valid.email, password: ['matkhau123'] }, { email: { $ne: '' }, password: valid.password }]) {
+    for (const body of [[valid], { email: valid.email, password: ['Gio-Hoa#Sen2026'] }, { email: { $ne: '' }, password: valid.password }]) {
       const res = await request(app).post('/api/auth/login').send(body)
       expect(res.status).toBe(401)
       expect(res.body.error.code).toBe('INVALID_CREDENTIALS')
@@ -327,7 +329,7 @@ describe('Phiên (access token hết hạn, refresh, đăng xuất)', () => {
     const change = await request(app)
       .post('/api/auth/change-password')
       .set('Authorization', `Bearer ${s.accessToken}`)
-      .send({ currentPassword: valid.password, password: 'matkhaumoi1' })
+      .send({ currentPassword: valid.password, password: 'Moi-Nang#Xuan71' })
     expect(change.status).toBe(401)
     const out = await request(app).post('/api/auth/logout').set('Authorization', `Bearer ${s.accessToken}`).set('Cookie', s.cookie)
     expect(out.status).toBe(204)
@@ -371,8 +373,8 @@ describe('Phiên (access token hết hạn, refresh, đăng xuất)', () => {
 
   it('GET /me tự tạo hồ sơ customer nếu tài khoản chưa có hồ sơ', async () => {
     // Tài khoản tạo ngoài API
-    await auth.signUp({ email: 'ngoai@example.com', password: 'matkhau123' })
-    const s = await auth.signIn({ email: 'ngoai@example.com', password: 'matkhau123' })
+    await auth.signUp({ email: 'ngoai@example.com', password: 'Gio-Hoa#Sen2026' })
+    const s = await auth.signIn({ email: 'ngoai@example.com', password: 'Gio-Hoa#Sen2026' })
     expect(await repo.getProfile(s.user.id)).toBeNull()
     const res = await me(s.accessToken)
     expect(res.status).toBe(200)
@@ -381,8 +383,8 @@ describe('Phiên (access token hết hạn, refresh, đăng xuất)', () => {
   })
 
   it('PATCH /me cho tài khoản chưa có hồ sơ → tạo hồ sơ customer', async () => {
-    await auth.signUp({ email: 'ngoai@example.com', password: 'matkhau123' })
-    const s = await auth.signIn({ email: 'ngoai@example.com', password: 'matkhau123' })
+    await auth.signUp({ email: 'ngoai@example.com', password: 'Gio-Hoa#Sen2026' })
+    const s = await auth.signIn({ email: 'ngoai@example.com', password: 'Gio-Hoa#Sen2026' })
     const res = await request(app).patch('/api/me').set('Authorization', `Bearer ${s.accessToken}`).send({ fullName: 'Ngoài' })
     expect(res.status).toBe(200)
     expect(res.body.profile).toMatchObject({ fullName: 'Ngoài', role: 'customer' })
@@ -390,39 +392,20 @@ describe('Phiên (access token hết hạn, refresh, đăng xuất)', () => {
 })
 
 describe('Quên / đặt lại mật khẩu — bảo mật', () => {
-  it('forgot-password: email tồn tại và không tồn tại → cùng status, body, header nội dung', async () => {
+  it('forgot-password (D-92): email đã đăng ký → 202; email chưa đăng ký → 404 EMAIL_NOT_REGISTERED, không thư', async () => {
     await register().expect(201)
     const a = await request(app).post('/api/auth/forgot-password').send({ email: 'AN@example.com ' })
     const b = await request(app).post('/api/auth/forgot-password').send({ email: 'khong-co@example.com' })
     expect(a.status).toBe(202)
-    expect(b.status).toBe(202)
-    expect(a.text).toBe(b.text)
-    expect(a.headers['content-length']).toBe(b.headers['content-length'])
-    expect(a.headers['content-type']).toBe(b.headers['content-type'])
+    expect(b.status).toBe(404)
+    expect(b.body.error.code).toBe('EMAIL_NOT_REGISTERED')
+    expect(b.headers['set-cookie']).toBeUndefined()
     // email hoa thường/khoảng trắng vẫn gửi đúng người
     expect(mailer.outbox).toHaveLength(1)
     expect(mailer.outbox[0].to).toBe('an@example.com')
   })
 
-  it('forgot-password: thời gian phản hồi không chênh lệch lớn giữa email có/không tồn tại', async () => {
-    await register().expect(201)
-    const time = async (email) => {
-      const t0 = performance.now()
-      await request(app).post('/api/auth/forgot-password').send({ email })
-      return performance.now() - t0
-    }
-    const n = 10
-    let exist = 0
-    let missing = 0
-    for (let i = 0; i < n; i++) {
-      exist += await time('an@example.com')
-      missing += await time(`khong${i}@example.com`)
-    }
-    // Ngưỡng rộng để tránh test chập chờn; chỉ bắt chênh lệch rõ rệt (vd băm mật khẩu chỉ ở một nhánh)
-    expect(Math.abs(exist - missing) / n).toBeLessThan(50)
-  })
-
-  it('forgot-password: email sai định dạng / body mảng → 400 VALIDATION_ERROR (không phụ thuộc email tồn tại)', async () => {
+  it('forgot-password: email sai định dạng / body mảng → 400 VALIDATION_ERROR (kiểm định dạng trước khi tra email)', async () => {
     const res = await request(app).post('/api/auth/forgot-password').send({ email: 'sai' })
     expect(res.status).toBe(400)
     expect(res.body.error.fields.email).toBe('INVALID_EMAIL')
@@ -445,10 +428,10 @@ describe('Quên / đặt lại mật khẩu — bảo mật', () => {
     const s = await registerAndLogin()
     await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
     const rec = resetToken()
-    await request(app).post('/api/auth/reset-password').send({ token: rec, password: 'matkhaumoi1' }).expect(204)
+    await request(app).post('/api/auth/reset-password').send({ token: rec, password: 'Moi-Nang#Xuan71' }).expect(204)
     expect((await me(s.accessToken)).status).toBe(401)
     expect((await refresh(s.cookie)).status).toBe(401)
-    expect((await request(app).post('/api/auth/reset-password').send({ token: rec, password: 'matkhaumoi2' })).status).toBe(400)
+    expect((await request(app).post('/api/auth/reset-password').send({ token: rec, password: 'Moi-Nang#Xuan72' })).status).toBe(400)
   })
 
   it('reset-password: mật khẩu mới quá dài / thiếu → 400 và token vẫn còn dùng được', async () => {
@@ -460,20 +443,20 @@ describe('Quên / đặt lại mật khẩu — bảo mật', () => {
     expect(long.body.error.fields.password).toBe('PASSWORD_TOO_LONG')
     const missing = await request(app).post('/api/auth/reset-password').send({ token })
     expect(missing.body.error.fields.password).toBe('REQUIRED')
-    await request(app).post('/api/auth/reset-password').send({ token, password: 'matkhaumoi1' }).expect(204)
+    await request(app).post('/api/auth/reset-password').send({ token, password: 'Moi-Nang#Xuan71' }).expect(204)
   })
 
   it('reset-password: token hết hạn sau 1 giờ → 400', async () => {
     await register().expect(201)
     await request(app).post('/api/auth/forgot-password').send({ email: valid.email })
     clock.t += 3600_000
-    const res = await request(app).post('/api/auth/reset-password').send({ token: resetToken(), password: 'matkhaumoi1' })
+    const res = await request(app).post('/api/auth/reset-password').send({ token: resetToken(), password: 'Moi-Nang#Xuan71' })
     expect(res.status).toBe(400)
     expect(res.body.error.code).toBe('INVALID_RESET_TOKEN')
   })
 
   it('reset-password không gửi token → 400 INVALID_RESET_TOKEN', async () => {
-    const res = await request(app).post('/api/auth/reset-password').send({ password: 'matkhaumoi1' })
+    const res = await request(app).post('/api/auth/reset-password').send({ password: 'Moi-Nang#Xuan71' })
     expect(res.status).toBe(400)
     expect(res.body.error.code).toBe('INVALID_RESET_TOKEN')
   })
@@ -481,8 +464,8 @@ describe('Quên / đặt lại mật khẩu — bảo mật', () => {
 
 describe('Adapter bộ nhớ — hành vi riêng', () => {
   it('refresh xoay vòng: refresh token mới khác cũ; token cũ không dùng lại được', async () => {
-    const s = await auth.signUp({ email: 'x@example.com', password: 'matkhau123' }).then(() =>
-      auth.signIn({ email: 'x@example.com', password: 'matkhau123' }),
+    const s = await auth.signUp({ email: 'x@example.com', password: 'Gio-Hoa#Sen2026' }).then(() =>
+      auth.signIn({ email: 'x@example.com', password: 'Gio-Hoa#Sen2026' }),
     )
     const r = await auth.refresh(s.refreshToken)
     expect(r.refreshToken).not.toBe(s.refreshToken)
@@ -530,7 +513,7 @@ describe('G-18 — /auth/change-password: biên và tác dụng phụ', () => {
   it('currentPassword sai kiểu (số, mảng, rỗng) → REQUIRED, không phải 500', async () => {
     const s = await registerAndLogin()
     for (const currentPassword of [123, ['a'], { a: 1 }, '', null]) {
-      const res = await change(s.accessToken, { currentPassword, password: 'matkhaumoi1' })
+      const res = await change(s.accessToken, { currentPassword, password: 'Moi-Nang#Xuan71' })
       expect(res.status, JSON.stringify(currentPassword)).toBe(400)
       expect(res.body.error.fields.currentPassword).toBe('REQUIRED')
     }
@@ -542,7 +525,7 @@ describe('G-18 — /auth/change-password: biên và tác dụng phụ', () => {
     const res = await request(app)
       .post('/api/auth/change-password')
       .set('Authorization', `Bearer ${s.accessToken}`)
-      .send([{ currentPassword: valid.password, password: 'matkhaumoi1' }])
+      .send([{ currentPassword: valid.password, password: 'Moi-Nang#Xuan71' }])
     expect(res.status).toBe(400)
     expect((await login()).status).toBe(200)
   })

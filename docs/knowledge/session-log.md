@@ -1,5 +1,17 @@
 # Nhật ký phiên
 
+## 2026-10-05 (tiếp) — Thông báo đơn hàng, khung thư, mật khẩu, quên mật khẩu, trang đích admin (nhánh `feat/order-notifications`)
+
+**Mục tiêu người dùng**: gửi thông báo đơn hàng qua Resend; thiết kế banner và layout cho thư; đặt lại mật khẩu cần ô nhập lại + quy tắc mật khẩu (sau đó rút gọn: chỉ cần quy tắc cơ bản, không chặn mật khẩu phổ biến/đã lộ); "quên mật khẩu" phải từ chối email chưa từng đăng ký; admin đăng nhập vào thẳng /admin.
+
+**Đã làm**: D-91…D-94, T-55. Notifier + 5 loại thư; `layout()` dùng chung + banner (`npm run gen:mail-banner`) đã xem bằng Chromium desktop/di động ở vi/en/zh; `src/lib/password.js` + `PasswordRules` + ô nhập lại; `EMAIL_NOT_REGISTERED` + link tạo tài khoản; `landingPath` cho đăng nhập và Google callback.
+
+**Bẫy**: (1) Đã làm bản mật khẩu khắt khe (danh sách phổ biến, leetspeak, dãy liên tiếp, thông tin cá nhân; 118 test cũ phải đổi mật khẩu thử) rồi PO bảo bỏ — chỉ giữ quy tắc cơ bản; mật khẩu thử trong test nay là `Gio-Hoa#Sen2026` và họ hàng. (2) `useSubmit().run` trả giá trị của hàm truyền vào — viết `run(async () => { x = … })` làm đăng nhập luôn bị coi là thất bại. (3) Test cũ khẳng định đúng hành vi cũ (quên mật khẩu luôn 202, đo thời gian) phải đổi/xoá theo D-92. (4) Banner xem thử bằng `file://` dễ sai đường dẫn: ô tiêu đề hiện chữ `alt` nên lỗi lộ ngay.
+
+**Còn lại / cần người dùng**: xem thư thật trên Gmail/Outlook (G-66); nhắc soạn/khoá lời chúc và cảnh báo ngân sách Mây qua email chưa làm (cần lịch chạy); PO xác nhận IT cũng vào /admin thay vì /it (D-94 `[ASSUMPTION]`); Resend miễn phí 100 thư/ngày.
+
+---
+
 ## 2026-10-05 — Lời chúc & QR, quản lý người dùng, Resend (nhánh `feat/gift-message-admin-users`)
 
 **Mục tiêu người dùng**: kiểm tra production so với BA; rồi "thêm quản lý user vào admin, làm lời chúc và trang QR lời chúc"; "tích hợp luôn Resend, dashboard IT đang báo có config nhưng chưa tích hợp". Người dùng báo đã gắn Supabase thật, Resend, OAuth, OpenAI cho Mây, GA4, Vercel Web Analytics.

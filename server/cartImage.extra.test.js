@@ -13,9 +13,9 @@ beforeEach(async () => {
   auth = createMemoryAuth()
   const maintenance = createMaintenance({ repo, ttlMs: 0 })
   app = createApp({ repo, auth, storage: createMemoryStorage(), config: { publicSiteUrl: 'https://moc.test' }, maintenance })
-  const { user } = await auth.signUp({ email: 'an@moc.test', password: 'matkhau123' })
+  const { user } = await auth.signUp({ email: 'an@moc.test', password: 'Gio-Hoa#Sen2026' })
   await repo.upsertProfile({ id: user.id, fullName: 'An' })
-  token = `Bearer ${(await auth.signIn({ email: 'an@moc.test', password: 'matkhau123' })).accessToken}`
+  token = `Bearer ${(await auth.signIn({ email: 'an@moc.test', password: 'Gio-Hoa#Sen2026' })).accessToken}`
 })
 
 describe('Giỏ trả ảnh sản phẩm (D-83)', () => {

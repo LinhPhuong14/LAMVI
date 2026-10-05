@@ -90,6 +90,12 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
     if (pwned && (await pwned(password))) assertValid({ password: 'PASSWORD_BREACHED' })
   }
 
+  // D-91: ô "nhập lại mật khẩu mới". Giao diện luôn gửi; không gửi (API cũ/tích hợp khác) thì bỏ qua,
+  // gửi mà không khớp thì từ chối trước khi tiêu thụ token đặt lại.
+  function assertConfirmed(b) {
+    if (b.confirmPassword !== undefined && b.confirmPassword !== b.password) assertValid({ confirmPassword: 'PASSWORD_MISMATCH' })
+  }
+
   // G-20: chống dò mật khẩu và spam. Ngưỡng ở config (loadConfig). Đếm theo cả IP và email để
   // một IP đổi email liên tục vẫn không dò được một tài khoản cụ thể.
   const rl = config.rateLimit ?? {}
@@ -125,6 +131,7 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
     if (emailErr) errors.email = emailErr
     if (pwErr) errors.password = pwErr
     assertValid(errors)
+    assertConfirmed(b)
     await assertPasswordAcceptable(b.password)
 
     const lang = values.preferredLocale
@@ -217,22 +224,25 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
     res.status(204).end()
   })
 
-  // Luôn trả 202 để không tiết lộ email có tồn tại hay không. Thư do server gửi (mailer), không
-  // phụ thuộc SMTP của Supabase (T-49).
+  // D-92: email CHƯA từng đăng ký thì không được "quên mật khẩu" — báo rõ 404 EMAIL_NOT_REGISTERED để khách
+  // biết đăng ký thay vì chờ một lá thư không bao giờ tới. Đánh đổi có chủ ý: ai cũng dò được email có tài
+  // khoản hay không (G-65); giảm nhẹ bằng giới hạn tốc độ theo cả IP và email (G-20).
+  // Lỗi từ nhà cung cấp (Supabase/thư) vẫn trả 202 và chỉ ghi log — lỗi hạ tầng không phải lỗi của khách.
   r.post('/auth/forgot-password', forgotLimit, async (req, res) => {
     const email = normalizeEmail(body(req).email)
     const emailErr = validateEmail(email)
     if (emailErr) assertValid({ email: emailErr })
     const lang = normalizeLang(req.query.lang)
+    let token = null
     try {
-      const token = await auth.createRecoveryToken(email)
-      if (token) {
-        const url = `${siteUrl(lang, '/reset-password')}#t=${encodeURIComponent(token)}`
-        await notify(email, recoveryMail({ lang, url }))
-      }
+      token = await auth.createRecoveryToken(email)
     } catch (err) {
       console.error('[auth] createRecoveryToken', err.code ?? err.message)
+      return res.status(202).json({ ok: true })
     }
+    if (!token) throw new HttpError(404, 'EMAIL_NOT_REGISTERED', 'Email này chưa đăng ký tài khoản')
+    const url = `${siteUrl(lang, '/reset-password')}#t=${encodeURIComponent(token)}`
+    await notify(email, recoveryMail({ lang, url, siteUrl: config.publicSiteUrl }))
     res.status(202).json({ ok: true })
   })
 
@@ -240,7 +250,7 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
     clearRefreshCookie(res, config)
     await audit(user.id, 'password_changed')
     const profile = await repo.getProfile(user.id).catch(() => null)
-    await notify(user.email, passwordChangedMail({ lang: profile?.preferredLocale }))
+    await notify(user.email, passwordChangedMail({ lang: profile?.preferredLocale, siteUrl: config.publicSiteUrl }))
   }
 
   // Token một lần từ link trong thư (#t=…) thay cho phiên khôi phục của Supabase. Mọi phiên bị
@@ -248,6 +258,7 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
   r.post('/auth/reset-password', resetLimit, async (req, res) => {
     const b = body(req)
     if (typeof b.token !== 'string' || !b.token) throw new HttpError(400, 'INVALID_RESET_TOKEN', 'Link đặt lại mật khẩu không hợp lệ')
+    assertConfirmed(b)
     await assertPasswordAcceptable(b.password)
     const { user } = await call(() => auth.resetPassword({ token: b.token, password: b.password }))
     await afterPasswordChange(user, res)
@@ -257,6 +268,7 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
   // G-18: đổi mật khẩu khi đang đăng nhập — bắt buộc nhập lại mật khẩu hiện tại
   r.post('/auth/change-password', guard, changeLimit, async (req, res) => {
     const b = body(req)
+    assertConfirmed(b)
     await assertPasswordAcceptable(b.password)
     if (typeof b.currentPassword !== 'string' || !b.currentPassword) {
       assertValid({ currentPassword: 'REQUIRED' })
