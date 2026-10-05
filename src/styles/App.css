@@ -3316,9 +3316,7 @@
 }
 
 .page-auth .nav-auth {
-  position: fixed;
-  left: 0;
-  right: 0;
+  margin-bottom: -56px; /* vẫn sticky từ .nav; kéo sân khấu lên nằm sau thanh kính */
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
 }
