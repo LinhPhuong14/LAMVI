@@ -317,5 +317,5 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 
 - Bối cảnh: T-46/D-80 đã cho `.nav` kính mờ, nhưng ở trang auth ảnh `.auth-stage` bắt đầu **dưới** header nên không có gì phía sau để `backdrop-filter` làm mờ (trông như nền đặc).
 - `LocaleLayout` gắn `page-auth` cho `AUTH_PAGES`. Với `.page-auth`: sân khấu cao `100svh`, padding trên/dưới 112px; `.nav-auth` giữ `position: sticky` thừa hưởng từ `.nav` và dùng `margin-bottom: -56px` để ảnh trượt lên nằm sau thanh; `.auth-foot` là `position: absolute; bottom: 0` (không blur-fixed/sticky).
-- Kính tối: nền `rgba(14,22,32,.34)`, `blur(18px) saturate(160%)`, viền sáng 18%, chữ sáng; có `@supports not` rơi về nền đặc.
+- Kính be: nền `rgba(244,237,224,.66)` (cùng màu `.nav` ban đầu), `blur(18px) saturate(140%)`, viền trắng mờ, giữ chữ tối mặc định; có `@supports not` rơi về nền đặc.
 - **Không dùng `position: fixed` cho phần tử có `backdrop-filter`**: test `AccountTheme.extra.test.jsx` (quy tắc design-rules) cấm; ngoại lệ chỉ là `.nav`. Lần đầu dùng `fixed` làm test hỏng → đổi sang sticky + margin âm. Chiều cao header (~56px) là hằng số ở `margin-bottom`; đổi padding `.nav-auth` thì phải đổi theo.
