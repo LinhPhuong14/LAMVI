@@ -9,6 +9,14 @@ export function redactPii(text) {
   return String(text).replace(EMAIL, '[email]').replace(VN_PHONE, '[phone]')
 }
 
+// SĐT về dạng so sánh được (0912345678). Dùng để đối chiếu mã đơn + SĐT ở server (BR-AI-002);
+// SĐT không bao giờ gửi sang OpenAI.
+export const phoneKey = (v) => String(v ?? '').replace(/\D/g, '').replace(/^840?/, '0')
+
+export function extractPhones(text) {
+  return (String(text).match(VN_PHONE) ?? []).map(phoneKey).filter((p) => /^0\d{9}$/.test(p))
+}
+
 // BR-AI-003: mọi con số (giá, năm, mã…) từ 4 chữ số trở lên trong câu trả lời phải xuất hiện
 // trong kết quả hàm backend của chính lượt đó
 const NUMBER = /\d{1,3}(?:[.,\u00a0\u202f ]\d{3})+|\d{4,}/g
