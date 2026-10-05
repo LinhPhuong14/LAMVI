@@ -339,3 +339,10 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - **Audit log** (`server/routes/admin.js`): `changed(before, values)` chỉ lưu trường đổi; `logAdmin` nuốt lỗi ghi nhật ký. Bảo trì: `server/routes/it.js` ghi entity `maintenance`.
 - **Rollback đăng ký** (`server/routes/auth.js`): bọc `getProfile/upsertProfile` trong try/catch, lỗi → `auth.deleteUser` best-effort rồi ném lỗi gốc. Cả hai adapter auth có `deleteUser`.
 - **SSR**: `classifyPath` thêm `kind: 'shop'` (nạp `/collections`) và `'collection'`; sitemap thêm `/privacy`, `/returns`, `/collections/:slug`.
+
+### T-58 — Địa chỉ 2 cấp và tồn kho
+
+- **Danh mục** (`server/data/vnAdmin.js`, sinh bởi `scripts/gen-vn-admin.js` từ `https://provinces.open-api.vn/api/v2/?depth=2`): mảng module JS tĩnh (không đọc file lúc chạy → Vercel tự theo vết `import`, không cần `includeFiles`). ~98 KB, 34 tỉnh, 3.321 phường/xã, `wards: [[mã, tên]]`. Test thương hiệu `Brand.extra.test.jsx` phải loại file này vì có địa danh "Mộc Châu".
+- **Địa chỉ** (`server/domain/address.js → resolveAddress`): client gửi `provinceCode` + `wardCode` (chuỗi), server tra tên; mã lạ / sai kiểu / phường thuộc tỉnh khác → `INVALID`; thiếu → `REQUIRED`. Dùng `Map` nên `__proto__`, `constructor` là mã không hợp lệ. Cache API geo `public, s-maxage` đặt trong route (middleware chung đặt `no-store` trước nên route phải ghi đè).
+- **Tồn kho**: `stock` NULL = không theo dõi (nâng cấp không làm ai hết hàng bất ngờ). Giữ chỗ nguyên tử bằng hàm SQL `reserve_stock(jsonb)`: khoá dòng theo thứ tự id (tránh deadlock), kiểm đủ hàng cho cả đơn, rồi mới trừ; trả id sản phẩm thiếu hoặc NULL. `release_stock` cộng lại chỉ với sản phẩm có theo dõi. Service gọi `restock(order)` đúng một lần sau `updateOrderIfStatus` thành công ở 3 đường huỷ (khách, admin, hết hạn) nên không trả đôi; `createOrder` hỏng sau giữ chỗ thì trả lại cùng với coupon. Memory adapter mô phỏng cùng ngữ nghĩa (đồng bộ nên không có race; race thật do Postgres khoá hàng).
+- **Hiển thị**: `presentStock` → `inStock`, `stockLeft` (chỉ khi 1–5). Giỏ/ checkout báo `hasShortage`; `createOrder` kiểm sớm (`short`) rồi giữ chỗ nguyên tử mới là cổng chính thức.

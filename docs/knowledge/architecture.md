@@ -201,6 +201,8 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET | `/api/products/:slug?lang=` | – | 404 nếu không `published` |
 | GET | `/api/collections?lang=` | – | Bộ sưu tập `published` kèm `lamps[]` và `set` (D-96); không có story |
 | GET | `/api/collections/:slug?lang=` | – | 404 nếu không công khai |
+| GET | `/api/geo/provinces` | – | Tỉnh/thành (mã, tên) — D-99, cache dài |
+| GET | `/api/geo/provinces/:code/wards` | – | Phường/xã của tỉnh; 404 nếu mã lạ |
 | GET | `/api/gallery?lang=` | Đăng nhập | Đèn đã nhận (đơn DELIVERED), bộ sưu tập + mảnh, `reward` chỉ khi đủ bộ, `quilt` (D-97) |
 | GET | `/api/it/maintenance/log` | IT | Lịch sử bật/tắt bảo trì (G-27) |
 | GET | `/api/faq?lang=` | – | FAQ `is_published` |

@@ -41,6 +41,8 @@ function walk(dir, exts) {
   }
   return out
 }
+// Danh mục hành chính (G-46) chứa địa danh thật như "Mộc Châu", không phải tên thương hiệu
+const DATA_FILES = new Set(['server/data/vnAdmin.js'])
 const SOURCE_FILES = [
   ...walk(join(ROOT, 'src'), /\.(jsx?|css|json|html|svg)$/),
   ...walk(join(ROOT, 'server'), /\.(jsx?|json|html)$/),
@@ -49,7 +51,7 @@ const SOURCE_FILES = [
   ...readdirSync(join(ROOT, 'public'))
     .filter((f) => f.endsWith('.svg'))
     .map((f) => join(ROOT, 'public', f)),
-]
+].filter((f) => !DATA_FILES.has(relative(ROOT, f)))
 
 describe('D-62: mã nguồn không còn tên thương hiệu cũ', () => {
   it('danh sách file quét không rỗng và có các file chính', () => {

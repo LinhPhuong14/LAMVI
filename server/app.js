@@ -6,6 +6,7 @@ import { seoRouter } from './routes/seo.js'
 import { itRouter } from './routes/it.js'
 import { mayRouter } from './routes/may.js'
 import { galleryRouter } from './routes/gallery.js'
+import { geoRouter } from './routes/geo.js'
 import { createMayService } from './may/service.js'
 import { cartRouter } from './routes/cart.js'
 import { ordersRouter } from './routes/orders.js'
@@ -73,6 +74,7 @@ export function createApp({
   api.use(maintenance.apiGuard)
   api.get('/health', (req, res) => res.json({ ok: true }))
   api.use(catalogRouter({ repo }))
+  api.use(geoRouter())
   if (auth) api.use(authRouter({ repo, auth, config, mailer, pwned }))
   if (auth && storage) api.use(adminRouter({ repo, auth, storage, config, orders, gaRealtime }))
   if (auth && storage) api.use(adminUsersRouter({ repo, auth }))

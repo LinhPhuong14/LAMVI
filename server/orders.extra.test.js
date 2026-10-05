@@ -66,8 +66,7 @@ const CHECKOUT = {
   recipientName: 'Nguyễn Văn A',
   recipientPhone: '0912345678',
   addressLine: '12 Hàng Bông',
-  province: 'Hà Nội',
-  district: 'Hoàn Kiếm',
+  provinceCode: '1', wardCode: '4',
   paymentMethod: 'cod',
 }
 
@@ -541,7 +540,7 @@ describe('Quyền và rò rỉ dữ liệu (BR-ACC-001, AC-004 US-004)', () => {
     const created = await createOrder({ paymentMethod: 'payos', couponCode: undefined })
     const allowed = [
       'code', 'status', 'orderKind', 'hasMessage', 'qrLang', 'recipientIsSelf', 'recipientName',
-      'recipientPhone', 'addressLine', 'ward', 'district', 'province', 'note', 'paymentMethod',
+      'recipientPhone', 'addressLine', 'ward', 'district', 'province', 'provinceCode', 'wardCode', 'note', 'paymentMethod',
       'paymentStatus', 'paymentExpiresAt', 'subtotal', 'discount', 'shippingFee', 'total',
       'vatAmount', 'vatRate', 'couponCode', 'trackingCode', 'cancelledAt', 'createdAt',
       'currency', 'items',

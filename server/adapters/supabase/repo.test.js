@@ -63,6 +63,7 @@ describe('createSupabaseRepo — mapping snake_case → camelCase', () => {
       imageUrl: undefined,
       imagePath: undefined,
       imageAlt: undefined,
+      stock: null,
       collectionSlug: null,
       pieceOrder: 0,
       updatedAt: expect.anything(),

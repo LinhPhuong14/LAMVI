@@ -256,7 +256,7 @@ describe('Danh sách/tìm kiếm với đầu vào lạ', () => {
         recipientName: 'An',
         recipientPhone: '0912345678',
         addressLine: '1 A',
-        province: 'Hà Nội',
+        provinceCode: '1', wardCode: '4',
         paymentMethod: 'cod',
       })
       expect(r.status).toBe(201)

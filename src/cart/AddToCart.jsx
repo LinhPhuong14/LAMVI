@@ -6,12 +6,23 @@ import { track } from '../analytics/index.js'
 // Nút thêm vào giỏ (thẻ sản phẩm + trang chi tiết).
 // Phản hồi thành công do bong bóng của Mây (CartBubble) đảm nhận; ở đây chỉ đổi nhãn nút "✓ Đã thêm" ngắn
 // và báo lỗi tại chỗ. Không còn link "Xem giỏ hàng" chen vào thẻ sản phẩm (D-83).
-export default function AddToCart({ slug, quantity = 1, label, className = 'btn btn-small' }) {
+// G-44, D-100: soldOut → nút khoá "Tạm hết hàng"
+export default function AddToCart({ slug, quantity = 1, label, className = 'btn btn-small', soldOut = false }) {
   const { t } = useI18n()
   const { add, error } = useCart()
   const [state, setState] = useState(null) // null | 'pending' | 'added' | 'error'
   const timer = useRef(null)
   useEffect(() => () => clearTimeout(timer.current), [])
+
+  if (soldOut) {
+    return (
+      <span className="add-to-cart">
+        <button type="button" className={className} disabled>
+          {t('cart.soldOut')}
+        </button>
+      </span>
+    )
+  }
 
   async function onClick() {
     clearTimeout(timer.current)

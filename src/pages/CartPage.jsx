@@ -92,6 +92,7 @@ export default function CartPage() {
         </p>
       )}
       {cart.hasUnavailable && <p className="notice error">{t('cart.hasUnavailable')}</p>}
+      {cart.hasShortage && <p className="notice error" role="alert">{t('cart.hasShortage')}</p>}
       <div className="cart-layout">
         <div className="cart-main">
           <ul className="cart-lines">
@@ -109,6 +110,9 @@ export default function CartPage() {
                     <strong>{t('cart.unavailableName')}</strong>
                   )}
                   {i.available ? <Price amount={i.product.price} /> : <span className="field-error">{t('cart.unavailable')}</span>}
+                  {i.available && i.inStock === false && (
+                    <span className="field-error">{i.stockLeft ? t('cart.shortage', { n: i.stockLeft }) : t('cart.soldOut')}</span>
+                  )}
                 </div>
                 <QuantityInput
                   value={i.quantity}
@@ -155,7 +159,7 @@ export default function CartPage() {
           </dl>
           <p className="field-hint">{t('cart.shippingNote')}</p>
           {!user && <p className="field-hint">{t('cart.guestNote')}</p>}
-          <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0}>
+          <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0 || cart.hasShortage}>
             {t('cart.checkout')}
           </button>
           <Link to={path('/shop')} className="cart-continue">

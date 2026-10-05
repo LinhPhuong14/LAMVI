@@ -11,7 +11,7 @@ import AddToCart from '../cart/AddToCart.jsx'
 // Lưới thẻ sản phẩm dùng chung cho bộ sưu tập ở trang chủ và trang Cửa hàng (D-86).
 // FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002, D-83).
 export default function ProductCards({ items, className = '' }) {
-  const { path } = useI18n()
+  const { t, path } = useI18n()
   return (
     <Reveal className={`product-grid ${className}`.trim()} variants={group} margin="-8% 0px -8% 0px">
       {items.map((p, i) => (
@@ -29,9 +29,10 @@ export default function ProductCards({ items, className = '' }) {
               </Link>
             </h3>
             <p className="product-desc">{p.description}</p>
+            {p.stockLeft != null && <p className="stock-left">{t('cart.lowStock', { n: p.stockLeft })}</p>}
             <div className="product-foot">
               <Price amount={p.price} />
-              <AddToCart slug={p.slug} />
+              <AddToCart slug={p.slug} soldOut={p.inStock === false} />
             </div>
           </div>
         </TiltCard>

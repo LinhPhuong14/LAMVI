@@ -1,4 +1,5 @@
 import { pick } from '../i18n.js'
+import { presentStock } from './stock.js'
 
 // D-39: chỉ sản phẩm Published được hiển thị và bán; Hidden/Draft coi như không tồn tại với khách
 export const PUBLIC_PRODUCT_STATUSES = ['published']
@@ -14,6 +15,8 @@ export function presentProduct(p, lang) {
     // D-96: thuộc bộ sưu tập nào (null = đèn lẻ)
     collection: p.collectionSlug ?? null,
     pieceOrder: p.pieceOrder ?? 0,
+    // D-100: tồn kho (inStock=false → "tạm hết hàng"; stockLeft chỉ có khi sắp hết)
+    ...presentStock(p),
     // D-68 / T-09: giá niêm yết ĐÃ gồm VAT, số nguyên VND
     price: p.price,
     currency: 'VND',

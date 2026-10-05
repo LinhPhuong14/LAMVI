@@ -1,5 +1,6 @@
 // Đơn hàng (§12, §16, FR-CHK-*, FR-ORD-*). Thuần hàm — không đụng DB.
 import { randomBytes } from 'node:crypto'
+import { resolveAddress } from './address.js'
 
 // §16. Đơn COD bỏ qua pending_payment.
 export const ORDER_STATUSES = Object.freeze([
@@ -130,11 +131,17 @@ export function validateCheckout(body) {
   values.addressLine = str(b.addressLine, 200)
   if (!values.addressLine) errors.addressLine = 'REQUIRED'
 
-  // BR-SHP-002: chỉ giao trong Việt Nam → tỉnh/thành bắt buộc, không có trường quốc gia
-  values.province = str(b.province, 80)
-  if (!values.province) errors.province = 'REQUIRED'
-  values.district = str(b.district, 80) || null
-  values.ward = str(b.ward, 80) || null
+  // BR-SHP-002: chỉ giao trong Việt Nam, không có trường quốc gia. G-46, D-99: chọn tỉnh/thành và
+  // phường/xã từ danh mục (client gửi mã, server tra tên). Cấp quận/huyện đã bỏ từ 01/07/2025.
+  const addr = resolveAddress(b.provinceCode, b.wardCode)
+  if (addr.errors) Object.assign(errors, addr.errors)
+  else {
+    values.province = addr.province
+    values.ward = addr.ward
+    values.provinceCode = addr.provinceCode
+    values.wardCode = addr.wardCode
+  }
+  values.district = null
   values.note = str(b.note, 500) || null
 
   // FR-CHK-007

@@ -10,7 +10,7 @@ import PageHead from './PageHead.jsx'
 import { S, fmt } from './strings.js'
 import { uploadFile } from './uploadFile.js'
 
-const EMPTY = { slug: '', kind: 'single', status: 'draft', price: '', tone: '', sortOrder: 0, name: {}, description: {}, badge: {}, imageAlt: {} }
+const EMPTY = { slug: '', kind: 'single', status: 'draft', price: '', stock: '', tone: '', sortOrder: 0, name: {}, description: {}, badge: {}, imageAlt: {} }
 
 // Giới hạn phía client chỉ để báo sớm; server mới là nơi quyết định (MAX_IMAGE_MB)
 const MAX_IMAGE_MB = 5
@@ -95,6 +95,7 @@ function toBody(form) {
   return {
     ...form,
     price: form.price === '' ? undefined : Number(form.price),
+    stock: form.stock === '' || form.stock === null ? null : Number(form.stock),
     sortOrder: Number(form.sortOrder) || 0,
     tone: form.tone || null,
   }
@@ -103,7 +104,7 @@ function toBody(form) {
 function ProductForm({ initial, onDone, onCancel, onImageChange }) {
   const { authedApi } = useAuth()
   const { t } = useI18n()
-  const [form, setForm] = useState(() => ({ ...EMPTY, ...initial, tone: initial?.tone ?? '', name: initial?.name ?? {}, description: initial?.description ?? {}, badge: initial?.badge ?? {}, imageAlt: initial?.imageAlt ?? {} }))
+  const [form, setForm] = useState(() => ({ ...EMPTY, ...initial, tone: initial?.tone ?? '', stock: initial?.stock ?? '', name: initial?.name ?? {}, description: initial?.description ?? {}, badge: initial?.badge ?? {}, imageAlt: initial?.imageAlt ?? {} }))
   const { pending, error, fields, run } = useSubmit()
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
@@ -145,6 +146,7 @@ function ProductForm({ initial, onDone, onCancel, onImageChange }) {
             </option>
           ))}
         </Field>
+        <Field label={S.products.stock} type="number" min="0" step="1" value={form.stock} onChange={set('stock')} error={fields.stock} hint={S.products.stockHint} />
         <Field label={S.common.sortOrder} type="number" value={form.sortOrder} onChange={set('sortOrder')} error={fields.sortOrder} />
       </div>
       <p className="field-hint">{S.common.viRequiredHint}</p>
@@ -243,6 +245,7 @@ export default function ProductsPage() {
                 <th>{S.products.colName}</th>
                 <th>{S.products.slug}</th>
                 <th>{S.products.colPrice}</th>
+                <th>{S.products.colStock}</th>
                 <th>{S.products.colStatus}</th>
                 <th>{S.products.colImage}</th>
                 <th />
@@ -256,6 +259,7 @@ export default function ProductsPage() {
                     <code>{p.slug}</code>
                   </td>
                   <td>{formatVnd(p.price)}</td>
+                  <td>{p.stock === null || p.stock === undefined ? S.products.stockUntracked : p.stock === 0 ? S.products.stockOut : p.stock}</td>
                   <td>
                     <span className={`status status-${p.status}`}>{S.products.statuses[p.status]}</span>
                   </td>

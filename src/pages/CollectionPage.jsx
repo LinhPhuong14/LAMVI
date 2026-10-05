@@ -78,7 +78,7 @@ export default function CollectionPage() {
           </div>
           <div className="collection-set-buy">
             <Price amount={c.set.price} className="product-price large" />
-            <AddToCart slug={c.set.slug} className="btn btn-primary" label={t('collection.addSet')} />
+            <AddToCart slug={c.set.slug} className="btn btn-primary" label={t('collection.addSet')} soldOut={c.set.inStock === false} />
           </div>
         </div>
       )}

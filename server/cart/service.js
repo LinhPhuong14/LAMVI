@@ -1,5 +1,6 @@
 import { HttpError } from '../errors.js'
 import { PUBLIC_PRODUCT_STATUSES, presentProduct } from '../domain/catalog.js'
+import { hasStock, isTracked } from '../domain/stock.js'
 
 // D-60: tối đa 10 mỗi dòng. Số dòng tối đa để chặn lạm dụng [ASSUMPTION]
 export const MAX_QTY = 10
@@ -36,6 +37,9 @@ export function createCartService({ repo }) {
         slug: product.slug,
         quantity,
         available,
+        // G-44: không đủ hàng cho số lượng trong giỏ; stockLeft chỉ báo khi thiếu (không lộ số tồn khi đủ)
+        inStock: !available || hasStock(product, quantity),
+        stockLeft: available && !hasStock(product, quantity) ? Math.max(0, product.stock) : null,
         product: {
           name: hideName ? null : p.name,
           kind: hideName ? null : p.kind,
@@ -53,6 +57,7 @@ export function createCartService({ repo }) {
       currency: 'VND',
       itemCount: items.filter((i) => i.available).reduce((s, i) => s + i.quantity, 0),
       hasUnavailable: items.some((i) => !i.available),
+      hasShortage: items.some((i) => !i.inStock),
       maxQuantity: MAX_QTY,
     }
   }
@@ -88,6 +93,10 @@ export function createCartService({ repo }) {
       if (!isPublic(product) && quantity > current.quantity) {
         throw new HttpError(409, 'PRODUCT_UNAVAILABLE', 'Sản phẩm không còn bán')
       }
+      // G-44, D-100: không cho thêm vượt tồn kho; giảm số lượng / xoá luôn được
+      if (isTracked(product) && quantity > (current?.quantity ?? 0) && !hasStock(product, quantity)) {
+        throw new HttpError(409, 'OUT_OF_STOCK', 'Sản phẩm không đủ hàng', { quantity: 'OUT_OF_STOCK' }, { stockLeft: Math.max(0, product.stock) })
+      }
       if (!current && (await repo.getCart(userId)).length >= MAX_LINES) {
         throw new HttpError(409, 'CART_FULL', 'Giỏ đã đầy')
       }
@@ -108,7 +117,10 @@ export function createCartService({ repo }) {
         const product = await productBySlug(line.slug)
         if (!product || !isPublic(product)) continue
         if (!current.has(product.id) && current.size >= MAX_LINES) continue
-        const q = Math.min(MAX_QTY, (current.get(product.id) ?? 0) + line.quantity)
+        let q = Math.min(MAX_QTY, (current.get(product.id) ?? 0) + line.quantity)
+        // G-44: gộp giỏ không vượt tồn kho; hết hàng thì bỏ qua dòng
+        if (isTracked(product)) q = Math.min(q, product.stock)
+        if (q < 1) continue
         current.set(product.id, q)
         await repo.setCartItem(userId, product.id, q)
       }

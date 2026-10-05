@@ -106,10 +106,11 @@ export default function ProductPage() {
           <h1 className="page-title">{p.name}</h1>
           <Price amount={p.price} className="product-price large" />
           <p className="pdp-desc">{p.description}</p>
+          {p.stockLeft != null && <p className="stock-left">{t('cart.lowStock', { n: p.stockLeft })}</p>}
           {/* FR-CART-001 */}
           <div className="product-buy">
             <QuantityInput value={qty} onChange={setQty} />
-            <AddToCart slug={p.slug} quantity={qty} className="btn btn-primary" />
+            <AddToCart slug={p.slug} quantity={qty} className="btn btn-primary" soldOut={p.inStock === false} />
           </div>
           <p className="pdp-note">{t('pdp.checkoutNote')}</p>
           <ul className="shop-perks pdp-perks">

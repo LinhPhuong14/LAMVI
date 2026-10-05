@@ -1,5 +1,19 @@
 # Nhật ký phiên
 
+## 2026-10-05 (phiên 5) — Địa chỉ 2 cấp và tồn kho (nhánh `feat/address-inventory`)
+
+**Yêu cầu người dùng**: "làm tiếp G-46 địa chỉ VN và tồn kho".
+
+**Quyết định từ người dùng**: D-99 (địa chỉ 2 cấp mới: tỉnh/thành → phường/xã, thay phần quận/huyện của D-41 vì cấp quận/huyện đã bỏ từ 01/07/2025); D-100 (tồn kho theo số lượng từng đèn, trừ khi đặt đơn — chốt Q-07).
+
+**Đã làm**: T-58. Danh mục 34 tỉnh/3.321 phường-xã đóng gói trong repo; checkout chọn từ hai ô, server tra tên; tồn kho giữ chỗ nguyên tử (hàm SQL), trả khi huỷ/hết hạn, UI "Tạm hết hàng", giỏ/checkout chặn, admin chỉnh tồn.
+
+**Bẫy**: nhiều test checkout/đơn cũ gửi `province` dạng chữ → đổi sang `provinceCode`/`wardCode`; test thương hiệu cấm "Mộc" nên loại file danh mục địa danh; memory adapter phải mặc định `stock: null` cho khớp Supabase.
+
+**Còn lại / cần người dùng**: chạy migration `20261005000012` trước khi deploy (G-78) rồi nhập tồn kho ở `/admin/products`; cảnh báo sắp hết hàng (G-79) cần chốt ngưỡng/kênh.
+
+---
+
 ## 2026-10-05 (phiên 3) — Mây tra đơn, chính sách, audit log, bộ sưu tập, gallery + chăn Đông Hồ (nhánh `feat/may-orders-policy-audit`)
 
 **Yêu cầu người dùng**: danh sách khoảng trống (Mây tra đơn; chính sách riêng tư/đổi trả; audit log sản phẩm/FAQ/lô; thông báo đơn; khoá tài khoản admin; phần nhỏ) + (8) thiết kế lại catalog: bộ sưu tập khác đèn lẻ, mua lẻ đèn trong bộ; (9) gallery đèn, video lời chúc, chăn Đông Hồ mở mảnh khi đủ bộ với hiệu ứng như game.
