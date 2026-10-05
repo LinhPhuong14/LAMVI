@@ -161,21 +161,22 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     const shortId = await repo.reserveStock(stockItems)
     if (shortId) throw outOfStock(lines.find((l) => l.product.id === shortId)?.product)
 
-    // C-5: giữ lượt coupon trước khi tạo đơn; hết lượt giữa chừng → báo khách
+    // Từ đây mọi lỗi TRƯỚC khi đơn được ghi phải trả lại hàng và lượt coupon; SAU khi đơn đã ghi thì
+    // không được trả (đơn còn đó và đang giữ cả hai) — chỉ báo lỗi cho khách.
     let claimed = null
-    if (coupon) {
-      claimed = await repo.claimCoupon(coupon.id)
-      if (claimed === null) {
-        // claimCoupon trả null cho cả hai trường hợp: hết lượt, hoặc admin vừa tắt mã. Đọc lại để
-        // báo đúng lý do cho khách.
-        const fresh = await repo.getCouponById(coupon.id)
-        const reason = fresh && fresh.status !== 'active' ? 'COUPON_INACTIVE' : 'COUPON_USED_UP'
-        await repo.releaseStock(stockItems).catch(logRestock)
-        throw new HttpError(409, reason, 'Mã giảm giá không dùng được')
-      }
-    }
-
+    let created = null
     try {
+      // C-5: giữ lượt coupon trước khi tạo đơn; hết lượt giữa chừng → báo khách
+      if (coupon) {
+        claimed = await repo.claimCoupon(coupon.id)
+        if (claimed === null) {
+          // claimCoupon trả null cho cả hai trường hợp: hết lượt, hoặc admin vừa tắt mã. Đọc lại để
+          // báo đúng lý do cho khách.
+          const fresh = await repo.getCouponById(coupon.id)
+          const reason = fresh && fresh.status !== 'active' ? 'COUPON_INACTIVE' : 'COUPON_USED_UP'
+          throw new HttpError(409, reason, 'Mã giảm giá không dùng được')
+        }
+      }
       const isCod = checkout.paymentMethod === 'cod'
       const createdAt = now()
       const order = {
@@ -207,7 +208,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
         lineTotal: product.price * quantity,
       }))
 
-      const created = await repo.createOrder(
+      created = await repo.createOrder(
         order,
         items,
         coupon ? { couponId: coupon.id, userId } : null,
@@ -231,9 +232,11 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
       if (isCod) await notify('confirmed', created)
       return { order: created, payment }
     } catch (err) {
-      // C-8: tạo đơn hỏng thì trả lại lượt coupon đã giữ
-      if (claimed !== null && coupon) await repo.releaseCoupon(coupon.id).catch(() => {})
-      await repo.releaseStock(stockItems).catch(logRestock)
+      if (!created) {
+        // C-8: tạo đơn hỏng thì trả lại lượt coupon đã giữ; G-44: và trả hàng về kho
+        if (claimed !== null && coupon) await repo.releaseCoupon(coupon.id).catch(() => {})
+        await repo.releaseStock(stockItems).catch(logRestock)
+      }
       throw err
     }
   }
