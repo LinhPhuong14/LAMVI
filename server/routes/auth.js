@@ -242,7 +242,7 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
     }
     if (!token) throw new HttpError(404, 'EMAIL_NOT_REGISTERED', 'Email này chưa đăng ký tài khoản')
     const url = `${siteUrl(lang, '/reset-password')}#t=${encodeURIComponent(token)}`
-    await notify(email, recoveryMail({ lang, url, siteUrl: config.publicSiteUrl }))
+    await notify(email, recoveryMail({ lang, url, siteUrl: config.publicSiteUrl, brand: config.mail?.brand }))
     res.status(202).json({ ok: true })
   })
 
@@ -250,7 +250,7 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
     clearRefreshCookie(res, config)
     await audit(user.id, 'password_changed')
     const profile = await repo.getProfile(user.id).catch(() => null)
-    await notify(user.email, passwordChangedMail({ lang: profile?.preferredLocale, siteUrl: config.publicSiteUrl }))
+    await notify(user.email, passwordChangedMail({ lang: profile?.preferredLocale, siteUrl: config.publicSiteUrl, brand: config.mail?.brand }))
   }
 
   // Token một lần từ link trong thư (#t=…) thay cho phiên khôi phục của Supabase. Mọi phiên bị

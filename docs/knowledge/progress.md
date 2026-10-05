@@ -47,7 +47,7 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 | Vận hành | Deploy Vercel (T-33) | 🟡 | `api/index.js`, `vercel.json`, `docs/knowledge/deploy-vercel.md` | `lamvi.vercel.app` chạy (200) nhưng bằng dữ liệu bộ nhớ | Chưa có bảng trên Supabase + biến `SUPABASE_*` ở Vercel (G-36); cron chưa kiểm chứng (G-47) |
 | Vận hành | Dashboard IT kiểm tra thật Resend (T-54): khoá, tên miền gửi; payOS "đã cấu hình" | ✅ | `server/mail/mailer.js` (`ping`), `server/monitoring/health.js`, `src/it/ItDashboard.jsx` | `server/mail/mailer.test.js`, `server/it.extra.test.js` | Cần `MAIL_FROM` + `RESEND_API_KEY` ở Vercel |
 | Vận hành | FR-IT-001…004 (dashboard IT) | ✅ | `server/routes/it.js`, `server/monitoring/*`, `src/it/*` | `server/it*.test.js`, `src/it/It*.test.jsx` | Cảnh báo chủ động (G-25) chờ Q-24 |
-| Vận hành | Thông báo đơn hàng qua email Resend (§20, D-93): xác nhận, hết hạn thanh toán, đã gửi, huỷ, hoàn tiền; khung thư + banner | ✅ | `server/orders/notify.js`, `server/mail/templates.js`, `scripts/gen_mail_banner.py`, `public/images/mail/banner.jpg` | `server/orderNotify.test.js`, `server/mail/layout.test.js` | Nhắc lời chúc, cảnh báo ngân sách Mây, đổi trả chưa làm (G-45); chưa thử trên hộp thư thật (G-66) |
+| Vận hành | Thông báo đơn hàng qua email Resend (§20, D-93): xác nhận, hết hạn thanh toán, đã gửi, huỷ, hoàn tiền; khung thư + banner + chân thư doanh nghiệp (`MAIL_*`) | ✅ | `server/orders/notify.js`, `server/mail/templates.js`, `scripts/gen_mail_banner.py`, `public/images/mail/banner.jpg` | `server/orderNotify.test.js`, `server/mail/layout.test.js` | Nhắc lời chúc, cảnh báo ngân sách Mây, đổi trả chưa làm (G-45); chưa thử trên hộp thư thật (G-66) |
 
 ## Việc có thể làm tiếp mà không bị chặn
 

@@ -70,6 +70,20 @@ export function loadConfig(env = process.env) {
       from: env.MAIL_FROM || null,
       resendApiKey: env.RESEND_API_KEY || null,
       brevoApiKey: env.BREVO_API_KEY || null,
+      // Chân thư doanh nghiệp (T-56). Chỉ hiện mục nào có giá trị; KHÔNG có giá trị mặc định bịa ra
+      brand: {
+        name: env.MAIL_BRAND_NAME || null,
+        legalName: env.MAIL_COMPANY_LEGAL || null,
+        address: env.MAIL_COMPANY_ADDRESS || null,
+        supportEmail: env.MAIL_SUPPORT_EMAIL || null,
+        phone: env.MAIL_SUPPORT_PHONE || null,
+        hours: env.MAIL_SUPPORT_HOURS || null,
+        facebookUrl: env.MAIL_FACEBOOK_URL || null,
+        instagramUrl: env.MAIL_INSTAGRAM_URL || null,
+        tiktokUrl: env.MAIL_TIKTOK_URL || null,
+        zaloUrl: env.MAIL_ZALO_URL || null,
+        youtubeUrl: env.MAIL_YOUTUBE_URL || null,
+      },
     },
     // T-49: chặn mật khẩu đã lộ (HIBP). Từ D-91 mặc định TẮT (PO chỉ cần quy tắc cơ bản); PWNED_CHECK=1 để bật.
     pwnedCheck: env.PWNED_CHECK === '1',

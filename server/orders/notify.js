@@ -11,9 +11,9 @@ const DEFAULT_WAIT_MS = 3000
  * Mỗi sự kiện chỉ được gọi từ chỗ đã chuyển trạng thái thành công (khoá lạc quan) nên webhook gửi lại
  * không sinh thêm thư.
  *
- * @param {{ repo: object, mailer: object|null, siteUrl: string, waitMs?: number }} deps
+ * @param {{ repo: object, mailer: object|null, siteUrl: string, brand?: object|null, waitMs?: number }} deps
  */
-export function createOrderNotifier({ repo, mailer, siteUrl, waitMs = DEFAULT_WAIT_MS }) {
+export function createOrderNotifier({ repo, mailer, siteUrl, brand = null, waitMs = DEFAULT_WAIT_MS }) {
   async function send(kind, order) {
     const profile = await repo.getProfile(order.userId)
     // Tài khoản cũ chưa có email ở hồ sơ → chưa gửi được (migration 010 đã điền cho hồ sơ có sẵn)
@@ -21,7 +21,7 @@ export function createOrderNotifier({ repo, mailer, siteUrl, waitMs = DEFAULT_WA
       console.warn(`[notify] ${kind} ${order.code}: hồ sơ chưa có email, bỏ qua`)
       return false
     }
-    const mail = orderMail({ kind, lang: profile.preferredLocale, order, siteUrl, name: profile.fullName })
+    const mail = orderMail({ kind, lang: profile.preferredLocale, order, siteUrl, name: profile.fullName, brand })
     await mailer.send({ to: profile.email, ...mail })
     return true
   }
