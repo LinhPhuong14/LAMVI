@@ -166,6 +166,7 @@ Lỗi chung: `RATE_LIMITED`.
 
 | Bảng | Cột chính | Ghi chú |
 |---|---|---|
+| `collections` | `slug` unique, `status`, `tone`, `name/description` jsonb, `story_title/story` jsonb (phần thưởng, chỉ server trả khi đủ bộ) — D-96, migration 011 |
 | `products` | `slug` unique, `kind` single/set, `status` draft/published/hidden, `price` int (**đã gồm VAT**), `name/description/badge` jsonb, `image_url`/`image_path`/`image_alt` | D-39, D-68, D-77 |
 | `faq_entries` | `question/answer` jsonb, `is_published`, `sort_order` | G-07 |
 | `batches` | `code` unique, `status` created/video_published, `video_url`, `video_path`, `title/story` jsonb | D-10, D-43; `video_published` bắt buộc có `video_url`; trigger chặn gỡ xuất bản/xoá/đổi mã khi đã xuất bản (D-47) |
@@ -198,6 +199,10 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET | `/api/health` | – | |
 | GET | `/api/products?lang=` | – | Sản phẩm `published` |
 | GET | `/api/products/:slug?lang=` | – | 404 nếu không `published` |
+| GET | `/api/collections?lang=` | – | Bộ sưu tập `published` kèm `lamps[]` và `set` (D-96); không có story |
+| GET | `/api/collections/:slug?lang=` | – | 404 nếu không công khai |
+| GET | `/api/gallery?lang=` | Đăng nhập | Đèn đã nhận (đơn DELIVERED), bộ sưu tập + mảnh, `reward` chỉ khi đủ bộ, `quilt` (D-97) |
+| GET | `/api/it/maintenance/log` | IT | Lịch sử bật/tắt bảo trì (G-27) |
 | GET | `/api/faq?lang=` | – | FAQ `is_published` |
 | GET | `/api/batches/:code?lang=` | – | 404 nếu chưa có video |
 | POST | `/api/auth/register?lang=` | – | `{ email, password, fullName, phone?, preferredLocale? }` → 201 |
@@ -296,6 +301,7 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 ## Frontend
 
 - Route: `LocaleLayout` bọc mọi trang, cấp ngôn ngữ qua `LocaleProvider`, đặt `<html lang>` và `document.title`.
+- Công khai: `/shop` (bộ sưu tập + đèn lẻ), `/collections/:slug`, `/privacy`, `/returns`; tài khoản: `/account?tab=gallery` (gallery + chăn Đông Hồ).
 - Admin: `/admin/{orders,users,products,faq,batches,coupons,analytics,may}` — chỉ tiếng Việt, ngoài `LocaleLayout` (D-48).
 - IT: `/it` — chỉ tiếng Việt (D-51).
 - Trang con: `/` · `/products/:slug` · `/lo/:code` · `/qr/:token` (riêng tư, noindex) · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.

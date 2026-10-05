@@ -207,7 +207,7 @@ describe('Bàn phím', () => {
     expect(btn.tabIndex).toBe(0)
     expect(btn).not.toBeDisabled()
     expect(btn.closest('[role="tablist"]')).toBeNull()
-    expect(within(tablist()).getAllByRole('tab')).toHaveLength(4)
+    expect(within(tablist()).getAllByRole('tab')).toHaveLength(5)
     btn.focus()
     expect(document.activeElement).toBe(btn)
     // Mũi tên trên nút giao diện không đổi tab

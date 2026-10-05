@@ -1,5 +1,23 @@
 # Nhật ký phiên
 
+## 2026-10-05 (phiên 3) — Mây tra đơn, chính sách, audit log, bộ sưu tập, gallery + chăn Đông Hồ (nhánh `feat/may-orders-policy-audit`)
+
+**Yêu cầu người dùng**: danh sách khoảng trống (Mây tra đơn; chính sách riêng tư/đổi trả; audit log sản phẩm/FAQ/lô; thông báo đơn; khoá tài khoản admin; phần nhỏ) + (8) thiết kế lại catalog: bộ sưu tập khác đèn lẻ, mua lẻ đèn trong bộ; (9) gallery đèn, video lời chúc, chăn Đông Hồ mở mảnh khi đủ bộ với hiệu ứng như game.
+
+**Quyết định từ người dùng**: D-98 (đổi trả 7 ngày từ DELIVERED, đổi/hoàn khi lỗi-vỡ-sai hàng); gallery lấy từ đơn DELIVERED; đèn sở hữu = mảnh nhỏ, đủ bộ = mảnh lớn; dev dựng khung + nội dung mẫu (D-96, D-97).
+
+**Đã làm** (mỗi tính năng có subagent kiểm thử độc lập, T-11)
+
+1. Mây tra đơn (G-29). Subagent: không lỗi bảo mật; sửa `String(code)` ép mảng thành mã hợp lệ.
+2. Trang `/privacy`, `/returns` + footer + sitemap (G-10). Subagent: nhãn footer en/zh lệch tiêu đề → đã đồng bộ; nhắc Q-19/Q-22 chưa có D-xx → đã ghi D-98.
+3. Audit log sản phẩm/FAQ/lô (G-21), rollback đăng ký (G-38), nhật ký bảo trì (G-27).
+4. Bộ sưu tập, gallery, chăn Đông Hồ (D-96, D-97).
+
+**Đã có từ trước (không làm lại)**: thông báo đơn qua Resend (v0.33, G-45 còn nhắc soạn/khoá lời chúc), khoá tài khoản (v0.31, G-19).
+
+**Chưa làm**: G-46 (địa chỉ VN), G-44 (tồn kho), G-25 (cảnh báo IT chủ động) — mỗi mục cần quyết định riêng (G-77); luồng gửi yêu cầu đổi trả (G-75); admin quản lý bộ sưu tập (G-70).
+
+**Còn lại / cần người dùng**: chạy migration 011 + seed bộ mẫu (G-69); thay nội dung mẫu (G-71); pháp chế duyệt chính sách (Q-40); xem hiệu ứng chăn trên thiết bị thật (G-72).
 ## 2026-10-05 (phiên 3) — Chân thư doanh nghiệp (nhánh `feat/mail-business-footer`)
 
 **Mục tiêu người dùng**: thư thật đã có banner nhưng muốn đẹp và chuyên nghiệp hơn, thêm footer và thông tin như email doanh nghiệp chuẩn mực.

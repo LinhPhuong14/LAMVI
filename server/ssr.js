@@ -7,7 +7,7 @@ import { buildHeadTags, normalizeSiteUrl, renderHeadTags, safeJson } from '../sr
 import { gaInlineScript, gaScriptSrc } from '../src/analytics/ga.js'
 import { cspHash } from './middleware/security.js'
 import { HttpError } from './errors.js'
-import { getPublicBatch, getPublicProduct, listPublicFaq, listPublicProducts } from './services/catalog.js'
+import { getPublicBatch, getPublicCollection, getPublicProduct, listPublicCollections, listPublicFaq, listPublicProducts } from './services/catalog.js'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 
@@ -19,6 +19,8 @@ async function loadData(repo, route) {
     try {
       let data
       if (path === '/products') data = await listPublicProducts(repo, route.lang)
+      else if (path === '/collections') data = await listPublicCollections(repo, route.lang)
+      else if (route.kind === 'collection') data = await getPublicCollection(repo, route.slug, route.lang)
       else if (path === '/faq') data = await listPublicFaq(repo, route.lang)
       else if (route.kind === 'product') data = await getPublicProduct(repo, route.slug, route.lang)
       else if (route.kind === 'batch') data = await getPublicBatch(repo, route.code, route.lang)

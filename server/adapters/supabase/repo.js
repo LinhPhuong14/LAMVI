@@ -16,6 +16,21 @@ const toProduct = (r) => ({
   imageUrl: r.image_url,
   imagePath: r.image_path,
   imageAlt: r.image_alt,
+  collectionSlug: r.collection_slug ?? null,
+  pieceOrder: r.piece_order ?? 0,
+  updatedAt: r.updated_at,
+})
+
+const toCollection = (r) => ({
+  id: r.id,
+  slug: r.slug,
+  status: r.status,
+  tone: r.tone,
+  sortOrder: r.sort_order,
+  name: r.name,
+  description: r.description,
+  storyTitle: r.story_title,
+  story: r.story,
   updatedAt: r.updated_at,
 })
 
@@ -137,7 +152,7 @@ const toGiftMessage = (r) => ({
 const GIFT_COLS = { text: 'text', textLang: 'text_lang', voicePath: 'voice_path', voiceType: 'voice_type', videoPath: 'video_path', videoType: 'video_type', confirmedAt: 'confirmed_at', mediaDeletedAt: 'media_deleted_at', translations: 'translations' }
 
 // camelCase → snake_case cho các trường được phép ghi
-const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge', imageUrl: 'image_url', imagePath: 'image_path', imageAlt: 'image_alt' }
+const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge', imageUrl: 'image_url', imagePath: 'image_path', imageAlt: 'image_alt', collectionSlug: 'collection_slug', pieceOrder: 'piece_order' }
 const FAQ_COLS = { sortOrder: 'sort_order', isPublished: 'is_published', question: 'question', answer: 'answer' }
 const BATCH_COLS = { code: 'code', status: 'status', videoUrl: 'video_url', videoPath: 'video_path', producedOn: 'produced_on', title: 'title', story: 'story' }
 const COUPON_COLS = { code: 'code', type: 'type', value: 'value', maxDiscount: 'max_discount', minOrder: 'min_order', productIds: 'product_ids', usageLimit: 'usage_limit', perUserLimit: 'per_user_limit', startsAt: 'starts_at', endsAt: 'ends_at', status: 'status' }
@@ -490,6 +505,13 @@ export function createSupabaseRepo(client) {
       let q = client.from('products').select('*').order('sort_order')
       if (statuses) q = q.in('status', statuses)
       return unwrap(await q).map(toProduct)
+    },
+
+    // D-96: bộ sưu tập (chỉ đọc; nội dung đặt bằng seed/SQL — G-70)
+    async listCollections({ statuses } = {}) {
+      let q = client.from('collections').select('*').order('sort_order')
+      if (statuses) q = q.in('status', statuses)
+      return unwrap(await q).map(toCollection)
     },
 
     async getProductBySlug(slug) {

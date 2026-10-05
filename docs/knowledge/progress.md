@@ -17,16 +17,22 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 | Checkout | FR-CHK-001…008 | ✅ | `server/orders/service.js`, `server/routes/orders.js`, `server/domain/{order,pricing,coupon}.js`, `src/pages/CheckoutPage.jsx` | `server/orders.test.js`, `server/orders.extra.test.js`, `server/pricing*.test.js` | Q-12 (phí thiệp), G-44 (tồn kho), G-46 (danh mục địa chỉ) |
 | Thanh toán | FR-PAY-001/002 | ✅ | `server/adapters/payos.js`, `server/orders/service.js` | `server/payos.extra.test.js`, `server/orders*.test.js` | Chưa thử với tài khoản payOS thật |
 | Đơn | FR-ORD-001/002 | ✅ | `server/orders/service.js`, `src/admin/OrdersPage.jsx`, `src/pages/OrderPage.jsx` | `server/orders*.test.js`, `src/admin/AdminOrders.extra.test.jsx` | Q-20 (mức hoàn tiền), BR-ORD-002 không kiểm được (G-43) |
-| Đổi trả | FR-RET-001/002 | ⛔ | — | — | Q-19, Q-22 |
+| Đổi trả | Chính sách `/returns` (D-98) | ✅ | `src/pages/PolicyPage.jsx`, `src/i18n/messages/*` (`policy.returns`) | `src/pages/PolicyPage*.test.jsx`, `server/ssr.policy.extra.test.js` | `[LEGAL]` Q-40 |
+| Đổi trả | FR-RET-001/002 (luồng gửi yêu cầu) | ⬜ | — | — | Q-19/Q-22 đã chốt (D-98); chưa làm (G-75) |
+| Chính sách | Riêng tư `/privacy` (G-10) | 🟡 | `src/pages/PolicyPage.jsx` | `src/pages/PolicyPage*.test.jsx` | `[LEGAL]` Q-40 duyệt |
+| Catalog | Bộ sưu tập (D-96) | ✅ | `supabase/migrations/20261005000011_collections.sql`, `server/services/catalog.js`, `src/pages/{ShopPage,CollectionPage}.jsx`, `src/components/CollectionCard.jsx` | `server/collections*.test.js`, `src/gallery/Gallery*.test.jsx` | G-69 chạy migration, G-70 admin bộ |
+| Tài khoản | Gallery + chăn Đông Hồ (D-97) | ✅ | `server/services/gallery.js`, `src/gallery/*` | `server/gallery.test.js`, `src/gallery/Gallery*.test.jsx` | G-71 nội dung mẫu |
 | Lời chúc & QR | FR-MSG-001, FR-QR-001…005 (D-88, D-89) | ✅ | `server/domain/message.js`, `server/messages/service.js`, `server/routes/qr.js`, `src/pages/GiftPage.jsx`, `supabase/migrations/20261005000010_*.sql` | `server/messages.test.js`, `src/pages/GiftPage.test.jsx` | Migration 010 (G-55); Q-14/27/29 tạm thời (D-89); G-56, G-58 |
 | Lời chúc & QR | FR-QR-006 (trang QR lô) | ✅ | `src/pages/BatchPage.jsx`, `GET /api/batches/:code` | `src/pages/BatchPage*.test.jsx`, `server/catalog*.test.js` | — |
 | Lời chúc & QR | FR-QR-007 (admin lô + video) | ✅ | `server/routes/admin.js`, `server/adapters/*/storage.js`, `src/admin/BatchesPage.jsx` | `server/admin*.test.js`, `src/admin/Admin*.test.jsx` | Thử với Supabase thật (G-22) |
 | Admin | FAQ (G-07) | ✅ | `src/admin/FaqPage.jsx` | `server/admin*.test.js` | — |
 | Admin | Đơn hàng, coupon | ✅ | `src/admin/OrdersPage.jsx`, `src/admin/CouponsPage.jsx` | `src/admin/AdminOrders.extra.test.jsx`, `server/orders.test.js` | — |
 | Admin | Quản lý người dùng: tìm, khoá/mở khoá, đổi vai trò (D-90, G-19) | ✅ | `server/routes/adminUsers.js`, `server/security/lockedAccounts.js`, `src/admin/UsersPage.jsx` | `server/adminUsers.test.js`, `src/admin/AdminUsers.test.jsx` | Migration 010 (G-55) |
-| Admin | Đổi trả | ⛔ | — | — | Q-19, Q-22 |
+| Admin | Đổi trả | ⬜ | — | — | G-75 |
+| Admin | Audit log sản phẩm/FAQ/lô (G-21) | ✅ | `server/routes/admin.js` | `server/admin.audit*.test.js` | — |
+| IT | Nhật ký bảo trì (G-27) | 🟡 | `server/routes/it.js` | `server/it.test.js`, `server/admin.audit.extra.test.js` | Chưa có giao diện |
 | AI Mây | FR-AI-001…003, 005…007 | ✅ | `server/may/*`, `server/routes/may.js`, `src/may/*`, `src/admin/MayConfigPage.jsx` | `server/may*.test.js`, `src/may/May*.test.jsx` | Cần `OPENAI_API_KEY` + Supabase trên Vercel |
-| AI Mây | FR-AI-004 (tra đơn) | ⬜ | Đã có đơn hàng — làm được ngay | — | G-29 |
+| AI Mây | FR-AI-004 (tra đơn, G-29) | ✅ | `server/may/{tools,guard,service}.js` | `server/may.orders*.test.js` | — |
 | Coupon | FR-CPN-001/002 | ✅ | `server/domain/{coupon,couponValidate}.js`, `server/routes/admin.js`, `src/admin/CouponsPage.jsx` | `server/orders*.test.js`, `server/pricing*.test.js` | — |
 | Nền tảng | FR-I18N-001 | ✅ | `src/i18n/*`, `server/i18n.js` | `src/i18n/core.test.js`, `src/pages/Routing.extra.test.jsx` | Duyệt bản dịch (G-14) |
 | Nền tảng | FR-SEO-001 | ✅ | `server/ssr.js`, `server/routes/seo.js`, `src/seo/*`, `public/images/og` | `server/seo*.test.js`, `server/analytics.seo.extra.test.js`, `src/seo/*.test.js*` | Ảnh sản phẩm thật (G-33) |
@@ -52,15 +58,12 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 ## Việc có thể làm tiếp mà không bị chặn
 
 1. **Chạy migration `20261005000010` trên Supabase TRƯỚC khi deploy** (G-55) rồi thử luồng lời chúc thật: tải media, quét QR, xác nhận, dịch (G-59, G-61).
-2. **Mây tra đơn** (G-29, FR-AI-004) — đã có bảng đơn; cần `get_my_orders` / `lookup_order` + chống dò mã đơn (BR-AI-002).
-3. **Nội dung chính sách** (G-10): Chính sách riêng tư (bắt buộc vì D-72 nêu GA ở đó), chính sách đổi trả, link footer.
-4. **Nhật ký admin cho sản phẩm/FAQ/lô** (G-21; người dùng đã có) — đã có bảng `audit_log`, chỉ cần gọi thêm.
 5. **Đưa lên Supabase thật** (G-36): chạy migration 001→008 + seed, đặt biến môi trường, kiểm luồng đặt hàng thật.
 
 ## Còn chờ người dùng / bên ngoài
 
-- Q-05 (giá lẻ đèn trong bộ Sum Vầy), Q-12, Q-19, Q-20, Q-22, Q-24, Q-25, Q-27, Q-29, Q-33, Q-35, Q-37, Q-38.
-- `[LEGAL]` Q-36 (ảnh tư liệu CC0), I-15 (xoá lịch sử chat).
+- Q-05 (giá lẻ đèn trong bộ Sum Vầy), Q-12, Q-20, Q-24, Q-25, Q-27, Q-29, Q-33, Q-35, Q-37, Q-38.
+- `[LEGAL]` Q-40 (duyệt chính sách riêng tư/đổi trả), Q-36 (ảnh tư liệu CC0), I-15 (xoá lịch sử chat).
 - Tài khoản payOS thật (`PAYOS_*`) và khoá GA (`GA_MEASUREMENT_ID`).
 - Ảnh sản phẩm thật (G-33, G-23).
 

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Lotus } from '../components/Motifs'
+import CollectionCard from '../components/CollectionCard'
 import ProductCards from '../components/ProductCards'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
@@ -17,10 +18,15 @@ export default function ShopPage() {
   const { t, lang, path } = useI18n()
   const siteUrl = useSiteUrl()
   const res = useApi('/products', lang)
+  // D-96: bộ sưu tập hiện thành thẻ lớn riêng; đèn thuộc bộ chỉ mua ở trang bộ sưu tập hoặc trang đèn
+  const colRes = useApi('/collections', lang)
+  const collections = useMemo(() => (colRes.status === 'ok' ? colRes.data.items : []), [colRes])
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('featured')
 
-  const items = res.status === 'ok' ? res.data.items : null
+  const inCollection = useMemo(() => new Set(collections.map((c) => c.slug)), [collections])
+  const all = res.status === 'ok' ? res.data.items : null
+  const items = all ? all.filter((p) => !(p.collection && inCollection.has(p.collection))) : null
   const shown = useMemo(() => {
     if (!items) return []
     const list = filter === 'all' ? items : items.filter((p) => p.kind === filter)
@@ -61,6 +67,22 @@ export default function ShopPage() {
         </ul>
       </header>
 
+      {collections.length > 0 && (
+        <section className="shop-collections" aria-labelledby="shop-col-title">
+          <h2 id="shop-col-title" className="shop-section-title">
+            {t('collection.sectionTitle')}
+          </h2>
+          <p className="shop-section-lead">{t('collection.sectionLead')}</p>
+          <div className="collection-grid">
+            {collections.map((c, i) => (
+              <CollectionCard key={c.slug} collection={c} index={i} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {items && items.length > 0 && <h2 className="shop-section-title">{t('collection.singlesTitle')}</h2>}
+      {!(items && items.length === 0 && collections.length > 0) && (
       <div className="shop-bar">
         <div className="shop-filters" role="group" aria-label={t('shop.filterLabel')}>
           {FILTERS.filter((f) => f === 'all' || kinds.has(f)).map((f) => (
@@ -85,6 +107,7 @@ export default function ShopPage() {
           </p>
         )}
       </div>
+      )}
 
       {res.status === 'loading' && <p className="products-status">{t('products.loading')}</p>}
       {res.status === 'error' && (
@@ -92,7 +115,7 @@ export default function ShopPage() {
           {t('products.error')}
         </p>
       )}
-      {items && shown.length === 0 && <p className="products-status">{t('products.empty')}</p>}
+      {items && shown.length === 0 && collections.length === 0 && <p className="products-status">{t('products.empty')}</p>}
       {shown.length > 0 && <ProductCards items={shown} className="shop-grid" key={`${filter}-${sort}`} />}
 
       <aside className="shop-foot">

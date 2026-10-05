@@ -1,0 +1,87 @@
+/* Bộ sưu tập (D-96) — thẻ lớn, khác thẻ đèn lẻ */
+.shop-section-title { font-size: clamp(1.4rem, 2.6vw, 2rem); margin: 40px 0 8px; }
+.shop-section-lead { opacity: 0.8; margin: 0 0 20px; max-width: 60ch; }
+.collection-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.collection-card {
+  position: relative; overflow: hidden; border-radius: 24px; padding: 28px;
+  background: linear-gradient(160deg, rgba(255, 244, 220, 0.9), rgba(236, 196, 140, 0.55));
+  border: 1px solid rgba(160, 110, 60, 0.28); box-shadow: 0 18px 40px -24px rgba(90, 50, 20, 0.5);
+  display: grid; gap: 18px;
+}
+.collection-card.tone-dusk { background: linear-gradient(160deg, rgba(240, 232, 250, 0.9), rgba(168, 150, 205, 0.5)); }
+.collection-card.tone-dawn { background: linear-gradient(160deg, rgba(255, 236, 230, 0.9), rgba(240, 170, 150, 0.5)); }
+.collection-card.tone-moss { background: linear-gradient(160deg, rgba(236, 245, 230, 0.9), rgba(150, 190, 140, 0.5)); }
+.collection-lamps { display: flex; justify-content: center; align-items: flex-end; min-height: 96px; }
+.collection-lamp { display: inline-block; margin: 0 -10px; transform-origin: top center; animation: collection-sway 5s ease-in-out infinite; animation-delay: calc(var(--i) * -0.9s); }
+.collection-lamp:nth-child(even) { margin-bottom: 18px; }
+@keyframes collection-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.collection-body h3 { font-size: 1.6rem; margin: 6px 0; }
+.collection-count { display: inline-block; }
+.collection-names { display: flex; flex-wrap: wrap; gap: 6px 14px; list-style: none; padding: 0; margin: 8px 0 0; font-size: 0.9rem; opacity: 0.85; }
+.collection-names li::before { content: '✦ '; opacity: 0.6; }
+.collection-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.collection-set { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; border-radius: 24px; padding: 24px; margin: 24px 0 8px; background: rgba(255, 255, 255, 0.55); border: 1px solid rgba(160, 110, 60, 0.28); backdrop-filter: blur(8px); }
+.collection-set-body { flex: 1 1 240px; }
+.collection-set-body h2 { margin: 0 0 6px; }
+.collection-set-note { opacity: 0.75; font-size: 0.9rem; }
+.collection-set-buy { display: grid; gap: 10px; justify-items: end; }
+.collection-sub { margin: 36px 0 16px; font-size: 1.3rem; }
+@media (prefers-reduced-motion: reduce) { .collection-lamp { animation: none; } }
+
+/* Gallery + chăn Đông Hồ (D-97) */
+.gallery { display: grid; gap: 28px; }
+.gallery h3 { margin: 0 0 8px; }
+.gallery-empty { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.gallery-grid { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+.gallery-card { border-radius: 20px; padding: 16px; background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(160, 110, 60, 0.25); backdrop-filter: blur(6px); display: grid; gap: 4px; justify-items: start; }
+.gallery-art { align-self: center; justify-self: center; }
+.gallery-card h4 { margin: 8px 0 0; }
+.gallery-col, .gallery-date { margin: 0; font-size: 0.85rem; opacity: 0.75; }
+.gallery-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.gallery-tag { font-size: 0.8rem; padding: 4px 10px; border-radius: 99px; background: rgba(160, 110, 60, 0.15); }
+
+.quilt { border-radius: 24px; padding: 20px; background: linear-gradient(160deg, rgba(255, 244, 220, 0.75), rgba(214, 170, 120, 0.35)); border: 2px dashed rgba(140, 90, 40, 0.45); }
+.quilt.is-complete { border-style: solid; box-shadow: 0 0 0 4px rgba(242, 196, 107, 0.35), 0 20px 50px -20px rgba(200, 120, 20, 0.6); animation: quilt-glow 3.2s ease-in-out infinite; }
+@keyframes quilt-glow { 50% { box-shadow: 0 0 0 8px rgba(242, 196, 107, 0.55), 0 20px 60px -16px rgba(200, 120, 20, 0.8); } }
+.quilt-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.quilt-head h3 { margin: 0; }
+.quilt-progress { font-weight: 600; margin: 0; }
+.quilt-lead { margin: 6px 0 16px; opacity: 0.85; max-width: 62ch; }
+.quilt-board { display: grid; gap: 18px; }
+.quilt-panel { border-radius: 18px; padding: 14px; background: rgba(255, 255, 255, 0.45); }
+.quilt-panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.quilt-panel-head h4 { margin: 0; }
+.quilt-patches { list-style: none; margin: 12px 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 10px; }
+.quilt-patch { position: relative; text-align: center; font-size: 0.78rem; }
+.quilt-patch-art, .quilt-emblem-art { width: 100%; height: auto; display: block; color: #7a5a3a; }
+.quilt-patch.is-off { opacity: 0.7; }
+.quilt-patch-name { display: block; margin-top: 2px; }
+.quilt-patch.is-new .quilt-stitch { animation: quilt-stitch 1.1s ease-out calc(var(--delay, 0s) + 0.2s) both; stroke-dasharray: 1; stroke-dashoffset: 1; }
+@keyframes quilt-stitch { to { stroke-dashoffset: 0; } }
+.quilt-patch.is-new::before { content: ''; position: absolute; inset: 4%; border-radius: 12px; pointer-events: none; box-shadow: 0 0 0 0 rgba(255, 214, 120, 0.9); animation: quilt-flash 0.9s ease-out calc(var(--delay, 0s) + 0.1s) both; }
+@keyframes quilt-flash { 0% { box-shadow: 0 0 0 0 rgba(255, 214, 120, 0.95); opacity: 1; } 100% { box-shadow: 0 0 0 26px rgba(255, 214, 120, 0); opacity: 0; } }
+.quilt-burst { position: absolute; left: 50%; top: 45%; pointer-events: none; }
+.quilt-burst i { position: absolute; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: #ffd873; opacity: 0; animation: quilt-spark 0.9s ease-out calc(var(--delay, 0s) + 0.2s) both; }
+@keyframes quilt-spark { 0% { opacity: 1; transform: rotate(var(--a, 0deg)) translateX(0); } 100% { opacity: 0; transform: rotate(var(--a, 0deg)) translateX(44px) scale(0.3); } }
+.quilt-emblem { display: grid; gap: 6px; justify-items: center; }
+.quilt-emblem:not(.is-on) .quilt-emblem-art { opacity: 0.7; }
+.quilt-hint { margin: 0; font-size: 0.85rem; opacity: 0.75; }
+.quilt-finale-btn { margin-top: 16px; }
+
+.reward-overlay { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; background: radial-gradient(circle at 50% 40%, rgba(60, 30, 10, 0.78), rgba(10, 6, 14, 0.94)); overflow: hidden; }
+.reward-rays { position: absolute; width: 140vmax; height: 140vmax; left: 50%; top: 50%; margin: -70vmax; background: repeating-conic-gradient(from 0deg, rgba(255, 214, 120, 0.16) 0 8deg, transparent 8deg 24deg); animation: reward-spin 40s linear infinite; mask-image: radial-gradient(circle, #000 0, transparent 60%); }
+@keyframes reward-spin { to { transform: rotate(360deg); } }
+.reward-sparks i { position: absolute; bottom: -10px; left: var(--x, 50%); width: 10px; height: 14px; border-radius: 40% 40% 50% 50%; background: radial-gradient(circle at 50% 30%, #fff3c4, #f2a93b); transform: scale(var(--s, 1)); opacity: 0; animation: reward-rise 6s ease-in var(--d, 0s) infinite; box-shadow: 0 0 12px 3px rgba(255, 190, 80, 0.7); }
+@keyframes reward-rise { 0% { opacity: 0; transform: translateY(0) scale(var(--s, 1)); } 15% { opacity: 1; } 100% { opacity: 0; transform: translateY(-105vh) translateX(24px) scale(var(--s, 1)); } }
+.reward-card { position: relative; max-width: 520px; width: 100%; border-radius: 28px; padding: 28px 24px; text-align: center; color: #3a2414; background: linear-gradient(170deg, var(--rw-soft, #fbe3ab), #fff7e6); border: 3px solid var(--rw-fg, #8a3b12); box-shadow: 0 0 0 6px rgba(255, 214, 120, 0.4), 0 30px 80px rgba(0, 0, 0, 0.5); display: grid; gap: 12px; justify-items: center; }
+.reward-kicker { margin: 0; letter-spacing: 0.16em; text-transform: uppercase; font-size: 0.78rem; color: var(--rw-fg, #8a3b12); font-weight: 700; }
+.reward-emblem { width: min(150px, 40vw); filter: drop-shadow(0 0 18px rgba(255, 200, 90, 0.9)); }
+.reward-overlay.is-finale .reward-emblem { width: min(280px, 70vw); }
+.reward-title { margin: 0; font-size: 1.5rem; }
+.reward-story { margin: 0; line-height: 1.7; text-align: left; min-height: 8em; }
+.reward-caret { display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: text-bottom; background: currentColor; animation: reward-blink 0.7s steps(1) infinite; }
+@keyframes reward-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .quilt.is-complete, .quilt-patch.is-new::before, .quilt-burst i, .reward-rays, .reward-sparks i, .reward-caret { animation: none; }
+  .quilt-patch.is-new .quilt-stitch { animation: none; stroke-dashoffset: 0; }
+}

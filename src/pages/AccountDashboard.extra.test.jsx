@@ -108,10 +108,10 @@ describe('Tab — chuột, URL, ARIA', () => {
     await screen.findByRole('tablist')
     expect(tablist()).toHaveAttribute('aria-orientation', 'vertical')
     const tabs = within(tablist()).getAllByRole('tab')
-    expect(tabs).toHaveLength(4)
+    expect(tabs).toHaveLength(5)
     expect(selected()).toHaveLength(1)
     expect(selected()[0]).toHaveAccessibleName(/Tổng quan/)
-    expect(tabs.map((t) => t.tabIndex)).toEqual([0, -1, -1, -1])
+    expect(tabs.map((t) => t.tabIndex)).toEqual([0, -1, -1, -1, -1])
     expect(panel()).toHaveAttribute('aria-labelledby', selected()[0].id)
     expect(screen.getByRole('heading', { level: 1, name: 'Tài khoản của tôi' })).toBeInTheDocument()
   })
@@ -185,9 +185,11 @@ describe('Tab — bàn phím (WAI-ARIA)', () => {
     expect(document.activeElement).toBe(tab('Đơn hàng'))
 
     key('ArrowRight')
-    expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')
-    expect(document.activeElement).toBe(tab('Trò chuyện'))
+    expect(tab('Gallery')).toHaveAttribute('aria-selected', 'true')
+    expect(document.activeElement).toBe(tab('Gallery'))
 
+    key('ArrowDown')
+    expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')
     key('ArrowDown')
     key('ArrowDown') // quay vòng từ Hồ sơ về Tổng quan
     expect(tab('Tổng quan')).toHaveAttribute('aria-selected', 'true')

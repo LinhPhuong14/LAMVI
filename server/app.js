@@ -5,6 +5,7 @@ import { adminRouter } from './routes/admin.js'
 import { seoRouter } from './routes/seo.js'
 import { itRouter } from './routes/it.js'
 import { mayRouter } from './routes/may.js'
+import { galleryRouter } from './routes/gallery.js'
 import { createMayService } from './may/service.js'
 import { cartRouter } from './routes/cart.js'
 import { ordersRouter } from './routes/orders.js'
@@ -80,6 +81,7 @@ export function createApp({
   if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))
   // FR-CHK-*, FR-ORD-*, FR-PAY-*: cần repo có bảng đơn hàng (adapter cũ trong test không có)
   if (auth && repo.createOrder) api.use(ordersRouter({ repo, auth, orders, config, payos, messages }))
+  if (auth && repo.createOrder && repo.listCollections) api.use(galleryRouter({ repo, auth }))
   // Trang QR lời chúc: người nhận, không đăng nhập (US-004)
   if (messages && repo.getOrderByQrToken) api.use(qrRouter({ repo, messages, config }))
   // Storage bộ nhớ (dev/test) tự phục vụ tải lên/đọc file

@@ -11,6 +11,9 @@ export function presentProduct(p, lang) {
     description: pick(p.description, lang),
     badge: pick(p.badge, lang),
     tone: p.tone,
+    // D-96: thuộc bộ sưu tập nào (null = đèn lẻ)
+    collection: p.collectionSlug ?? null,
+    pieceOrder: p.pieceOrder ?? 0,
     // D-68 / T-09: giá niêm yết ĐÃ gồm VAT, số nguyên VND
     price: p.price,
     currency: 'VND',
@@ -35,5 +38,20 @@ export function presentBatch(b, lang) {
     story: pick(b.story, lang),
     videoUrl: b.videoUrl,
     producedOn: b.producedOn,
+  }
+}
+
+// D-96: bộ sưu tập công khai. `story` là phần thưởng (D-97) — không bao giờ nằm trong dữ liệu công khai.
+export function presentCollection(c, products, lang) {
+  const mine = products
+    .filter((p) => p.collection === c.slug)
+    .sort((a, b) => a.pieceOrder - b.pieceOrder)
+  return {
+    slug: c.slug,
+    name: pick(c.name, lang),
+    description: pick(c.description, lang),
+    tone: c.tone,
+    lamps: mine.filter((p) => p.kind === 'single'),
+    set: mine.find((p) => p.kind === 'set') ?? null,
   }
 }

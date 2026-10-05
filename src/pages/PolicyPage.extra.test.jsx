@@ -1,8 +1,6 @@
 // @vitest-environment jsdom
 // Kiểm thử độc lập (T-11) cho G-10: trang /privacy, /returns — nội dung, ba ngôn ngữ, SSR, footer, sitemap
-import { readFileSync } from 'node:fs'
-import { URL as NodeURL } from 'node:url'
-import { beforeAll, describe, expect, it,  } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
 import vi from '../i18n/messages/vi.js'
@@ -89,8 +87,8 @@ describe('Chính sách — render ba ngôn ngữ, không rơi về tiếng Việ
 describe('Footer — link theo ngôn ngữ', () => {
   it.each([
     ['/privacy', '', 'Chính sách riêng tư', 'Chính sách đổi trả'],
-    ['/en/privacy', '/en', 'Privacy Policy', 'Returns policy'],
-    ['/zh/privacy', '/zh', '隐私政策', '退换政策'],
+    ['/en/privacy', '/en', 'Privacy Policy', 'Return Policy'],
+    ['/zh/privacy', '/zh', '隐私政策', '退换货政策'],
   ])('%s', async (url, pre, priv, ret) => {
     mockApi(base)
     renderAt(url)

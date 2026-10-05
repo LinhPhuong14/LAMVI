@@ -97,7 +97,7 @@ describe('Trả lời bằng dữ liệu thật (FR-AI-003, BR-AI-001, BR-AI-003
     const res = await chat({ message: 'Đèn Vọng giá bao nhiêu?' })
     expect(res.body.reply).toEqual({ kind: 'answer', text: 'Đèn Vọng giá 1.050.000 ₫ (đã gồm VAT).' })
     const toolMsg = openai.calls[1].messages.find((m) => m.role === 'tool')
-    expect(JSON.parse(toolMsg.content).products.map((p) => p.slug)).toEqual(['den-nguyet', 'den-vong', 'den-sum-vay'])
+    expect(JSON.parse(toolMsg.content).products.map((p) => p.slug)).toEqual(['den-nguyet', 'den-vong', 'den-sum-vay', 'den-tinh', 'den-hoi-xuan', 'den-hoi-ha', 'den-hoi-thu', 'den-hoi-dong'])
     expect(openai.calls[0].tools.map((t) => t.function.name)).toEqual(['get_products', 'get_product', 'get_faq', 'get_my_orders', 'lookup_order'])
   })
 

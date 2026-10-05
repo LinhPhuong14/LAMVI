@@ -69,6 +69,11 @@ export function validateProduct(body, { partial = false } = {}) {
   )
   field(body, 'tone', partial, errors, values, optionalOneOf(TONES))
   field(body, 'sortOrder', partial, errors, values, sortOrder)
+  // D-96: thuộc bộ sưu tập nào (slug) và thứ tự trong bộ; null = đèn lẻ
+  field(body, 'collectionSlug', partial, errors, values, (v) =>
+    v === null || v === undefined || v === '' ? { value: null } : typeof v === 'string' && v.length <= 80 && SLUG_RE.test(v) ? { value: v } : { error: 'INVALID_SLUG' },
+  )
+  field(body, 'pieceOrder', partial, errors, values, (v) => (v === undefined ? { value: 0 } : isInt(v, 0, 1000) ? { value: v } : { error: 'INVALID' }))
   field(body, 'name', partial, errors, values, (v) => parseI18n(v, { required: true, max: 120 }))
   field(body, 'description', partial, errors, values, (v) => parseI18n(v, { max: 1000 }))
   field(body, 'badge', partial, errors, values, (v) => parseI18n(v, { max: 40 }))

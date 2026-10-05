@@ -42,7 +42,8 @@ describe.each(['vi', 'en', 'zh'])('GET %s /shop (SSR qua web layer)', (lang) => 
     for (const p of products.filter((x) => x.status === 'published' || x.status === undefined)) {
       expect(html, p.slug).toContain(esc(p.name[lang]))
     }
-    expect(html).toContain('product-card')
+    // D-96: đèn thuộc bộ hiện trong thẻ bộ sưu tập (đèn lẻ độc lập mới dùng product-card)
+    expect(html).toContain('collection-card')
     const lds = [...html.matchAll(/<script type="application\/ld\+json" data-seo>(.*?)<\/script>/gs)].map((m) => JSON.parse(m[1]))
     const bc = lds.find((j) => j['@type'] === 'BreadcrumbList')
     expect(bc).toBeTruthy()

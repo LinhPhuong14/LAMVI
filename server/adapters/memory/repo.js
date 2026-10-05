@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { products, faqEntries, demoBatches } from '../../data/seed.js'
+import { collections, products, faqEntries, demoBatches } from '../../data/seed.js'
 import { RepoError } from '../repoErrors.js'
 
 const clone = (v) => structuredClone(v)
@@ -8,6 +8,7 @@ const clone = (v) => structuredClone(v)
 export function createMemoryRepo(data = {}) {
   const state = {
     products: clone(data.products ?? products),
+    collections: clone(data.collections ?? collections),
     faqEntries: clone(data.faqEntries ?? faqEntries),
     batches: clone(data.batches ?? demoBatches),
     profiles: new Map(),
@@ -197,6 +198,14 @@ export function createMemoryRepo(data = {}) {
       return clone(
         state.products
           .filter((p) => !statuses || statuses.includes(p.status))
+          .sort((a, b) => a.sortOrder - b.sortOrder),
+      )
+    },
+
+    async listCollections({ statuses } = {}) {
+      return clone(
+        state.collections
+          .filter((c) => !statuses || statuses.includes(c.status))
           .sort((a, b) => a.sortOrder - b.sortOrder),
       )
     },

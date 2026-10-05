@@ -60,6 +60,11 @@ describe('createSupabaseRepo — mapping snake_case → camelCase', () => {
       name: { vi: 'Đèn Nguyệt' },
       description: null,
       badge: null,
+      imageUrl: undefined,
+      imagePath: undefined,
+      imageAlt: undefined,
+      collectionSlug: null,
+      pieceOrder: 0,
       updatedAt: expect.anything(),
     })
     expect(p).not.toHaveProperty('createdAt')

@@ -14,6 +14,8 @@ import { useAuth } from '../auth/context.js'
 import { useCart } from '../cart/context.js'
 import { useSubmit } from '../auth/useForm.js'
 import { useMyOrders } from '../orders/useOrders.js'
+import GalleryPanel from '../gallery/GalleryPanel.jsx'
+import { useGallery } from '../gallery/useGallery.js'
 import { StatusBadge } from '../orders/OrderStatus.jsx'
 import { formatVnd } from '../lib/money.js'
 
@@ -21,7 +23,7 @@ import { formatVnd } from '../lib/money.js'
 const TZ = 'Asia/Ho_Chi_Minh'
 
 // Tab lưu ở ?tab= để tải lại, chia sẻ link và nút Back đều giữ đúng mục
-const TABS = ['overview', 'orders', 'may', 'profile']
+const TABS = ['overview', 'orders', 'gallery', 'may', 'profile']
 
 // Biểu tượng nét mảnh cho từng tab (trang trí)
 const ICONS = {
@@ -32,6 +34,14 @@ const ICONS = {
     <>
       <path d="M12 2v2M9 20h6M12 20v2" />
       <path d="M8 5h8M8 19h8M7.5 5C5 8 5 16 7.5 19M16.5 5C19 8 19 16 16.5 19M12 5v14" />
+    </>
+  ),
+  gallery: (
+    <>
+      <rect x="3" y="3" width="8" height="8" rx="1" />
+      <rect x="13" y="3" width="8" height="8" rx="1" />
+      <rect x="3" y="13" width="8" height="8" rx="1" />
+      <path d="M13 17l2.5 2.5L21 14" />
     </>
   ),
   may: (
@@ -441,6 +451,7 @@ export default function AccountPage() {
 
   const raw = params.get('tab')
   const tab = TABS.includes(raw) ? raw : 'overview'
+  const gallery = useGallery(tab === 'gallery')
 
   useEffect(() => {
     if (!user) return
@@ -605,6 +616,7 @@ export default function AccountPage() {
         <div className="dash-panel" key={tab}>
           {tab === 'overview' && <Overview cart={cart} mayItems={mayItems} profile={profile} orders={orders} go={go} />}
           {tab === 'orders' && <OrdersPanel status={myOrders.status} items={myOrders.items} error={myOrders.error} />}
+          {tab === 'gallery' && <GalleryPanel state={gallery} />}
           {tab === 'may' && <MayPanel items={mayItems} />}
           {tab === 'profile' && <ProfilePanel state={state} setState={setState} />}
         </div>
