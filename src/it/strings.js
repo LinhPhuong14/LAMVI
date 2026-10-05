@@ -34,6 +34,7 @@ export const S = {
       domain_not_verified: 'Tên miền của MAIL_FROM chưa được xác minh trên Resend (cần SPF/DKIM)',
       rate_limited: 'Nhà cung cấp đang giới hạn tốc độ',
       timeout: 'Nhà cung cấp không phản hồi kịp',
+      unexpected_error: 'Lỗi không xác định khi gọi nhà cung cấp — xem log máy chủ',
     },
     mailNotes: {
       sending_only: 'Khoá chỉ có quyền gửi — không kiểm được tên miền, gửi thử bằng "Quên mật khẩu"',

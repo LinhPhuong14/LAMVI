@@ -49,6 +49,22 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
     })
   }
 
+  // Xoá media quá hạn nếu có; trả dòng lời chúc mới nhất. Lỗi Storage → giữ nguyên để thử lại sau.
+  async function purgeIfExpired(order, message) {
+    if (message && hasMedia(message) && mediaExpired(order, message, now())) {
+      return purgeMedia(order, message).catch(() => message)
+    }
+    return message
+  }
+
+  // Đơn có thể đã đổi trạng thái giữa lúc kiểm quyền và lúc ghi (admin bấm "Đã đóng gói"/"Đã gửi"):
+  // đọc lại SAU khi ghi, nếu đã khoá thì hoàn tác. Không có giao dịch nhiều bảng nên đây là cách thu hẹp
+  // cửa sổ đua xuống một lần ghi (BR-MSG-001, BR-MSG-008).
+  async function stillEditable(order, right) {
+    const fresh = await repo.getOrderById(order.id)
+    return Boolean(fresh) && editRights(fresh, null)[right]
+  }
+
   // ---------- Người mua (đã đăng nhập) ----------
 
   function presentOwner(order, message) {
@@ -86,6 +102,14 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
     if (Object.keys(errors).length) throw validation(errors)
     // Chữ đổi → bản dịch cũ hết giá trị
     const saved = await repo.upsertGiftMessage(order.id, { ...values, translations: {} })
+    if (!(await stillEditable(order, 'text'))) {
+      await repo.upsertGiftMessage(order.id, {
+        text: message?.text ?? null,
+        textLang: message?.textLang ?? null,
+        translations: message?.translations ?? {},
+      })
+      throw new HttpError(409, 'MESSAGE_TEXT_LOCKED', 'Lời chúc chữ đã khoá')
+    }
     return presentOwner(order, saved)
   }
 
@@ -103,7 +127,7 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
 
   async function attachMedia(order, { kind, path }) {
     assertAllowed(order)
-    if (!COLS[kind]) throw validation({ kind: 'INVALID' })
+    if (!Object.hasOwn(COLS, kind)) throw validation({ kind: 'INVALID' })
     const message = await repo.getGiftMessage(order.id)
     if (!editRights(order, message).media) throw new HttpError(409, 'MESSAGE_LOCKED', 'Lời chúc đã khoá')
     // Chỉ nhận đường dẫn do chính server cấp cho đơn này (chống gắn file của đơn khác)
@@ -118,18 +142,27 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
     const [pathCol, typeCol] = COLS[kind]
     const oldPath = message?.[pathCol]
     const saved = await repo.upsertGiftMessage(order.id, { [pathCol]: path, [typeCol]: obj.contentType })
+    if (!(await stillEditable(order, 'media'))) {
+      await repo.upsertGiftMessage(order.id, { [pathCol]: oldPath ?? null, [typeCol]: message?.[typeCol] ?? null })
+      await storage.removeObject(path, GIFT_MEDIA_BUCKET).catch(() => {})
+      throw new HttpError(409, 'MESSAGE_LOCKED', 'Lời chúc đã khoá')
+    }
     if (oldPath && oldPath !== path) await storage.removeObject(oldPath, GIFT_MEDIA_BUCKET).catch(() => {})
     return presentOwner(order, saved)
   }
 
   async function removeMedia(order, kind) {
     assertAllowed(order)
-    if (!COLS[kind]) throw validation({ kind: 'INVALID' })
+    if (!Object.hasOwn(COLS, kind)) throw validation({ kind: 'INVALID' })
     const message = await repo.getGiftMessage(order.id)
     if (!editRights(order, message).media) throw new HttpError(409, 'MESSAGE_LOCKED', 'Lời chúc đã khoá')
     const [pathCol, typeCol] = COLS[kind]
     if (!message?.[pathCol]) return presentOwner(order, message)
     const saved = await repo.upsertGiftMessage(order.id, { [pathCol]: null, [typeCol]: null })
+    if (!(await stillEditable(order, 'media'))) {
+      await repo.upsertGiftMessage(order.id, { [pathCol]: message[pathCol], [typeCol]: message[typeCol] })
+      throw new HttpError(409, 'MESSAGE_LOCKED', 'Lời chúc đã khoá')
+    }
     await storage.removeObject(message[pathCol], GIFT_MEDIA_BUCKET).catch(() => {})
     return presentOwner(order, saved)
   }
@@ -174,11 +207,8 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
     const lang = order.qrLang ?? 'vi'
     // §21.4(7): chưa SHIPPED → "đang chuẩn bị", không cho xác nhận
     if (qrAvailability(order.status) === 'preparing') return { state: 'preparing', lang }
-    let message = await repo.getGiftMessage(order.id)
     // Hết hạn thì xoá thật ngay khi có người mở (NFR-PRV-003), không chờ cron
-    if (message && hasMedia(message) && mediaExpired(order, message, now())) {
-      message = await purgeMedia(order, message).catch(() => message)
-    }
+    const message = await purgeIfExpired(order, await repo.getGiftMessage(order.id))
     // AC-001, BR-MSG-007: chưa xác nhận → chỉ lời chào, không lộ nội dung, không đếm ngược
     if (!message?.confirmedAt) return { state: 'greeting', lang, orderKind: order.orderKind }
 
@@ -204,6 +234,9 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
   async function confirm(token) {
     const order = await openOrder(token)
     if (qrAvailability(order.status) !== 'open') throw new HttpError(409, 'GIFT_NOT_READY', 'Món quà đang được chuẩn bị')
+    // BR-MSG-006: media đã quá hạn 90 ngày phải bị xoá TRƯỚC khi xác nhận, nếu không bấm xác nhận
+    // (không qua GET) sẽ "hồi sinh" thêm 30 ngày đếm ngược
+    await purgeIfExpired(order, await repo.getGiftMessage(order.id))
     // US-004 AC-002: chỉ lần đầu; Q-18: không đổi trạng thái đơn
     await repo.confirmGiftMessage(order.id, nowIso())
     return view(token)

@@ -44,9 +44,12 @@ const resend = ({ apiKey, from }, fetchImpl) => ({
     const domain = fromDomain(from)
     // Địa chỉ thử nghiệm của Resend gửi được không cần xác minh nhưng chỉ tới chủ tài khoản
     if (domain === 'resend.dev') return { note: 'test_domain' }
-    const verified = (data?.data ?? []).some(
-      (d) => d.status === 'verified' && (domain === d.name?.toLowerCase() || domain.endsWith(`.${d.name?.toLowerCase()}`)),
-    )
+    // Phản hồi lạ (không phải mảng, phần tử null/không phải object) → coi như chưa xác minh, không ném TypeError thô
+    const list = Array.isArray(data?.data) ? data.data : []
+    const verified = list.some((d) => {
+      const name = typeof d?.name === 'string' ? d.name.toLowerCase() : ''
+      return d?.status === 'verified' && name && (domain === name || domain.endsWith(`.${name}`))
+    })
     if (!verified) throw new Error('domain_not_verified')
     return {}
   },

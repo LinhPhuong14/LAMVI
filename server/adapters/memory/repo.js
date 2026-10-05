@@ -388,6 +388,20 @@ export function createMemoryRepo(data = {}) {
       return clone(p)
     },
 
+    // Khoá/mở khoá có điều kiện: hai admin cùng bấm thì chỉ một người thành công (trả null cho người sau)
+    async lockProfile(id, { lockedAt, lockedReason }) {
+      const p = state.profiles.get(id)
+      if (!p || p.lockedAt) return null
+      Object.assign(p, { lockedAt, lockedReason })
+      return clone(p)
+    },
+    async unlockProfile(id) {
+      const p = state.profiles.get(id)
+      if (!p || !p.lockedAt) return null
+      Object.assign(p, { lockedAt: null, lockedReason: null })
+      return clone(p)
+    },
+
     // --- Lời chúc (FR-MSG-001, FR-QR-002…005)
     async getOrderByQrToken(token) {
       const o = state.orders.find((x) => x.qrToken === token)

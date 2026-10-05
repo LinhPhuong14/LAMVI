@@ -39,7 +39,9 @@ async function mailCheck(mailer, config, timeoutMs) {
   const result = await check(async () => {
     note = (await mailer.ping?.())?.note
   }, timeoutMs)
-  // `message` là mã ngắn (invalid_api_key, domain_not_verified…), không bao giờ chứa khoá
+  // `message` chỉ được là mã ngắn (invalid_api_key, domain_not_verified, timeout…). Lỗi lạ (TypeError,
+  // lỗi mạng kèm tiêu đề yêu cầu…) có thể chứa khoá → không trả nguyên văn ra dashboard.
+  if (result.status === 'error' && !/^[a-z0-9_]+$/.test(result.message ?? '')) result.message = 'unexpected_error'
   return { name: 'mail', provider: mailer.provider, configured, ...result, ...(note ? { note } : {}) }
 }
 

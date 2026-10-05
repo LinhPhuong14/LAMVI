@@ -21,6 +21,8 @@ export default function GiftPage() {
   const load = useCallback(async () => {
     try {
       const r = await api(`/qr/${encodeURIComponent(token)}`)
+      // Phản hồi 200 nhưng không có `item` (proxy/phiên bản lệch) → báo lỗi thay vì làm trắng trang
+      if (!r?.item || typeof r.item !== 'object') throw new ApiError(0, 'INTERNAL_ERROR')
       setState({ status: 'ok', item: r.item })
     } catch (err) {
       setState({ status: 'error', error: err instanceof ApiError ? err : new ApiError(0, 'INTERNAL_ERROR') })
@@ -45,6 +47,7 @@ export default function GiftPage() {
     setError(null)
     try {
       const r = await api(`/qr/${encodeURIComponent(token)}/confirm`, { method: 'POST', body: {} })
+      if (!r?.item || typeof r.item !== 'object') throw new ApiError(0, 'INTERNAL_ERROR')
       setState({ status: 'ok', item: r.item })
       track('confirm_gift_received')
     } catch (err) {
@@ -134,6 +137,17 @@ export default function GiftPage() {
         <p className="field-hint" style={{ marginTop: 24 }}>
           {t('gift.private')}
         </p>
+      </section>
+    )
+  }
+
+  // Server mới hơn client có thể trả trạng thái chưa biết: không được hiện như đã mở lời chúc
+  if (m.state !== 'active') {
+    return (
+      <section className="page-section narrow">
+        <Seo title={t('gift.errorTitle')} noindex status={500} />
+        <h1 className="page-title">{t('gift.errorTitle')}</h1>
+        <p>{t('errors.INTERNAL_ERROR')}</p>
       </section>
     )
   }

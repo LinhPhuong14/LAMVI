@@ -382,6 +382,8 @@ export default {
     mayHint: 'Bấm vào Mây ở góc màn hình để hỏi về đèn, lời chúc hay giao hàng.',
   },
   errors: {
+    CANNOT_MANAGE_SELF: 'Bạn không thể tự khoá hay tự đổi vai trò của chính mình.',
+    LAST_IT: 'Phải còn ít nhất một tài khoản IT đang hoạt động.',
     ACCOUNT_LOCKED: 'Tài khoản đã bị khoá. Vui lòng liên hệ LAMVI để được hỗ trợ.',
     MESSAGE_TEXT_LOCKED: 'Phần chữ của lời chúc đã khoá vì đèn đã được đóng gói.',
     MESSAGE_LOCKED: 'Lời chúc đã khoá vì đơn đã được gửi đi.',

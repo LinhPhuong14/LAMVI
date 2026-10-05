@@ -368,6 +368,8 @@ export default {
     mayHint: 'Tap Mây in the corner of the screen to ask about lanterns, messages or delivery.',
   },
   errors: {
+    CANNOT_MANAGE_SELF: 'You cannot lock or change the role of your own account.',
+    LAST_IT: 'At least one active IT account must remain.',
     ACCOUNT_LOCKED: 'This account has been locked. Please contact LAMVI for help.',
     MESSAGE_TEXT_LOCKED: 'The text of the message is locked because the lantern has been packed.',
     MESSAGE_LOCKED: 'The message is locked because the order has shipped.',

@@ -39,7 +39,8 @@ export const isQrToken = (t) => typeof t === 'string' && QR_TOKEN_RE.test(t)
 
 const isBadControl = (ch) => {
   const c = ch.codePointAt(0)
-  return (c < 0x20 && c !== 0x09 && c !== 0x0a && c !== 0x0d) || c === 0x7f
+  // C0 (trừ tab, xuống dòng), DEL và C1 (U+0080–U+009F)
+  return (c < 0x20 && c !== 0x09 && c !== 0x0a && c !== 0x0d) || (c >= 0x7f && c <= 0x9f)
 }
 
 /** Kiểm chữ lời chúc. Chuỗi rỗng = xoá chữ. Trả { errors, values: { text, textLang } }. */
@@ -116,7 +117,9 @@ export const qrAvailability = (status) => (status === 'cancelled' ? 'hidden' : O
 /** Trạng thái lời chúc theo §21.3, để hiện cho khách/admin. */
 export function messageState(order, message, now = new Date()) {
   if (!message || (!message.text && !message.voicePath && !message.videoPath && !message.mediaDeletedAt)) return 'EMPTY'
-  if (message.mediaDeletedAt || (message.confirmedAt && mediaExpired(order, message, now))) return 'MEDIA_EXPIRED'
+  // Chỉ "hết hạn" khi từng có media: lời chúc chỉ có chữ thì chữ lưu mãi (BR-MSG-003), vẫn ACTIVE
+  const hasMedia = Boolean(message.voicePath || message.videoPath)
+  if (message.mediaDeletedAt || (hasMedia && message.confirmedAt && mediaExpired(order, message, now))) return 'MEDIA_EXPIRED'
   if (message.confirmedAt) return 'ACTIVE'
   if (isMessageLocked(order.status)) return 'LOCKED'
   if (isMessageTextLocked(order.status)) return 'TEXT_LOCKED'

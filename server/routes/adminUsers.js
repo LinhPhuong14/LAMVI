@@ -32,6 +32,8 @@ export function adminUsersRouter({ repo, auth }) {
   const r = Router()
   r.use('/admin/users', requireAdmin(auth, repo))
 
+  const itRemains = async () => (await repo.listProfiles({ role: 'it', locked: false, limit: 1 })).total > 0
+
   const target = async (req) => {
     if (!UUID_RE.test(req.params.id)) throw notFound()
     const p = await repo.getProfile(req.params.id)
@@ -67,8 +69,10 @@ export function adminUsersRouter({ repo, auth }) {
   r.get('/admin/users/:id', async (req, res) => {
     const p = await target(req)
     const orders = await repo.listOrdersByUser(p.id, { limit: 20 })
+    // Số đơn thật (danh sách đơn ở đây chỉ lấy 20 đơn gần nhất)
+    const counts = await repo.countOrdersByUsers([p.id])
     res.json({
-      item: present(p, orders.length),
+      item: present(p, counts[p.id] ?? orders.length),
       orders: orders.map((o) => ({ code: o.code, status: o.status, total: o.total, paymentMethod: o.paymentMethod, createdAt: o.createdAt })),
       audit: await repo.listAuditLog({ entity: 'user', entityId: p.id, limit: 50 }),
     })
@@ -78,8 +82,15 @@ export function adminUsersRouter({ repo, auth }) {
     const p = await target(req)
     assertCanManage(req, p)
     if (p.lockedAt) return res.json({ item: present(p) })
-    const reason = typeof body(req).reason === 'string' ? body(req).reason.trim().slice(0, 300) || null : null
-    const item = await repo.updateProfileAdmin(p.id, { lockedAt: new Date().toISOString(), lockedReason: reason })
+    // Cắt theo ký tự (không theo đơn vị UTF-16) để không tách đôi emoji
+    const reason = typeof body(req).reason === 'string' ? [...body(req).reason.trim()].slice(0, 300).join('') || null : null
+    const item = await repo.lockProfile(p.id, { lockedAt: new Date().toISOString(), lockedReason: reason })
+    // Người khác vừa khoá trước một nhịp → coi như đã xong, không ghi nhật ký lần hai
+    if (!item) return res.json({ item: present(await repo.getProfile(p.id)) })
+    if (p.role === 'it' && !(await itRemains())) {
+      await repo.unlockProfile(p.id)
+      throw new HttpError(409, 'LAST_IT', 'Phải còn ít nhất một tài khoản IT đang hoạt động')
+    }
     await logUser(req, p.id, 'lock', { locked: false }, { locked: true, reason })
     res.json({ item: present(item) })
   })
@@ -88,7 +99,8 @@ export function adminUsersRouter({ repo, auth }) {
     const p = await target(req)
     assertCanManage(req, p)
     if (!p.lockedAt) return res.json({ item: present(p) })
-    const item = await repo.updateProfileAdmin(p.id, { lockedAt: null, lockedReason: null })
+    const item = await repo.unlockProfile(p.id)
+    if (!item) return res.json({ item: present(await repo.getProfile(p.id)) })
     await logUser(req, p.id, 'unlock', { locked: true }, { locked: false })
     res.json({ item: present(item) })
   })
@@ -102,6 +114,12 @@ export function adminUsersRouter({ repo, auth }) {
     if (!USER_ROLES.includes(role)) throw new HttpError(400, 'VALIDATION_ERROR', 'Vai trò không hợp lệ', { role: 'INVALID' })
     if (role === p.role) return res.json({ item: present(p) })
     const item = await repo.updateProfileAdmin(p.id, { role })
+    // Hạ quyền một IT: không có giao dịch nhiều dòng nên kiểm lại SAU khi ghi, nếu không còn IT nào
+    // (hai IT hạ quyền nhau cùng lúc) thì hoàn tác — bất biến "luôn còn ít nhất một IT hoạt động"
+    if (p.role === 'it' && role !== 'it' && !(await itRemains())) {
+      await repo.updateProfileAdmin(p.id, { role: p.role })
+      throw new HttpError(409, 'LAST_IT', 'Phải còn ít nhất một tài khoản IT đang hoạt động')
+    }
     await logUser(req, p.id, 'role', { role: p.role }, { role })
     res.json({ item: present(item) })
   })

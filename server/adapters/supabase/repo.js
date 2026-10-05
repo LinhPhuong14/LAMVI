@@ -534,7 +534,9 @@ export function createSupabaseRepo(client) {
       if (needle) {
         // Bỏ ký tự có nghĩa với cú pháp lọc của PostgREST (dấu phẩy, ngoặc) và ký tự đại diện của LIKE
         const safe = needle.replace(/[,()*%_\\]/g, ' ').trim()
-        if (safe) query = query.or(`email.ilike.%${safe}%,full_name.ilike.%${safe}%,phone.ilike.%${safe}%`)
+        // Chỉ toàn ký tự đặc biệt → không khớp ai (không được bỏ lọc rồi liệt kê tất cả như adapter bộ nhớ không làm)
+        if (!safe) return { items: [], total: 0 }
+        query = query.or(`email.ilike.%${safe}%,full_name.ilike.%${safe}%,phone.ilike.%${safe}%`)
       }
       const { data, error, count } = await query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
       if (error) throw error
@@ -552,6 +554,20 @@ export function createSupabaseRepo(client) {
       if (patch.lockedAt !== undefined) row.locked_at = patch.lockedAt
       if (patch.lockedReason !== undefined) row.locked_reason = patch.lockedReason
       const data = unwrap(await client.from('profiles').update(row).eq('id', id).select('*'))
+      return data.length ? toProfile(data[0]) : null
+    },
+
+    // Khoá/mở khoá có điều kiện (một câu lệnh nguyên tử): người đến sau nhận null
+    async lockProfile(id, { lockedAt, lockedReason }) {
+      const data = unwrap(
+        await client.from('profiles').update({ locked_at: lockedAt, locked_reason: lockedReason }).eq('id', id).is('locked_at', null).select('*'),
+      )
+      return data.length ? toProfile(data[0]) : null
+    },
+    async unlockProfile(id) {
+      const data = unwrap(
+        await client.from('profiles').update({ locked_at: null, locked_reason: null }).eq('id', id).not('locked_at', 'is', null).select('*'),
+      )
       return data.length ? toProfile(data[0]) : null
     },
 

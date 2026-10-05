@@ -31,6 +31,8 @@ export function isValidMeasurementId(id) {
 // Đường dẫn có đoạn bí mật: đoạn cuối bị thay bằng nhãn cố định trước khi gửi (NFR-PRV-002).
 // Trang QR lời chúc dùng token trong URL; trang lô dùng mã lô (mã chung, không bí mật — D-43).
 const SECRET_SEGMENT = [
+  // API trang QR lời chúc: token nằm ở đoạn thứ ba, không được lọt vào nhật ký lỗi 5xx của IT (G-28)
+  { re: /^\/api\/qr\/[^/]+/i, label: '/api/qr/:token' },
   { re: /^(\/(?:en|zh))?\/qr\/[^/]+/i, label: '/qr/:token' },
   { re: /^(\/(?:en|zh))?\/reset-password\/[^/]+/i, label: '/reset-password/:token' },
 ]

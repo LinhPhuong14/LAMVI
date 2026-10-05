@@ -5,6 +5,7 @@ import { useI18n } from '../i18n/index.js'
 import { uploadFile } from '../admin/uploadFile.js'
 
 const MB = 1024 * 1024
+const LOCKED_CODES = new Set(['MESSAGE_TEXT_LOCKED', 'MESSAGE_LOCKED'])
 const ACCEPT = { voice: 'audio/mpeg,audio/mp4,audio/x-m4a,audio/webm,audio/ogg,audio/wav', video: 'video/mp4,video/webm,video/quicktime' }
 
 // Một dòng media (giọng nói hoặc video): tải lên bằng signed URL, gỡ
@@ -68,6 +69,17 @@ export default function GiftMessageEditor({ code }) {
     setTextLang(it.textLang)
   }, [])
 
+  // Đơn có thể vừa bị khoá (admin bấm "Đã đóng gói"/"Đã gửi") giữa lúc khách đang soạn: lấy lại trạng thái
+  // thật để khung phản chiếu đúng, nhưng GIỮ chữ khách đang gõ dở (không ghi đè ô nhập)
+  const refreshLock = useCallback(async () => {
+    try {
+      const r = await authedApi(base)
+      setItem(r.item)
+    } catch {
+      /* giữ nguyên khung hiện tại; thông báo lỗi đã hiện */
+    }
+  }, [authedApi, base])
+
   useEffect(() => {
     let alive = true
     authedApi(base)
@@ -91,6 +103,7 @@ export default function GiftMessageEditor({ code }) {
     } catch (err) {
       setError(err.code ?? 'INTERNAL_ERROR')
       setFieldErrors(err.fields ?? {})
+      if (LOCKED_CODES.has(err.code)) await refreshLock()
     } finally {
       setBusy(false)
     }
@@ -108,6 +121,7 @@ export default function GiftMessageEditor({ code }) {
       setItem(r.item)
     } catch (err) {
       setError(err.fields ? Object.values(err.fields)[0] : (err.code ?? 'INTERNAL_ERROR'))
+      if (LOCKED_CODES.has(err.code)) await refreshLock()
     } finally {
       setProgress((p) => ({ ...p, [kind]: null }))
       setBusy(false)
@@ -122,6 +136,7 @@ export default function GiftMessageEditor({ code }) {
       setItem(r.item)
     } catch (err) {
       setError(err.code ?? 'INTERNAL_ERROR')
+      if (LOCKED_CODES.has(err.code)) await refreshLock()
     } finally {
       setBusy(false)
     }

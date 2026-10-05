@@ -357,6 +357,8 @@ export default {
     mayHint: '点击屏幕角落的 Mây，询问灯、祝福或配送相关问题。',
   },
   errors: {
+    CANNOT_MANAGE_SELF: '不能锁定或更改自己账号的角色。',
+    LAST_IT: '必须至少保留一个正常使用的 IT 账号。',
     ACCOUNT_LOCKED: '此账号已被锁定，请联系 LAMVI 获取帮助。',
     MESSAGE_TEXT_LOCKED: '灯笼已包装，祝福文字已锁定。',
     MESSAGE_LOCKED: '订单已发出，祝福已锁定。',
