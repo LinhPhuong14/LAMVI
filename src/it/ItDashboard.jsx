@@ -64,7 +64,9 @@ function HealthPanel({ health }) {
                 })}
               </small>
             )}
-            {c.message && <small className="field-error">{c.message}</small>}
+            {c.provider && c.name === 'mail' && <small>{c.provider}</small>}
+            {c.note && <small>{S.health.mailNotes[c.note] ?? c.note}</small>}
+            {c.message && <small className="field-error">{(c.name === 'mail' && S.health.mailErrors[c.message]) || c.message}</small>}
           </li>
         ))}
       </ul>

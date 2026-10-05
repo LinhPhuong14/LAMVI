@@ -32,7 +32,7 @@ describe('cron expire-orders', () => {
   it('đúng secret → 200 (GET và POST)', async () => {
     const g = await request(app).get(URL_).set('Authorization', 'Bearer bimat-cron')
     expect(g.status).toBe(200)
-    expect(g.body).toEqual({ cancelled: 0 })
+    expect(g.body).toEqual({ cancelled: 0, mediaPurged: 0 })
     expect((await request(app).post(URL_).set('Authorization', 'Bearer bimat-cron')).status).toBe(200)
   })
   it('không cấu hình secret → 404 dù có header', async () => {

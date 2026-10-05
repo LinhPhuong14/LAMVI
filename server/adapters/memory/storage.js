@@ -54,6 +54,10 @@ export function createMemoryStorage({ maxBytes = 500 * 1024 * 1024, defaultBucke
       objects.delete(keyOf(path, bucket))
     },
 
+    async signedUrl(path, bucket, { download } = {}) {
+      return `/api/dev-storage/o/${encodeURIComponent(keyOf(path, bucket))}${download ? `?download=${encodeURIComponent(download)}` : ''}`
+    },
+
     publicUrl(path, bucket) {
       return `/api/dev-storage/o/${encodeURIComponent(keyOf(path, bucket))}`
     },

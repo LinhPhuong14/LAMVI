@@ -64,7 +64,9 @@ describe('Sức khoẻ (D-52)', () => {
     expect(res.body.status).toBe('ok')
     const byName = Object.fromEntries(res.body.checks.map((c) => [c.name, c]))
     expect(byName.database).toMatchObject({ status: 'ok', provider: 'memory' })
-    expect(byName.payos).toMatchObject({ status: 'not_integrated', configured: false })
+    expect(byName.payos).toMatchObject({ status: 'not_configured', configured: false })
+    // T-49: chưa có MAIL_FROM/khoá → báo chưa cấu hình (không còn "not_integrated" gắn cứng)
+    expect(byName.mail).toMatchObject({ status: 'not_configured', configured: false })
     // D-55: chưa có khoá OpenAI
     expect(byName.openai).toMatchObject({ status: 'not_configured', configured: false })
     expect(res.body.system).toMatchObject({ dataMode: 'memory', node: process.version })

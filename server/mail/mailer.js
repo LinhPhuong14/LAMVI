@@ -19,16 +19,48 @@ async function post(url, headers, payload, fetchImpl) {
   if (!res.ok) throw new Error(`mail ${res.status}`)
 }
 
+async function get(url, headers, fetchImpl) {
+  const res = await fetchImpl(url, { headers, signal: AbortSignal.timeout(TIMEOUT_MS) })
+  const data = await res.json().catch(() => null)
+  return { status: res.status, data }
+}
+
+// Tên miền của địa chỉ gửi, vd `Tên <no-reply@send.example.vn>` → send.example.vn
+const fromDomain = (from) => parseFrom(from).email.split('@')[1]?.toLowerCase() ?? ''
+
 // Resend: 3.000 thư/tháng, 100/ngày (gói miễn phí); cần xác minh tên miền gửi
 const resend = ({ apiKey, from }, fetchImpl) => ({
   provider: 'resend',
   send: ({ to, subject, text, html }) =>
     post('https://api.resend.com/emails', { Authorization: `Bearer ${apiKey}` }, { from, to: [to], subject, text, html }, fetchImpl),
+  // Kiểm khoá và tên miền gửi mà KHÔNG gửi thư (dashboard IT). Trả { note? }; lỗi → ném Error(mã).
+  async ping() {
+    const { status, data } = await get('https://api.resend.com/domains', { Authorization: `Bearer ${apiKey}` }, fetchImpl)
+    // Khoá "Sending access" không đọc được danh sách tên miền nhưng vẫn gửi được → khoá hợp lệ, không kiểm được domain
+    if (status === 401 && data?.name === 'restricted_api_key') return { note: 'sending_only' }
+    if (status === 401 || status === 403) throw new Error('invalid_api_key')
+    if (status === 429) throw new Error('rate_limited')
+    if (status !== 200) throw new Error(`http_${status}`)
+    const domain = fromDomain(from)
+    // Địa chỉ thử nghiệm của Resend gửi được không cần xác minh nhưng chỉ tới chủ tài khoản
+    if (domain === 'resend.dev') return { note: 'test_domain' }
+    const verified = (data?.data ?? []).some(
+      (d) => d.status === 'verified' && (domain === d.name?.toLowerCase() || domain.endsWith(`.${d.name?.toLowerCase()}`)),
+    )
+    if (!verified) throw new Error('domain_not_verified')
+    return {}
+  },
 })
 
 // Brevo: 300 thư/ngày (gói miễn phí); cho xác minh một địa chỉ gửi đơn lẻ, không bắt buộc tên miền
 const brevo = ({ apiKey, from }, fetchImpl) => ({
   provider: 'brevo',
+  async ping() {
+    const { status } = await get('https://api.brevo.com/v3/account', { 'api-key': apiKey }, fetchImpl)
+    if (status === 401 || status === 403) throw new Error('invalid_api_key')
+    if (status !== 200) throw new Error(`http_${status}`)
+    return {}
+  },
   send: ({ to, subject, text, html }) =>
     post(
       'https://api.brevo.com/v3/smtp/email',
@@ -52,10 +84,10 @@ export function createMailer(mail = {}, fetchImpl = globalThis.fetch) {
 // Hộp thư trong bộ nhớ cho dev/test: không gửi đi đâu, chỉ ghi lại để kiểm tra
 export function createMemoryMailer() {
   const outbox = []
-  return { provider: 'memory', outbox, async send(msg) { outbox.push({ ...msg }) } }
+  return { provider: 'memory', outbox, async send(msg) { outbox.push({ ...msg }) }, async ping() { return {} } }
 }
 
 // Dev không có nhà cung cấp thư: in thư ra console để bấm link thử luồng đặt lại mật khẩu
 export function createConsoleMailer(log = console.log) {
-  return { provider: 'console', async send({ to, subject, text }) { log(`[mail → ${to}] ${subject}\n${text}`) } }
+  return { provider: 'console', async send({ to, subject, text }) { log(`[mail → ${to}] ${subject}\n${text}`) }, async ping() { return { note: 'console' } } }
 }

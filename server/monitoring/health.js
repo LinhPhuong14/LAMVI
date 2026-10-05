@@ -30,27 +30,38 @@ async function openaiCheck(may, env) {
   }
 }
 
+// T-49: thư giao dịch. Thật sự gọi nhà cung cấp (không gửi thư) để biết khoá còn dùng được và tên
+// miền gửi đã xác minh chưa — "có biến môi trường" chưa đủ để thư tới được khách.
+async function mailCheck(mailer, config, timeoutMs) {
+  const configured = Boolean(config.mail?.from && (config.mail.resendApiKey || config.mail.brevoApiKey))
+  if (!mailer || !configured) return { name: 'mail', status: 'not_configured', configured }
+  let note
+  const result = await check(async () => {
+    note = (await mailer.ping?.())?.note
+  }, timeoutMs)
+  // `message` là mã ngắn (invalid_api_key, domain_not_verified…), không bao giờ chứa khoá
+  return { name: 'mail', provider: mailer.provider, configured, ...result, ...(note ? { note } : {}) }
+}
+
 // D-52: trạng thái tích hợp — chỉ báo đã cấu hình/kết nối được, không bao giờ trả giá trị khoá
-export async function runHealthChecks({ repo, auth, storage, config, may, env = process.env, timeoutMs = 3000 }) {
+export async function runHealthChecks({ repo, auth, storage, config, may, mailer = null, payos = null, env = process.env, timeoutMs = 3000 }) {
   const supabase = config.useSupabase ? 'supabase' : 'memory'
   const [database, authCheck, storageCheck] = await Promise.all([
     check(() => repo.ping(), timeoutMs),
     check(() => auth.ping(), timeoutMs),
     check(() => storage.ping(), timeoutMs),
   ])
-  const integration = (name, configured) => ({
-    name,
-    // Chưa có code tích hợp (checkout/Mây chưa làm) → chỉ báo đã có biến môi trường chưa
-    status: 'not_integrated',
-    configured,
-  })
+  // payOS đã tích hợp (FR-PAY-001) nhưng không có lệnh kiểm tra không tốn tiền → chỉ báo đã tạo client
+  // hay chưa: 'configured' = đã cấu hình, chưa kiểm kết nối (G-26)
+  const payosCheck = payos
+    ? { name: 'payos', status: 'configured', configured: true }
+    : { name: 'payos', status: 'not_configured', configured: Boolean(env.PAYOS_CLIENT_ID && env.PAYOS_API_KEY && env.PAYOS_CHECKSUM_KEY) }
   const checks = [
     { name: 'database', provider: supabase, ...database },
     { name: 'auth', provider: supabase, ...authCheck },
     { name: 'storage', provider: supabase, ...storageCheck },
-    integration('payos', Boolean(env.PAYOS_CLIENT_ID && env.PAYOS_API_KEY && env.PAYOS_CHECKSUM_KEY)),
-    // T-49: thư giao dịch — chỉ báo đã cấu hình chưa, không trả khoá
-    { name: 'mail', status: 'not_integrated', configured: Boolean(config.mail?.from && (config.mail.resendApiKey || config.mail.brevoApiKey)) },
+    payosCheck,
+    await mailCheck(mailer, config, timeoutMs),
     await openaiCheck(may, env),
   ]
   const mem = process.memoryUsage()

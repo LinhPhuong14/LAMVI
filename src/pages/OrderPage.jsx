@@ -7,6 +7,7 @@ import { useAuth } from '../auth/context.js'
 import { formatVnd } from '../lib/money.js'
 import OrderProgress, { StatusBadge } from '../orders/OrderStatus.jsx'
 import { track } from '../analytics/index.js'
+import GiftMessageEditor from '../orders/GiftMessageEditor.jsx'
 
 function Row({ label, children }) {
   return (
@@ -236,6 +237,9 @@ export default function OrderPage() {
           </button>
         )}
       </Reveal>
+
+      {/* FR-ACC-003, US-003: lời chúc của đơn (chỉ đơn có lời chúc — D-14, D-76) */}
+      {order.hasMessage && order.status !== 'cancelled' && <GiftMessageEditor code={order.code} />}
 
       <Link to={`${path('/account')}?tab=orders`} className="back-link">
         ← {t('orders.title')}

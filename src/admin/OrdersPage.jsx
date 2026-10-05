@@ -29,6 +29,61 @@ function Row({ label, children }) {
   )
 }
 
+// FR-QR-001, D-28: mã QR của đơn để in lên thiệp cảm ơn. Dựng ở trình duyệt, không gửi URL đi đâu.
+function GiftCard({ order }) {
+  const [png, setPng] = useState(null)
+  const [copied, setCopied] = useState(false)
+  const url = order.qrUrl
+  useEffect(() => {
+    if (!url) return
+    let alive = true
+    import('qrcode')
+      .then((m) => m.default.toDataURL(url, { margin: 2, width: 320, errorCorrectionLevel: 'M' }))
+      .then((d) => alive && setPng(d))
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [url])
+
+  if (!url) return null
+  const m = order.message
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+    } catch {
+      /* trình duyệt chặn clipboard: admin vẫn chọn tay được ở ô liên kết */
+    }
+  }
+
+  return (
+    <div className="account-card">
+      <h2>{S.orders.gift}</h2>
+      <p className="field-hint">{S.orders.giftHint}</p>
+      {m ? (
+        <>
+          <Row label={S.orders.giftState}>{S.orders.giftStates[m.state] ?? m.state}</Row>
+          <Row label={S.orders.giftText}>{m.hasText ? S.faq.yes : S.faq.no}</Row>
+          {m.hasText && m.textLang && <Row label={S.orders.giftTextLang}>{S.common.langs[m.textLang]}</Row>}
+          <Row label={S.orders.giftVoice}>{m.hasVoice ? S.faq.yes : S.faq.no}</Row>
+          <Row label={S.orders.giftVideo}>{m.hasVideo ? S.faq.yes : S.faq.no}</Row>
+          <Row label={S.orders.giftConfirmed}>{m.confirmedAt ? date(m.confirmedAt) : S.orders.giftNotConfirmed}</Row>
+          {m.mediaDeleted && <p className="field-hint">{S.orders.giftMediaDeleted}</p>}
+        </>
+      ) : (
+        <p className="field-hint">{S.orders.giftNone}</p>
+      )}
+      <h3>{S.orders.qrImage}</h3>
+      {png && <img src={png} alt={S.orders.qrImage} width="160" height="160" />}
+      <Field label={S.orders.qrLink} value={url} readOnly onFocus={(e) => e.target.select()} hint={S.orders.qrPrivate} />
+      <button type="button" className="btn btn-small" onClick={copy}>
+        {copied ? S.orders.qrCopied : S.orders.qrCopy}
+      </button>
+    </div>
+  )
+}
+
 // FR-ORD-002: chi tiết một đơn + đổi trạng thái theo đúng luồng §16
 function OrderDetail({ code }) {
   const { authedApi } = useAuth()
@@ -173,6 +228,8 @@ function OrderDetail({ code }) {
           )}
         </div>
       </div>
+
+      <GiftCard order={o} />
 
       <div className="account-card">
         <h2>{S.orders.nextStatus}</h2>

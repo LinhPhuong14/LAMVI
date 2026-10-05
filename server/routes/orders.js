@@ -59,7 +59,7 @@ function presentOrder(o, { lang = 'vi' } = {}) {
  * Checkout, đơn hàng của tôi (FR-CHK-*, FR-ORD-001, FR-ACC-002) và webhook payOS (FR-PAY-001).
  * Webhook KHÔNG yêu cầu đăng nhập — bảo vệ bằng chữ ký (NFR-SEC-002).
  */
-export function ordersRouter({ repo, auth, orders, config, payos = null }) {
+export function ordersRouter({ repo, auth, orders, config, payos = null, messages = null }) {
   const r = Router()
   const guard = requireAuth(auth)
   const lang = (req) => normalizeLang(req.query.lang)
@@ -79,6 +79,7 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
     })
   const orderLimit = limitOn('order')
   const paymentLinkLimit = limitOn('payment-link')
+  const mediaLimit = limitOn('gift-media')
 
   // FR-CHK-008: bảng giá của giỏ, kèm coupon nếu có (FR-CHK-006)
   r.post('/checkout/quote', guard, async (req, res) => {
@@ -130,6 +131,30 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
     res.json({ item: presentOrder(order, { lang: lang(req) }) })
   })
 
+  // FR-MSG-001, FR-ACC-003, US-003: soạn/sửa lời chúc của đơn mình. Không phải đơn của mình → 404.
+  if (messages) {
+    const mine = async (req) => {
+      const order = await repo.getOrderByCode(req.params.code)
+      if (!order || order.userId !== req.user.id) throw notFound()
+      return order
+    }
+    r.get('/orders/:code/message', guard, async (req, res) => {
+      res.json({ item: await messages.ownerView(await mine(req)) })
+    })
+    r.put('/orders/:code/message', guard, async (req, res) => {
+      res.json({ item: await messages.saveText(await mine(req), body(req)) })
+    })
+    r.post('/orders/:code/message/media-upload', guard, mediaLimit, async (req, res) => {
+      res.status(201).json(await messages.createMediaUpload(await mine(req), body(req)))
+    })
+    r.post('/orders/:code/message/media', guard, async (req, res) => {
+      res.json({ item: await messages.attachMedia(await mine(req), body(req)) })
+    })
+    r.delete('/orders/:code/message/media/:kind', guard, async (req, res) => {
+      res.json({ item: await messages.removeMedia(await mine(req), req.params.kind) })
+    })
+  }
+
   // FR-PAY-001: lấy lại liên kết thanh toán (lần tạo đơn gặp lỗi cổng, hoặc khách quay lại sau)
   r.post('/orders/:code/payment', guard, paymentLinkLimit, async (req, res) => {
     const order = await repo.getOrderByCode(req.params.code)
@@ -158,7 +183,9 @@ export function ordersRouter({ repo, auth, orders, config, payos = null }) {
     const given = req.get('authorization')
     if (!safeEqual(given ?? '', `Bearer ${secret}`)) throw new HttpError(401, 'UNAUTHORIZED', 'Chưa xác thực')
     const cancelled = await orders.expirePendingOrders()
-    res.json({ cancelled: cancelled.length })
+    // D-26, D-75: dùng chung lịch cron này để xoá media lời chúc quá hạn (Hobby chỉ có 1 cron/ngày)
+    const mediaPurged = messages ? await messages.purgeExpiredMedia() : 0
+    res.json({ cancelled: cancelled.length, mediaPurged })
   })
 
   // FR-PAY-001: webhook payOS. NFR-SEC-002 — xác minh chữ ký trước khi xử lý.

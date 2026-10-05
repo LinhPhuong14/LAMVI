@@ -1,4 +1,5 @@
 // Checkout, đơn hàng và thanh toán (§12, §15, §16). Server là nơi duy nhất tính tiền (BR-PRC-001).
+import { randomBytes } from 'node:crypto'
 import { HttpError } from '../errors.js'
 import { PUBLIC_PRODUCT_STATUSES, presentProduct } from '../domain/catalog.js'
 import { PRICING_SETTING_KEY, normalizePricingConfig, quoteOrder } from '../domain/pricing.js'
@@ -171,6 +172,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
         vatRate: quote.vatRate,
         couponId: coupon?.id ?? null,
         couponCode: coupon?.code ?? null,
+        // BR-QR-001: token QR ngẫu nhiên 256 bit, không chứa dữ liệu đọc được
+        qrToken: randomBytes(32).toString('hex'),
       }
       const items = lines.map(({ product, quantity }) => ({
         productId: product.id,
@@ -392,6 +395,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date() 
       else if (order.paymentStatus === 'pending') values.paymentStatus = 'cancelled'
     }
     if (trackingCode !== undefined) values.trackingCode = trackingCode
+    // D-75: mốc "giao thành công" để tính hạn xoá media khi không ai xác nhận
+    if (next === 'delivered') values.deliveredAt = now().toISOString()
 
     const updated = await repo.updateOrderIfStatus(order.id, order.status, values)
     if (!updated) throw new HttpError(409, 'INVALID_STATUS_TRANSITION', 'Trạng thái đơn vừa thay đổi')
