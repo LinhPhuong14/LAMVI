@@ -3309,7 +3309,7 @@
 
 .page-auth .nav-auth,
 .page-auth .auth-foot {
-  background: rgba(244, 237, 224, 0.66);
+  background: rgba(244, 237, 224, 0.5);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   backdrop-filter: blur(18px) saturate(140%);
 }
@@ -3325,7 +3325,7 @@
 }
 
 .page-auth .auth-foot {
-  background: rgba(244, 237, 224, 0.66);
+  background: rgba(244, 237, 224, 0.5);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   backdrop-filter: blur(18px) saturate(140%);
 }
