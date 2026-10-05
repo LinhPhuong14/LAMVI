@@ -20,6 +20,7 @@ const STATUS = {
   EMAIL_TAKEN: 409,
   INVALID_CREDENTIALS: 401,
   EMAIL_NOT_CONFIRMED: 403,
+  ACCOUNT_LOCKED: 403, // G-19
   UNAUTHORIZED: 401,
   RATE_LIMITED: 429,
   PASSWORD_TOO_SHORT: 400,
@@ -135,6 +136,7 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
       fullName: values.fullName,
       phone: values.phone ?? null,
       preferredLocale: lang,
+      email,
     })
     res.status(201).json({ user: result.user, needsConfirmation: result.needsConfirmation })
   })
@@ -177,7 +179,7 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
       const email = normalizeEmail(g.email)
       const session = await call(() => auth.signInVerifiedEmail(email))
       if (!(await repo.getProfile(session.user.id))) {
-        await repo.upsertProfile({ id: session.user.id, fullName: g.name, preferredLocale: lang })
+        await repo.upsertProfile({ id: session.user.id, fullName: g.name, preferredLocale: lang, email })
       }
       // T-49: không đưa token lên URL. Refresh token nằm trong cookie HttpOnly; trang /auth/callback
       // gọi /auth/refresh để lấy access token. `next` đã được kiểm là đường dẫn nội bộ ở /start.
@@ -271,7 +273,9 @@ export function authRouter({ repo, auth, config, mailer = null, pwned = null }) 
   r.get('/me', guard, async (req, res) => {
     let profile = await repo.getProfile(req.user.id)
     // Tài khoản tạo ngoài API (vd Supabase dashboard) chưa có hồ sơ
-    if (!profile) profile = await repo.upsertProfile({ id: req.user.id })
+    if (!profile) profile = await repo.upsertProfile({ id: req.user.id, email: req.user.email })
+    // Hồ sơ cũ chưa có email (admin tìm người dùng theo email) → bổ sung
+    else if (!profile.email && req.user.email) profile = await repo.upsertProfile({ id: req.user.id, email: req.user.email })
     res.json({ profile: presentProfile(profile, req.user) })
   })
 

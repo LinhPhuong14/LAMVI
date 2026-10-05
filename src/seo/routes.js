@@ -27,6 +27,8 @@ export function classifyPath(pathname) {
   if (PRIVATE.includes(lower)) return { kind: 'private', lang }
   // Trang chi tiết đơn: nội dung phụ thuộc phiên đăng nhập (BR-SEO-001)
   if (/^\/don-hang\/[^/]+$/.test(lower)) return { kind: 'private', lang }
+  // Trang QR lời chúc: token là bí mật (BR-QR-001) → không SSR nội dung, noindex
+  if (/^\/qr\/[^/]+$/.test(lower)) return { kind: 'private', lang }
   if (path === '/') return { kind: 'home', lang }
   let m = path.match(/^\/products\/([^/]+)$/i)
   if (m) return seg(m[1]) === null ? { kind: 'invalid', lang } : { kind: 'product', lang, slug: seg(m[1]) }

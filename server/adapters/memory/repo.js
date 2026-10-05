@@ -22,6 +22,7 @@ export function createMemoryRepo(data = {}) {
     orders: clone(data.orders ?? []), // mỗi đơn kèm items
     couponRedemptions: [],
     auditLog: [],
+    giftMessages: [], // lời chúc, mỗi đơn tối đa một dòng (FR-MSG-001)
   }
 
   const now = () => new Date().toISOString()
@@ -345,12 +346,108 @@ export function createMemoryRepo(data = {}) {
         fullName: null,
         phone: null,
         preferredLocale: 'vi',
+        email: null,
+        lockedAt: null,
+        lockedReason: null,
         createdAt: new Date().toISOString(),
         ...existing,
         ...profile,
       }
+      // Khoá chỉ đổi qua updateProfileAdmin, không qua upsert từ API khách (role giữ như cũ: test dùng upsert để cấp quyền)
+      if (existing) {
+        next.lockedAt = existing.lockedAt
+        next.lockedReason = existing.lockedReason
+      }
       state.profiles.set(profile.id, next)
       return clone(next)
+    },
+
+    // --- Quản lý người dùng (G-19)
+    async listProfiles({ q, role, locked, limit = 20, offset = 0 } = {}) {
+      const needle = typeof q === 'string' ? q.trim().toLowerCase() : ''
+      const rows = [...state.profiles.values()]
+        .filter((p) => !role || p.role === role)
+        .filter((p) => locked === undefined || Boolean(p.lockedAt) === locked)
+        .filter(
+          (p) =>
+            !needle ||
+            [p.email, p.fullName, p.phone].some((v) => typeof v === 'string' && v.toLowerCase().includes(needle)),
+        )
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      return { items: clone(rows.slice(offset, offset + limit)), total: rows.length }
+    },
+    async countOrdersByUsers(userIds) {
+      const out = {}
+      for (const id of userIds) out[id] = state.orders.filter((o) => o.userId === id).length
+      return out
+    },
+    async updateProfileAdmin(id, patch) {
+      const p = state.profiles.get(id)
+      if (!p) return null
+      for (const k of ['role', 'lockedAt', 'lockedReason']) if (patch[k] !== undefined) p[k] = patch[k]
+      return clone(p)
+    },
+
+    // Khoá/mở khoá có điều kiện: hai admin cùng bấm thì chỉ một người thành công (trả null cho người sau)
+    async lockProfile(id, { lockedAt, lockedReason }) {
+      const p = state.profiles.get(id)
+      if (!p || p.lockedAt) return null
+      Object.assign(p, { lockedAt, lockedReason })
+      return clone(p)
+    },
+    async unlockProfile(id) {
+      const p = state.profiles.get(id)
+      if (!p || !p.lockedAt) return null
+      Object.assign(p, { lockedAt: null, lockedReason: null })
+      return clone(p)
+    },
+
+    // --- Lời chúc (FR-MSG-001, FR-QR-002…005)
+    async getOrderByQrToken(token) {
+      const o = state.orders.find((x) => x.qrToken === token)
+      return o ? clone(o) : null
+    },
+    async getGiftMessage(orderId) {
+      const m = state.giftMessages.find((x) => x.orderId === orderId)
+      return m ? clone(m) : null
+    },
+    async upsertGiftMessage(orderId, patch) {
+      let m = state.giftMessages.find((x) => x.orderId === orderId)
+      if (!m) {
+        m = {
+          id: randomUUID(),
+          orderId,
+          text: null,
+          textLang: null,
+          voicePath: null,
+          voiceType: null,
+          videoPath: null,
+          videoType: null,
+          confirmedAt: null,
+          mediaDeletedAt: null,
+          translations: {},
+          createdAt: now(),
+        }
+        state.giftMessages.push(m)
+      }
+      Object.assign(m, patch, { updatedAt: now() })
+      return clone(m)
+    },
+    // US-004 AC-002: confirmedAt chỉ ghi lần đầu, hai lần bấm đồng thời không ghi đè nhau
+    async confirmGiftMessage(orderId, at) {
+      const m = await this.upsertGiftMessage(orderId, {})
+      const row = state.giftMessages.find((x) => x.id === m.id)
+      if (!row.confirmedAt) row.confirmedAt = at
+      return clone(row)
+    },
+    async listGiftMediaCandidates() {
+      return state.giftMessages
+        .filter((m) => (m.voicePath || m.videoPath) && !m.mediaDeletedAt)
+        .map((m) => {
+          const o = byId(state.orders, m.orderId)
+          return o ? { message: clone(m), order: clone(o) } : null
+        })
+        .filter(Boolean)
     },
   }
 }

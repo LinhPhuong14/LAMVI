@@ -8,6 +8,10 @@ import { mayRouter } from './routes/may.js'
 import { createMayService } from './may/service.js'
 import { cartRouter } from './routes/cart.js'
 import { ordersRouter } from './routes/orders.js'
+import { adminUsersRouter } from './routes/adminUsers.js'
+import { qrRouter } from './routes/qr.js'
+import { createMessageService } from './messages/service.js'
+import { withAccountLock } from './security/lockedAccounts.js'
 import { createOrderService } from './orders/service.js'
 import { createCartService } from './cart/service.js'
 import { createMetrics } from './monitoring/metrics.js'
@@ -22,7 +26,7 @@ import { isPwnedPassword } from './security/pwned.js'
 // T-02: nhận adapter qua tham số để test bằng adapter bộ nhớ
 export function createApp({
   repo,
-  auth,
+  auth: rawAuth,
   storage,
   web,
   config = { publicSiteUrl: 'http://localhost:5173' },
@@ -35,8 +39,12 @@ export function createApp({
   // T-49: thư giao dịch (null → không gửi) và kiểm tra mật khẩu đã lộ (null → bỏ qua)
   mailer = createMailer(config.mail),
   pwned = config.pwnedCheck ? isPwnedPassword : null,
+  // FR-MSG-001, FR-QR-*: lời chúc cần storage (bucket riêng tư); thiếu storage → không bật
+  messages = storage ? createMessageService({ repo, storage, may }) : null,
   dev = false,
 }) {
+  // G-19: khoá tài khoản có hiệu lực ở mọi route dùng phiên
+  const auth = rawAuth && repo.getProfile ? withAccountLock(rawAuth, repo) : rawAuth
   const app = express()
   app.disable('x-powered-by')
   // IP thật khi chạy sau proxy (hạn mức Mây theo IP) — đặt TRUST_PROXY theo hạ tầng
@@ -60,11 +68,14 @@ export function createApp({
   api.use(catalogRouter({ repo }))
   if (auth) api.use(authRouter({ repo, auth, config, mailer, pwned }))
   if (auth && storage) api.use(adminRouter({ repo, auth, storage, config, orders, gaRealtime }))
-  if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may }))
+  if (auth && storage) api.use(adminUsersRouter({ repo, auth }))
+  if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may, mailer, payos }))
   if (auth) api.use(mayRouter({ repo, auth, may }))
   if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))
   // FR-CHK-*, FR-ORD-*, FR-PAY-*: cần repo có bảng đơn hàng (adapter cũ trong test không có)
-  if (auth && repo.createOrder) api.use(ordersRouter({ repo, auth, orders, config, payos }))
+  if (auth && repo.createOrder) api.use(ordersRouter({ repo, auth, orders, config, payos, messages }))
+  // Trang QR lời chúc: người nhận, không đăng nhập (US-004)
+  if (messages && repo.getOrderByQrToken) api.use(qrRouter({ repo, messages, config }))
   // Storage bộ nhớ (dev/test) tự phục vụ tải lên/đọc file
   if (storage?.router) api.use(storage.router)
   api.use(() => {

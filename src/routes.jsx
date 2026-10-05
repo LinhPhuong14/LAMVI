@@ -5,6 +5,7 @@ import ProductPage from './pages/ProductPage'
 import NotFoundPage from './pages/NotFoundPage'
 import AccountPage from './pages/AccountPage'
 import BatchPage from './pages/BatchPage'
+import GiftPage from './pages/GiftPage'
 import ShopPage from './pages/ShopPage'
 import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
@@ -17,6 +18,7 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import AdminLayout from './admin/AdminLayout'
 import AdminOrdersPage from './admin/OrdersPage'
 import CouponsPage from './admin/CouponsPage'
+import UsersPage from './admin/UsersPage'
 import ProductsPage from './admin/ProductsPage'
 import FaqPage from './admin/FaqPage'
 import BatchesPage from './admin/BatchesPage'
@@ -31,6 +33,7 @@ function localeChildren() {
       <Route index element={<HomePage />} />
       <Route path="products/:slug" element={<ProductPage />} />
       <Route path="lo/:code" element={<BatchPage />} />
+      <Route path="qr/:token" element={<GiftPage />} />
       <Route path="shop" element={<ShopPage />} />
       <Route path="cart" element={<CartPage />} />
       <Route path="checkout" element={<CheckoutPage />} />
@@ -57,6 +60,8 @@ export default function AppRoutes() {
         <Route index element={<Navigate to="orders" replace />} />
         <Route path="orders" element={<AdminOrdersPage />} />
         <Route path="orders/:code" element={<AdminOrdersPage />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="users/:id" element={<UsersPage />} />
         <Route path="coupons" element={<CouponsPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="faq" element={<FaqPage />} />

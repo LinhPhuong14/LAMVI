@@ -83,3 +83,12 @@ export const AnalyticsIcon = () => (
     <path d="M7 20v-7M12 20V6M17 20v-10" />
   </svg>
 )
+
+/** Người dùng: hai bóng người */
+export const UsersIcon = () => (
+  <svg {...base}>
+    <circle cx="9" cy="8.5" r="3" />
+    <path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5" />
+    <path d="M15.5 6a3 3 0 0 1 0 5.5M17.5 14.3c2 .6 3 2.2 3 4.7" />
+  </svg>
+)

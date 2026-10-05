@@ -25,19 +25,21 @@ server/
   monitoring/              metrics.js (số liệu API), maintenance.js (bảo trì), health.js (kiểm tra tích hợp)
   may/                     config.js (cấu hình mặc định + validate), guard.js (PII, kiểm tra số, FAQ offline), tools.js (hàm backend cho Mây), service.js
   cart/service.js          Giỏ hàng: tính giá, gộp, giới hạn (D-59, D-60)
+  messages/service.js      Lời chúc: soạn (chữ/giọng nói/video), trang QR người nhận, xác nhận, dịch, xoá media hết hạn (FR-MSG-001, FR-QR-002…005, T-54)
+  security/lockedAccounts.js  Bọc auth provider: tài khoản bị khoá không có phiên (G-19, T-54)
   orders/service.js        Checkout → đơn → thanh toán: quoteCart (T-40), createOrder, webhook payOS, huỷ, hết hạn (T-41)
   app.js                   createApp({ repo, auth, config }) — dùng trong test
   config.js                Đọc biến môi trường
   errors.js                HttpError + errorHandler (định dạng lỗi thống nhất)
   i18n.js                  normalizeLang, pick (D-40), localePath (D-37)
-  domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js, pricing.js, order.js, coupon.js, couponValidate.js)
+  domain/                  Quy tắc nghiệp vụ thuần (catalog.js, account.js, pricing.js, order.js, coupon.js, couponValidate.js, message.js)
   middleware/auth.js       requireAuth (Bearer token → req.user)
   middleware/sessionCookie.js  cookie refresh token HttpOnly (`lamvi_rt`), `sameOriginOnly` chống CSRF (T-49)
   mail/{mailer,templates}.js   thư giao dịch qua Resend/Brevo (HTTPS), mẫu thư vi/en/zh (T-49)
   security/pwned.js        kiểm mật khẩu đã lộ (HIBP k-anonymity, fail-open) (T-49)
   middleware/security.js   Security headers + CSP hash (T-37)
   middleware/rateLimit.js  Chống dò/spam, đếm trong DB (T-38, G-20)
-  routes/                  catalog.js, auth.js, admin.js, it.js, may.js, cart.js, orders.js, seo.js (sitemap, robots)
+  routes/                  catalog.js, auth.js, admin.js, adminUsers.js, it.js, may.js, cart.js, orders.js, qr.js, seo.js (sitemap, robots)
   adapters/openai.js       Chat Completions qua fetch (T-29)
   adapters/payos.js        Cổng thanh toán: ký/xác minh HMAC, tạo & huỷ link (NFR-SEC-002)
   domain/admin.js          Kiểm tra dữ liệu admin (sản phẩm, FAQ, lô, video)
@@ -94,6 +96,19 @@ Thêm phương thức → thêm ở **cả** `memory` và `supabase` + test.
 | `getProductById`, `createProduct`, `updateProduct(id, patch)`, `deleteProduct` | Admin; trùng slug → `RepoError CONFLICT` |
 | `getFaq`, `createFaq`, `updateFaq`, `deleteFaq` | Admin |
 | `listBatches`, `getBatchById`, `createBatch`, `updateBatch`, `deleteBatch` | Admin; trùng mã → `RepoError CONFLICT` |
+
+### Lời chúc và người dùng (repository)
+
+| Phương thức | Ghi chú |
+|---|---|
+| `getOrderByQrToken(token)` | Đơn theo token QR (64 hex) |
+| `getGiftMessage(orderId)`, `upsertGiftMessage(orderId, patch)` | Mỗi đơn tối đa một dòng `gift_messages` |
+| `confirmGiftMessage(orderId, at)` | Ghi `confirmed_at` đúng một lần (tạo dòng nếu chưa có) |
+| `listGiftMediaCandidates()` | Các dòng còn media chưa xoá, kèm đơn — để cron xoá quá hạn |
+| `listProfiles({ q, role, locked, limit, offset })`, `countOrdersByUsers(ids)` | Admin: danh sách người dùng |
+| `updateProfileAdmin(id, { role?, lockedAt?, lockedReason? })` | Đổi vai trò/khoá; `upsertProfile` không đổi được khoá |
+
+Storage thêm `signedUrl(path, bucket, { expiresIn, download })` (bucket riêng tư `gift-media`). Mailer thêm `ping()` (kiểm khoá, không gửi thư). OpenAI client thêm `completeText` (không tool) cho `may.translate`.
 
 ### Giám sát (repository)
 
@@ -165,7 +180,10 @@ Lỗi chung: `RATE_LIMITED`.
 | `orders` | `code` unique, `user_id`, `status` (§16), `order_kind` gift/self, `has_message`, `qr_lang`, người nhận + địa chỉ VN, `payment_method` payos/cod, `payment_status`, `payment_expires_at`, `payos_order_code` unique, `payment_flag`, bảng giá chốt (`subtotal`, `discount`, `shipping_fee`, `total`, `vat_amount`, `vat_rate`), `coupon_id`/`coupon_code`, `tracking_code` | D-68…D-76. Ràng buộc: COD chỉ khi giao cho chính mình (BR-PAY-004), `qr_lang` chỉ khi có lời chúc, COD không ở `pending_payment` |
 | `order_items` | `order_id`, `product_id` (nullable), `slug`, `name` jsonb, `unit_price`, `quantity`, `line_total` | Chốt giá và tên lúc tạo đơn (BR-PRC-002) |
 | `coupon_redemptions` | `coupon_id`, `user_id`, `order_id` unique | Đếm lượt theo khách (C-5); xoá khi huỷ đơn (C-8) |
-| `audit_log` | `at`, `actor_id`, `actor_role`, `entity`, `entity_id`, `action`, `old_value`/`new_value` jsonb | NFR-AUD-001: đơn, coupon, hoàn tiền |
+| `audit_log` | `at`, `actor_id`, `actor_role`, `entity`, `entity_id`, `action`, `old_value`/`new_value` jsonb | NFR-AUD-001: đơn, coupon, hoàn tiền, người dùng (khoá, mở khoá, đổi vai trò) |
+| `gift_messages` | `order_id` unique, `text` (≤300 ký tự do server kiểm), `text_lang`, `voice_path/type`, `video_path/type`, `confirmed_at`, `media_deleted_at`, `translations` jsonb | FR-MSG-001, D-12, D-26, D-75; bucket riêng tư `gift-media` |
+| `orders` (thêm) | `qr_token` unique NOT NULL (256 bit hex), `delivered_at` | BR-QR-001, D-75 |
+| `profiles` (thêm) | `email`, `locked_at`, `locked_reason` | G-19, D-90 |
 
 RLS bật, không có policy (chỉ service role của server truy cập).
 
@@ -203,7 +221,7 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET/POST | `/api/admin/coupons` | Admin | Danh sách / tạo (§14, D-71) |
 | GET/PATCH/DELETE | `/api/admin/coupons/:id` | Admin | Xoá coupon đã dùng → 409 `COUPON_IN_USE` |
 | GET | `/api/admin/orders?status=` | Admin | Danh sách đơn, kèm `nextStatuses` và `paymentFlag` |
-| GET | `/api/admin/orders/:code` | Admin | Chi tiết + nhật ký kiểm toán |
+| GET | `/api/admin/orders/:code` | Admin | Chi tiết + nhật ký kiểm toán + `message` (cờ, KHÔNG có nội dung — D-89) + `qrUrl` để in thiệp |
 | POST | `/api/admin/orders/:code/status` | Admin | `{ status, trackingCode? }`; bước nhảy sai → 409 (§16) |
 | POST | `/api/admin/orders/:code/refund` | Admin | Ghi nhận đã hoàn tiền thủ công (D-74) |
 | PUT/GET | `/api/dev-storage/upload/:token`, `/api/dev-storage/o/*` | Token | Chỉ khi chạy adapter bộ nhớ |
@@ -217,8 +235,18 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET | `/api/orders/:code?lang=` | Bearer | Chi tiết; đơn người khác → 404 |
 | POST | `/api/orders/:code/payment` | Bearer | Lấy lại liên kết thanh toán payOS |
 | POST | `/api/orders/:code/cancel` | Bearer | Huỷ đơn trước SHIPPED (BR-ORD-001) |
+| GET/PUT | `/api/orders/:code/message` | Bearer | Đọc / lưu chữ lời chúc `{ text, textLang? }`. 409 `MESSAGE_TEXT_LOCKED` (từ PACKED), `NO_MESSAGE`; đơn người khác → 404 |
+| POST | `/api/orders/:code/message/media-upload` | Bearer | `{ kind: voice\|video, contentType, size }` → `{ path, uploadUrl, headers }`; 409 `MESSAGE_LOCKED` (từ SHIPPED) |
+| POST/DELETE | `/api/orders/:code/message/media[/:kind]` | Bearer | Gắn media đã tải (kiểm lại kiểu/size thật) / gỡ |
+| GET | `/api/qr/:token` | – (token) | Trang người nhận: `preparing` \| `greeting` \| `active` (chữ, media signed URL, đếm ngược). Token sai/đơn huỷ → 404 chung |
+| POST | `/api/qr/:token/confirm` | – (token) | "Tôi đã nhận được quà": ghi `confirmed_at` lần đầu; 409 `GIFT_NOT_READY` nếu chưa SHIPPED |
+| POST | `/api/qr/:token/translate` | – (token) | `{ lang }` → `{ lang, text, cached }`; 503 `TRANSLATE_UNAVAILABLE` |
+| GET | `/api/admin/users?q=&role=&status=&page=` | Admin, IT | Danh sách 20 người/trang kèm số đơn (D-90) |
+| GET | `/api/admin/users/:id` | Admin, IT | Hồ sơ + 20 đơn gần nhất + nhật ký |
+| POST | `/api/admin/users/:id/lock` · `/unlock` | Admin (khách), IT (mọi người) | `{ reason? }`; không tự khoá mình (409 `CANNOT_MANAGE_SELF`) |
+| PATCH | `/api/admin/users/:id` | IT | `{ role }` customer/admin/it; không tự đổi vai trò của mình |
 | POST | `/api/payments/payos/webhook` | **Chữ ký** | Nguồn sự thật để xác nhận đơn (NFR-SEC-002, BR-PAY-001) |
-| GET/POST | `/api/internal/expire-orders` | `CRON_SECRET` | Quét đơn payOS quá hạn (BR-PAY-003); Vercel Cron gọi bằng GET |
+| GET/POST | `/api/internal/expire-orders` | `CRON_SECRET` | Quét đơn payOS quá hạn (BR-PAY-003) và xoá media lời chúc quá hạn (D-26, D-75) → `{ cancelled, mediaPurged }`; Vercel Cron gọi bằng GET |
 | POST | `/api/may/chat` | Tuỳ chọn | `{ message, lang, sessionId, history }` → `{ reply: { kind: answer\|resting\|tired\|sick\|unknown, text, faq? } }` |
 | GET | `/api/may/history` | Bearer | Lịch sử chat của mình |
 | GET/PUT | `/api/admin/may/config` | Admin, IT | Cấu hình Mây |
@@ -265,7 +293,7 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 ## Frontend
 
 - Route: `LocaleLayout` bọc mọi trang, cấp ngôn ngữ qua `LocaleProvider`, đặt `<html lang>` và `document.title`.
-- Admin: `/admin/{products,faq,batches}` — chỉ tiếng Việt, ngoài `LocaleLayout` (D-48).
+- Admin: `/admin/{orders,users,products,faq,batches,coupons,analytics,may}` — chỉ tiếng Việt, ngoài `LocaleLayout` (D-48).
 - IT: `/it` — chỉ tiếng Việt (D-51).
-- Trang con: `/` · `/products/:slug` · `/lo/:code` · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
+- Trang con: `/` · `/products/:slug` · `/lo/:code` · `/qr/:token` (riêng tư, noindex) · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
 - `AuthProvider`: access token + user trong `localStorage` (`moc.session`, không có refresh token — T-49), `authedApi` tự gọi `/auth/refresh` (cookie) một lần khi gặp 401.

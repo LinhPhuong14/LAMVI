@@ -2,6 +2,8 @@
 // signed upload URL do server cấp — frontend không cần key Supabase (T-05).
 export const BATCH_VIDEO_BUCKET = 'batch-videos'
 export const PRODUCT_IMAGE_BUCKET = 'product-images'
+// Bucket RIÊNG TƯ cho giọng nói/video lời chúc (D-09, D-26): chỉ truy cập qua signed URL ngắn hạn
+export const GIFT_MEDIA_BUCKET = 'gift-media'
 
 export function createSupabaseStorage(admin, defaultBucket = BATCH_VIDEO_BUCKET) {
   const files = (bucket = defaultBucket) => admin.storage.from(bucket)
@@ -36,6 +38,13 @@ export function createSupabaseStorage(admin, defaultBucket = BATCH_VIDEO_BUCKET)
     async removeObject(path, bucket) {
       const { error } = await files(bucket).remove([path])
       if (error) throw error
+    },
+
+    // URL đọc có hạn cho bucket riêng tư; download = tên file → trình duyệt tải về thay vì phát
+    async signedUrl(path, bucket, { expiresIn = 3600, download } = {}) {
+      const { data, error } = await files(bucket).createSignedUrl(path, expiresIn, download ? { download } : undefined)
+      if (error) throw error
+      return data.signedUrl
     },
 
     publicUrl(path, bucket) {

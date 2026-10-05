@@ -98,6 +98,8 @@ const toOrder = (r) => ({
   couponId: r.coupon_id,
   couponCode: r.coupon_code,
   trackingCode: r.tracking_code,
+  qrToken: r.qr_token,
+  deliveredAt: r.delivered_at,
   cancelledAt: r.cancelled_at,
   cancelReason: r.cancel_reason,
   createdAt: r.created_at,
@@ -111,15 +113,35 @@ const toProfile = (r) => ({
   phone: r.phone,
   preferredLocale: r.preferred_locale,
   role: r.role,
+  email: r.email ?? null,
+  lockedAt: r.locked_at ?? null,
+  lockedReason: r.locked_reason ?? null,
   createdAt: r.created_at,
 })
+
+const toGiftMessage = (r) => ({
+  id: r.id,
+  orderId: r.order_id,
+  text: r.text,
+  textLang: r.text_lang,
+  voicePath: r.voice_path,
+  voiceType: r.voice_type,
+  videoPath: r.video_path,
+  videoType: r.video_type,
+  confirmedAt: r.confirmed_at,
+  mediaDeletedAt: r.media_deleted_at,
+  translations: r.translations ?? {},
+  createdAt: r.created_at,
+  updatedAt: r.updated_at,
+})
+const GIFT_COLS = { text: 'text', textLang: 'text_lang', voicePath: 'voice_path', voiceType: 'voice_type', videoPath: 'video_path', videoType: 'video_type', confirmedAt: 'confirmed_at', mediaDeletedAt: 'media_deleted_at', translations: 'translations' }
 
 // camelCase → snake_case cho các trường được phép ghi
 const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge', imageUrl: 'image_url', imagePath: 'image_path', imageAlt: 'image_alt' }
 const FAQ_COLS = { sortOrder: 'sort_order', isPublished: 'is_published', question: 'question', answer: 'answer' }
 const BATCH_COLS = { code: 'code', status: 'status', videoUrl: 'video_url', videoPath: 'video_path', producedOn: 'produced_on', title: 'title', story: 'story' }
 const COUPON_COLS = { code: 'code', type: 'type', value: 'value', maxDiscount: 'max_discount', minOrder: 'min_order', productIds: 'product_ids', usageLimit: 'usage_limit', perUserLimit: 'per_user_limit', startsAt: 'starts_at', endsAt: 'ends_at', status: 'status' }
-const ORDER_COLS = { status: 'status', paymentStatus: 'payment_status', paymentExpiresAt: 'payment_expires_at', payosOrderCode: 'payos_order_code', paymentFlag: 'payment_flag', trackingCode: 'tracking_code', cancelledAt: 'cancelled_at', cancelReason: 'cancel_reason' }
+const ORDER_COLS = { status: 'status', paymentStatus: 'payment_status', paymentExpiresAt: 'payment_expires_at', payosOrderCode: 'payos_order_code', paymentFlag: 'payment_flag', trackingCode: 'tracking_code', deliveredAt: 'delivered_at', cancelledAt: 'cancelled_at', cancelReason: 'cancel_reason' }
 
 const toUsage = (r) => ({
   month: r.month,
@@ -325,6 +347,7 @@ export function createSupabaseRepo(client) {
             vat_rate: order.vatRate,
             coupon_id: order.couponId,
             coupon_code: order.couponCode,
+            qr_token: order.qrToken,
           })
           .select('*')
           .single(),
@@ -495,9 +518,90 @@ export function createSupabaseRepo(client) {
       if (profile.fullName !== undefined) row.full_name = profile.fullName
       if (profile.phone !== undefined) row.phone = profile.phone
       if (profile.preferredLocale !== undefined) row.preferred_locale = profile.preferredLocale
+      if (profile.email !== undefined) row.email = profile.email
       // role không cho cập nhật qua upsert từ API khách
       const data = unwrap(await client.from('profiles').upsert(row).select('*').single())
       return toProfile(data)
+    },
+
+    // --- Quản lý người dùng (G-19)
+    async listProfiles({ q, role, locked, limit = 20, offset = 0 } = {}) {
+      let query = client.from('profiles').select('*', { count: 'exact' })
+      if (role) query = query.eq('role', role)
+      if (locked === true) query = query.not('locked_at', 'is', null)
+      if (locked === false) query = query.is('locked_at', null)
+      const needle = typeof q === 'string' ? q.trim() : ''
+      if (needle) {
+        // Bỏ ký tự có nghĩa với cú pháp lọc của PostgREST (dấu phẩy, ngoặc) và ký tự đại diện của LIKE
+        const safe = needle.replace(/[,()*%_\\]/g, ' ').trim()
+        // Chỉ toàn ký tự đặc biệt → không khớp ai (không được bỏ lọc rồi liệt kê tất cả như adapter bộ nhớ không làm)
+        if (!safe) return { items: [], total: 0 }
+        query = query.or(`email.ilike.%${safe}%,full_name.ilike.%${safe}%,phone.ilike.%${safe}%`)
+      }
+      const { data, error, count } = await query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)
+      if (error) throw error
+      return { items: data.map(toProfile), total: count ?? data.length }
+    },
+    async countOrdersByUsers(userIds) {
+      const out = Object.fromEntries(userIds.map((id) => [id, 0]))
+      if (!userIds.length) return out
+      for (const r of unwrap(await client.from('orders').select('user_id').in('user_id', userIds))) out[r.user_id] += 1
+      return out
+    },
+    async updateProfileAdmin(id, patch) {
+      const row = {}
+      if (patch.role !== undefined) row.role = patch.role
+      if (patch.lockedAt !== undefined) row.locked_at = patch.lockedAt
+      if (patch.lockedReason !== undefined) row.locked_reason = patch.lockedReason
+      const data = unwrap(await client.from('profiles').update(row).eq('id', id).select('*'))
+      return data.length ? toProfile(data[0]) : null
+    },
+
+    // Khoá/mở khoá có điều kiện (một câu lệnh nguyên tử): người đến sau nhận null
+    async lockProfile(id, { lockedAt, lockedReason }) {
+      const data = unwrap(
+        await client.from('profiles').update({ locked_at: lockedAt, locked_reason: lockedReason }).eq('id', id).is('locked_at', null).select('*'),
+      )
+      return data.length ? toProfile(data[0]) : null
+    },
+    async unlockProfile(id) {
+      const data = unwrap(
+        await client.from('profiles').update({ locked_at: null, locked_reason: null }).eq('id', id).not('locked_at', 'is', null).select('*'),
+      )
+      return data.length ? toProfile(data[0]) : null
+    },
+
+    // --- Lời chúc (FR-MSG-001, FR-QR-002…005)
+    async getOrderByQrToken(token) {
+      const row = unwrap(await client.from('orders').select('*, order_items(*)').eq('qr_token', token).maybeSingle())
+      return row ? toOrder(row) : null
+    },
+    async getGiftMessage(orderId) {
+      const row = unwrap(await client.from('gift_messages').select('*').eq('order_id', orderId).maybeSingle())
+      return row ? toGiftMessage(row) : null
+    },
+    async upsertGiftMessage(orderId, patch) {
+      const row = { order_id: orderId, ...toRow(patch, GIFT_COLS) }
+      return toGiftMessage(unwrap(await client.from('gift_messages').upsert(row, { onConflict: 'order_id' }).select('*').single()))
+    },
+    // confirmed_at chỉ ghi lần đầu: tạo dòng nếu chưa có, rồi cập nhật khi còn NULL
+    async confirmGiftMessage(orderId, at) {
+      unwrap(await client.from('gift_messages').upsert({ order_id: orderId }, { onConflict: 'order_id', ignoreDuplicates: true }))
+      unwrap(await client.from('gift_messages').update({ confirmed_at: at }).eq('order_id', orderId).is('confirmed_at', null))
+      return this.getGiftMessage(orderId)
+    },
+    async listGiftMediaCandidates() {
+      const rows = unwrap(
+        await client
+          .from('gift_messages')
+          .select('*, orders(id, status, delivered_at)')
+          .is('media_deleted_at', null)
+          .or('voice_path.not.is.null,video_path.not.is.null'),
+      )
+      return rows.map((r) => ({
+        message: toGiftMessage(r),
+        order: { id: r.orders.id, status: r.orders.status, deliveredAt: r.orders.delivered_at },
+      }))
     },
   }
 }

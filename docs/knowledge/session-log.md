@@ -1,5 +1,19 @@
 # Nhật ký phiên
 
+## 2026-10-05 — Lời chúc & QR, quản lý người dùng, Resend (nhánh `feat/gift-message-admin-users`)
+
+**Mục tiêu người dùng**: kiểm tra production so với BA; rồi "thêm quản lý user vào admin, làm lời chúc và trang QR lời chúc"; "tích hợp luôn Resend, dashboard IT đang báo có config nhưng chưa tích hợp". Người dùng báo đã gắn Supabase thật, Resend, OAuth, OpenAI cho Mây, GA4, Vercel Web Analytics.
+
+**Quyết định từ người dùng**: D-88 (chữ + giọng nói + video, 300 ký tự, 20/100 MB), D-89 (Q-14/27/29 tạm thời theo "mặc định an toàn"), D-90 (quản lý người dùng đầy đủ: khoá/mở khoá + đổi vai trò).
+
+**Đã làm**: T-54. Migration `20261005000010`; `server/domain/message.js`, `server/messages/service.js`, `server/routes/qr.js`, mở rộng `routes/orders.js`/`admin.js`; `server/routes/adminUsers.js` + `server/security/lockedAccounts.js`; `may.translate`; trang `GiftPage`, khung soạn `GiftMessageEditor`, `UsersPage`, khối QR ở chi tiết đơn admin (thư viện `qrcode`, chỉ nạp khi mở chi tiết đơn); i18n vi/en/zh; `mailer.ping()` + health thật cho Resend; sửa dashboard IT không còn báo "Chưa tích hợp" sai cho thư và payOS.
+
+**Bẫy**: (1) `tool_choice` không được gửi khi không có `tools` (OpenAI báo lỗi) → tách `completeText`. (2) Test cũ khẳng định đúng hành vi sai ("payos not_integrated") nên phải đổi theo. (3) Test cron khẳng định body `{ cancelled }` chính xác → thêm `mediaPurged`. (4) Memory `upsertProfile` phải còn nhận `role` vì test dùng nó để cấp quyền, nhưng không được ghi đè `lockedAt`.
+
+**Còn lại / cần người dùng**: **chạy migration 010 trên Supabase TRƯỚC khi deploy** (G-55) — vì vậy nhánh chưa được gộp vào `master` dù CLAUDE.md cho phép tự gộp; gộp sau khi migration đã chạy. Thử luồng thật: tải media, quét QR, dịch (G-59, G-61). PO chốt Q-14 (G-56: admin chưa có chữ để viết thiệp tay), Q-27, Q-29, Q-25. Thông báo đơn hàng qua Resend (G-45) vẫn chờ Q-24 (kênh) và nội dung thư.
+
+---
+
 ## 2026-10-02 — Chi tiết sản phẩm v2 (nhánh `feat/product-detail-v2`)
 
 **Mục tiêu người dùng**: thiết kế lại trang sản phẩm chi tiết giống phong cách shop.

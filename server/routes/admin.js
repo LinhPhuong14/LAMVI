@@ -19,6 +19,8 @@ import { validateCoupon } from '../domain/couponValidate.js'
 import { ORDER_STATUSES, adminNextStatuses } from '../domain/order.js'
 import { GaError } from '../adapters/gaRealtime.js'
 import { presentOrder } from './orders.js'
+import { localePath } from '../i18n.js'
+import { messageState } from '../domain/message.js'
 
 const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {})
 
@@ -272,8 +274,28 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
   })
   r.get('/admin/orders/:code', async (req, res) => {
     const o = found(await repo.getOrderByCode(req.params.code))
+    // Q-14 (mặc định an toàn, chờ PO): admin KHÔNG xem nội dung lời chúc, chỉ thấy cờ để in thiệp.
+    // `qrUrl` để in QR lên thiệp cảm ơn (D-28, FR-QR-001); ngôn ngữ trang theo người mua (D-24).
+    const gm = o.hasMessage && repo.getGiftMessage ? await repo.getGiftMessage(o.id) : null
+    const message = o.hasMessage
+      ? {
+          state: messageState(o, gm),
+          hasText: Boolean(gm?.text),
+          textLang: gm?.textLang ?? null,
+          hasVoice: Boolean(gm?.voicePath),
+          hasVideo: Boolean(gm?.videoPath),
+          confirmedAt: gm?.confirmedAt ?? null,
+          mediaDeleted: Boolean(gm?.mediaDeletedAt),
+        }
+      : null
     res.json({
-      item: { ...presentOrder(o), paymentFlag: o.paymentFlag, nextStatuses: adminNextStatuses(o.status) },
+      item: {
+        ...presentOrder(o),
+        paymentFlag: o.paymentFlag,
+        nextStatuses: adminNextStatuses(o.status),
+        message,
+        qrUrl: o.qrToken ? `${config.publicSiteUrl}${localePath(o.qrLang ?? 'vi', `/qr/${o.qrToken}`)}` : null,
+      },
       audit: await repo.listAuditLog({ entity: 'order', entityId: o.id, limit: 50 }),
     })
   })

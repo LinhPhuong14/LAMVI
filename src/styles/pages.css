@@ -4614,3 +4614,58 @@
 .admin-main > .it-grid {
   margin-top: 24px;
 }
+
+/* Lời chúc: trang QR cho người nhận (FR-QR-002…005) và khung soạn của người mua (FR-ACC-003) */
+.gift-page .gift-card h2 {
+  margin: 0 0 12px;
+}
+
+.gift-text {
+  margin: 0 0 16px;
+  font-size: 1.15rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.gift-translation {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line, rgba(0, 0, 0, 0.15));
+}
+
+.gift-audio {
+  display: block;
+  width: 100%;
+  margin: 8px 0 16px;
+}
+
+.gift-editor textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.gift-media {
+  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+}
+
+.gift-media-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.gift-media-row strong {
+  min-width: 90px;
+}
+
+.admin-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}

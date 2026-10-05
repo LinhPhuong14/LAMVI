@@ -416,7 +416,7 @@ describe('Sức khoẻ (D-52)', () => {
     const json = JSON.stringify(h)
     expect(json).not.toMatch(/bi-mat/)
     expect(h.checks.find((c) => c.name === 'openai')).toEqual({ name: 'openai', status: 'not_integrated', configured: true })
-    expect(h.checks.find((c) => c.name === 'payos')).toMatchObject({ status: 'not_integrated', configured: true })
+    expect(h.checks.find((c) => c.name === 'payos')).toMatchObject({ status: 'not_configured', configured: true })
     expect(h.status).toBe('ok')
   })
 
@@ -673,5 +673,41 @@ describe('Chế độ bảo trì — SSR (D-54)', () => {
     const p = await renderPage({ repo, config: { publicSiteUrl: 'https://moc.test' }, template, render, url: '/', pathname: '/', maintenance: m })
     expect(p.status).toBe(200)
     err.mockRestore()
+  })
+})
+
+describe('Sức khoẻ — thư giao dịch (Resend)', () => {
+  const ok = { ping: async () => {} }
+  const cfg = { useSupabase: true, mail: { from: 'LAMVI <a@lamvi.com.vn>', resendApiKey: 're_bi-mat' } }
+  const run = (mailer, config = cfg) => runHealthChecks({ repo: ok, auth: ok, storage: ok, config, mailer, env: {} })
+  const mail = (h) => h.checks.find((c) => c.name === 'mail')
+
+  it('có khoá và nhà cung cấp trả lời → ok, kèm provider, không lộ khoá', async () => {
+    const h = await run({ provider: 'resend', ping: async () => ({}) })
+    expect(mail(h)).toMatchObject({ status: 'ok', provider: 'resend', configured: true })
+    expect(JSON.stringify(h)).not.toMatch(/bi-mat/)
+  })
+
+  it('tên miền chưa xác minh → error với mã ngắn, status tổng degraded', async () => {
+    const h = await run({ provider: 'resend', ping: async () => { throw new Error('domain_not_verified') } })
+    expect(mail(h)).toMatchObject({ status: 'error', message: 'domain_not_verified' })
+    expect(h.status).toBe('degraded')
+  })
+
+  it('khoá chỉ gửi → ok kèm note', async () => {
+    const h = await run({ provider: 'resend', ping: async () => ({ note: 'sending_only' }) })
+    expect(mail(h)).toMatchObject({ status: 'ok', note: 'sending_only' })
+  })
+
+  it('thiếu MAIL_FROM/khoá hoặc không có mailer → not_configured, không gọi ping', async () => {
+    const ping = vi.fn()
+    expect(mail(await run(null, { useSupabase: true, mail: {} }))).toMatchObject({ status: 'not_configured', configured: false })
+    expect(mail(await run({ provider: 'resend', ping }, { useSupabase: true, mail: { from: 'a@b.vn' } })).status).toBe('not_configured')
+    expect(ping).not.toHaveBeenCalled()
+  })
+
+  it('nhà cung cấp treo → timeout, không treo dashboard', async () => {
+    const h = await runHealthChecks({ repo: ok, auth: ok, storage: ok, config: cfg, env: {}, timeoutMs: 30, mailer: { provider: 'resend', ping: () => new Promise(() => {}) } })
+    expect(mail(h)).toMatchObject({ status: 'error', message: 'timeout' })
   })
 })

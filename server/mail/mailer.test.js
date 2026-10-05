@@ -88,3 +88,40 @@ describe('mẫu thư', () => {
     expect(m.html).not.toContain('href=')
   })
 })
+
+describe('mailer.ping — kiểm khoá và tên miền, không gửi thư', () => {
+  const reply = (status, data) => vi.fn(async () => ({ ok: status < 400, status, json: async () => data }))
+  const make = (fetchImpl, from = 'LAMVI <no-reply@send.lamvi.com.vn>') =>
+    createMailer({ resendApiKey: 'k', from }, fetchImpl)
+
+  it('Resend: khoá đúng + tên miền (hoặc miền cha) đã xác minh → ok, chỉ GET /domains', async () => {
+    const f = reply(200, { data: [{ name: 'lamvi.com.vn', status: 'verified' }] })
+    expect(await make(f).ping()).toEqual({})
+    expect(f.mock.calls[0][0]).toBe('https://api.resend.com/domains')
+    expect(f.mock.calls[0][1].method).toBeUndefined()
+  })
+
+  it('Resend: tên miền chưa xác minh → domain_not_verified', async () => {
+    const f = reply(200, { data: [{ name: 'lamvi.com.vn', status: 'pending' }] })
+    await expect(make(f).ping()).rejects.toThrow('domain_not_verified')
+    // miền khác hẳn cũng không khớp (không so khớp theo hậu tố chuỗi thô)
+    const g = reply(200, { data: [{ name: 'vi.com.vn', status: 'verified' }] })
+    await expect(make(g, 'x@lamvi.com.vn').ping()).rejects.toThrow('domain_not_verified')
+  })
+
+  it('Resend: khoá chỉ có quyền gửi → ok kèm note; khoá sai → invalid_api_key', async () => {
+    expect(await make(reply(401, { name: 'restricted_api_key' })).ping()).toEqual({ note: 'sending_only' })
+    await expect(make(reply(401, { name: 'invalid_api_key' })).ping()).rejects.toThrow('invalid_api_key')
+    await expect(make(reply(500, {})).ping()).rejects.toThrow('http_500')
+  })
+
+  it('Resend: địa chỉ thử nghiệm resend.dev → note test_domain', async () => {
+    expect(await make(reply(200, { data: [] }), 'onboarding@resend.dev').ping()).toEqual({ note: 'test_domain' })
+  })
+
+  it('Brevo: 200 ok, 401 → invalid_api_key', async () => {
+    const m = (f) => createMailer({ brevoApiKey: 'k', from: 'a@b.vn' }, f)
+    expect(await m(reply(200, {})).ping()).toEqual({})
+    await expect(m(reply(401, {})).ping()).rejects.toThrow('invalid_api_key')
+  })
+})
