@@ -1,5 +1,17 @@
 # Nhật ký phiên
 
+## 2026-10-05 (phiên 3) — Chân thư doanh nghiệp (nhánh `feat/mail-business-footer`)
+
+**Mục tiêu người dùng**: thư thật đã có banner nhưng muốn đẹp và chuyên nghiệp hơn, thêm footer và thông tin như email doanh nghiệp chuẩn mực.
+
+**Đã làm**: D-95, T-56 (bổ sung). `server/mail/layout.js` (tách khung thư khỏi `templates.js`): nhãn phân loại, vạch son, hộp lưu ý, khối đơn hàng có mã đơn, chân thư doanh nghiệp đọc từ `MAIL_*`. Đã xem bằng Chromium với dữ liệu mẫu.
+
+**Bẫy**: website không có thông tin công ty thật nên KHÔNG điền bừa địa chỉ/hotline/MST — mục nào trống thì không hiện. Thư báo đổi mật khẩu vẫn không có link nào, kể cả `mailto:`/mạng xã hội (giữ chữ thuần).
+
+**Còn lại / cần người dùng**: cung cấp thông tin công ty (tên pháp nhân + MST, địa chỉ, hotline, email hỗ trợ, giờ làm việc, link mạng xã hội) để đặt `MAIL_*` ở Vercel rồi redeploy; quyết có hộp thư hỗ trợ trả lời được không (G-68).
+
+---
+
 ## 2026-10-05 (phiên 2) — Header/footer auth kính mờ (nhánh `fix/glass-header-footer`, `docs/glass-auth-header-footer`)
 
 **Mục tiêu người dùng**: "sửa các phần banner và footer thành dạng glass morphism" (ảnh chụp trang đặt lại mật khẩu).

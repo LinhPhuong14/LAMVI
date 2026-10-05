@@ -42,7 +42,7 @@ export function createApp({
   orders = createOrderService({
     repo,
     payos,
-    notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl }),
+    notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl, brand: config.mail?.brand }),
   }),
   pwned = config.pwnedCheck ? isPwnedPassword : null,
   // FR-MSG-001, FR-QR-*: lời chúc cần storage (bucket riêng tư); thiếu storage → không bật

@@ -71,7 +71,7 @@ if (!mailer) console.warn('[api] Thiếu MAIL_FROM + RESEND_API_KEY/BREVO_API_KE
 const orders = createOrderService({
   repo,
   payos,
-  notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl }),
+  notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl, brand: config.mail?.brand }),
 })
 
 const web = process.env.API_ONLY === '1' ? undefined : await createWeb({ repo, config, dev, maintenance })
