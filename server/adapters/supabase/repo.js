@@ -82,6 +82,7 @@ const toOrderItem = (r) => ({
   unitPrice: r.unit_price,
   quantity: r.quantity,
   lineTotal: r.line_total,
+  stockReserved: r.stock_reserved ?? null,
 })
 
 const toOrder = (r) => ({
@@ -346,64 +347,38 @@ export function createSupabaseRepo(client) {
 
     // --- Đơn hàng (FR-CHK-*, FR-ORD-*)
     async createOrder(order, items, redemption) {
-      const row = unwrap(
-        await client
-          .from('orders')
-          .insert({
-            code: order.code,
-            user_id: order.userId,
-            status: order.status,
-            order_kind: order.orderKind,
-            has_message: order.hasMessage,
-            qr_lang: order.qrLang,
-            recipient_is_self: order.recipientIsSelf,
-            recipient_name: order.recipientName,
-            recipient_phone: order.recipientPhone,
-            address_line: order.addressLine,
-            ward: order.ward,
-            district: order.district,
-            province: order.province,
-            province_code: order.provinceCode ?? null,
-            ward_code: order.wardCode ?? null,
-            note: order.note,
-            payment_method: order.paymentMethod,
-            payment_status: order.paymentStatus,
-            payment_expires_at: order.paymentExpiresAt,
-            payos_order_code: order.payosOrderCode,
-            subtotal: order.subtotal,
-            discount: order.discount,
-            shipping_fee: order.shippingFee,
-            total: order.total,
-            vat_amount: order.vatAmount,
-            vat_rate: order.vatRate,
-            coupon_id: order.couponId,
-            coupon_code: order.couponCode,
-            qr_token: order.qrToken,
-          })
-          .select('*')
-          .single(),
-      )
-      unwrap(
-        await client.from('order_items').insert(
-          items.map((i) => ({
-            order_id: row.id,
-            product_id: i.productId,
-            slug: i.slug,
-            name: i.name,
-            unit_price: i.unitPrice,
-            quantity: i.quantity,
-            line_total: i.lineTotal,
-          })),
-        ),
-      )
-      if (redemption) {
-        unwrap(
-          await client
-            .from('coupon_redemptions')
-            .insert({ coupon_id: redemption.couponId, user_id: redemption.userId, order_id: row.id }),
-        )
+      const { data, error } = await client.rpc('create_checkout_order', {
+        p_order: {
+          code: order.code, user_id: order.userId, status: order.status,
+          order_kind: order.orderKind, has_message: order.hasMessage, qr_lang: order.qrLang,
+          recipient_is_self: order.recipientIsSelf, recipient_name: order.recipientName,
+          recipient_phone: order.recipientPhone, address_line: order.addressLine,
+          ward: order.ward, district: order.district, province: order.province,
+          province_code: order.provinceCode ?? null, ward_code: order.wardCode ?? null,
+          note: order.note, payment_method: order.paymentMethod, payment_status: order.paymentStatus,
+          payment_expires_at: order.paymentExpiresAt, payos_order_code: order.payosOrderCode,
+          subtotal: order.subtotal, discount: order.discount, shipping_fee: order.shippingFee,
+          total: order.total, vat_amount: order.vatAmount, vat_rate: order.vatRate,
+          coupon_id: order.couponId, coupon_code: order.couponCode, qr_token: order.qrToken,
+        },
+        p_items: items.map((i) => ({
+          product_id: i.productId, slug: i.slug, name: i.name,
+          unit_price: i.unitPrice, quantity: i.quantity, line_total: i.lineTotal,
+        })),
+        p_coupon: redemption?.coupon ? toRow(redemption.coupon, {
+          ...COUPON_COLS, id: 'id', usedCount: 'used_count',
+        }) : null,
+      })
+      if (error) {
+        const codes = ['OUT_OF_STOCK', 'CART_EMPTY', 'CART_HAS_UNAVAILABLE', 'PRICE_CHANGED',
+          'COUPON_NOT_FOUND', 'COUPON_INACTIVE', 'COUPON_NOT_STARTED', 'COUPON_EXPIRED',
+          'COUPON_USED_UP', 'COUPON_USER_LIMIT', 'COUPON_MIN_ORDER', 'COUPON_NOT_APPLICABLE']
+        if (error.code === 'P0001' && codes.includes(error.message)) {
+          throw new RepoError(error.message, error.message === 'OUT_OF_STOCK' ? error.details : undefined)
+        }
+        throw error
       }
-      return { ...toOrder(row), items: items.map((i) => ({ ...i })) }
+      return toOrder(data)
     },
     async getOrderById(id) {
       const r = unwrap(await client.from('orders').select('*, order_items(*)').eq('id', id).maybeSingle())
@@ -446,7 +421,7 @@ export function createSupabaseRepo(client) {
       return rows.map(toOrder)
     },
     async updateOrder(id, values) {
-      const data = unwrap(await client.from('orders').update(toRow(values, ORDER_COLS)).eq('id', id).select('*, order_items(*)'))
+      const data = unwrap(await client.from('orders').update({ ...toRow(values, ORDER_COLS), ...(values.status === 'cancelled' ? { atomic_cancellation: true } : {}) }).eq('id', id).select('*, order_items(*)'))
       return data.length ? toOrder(data[0]) : null
     },
     /**
@@ -457,7 +432,7 @@ export function createSupabaseRepo(client) {
       const data = unwrap(
         await client
           .from('orders')
-          .update(toRow(values, ORDER_COLS))
+          .update({ ...toRow(values, ORDER_COLS), ...(values.status === 'cancelled' ? { atomic_cancellation: true } : {}) })
           .eq('id', id)
           .eq('status', expectedStatus)
           .select('*, order_items(*)'),
@@ -527,7 +502,11 @@ export function createSupabaseRepo(client) {
     async listCollections({ statuses } = {}) {
       let q = client.from('collections').select('*').order('sort_order')
       if (statuses) q = q.in('status', statuses)
-      return unwrap(await q).map(toCollection)
+      const result = await q
+      if (['PGRST205', '42P01', '42703', 'PGRST204'].includes(result.error?.code)) {
+        throw new RepoError('CATALOG_NOT_READY', 'collections')
+      }
+      return unwrap(result).map(toCollection)
     },
 
     async getProductBySlug(slug) {

@@ -1,6 +1,6 @@
 # Tiến độ tính năng
 
-Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một phần · ⛔ bị chặn (chờ quyết định) · ⬜ chưa làm.
+Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một phần · ⛔ bị chặn (chờ quyết định) · ⬜ chưa làm.
 
 | Nhóm | FR | Trạng thái | Code chính | Test | Chặn bởi |
 |---|---|---|---|---|---|
@@ -70,3 +70,10 @@ Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một ph�
 - Ảnh sản phẩm thật (G-33, G-23).
 
 - Vercel Web Analytics (T-42): `@vercel/analytics` nhúng ở `src/main.jsx`, URL đã làm sạch. Cần bật Analytics trên dashboard Vercel.
+
+
+| Đợt v0.37 | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Checkout transaction + cart consumption | ✅ code, chưa deploy | RPC/migration 013; checkoutAtomic.extra.test.js; Supabase checkout.extra.test.js; SQL PostgreSQL regressions | Chạy migration trước deploy |
+| Ledger giữ kho và huỷ atomic | ✅ cho đơn mới; legacy một phần | stock_reserved, atomic_cancellation; HTTP + SQL rollback/concurrency | Đối soát đơn legacy NULL |
+| Collections production 500 | 🟡 chẩn đoán/giảm lỗi thiếu schema | check-schema.js; lỗi 503; sản phẩm vẫn duyệt được | Cần quyền DB/log production, migration/content thật và xác minh deployment |

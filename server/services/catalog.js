@@ -1,4 +1,4 @@
-import { notFound } from '../errors.js'
+import { HttpError, notFound } from '../errors.js'
 import {
   PUBLIC_PRODUCT_STATUSES,
   presentProduct,
@@ -34,7 +34,16 @@ export async function getPublicBatch(repo, code, lang) {
 
 // D-96: bộ sưu tập kèm đèn lẻ và bộ "set" (nếu có). Bộ không có đèn công khai nào thì ẩn.
 export async function listPublicCollections(repo, lang) {
-  const [cols, { items: products }] = await Promise.all([repo.listCollections({ statuses: PUBLIC_PRODUCT_STATUSES }), listPublicProducts(repo, lang)])
+  let cols, products
+  try {
+    const result = await Promise.all([repo.listCollections({ statuses: PUBLIC_PRODUCT_STATUSES }), listPublicProducts(repo, lang)])
+    cols = result[0]
+    products = result[1].items
+  } catch (err) {
+    if (err.code !== 'CATALOG_NOT_READY') throw err
+    console.error('[catalog] collections schema not ready; apply migration 011 and reload PostgREST schema')
+    throw new HttpError(503, 'CATALOG_NOT_READY', 'Bộ sưu tập tạm thời chưa sẵn sàng. Bạn vẫn có thể xem các sản phẩm trong cửa hàng.')
+  }
   return { items: cols.map((c) => presentCollection(c, products, lang)).filter((c) => c.lamps.length || c.set) }
 }
 

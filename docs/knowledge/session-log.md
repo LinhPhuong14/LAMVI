@@ -1,5 +1,17 @@
 # Nhật ký phiên
 
+## 2026-10-06 — Checkout nguyên tử và dấu vết giữ kho (nhánh `fix/checkout-atomic-inventory`)
+
+**Yêu cầu**: bắt đầu sửa theo đề xuất rà soát BA/production, ưu tiên bộ sưu tập và an toàn đơn/kho.
+
+**Đã làm (T-59)**: migration 013 + RPC transaction cho giữ kho/coupon, tạo đơn/dòng hàng và dọn giỏ; kiểm lại giá/status/coupon và per-user limit dưới lock; `stock_reserved` phân biệt không theo dõi với số thực giữ. Huỷ mới opt-in `atomic_cancellation` để trạng thái và trả tài nguyên cùng commit; flag bảo vệ migrate-before-deploy khỏi double release với code cũ. Legacy ledger NULL không tự suy đoán stock; cần đối soát. Supabase adapter gọi một RPC, không bù trừ sau timeout không rõ commit. Collections thiếu schema nhận mã 503 riêng; thêm `scripts/check-schema.js` đọc-only.
+
+**Kiểm tra**: subagent độc lập T-11 thêm 12 regression HTTP; PostgreSQL 17 Docker chạy toàn bộ migrations, chạy lại 013, lỗi giữa order/items, rollback cancellation, legacy và compatibility, tranh hàng cuối/coupon, giới hạn coupon theo khách, double checkout, đảo thứ tự sản phẩm. Toàn suite: 150 file/2.979 test qua; sau bổ sung hai test marker rollout, nhóm Supabase/checkout độc lập 23/23 qua. Lint + build qua; bản SSR build local trả 200 ở `/`, `/en`, `/zh`, `/shop`, `/collections/sum-vay` và API sản phẩm/bộ sưu tập.
+
+**Còn lại**: production `lamvi.com.vn` chưa được sửa/deploy. API collections 500 chỉ có lỗi chung, không thể kết luận thiếu migration từ response đó. Chạy preflight với binding production qua kênh an toàn, áp dụng migration theo runbook và kiểm Preview trước merge master. Không đổ seed mẫu vào DB thật. Outbox mail, gắn lô, đổi trả và các mục UX là các đợt tiếp theo.
+
+---
+
 ## 2026-10-05 (phiên 5) — Địa chỉ 2 cấp và tồn kho (nhánh `feat/address-inventory`)
 
 **Yêu cầu người dùng**: "làm tiếp G-46 địa chỉ VN và tồn kho".

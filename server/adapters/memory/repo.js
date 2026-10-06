@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { collections, products, faqEntries, demoBatches } from '../../data/seed.js'
 import { RepoError } from '../repoErrors.js'
+import { couponRejectReason } from '../../domain/coupon.js'
 
 const clone = (v) => structuredClone(v)
 
@@ -53,6 +54,24 @@ export function createMemoryRepo(data = {}) {
   }
 
   const HIST = ['le_50', 'le_100', 'le_250', 'le_500', 'le_1000', 'le_2500', 'gt_2500']
+
+  const updateOrder = (id, values) => {
+    const o = byId(state.orders, id)
+    if (!o) return null
+    if (values.status === 'cancelled' && o.status !== 'cancelled') {
+      for (const i of o.items ?? []) {
+        const p = byId(state.products, i.productId)
+        if (p?.stock != null && i.stockReserved > 0) p.stock += i.stockReserved
+      }
+      const redemption = state.couponRedemptions.find((r) => r.orderId === id)
+      if (redemption) {
+        const c = byId(state.coupons, redemption.couponId)
+        if (c) c.usedCount = Math.max(0, c.usedCount - 1)
+        state.couponRedemptions = state.couponRedemptions.filter((r) => r.orderId !== id)
+      }
+    }
+    return update(state.orders, id, values)
+  }
 
   return {
     // --- Giám sát (D-52, D-53)
@@ -288,7 +307,35 @@ export function createMemoryRepo(data = {}) {
     },
 
     // --- Đơn hàng (FR-CHK-*, FR-ORD-*)
-    async createOrder(order, items, redemption) {
+    async createOrder(order, items, redemption, { now: checkoutNow = new Date(), fromCart = false } = {}) {
+      // No await between validation and commit: mirrors the Postgres transaction.
+      const cart = state.carts.get(order.userId)
+      if (fromCart) {
+        if (!cart?.size) throw new RepoError('CART_EMPTY')
+        if (cart.size !== items.length || items.some((i) => cart.get(i.productId)?.quantity !== i.quantity)) {
+          throw new RepoError('CART_HAS_UNAVAILABLE')
+        }
+      }
+      const need = new Map()
+      if (fromCart) for (const i of items) need.set(i.productId, (need.get(i.productId) ?? 0) + i.quantity)
+      for (const [id, qty] of need) {
+        const p = byId(state.products, id)
+        if (!p || p.status !== 'published') throw new RepoError('CART_HAS_UNAVAILABLE')
+        if (items.some((i) => i.productId === id && i.unitPrice !== p.price)) throw new RepoError('PRICE_CHANGED')
+        if (p.stock != null && p.stock < qty) throw new RepoError('OUT_OF_STOCK', p.slug)
+      }
+      const c = redemption ? byId(state.coupons, redemption.couponId) : null
+      if (redemption) {
+        const reason = couponRejectReason(c, {
+          subtotal: order.subtotal, now: checkoutNow, productIds: [...need.keys()],
+          userUses: state.couponRedemptions.filter((r) => r.couponId === c?.id && r.userId === order.userId).length,
+        })
+        if (reason) throw new RepoError(reason)
+        const keys = ['type', 'value', 'maxDiscount', 'minOrder', 'productIds', 'usageLimit', 'perUserLimit', 'startsAt', 'endsAt']
+        if (redemption.coupon && keys.some((k) => JSON.stringify(c[k] ?? null) !== JSON.stringify(redemption.coupon[k] ?? null))) {
+          throw new RepoError('PRICE_CHANGED')
+        }
+      }
       if (state.orders.some((o) => o.code === order.code)) throw new RepoError('CONFLICT', 'code')
       const row = {
         id: randomUUID(),
@@ -299,9 +346,15 @@ export function createMemoryRepo(data = {}) {
         cancelledAt: null,
         cancelReason: null,
         ...order,
-        items: items.map((i) => ({ id: randomUUID(), ...i })),
+        items: items.map((i) => ({ id: randomUUID(), ...i, stockReserved: fromCart && byId(state.products, i.productId)?.stock != null ? i.quantity : 0 })),
       }
+      for (const [id, qty] of need) {
+        const p = byId(state.products, id)
+        if (p.stock != null) p.stock -= qty
+      }
+      if (c) c.usedCount += 1
       state.orders.push(row)
+      if (fromCart) state.carts.delete(order.userId)
       if (redemption) {
         state.couponRedemptions.push({ ...redemption, orderId: row.id, createdAt: now() })
       }
@@ -341,12 +394,12 @@ export function createMemoryRepo(data = {}) {
       )
     },
     async updateOrder(id, values) {
-      return update(state.orders, id, values)
+      return updateOrder(id, values)
     },
     async updateOrderIfStatus(id, expectedStatus, values) {
       const o = byId(state.orders, id)
       if (!o || o.status !== expectedStatus) return null
-      return update(state.orders, id, values)
+      return updateOrder(id, values)
     },
 
     // --- NFR-AUD-001
