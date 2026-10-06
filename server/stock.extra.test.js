@@ -136,11 +136,11 @@ describe('Trả hàng không bị hai lần', () => {
 
 describe('Rò rỉ kho khi lỗi hạ tầng giữa chừng', () => {
   // Lỗi đã sửa (tìm thấy ở T-11)
-  it('claimCoupon ném lỗi (DB) sau khi đã giữ chỗ → kho phải được trả', async () => {
+  it('checkout transaction lỗi (DB) → kho, coupon và giỏ giữ nguyên', async () => {
     await setStock('den-nguyet', 3)
     await repo.createCoupon({ code: 'LOI', type: 'percent', value: 10, status: 'active', usageLimit: 5, perUserLimit: 5 })
     await add('den-nguyet', 1)
-    vi.spyOn(repo, 'claimCoupon').mockRejectedValueOnce(new Error('db down'))
+    vi.spyOn(repo, 'createOrder').mockRejectedValueOnce(new Error('db down'))
     const r = await order({ couponCode: 'LOI' })
     expect(r.status).toBeGreaterThanOrEqual(500)
     expect(await stockOf('den-nguyet')).toBe(3)

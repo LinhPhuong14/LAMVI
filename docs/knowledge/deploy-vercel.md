@@ -1,5 +1,7 @@
 # Triển khai Vercel
 
+Production hiện tại: `https://www.lamvi.com.vn` (`lamvi.com.vn` chuyển hướng sang www, kiểm ngày 06/10/2026). Các tham chiếu `lamvi.vercel.app` bên dưới là hướng dẫn domain cũ; dùng domain production thật khi cấu hình URL/OAuth/mail.
+
 Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy tắc deploy duy nhất; `CLAUDE.md` chỉ tóm tắt.
 
 ## Cách chạy trên Vercel
@@ -71,3 +73,22 @@ Gói `@vercel/analytics` được nhúng ở `src/main.jsx`. Bật **Analytics**
 16. **Thông báo đơn hàng và banner thư (T-56)**: dùng chung `MAIL_FROM` + `RESEND_API_KEY`; không có biến mới. `PUBLIC_SITE_URL` phải là domain https công khai vì banner nằm ở `{PUBLIC_SITE_URL}/images/mail/banner.jpg` (Gmail chỉ tải ảnh công khai). Dựng lại banner: `npm run gen:mail-banner` (python3 + Pillow). Gói Resend miễn phí 100 thư/ngày. `PWNED_CHECK` nay mặc định tắt.
 17. **Chân thư doanh nghiệp (T-56)**: đặt ở Vercel (Production) các biến `MAIL_COMPANY_LEGAL` (tên pháp nhân + MST), `MAIL_COMPANY_ADDRESS`, `MAIL_SUPPORT_EMAIL`, `MAIL_SUPPORT_PHONE`, `MAIL_SUPPORT_HOURS`, `MAIL_FACEBOOK_URL`/`MAIL_INSTAGRAM_URL`/`MAIL_TIKTOK_URL`/`MAIL_ZALO_URL`/`MAIL_YOUTUBE_URL`, tuỳ chọn `MAIL_BRAND_NAME` (mặc định LAMVI). Mục nào trống thì **không hiện** — code không có giá trị mặc định về địa chỉ/điện thoại/MST. Có `MAIL_SUPPORT_EMAIL` hoặc điện thoại thì chân thư nói "cần hỗ trợ hãy liên hệ…", không có thì nói "không trả lời thư này". Đổi biến cần redeploy. Thư báo đổi mật khẩu luôn không có liên kết (kể cả mạng xã hội, mailto).
 
+## Checkout nguyên tử và lỗi collections — v0.37 (T-59)
+
+1. Kiểm lịch sử migration trên Supabase; áp dụng các migration còn thiếu theo thứ tự. **Không chạy lại toàn bộ 001–012 một cách mù quáng**, vì các migration cũ không phải tất cả đều idempotent. Đặc biệt cần 010 (QR/media/profile), 011 (collections), 012 (địa chỉ/kho) và **013 `20261006000013_atomic_checkout.sql` trước khi deploy code mới**. 013 có thể chạy lại an toàn và thông báo PostgREST reload schema. Không nạp `seed.sql` mẫu lên DB đang bán hàng.
+2. Chạy preflight bằng binding của môi trường đích qua kênh an toàn (không gửi key trong chat): `node --env-file-if-exists=.env scripts/check-schema.js`. Mỗi bảng/cột và RPC phải PASS. RPC thử giỏ rỗng, bị từ chối trước mọi write; không gọi thanh toán hay gửi mail. Nếu FAIL, kiểm mã lỗi, migration và quyền service role; response 500 chung của `/api/collections` không tự chứng minh thiếu bảng.
+3. 013 thêm `stock_reserved` và marker `atomic_cancellation`. Marker mặc định false: code cũ vẫn dùng release thủ công, không bị trigger trả thêm một lần sau khi chỉ chạy migration. Code mới opt-in khi huỷ. Hoàn tất chuyển traffic sang bản mới, không rollback code cũ vào quy trình checkout mới nếu chưa đánh giá ledger/compatibility.
+4. Đơn trước 013 có `stock_reserved NULL`: không đủ bằng chứng đã giữ kho hay chưa. Code mới không tự cộng cho các dòng này; đối soát tồn thực và lịch sử trước khi sửa tay. Truy vấn danh sách cần xử lý (SQL editor):
+
+   ```sql
+   select o.code, o.status, i.slug, i.quantity, i.product_id
+   from public.orders o join public.order_items i on i.order_id = o.id
+   where i.stock_reserved is null
+     and o.status not in ('delivered', 'delivery_failed')
+   order by o.created_at, o.code;
+   ```
+
+   Không backfill `stock_reserved=quantity` dựa vào stock hiện tại. Nếu đơn cũ bị huỷ bằng code mới, log DB có cảnh báo đối soát; coupon vẫn được trả atomic từ redemption thực.
+5. Test Preview với Supabase test đã migration: sản phẩm/collections 200, tạo đơn COD, payOS với tài khoản test được cho phép, huỷ/hết hạn, hai checkout tranh món cuối. Trên local chạy `npm test -- --maxWorkers=2`, `npm run lint`, `npm run build`; kiểm DB thật riêng bằng `python3 scripts/test-checkout-postgres.py` (cần Docker, tự tạo/xoá container, không chạm DB production).
+6. Chỉ merge vào `master` sau khi schema production đã đạt preflight và Preview được kiểm. Merge `master` kích hoạt deploy production, vì vậy không tự merge khi còn thiếu quyền xác minh migration. Sau deploy kiểm `/`, `/en`, `/zh`, `/api/products`, `/api/collections`, SSR và asset; xác minh luồng checkout được cho phép, không tạo giao dịch hoặc gửi thư cho khách thật chỉ để thử.
+7. Nếu collections thiếu schema, code mới trả 503 `CATALOG_NOT_READY` và SSR noindex/status 503; shop vẫn hiển thị sản phẩm. Đây là chẩn đoán có kiểm chứng, **không thay thế** việc chuẩn bị bảng và dữ liệu bộ sưu tập thật. Permission/network lỗi không được che thành danh sách rỗng.

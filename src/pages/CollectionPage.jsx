@@ -34,7 +34,7 @@ export default function CollectionPage() {
     const nf = res.error.status === 404
     return (
       <section className="page-section">
-        <Seo title={nf ? t('collection.notFound') : t('products.error')} noindex status={nf ? 404 : 500} />
+        <Seo title={nf ? t('collection.notFound') : t('products.error')} noindex status={nf ? 404 : res.error.status >= 500 ? res.error.status : 500} />
         {back}
         <h1 className="page-title">{nf ? t('collection.notFound') : t('products.error')}</h1>
       </section>

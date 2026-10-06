@@ -308,3 +308,10 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 - IT: `/it` — chỉ tiếng Việt (D-51).
 - Trang con: `/` · `/products/:slug` · `/lo/:code` · `/qr/:token` (riêng tư, noindex) · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
 - `AuthProvider`: access token + user trong `localStorage` (`moc.session`, không có refresh token — T-49), `authedApi` tự gọi `/auth/refresh` (cookie) một lần khi gặp 401.
+
+
+## Checkout transaction (T-59)
+
+`orders/service.js` tính quote và payload; `repo.createOrder` commit qua RPC `create_checkout_order`. Postgres giữ kho/coupon, order_items snapshots, redemption và consumption của cart trong một transaction. Memory adapter mô phỏng khi `fromCart:true`; việc chèn snapshot fixture không có cart dùng cho test lịch sử.
+
+Schema 013 thêm `order_items.stock_reserved` và `orders.atomic_cancellation`. Các lệnh huỷ adapter mới set marker ngay trong conditional UPDATE; trigger `orders_release_on_cancel` trả tài nguyên atomic. Public order presentation không trả các trường vận hành này. Ledger legacy NULL cần runbook đối soát, không dựa vào tồn kho hiện tại để suy luận quá khứ.

@@ -244,10 +244,10 @@ describe('Coupon: giữ lượt, trả lượt, tình huống đồng thời (D-
 
   it('admin tắt coupon ngay trước khi giữ lượt → không tạo đơn, không giữ lượt', async () => {
     const c = await coupon({ code: 'TATGIUA', type: 'amount', value: 100_000 })
-    const claim = repo.claimCoupon
-    repo.claimCoupon = async (id) => {
-      await repo.updateCoupon(id, { status: 'disabled' })
-      return claim(id)
+    const create = repo.createOrder.bind(repo)
+    repo.createOrder = async (...args) => {
+      await repo.updateCoupon(c.id, { status: 'disabled' })
+      return create(...args)
     }
     await addToCart('den-nguyet', 1)
     const r = await createOrder({ couponCode: 'TATGIUA' })
