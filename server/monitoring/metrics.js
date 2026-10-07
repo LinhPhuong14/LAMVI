@@ -8,7 +8,23 @@ const TOKENISH = /\b[A-Za-z0-9_-]{24,}\b/g
 
 /** G-28: che email, SĐT (redactPii) và các chuỗi giống token trong thông điệp lỗi. */
 export function redactSecrets(text) {
-  return redactPii(text).replace(TOKENISH, '[token]')
+  let clean = String(text)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const decoded = clean.replace(/(?:%[0-9a-f]{2})+/gi, encoded => {
+      try { return decodeURIComponent(encoded) } catch { return '[encoded]' }
+    })
+    if (decoded === clean) break
+    clean = decoded
+  }
+  return redactPii(clean)
+    .replace(/\+\d(?:[\s.()-]*\d){7,14}\b|\b\d{10,15}\b/g, '[phone]')
+    .replace(TOKENISH, '[token]')
+}
+
+// URI segments can contain percent-encoded PII outside the QR/reset routes.
+// Decode before redaction, but never let a malformed escape break a response.
+export function redactErrorPath(path) {
+  return sanitizePath(path).slice(0, 200)
 }
 
 export const BOUNDS = [50, 100, 250, 500, 1000, 2500]
@@ -66,9 +82,10 @@ export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flus
   const batches = []
 
   function record({ method, route, status, ms, path, code, message }) {
-    if (!buffer.has(`${bucketOf(now())}|${method}|${route}|${status}`) && buffer.size >= maxRows) return
-    const bucket = bucketOf(now())
+    const at = now()
+    const bucket = bucketOf(at)
     const k = `${bucket}|${method}|${route}|${status}`
+    if (!buffer.has(k) && buffer.size >= maxRows) return
     const row = buffer.get(k) ?? emptyRow(bucket, method, route, status)
     row.count += 1
     row.total_ms += ms
@@ -81,12 +98,12 @@ export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flus
       // - Đường dẫn: che đoạn bí mật (token trang QR lời chúc, token đặt lại mật khẩu).
       // - Thông điệp lỗi có thể chứa email/SĐT khách (lỗi từ DB, từ cổng thanh toán) → che.
       errors.push({
-        at: new Date(now()).toISOString(),
+        at: new Date(at).toISOString(),
         method,
         route,
-        path: sanitizePath(path),
+        path: redactErrorPath(path),
         status,
-        code: code ?? null,
+        code: code == null ? null : redactSecrets(String(code)).slice(0, 80),
         message: message ? redactSecrets(String(message)).slice(0, 300) : null,
       })
     }
@@ -109,7 +126,7 @@ export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flus
         route,
         status: res.statusCode,
         ms,
-        path: req.originalUrl.split('?')[0].slice(0, 200),
+        path: req.originalUrl.split('?')[0],
         code: res.locals.errorCode,
         message: res.locals.errorMessage,
       })

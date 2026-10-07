@@ -99,9 +99,9 @@ describe('G-28 — sanitizePath cho nhật ký lỗi', () => {
   })
 
   // sanitizePath KHÔNG cắt độ dài — việc cắt do middleware số liệu làm (slice 200)
-  it('đường dẫn rất dài được trả nguyên vẹn (cắt là việc của middleware)', () => {
+  it('đường dẫn dài giống token bị che ngay trong sanitizer chung', () => {
     const long = `/api/${'a'.repeat(5000)}`
-    expect(sanitizePath(long)).toBe(long)
+    expect(sanitizePath(long)).toBe('/api/[token]')
   })
 })
 

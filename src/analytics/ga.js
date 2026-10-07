@@ -44,13 +44,37 @@ const SECRET_SEGMENT = [
 export function sanitizePath(pathname) {
   if (typeof pathname !== 'string' || !pathname) return '/'
   // Gộp dấu "/" lặp trước khi so mẫu: `//qr/token` mở cùng trang nhưng lách được mẫu bên dưới
-  const path = pathname.split('?')[0].split('#')[0].replace(/\/{2,}/g, '/') || '/'
+  let path = pathname.split('?')[0].split('#')[0]
+  // Encoded route names and delimiters must not bypass QR/reset token matching.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const decoded = decodeURIComponent(path)
+      if (decoded === path) break
+      path = decoded
+    } catch {
+      const decoded = path.replace(/(?:%[0-9a-f]{2})+/gi, encoded => {
+        try { return decodeURIComponent(encoded) } catch { return '[encoded]' }
+      })
+      if (decoded === path) break
+      path = decoded
+    }
+  }
+  path = path.split('?')[0].split('#')[0].replace(/\/{2,}/g, '/') || '/'
   for (const { re, label } of SECRET_SEGMENT) {
     const m = path.match(re)
     // Tiền tố ngôn ngữ về chữ thường để GA gộp đúng một trang (URL in trên đèn có thể viết HOA)
     if (m) return `${(m[1] ?? '').toLowerCase()}${label}`
   }
-  return path
+  // Unknown/public URIs can still contain user-supplied PII or opaque tokens.
+  // Keep normal product slugs/order codes, never collect these segments verbatim.
+  return path.split('/').map(segment => (segment.includes('@')
+    ? segment.replace(/[^\s@]+@[^\s@]+\.[^\s@]+/g, '[email]') : segment)
+    .replace(/\(?\+?84\)?(?:[\s.()-]*\d){9,10}\b|\b0(?:[\s.-]*\d){9,10}\b/g, '[phone]')
+    .replace(/\+\d(?:[\s.()-]*\d){7,14}\b|\b\d{10,15}\b/g, '[phone]')
+    .replace(/\b[A-Za-z0-9_-]{24,}\b/g, '[token]')
+    .replace(/[^/]*%[^/]*/g, '[encoded]')
+    .split('').filter(char => char.charCodeAt(0) >= 32 && char.charCodeAt(0) !== 127).join('')
+  ).join('/').slice(0, 200)
 }
 
 // Chỉ cho qua giá trị nguyên thuỷ và tên tham số an toàn; chuỗi bị cắt để không lọt nội dung dài
