@@ -41,6 +41,6 @@ describe('phân loại đường dẫn SSR', () => {
   })
 
   it('key dữ liệu khớp useApi', () => {
-    expect(dataKeysFor({ kind: 'product', lang: 'vi', slug: 'a b' })).toEqual(['/products', '/products/a%20b'])
+    expect(dataKeysFor({ kind: 'product', lang: 'vi', slug: 'a b' })).toEqual(['/products', '/site', '/products/a%20b'])
   })
 })

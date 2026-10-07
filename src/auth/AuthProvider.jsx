@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useHydrated } from '../lib/hydration.js'
 import { api, ApiError } from '../api/client.js'
 import { AuthContext, loadSession, saveSession } from './context.js'
 
@@ -15,7 +16,9 @@ function initialSession() {
 }
 
 export default function AuthProvider({ children }) {
-  const [session, setSession] = useState(initialSession)
+  const hydrated = useHydrated()
+  const restoreStoredSession = useRef(!hydrated)
+  const [session, setSession] = useState(() => hydrated ? initialSession() : null)
   const sessionRef = useRef(session)
   const refreshing = useRef(null)
 
@@ -24,6 +27,14 @@ export default function AuthProvider({ children }) {
     saveSession(next)
     setSession(next)
   }, [])
+
+  useEffect(() => {
+    if (hydrated && restoreStoredSession.current) {
+      restoreStoredSession.current = false
+      // The public SSR header is anonymous. Restore only after it has hydrated.
+      queueMicrotask(() => update(initialSession()))
+    }
+  }, [hydrated, update])
 
   const login = useCallback(
     async (email, password) => {

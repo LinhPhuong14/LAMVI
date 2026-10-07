@@ -344,12 +344,12 @@ describe('SSR — __INITIAL_DATA__', () => {
   }
 
   it('chỉ chứa key trang cần (dataKeysFor)', async () => {
-    await expectKeys('/', ['/products|vi', '/faq|vi'])
-    await expectKeys('/en/products/den-vong', ['/products|en', '/products/den-vong|en'])
-    await expectKeys('/zh/lo/DEMO-2026-01', ['/products|zh', '/batches/DEMO-2026-01|zh'])
-    await expectKeys('/abc', ['/products|vi'])
+    await expectKeys('/', ['/products|vi', '/site|vi', '/faq|vi'])
+    await expectKeys('/en/products/den-vong', ['/products|en', '/site|en', '/products/den-vong|en'])
+    await expectKeys('/zh/lo/DEMO-2026-01', ['/products|zh', '/site|zh', '/batches/DEMO-2026-01|zh'])
+    await expectKeys('/abc', ['/products|vi', '/site|vi'])
     const route = classifyPath('/en/products/den-vong')
-    expect(dataKeysFor(route)).toEqual(['/products', '/products/den-vong'])
+    expect(dataKeysFor(route)).toEqual(['/products', '/site', '/products/den-vong'])
   })
 
   it('không chứa trường nội bộ (id sản phẩm, status, videoPath, sortOrder, id lô)', async () => {

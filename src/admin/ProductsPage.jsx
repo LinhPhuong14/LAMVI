@@ -10,7 +10,7 @@ import PageHead from './PageHead.jsx'
 import { S, fmt } from './strings.js'
 import { uploadFile } from './uploadFile.js'
 
-const EMPTY = { slug: '', kind: 'single', status: 'draft', price: '', stock: '', tone: '', sortOrder: 0, name: {}, description: {}, badge: {}, imageAlt: {} }
+const EMPTY = { collectionSlug: '', pieceOrder: 0, slug: '', kind: 'single', status: 'draft', price: '', stock: '', tone: '', sortOrder: 0, name: {}, description: {}, badge: {}, imageAlt: {} }
 
 // Giới hạn phía client chỉ để báo sớm; server mới là nơi quyết định (MAX_IMAGE_MB)
 const MAX_IMAGE_MB = 5
@@ -98,13 +98,16 @@ function toBody(form) {
     stock: form.stock === '' || form.stock === null ? null : Number(form.stock),
     sortOrder: Number(form.sortOrder) || 0,
     tone: form.tone || null,
+    collectionSlug: form.collectionSlug || null,
+    pieceOrder: Number(form.pieceOrder),
   }
 }
 
 function ProductForm({ initial, onDone, onCancel, onImageChange }) {
+  const collections = useAdminList('/admin/collections')
   const { authedApi } = useAuth()
   const { t } = useI18n()
-  const [form, setForm] = useState(() => ({ ...EMPTY, ...initial, tone: initial?.tone ?? '', stock: initial?.stock ?? '', name: initial?.name ?? {}, description: initial?.description ?? {}, badge: initial?.badge ?? {}, imageAlt: initial?.imageAlt ?? {} }))
+  const [form, setForm] = useState(() => ({ ...EMPTY, ...initial, tone: initial?.tone ?? '', collectionSlug: initial?.collectionSlug ?? '', stock: initial?.stock ?? '', name: initial?.name ?? {}, description: initial?.description ?? {}, badge: initial?.badge ?? {}, imageAlt: initial?.imageAlt ?? {} }))
   const { pending, error, fields, run } = useSubmit()
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
@@ -146,6 +149,13 @@ function ProductForm({ initial, onDone, onCancel, onImageChange }) {
             </option>
           ))}
         </Field>
+        <Field as="select" label={S.collections.title} value={form.collectionSlug} onChange={set('collectionSlug')} error={fields.collectionSlug} disabled={collections.status !== 'ok'}>
+          <option value="">{S.collections.independent}</option>
+          {collections.items?.map((c) => <option key={c.id} value={c.slug}>{c.name.vi} ({c.status})</option>)}
+          {form.collectionSlug && !collections.items?.some((c) => c.slug === form.collectionSlug) && <option value={form.collectionSlug}>{form.collectionSlug} {S.collections.legacy}</option>}
+        </Field>
+        {collections.status === 'error' && <p className="notice error" role="alert">{S.collections.assignmentError}</p>}
+        <Field label={S.collections.pieceOrder} type="number" min="0" max="1000" step="1" value={form.pieceOrder} onChange={set('pieceOrder')} error={fields.pieceOrder} />
         <Field label={S.products.stock} type="number" min="0" step="1" value={form.stock} onChange={set('stock')} error={fields.stock} hint={S.products.stockHint} />
         <Field label={S.common.sortOrder} type="number" value={form.sortOrder} onChange={set('sortOrder')} error={fields.sortOrder} />
       </div>

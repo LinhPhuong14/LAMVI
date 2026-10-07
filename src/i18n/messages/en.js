@@ -1,5 +1,6 @@
 // Bản dịch do đội dev soạn — chờ PO duyệt (ba-spec §31.2 G-14).
 export default {
+  routeLoad: { error: 'This page could not load. Reload to continue.', reload: 'Reload page' },
   meta: {
     shopTitle: 'Shop — LAMVI · handmade dó paper lanterns',
     shopDescription: 'All LAMVI handmade dó paper lanterns: filter by type, each with a thank-you card QR message and the video of how the batch was made.',
@@ -197,6 +198,7 @@ export default {
     error: 'Could not load the FAQ.',
   },
   footer: {
+    newsUnavailable: 'Newsletter sign-up is not available yet. Follow LAMVI through our official channels.',
     tagline: 'Handmade dó paper lanterns — keeping memories alight.',
     products: 'Products',
     support: 'Support',
@@ -407,6 +409,7 @@ export default {
     mayHint: 'Tap Mây in the corner of the screen to ask about lanterns, messages or delivery.',
   },
   errors: {
+    CHECKOUT_KEY_CONFLICT: 'Checkout details have changed. Review your cart before trying again.',
     CANNOT_MANAGE_SELF: 'You cannot lock or change the role of your own account.',
     LAST_IT: 'At least one active IT account must remain.',
     EMAIL_NOT_REGISTERED: 'This email is not registered with LAMVI.',
@@ -497,6 +500,9 @@ export default {
     END_BEFORE_START: 'The end date must come after the start date.',
   },
   checkout: {
+    geoEmpty: 'No wards found',
+    geoLoading: 'Loading address list…',
+    retry: 'Try again',
     title: 'Checkout',
     loading: 'Loading…',
     emptyCart: 'Your cart is empty.',
@@ -742,7 +748,7 @@ export default {
           'Gift recipients view a greeting only through the private link on the card, without creating an account.'
         ] },
         { h: 'Security', items: [
-          'Connections are encrypted (HTTPS). Passwords are never stored in plain text and are checked against lists of leaked passwords.',
+          'Connections are encrypted (HTTPS). Passwords are never stored in plain text. Checks against lists of leaked passwords apply when that feature is enabled.',
           'Sessions use secure cookies; administrators only access data needed for their work and important changes are logged.'
         ] },
         { h: 'Changes to this policy', items: [

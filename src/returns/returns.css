@@ -1,0 +1,15 @@
+.returns-panel { display: grid; gap: 1rem; }
+.returns-panel > h1, .returns-panel > h2, .returns-panel > p { margin: 0; }
+.returns-panel article { display: grid; gap: .8rem; margin-bottom: 0; }
+.returns-panel form, .returns-panel fieldset { display: grid; gap: 1rem; }
+.returns-panel fieldset { min-width: 0; border: 1px solid var(--brown-line); border-radius: var(--r-sm); padding: 1rem; }
+.returns-panel label { display: grid; gap: .4rem; font-size: .92rem; }
+.returns-panel input, .returns-panel select, .returns-panel textarea { font: inherit; padding: .7rem .8rem; border: 1px solid var(--brown-line); border-radius: var(--r-sm); background: var(--white); color: var(--ink); max-width: 100%; box-sizing: border-box; }
+.returns-panel input[type='checkbox'] { width: auto; }
+.returns-panel textarea { min-height: 6rem; resize: vertical; }
+.returns-panel :is(input,select,textarea,button):focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+.returns-panel nav { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.returns-panel button { min-height: 44px; }
+.returns-panel [role='alert'] { border-left: 3px solid var(--ember); padding-left: .8rem; }
+
+.returns-panel video { width: 100%; max-height: 30rem; border-radius: var(--r-sm); background: var(--ink); }

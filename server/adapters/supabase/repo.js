@@ -103,6 +103,9 @@ const toOrder = (r) => ({
   provinceCode: r.province_code ?? null,
   wardCode: r.ward_code ?? null,
   note: r.note,
+  checkoutIdempotencyKey: r.checkout_idempotency_key ?? null,
+  checkoutFingerprint: r.checkout_fingerprint ?? null,
+  checkoutReplayed: r.checkout_replayed === true,
   paymentMethod: r.payment_method,
   paymentStatus: r.payment_status,
   paymentExpiresAt: r.payment_expires_at,
@@ -156,6 +159,7 @@ const toGiftMessage = (r) => ({
 const GIFT_COLS = { text: 'text', textLang: 'text_lang', voicePath: 'voice_path', voiceType: 'voice_type', videoPath: 'video_path', videoType: 'video_type', confirmedAt: 'confirmed_at', mediaDeletedAt: 'media_deleted_at', translations: 'translations' }
 
 // camelCase → snake_case cho các trường được phép ghi
+const COLLECTION_COLS = { slug: 'slug', status: 'status', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', storyTitle: 'story_title', story: 'story' }
 const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge', imageUrl: 'image_url', imagePath: 'image_path', imageAlt: 'image_alt', stock: 'stock', collectionSlug: 'collection_slug', pieceOrder: 'piece_order' }
 const FAQ_COLS = { sortOrder: 'sort_order', isPublished: 'is_published', question: 'question', answer: 'answer' }
 const BATCH_COLS = { code: 'code', status: 'status', videoUrl: 'video_url', videoPath: 'video_path', producedOn: 'produced_on', title: 'title', story: 'story' }
@@ -177,10 +181,11 @@ function toRow(obj, cols) {
 }
 
 // 23505 = unique_violation của Postgres
-const UNIQUE_FIELD = { products_slug_key: 'slug', batches_code_key: 'code', coupons_code_key: 'code', orders_code_key: 'code' }
+const UNIQUE_FIELD = { collections_slug_key: 'slug', products_slug_key: 'slug', batches_code_key: 'code', coupons_code_key: 'code', orders_code_key: 'code' }
 
 function unwrap({ data, error }) {
   if (error) {
+    if (error.code === '23503' && error.message?.includes('products_collection_slug_fkey')) throw new RepoError('COLLECTION_IN_USE', 'collectionSlug')
     if (error.code === '23505') {
       const constraint = Object.keys(UNIQUE_FIELD).find((c) => error.message?.includes(c))
       throw new RepoError('CONFLICT', UNIQUE_FIELD[constraint])
@@ -208,6 +213,12 @@ export function createSupabaseRepo(client) {
       unwrap(await client.from('products').select('id').limit(1))
       return true
     },
+    async recordApiMetricBatch(batchId, rows, errors) {
+      unwrap(await client.rpc('record_api_metric_batch', { batch_id: batchId, rows, errors }))
+    },
+    async aggregateApiMetrics({ since }) {
+      return unwrap(await client.rpc('aggregate_api_metrics', { since_at: since })) ?? []
+    },
     async recordApiMetrics(rows) {
       // Cộng dồn nguyên tử trong DB (nhiều server cùng ghi một phút)
       unwrap(await client.rpc('record_api_metrics', { rows }))
@@ -221,6 +232,7 @@ export function createSupabaseRepo(client) {
     async deleteApiMetricsBefore(before) {
       unwrap(await client.from('api_metrics').delete().lt('bucket', before))
       unwrap(await client.from('api_errors').delete().lt('at', before))
+      unwrap(await client.from('api_metric_batches').delete().lt('created_at', before))
     },
     async recordApiErrors(rows) {
       if (rows.length) unwrap(await client.from('api_errors').insert(rows))
@@ -249,6 +261,15 @@ export function createSupabaseRepo(client) {
     async getCart(userId) {
       const rows = unwrap(await client.from('cart_items').select('*').eq('user_id', userId).order('added_at'))
       return rows.map((r) => ({ productId: r.product_id, quantity: r.quantity, addedAt: r.added_at }))
+    },
+    async mutateCart(userId, mode, lines) {
+      const { data, error } = await client.rpc('mutate_cart', { p_user: userId, p_mode: mode, p_lines: lines })
+      if (error) {
+        const codes = ['PRODUCT_UNAVAILABLE', 'PRODUCT_UNAVAILABLE_INCREASE', 'OUT_OF_STOCK', 'CART_FULL', 'INVALID_CART_MUTATION']
+        if (error.code === 'P0001' && codes.includes(error.message)) throw new RepoError(error.message, error.details)
+        throw error
+      }
+      return data.map((row) => ({ productId: row.product_id, quantity: row.quantity, addedAt: row.added_at }))
     },
     async setCartItem(userId, productId, quantity) {
       unwrap(
@@ -350,6 +371,7 @@ export function createSupabaseRepo(client) {
       const { data, error } = await client.rpc('create_checkout_order', {
         p_order: {
           code: order.code, user_id: order.userId, status: order.status,
+          checkout_idempotency_key: order.checkoutIdempotencyKey ?? null, checkout_fingerprint: order.checkoutFingerprint ?? null,
           order_kind: order.orderKind, has_message: order.hasMessage, qr_lang: order.qrLang,
           recipient_is_self: order.recipientIsSelf, recipient_name: order.recipientName,
           recipient_phone: order.recipientPhone, address_line: order.addressLine,
@@ -370,7 +392,7 @@ export function createSupabaseRepo(client) {
         }) : null,
       })
       if (error) {
-        const codes = ['OUT_OF_STOCK', 'CART_EMPTY', 'CART_HAS_UNAVAILABLE', 'PRICE_CHANGED',
+        const codes = ['CHECKOUT_KEY_CONFLICT', 'OUT_OF_STOCK', 'CART_EMPTY', 'CART_HAS_UNAVAILABLE', 'PRICE_CHANGED',
           'COUPON_NOT_FOUND', 'COUPON_INACTIVE', 'COUPON_NOT_STARTED', 'COUPON_EXPIRED',
           'COUPON_USED_UP', 'COUPON_USER_LIMIT', 'COUPON_MIN_ORDER', 'COUPON_NOT_APPLICABLE']
         if (error.code === 'P0001' && codes.includes(error.message)) {
@@ -379,6 +401,10 @@ export function createSupabaseRepo(client) {
         throw error
       }
       return toOrder(data)
+    },
+    async getOrderByCheckoutKey(userId, key) {
+      const row = unwrap(await client.from('orders').select('*, order_items(*)').eq('user_id', userId).eq('checkout_idempotency_key', key).maybeSingle())
+      return row ? toOrder(row) : null
     },
     async getOrderById(id) {
       const r = unwrap(await client.from('orders').select('*, order_items(*)').eq('id', id).maybeSingle())
@@ -428,15 +454,13 @@ export function createSupabaseRepo(client) {
      * Đổi trạng thái chỉ khi trạng thái hiện tại đúng như mong đợi (khoá lạc quan) — hai request
      * đồng thời (khách huỷ + webhook PAID) không được cùng thành công.
      */
-    async updateOrderIfStatus(id, expectedStatus, values) {
-      const data = unwrap(
-        await client
-          .from('orders')
-          .update({ ...toRow(values, ORDER_COLS), ...(values.status === 'cancelled' ? { atomic_cancellation: true } : {}) })
-          .eq('id', id)
-          .eq('status', expectedStatus)
-          .select('*, order_items(*)'),
-      )
+    async updateOrderIfStatus(id, expectedStatus, values, expectedPaymentStatus, expectedPaymentFlag) {
+      let query = client.from('orders')
+        .update({ ...toRow(values, ORDER_COLS), ...(values.status === 'cancelled' ? { atomic_cancellation: true } : {}) })
+        .eq('id', id).eq('status', expectedStatus)
+      if (expectedPaymentStatus !== undefined) query = query.eq('payment_status', expectedPaymentStatus)
+      if (expectedPaymentFlag !== undefined) query = query.eq('payment_flag', expectedPaymentFlag)
+      const data = unwrap(await query.select('*, order_items(*)'))
       return data.length ? toOrder(data[0]) : null
     },
 
@@ -474,6 +498,11 @@ export function createSupabaseRepo(client) {
       }))
     },
 
+    async getProductsByIds(ids) {
+      if (!ids.length) return []
+      const rows = unwrap(await client.from('products').select('*').in('id', [...new Set(ids)]))
+      return rows.map(toProduct)
+    },
     getProductById: (id) => one('products', id, toProduct),
     createProduct: (p) => insert('products', toRow(p, PRODUCT_COLS), toProduct),
     updateProduct: (id, p) => patch('products', id, toRow(p, PRODUCT_COLS), toProduct),
@@ -498,7 +527,12 @@ export function createSupabaseRepo(client) {
       return unwrap(await q).map(toProduct)
     },
 
-    // D-96: bộ sưu tập (chỉ đọc; nội dung đặt bằng seed/SQL — G-70)
+    getCollectionById: (id) => one('collections', id, toCollection),
+    createCollection: (c) => insert('collections', toRow(c, COLLECTION_COLS), toCollection),
+    updateCollection: (id, c) => patch('collections', id, toRow(c, COLLECTION_COLS), toCollection),
+    deleteCollection: (id) => del('collections', id),
+
+    // D-96: bộ sưu tập
     async listCollections({ statuses } = {}) {
       let q = client.from('collections').select('*').order('sort_order')
       if (statuses) q = q.in('status', statuses)
@@ -607,17 +641,11 @@ export function createSupabaseRepo(client) {
       unwrap(await client.from('gift_messages').update({ confirmed_at: at }).eq('order_id', orderId).is('confirmed_at', null))
       return this.getGiftMessage(orderId)
     },
-    async listGiftMediaCandidates() {
-      const rows = unwrap(
-        await client
-          .from('gift_messages')
-          .select('*, orders(id, status, delivered_at)')
-          .is('media_deleted_at', null)
-          .or('voice_path.not.is.null,video_path.not.is.null'),
-      )
+    async listGiftMediaCandidates({ before = new Date().toISOString(), after = null, limit = 100 } = {}) {
+      const rows = unwrap(await client.rpc('list_expired_gift_media', { before_at: before, after_id: after, batch_limit: limit })) ?? []
       return rows.map((r) => ({
-        message: toGiftMessage(r),
-        order: { id: r.orders.id, status: r.orders.status, deliveredAt: r.orders.delivered_at },
+        message: toGiftMessage(r.message),
+        order: { id: r.order.id, status: r.order.status, deliveredAt: r.order.delivered_at },
       }))
     },
   }

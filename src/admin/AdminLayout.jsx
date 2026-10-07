@@ -11,8 +11,10 @@ import { S } from './strings.js'
 // Thứ tự theo tần suất dùng hằng ngày: đơn hàng trước, cấu hình sau
 const NAV = [
   ['/admin/orders', 'orders', OrdersIcon],
+  ['/admin/returns', 'returns', OrdersIcon],
   ['/admin/users', 'users', UsersIcon],
   ['/admin/products', 'products', ProductsIcon],
+  ['/admin/collections', 'collections', ProductsIcon],
   ['/admin/faq', 'faq', FaqIcon],
   ['/admin/batches', 'batches', BatchesIcon],
   ['/admin/coupons', 'coupons', CouponsIcon],

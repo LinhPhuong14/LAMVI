@@ -1,6 +1,7 @@
 // Nguồn chuỗi giao diện tiếng Việt (mặc định). en/zh phải có cùng key (D-40: thiếu thì dùng vi).
 // Các câu đánh dấu §31.3 là câu thay thế đề xuất — chờ PO/Marketing duyệt.
 export default {
+  routeLoad: { error: 'Chưa tải được trang. Vui lòng tải lại để tiếp tục.', reload: 'Tải lại trang' },
   meta: {
     shopTitle: 'Cửa hàng — LAMVI · đèn giấy dó thủ công',
     shopDescription: 'Toàn bộ đèn giấy dó thủ công LAMVI: lọc theo loại, kèm thiệp lời chúc gắn mã QR và video hành trình làm đèn.',
@@ -209,6 +210,7 @@ export default {
     error: 'Không tải được câu hỏi thường gặp.',
   },
   footer: {
+    newsUnavailable: 'Đăng ký nhận tin hiện chưa mở. Bạn có thể theo dõi LAMVI qua các kênh chính thức.',
     tagline: 'Đèn giấy dó thủ công — giữ lửa ký ức, thắp sáng yêu thương.',
     products: 'Sản phẩm',
     support: 'Hỗ trợ',
@@ -421,6 +423,7 @@ export default {
     mayHint: 'Bấm vào Mây ở góc màn hình để hỏi về đèn, lời chúc hay giao hàng.',
   },
   errors: {
+    CHECKOUT_KEY_CONFLICT: 'Thông tin đặt hàng đã thay đổi. Hãy kiểm tra lại giỏ hàng trước khi thử lại.',
     CANNOT_MANAGE_SELF: 'Bạn không thể tự khoá hay tự đổi vai trò của chính mình.',
     LAST_IT: 'Phải còn ít nhất một tài khoản IT đang hoạt động.',
     EMAIL_NOT_REGISTERED: 'Email này chưa đăng ký tài khoản LAMVI.',
@@ -511,6 +514,9 @@ export default {
     END_BEFORE_START: 'Ngày kết thúc phải sau ngày bắt đầu.',
   },
   checkout: {
+    geoEmpty: 'Không tìm thấy phường / xã',
+    geoLoading: 'Đang tải danh mục địa chỉ…',
+    retry: 'Thử lại',
     title: 'Thanh toán',
     loading: 'Đang tải…',
     emptyCart: 'Giỏ hàng đang trống.',
@@ -756,7 +762,7 @@ export default {
           'Người nhận quà chỉ xem được lời chúc qua đường dẫn riêng trên thiệp, không cần tạo tài khoản.'
         ] },
         { h: 'Bảo mật', items: [
-          'Kết nối được mã hoá (HTTPS). Mật khẩu không được lưu dạng chữ thường và được kiểm tra với danh sách mật khẩu đã bị lộ.',
+          'Kết nối được mã hoá (HTTPS). Mật khẩu không được lưu dạng chữ thường. Việc đối chiếu danh sách mật khẩu đã bị lộ được áp dụng khi tính năng này được bật.',
           'Phiên đăng nhập dùng cookie bảo mật; quản trị viên chỉ truy cập dữ liệu cần cho công việc và mọi thay đổi quan trọng đều được ghi nhật ký.'
         ] },
         { h: 'Thay đổi chính sách', items: [

@@ -1,7 +1,8 @@
 // D-48: giao diện admin chỉ tiếng Việt. Nội dung sản phẩm/FAQ/lô vẫn nhập đủ vi/en/zh.
 export const S = {
   title: 'Quản trị LAMVI',
-  nav: { orders: 'Đơn hàng', users: 'Người dùng', products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', coupons: 'Mã giảm giá', analytics: 'Truy cập (GA)', may: 'Mây (AI)', it: 'Dashboard IT', site: 'Về trang web' },
+  nav: { returns: 'Đổi trả', collections: 'Bộ sưu tập', orders: 'Đơn hàng', users: 'Người dùng', products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', coupons: 'Mã giảm giá', analytics: 'Truy cập (GA)', may: 'Mây (AI)', it: 'Dashboard IT', site: 'Về trang web' },
+  returns: { filter: 'Trạng thái', retry: 'Thử lại', empty: 'Không có yêu cầu trong trạng thái này.', pages: 'Phân trang yêu cầu đổi trả', previous: 'Trang trước', next: 'Trang sau', outcome: 'Kết quả xử lý thủ công', outcomes: { replacement: 'Đã đổi sản phẩm', refund: 'Đã hoàn tiền thủ công' }, title: 'Yêu cầu đổi trả', note: 'Chỉ duyệt yêu cầu. Không tự động chuyển tiền hoặc tính hoàn tiền một phần.', error: 'Không thể xử lý. Hãy tải lại hoặc thử lại.', video: 'Xem video riêng tư (5 phút)', decision: 'Quyết định', approved: 'Duyệt', rejected: 'Từ chối', reason: 'Lý do / hướng xử lý', save: 'Lưu quyết định' },
   common: {
     loading: 'Đang tải…',
     save: 'Lưu',
@@ -19,6 +20,27 @@ export const S = {
     langs: { vi: 'Tiếng Việt', en: 'English', zh: '简体中文' },
     viRequiredHint: 'Tiếng Việt bắt buộc; thiếu bản en/zh thì web hiện tiếng Việt (D-40).',
   },
+  collections: {
+    "title": "Bộ sưu tập",
+    "note": "Chỉ phát hành nội dung đã được tác giả/Marketing duyệt. Bộ chỉ hiển thị khi có ít nhất một sản phẩm đang bán; cốt truyện chỉ mở khi khách sở hữu đủ bộ.",
+    "slug": "Slug bộ sưu tập",
+    "slugHint": "Không đổi sau khi tạo để giữ liên kết sản phẩm và mảnh ghép.",
+    "name": "Tên bộ sưu tập",
+    "storyTitle": "Tiêu đề phần thưởng",
+    "story": "Cốt truyện phần thưởng",
+    "saveError": "Không thể lưu ({error}). Kiểm tra thông tin và thử lại.",
+    "confirmDelete": "Xoá bộ chưa có sản phẩm? Bộ có sản phẩm cần chuyển sang Đã ẩn.",
+    "inUse": "Bộ đang có sản phẩm. Hãy sửa và chuyển sang Đã ẩn thay vì xoá.",
+    "deleteError": "Không thể xoá ({error}).",
+    "loadError": "Không tải được bộ sưu tập.",
+    "retry": "Thử lại",
+    "empty": "Chưa có bộ sưu tập.",
+    "actions": "Thao tác",
+    "independent": "Đèn độc lập",
+    "legacy": "— cần đối chiếu dữ liệu",
+    "assignmentError": "Không tải được bộ sưu tập. Tải lại trang để gán bộ.",
+    "pieceOrder": "Thứ tự mảnh trong bộ"
+},
   products: {
     title: 'Sản phẩm',
     slug: 'Slug (đường dẫn)',

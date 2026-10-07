@@ -1,6 +1,8 @@
+import { returnsRouter } from './returns/routes.js'
 import express from 'express'
 import { catalogRouter } from './routes/catalog.js'
 import { authRouter } from './routes/auth.js'
+import { adminCollectionsRouter } from './routes/adminCollections.js'
 import { adminRouter } from './routes/admin.js'
 import { seoRouter } from './routes/seo.js'
 import { itRouter } from './routes/it.js'
@@ -24,11 +26,14 @@ import { classifyPath } from '../src/seo/routes.js'
 import { errorHandler, notFound } from './errors.js'
 import { securityHeaders } from './middleware/security.js'
 import { createMailer } from './mail/mailer.js'
+import { notificationOperationsRouter } from './routes/notificationOperations.js'
 import { isPwnedPassword } from './security/pwned.js'
+import { publicSite } from './services/site.js'
 
 // T-02: nhận adapter qua tham số để test bằng adapter bộ nhớ
 export function createApp({
   repo,
+  returnsRepo = null,
   auth: rawAuth,
   storage,
   web,
@@ -37,6 +42,8 @@ export function createApp({
   maintenance = createMaintenance({ repo }),
   may = createMayService({ repo, openai: null }),
   payos = null,
+  notifications = null,
+  notificationOutbox = null,
   gaRealtime = createGaRealtime(config.gaRealtime ?? {}),
   // T-49: thư giao dịch (null → không gửi) và kiểm tra mật khẩu đã lộ (null → bỏ qua)
   mailer = createMailer(config.mail),
@@ -44,7 +51,7 @@ export function createApp({
   orders = createOrderService({
     repo,
     payos,
-    notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl, brand: config.mail?.brand }),
+    notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl, brand: config.mail?.brand, worker: notifications }),
   }),
   pwned = config.pwnedCheck ? isPwnedPassword : null,
   // FR-MSG-001, FR-QR-*: lời chúc cần storage (bucket riêng tư); thiếu storage → không bật
@@ -73,16 +80,23 @@ export function createApp({
   // D-54: bảo trì → API ghi trả 503
   api.use(maintenance.apiGuard)
   api.get('/health', (req, res) => res.json({ ok: true }))
+  api.get('/site', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=60, s-maxage=300')
+    res.json(publicSite(config))
+  })
   api.use(catalogRouter({ repo }))
   api.use(geoRouter())
+  if (auth && storage && returnsRepo) api.use(returnsRouter({ repo, returnsRepo, auth, storage, config }))
   if (auth) api.use(authRouter({ repo, auth, config, mailer, pwned }))
   if (auth && storage) api.use(adminRouter({ repo, auth, storage, config, orders, gaRealtime }))
+  if (auth && repo.createCollection) api.use(adminCollectionsRouter({ repo, auth }))
   if (auth && storage) api.use(adminUsersRouter({ repo, auth }))
+  if (auth && notificationOutbox) api.use(notificationOperationsRouter({ repo, auth, outbox: notificationOutbox }))
   if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may, mailer, payos }))
   if (auth) api.use(mayRouter({ repo, auth, may }))
   if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))
   // FR-CHK-*, FR-ORD-*, FR-PAY-*: cần repo có bảng đơn hàng (adapter cũ trong test không có)
-  if (auth && repo.createOrder) api.use(ordersRouter({ repo, auth, orders, config, payos, messages }))
+  if (auth && repo.createOrder) api.use(ordersRouter({ repo, auth, orders, config, payos, messages, notifications, metrics }))
   if (auth && repo.createOrder && repo.listCollections) api.use(galleryRouter({ repo, auth }))
   // Trang QR lời chúc: người nhận, không đăng nhập (US-004)
   if (messages && repo.getOrderByQrToken) api.use(qrRouter({ repo, messages, config }))

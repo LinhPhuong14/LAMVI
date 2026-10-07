@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { collections, products, faqEntries, demoBatches } from '../../data/seed.js'
 import { RepoError } from '../repoErrors.js'
+import { mediaExpired } from '../../domain/message.js'
 import { couponRejectReason } from '../../domain/coupon.js'
 
 const clone = (v) => structuredClone(v)
@@ -16,6 +17,7 @@ export function createMemoryRepo(data = {}) {
     profiles: new Map(),
     apiMetrics: new Map(), // `${bucket}|${method}|${route}|${status}` → row
     apiErrors: [],
+    apiMetricBatches: new Set(),
     settings: new Map(),
     chatMessages: [],
     carts: new Map(), // userId → Map(productId → { quantity, addedAt })
@@ -78,6 +80,12 @@ export function createMemoryRepo(data = {}) {
     async ping() {
       return true
     },
+    async recordApiMetricBatch(batchId, rows, errors) {
+      if (state.apiMetricBatches.has(batchId)) return
+      await this.recordApiMetrics(rows)
+      await this.recordApiErrors(errors)
+      state.apiMetricBatches.add(batchId)
+    },
     async recordApiMetrics(rows) {
       for (const r of rows) {
         const k = `${r.bucket}|${r.method}|${r.route}|${r.status}`
@@ -128,6 +136,32 @@ export function createMemoryRepo(data = {}) {
         .map(([productId, v]) => ({ productId, quantity: v.quantity, addedAt: v.addedAt }))
         .sort((a, b) => a.addedAt.localeCompare(b.addedAt))
     },
+    async mutateCart(userId, mode, lines) {
+      // No awaits in this method: validation and the entire mutation are one commit.
+      if (!['set', 'remove', 'merge'].includes(mode) || !Array.isArray(lines) || lines.length > 100 || (mode !== 'merge' && lines.length !== 1)) throw new RepoError('INVALID_CART_MUTATION')
+      const original = state.carts.get(userId) ?? new Map()
+      const cart = new Map([...original].map(([id, value]) => [id, { ...value }]))
+      for (const line of lines) {
+        const product = state.products.find((row) => row.slug === line.slug)
+        const current = product ? cart.get(product.id) : null
+        if (mode === 'remove') { if (product) cart.delete(product.id); continue }
+        if (product && mode !== 'remove' && (!Number.isInteger(line.quantity) || line.quantity < 1 || line.quantity > 10)) throw new RepoError('INVALID_CART_MUTATION')
+        if (mode === 'set') {
+          if (!product || (product.status !== 'published' && !current)) throw new RepoError('PRODUCT_UNAVAILABLE')
+          if (product.status !== 'published' && line.quantity > current.quantity) throw new RepoError('PRODUCT_UNAVAILABLE_INCREASE')
+          if (product.stock != null && line.quantity > (current?.quantity ?? 0) && product.stock < line.quantity) throw new RepoError('OUT_OF_STOCK', String(Math.max(0, product.stock)))
+          if (!current && cart.size >= 50) throw new RepoError('CART_FULL')
+          cart.set(product.id, { quantity: line.quantity, addedAt: current?.addedAt ?? now() })
+        } else if (mode === 'merge') {
+          if (!product || product.status !== 'published' || (!current && cart.size >= 50)) continue
+          const quantity = Math.min(10, (current?.quantity ?? 0) + line.quantity, product.stock ?? Infinity)
+          if (quantity < 1) continue
+          cart.set(product.id, { quantity, addedAt: current?.addedAt ?? now() })
+        } else throw new RepoError('INVALID_CART_MUTATION')
+      }
+      state.carts.set(userId, cart)
+      return [...cart].map(([productId, value]) => ({ productId, ...value })).sort((a, b) => a.addedAt.localeCompare(b.addedAt))
+    },
     async setCartItem(userId, productId, quantity) {
       if (!state.carts.has(userId)) state.carts.set(userId, new Map())
       const c = state.carts.get(userId)
@@ -167,6 +201,10 @@ export function createMemoryRepo(data = {}) {
     },
 
     // --- Sản phẩm (FR-CAT-004)
+    async getProductsByIds(ids) {
+      const selected = new Set(ids)
+      return clone(state.products.filter((product) => selected.has(product.id)))
+    },
     async getProductById(id) {
       const p = byId(state.products, id)
       return p ? clone(p) : null
@@ -220,6 +258,15 @@ export function createMemoryRepo(data = {}) {
           .filter((p) => !statuses || statuses.includes(p.status))
           .sort((a, b) => a.sortOrder - b.sortOrder),
       )
+    },
+
+    async getCollectionById(id) { return clone(byId(state.collections, id) ?? null) },
+    async createCollection(row) { return create(state.collections, row, 'slug') },
+    async updateCollection(id, row) { return update(state.collections, id, row, 'slug') },
+    async deleteCollection(id) {
+      const c = byId(state.collections, id)
+      if (c && state.products.some((p) => p.collectionSlug === c.slug)) throw new RepoError('COLLECTION_IN_USE')
+      return remove(state.collections, id)
     },
 
     async listCollections({ statuses } = {}) {
@@ -309,6 +356,13 @@ export function createMemoryRepo(data = {}) {
     // --- Đơn hàng (FR-CHK-*, FR-ORD-*)
     async createOrder(order, items, redemption, { now: checkoutNow = new Date(), fromCart = false } = {}) {
       // No await between validation and commit: mirrors the Postgres transaction.
+      if (order.checkoutIdempotencyKey) {
+        const existing = state.orders.find((row) => row.userId === order.userId && row.checkoutIdempotencyKey === order.checkoutIdempotencyKey)
+        if (existing) {
+          if (existing.checkoutFingerprint !== order.checkoutFingerprint) throw new RepoError('CHECKOUT_KEY_CONFLICT')
+          return { ...clone(existing), checkoutReplayed: true }
+        }
+      }
       const cart = state.carts.get(order.userId)
       if (fromCart) {
         if (!cart?.size) throw new RepoError('CART_EMPTY')
@@ -360,6 +414,10 @@ export function createMemoryRepo(data = {}) {
       }
       return clone(row)
     },
+    async getOrderByCheckoutKey(userId, key) {
+      const order = state.orders.find((row) => row.userId === userId && row.checkoutIdempotencyKey === key)
+      return order ? clone(order) : null
+    },
     async getOrderById(id) {
       const o = byId(state.orders, id)
       return o ? clone(o) : null
@@ -396,9 +454,9 @@ export function createMemoryRepo(data = {}) {
     async updateOrder(id, values) {
       return updateOrder(id, values)
     },
-    async updateOrderIfStatus(id, expectedStatus, values) {
+    async updateOrderIfStatus(id, expectedStatus, values, expectedPaymentStatus, expectedPaymentFlag) {
       const o = byId(state.orders, id)
-      if (!o || o.status !== expectedStatus) return null
+      if (!o || o.status !== expectedStatus || (expectedPaymentStatus !== undefined && o.paymentStatus !== expectedPaymentStatus) || (expectedPaymentFlag !== undefined && o.paymentFlag !== expectedPaymentFlag)) return null
       return updateOrder(id, values)
     },
 
@@ -523,14 +581,16 @@ export function createMemoryRepo(data = {}) {
       if (!row.confirmedAt) row.confirmedAt = at
       return clone(row)
     },
-    async listGiftMediaCandidates() {
+    async listGiftMediaCandidates({ before = new Date().toISOString(), after = null, limit = 100 } = {}) {
       return state.giftMessages
-        .filter((m) => (m.voicePath || m.videoPath) && !m.mediaDeletedAt)
+        .filter((m) => (m.voicePath || m.videoPath) && !m.mediaDeletedAt && (!after || m.id > after))
         .map((m) => {
           const o = byId(state.orders, m.orderId)
           return o ? { message: clone(m), order: clone(o) } : null
         })
-        .filter(Boolean)
+        .filter((r) => r && mediaExpired(r.order, r.message, new Date(before)))
+        .sort((a, b) => a.message.id.localeCompare(b.message.id))
+        .slice(0, Math.max(1, Math.min(limit, 100)))
     },
   }
 }

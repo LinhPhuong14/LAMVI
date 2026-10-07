@@ -1,3 +1,4 @@
+import ReturnRequest from '../returns/ReturnRequest.jsx'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Reveal } from '../components/Reveal'
@@ -147,6 +148,7 @@ export default function OrderPage() {
           {order.hasMessage && <p className="field-hint">{t('orders.thanksMessage')}</p>}
         </Reveal>
       )}
+      <ReturnRequest order={order} />
       {!isNew && <h1 className="page-title">{t('orders.detailTitle', { code: order.code })}</h1>}
 
       <Reveal as="div" className="account-card">

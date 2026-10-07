@@ -16,6 +16,7 @@ describe('Đặt lại mật khẩu: nhập lại mật khẩu mới', () => {
   it('hai ô không khớp → báo lỗi ngay ở trình duyệt, KHÔNG gọi API (token chưa bị tiêu thụ)', async () => {
     const fetchMock = mockApi({ ...base, 'POST /auth/reset-password': () => ({ status: 204 }) })
     renderAt('/reset-password')
+    await screen.findByRole('heading', { level: 1 })
     type('Mật khẩu mới', 'Moi-Nang#Xuan71')
     type('Nhập lại mật khẩu mới', 'Moi-Nang#Xuan72')
     fireEvent.click(screen.getByRole('button', { name: 'Lưu mật khẩu mới' }))
@@ -26,6 +27,7 @@ describe('Đặt lại mật khẩu: nhập lại mật khẩu mới', () => {
   it('sửa ô nhập lại cho khớp → lỗi biến mất và gửi được; body có confirmPassword', async () => {
     const fetchMock = mockApi({ ...base, 'POST /auth/reset-password': () => ({ status: 204 }) })
     renderAt('/reset-password')
+    await screen.findByRole('heading', { level: 1 })
     type('Mật khẩu mới', 'Moi-Nang#Xuan71')
     type('Nhập lại mật khẩu mới', 'sai')
     fireEvent.click(screen.getByRole('button', { name: 'Lưu mật khẩu mới' }))
@@ -44,31 +46,35 @@ describe('Đặt lại mật khẩu: nhập lại mật khẩu mới', () => {
       'POST /auth/reset-password': () => ({ status: 400, body: { error: { code: 'VALIDATION_ERROR', fields: { confirmPassword: 'PASSWORD_MISMATCH' } } } }),
     })
     renderAt('/reset-password')
+    await screen.findByRole('heading', { level: 1 })
     type('Mật khẩu mới', 'Moi-Nang#Xuan71')
     type('Nhập lại mật khẩu mới', 'Moi-Nang#Xuan71')
     fireEvent.click(screen.getByRole('button', { name: 'Lưu mật khẩu mới' }))
     expect(await screen.findByText('Hai ô mật khẩu chưa khớp nhau.')).toBeInTheDocument()
   })
 
-  it('có 3 ngôn ngữ cho nhãn ô nhập lại', () => {
+  it('có 3 ngôn ngữ cho nhãn ô nhập lại', async () => {
     mockApi(base)
     renderAt('/zh/reset-password')
+    await screen.findByRole('heading', { level: 1 })
     expect(screen.getByLabelText('再次输入新密码')).toBeInTheDocument()
   })
 })
 
 describe('Danh sách quy tắc mật khẩu', () => {
-  it('chưa gõ: hiện đủ 4 quy tắc + "khớp nhau", không tô đỏ', () => {
+  it('chưa gõ: hiện đủ 4 quy tắc + "khớp nhau", không tô đỏ', async () => {
     mockApi(base)
     renderAt('/reset-password')
+    await screen.findByRole('heading', { level: 1 })
     for (const id of ['length', 'lower', 'upper', 'digit', 'match']) expect(rule(id), id).not.toBeNull()
     expect(document.querySelector('.pw-rules .is-bad')).toBeNull()
     expect(document.querySelector('.pw-rules .is-ok')).toBeNull()
   })
 
-  it('đánh dấu từng quy tắc theo từng phím và có chữ cho trình đọc màn hình', () => {
+  it('đánh dấu từng quy tắc theo từng phím và có chữ cho trình đọc màn hình', async () => {
     mockApi(base)
     renderAt('/reset-password')
+    await screen.findByRole('heading', { level: 1 })
     type('Mật khẩu mới', 'abc')
     expect(rule('lower')).toHaveClass('is-ok')
     expect(rule('length')).toHaveClass('is-bad')
@@ -81,18 +87,20 @@ describe('Danh sách quy tắc mật khẩu', () => {
     expect(rule('match')).toHaveClass('is-ok')
   })
 
-  it('trang đăng ký có danh sách quy tắc (không có quy tắc "khớp nhau")', () => {
+  it('trang đăng ký có danh sách quy tắc (không có quy tắc "khớp nhau")', async () => {
     mockApi(base)
     renderAt('/register')
+    await screen.findByRole('heading', { level: 1 })
     expect(rule('digit')).not.toBeNull()
     expect(rule('match')).toBeNull()
     type('Mật khẩu', 'Abcdefg1')
     expect(rule('length')).toHaveClass('is-ok')
   })
 
-  it('ngôn ngữ en/zh dịch quy tắc', () => {
+  it('ngôn ngữ en/zh dịch quy tắc', async () => {
     mockApi(base)
     renderAt('/en/reset-password')
+    await screen.findByRole('heading', { level: 1 })
     expect(screen.getByText('Be at least 8 characters')).toBeInTheDocument()
   })
 })

@@ -1,5 +1,5 @@
 // Checkout, đơn hàng và thanh toán (§12, §15, §16). Server là nơi duy nhất tính tiền (BR-PRC-001).
-import { randomBytes } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import { HttpError } from '../errors.js'
 import { PUBLIC_PRODUCT_STATUSES, presentProduct } from '../domain/catalog.js'
 import { hasStock } from '../domain/stock.js'
@@ -37,9 +37,10 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
 
   /** Dòng hàng từ giỏ của khách; sản phẩm đã ẩn/xoá thì không cho đặt (D-39). */
   async function cartLines(userId) {
-    const products = new Map((await repo.listProducts()).map((p) => [p.id, p]))
+    const cart = await repo.getCart(userId)
+    const products = new Map((await repo.getProductsByIds(cart.map((item) => item.productId))).map((p) => [p.id, p]))
     const lines = []
-    for (const { productId, quantity } of await repo.getCart(userId)) {
+    for (const { productId, quantity } of cart) {
       const product = products.get(productId)
       if (!product) continue
       // G-44: `short` = tồn kho không đủ cho số lượng trong giỏ (chỉ báo; giữ chỗ nguyên tử ở createOrder)
@@ -132,7 +133,43 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
    * Tạo đơn từ giỏ (§12 bước "Tạo đơn"). Kiểm tra lại giá và coupon ngay lúc tạo (BR-CPN-002):
    * khách xác nhận bảng giá nào thì phải ra đúng bảng giá đó, lệch thì trả 409 kèm bảng giá mới.
    */
-  async function createOrder({ userId, checkout, expectedTotal, lang = 'vi', siteUrl }) {
+  // Hash normalized business inputs, never client prices as authoritative pricing.
+  // The key belongs to a user and survives the cart being consumed at commit.
+  async function createOrder(args) {
+    const { userId, checkout, expectedTotal, idempotencyKey } = args
+    if (idempotencyKey == null) return createOrderOnce(args)
+    if (typeof idempotencyKey !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idempotencyKey)) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', { idempotencyKey: 'INVALID' })
+    }
+    const key = idempotencyKey.toLowerCase()
+    const business = Object.fromEntries(Object.keys(checkout).sort().filter((field) => !['province', 'ward', 'district'].includes(field)).map((field) => [field, checkout[field]]))
+    business.couponCode = normalizeCouponCode(checkout.couponCode) || null
+    const fingerprint = createHash('sha256').update(JSON.stringify({ checkout: business, expectedTotal: expectedTotal ?? null })).digest('hex')
+    const replay = async () => {
+      const existing = await repo.getOrderByCheckoutKey(userId, key)
+      if (!existing) return null
+      if (existing.checkoutFingerprint !== fingerprint) throw new HttpError(409, 'CHECKOUT_KEY_CONFLICT', 'Yêu cầu đặt hàng đã thay đổi')
+      return { order: existing, payment: null, replayed: true }
+    }
+    const existing = await replay()
+    if (existing) return existing
+    try {
+      return await createOrderOnce({ ...args, idempotencyKey: key, checkoutFingerprint: fingerprint })
+    } catch (err) {
+      // A concurrent request may have consumed the cart, or the RPC response may have
+      // been lost AFTER commit. Read the durable key; never compensate stock/coupon.
+      const committed = await replay().catch((lookupError) => {
+        if (lookupError.code === 'CHECKOUT_KEY_CONFLICT') throw lookupError
+        return null
+      })
+      if (committed) return committed
+      throw err
+    }
+  }
+
+  async function createOrderOnce({ userId, checkout, expectedTotal, lang = 'vi', siteUrl, idempotencyKey, checkoutFingerprint }) {
+    // Replays do not depend on current gateway availability or create new links.
+    if (checkout.paymentMethod === 'payos' && !payos) throw new HttpError(503, 'PAYMENT_UNAVAILABLE', 'Thanh toán trực tuyến chưa sẵn sàng')
     const { quote, coupon, couponError, lines } = await quoteCart(userId, { couponCode: checkout.couponCode, lang })
 
     if (!lines.length) throw new HttpError(409, 'CART_EMPTY', 'Giỏ hàng trống')
@@ -156,6 +193,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
       const createdAt = now()
       const order = {
         code: await uniqueOrderCode(),
+        checkoutIdempotencyKey: idempotencyKey ?? null,
+        checkoutFingerprint: checkoutFingerprint ?? null,
         userId,
         // §16: đơn COD chuyển CONFIRMED ngay khi tạo (D-41)
         status: isCod ? 'confirmed' : 'pending_payment',
@@ -190,6 +229,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
         { now: createdAt, fromCart: true },
       )
 
+      if (created.checkoutReplayed) return { order: created, payment: null, replayed: true }
+
       // The repository consumed the cart in the same transaction.
 
       await audit({
@@ -207,6 +248,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
       if (isCod) await notify('confirmed', created)
       return { order: created, payment }
     } catch (err) {
+      if (err.code === 'CHECKOUT_KEY_CONFLICT') throw new HttpError(409, err.code, 'Yêu cầu đặt hàng đã thay đổi')
       if (err.code === 'OUT_OF_STOCK') throw outOfStock({ slug: err.field })
       if (err.code === 'CART_EMPTY' || err.code === 'CART_HAS_UNAVAILABLE' || COUPON_ERRORS.has(err.code)) {
         throw new HttpError(409, err.code, 'Giỏ hàng hoặc mã giảm giá vừa thay đổi')
@@ -258,7 +300,11 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
    * Xử lý webhook payOS đã xác minh chữ ký (BR-PAY-001/002). Idempotent theo mã giao dịch:
    * lần hai không đổi gì.
    */
-  async function applyPayosWebhook({ orderCode, amount, paid, reference }) {
+  async function applyPayosWebhook({ orderCode, amount, paid, reference }, attempt = 0) {
+    const retryChanged = () => {
+      if (attempt >= 2) throw new HttpError(503, 'PAYMENT_RETRY_REQUIRED', 'Trạng thái thanh toán đang thay đổi; vui lòng thử lại')
+      return applyPayosWebhook({ orderCode, amount, paid, reference }, attempt + 1)
+    }
     const found = await repo.getOrderByPayosCode(orderCode)
     if (!found) return { handled: false, reason: 'ORDER_NOT_FOUND' }
     if (!paid) return { handled: false, reason: 'NOT_PAID' }
@@ -266,11 +312,12 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     // (§15.1 — trả tiền sau khi đơn hết hạn thì gắn cờ hoàn tiền tay, dù cron đã chạy hay chưa)
     const order = await expireIfDue(found)
     // BR-PAY-002: đã ghi nhận rồi thì thôi
-    if (order.paymentStatus === 'paid') return { handled: true, idempotent: true, order }
+    if (['paid', 'refund_pending', 'refunded'].includes(order.paymentStatus)) return { handled: true, idempotent: true, order }
 
     // §15.1: số tiền lệch → không xác nhận đơn, gắn cờ cho admin
     if (amount !== order.total) {
-      await repo.updateOrder(order.id, { paymentFlag: 'AMOUNT_MISMATCH' })
+      const flagged = await repo.updateOrderIfStatus(order.id, order.status, { paymentFlag: 'AMOUNT_MISMATCH' }, order.paymentStatus)
+      if (!flagged) return retryChanged()
       await audit({
         actorRole: 'system',
         entity: 'order',
@@ -284,7 +331,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
 
     // §15.1: trả tiền sau khi đơn đã huỷ/hết hạn → ghi nhận PAID, gắn cờ hoàn tiền thủ công
     if (order.status === 'cancelled') {
-      await repo.updateOrder(order.id, { paymentStatus: 'paid', paymentFlag: 'PAID_AFTER_CANCEL' })
+      const recorded = await repo.updateOrderIfStatus(order.id, 'cancelled', { paymentStatus: 'paid', paymentFlag: 'PAID_AFTER_CANCEL' }, order.paymentStatus)
+      if (!recorded) return retryChanged()
       await audit({
         actorRole: 'system',
         entity: 'order',
@@ -303,7 +351,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
       // Gỡ cờ lệch tiền của lần chuyển trước, nếu có — lần này đã đúng số tiền
       paymentFlag: null,
     })
-    if (!updated) return { handled: false, reason: 'STATUS_CHANGED' }
+    if (!updated) return retryChanged()
     await audit({
       actorRole: 'system',
       entity: 'order',
@@ -324,7 +372,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
   async function expireIfDue(order) {
     if (order.status !== 'pending_payment' || !order.paymentExpiresAt) return order
     if (Date.parse(order.paymentExpiresAt) > now().getTime()) return order
-    return (await cancelExpired(order)) ?? order
+    return (await cancelExpired(order)) ?? (await repo.getOrderById(order.id)) ?? order
   }
 
   async function cancelExpired(order) {
@@ -432,17 +480,19 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
 
   /** D-74 (Q-16): hoàn tiền thủ công — admin chuyển khoản tay rồi ghi nhận trên web. */
   async function markRefunded(order, adminId, note) {
-    if (order.paymentStatus !== 'refund_pending') {
+    const paidAfterCancel = order.status === 'cancelled' && order.paymentStatus === 'paid' && order.paymentFlag === 'PAID_AFTER_CANCEL'
+    if (order.paymentStatus !== 'refund_pending' && !paidAfterCancel) {
       throw new HttpError(409, 'REFUND_NOT_PENDING', 'Đơn không ở trạng thái chờ hoàn tiền')
     }
-    const updated = await repo.updateOrder(order.id, { paymentStatus: 'refunded' })
+    const updated = await repo.updateOrderIfStatus(order.id, order.status, { paymentStatus: 'refunded' }, order.paymentStatus, paidAfterCancel ? 'PAID_AFTER_CANCEL' : undefined)
+    if (!updated) throw new HttpError(409, 'REFUND_NOT_PENDING', 'Trạng thái hoàn tiền vừa thay đổi')
     await audit({
       actorId: adminId,
       actorRole: 'admin',
       entity: 'order',
       entityId: order.id,
       action: 'refund',
-      oldValue: { paymentStatus: 'refund_pending' },
+      oldValue: { paymentStatus: order.paymentStatus },
       newValue: { paymentStatus: 'refunded', note: typeof note === 'string' ? note.slice(0, 300) : null },
     })
     await notify('refunded', updated)

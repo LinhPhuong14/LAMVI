@@ -45,7 +45,7 @@ beforeEach(() => {
 })
 
 describe('Thanh bên trang nội bộ', () => {
-  it('admin: ấn triện + nhãn khu vực + 8 mục có biểu tượng, mục đang mở được đánh dấu', async () => {
+  it('admin: ấn triện + nhãn khu vực + 10 mục có biểu tượng, mục đang mở được đánh dấu', async () => {
     mockApi({ 'GET /me': me('admin'), 'GET /admin/products': () => ({ body: { items: [] } }) })
     const { container } = renderAt('/admin/products')
     await screen.findByRole('heading', { name: 'Sản phẩm', level: 1 })
@@ -54,8 +54,10 @@ describe('Thanh bên trang nội bộ', () => {
     const links = [...nav.querySelectorAll('a')]
     expect(links.map((a) => a.textContent)).toEqual([
       'Đơn hàng',
+      'Đổi trả',
       'Người dùng',
       'Sản phẩm',
+      'Bộ sưu tập',
       'Hỏi đáp',
       'Lô đèn',
       'Mã giảm giá',

@@ -30,7 +30,7 @@ const validation = (errors) => new HttpError(400, 'VALIDATION_ERROR', 'Dữ li�
  * Lời chúc của đơn (FR-MSG-001, FR-ACC-003) và trang QR lời chúc (FR-QR-002…005).
  * deps: repo, storage (bucket riêng tư gift-media), may (dịch dùng chung ngân sách), now.
  */
-export function createMessageService({ repo, storage, may = null, now = () => new Date() }) {
+export function createMessageService({ repo, storage, may = null, now = () => new Date(), cleanupTimeoutMs = 5000 }) {
   const nowIso = () => now().toISOString()
 
   const hasMedia = (m) => Boolean(m?.voicePath || m?.videoPath)
@@ -184,19 +184,23 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
     return published[0] ? { code: published[0].code, title: published[0].title } : null
   }
 
-  async function mediaUrls(message) {
+  async function mediaUrls(message, deadline) {
     const out = {}
+    const remaining = () => deadline ? Math.min(3600, Math.floor((deadline.getTime() - now().getTime()) / 1000)) : 3600
     for (const [kind, [pathCol, typeCol]] of Object.entries(COLS)) {
       if (!message[pathCol]) continue
+      const expiresIn = remaining()
+      if (expiresIn <= 0) break
       const ext = message[pathCol].split('.').pop()
+      const url = await storage.signedUrl(message[pathCol], GIFT_MEDIA_BUCKET, { expiresIn })
+      const downloadTtl = remaining()
       out[kind] = {
         type: message[typeCol],
-        url: await storage.signedUrl(message[pathCol], GIFT_MEDIA_BUCKET, { expiresIn: 3600 }),
-        // FR-QR-004: tải về trước khi bị xoá
-        downloadUrl: await storage.signedUrl(message[pathCol], GIFT_MEDIA_BUCKET, {
-          expiresIn: 3600,
+        url,
+        ...(downloadTtl > 0 ? { downloadUrl: await storage.signedUrl(message[pathCol], GIFT_MEDIA_BUCKET, {
+          expiresIn: downloadTtl,
           download: `${DOWNLOAD_NAME[kind]}.${ext}`,
-        }),
+        }) } : {}),
       }
     }
     return out
@@ -221,7 +225,7 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
       text: message.text,
       textLang: message.textLang,
       translations: message.translations ?? {},
-      media: expired || !hasMedia(message) ? {} : await mediaUrls(message),
+      media: expired || !hasMedia(message) ? {} : await mediaUrls(message, deadline),
       mediaExpired: expired && (hasMedia(message) || Boolean(message.mediaDeletedAt)),
       mediaExpiresAt: !expired && hasMedia(message) && deadline ? deadline.toISOString() : null,
       mediaDaysLeft: !expired && hasMedia(message) ? mediaDaysLeft(order, message, now()) : null,
@@ -262,17 +266,39 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
 
   /** D-26, D-75: xoá media quá hạn. Gọi từ cron (chung endpoint expire-orders). */
   async function purgeExpiredMedia() {
-    const candidates = await repo.listGiftMediaCandidates()
+    const cursorKey = 'gift_media_cleanup_cursor'
+    const previous = await repo.getSetting(cursorKey)
+    const after = previous?.value?.after ?? null
+    const before = nowIso()
+    let candidates = await repo.listGiftMediaCandidates({ before, after, limit: 10 })
+    // Wrap only after reaching the end; failed files will be retried next cycle.
+    if (!candidates.length && after) candidates = await repo.listGiftMediaCandidates({ before, after: null, limit: 10 })
     let purged = 0
-    for (const { message, order } of candidates) {
-      if (!mediaExpired(order, message, now())) continue
-      try {
-        await purgeMedia(order, message)
-        purged += 1
-      } catch (err) {
-        console.error('[messages] không xoá được media', order.id, err?.message)
+    let next = 0
+    const worker = async () => {
+      while (next < candidates.length) {
+        const { message, order } = candidates[next++]
+        if (!mediaExpired(order, message, now())) continue
+        let timeout
+        let timedOut = false
+        try {
+          // Storage acknowledgement is still required before media_deleted_at is
+          // written. A timeout advances the cursor; uncertain work retries later.
+          await Promise.race([
+            purgeMedia(order, message),
+            new Promise((_, reject) => { timeout = setTimeout(() => { timedOut = true; reject(new Error('MEDIA_CLEANUP_TIMEOUT')) }, cleanupTimeoutMs) }),
+          ])
+          purged += 1
+        } catch {
+          console.error('[messages] media cleanup failed; candidate retained for retry')
+          // An uncertain Storage request still occupies this worker's slot.
+          // Stop that worker rather than accumulating additional hung requests.
+          if (timedOut) break
+        } finally { clearTimeout(timeout) }
       }
     }
+    await Promise.all(Array.from({ length: Math.min(5, candidates.length) }, worker))
+    await repo.setSetting(cursorKey, { after: candidates[next - 1]?.message.id ?? null }, null)
     return purged
   }
 

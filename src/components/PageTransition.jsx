@@ -1,6 +1,7 @@
+import { useHydratedReducedMotion } from '../lib/hydration.js'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { UNSAFE_LocationContext as LocationContext, UNSAFE_RouteContext as RouteContext } from 'react-router-dom'
-import { AnimatePresence, m, useIsPresent, useReducedMotionConfig } from 'framer-motion'
+import { AnimatePresence, m, useIsPresent } from 'framer-motion'
 import { EASE_IN, EASE_OUT } from '../lib/motion.js'
 
 // Chuyển trang (T-45): trang cũ mờ đi và trôi nhẹ lên, trang mới hiện từ dưới như tờ giấy dó được
@@ -37,7 +38,7 @@ function Frozen({ children }) {
 const toTopOnShow = (def) => def?.opacity === 1 && toTop()
 
 export default function PageTransition({ pageKey, className, children }) {
-  const reduce = useReducedMotionConfig()
+  const reduce = useHydratedReducedMotion()
   const first = useRef(true)
   useEffect(() => {
     if (first.current) first.current = false

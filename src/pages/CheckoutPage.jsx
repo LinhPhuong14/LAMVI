@@ -11,6 +11,7 @@ import { useCart } from '../cart/context.js'
 import { useSubmit } from '../auth/useForm.js'
 import { formatVnd } from '../lib/money.js'
 import { track } from '../analytics/index.js'
+import { checkoutRequestKey, clearCheckoutRequest, readCheckoutRequest } from './checkoutRequest.js'
 
 // D-73 (Q-15): hạn link thanh toán payOS — chỉ để hiện cho khách, server mới là nguồn sự thật
 const PAYMENT_MINUTES = 15
@@ -63,10 +64,18 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState('')
   const [quote, setQuote] = useState(null)
   const [quoteError, setQuoteError] = useState(null)
+  const [quotePending, setQuotePending] = useState(true)
+  const [quotedCoupon, setQuotedCoupon] = useState(null)
+  const submitting = useRef(false)
+  const retryLabel = t('checkout.retry')
   const [priceChanged, setPriceChanged] = useState(false)
   const { pending, error, fields, run } = useSubmit()
   // Tổng khách nhìn thấy lúc bấm Đặt hàng — server đối chiếu để phát hiện giá đổi giữa chừng (§12)
   const seenTotal = useRef(null)
+  const checkoutForm = useRef(null)
+  useEffect(() => {
+    if (Object.keys(fields).length) checkoutForm.current?.querySelector('[aria-invalid="true"]')?.focus()
+  }, [fields])
 
   // D-36 / FR-CHK-001: chưa đăng nhập → đăng nhập rồi quay lại
   useEffect(() => {
@@ -79,25 +88,51 @@ export default function CheckoutPage() {
   const loadQuote = useCallback(
     async (couponCode) => {
       const id = ++quoteSeq.current
+      setQuotePending(true)
       try {
         const q = await authedApi('/checkout/quote', { method: 'POST', body: { couponCode }, lang })
         if (id !== quoteSeq.current) return
         setQuote(q)
+        setQuotedCoupon(couponCode || '')
         setQuoteError(null)
         seenTotal.current = q.total
       } catch (err) {
         if (id === quoteSeq.current) setQuoteError(err.code ?? 'INTERNAL_ERROR')
+      } finally {
+        if (id === quoteSeq.current) setQuotePending(false)
       }
     },
     [authedApi, lang],
   )
 
-  useEffect(() => {
+  const refreshCheckout = useCallback(async () => {
     if (!user) return
-    // Đồng bộ với hệ thống ngoài (gọi API); mọi setState trong loadQuote đều nằm sau `await`.
+    const key = readCheckoutRequest(user.id)
+    if (!key) return loadQuote(appliedCoupon || undefined)
+    const id = ++quoteSeq.current
+    setQuotePending(true)
+    try {
+      const result = await authedApi(`/checkout/requests/${encodeURIComponent(key)}`, { lang })
+      if (id !== quoteSeq.current) return
+      clearCheckoutRequest(user.id)
+      reloadCart?.()
+      navigate(`${path(`/don-hang/${result.order.code}`)}?moi=1`, { replace: true })
+    } catch (err) {
+      if (id !== quoteSeq.current) return
+      if (err.status === 404) {
+        clearCheckoutRequest(user.id)
+        return loadQuote(appliedCoupon || undefined)
+      }
+      setQuoteError(err.code ?? 'INTERNAL_ERROR')
+      setQuotePending(false)
+    }
+  }, [user, authedApi, lang, appliedCoupon, loadQuote, reloadCart, navigate, path])
+
+  useEffect(() => {
     // oxlint-disable-next-line react/set-state-in-effect
-    loadQuote(appliedCoupon || undefined)
-  }, [user, appliedCoupon, loadQuote])
+    refreshCheckout()
+    return () => { quoteSeq.current += 1 }
+  }, [refreshCheckout])
 
   // FR-GA-001 §23.3: begin_checkout khi bảng giá đầu tiên hiện ra
   const tracked = useRef(false)
@@ -123,6 +158,8 @@ export default function CheckoutPage() {
 
   async function onSubmit(e) {
     e.preventDefault()
+    if (submitting.current || pending || quotePending || quoteError || !quote?.items.length || quote.hasShortage || quotedCoupon !== appliedCoupon) return
+    submitting.current = true
     const body = {
       ...form,
       hasMessage: form.orderKind === 'gift' ? true : form.hasMessage,
@@ -132,6 +169,7 @@ export default function CheckoutPage() {
     }
     const res = await run(async () => {
       try {
+        body.idempotencyKey = await checkoutRequestKey(user.id, body, quote.items)
         return await authedApi('/orders', { method: 'POST', body, lang })
       } catch (err) {
         // §12 (D-41): giá đổi giữa chừng → server trả kèm bảng giá mới; hiện ngay và bắt xác nhận lại
@@ -143,7 +181,8 @@ export default function CheckoutPage() {
         throw err
       }
     })
-    if (!res) return
+    if (!res) { submitting.current = false; return }
+    clearCheckoutRequest(user.id)
     setPriceChanged(false)
     reloadCart?.()
     // payOS: chuyển sang trang thanh toán; COD: sang trang cảm ơn
@@ -173,6 +212,7 @@ export default function CheckoutPage() {
         {quoteError ? (
           <p className="notice error" role="alert">
             {t(`errors.${quoteError}`)}
+            <button type="button" onClick={refreshCheckout} disabled={quotePending}>{retryLabel}</button>
           </p>
         ) : (
           <p>{t('checkout.loading')}</p>
@@ -200,7 +240,7 @@ export default function CheckoutPage() {
         {t('checkout.backToCart')}
       </Link>
 
-      <form className="form checkout-form" onSubmit={onSubmit} noValidate>
+      <form ref={checkoutForm} className="form checkout-form" onSubmit={onSubmit} noValidate>
         <div className="checkout-main">
           {/* FR-CHK-002 (C-02) */}
           <Reveal as="fieldset" className="account-card">
@@ -344,7 +384,7 @@ export default function CheckoutPage() {
 
         {/* FR-CHK-006, FR-CHK-008 */}
         <aside className="checkout-aside">
-          <div className="order-summary">
+          <div className="order-summary" aria-busy={quotePending}>
             <h2>{t('checkout.summary')}</h2>
             <ul className="sum-items">
               {quote.items.map((i) => (
@@ -406,18 +446,23 @@ export default function CheckoutPage() {
               )}
             </p>
 
+            {quotePending && <p role="status">{t('checkout.loading')}</p>}
+            {quoteError && <p className="notice error" role="alert">
+              {t(`errors.${quoteError}`)} <button type="button" disabled={quotePending} onClick={refreshCheckout}>{retryLabel}</button>
+            </p>}
+            {quote.hasShortage && <p className="notice error" role="alert">{t('cart.hasShortage')}</p>}
             {priceChanged && (
               <p className="notice error" role="alert">
                 {t('checkout.priceChanged')}
               </p>
             )}
-            {error && error !== 'PRICE_CHANGED' && !Object.keys(fields).length && (
+            {error && error !== 'PRICE_CHANGED' && (
               <p className="notice error" role="alert">
                 {t(`errors.${error}`)}
               </p>
             )}
 
-            <button className="btn btn-primary btn-block" type="submit" disabled={pending || Boolean(quote?.hasShortage)}>
+            <button className="btn btn-primary btn-block" type="submit" disabled={pending || quotePending || Boolean(quoteError) || quotedCoupon !== appliedCoupon || Boolean(quote?.hasShortage)}>
               {pending ? t('checkout.submitting') : t('checkout.submit')}
             </button>
           </div>

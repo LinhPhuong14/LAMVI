@@ -14,8 +14,11 @@ let failed = false
 for (const [table, columns, migration] of [
   ['collections', 'id,slug,status,sort_order,story_title,story', '011'],
   ['products', 'id,collection_slug,piece_order,stock', '011–012'],
-  ['orders', 'id,qr_token,delivered_at,province_code,ward_code,atomic_cancellation', '010–013'],
+  ['orders', 'id,qr_token,delivered_at,province_code,ward_code,atomic_cancellation,checkout_idempotency_key,checkout_fingerprint', '010–018'],
   ['order_items', 'id,stock_reserved', '013'],
+  ['notification_jobs', 'id,event,status,lease_token,delivery_started_at', '015'],
+  ['return_requests', 'id,status,resolution,resolved_at', '016'],
+  ['api_metric_batches', 'id,created_at', '017'],
 ]) {
   const { error } = await client.from(table).select(columns).limit(0)
   console.log(`${table}: ${error ? `FAIL (${error.code ?? 'network'}); verify migration ${migration} and permissions` : 'PASS'}`)
@@ -26,4 +29,14 @@ const { error } = await client.rpc('create_checkout_order', { p_order: {}, p_ite
 const rpcReady = error?.code === 'P0001' && error.message === 'CART_EMPTY'
 console.log(`create_checkout_order: ${rpcReady ? 'PASS (empty cart rejected without writes)' : 'FAIL; verify migration 013 and service-role permissions'}`)
 if (!rpcReady) failed = true
+// Invalid mode is rejected before the user lock or any cart reads/writes.
+const cartProbe = await client.rpc('mutate_cart', { p_user: '00000000-0000-0000-0000-000000000000', p_mode: 'preflight-invalid', p_lines: [] })
+const cartReady = cartProbe.error?.code === 'P0001' && cartProbe.error.message === 'INVALID_CART_MUTATION'
+console.log(`mutate_cart: ${cartReady ? 'PASS (invalid mode rejected without writes)' : 'FAIL; verify migration 019 and service-role permissions'}`)
+if (!cartReady) failed = true
+// Stable, SELECT-only RPC: a cutoff before the dataset cannot mutate records.
+const mediaProbe = await client.rpc('list_expired_gift_media', { before_at: '1970-01-01T00:00:00.000Z', after_id: null, batch_limit: 1 })
+const mediaReady = !mediaProbe.error && Array.isArray(mediaProbe.data)
+console.log(`list_expired_gift_media: ${mediaReady ? 'PASS (read-only bounded query)' : 'FAIL; verify migration 020 and service-role permissions'}`)
+if (!mediaReady) failed = true
 process.exitCode = failed ? 1 : 0

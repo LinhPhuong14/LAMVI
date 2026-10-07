@@ -42,7 +42,7 @@ export function classifyPath(pathname) {
 
 // Các lời gọi API mà trang cần khi render (khớp key useApi: `${path}|${lang}`)
 export function dataKeysFor(route) {
-  const keys = ['/products'] // footer
+  const keys = ['/products', '/site'] // footer: catalog + verified public business fields
   if (route.kind === 'home') keys.push('/faq')
   if (route.kind === 'product') keys.push(`/products/${encodeURIComponent(route.slug)}`)
   if (route.kind === 'collection') keys.push(`/collections/${encodeURIComponent(route.slug)}`)

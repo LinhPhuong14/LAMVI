@@ -1,0 +1,5 @@
+.address-combobox { position: relative; }
+.address-options { position: absolute; top: 100%; inset-inline: 0; z-index: 20; max-height: min(18rem, 40vh); overflow-y: auto; overscroll-behavior: contain; background: var(--paper, #fffaf0); color: var(--ink, #1c2638); border: 1px solid currentColor; border-radius: .75rem; box-shadow: 0 .5rem 1.5rem #0002; }
+.address-options [role='option'] { padding: .75rem 1rem; min-height: 44px; cursor: pointer; }
+.address-options [role='option']:hover, .address-options .is-active { background: #b98b3830; outline: 2px solid currentColor; outline-offset: -2px; }
+.address-options p { padding: .75rem 1rem; }

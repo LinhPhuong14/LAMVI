@@ -183,3 +183,101 @@ it('stock shortage arising after quote identifies the product requiring correcti
   expect(result.body.error.details?.slug).toBe('den-nguyet')
   expect((await product('den-nguyet')).stock).toBe(1)
 })
+
+describe('Independent checkout key replay', () => {
+  const key = 'd215a9bb-44ca-4b16-bdaa-836a8923beaf'
+  it('lost commit response replays existing order without releasing its inventory', async () => {
+    await stock('den-nguyet', 5)
+    await add('den-nguyet', 2)
+    const original = repo.createOrder.bind(repo)
+    vi.spyOn(repo, 'createOrder').mockImplementationOnce(async (...args) => {
+      await original(...args)
+      throw new Error('commit response lost')
+    })
+    const first = await place({ idempotencyKey: key })
+    const retry = await place({ idempotencyKey: key })
+    expect(retry.code).toBe(first.code)
+    expect((await product('den-nguyet')).stock).toBe(3)
+  })
+  it('same key cannot silently reuse order with different checkout details', async () => {
+    await stock('den-nguyet', 5)
+    await add('den-nguyet', 1)
+    await place({ idempotencyKey: key })
+    const result = await request(app).post('/api/orders').set('Authorization', customer).send({ ...body, idempotencyKey: key, recipientName: 'Changed recipient' })
+    expect(result.status).toBe(409)
+    expect(result.body.error.code).toBe('CHECKOUT_KEY_CONFLICT')
+    expect((await product('den-nguyet')).stock).toBe(4)
+  })
+})
+
+describe('Paid webhook racing cancellation and manual refunds', () => {
+  const paid = async (order) => {
+    const stored = await repo.getOrderByCode(order.code)
+    return orders.applyPayosWebhook({ orderCode: stored.payosOrderCode, amount: stored.total, paid: true, reference: 'same-transaction' })
+  }
+  it('records the paid-after-cancel flag when cancellation wins the confirmation CAS', async () => {
+    await stock('den-nguyet', 5)
+    await add('den-nguyet', 2)
+    const order = await place({ paymentMethod: 'payos' })
+    const original = repo.updateOrderIfStatus.bind(repo)
+    vi.spyOn(repo, 'updateOrderIfStatus').mockImplementationOnce(async (id, expected, values, ...rest) => {
+      await original(id, 'pending_payment', { status: 'cancelled', paymentStatus: 'cancelled', cancelReason: 'CUSTOMER' })
+      return original(id, expected, values, ...rest)
+    })
+    const result = await paid(order)
+    expect(result.handled).toBe(true)
+    expect(await repo.getOrderByCode(order.code)).toMatchObject({ status: 'cancelled', paymentStatus: 'paid', paymentFlag: 'PAID_AFTER_CANCEL' })
+    expect((await product('den-nguyet')).stock).toBe(5)
+  })
+  it('webhook replay preserves refund_pending and refunded financial states', async () => {
+    await add('den-nguyet', 1)
+    const order = await place({ paymentMethod: 'payos' })
+    await paid(order)
+    await cancel(order.code)
+    await paid(order)
+    const pending = await repo.getOrderByCode(order.code)
+    expect(pending.paymentStatus).toBe('refund_pending')
+    await orders.markRefunded(pending, 'admin', 'Bank transfer complete')
+    await paid(order)
+    expect((await repo.getOrderByCode(order.code)).paymentStatus).toBe('refunded')
+  })
+  it('concurrent refund confirmations cannot both report a newly recorded refund', async () => {
+    await add('den-nguyet', 1)
+    const order = await place({ paymentMethod: 'payos' })
+    await paid(order)
+    await cancel(order.code)
+    const pending = await repo.getOrderByCode(order.code)
+    const results = await Promise.allSettled([orders.markRefunded(pending, 'admin', 'Transfer A'), orders.markRefunded(pending, 'admin', 'Transfer B')])
+    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1)
+    expect(results.find((r) => r.status === 'rejected').reason.code).toBe('REFUND_NOT_PENDING')
+  })
+})
+
+it('records manual refund of a verified late payment after cancellation without changing order or stock', async () => {
+  await stock('den-nguyet', 5)
+  await add('den-nguyet', 2)
+  const placed = await place({ paymentMethod: 'payos' })
+  await cancel(placed.code)
+  const cancelled = await repo.getOrderByCode(placed.code)
+  const event = { orderCode: cancelled.payosOrderCode, amount: cancelled.total, paid: true, reference: 'late-paid-transaction' }
+  await orders.applyPayosWebhook(event)
+  const latePaid = await repo.getOrderByCode(placed.code)
+  expect(latePaid).toMatchObject({ status: 'cancelled', paymentStatus: 'paid', paymentFlag: 'PAID_AFTER_CANCEL' })
+  expect(await orders.markRefunded(latePaid, 'admin', 'Manual bank transfer completed')).toMatchObject({ status: 'cancelled', paymentStatus: 'refunded' })
+  await orders.applyPayosWebhook(event)
+  expect((await repo.getOrderByCode(placed.code)).paymentStatus).toBe('refunded')
+  expect((await product('den-nguyet')).stock).toBe(5)
+})
+
+it('checkout recovery remains owner-only and omits internal key and fingerprint', async () => {
+  const key = 'fbb5e716-8f7b-42bf-a3c0-30e5047759a2'
+  await add('den-nguyet', 1)
+  const placed = await place({ idempotencyKey: key })
+  const owner = await request(app).get(`/api/checkout/requests/${key}`).set('Authorization', customer)
+  expect(owner.status).toBe(200)
+  expect(owner.body.order.code).toBe(placed.code)
+  expect(owner.body.order).not.toHaveProperty('checkoutFingerprint')
+  expect(owner.body.order).not.toHaveProperty('checkoutIdempotencyKey')
+  expect((await request(app).get(`/api/checkout/requests/${key}`).set('Authorization', admin)).status).toBe(404)
+  expect((await request(app).get(`/api/checkout/requests/${key}`)).status).toBe(401)
+})

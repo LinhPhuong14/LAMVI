@@ -166,7 +166,7 @@ describe('Xác nhận đồng thời và hạn media biên (D-26, D-75)', () => 
     expect((await repo.getGiftMessage(await idOf(code))).confirmedAt).toBe('2026-10-01T03:00:00.000Z')
   })
 
-  it('BR-MSG-004: đúng biên 30 ngày từ xác nhận — trước 1ms còn media (còn 1 ngày), đúng 30 ngày thì bị xoá thật', async () => {
+  it('BR-MSG-004: đúng biên 30 ngày từ xác nhận — trước 1ms chưa hết hạn nhưng không ký URL vượt hạn, đúng 30 ngày thì bị xoá thật', async () => {
     const code = await makeOrder()
     const m = await uploadMedia(code, 'voice', 'audio/mpeg')
     await setStatus(code, 'shipped')
@@ -175,7 +175,8 @@ describe('Xác nhận đồng thời và hạn media biên (D-26, D-75)', () => 
     await confirm(t)
     clock = new Date(t0 + 30 * DAY - 1)
     const before = await request(app).get(`/api/qr/${t}`)
-    expect(before.body.item.media.voice).toBeTruthy()
+    expect(before.body.item.media).toEqual({})
+    expect(storage.getObject(m.up.path, GIFT_MEDIA_BUCKET)).toBeDefined()
     expect(before.body.item).toMatchObject({ mediaDaysLeft: 1, mediaExpired: false })
     clock = new Date(t0 + 30 * DAY)
     const at = await request(app).get(`/api/qr/${t}`)

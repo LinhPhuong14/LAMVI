@@ -58,6 +58,7 @@ describe('Tài khoản (FR-ACC-001)', () => {
       }),
     })
     renderAt('/register')
+    await screen.findByRole('heading', { level: 1 })
     fireEvent.click(screen.getByRole('button', { name: 'Tạo tài khoản' }))
     expect(await screen.findByText('Số điện thoại Việt Nam không hợp lệ.')).toBeInTheDocument()
   })
@@ -65,6 +66,7 @@ describe('Tài khoản (FR-ACC-001)', () => {
   it('đăng ký cần xác nhận email → hiện hướng dẫn', async () => {
     const fetchMock = mockApi({ ...base, 'POST /auth/register': () => ({ status: 201, body: { needsConfirmation: true } }) })
     renderAt('/zh/register')
+    await screen.findByRole('heading', { level: 1 })
     type('邮箱', 'an@example.com')
     fireEvent.click(screen.getByRole('button', { name: '创建账户' }))
     expect(await screen.findByRole('status')).toHaveTextContent('账户已创建')

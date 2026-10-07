@@ -116,6 +116,7 @@ describe('Form — trạng thái gửi', () => {
       'POST /auth/login': () => new Promise((r) => (release = () => r({ status: 401, body: { error: { code: 'INVALID_CREDENTIALS' } } }))),
     })
     renderAt('/login')
+    await screen.findByLabelText('Email')
     type('Email', 'an@example.com')
     type('Mật khẩu', 'Gio-Hoa#Sen2026')
     fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }))
@@ -134,11 +135,13 @@ describe('Form — trạng thái gửi', () => {
     mockApi({ ...base, 'POST /auth/register': pending, 'POST /auth/forgot-password': pending, 'GET /me': () => ({ body: { profile } }), 'PATCH /me': pending })
 
     const r1 = renderAt('/register')
+    await screen.findByRole('button', { name: 'Tạo tài khoản' })
     fireEvent.click(screen.getByRole('button', { name: 'Tạo tài khoản' }))
     expect(await screen.findByRole('button', { name: 'Đang xử lý…' })).toBeDisabled()
     r1.unmount()
 
     const r2 = renderAt('/forgot-password')
+    await screen.findByLabelText('Email')
     type('Email', 'an@example.com')
     fireEvent.click(screen.getByRole('button', { name: 'Gửi email đặt lại' }))
     expect(await screen.findByRole('button', { name: 'Đang xử lý…' })).toBeDisabled()
@@ -266,6 +269,7 @@ describe('Đăng ký thành công', () => {
       'GET /me': () => ({ body: { profile } }),
     })
     renderAt('/en/register')
+    await screen.findByLabelText('Full name')
     type('Full name', 'Nguyễn An')
     type('Email', 'an@example.com')
     type('Password', 'Gio-Hoa#Sen2026')
@@ -304,6 +308,7 @@ describe('Đăng ký thành công', () => {
       'GET /me': () => ({ body: { profile } }),
     })
     renderAt('/register?next=%2F%2Fevil.com')
+    await screen.findByLabelText('Họ và tên')
     type('Họ và tên', 'Nguyễn An')
     type('Email', 'an@example.com')
     type('Mật khẩu', 'Gio-Hoa#Sen2026')
@@ -314,6 +319,7 @@ describe('Đăng ký thành công', () => {
   it('email đã đăng ký → thông báo EMAIL_TAKEN', async () => {
     mockApi({ ...base, 'POST /auth/register': () => ({ status: 409, body: { error: { code: 'EMAIL_TAKEN' } } }) })
     renderAt('/register')
+    await screen.findByRole('button', { name: 'Tạo tài khoản' })
     fireEvent.click(screen.getByRole('button', { name: 'Tạo tài khoản' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Email này đã được đăng ký.')
   })
@@ -331,6 +337,7 @@ describe('Lỗi mạng hiển thị đúng ngôn ngữ', () => {
   ])('%s', async (path, pwLabel, submit, message) => {
     mockApi({ ...base, 'POST /auth/login': offline })
     renderAt(path)
+    await screen.findByLabelText(pwLabel)
     type(pwLabel, 'Gio-Hoa#Sen2026')
     fireEvent.click(screen.getByRole('button', { name: submit }))
     expect(await screen.findByRole('alert')).toHaveTextContent(message)
@@ -346,6 +353,7 @@ describe('Lỗi mạng hiển thị đúng ngôn ngữ', () => {
       },
     })
     renderAt('/en/forgot-password')
+    await screen.findByLabelText('Email')
     type('Email', 'an@example.com')
     fireEvent.click(screen.getByRole('button', { name: 'Send reset email' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not reach the server. Please try again.')
@@ -455,6 +463,7 @@ describe('Đặt lại mật khẩu — giao diện', () => {
     window.history.replaceState(null, '', '/en/reset-password#t=old')
     mockApi({ ...base, 'POST /auth/reset-password': () => ({ status: 400, body: { error: { code: 'INVALID_RESET_TOKEN' } } }) })
     renderAt('/en/reset-password')
+    await screen.findByLabelText('New password')
     type('New password', 'Moi-Nang#Xuan71')
     type('Confirm new password', 'Moi-Nang#Xuan71')
     fireEvent.click(screen.getByRole('button', { name: 'Save new password' }))
@@ -468,6 +477,7 @@ describe('Đặt lại mật khẩu — giao diện', () => {
       'POST /auth/reset-password': () => ({ status: 400, body: { error: { code: 'VALIDATION_ERROR', fields: { password: 'PASSWORD_TOO_SHORT' } } } }),
     })
     renderAt('/reset-password')
+    await screen.findByLabelText('Mật khẩu mới')
     type('Mật khẩu mới', 'ngan')
     type('Nhập lại mật khẩu mới', 'ngan')
     fireEvent.click(screen.getByRole('button', { name: 'Lưu mật khẩu mới' }))

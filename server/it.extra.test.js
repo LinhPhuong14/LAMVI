@@ -331,8 +331,8 @@ describe('Tổng hợp số liệu (D-52, D-53)', () => {
     expect(row).toMatchObject({ count: 2, max_ms: 3000, le_50: 1, gt_2500: 1 })
   })
 
-  // Hành vi hiện tại: flush lỗi thì bỏ cả lô (số liệu + lỗi 5xx) — ghi lại để biết
-  it('flush lỗi: lô bị bỏ, không ném ra ngoài; request sau vẫn được ghi', async () => {
+  // G-35: retry bounded and retain the idempotent batch until acknowledged.
+  it('flush lỗi: giữ lô và lưu lại cùng request tiếp theo sau phục hồi', async () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => {})
     const m = createMetrics({ repo, now: () => clock.t })
     m.record({ method: 'GET', route: '/api/x', status: 500, ms: 10, path: '/api/x' })
@@ -343,12 +343,13 @@ describe('Tổng hợp số liệu (D-52, D-53)', () => {
     await expect(m.flush()).resolves.toBeUndefined()
     expect(err).toHaveBeenCalled()
     repo.recordApiMetrics = orig
-    expect((await m.summary('1h')).routes).toEqual([]) // lô đã mất
-    // Ghi lỗi 5xx là bước riêng: vẫn lưu được dù ghi số liệu thất bại
-    expect((await m.recentErrors('1h')).map((e) => e.route)).toEqual(['/api/x'])
+    expect((await m.summary('1h')).routes).toEqual([]) // chưa xác nhận commit
+    // Cả số liệu và lỗi được ghi trong một transaction.
+    expect(await m.recentErrors('1h')).toEqual([])
     m.record({ method: 'GET', route: '/api/x', status: 200, ms: 10 })
     await m.flush()
-    expect((await m.summary('1h')).routes[0].count).toBe(1)
+    expect((await m.summary('1h')).routes[0].count).toBe(2)
+    expect((await m.recentErrors('1h')).map((e) => e.route)).toEqual(['/api/x'])
     err.mockRestore()
   })
 

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // Trang thanh toán (FR-CHK-001…008, §12) — luồng khách thật sự bấm, và giao diện theo design-rules.
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
@@ -156,8 +156,9 @@ describe('Đặt hàng', () => {
     fill('Địa chỉ (số nhà, đường)', '12 Hàng Bông')
     await screen.findByRole('option', { name: 'Thành phố Hà Nội' })
     fill('Tỉnh / thành phố', '1')
+    fireEvent.focus(screen.getByRole('combobox', { name: 'Phường / xã' }))
     await screen.findByRole('option', { name: 'Phường Ba Đình' })
-    fill('Phường / xã', '4')
+    fireEvent.click(screen.getByRole('option', { name: 'Phường Ba Đình' }))
   }
 
   it('gửi đúng dữ liệu kèm tổng khách đã thấy (D-41) rồi sang trang cảm ơn', async () => {
@@ -273,16 +274,18 @@ describe('Địa chỉ: tỉnh/thành → phường/xã (G-46, D-99)', () => {
     api()
     renderAt('/checkout')
     await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
-    expect(screen.getByLabelText('Phường / xã')).toBeDisabled()
+    expect(screen.getByRole('combobox', { name: 'Phường / xã' })).toBeDisabled()
     expect(screen.queryByLabelText('Quận / huyện')).toBeNull()
     await screen.findByRole('option', { name: 'Thành phố Hà Nội' })
     fill('Tỉnh / thành phố', '1')
+    fireEvent.focus(screen.getByRole('combobox', { name: 'Phường / xã' }))
     await screen.findByRole('option', { name: 'Phường Ngọc Hà' })
-    fill('Phường / xã', '8')
-    expect(screen.getByLabelText('Phường / xã')).toHaveValue('8')
+    fireEvent.click(screen.getByRole('option', { name: 'Phường Ngọc Hà' }))
+    expect(screen.getByRole('combobox', { name: 'Phường / xã' })).toHaveValue('Phường Ngọc Hà')
     fill('Tỉnh / thành phố', '79')
+    fireEvent.focus(screen.getByRole('combobox', { name: 'Phường / xã' }))
     await screen.findByRole('option', { name: 'Phường Sài Gòn' })
-    expect(screen.getByLabelText('Phường / xã')).toHaveValue('')
+    expect(screen.getByRole('combobox', { name: 'Phường / xã' })).toHaveValue('')
     expect(screen.queryByRole('option', { name: 'Phường Ngọc Hà' })).toBeNull()
   })
 
@@ -299,5 +302,50 @@ describe('Địa chỉ: tỉnh/thành → phường/xã (G-46, D-99)', () => {
     await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
     fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
     await waitFor(() => expect(screen.getByLabelText('Tỉnh / thành phố')).toHaveAttribute('aria-invalid', 'true'))
+  })
+})
+
+
+describe('Checkout quote and submit concurrency', () => {
+  it('blocks order POST during coupon refresh and failed quote, then enables retry without losing recipient input', async () => {
+    let count = 0
+    let release
+    const fetch = api({ extra: {
+      'POST /checkout/quote': () => {
+        count += 1
+        if (count === 2) return new Promise((resolve) => { release = resolve })
+        return { body: quote() }
+      },
+    } })
+    renderAt('/checkout')
+    const submit = await screen.findByRole('button', { name: 'Đặt hàng' })
+    fill('Họ tên người nhận', 'Nguyễn An')
+    fill('Mã giảm giá', 'TEST')
+    fireEvent.click(screen.getByRole('button', { name: 'Áp dụng' }))
+    await waitFor(() => expect(release).toBeTypeOf('function'))
+    expect(submit).toBeDisabled()
+    fireEvent.submit(document.querySelector('.checkout-form'))
+    expect(fetch.mock.calls.some(([url]) => String(url).startsWith('/api/orders'))).toBe(false)
+    await act(async () => release({ status: 503, body: { error: { code: 'INTERNAL_ERROR' } } }))
+    expect(submit).toBeDisabled()
+    fireEvent.submit(document.querySelector('.checkout-form'))
+    expect(fetch.mock.calls.some(([url]) => String(url).startsWith('/api/orders'))).toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
+    await waitFor(() => expect(submit).toBeEnabled())
+    expect(screen.getByLabelText('Họ tên người nhận')).toHaveValue('Nguyễn An')
+  })
+
+  it('guards duplicate submit events before React renders pending state', async () => {
+    let release
+    const fetch = api({ order: () => new Promise((resolve) => { release = resolve }) })
+    renderAt('/checkout')
+    await screen.findByRole('button', { name: 'Đặt hàng' })
+    const form = document.querySelector('.checkout-form')
+    fireEvent.submit(form)
+    fireEvent.submit(form)
+    await waitFor(() => expect(release).toBeTypeOf('function'))
+    expect(fetch.mock.calls.filter(([url, init]) => String(url).startsWith('/api/orders') && init.method === 'POST')).toHaveLength(1)
+    await act(async () => release({ status: 400, body: { error: { code: 'VALIDATION_ERROR' } } }))
+    expect(screen.getByRole('button', { name: 'Đặt hàng' })).toBeEnabled()
   })
 })

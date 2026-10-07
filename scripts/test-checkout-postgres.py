@@ -35,10 +35,11 @@ def reset(stock=1, coupon_limit=10):
     """)
 
 
-def purchase(code, user, products, coupon=False):
+def purchase(code, user, products, coupon=False, key=None, fingerprint="a" * 64):
     ids = ",".join(f"'20000000-0000-0000-0000-00000000000{i}'" for i in products)
+    extra = f",'{key}'::uuid,'{fingerprint}'" if key else ''
     return f"""begin; set local statement_timeout='8s'; set local role service_role;
-      select test_checkout('{code}','10000000-0000-0000-0000-00000000000{user}',array[{ids}]::uuid[],{str(coupon).lower()});
+      select test_checkout('{code}','10000000-0000-0000-0000-00000000000{user}',array[{ids}]::uuid[],{str(coupon).lower()}{extra});
       select pg_sleep(0.1); commit;"""
 
 
@@ -51,7 +52,7 @@ try:
     subprocess.run(["docker", "run", "--rm", "-d", "--name", NAME,
                     "-e", "POSTGRES_HOST_AUTH_METHOD=trust", IMAGE], check=True, stdout=subprocess.DEVNULL)
     for _ in range(60):
-        if subprocess.run(["docker", "exec", NAME, "pg_isready", "-U", "postgres"],
+        if subprocess.run(["docker", "exec", NAME, "pg_isready", "-h", "127.0.0.1", "-U", "postgres"],
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0:
             break
         time.sleep(0.5)
@@ -66,14 +67,38 @@ try:
     """)
     for migration in sorted((ROOT / "supabase/migrations").glob("*.sql")):
         sql(migration.read_text())
-    sql((ROOT / "supabase/migrations/20261006000013_atomic_checkout.sql").read_text())
-    sql((ROOT / "supabase/tests/atomic_checkout.sql").read_text())
+        if migration.name == '20261006000013_atomic_checkout.sql':
+            sql(migration.read_text())  # Repeat at its version; never overwrite newer RPC definitions.
+    for regression in sorted((ROOT / 'supabase/tests').glob('*.sql')):
+        sql(regression.read_text())
+        print('PASS: SQL regression ' + regression.name)
+    sql((ROOT / 'supabase/tests/operational_features.sql').read_text().split('do $$')[0] + 'commit;')
+    claims = parallel(["begin; select count(*) from claim_notification_jobs('90000000-0000-0000-0000-000000000099',5); select pg_sleep(0.1); commit;"] * 2)
+    counts = [r.stdout.strip().splitlines()[0] for r in claims]
+    assert sorted(counts) == ['0', '1'], counts
+    print('PASS: concurrent outbox claims cannot lease same event twice')
+    sql('truncate orders, cart_items, coupons, products, auth.users cascade;')
+    sql((ROOT / 'supabase/tests/returns_independent.sql').read_text().split('do $$')[0] + 'commit;')
+    def return_submit(request_id):
+        return "begin; select submit_return_request('80000000-0000-0000-0000-0000000000%s','10000000-0000-0000-0000-000000000098','wrong_item','Wrong lamp','[{\"slug\":\"return-lamp\",\"quantity\":1}]'); select pg_sleep(0.1); commit;" % request_id
+    submitted = parallel([return_submit('98'), return_submit('97')])
+    assert sum(r.returncode == 0 for r in submitted) == 1, [r.stderr for r in submitted]
+    assert any('RETURN_QUANTITY_EXCEEDED' in r.stderr for r in submitted), [r.stderr for r in submitted]
+    print('PASS: concurrent returns cannot reserve same purchased unit twice')
+    metric = """begin; select record_api_metric_batch('18000000-0000-4000-8000-000000000017',
+      '[{"bucket":"2026-10-07T01:00:00Z","method":"GET","route":"/concurrent-metric","status":200,"count":1,"total_ms":1,"max_ms":1,"le_50":1,"le_100":0,"le_250":0,"le_500":0,"le_1000":0,"le_2500":0,"gt_2500":0}]','[]');
+      select pg_sleep(0.1); commit;"""
+    receipts = parallel([metric, metric])
+    assert all(r.returncode == 0 for r in receipts), [r.stderr for r in receipts]
+    assert sql("select sum(count) from api_metrics where route='/concurrent-metric'").stdout.strip() == '1'
+    print('PASS: concurrent metric receipt counts once')
+    sql('truncate orders, cart_items, coupons, products, auth.users cascade;')
     print("PASS: all migrations, repeatable migration 013, rollback, cancellation, ledger and RPC permissions")
     sql("""
       grant usage on schema public to service_role;
       grant all on all tables in schema public to service_role;
       grant all on all sequences in schema public to service_role;
-      create function public.test_checkout(p_code text,p_user uuid,p_ids uuid[],p_coupon boolean)
+      create function public.test_checkout(p_code text,p_user uuid,p_ids uuid[],p_coupon boolean,p_key uuid default null,p_fingerprint text default null)
       returns jsonb language plpgsql as $$
       declare cp jsonb; items jsonb; n integer;
       begin
@@ -81,7 +106,7 @@ try:
         select jsonb_agg(jsonb_build_object('product_id',id,'quantity',1,'unit_price',1000)) into items from unnest(p_ids) id;
         if p_coupon then select to_jsonb(c) into cp from public.coupons c where c.code='ATOMIC'; end if;
         return public.create_checkout_order(jsonb_build_object(
-          'code',p_code,'user_id',p_user,'status','confirmed','order_kind','self','has_message',false,'qr_lang',null,
+          'code',p_code,'user_id',p_user,'checkout_idempotency_key',p_key,'checkout_fingerprint',p_fingerprint,'status','confirmed','order_kind','self','has_message',false,'qr_lang',null,
           'recipient_is_self',true,'recipient_name','Test','recipient_phone','0912345678','address_line','Test','province','Test',
           'payment_method','cod','payment_status','pending','subtotal',n,'discount',case when p_coupon then 100 else 0 end,
           'shipping_fee',0,'total',n-case when p_coupon then 100 else 0 end,'vat_amount',0,'vat_rate',0.1,
@@ -90,7 +115,7 @@ try:
         ),items,cp);
       end;
       $$;
-      grant execute on function public.test_checkout(text,uuid,uuid[],boolean) to service_role;
+      grant execute on function public.test_checkout(text,uuid,uuid[],boolean,uuid,text) to service_role;
     """)
     reset()
     sql("insert into cart_items(user_id,product_id,quantity) select id,'20000000-0000-0000-0000-000000000001',1 from auth.users;")
@@ -99,6 +124,18 @@ try:
     assert "OUT_OF_STOCK" in next(r.stderr for r in results if r.returncode)
     assert sql("select stock from products where slug='one'").stdout.strip() == "0"
     print("PASS: simultaneous purchase of last item commits one order")
+
+    reset(stock=5)
+    sql("insert into cart_items(user_id,product_id,quantity) values ('10000000-0000-0000-0000-000000000001','20000000-0000-0000-0000-000000000001',1);")
+    key = '18000000-0000-4000-8000-000000000018'
+    results = parallel([purchase('IDEM-RACE-1', 1, [1], key=key), purchase('IDEM-RACE-2', 1, [1], key=key)])
+    assert all(r.returncode == 0 for r in results), [r.stderr for r in results]
+    assert sql('select count(*) from orders').stdout.strip() == '1'
+    assert sql("select stock from products where slug='one'").stdout.strip() == '4'
+    assert sql('select count(*) from notification_jobs').stdout.strip() == '1'
+    changed = sql(purchase('IDEM-CHANGED', 1, [1], key=key, fingerprint='b' * 64), check=False)
+    assert changed.returncode and 'CHECKOUT_KEY_CONFLICT' in changed.stderr, changed.stderr
+    print('PASS: concurrent same-key checkout replays one order/stock/event; changed fingerprint conflicts')
 
     reset(stock=5, coupon_limit=1)
     sql("""insert into cart_items values
@@ -135,5 +172,36 @@ try:
     assert all(r.returncode == 0 for r in results), [r.stderr for r in results]
     assert sql("select sum(stock) from products").stdout.strip() == "6"
     print("PASS: reversed carts use stable product lock ordering without deadlock")
+    reset(stock=20)
+    cart_user = '10000000-0000-0000-0000-000000000001'
+    def cart_mutate(mode, lines):
+        return f"begin; set local statement_timeout='8s'; set local role service_role; select mutate_cart('{cart_user}','{mode}','{lines}'); select pg_sleep(0.1); commit;"
+    sql(cart_mutate('set', '[{"slug":"one","quantity":1}]'))
+    increments = parallel([cart_mutate('merge', '[{"slug":"one","quantity":2}]'), cart_mutate('merge', '[{"slug":"one","quantity":3}]')])
+    assert all(r.returncode == 0 for r in increments), [r.stderr for r in increments]
+    assert sql('select quantity from cart_items').stdout.strip() == '6'
+    print('PASS: concurrent cart merges retain both quantity increments')
+
+    reset(stock=20)
+    sql("""insert into products(id,slug,kind,status,price,name)
+      select md5('cart-cap-'||n)::uuid,'cart-cap-'||n,'single','published',1000,'{"vi":"Cart"}'::jsonb from generate_series(1,51) n;
+      insert into cart_items(user_id,product_id,quantity)
+      select '10000000-0000-0000-0000-000000000001',id,1 from products where slug like 'cart-cap-%' and split_part(slug,'-',3)::integer<=49;""")
+    capped = parallel([cart_mutate('set', '[{"slug":"cart-cap-50","quantity":1}]'), cart_mutate('set', '[{"slug":"cart-cap-51","quantity":1}]')])
+    assert sum(r.returncode == 0 for r in capped) == 1, [r.stderr for r in capped]
+    assert any('CART_FULL' in r.stderr for r in capped), [r.stderr for r in capped]
+    assert sql('select count(*) from cart_items').stdout.strip() == '50'
+    print('PASS: concurrent new lines cannot bypass the 50-line cart limit')
+
+    reset(stock=20)
+    sql(cart_mutate('set', '[{"slug":"one","quantity":1}]'))
+    raced = parallel([purchase('CART-CHECKOUT-RACE',1,[1]), cart_mutate('set', '[{"slug":"one","quantity":2}]')])
+    assert raced[1].returncode == 0, raced[1].stderr
+    assert raced[0].returncode == 0 or 'CART_HAS_UNAVAILABLE' in raced[0].stderr, raced[0].stderr
+    assert sql('select quantity from cart_items').stdout.strip() == '2'
+    committed = int(sql('select count(*) from orders').stdout.strip())
+    assert sql("select stock from products where slug='one'").stdout.strip() == str(20-committed)
+    print('PASS: checkout/cart race preserves the newer cart intent without a stock leak')
+
 finally:
     subprocess.run(["docker", "rm", "-f", NAME], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

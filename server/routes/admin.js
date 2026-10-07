@@ -33,6 +33,7 @@ async function write(fn) {
   try {
     return await fn()
   } catch (err) {
+    if (err instanceof RepoError && err.code === 'COLLECTION_IN_USE') throw new HttpError(409, 'COLLECTION_IN_USE', 'Bộ đã bị thay đổi; hãy tải lại')
     if (err instanceof RepoError && err.code === 'CONFLICT') {
       const code = err.field === 'code' ? 'BATCH_CODE_TAKEN' : 'SLUG_TAKEN'
       throw new HttpError(409, code, code, err.field ? { [err.field]: code } : undefined)
@@ -83,6 +84,7 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
   r.post('/admin/products', async (req, res) => {
     const { errors, values } = validateProduct(body(req))
     assertValid(errors)
+    await assertCollection(values.collectionSlug)
     const item = await write(() => repo.createProduct(values))
     await logAdmin(req, 'product', item.id, 'create', null, { slug: item.slug, status: item.status })
     res.status(201).json({ item })
@@ -91,6 +93,7 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
     const { errors, values } = validateProduct(body(req), { partial: true })
     assertValid(errors)
     const before = found(await repo.getProductById(req.params.id))
+    if (values.collectionSlug !== before.collectionSlug) await assertCollection(values.collectionSlug)
     if (!Object.keys(values).length) return res.json({ item: before })
     const item = found(await write(() => repo.updateProduct(before.id, values)))
     const diff = changed(before, values)
@@ -350,6 +353,10 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
     const updated = await orders.markRefunded(o, req.user.id, body(req).note)
     res.json({ item: presentOrder(updated) })
   })
+
+  async function assertCollection(slug) {
+    if (slug && !(await repo.listCollections()).some((c) => c.slug === slug)) throw new HttpError(400, 'VALIDATION_ERROR', 'Bộ không tồn tại', { collectionSlug: 'NOT_FOUND' })
+  }
 
   return r
 

@@ -1,5 +1,6 @@
+import { useHydratedReducedMotion } from '../lib/hydration.js'
 import { useEffect, useRef } from 'react'
-import { animate, m, useReducedMotionConfig } from 'framer-motion'
+import { animate, m } from 'framer-motion'
 import { EASE_OUT, group3, parseStat, rise, useViewState } from '../lib/motion.js'
 
 /** Khối tự theo dõi vị trí và truyền trạng thái xuống các con `m.*` dùng cùng tên biến thể. */
@@ -24,7 +25,7 @@ export function CountUp({ value }) {
   // Đếm ngay khi số vừa lộ ra, để không ai kịp thấy số 0 đứng yên
   const state = useViewState(ref, '0px')
   // Theo MotionConfig của LocaleLayout (reducedMotion="user" → cài đặt của thiết bị) — NFR-A11Y-001
-  const reduce = useReducedMotionConfig()
+  const reduce = useHydratedReducedMotion()
   const stat = parseStat(value)
   const target = stat?.target
   const suffix = stat?.suffix
