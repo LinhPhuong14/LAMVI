@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-07 — Merge theo yêu cầu trực tiếp của người dùng
+
+Người dùng yêu cầu “commit và push, merge vào master” sau vòng QA 3.150/3.150 tests, lint/build và PostgreSQL 001–020 đạt. Yêu cầu này cho phép merge trực tiếp cho đợt này dù gate preflight/Preview T-59 chưa được xác minh. Không coi merge hoặc deploy trigger là bằng chứng migration/integration production đạt; runbook rollout và các prerequisite còn nguyên.
+
+
 ## 2026-10-07 — QA/QC vòng hai (feat/production-commerce-readiness)
 
 Kết quả cuối: 3.150/3.150 tests, lint/build pass; PostgreSQL 001–020 + 10 SQL regressions/concurrency pass; browser recovery mất response/COD/cancel và 8 mẫu axe không có finding; local smoke 1.000 requests, 0 lỗi; production dependency audit 0 known advisory.
