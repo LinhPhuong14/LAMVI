@@ -2,7 +2,7 @@
 
 ## 2026-10-07 — Tiến độ triển khai (feat/production-commerce-readiness)
 
-Đã triển khai checkout idempotency/UX, collection admin, outbox email, metrics serverless và đổi trả gate-off; runtime fail-closed, footer cấu hình thật, private lazy routes và hydration fixes. Không thay quyết định PO/LEGAL. Bộ test đầy đủ 3.067/3.067 qua; build qua; PostgreSQL 001–018 và concurrency được kiểm thật trên container tạm. Browser mobile/axe và local load smoke được ghi trong [runbook](../production-release-1m.md).
+Đã triển khai checkout idempotency/UX, collection admin, outbox email, metrics serverless và đổi trả gate-off; runtime fail-closed, footer cấu hình thật, private lazy routes và hydration fixes. Không thay quyết định PO/LEGAL. Bộ test đầy đủ 3.070/3.070 qua; build qua; PostgreSQL 001–018 và concurrency được kiểm thật trên container tạm. Browser mobile/axe và local load smoke được ghi trong [runbook](../production-release-1m.md).
 
 Chưa deploy hoặc nghiệm thu 1M: thiếu production bindings/schema preflight/Preview integration; cần PO chốt video/retention/phạm vi quốc tế, nội dung sản phẩm và doanh nghiệp thật. Giữ master theo gate T-59.
 
