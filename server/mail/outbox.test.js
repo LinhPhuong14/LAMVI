@@ -51,3 +51,54 @@ describe('durable notification worker', () => {
     expect(fetch.mock.calls[0][1].headers['Idempotency-Key']).toBe('stable')
   })
 })
+
+it('awaits sibling deliveries even if one job cannot persist its failure', async () => {
+  let finish
+  let settled = false
+  const first = { ...job, id: 'one', delivery_payload: { to: 'one@test.invalid' } }
+  const second = { ...job, id: 'two', delivery_payload: { to: 'two@test.invalid' } }
+  const outbox = { claim: async () => [first, second], settle: async (current) => {
+    if (current.id === 'one') throw new Error('database unavailable')
+    return [{ id: current.id }]
+  } }
+  const repo = { getOrderById: async () => ({ userId: 'u', items: [] }), getProfile: async () => ({ email: 'x@test.invalid' }) }
+  const mailer = { send: async ({ to }) => {
+    if (to.startsWith('one')) throw new Error('timeout')
+    await new Promise((resolve) => { finish = resolve })
+    return { id: 'accepted' }
+  } }
+  const run = createNotificationWorker({ outbox, repo, mailer, siteUrl: 'https://lamvi.test' })().then((value) => { settled = true; return value })
+  await vi.waitFor(() => expect(finish).toBeTypeOf('function'))
+  expect(settled).toBe(false)
+  finish()
+  expect(await run).toMatchObject({ sent: 1, failed: 1 })
+})
+
+it('does not report durable sent state when a reclaimed lease fences completion', async () => {
+  const f = fixture({ delivery_payload: { to: 'x@test.invalid', idempotencyKey: 'frozen' } })
+  f.outbox.settle.mockResolvedValue([])
+  expect(await f.run()).toMatchObject({ sent: 0, failed: 1 })
+})
+
+it('missing mailer purges only expired retry payloads without claiming or sending', async () => {
+  const f = fixture()
+  f.outbox.purgeExpiredPayloads = vi.fn(async () => 4)
+  const run = createNotificationWorker({ ...f, mailer: null, now: () => date })
+  expect(await run()).toEqual({ claimed: 0, sent: 0, deferred: true, purged: 4 })
+  expect(f.outbox.purgeExpiredPayloads).toHaveBeenCalledWith('2026-10-06T11:00:00.000Z')
+  expect(f.outbox.claim).not.toHaveBeenCalled(); expect(f.mailer.send).not.toHaveBeenCalled()
+})
+
+it('expired-payload maintenance limits selection to100 and rechecks cutoff on update', async () => {
+  const cutoff = '2026-10-06T11:00:00.000Z'
+  const reads = { select: vi.fn(), not: vi.fn(), lte: vi.fn(), order: vi.fn(), limit: vi.fn(async () => ({ data: [{ id: 'old' }], error: null })) }
+  for (const method of ['select', 'not', 'lte', 'order']) reads[method].mockReturnValue(reads)
+  const writes = { update: vi.fn(), in: vi.fn(), not: vi.fn(), lte: vi.fn(), select: vi.fn(async () => ({ data: [{ id: 'old' }], error: null })) }
+  for (const method of ['update', 'in', 'not', 'lte']) writes[method].mockReturnValue(writes)
+  const from = vi.fn().mockReturnValueOnce(reads).mockReturnValueOnce(writes)
+  expect(await createNotificationOutboxRepo({ from }).purgeExpiredPayloads(cutoff)).toBe(1)
+  expect(reads.limit).toHaveBeenCalledWith(100)
+  expect(writes.in).toHaveBeenCalledWith('id', ['old'])
+  expect(writes.lte).toHaveBeenCalledWith('delivery_started_at', cutoff)
+  expect(writes.update).toHaveBeenCalledWith({ delivery_payload: null })
+})

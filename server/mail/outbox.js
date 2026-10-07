@@ -3,10 +3,15 @@ import { orderMail } from './templates.js'
 // No process queue or background promise: each invocation awaits a bounded leased batch.
 export function createNotificationWorker({ outbox, repo, mailer, siteUrl, brand = null, now = () => new Date() }) {
   return async function run({ orderId = null, limit = 5 } = {}) {
-    if (!mailer) return { claimed: 0, sent: 0, deferred: true }
+    if (!mailer) {
+      const purged = outbox.purgeExpiredPayloads
+        ? await outbox.purgeExpiredPayloads(new Date(now().getTime() - 23 * 3600_000).toISOString())
+        : 0
+      return { claimed: 0, sent: 0, deferred: true, purged }
+    }
     const jobs = await outbox.claim({ orderId, limit: Math.min(5, Math.max(1, limit)) })
     const result = { claimed: jobs.length, sent: 0, failed: 0 }
-    await Promise.all(jobs.map(async (job) => {
+    const outcomes = await Promise.allSettled(jobs.map(async (job) => {
       try {
         if (job.attempts > 6 || (job.delivery_started_at && now().getTime() - Date.parse(job.delivery_started_at) >= 23 * 3600_000)) {
           await outbox.settle(job, { status: 'dead', lease_until: null, last_error: 'RETRY_EXHAUSTED', ...(job.delivery_started_at && now().getTime() - Date.parse(job.delivery_started_at) >= 23 * 3600_000 ? { delivery_payload: null } : {}) })
@@ -29,9 +34,10 @@ export function createNotificationWorker({ outbox, repo, mailer, siteUrl, brand 
           if (!owned?.length) { result.failed++; return }
         }
         const accepted = await mailer.send(payload)
-        await outbox.settle(job, { status: 'sent', sent_at: now().toISOString(), lease_until: null,
+        const recorded = await outbox.settle(job, { status: 'sent', sent_at: now().toISOString(), lease_until: null,
           provider_message_id: typeof accepted?.id === 'string' ? accepted.id.slice(0, 200) : null, last_error: null, delivery_payload: null })
-        result.sent++
+        if (recorded?.length) result.sent++
+        else result.failed++
       } catch (error) {
         // Network/timeout/ack loss are uncertain: retry with the SAME provider idempotency key.
         // Other providers can duplicate delivery; sent means provider accepted, not delivered.
@@ -43,6 +49,8 @@ export function createNotificationWorker({ outbox, repo, mailer, siteUrl, brand 
         result.failed++
       }
     }))
+    // A DB failure must not return while sibling provider requests are still running.
+    result.failed += outcomes.filter((outcome) => outcome.status === 'rejected').length
     result.saturated = jobs.length >= Math.min(5, Math.max(1, limit))
     return result
   }
