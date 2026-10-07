@@ -1,5 +1,16 @@
 # Tiến độ tính năng
 
+## 2026-10-07 — Tiến độ triển khai (feat/production-commerce-readiness)
+
+Đã triển khai checkout idempotency/UX, collection admin, outbox email, metrics serverless và đổi trả gate-off; runtime fail-closed, footer cấu hình thật, private lazy routes và hydration fixes. Không thay quyết định PO/LEGAL. Bộ test đầy đủ 3.067/3.067 qua; build qua; PostgreSQL 001–018 và concurrency được kiểm thật trên container tạm. Browser mobile/axe và local load smoke được ghi trong [runbook](../production-release-1m.md).
+
+Chưa deploy hoặc nghiệm thu 1M: thiếu production bindings/schema preflight/Preview integration; cần PO chốt video/retention/phạm vi quốc tế, nội dung sản phẩm và doanh nghiệp thật. Giữ master theo gate T-59.
+
+
+## Audit production và kế hoạch — 2026-10-07
+
+Đã đối chiếu public production `www.lamvi.com.vn` với BA v0.37 và source; xem [ma trận và 9 ticket hoàn thiện](../production-feature-plan-2026-10-07.md). Đây là bằng chứng GET công khai và kế hoạch, không phải xác nhận các integration đã nghiệm thu. Collections 200 nhưng rỗng; 3 SKU chưa có ảnh API; checkout fix đã merge master nhưng deployment/migration 013 chưa xác minh. Không thay trạng thái FR thành production done.
+
 Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng thái: ✅ xong · 🟡 một phần · ⛔ bị chặn (chờ quyết định) · ⬜ chưa làm.
 
 | Nhóm | FR | Trạng thái | Code chính | Test | Chặn bởi |

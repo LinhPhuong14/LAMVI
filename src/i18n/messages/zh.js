@@ -1,5 +1,6 @@
 // 简体中文。Bản dịch do đội dev soạn — chờ PO duyệt (ba-spec §31.2 G-14).
 export default {
+  routeLoad: { error: '页面暂时无法加载。请刷新后重试。', reload: '重新加载' },
   meta: {
     shopTitle: '商店 — LAMVI · 手工宣纸灯笼',
     shopDescription: 'LAMVI 全部手工宣纸灯笼：按类型筛选，附带二维码祝福感谢卡和制作视频。',
@@ -186,6 +187,7 @@ export default {
     error: '无法加载常见问题。',
   },
   footer: {
+    newsUnavailable: '邮件订阅暂未开放。您可以通过官方渠道关注 LAMVI。',
     tagline: '手工纸灯——守护记忆之火，点亮爱意。',
     products: '产品',
     support: '支持',
@@ -396,6 +398,7 @@ export default {
     mayHint: '点击屏幕角落的 Mây，询问灯、祝福或配送相关问题。',
   },
   errors: {
+    CHECKOUT_KEY_CONFLICT: '订单信息已更改。请检查购物车后重试。',
     CANNOT_MANAGE_SELF: '不能锁定或更改自己账号的角色。',
     LAST_IT: '必须至少保留一个正常使用的 IT 账号。',
     EMAIL_NOT_REGISTERED: '此邮箱尚未注册 LAMVI 账号。',
@@ -486,6 +489,9 @@ export default {
     END_BEFORE_START: '结束日期必须晚于开始日期。',
   },
   checkout: {
+    geoEmpty: '未找到街道/乡',
+    geoLoading: '正在加载地址列表…',
+    retry: '重试',
     title: '结算',
     loading: '加载中…',
     emptyCart: '购物车是空的。',
@@ -731,7 +737,7 @@ export default {
           '收礼人只能通过卡片上的专属链接查看祝福，无需注册账户。'
         ] },
         { h: '安全', items: [
-          '连接已加密（HTTPS）。密码不以明文保存，并会与已泄露密码列表比对。',
+          '连接已加密（HTTPS）。密码不以明文保存；启用相应功能时会与已泄露密码列表比对。',
           '会话使用安全 Cookie；管理员只访问工作所需的数据，重要变更均有记录。'
         ] },
         { h: '政策变更', items: [

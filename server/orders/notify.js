@@ -13,7 +13,7 @@ const DEFAULT_WAIT_MS = 3000
  *
  * @param {{ repo: object, mailer: object|null, siteUrl: string, brand?: object|null, waitMs?: number }} deps
  */
-export function createOrderNotifier({ repo, mailer, siteUrl, brand = null, waitMs = DEFAULT_WAIT_MS }) {
+export function createOrderNotifier({ repo, mailer, siteUrl, brand = null, waitMs = DEFAULT_WAIT_MS, worker = null }) {
   async function send(kind, order) {
     const profile = await repo.getProfile(order.userId)
     // Tài khoản cũ chưa có email ở hồ sơ → chưa gửi được (migration 010 đã điền cho hồ sơ có sẵn)
@@ -28,7 +28,12 @@ export function createOrderNotifier({ repo, mailer, siteUrl, brand = null, waitM
 
   /** Không bao giờ ném lỗi. Trả true nếu đã gửi. */
   return async function notify(kind, order) {
-    if (!mailer || !order) return false
+    if (!order) return false
+    if (worker) {
+      try { return (await worker({ orderId: order.id, limit: 1 })).sent > 0 }
+      catch { console.error(`[notify] ${kind}: durable worker unavailable`); return false }
+    }
+    if (!mailer) return false
     let timer
     try {
       return await Promise.race([

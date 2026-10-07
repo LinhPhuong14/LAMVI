@@ -46,6 +46,18 @@ function fakeClient(tables = {}, { error, rpcError } = {}) {
 const row = (over) => ({ bucket: '2026-09-28T10:00:00+00:00', method: 'GET', route: '/api/x', status: 200, count: 1, total_ms: 5, max_ms: 5, le_50: 1, le_100: 0, le_250: 0, le_500: 0, le_1000: 0, le_2500: 0, gt_2500: 0, ...over })
 
 describe('Supabase repo — số liệu API', () => {
+  it('recordApiMetricBatch uses one transaction with a stable receipt ID', async () => {
+    const c = fakeClient()
+    await createSupabaseRepo(c).recordApiMetricBatch('batch-id', [row()], [])
+    expect(c.calls).toEqual([{ rpc: 'record_api_metric_batch', args: { batch_id: 'batch-id', rows: [row()], errors: [] } }])
+  })
+
+  it('aggregateApiMetrics calls DB aggregation instead of capped table reads', async () => {
+    const c = fakeClient()
+    expect(await createSupabaseRepo(c).aggregateApiMetrics({ since: '2026-09-28T00:00:00Z' })).toEqual([])
+    expect(c.calls).toEqual([{ rpc: 'aggregate_api_metrics', args: { since_at: '2026-09-28T00:00:00Z' } }])
+  })
+
   it('recordApiMetrics gọi rpc record_api_metrics với nguyên các dòng', async () => {
     const c = fakeClient()
     const rows = [row({ bucket: '2026-09-28T10:00:00.000Z' })]
@@ -95,6 +107,7 @@ describe('Supabase repo — số liệu API', () => {
     expect(c.calls.map((x) => [x.table, x.ops])).toEqual([
       ['api_metrics', [['delete'], ['lt', 'bucket', '2026-08-29T00:00:00.000Z']]],
       ['api_errors', [['delete'], ['lt', 'at', '2026-08-29T00:00:00.000Z']]],
+      ['api_metric_batches', [['delete'], ['lt', 'created_at', '2026-08-29T00:00:00.000Z']]],
     ])
   })
 

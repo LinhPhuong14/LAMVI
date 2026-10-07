@@ -30,7 +30,7 @@ function Steps({ current = 0 }) {
 export default function CartPage() {
   const { t, path } = useI18n()
   const { user } = useAuth()
-  const { cart, error, setQuantity, remove } = useCart()
+  const { cart, error, pendingLines = {}, lineErrors = {}, setQuantity, remove } = useCart()
   const navigate = useNavigate()
 
   // D-61 / FR-CHK-001: chưa đăng nhập → đăng nhập rồi quay lại giỏ (US-001 AC-003)
@@ -97,7 +97,7 @@ export default function CartPage() {
         <div className="cart-main">
           <ul className="cart-lines">
             {cart.items.map((i) => (
-              <li key={i.slug} className={`cart-line ${i.available ? '' : 'is-unavailable'}`}>
+              <li key={i.slug} aria-busy={Boolean(pendingLines[i.slug])} className={`cart-line ${i.available ? '' : 'is-unavailable'}`}>
                 <span className="cart-line-art">
                   <ProductImage image={i.product.image} size={84} tone={i.product.tone ?? undefined} name={i.product.name ?? ''} />
                 </span>
@@ -109,6 +109,7 @@ export default function CartPage() {
                   ) : (
                     <strong>{t('cart.unavailableName')}</strong>
                   )}
+                  {lineErrors[i.slug] && <span className="field-error" role="alert">{t(`errors.${lineErrors[i.slug]}`)}</span>}
                   {i.available ? <Price amount={i.product.price} /> : <span className="field-error">{t('cart.unavailable')}</span>}
                   {i.available && i.inStock === false && (
                     <span className="field-error">{i.stockLeft ? t('cart.shortage', { n: i.stockLeft }) : t('cart.soldOut')}</span>
@@ -116,13 +117,13 @@ export default function CartPage() {
                 </div>
                 <QuantityInput
                   value={i.quantity}
-                  disabled={!i.available}
+                  disabled={!i.available || Boolean(pendingLines[i.slug])}
                   label={`${t('cart.quantity')} — ${i.product.name ?? t('cart.unavailableName')}`}
                   onChange={(q) => q !== i.quantity && setQuantity(i.slug, q)}
                 />
                 <div className="cart-line-total">
                   {i.available && <Price amount={i.lineTotal} />}
-                  <button type="button" className="cart-remove" onClick={() => remove(i.slug)}>
+                  <button type="button" className="cart-remove" disabled={Boolean(pendingLines[i.slug])} onClick={() => remove(i.slug)}>
                     {t('cart.remove')}
                   </button>
                 </div>
@@ -159,7 +160,7 @@ export default function CartPage() {
           </dl>
           <p className="field-hint">{t('cart.shippingNote')}</p>
           {!user && <p className="field-hint">{t('cart.guestNote')}</p>}
-          <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0 || cart.hasShortage}>
+          <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0 || cart.hasShortage || Object.keys(pendingLines).length > 0}>
             {t('cart.checkout')}
           </button>
           <Link to={path('/shop')} className="cart-continue">

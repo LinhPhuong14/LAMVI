@@ -7,18 +7,20 @@ import { buildHeadTags, normalizeSiteUrl, renderHeadTags, safeJson } from '../sr
 import { gaInlineScript, gaScriptSrc } from '../src/analytics/ga.js'
 import { cspHash } from './middleware/security.js'
 import { HttpError } from './errors.js'
+import { publicSite } from './services/site.js'
 import { getPublicBatch, getPublicCollection, getPublicProduct, listPublicCollections, listPublicFaq, listPublicProducts } from './services/catalog.js'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 
 // Nạp sẵn dữ liệu giống lời gọi API của trang (key khớp useApi)
-async function loadData(repo, route) {
+async function loadData(repo, route, config) {
   const out = {}
   for (const path of dataKeysFor(route)) {
     const key = `${path}|${route.lang}`
     try {
       let data
-      if (path === '/products') data = await listPublicProducts(repo, route.lang)
+      if (path === '/site') data = publicSite(config)
+      else if (path === '/products') data = await listPublicProducts(repo, route.lang)
       else if (path === '/collections') data = await listPublicCollections(repo, route.lang)
       else if (route.kind === 'collection') data = await getPublicCollection(repo, route.slug, route.lang)
       else if (path === '/faq') data = await listPublicFaq(repo, route.lang)
@@ -123,7 +125,7 @@ export async function renderPage({ repo, config, template, render, url, pathname
 
   // Đường dẫn sản phẩm/lô có mã hoá hỏng → render trang 404 thay vì trang "đang tải"
   const renderUrl = route.kind === 'invalid' ? localePath(route.lang, '/__not-found') : url
-  const initialData = route.kind === 'invalid' ? {} : await loadData(repo, route)
+  const initialData = route.kind === 'invalid' ? {} : await loadData(repo, route, config)
   const { html, head: meta } = render(renderUrl, { initialData, siteUrl })
   const head = renderHeadTags(meta.tags, { noindex: meta.noindex })
   return {

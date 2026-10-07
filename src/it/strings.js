@@ -99,3 +99,16 @@ export function formatDuration(sec) {
   const m = Math.floor((sec % 3600) / 60)
   return [d && `${d} ngày`, h && `${h} giờ`, `${m} phút`].filter(Boolean).join(' ')
 }
+
+export const notificationStrings = {
+  title: 'Email đơn hàng',
+  hint: '“Đã nhận” là xác nhận từ nhà cung cấp, chưa chứng minh người mua đã nhận thư. Tối đa 50 thư gần nhất theo trạng thái.',
+  statuses: { pending: 'Đang chờ', leased: 'Đang xử lý', sent: 'Nhà cung cấp đã nhận', dead: 'Cần xử lý' },
+  status: 'Trạng thái thư', loading: 'Đang tải…',
+  disabled: 'Hàng đợi email chưa được bật trên môi trường này.',
+  loadError: 'Không tải được hàng đợi email. Vui lòng thử lại.',
+  retryError: 'Không thể thử lại. Thư quá cửa sổ an toàn cần đối soát với nhà cung cấp để tránh gửi trùng.',
+  empty: 'Không có thư ở trạng thái này.',
+  event: 'Sự kiện', attempts: 'Lần thử', time: 'Thời điểm', error: 'Lỗi', action: 'Thao tác',
+  retrying: 'Đang xếp hàng…', retry: 'Thử lại an toàn',
+}

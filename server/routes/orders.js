@@ -61,7 +61,7 @@ function presentOrder(o, { lang = 'vi' } = {}) {
  * Checkout, đơn hàng của tôi (FR-CHK-*, FR-ORD-001, FR-ACC-002) và webhook payOS (FR-PAY-001).
  * Webhook KHÔNG yêu cầu đăng nhập — bảo vệ bằng chữ ký (NFR-SEC-002).
  */
-export function ordersRouter({ repo, auth, orders, config, payos = null, messages = null }) {
+export function ordersRouter({ repo, auth, orders, config, payos = null, messages = null, notifications = null, metrics = null }) {
   const r = Router()
   const guard = requireAuth(auth)
   const lang = (req) => normalizeLang(req.query.lang)
@@ -96,10 +96,6 @@ export function ordersRouter({ repo, auth, orders, config, payos = null, message
     if (Object.keys(errors).length) {
       throw new HttpError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', errors)
     }
-    // COD chỉ khi không có cổng thanh toán? Không — COD luôn có. payOS cần cấu hình cổng.
-    if (values.paymentMethod === 'payos' && !payos) {
-      throw new HttpError(503, 'PAYMENT_UNAVAILABLE', 'Thanh toán trực tuyến chưa sẵn sàng')
-    }
     // D-41: client gửi expectedTotal sai kiểu → báo lỗi thay vì âm thầm bỏ bước chốt giá.
     // Không gửi (undefined/null) là hợp lệ: server vẫn là nguồn sự thật về giá.
     const expectedTotal = b.expectedTotal ?? undefined
@@ -110,6 +106,7 @@ export function ordersRouter({ repo, auth, orders, config, payos = null, message
       userId: req.user.id,
       checkout: values,
       expectedTotal,
+      idempotencyKey: b.idempotencyKey,
       lang: lang(req),
       siteUrl: config.publicSiteUrl,
     })
@@ -187,7 +184,17 @@ export function ordersRouter({ repo, auth, orders, config, payos = null, message
     const cancelled = await orders.expirePendingOrders()
     // D-26, D-75: dùng chung lịch cron này để xoá media lời chúc quá hạn (Hobby chỉ có 1 cron/ngày)
     const mediaPurged = messages ? await messages.purgeExpiredMedia() : 0
-    res.json({ cancelled: cancelled.length, mediaPurged })
+    if (metrics?.cleanup) await metrics.cleanup()
+    const notificationResult = notifications ? await notifications() : undefined
+    res.json({ cancelled: cancelled.length, mediaPurged, ...(notificationResult ? { notifications: notificationResult } : {}) })
+  })
+
+  // Optional external scheduler: same Express/Vercel function, same cron credential.
+  r.all('/internal/notifications', async (req, res) => {
+    if (!['GET', 'POST'].includes(req.method)) throw new HttpError(405, 'METHOD_NOT_ALLOWED', 'Không hỗ trợ')
+    if (!config.cronSecret || !notifications) throw new HttpError(404, 'NOT_FOUND', 'Không tìm thấy')
+    if (!safeEqual(req.get('authorization') ?? '', `Bearer ${config.cronSecret}`)) throw new HttpError(401, 'UNAUTHORIZED', 'Chưa xác thực')
+    res.json(await notifications())
   })
 
   // FR-PAY-001: webhook payOS. NFR-SEC-002 — xác minh chữ ký trước khi xử lý.

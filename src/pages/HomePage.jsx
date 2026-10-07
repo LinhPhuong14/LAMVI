@@ -1,9 +1,9 @@
+import { useHydratedReducedMotion } from '../lib/hydration.js'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   m,
   useMotionValueEvent,
-  useReducedMotionConfig,
   useScroll,
   useSpring,
   useTransform,
@@ -188,7 +188,7 @@ function LampHead({ eyebrow, title }) {
 // Sợi chỉ đỏ chạy theo tiến độ cuộn; qua bước nào thì bước đó "thắp" lên (ý tưởng "Tracing Beam")
 function ProcessTimeline({ steps }) {
   const ref = useRef(null)
-  const reduce = useReducedMotionConfig()
+  const reduce = useHydratedReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 85%', 'end 50%'] })
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24, restDelta: 0.001 })
   const sparkX = useTransform(progress, (v) => `${v * 100}%`)
@@ -224,7 +224,7 @@ function ProcessTimeline({ steps }) {
 
 function Hero() {
   const { t, path } = useI18n()
-  const reduce = useReducedMotionConfig()
+  const reduce = useHydratedReducedMotion()
   const { scrollY } = useScroll()
   // Rời màn hình đầu: chữ mờ dần và lui lên; đèn bay lên như thả đèn trời; trống đồng chìm xuống
   const copyOpacity = useTransform(scrollY, [0, 520], [1, 0])
@@ -467,7 +467,7 @@ export default function HomePage() {
         <SkyLanterns />
         <div className="lookbook-inner">
           <LampHead eyebrow={t('lookbook.eyebrow')} title={t('lookbook.title')} />
-          <Reveal className="lookbook-grid" variants={group} margin="-10% 0px -10% 0px">
+          <Reveal className="lookbook-grid" tabIndex={0} role="region" aria-label={t('lookbook.title')} variants={group} margin="-10% 0px -10% 0px">
             {t('lookbook.items').map((label, i) => (
               <m.div
                 className={`lookbook-card size-${SIZES[i]} tone-${TONES[i]}`}

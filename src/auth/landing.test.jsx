@@ -19,7 +19,7 @@ const base = (role, extra = {}) => ({
 })
 
 async function signIn() {
-  fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@lamvi.test' } })
+  fireEvent.change(await screen.findByLabelText('Email'), { target: { value: 'a@lamvi.test' } })
   fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'Gio-Hoa#Sen2026' } })
   fireEvent.click(screen.getAllByRole('button', { name: 'Đăng nhập' }).find((b) => b.type === 'submit'))
 }
@@ -57,7 +57,7 @@ describe('Trang đích sau khi đăng nhập', () => {
   it('trang đăng nhập bản en: admin vẫn vào /admin (admin không có tiền tố ngôn ngữ — D-48)', async () => {
     mockApi(base('admin'))
     renderAt('/en/login')
-    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'a@lamvi.test' } })
+    fireEvent.change(await screen.findByLabelText('Email'), { target: { value: 'a@lamvi.test' } })
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'Gio-Hoa#Sen2026' } })
     fireEvent.click(screen.getAllByRole('button', { name: 'Sign in' }).find((b) => b.type === 'submit'))
     expect(await screen.findByRole('heading', { name: 'Đơn hàng', level: 1 })).toBeInTheDocument()

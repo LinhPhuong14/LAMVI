@@ -8,6 +8,7 @@ import AdminAtmosphere from '../admin/AdminAtmosphere.jsx'
 import { ItIcon, OrdersIcon, SiteIcon } from '../admin/NavIcons.jsx'
 import Seo from '../seo/Seo.jsx'
 import { S, fmt, formatDuration } from './strings.js'
+import NotificationPanel from './NotificationPanel.jsx'
 
 const REFRESH_MS = 30_000
 const pct = (x) => `${(x * 100).toFixed(x > 0 && x < 0.001 ? 2 : 1)}%`
@@ -292,6 +293,7 @@ function Dashboard() {
         {maint && <MaintenancePanel state={maint} onChanged={setMaintenance} />}
         <MetricsPanel range={range} setRange={setRange} tick={tick} />
         <ErrorsPanel range={range} tick={tick} />
+        <NotificationPanel tick={tick} />
       </div>
     </main>
   )

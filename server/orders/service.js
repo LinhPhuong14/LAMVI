@@ -1,5 +1,5 @@
 // Checkout, đơn hàng và thanh toán (§12, §15, §16). Server là nơi duy nhất tính tiền (BR-PRC-001).
-import { randomBytes } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import { HttpError } from '../errors.js'
 import { PUBLIC_PRODUCT_STATUSES, presentProduct } from '../domain/catalog.js'
 import { hasStock } from '../domain/stock.js'
@@ -132,7 +132,43 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
    * Tạo đơn từ giỏ (§12 bước "Tạo đơn"). Kiểm tra lại giá và coupon ngay lúc tạo (BR-CPN-002):
    * khách xác nhận bảng giá nào thì phải ra đúng bảng giá đó, lệch thì trả 409 kèm bảng giá mới.
    */
-  async function createOrder({ userId, checkout, expectedTotal, lang = 'vi', siteUrl }) {
+  // Hash normalized business inputs, never client prices as authoritative pricing.
+  // The key belongs to a user and survives the cart being consumed at commit.
+  async function createOrder(args) {
+    const { userId, checkout, expectedTotal, idempotencyKey } = args
+    if (idempotencyKey == null) return createOrderOnce(args)
+    if (typeof idempotencyKey !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idempotencyKey)) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', { idempotencyKey: 'INVALID' })
+    }
+    const key = idempotencyKey.toLowerCase()
+    const business = Object.fromEntries(Object.keys(checkout).sort().filter((field) => !['province', 'ward', 'district'].includes(field)).map((field) => [field, checkout[field]]))
+    business.couponCode = normalizeCouponCode(checkout.couponCode) || null
+    const fingerprint = createHash('sha256').update(JSON.stringify({ checkout: business, expectedTotal: expectedTotal ?? null })).digest('hex')
+    const replay = async () => {
+      const existing = await repo.getOrderByCheckoutKey(userId, key)
+      if (!existing) return null
+      if (existing.checkoutFingerprint !== fingerprint) throw new HttpError(409, 'CHECKOUT_KEY_CONFLICT', 'Yêu cầu đặt hàng đã thay đổi')
+      return { order: existing, payment: null, replayed: true }
+    }
+    const existing = await replay()
+    if (existing) return existing
+    try {
+      return await createOrderOnce({ ...args, idempotencyKey: key, checkoutFingerprint: fingerprint })
+    } catch (err) {
+      // A concurrent request may have consumed the cart, or the RPC response may have
+      // been lost AFTER commit. Read the durable key; never compensate stock/coupon.
+      const committed = await replay().catch((lookupError) => {
+        if (lookupError.code === 'CHECKOUT_KEY_CONFLICT') throw lookupError
+        return null
+      })
+      if (committed) return committed
+      throw err
+    }
+  }
+
+  async function createOrderOnce({ userId, checkout, expectedTotal, lang = 'vi', siteUrl, idempotencyKey, checkoutFingerprint }) {
+    // Replays do not depend on current gateway availability or create new links.
+    if (checkout.paymentMethod === 'payos' && !payos) throw new HttpError(503, 'PAYMENT_UNAVAILABLE', 'Thanh toán trực tuyến chưa sẵn sàng')
     const { quote, coupon, couponError, lines } = await quoteCart(userId, { couponCode: checkout.couponCode, lang })
 
     if (!lines.length) throw new HttpError(409, 'CART_EMPTY', 'Giỏ hàng trống')
@@ -156,6 +192,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
       const createdAt = now()
       const order = {
         code: await uniqueOrderCode(),
+        checkoutIdempotencyKey: idempotencyKey ?? null,
+        checkoutFingerprint: checkoutFingerprint ?? null,
         userId,
         // §16: đơn COD chuyển CONFIRMED ngay khi tạo (D-41)
         status: isCod ? 'confirmed' : 'pending_payment',
@@ -190,6 +228,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
         { now: createdAt, fromCart: true },
       )
 
+      if (created.checkoutReplayed) return { order: created, payment: null, replayed: true }
+
       // The repository consumed the cart in the same transaction.
 
       await audit({
@@ -207,6 +247,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
       if (isCod) await notify('confirmed', created)
       return { order: created, payment }
     } catch (err) {
+      if (err.code === 'CHECKOUT_KEY_CONFLICT') throw new HttpError(409, err.code, 'Yêu cầu đặt hàng đã thay đổi')
       if (err.code === 'OUT_OF_STOCK') throw outOfStock({ slug: err.field })
       if (err.code === 'CART_EMPTY' || err.code === 'CART_HAS_UNAVAILABLE' || COUPON_ERRORS.has(err.code)) {
         throw new HttpError(409, err.code, 'Giỏ hàng hoặc mã giảm giá vừa thay đổi')

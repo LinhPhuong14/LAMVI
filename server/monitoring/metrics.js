@@ -1,4 +1,5 @@
 // D-52, D-53: số liệu API gộp theo phút × method × route × status, flush định kỳ vào repo (Supabase).
+import { randomUUID } from 'node:crypto'
 import { redactPii } from '../may/guard.js'
 import { sanitizePath } from '../../src/analytics/ga.js'
 
@@ -56,13 +57,16 @@ export function percentile(row, q) {
   return Math.round(row.max_ms)
 }
 
-export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flushMs = 60_000, retentionDays = 30, now = () => Date.now() }) {
+export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flushMs = 60_000, retentionDays = 30, now = () => Date.now(), maxRows = 1000, maxErrors = 100, maxBatches = 8, retries = 2 }) {
   let buffer = new Map()
   let errors = []
   let lastCleanup = 0
   let timer = null
+  let flushing = null
+  const batches = []
 
   function record({ method, route, status, ms, path, code, message }) {
+    if (!buffer.has(`${bucketOf(now())}|${method}|${route}|${status}`) && buffer.size >= maxRows) return
     const bucket = bucketOf(now())
     const k = `${bucket}|${method}|${route}|${status}`
     const row = buffer.get(k) ?? emptyRow(bucket, method, route, status)
@@ -71,7 +75,7 @@ export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flus
     row.max_ms = Math.max(row.max_ms, ms)
     row[histKey(ms)] += 1
     buffer.set(k, row)
-    if (status >= 500) {
+    if (status >= 500 && errors.length < maxErrors) {
       // G-28 / NFR-PRV-002: lỗi 5xx được IT xem, nên không lưu dữ liệu cá nhân.
       // - Không lưu query string, body, token ngay từ đầu.
       // - Đường dẫn: che đoạn bí mật (token trang QR lời chúc, token đặt lại mật khẩu).
@@ -113,34 +117,69 @@ export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flus
     next()
   }
 
-  async function flush() {
-    const rows = [...buffer.values()]
-    const errs = errors
+  function snapshot() {
+    if ((!buffer.size && !errors.length) || batches.length >= maxBatches) return
+    batches.push({ id: randomUUID(), rows: [...buffer.values()], errors })
     buffer = new Map()
     errors = []
-    // Mỗi bước độc lập: bước này lỗi không chặn bước sau. Lỗi → bỏ lô đó (mất tối đa 1 phút số liệu) [ASSUMPTION]
-    const step = async (name, fn) => {
-      try {
-        await fn()
-      } catch (err) {
-        console.error(`[metrics] ${name}`, err?.message ?? err)
+  }
+
+  async function cleanup() {
+    if (now() - lastCleanup <= 3600_000) return
+    try {
+      await repo.deleteApiMetricsBefore(new Date(now() - retentionDays * 86400_000).toISOString())
+      lastCleanup = now()
+    } catch {
+      console.error('[metrics] retention cleanup failed')
+    }
+  }
+
+  function flush({ cleanup: runCleanup = true } = {}) {
+    // Snapshot also during an in-flight write, so a second request's waitUntil
+    // covers its own measurements. No parallel writes/double-counted batches.
+    snapshot()
+    if (flushing) return flushing
+    flushing = (async () => {
+      let drained = 0
+      // Bound work even if concurrent requests continuously replenish the queue.
+      while (batches.length && drained++ < maxBatches * 2) {
+        const batch = batches[0]
+        let saved = false
+        for (let attempt = 0; attempt <= retries; attempt++) {
+          try {
+            if (repo.recordApiMetricBatch) {
+              await repo.recordApiMetricBatch(batch.id, batch.rows, batch.errors)
+            } else {
+              // Compatibility for older/test adapters: never retry ambiguous writes.
+              if (batch.rows.length) await repo.recordApiMetrics(batch.rows)
+              if (batch.errors.length) await repo.recordApiErrors(batch.errors)
+            }
+            saved = true
+            break
+          } catch {
+            if (!repo.recordApiMetricBatch) break
+          }
+        }
+        if (!saved) {
+          console.error('[metrics] batch persistence failed; bounded buffer retained')
+          break
+        }
+        batches.shift()
+        snapshot()
       }
-    }
-    if (rows.length) await step('metrics', () => repo.recordApiMetrics(rows))
-    if (errs.length) await step('errors', () => repo.recordApiErrors(errs))
-    // Giữ 30 ngày [ASSUMPTION]; dọn tối đa mỗi giờ một lần, chỉ đánh dấu khi dọn thành công
-    if (now() - lastCleanup > 3600_000) {
-      await step('cleanup', async () => {
-        await repo.deleteApiMetricsBefore(new Date(now() - retentionDays * 86400_000).toISOString())
-        lastCleanup = now()
-      })
-    }
+      if (runCleanup) await cleanup()
+    })().finally(() => { flushing = null })
+    return flushing
   }
 
   // Tổng hợp cho dashboard: dữ liệu đã lưu + phần chưa flush
   async function summary(range) {
     const since = new Date(now() - RANGES[range]).toISOString()
-    const stored = await repo.listApiMetrics({ since })
+    const stored = repo.aggregateApiMetrics
+      ? await repo.aggregateApiMetrics({ since })
+      : await repo.listApiMetrics({ since })
+    // Unsaved batches can have committed despite a lost response; do not add them
+    // to durable totals until retry confirms their idempotency receipt.
     const pending = [...buffer.values()].filter((r) => r.bucket >= since)
     const byRoute = new Map()
     const totals = emptyRow(null, '*', '*', 0)
@@ -190,10 +229,11 @@ export function createMetrics({ repo, classify = () => ({ kind: 'other' }), flus
     record,
     middleware,
     flush,
+    cleanup,
     summary,
     recentErrors,
     start() {
-      timer ??= setInterval(flush, flushMs)
+      timer ??= setInterval(() => flush(), flushMs)
       timer.unref?.()
     },
     async stop() {

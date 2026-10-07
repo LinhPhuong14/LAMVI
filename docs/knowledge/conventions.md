@@ -44,3 +44,5 @@
 - Frontend: `src/**/*.test.jsx`, đặt `// @vitest-environment jsdom` ở đầu file; mock `fetch`.
 - Tên test ghi mã AC/BR khi có: `it('AC-004: token không tồn tại → 404 chung', …)`.
 - Trước khi commit: `npm test` và `npm run lint` phải sạch; `npm run build` phải qua.
+
+Public SSR motion dùng useHydratedReducedMotion từ src/lib/hydration.js để server/client initial markup đồng nhất. Private lazy-route tests phải await phần tử page trước thao tác; không bỏ assertions hoặc ép eager import chỉ để test qua.

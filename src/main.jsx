@@ -20,6 +20,10 @@ const root = document.getElementById('root')
 if (root.hasChildNodes()) hydrateRoot(root, app)
 else createRoot(root).render(app)
 
+// Load diagnostics separately from the storefront bundle. No extra analytics event or network
+// collector is enabled; deployment QA can read the three numeric measurements locally.
+import('./analytics/vitals.js').then(({ startVitals }) => startVitals()).catch(() => {})
+
 // Vercel Web Analytics (không cookie). URL gửi đi đã làm sạch như GA: bỏ query/hash, che token QR (NFR-PRV-002)
 inject({
   beforeSend: (event) => {

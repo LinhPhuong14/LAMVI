@@ -315,3 +315,11 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 `orders/service.js` tính quote và payload; `repo.createOrder` commit qua RPC `create_checkout_order`. Postgres giữ kho/coupon, order_items snapshots, redemption và consumption của cart trong một transaction. Memory adapter mô phỏng khi `fromCart:true`; việc chèn snapshot fixture không có cart dùng cho test lịch sử.
 
 Schema 013 thêm `order_items.stock_reserved` và `orders.atomic_cancellation`. Các lệnh huỷ adapter mới set marker ngay trong conditional UPDATE; trigger `orders_release_on_cancel` trả tài nguyên atomic. Public order presentation không trả các trường vận hành này. Ledger legacy NULL cần runbook đối soát, không dựa vào tồn kho hiện tại để suy luận quá khứ.
+
+## Commerce readiness — 2026-10-07
+
+Migration 014–018 bổ sung FK collections, notification_jobs, return_requests/private evidence, api_metric_batches và checkout idempotency. Checkout RPC vẫn là ranh giới transaction giữ kho/coupon/dọn giỏ; UUID per user chống retry tạo thêm đơn. Outbox trigger capture trạng thái, worker claim SKIP LOCKED và token-fenced settle; scheduler phải được cấu hình thực tế. Returns có adapter riêng, quantity reservation dưới khoá order, admin resolution thủ công và gate mặc định 0.
+
+Vercel handler đăng ký waitUntil để flush metrics sau response; receipt RPC chống ghi trùng khi ACK thất lạc. Cleanup chạy qua authenticated cron. Public SSR tải /api/site với projection contact/social; private routes lazy dưới Suspense/error boundary. Reduced motion và session restore sau hydration tránh DOM SSR/client lệch nhau. CWV hiện chỉ diagnostic bounded trên browser, chưa có collector RUM.
+
+Chi tiết giới hạn, cutover và load profile: [runbook 1M](../production-release-1m.md).

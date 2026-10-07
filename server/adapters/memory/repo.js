@@ -16,6 +16,7 @@ export function createMemoryRepo(data = {}) {
     profiles: new Map(),
     apiMetrics: new Map(), // `${bucket}|${method}|${route}|${status}` → row
     apiErrors: [],
+    apiMetricBatches: new Set(),
     settings: new Map(),
     chatMessages: [],
     carts: new Map(), // userId → Map(productId → { quantity, addedAt })
@@ -77,6 +78,12 @@ export function createMemoryRepo(data = {}) {
     // --- Giám sát (D-52, D-53)
     async ping() {
       return true
+    },
+    async recordApiMetricBatch(batchId, rows, errors) {
+      if (state.apiMetricBatches.has(batchId)) return
+      await this.recordApiMetrics(rows)
+      await this.recordApiErrors(errors)
+      state.apiMetricBatches.add(batchId)
     },
     async recordApiMetrics(rows) {
       for (const r of rows) {
@@ -222,6 +229,15 @@ export function createMemoryRepo(data = {}) {
       )
     },
 
+    async getCollectionById(id) { return clone(byId(state.collections, id) ?? null) },
+    async createCollection(row) { return create(state.collections, row, 'slug') },
+    async updateCollection(id, row) { return update(state.collections, id, row, 'slug') },
+    async deleteCollection(id) {
+      const c = byId(state.collections, id)
+      if (c && state.products.some((p) => p.collectionSlug === c.slug)) throw new RepoError('COLLECTION_IN_USE')
+      return remove(state.collections, id)
+    },
+
     async listCollections({ statuses } = {}) {
       return clone(
         state.collections
@@ -309,6 +325,13 @@ export function createMemoryRepo(data = {}) {
     // --- Đơn hàng (FR-CHK-*, FR-ORD-*)
     async createOrder(order, items, redemption, { now: checkoutNow = new Date(), fromCart = false } = {}) {
       // No await between validation and commit: mirrors the Postgres transaction.
+      if (order.checkoutIdempotencyKey) {
+        const existing = state.orders.find((row) => row.userId === order.userId && row.checkoutIdempotencyKey === order.checkoutIdempotencyKey)
+        if (existing) {
+          if (existing.checkoutFingerprint !== order.checkoutFingerprint) throw new RepoError('CHECKOUT_KEY_CONFLICT')
+          return { ...clone(existing), checkoutReplayed: true }
+        }
+      }
       const cart = state.carts.get(order.userId)
       if (fromCart) {
         if (!cart?.size) throw new RepoError('CART_EMPTY')
@@ -359,6 +382,10 @@ export function createMemoryRepo(data = {}) {
         state.couponRedemptions.push({ ...redemption, orderId: row.id, createdAt: now() })
       }
       return clone(row)
+    },
+    async getOrderByCheckoutKey(userId, key) {
+      const order = state.orders.find((row) => row.userId === userId && row.checkoutIdempotencyKey === key)
+      return order ? clone(order) : null
     },
     async getOrderById(id) {
       const o = byId(state.orders, id)

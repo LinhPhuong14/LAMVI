@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import Field from './Field'
+import AddressCombobox from './AddressCombobox.jsx'
 import { api } from '../api/client.js'
 import { useI18n } from '../i18n/index.js'
 
 // G-46, D-99: chọn tỉnh/thành → phường/xã từ danh mục hành chính 2 cấp (server là nguồn sự thật)
 function useGeo(path) {
   const [state, setState] = useState({ path: null, items: [], error: false })
+  const [attempt, setAttempt] = useState(0)
   useEffect(() => {
     if (!path) return undefined
     let alive = true
@@ -15,9 +17,9 @@ function useGeo(path) {
     return () => {
       alive = false
     }
-  }, [path])
+  }, [path, attempt])
   // Đổi path → coi như đang tải tới khi có kết quả mới
-  return path && state.path === path ? state : { path, items: [], error: false, loading: Boolean(path) }
+  return { ...(path && state.path === path ? state : { path, items: [], error: false, loading: Boolean(path) }), retry: () => { setState({ path: null, items: [], error: false }); setAttempt((n) => n + 1) } }
 }
 
 export default function AddressSelect({ provinceCode, wardCode, onChange, errors = {} }) {
@@ -42,24 +44,19 @@ export default function AddressSelect({ provinceCode, wardCode, onChange, errors
           </option>
         ))}
       </Field>
-      <Field
-        as="select"
+      <AddressCombobox
+        key={provinceCode}
         label={t('checkout.ward')}
+        items={wards.items}
         value={wardCode}
-        onChange={(e) => onChange({ provinceCode, wardCode: e.target.value })}
+        onChange={(code) => onChange({ provinceCode, wardCode: code })}
         error={errors.wardCode}
         disabled={!provinceCode}
-        autoComplete="address-level2"
-        required
-        hint={provinces.error || wards.error ? t('checkout.geoError') : undefined}
-      >
-        <option value="">{provinceCode ? t('checkout.chooseWard') : t('checkout.chooseProvinceFirst')}</option>
-        {wards.items.map((w) => (
-          <option key={w.code} value={w.code}>
-            {w.name}
-          </option>
-        ))}
-      </Field>
+        loading={wards.loading}
+        failed={provinces.error || wards.error}
+        retry={provinces.error ? provinces.retry : wards.retry}
+        placeholder={provinceCode ? t('checkout.chooseWard') : t('checkout.chooseProvinceFirst')}
+      />
     </div>
   )
 }

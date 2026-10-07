@@ -9,6 +9,8 @@ import { group } from '../lib/motion.js'
 export default function SiteFooter() {
   const { t, lang, path } = useI18n()
   const products = useApi('/products', lang)
+  const site = useApi('/site', lang)
+  const business = site.status === 'ok' ? site.data : null
   const home = (hash) => ({ pathname: path('/'), hash })
 
   return (
@@ -17,17 +19,11 @@ export default function SiteFooter() {
         <div className="footer-brand">
           <Seal className="seal-lg">LAMVI</Seal>
           <p>{t('footer.tagline')}</p>
-          <div className="social-links">
-            <a href="#" aria-label="Facebook">
-              Facebook
-            </a>
-            <a href="#" aria-label="Instagram">
-              Instagram
-            </a>
-            <a href="#" aria-label="TikTok">
-              TikTok
-            </a>
-          </div>
+          {business?.legalName && <p>{business.legalName}</p>}
+          {business?.address && <p>{business.address}</p>}
+          {business?.social?.length > 0 && <div className="social-links">
+            {business.social.map(({ label, url }) => <a key={label} href={url} rel="noopener noreferrer">{label}</a>)}
+          </div>}
         </div>
         <div className="footer-col">
           <h3>{t('footer.products')}</h3>
@@ -44,10 +40,13 @@ export default function SiteFooter() {
           <Link to={path('/returns')}>{t('footer.returns')}</Link>
           <Link to={path('/privacy')}>{t('footer.privacy')}</Link>
           <Link to={path('/account?tab=orders')}>{t('footer.tracking')}</Link>
+          {business?.supportEmail && <a href={`mailto:${business.supportEmail}`}>{business.supportEmail}</a>}
+          {business?.phone && <a href={`tel:${business.phone.replace(/[^0-9+]/g, '')}`}>{business.phone}</a>}
+          {business?.hours && <p>{business.hours}</p>}
         </div>
         <div className="footer-col footer-news">
           <h3>{t('footer.newsTitle')}</h3>
-          <p>{t('footer.newsText')}</p>
+          <p>{t('footer.newsUnavailable')}</p>
           {/* G-11: newsletter chưa có backend — giữ hay bỏ form chờ PO (§30 P2) */}
           <form className="news-form" onSubmit={(e) => e.preventDefault()}>
             <input
@@ -55,8 +54,9 @@ export default function SiteFooter() {
               placeholder={t('footer.newsPlaceholder')}
               aria-label={t('footer.newsPlaceholder')}
               required
+              disabled
             />
-            <button type="submit" className="btn btn-small">
+            <button type="submit" className="btn btn-small" disabled>
               {t('footer.newsSubmit')}
             </button>
           </form>

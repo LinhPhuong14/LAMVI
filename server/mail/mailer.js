@@ -16,7 +16,12 @@ async function post(url, headers, payload, fetchImpl) {
     body: JSON.stringify(payload),
     signal: AbortSignal.timeout(TIMEOUT_MS),
   })
-  if (!res.ok) throw new Error(`mail ${res.status}`)
+  if (!res.ok) {
+    const error = new Error(`mail ${res.status}`)
+    error.status = res.status
+    throw error
+  }
+  return typeof res.json === 'function' ? await res.json().catch(() => null) : null
 }
 
 async function get(url, headers, fetchImpl) {
@@ -31,8 +36,8 @@ const fromDomain = (from) => parseFrom(from).email.split('@')[1]?.toLowerCase() 
 // Resend: 3.000 thư/tháng, 100/ngày (gói miễn phí); cần xác minh tên miền gửi
 const resend = ({ apiKey, from }, fetchImpl) => ({
   provider: 'resend',
-  send: ({ to, subject, text, html }) =>
-    post('https://api.resend.com/emails', { Authorization: `Bearer ${apiKey}` }, { from, to: [to], subject, text, html }, fetchImpl),
+  send: ({ to, subject, text, html, idempotencyKey }) =>
+    post('https://api.resend.com/emails', { Authorization: `Bearer ${apiKey}`, ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}) }, { from, to: [to], subject, text, html }, fetchImpl),
   // Kiểm khoá và tên miền gửi mà KHÔNG gửi thư (dashboard IT). Trả { note? }; lỗi → ném Error(mã).
   async ping() {
     const { status, data } = await get('https://api.resend.com/domains', { Authorization: `Bearer ${apiKey}` }, fetchImpl)

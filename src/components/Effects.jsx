@@ -1,9 +1,9 @@
+import { useHydratedReducedMotion } from '../lib/hydration.js'
 import { useEffect, useId, useRef } from 'react'
 import {
   m,
   useMotionTemplate,
   useMotionValue,
-  useReducedMotionConfig,
   useSpring,
 } from 'framer-motion'
 import { useFinePointer } from '../lib/motion.js'
@@ -14,7 +14,7 @@ import { useFinePointer } from '../lib/motion.js'
 
 function usePointerEffects() {
   const fine = useFinePointer()
-  const reduce = useReducedMotionConfig()
+  const reduce = useHydratedReducedMotion()
   return fine && !reduce
 }
 
@@ -123,7 +123,7 @@ export function BrandHover({ text }) {
   // id riêng cho mỗi lần dùng (lọc ký tự đặc biệt để `url(#…)` và selector luôn hợp lệ)
   const gradId = `brandInk-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
   const active = usePointerEffects()
-  const reduce = useReducedMotionConfig()
+  const reduce = useHydratedReducedMotion()
   const cx = useSpring(50, { stiffness: 120, damping: 20 })
   const cy = useSpring(50, { stiffness: 120, damping: 20 })
   const r = useSpring(0, { stiffness: 120, damping: 20 })

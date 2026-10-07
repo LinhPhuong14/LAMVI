@@ -16,6 +16,7 @@ describe('Quên mật khẩu với email chưa đăng ký', () => {
   it('hiện thông báo rõ và link tạo tài khoản; không hiện "đã gửi thư"', async () => {
     mockApi({ ...base, ...notRegistered })
     renderAt('/forgot-password')
+    await screen.findByLabelText('Email')
     submit('chua-dk@example.com')
     const alert = await screen.findByRole('alert')
     expect(alert).toHaveTextContent('Email này chưa đăng ký tài khoản LAMVI.')
@@ -30,6 +31,7 @@ describe('Quên mật khẩu với email chưa đăng ký', () => {
       'POST /auth/forgot-password': () => (n++ === 0 ? { status: 404, body: { error: { code: 'EMAIL_NOT_REGISTERED' } } } : { status: 202, body: { ok: true } }),
     })
     renderAt('/forgot-password')
+    await screen.findByLabelText('Email')
     submit('sai@example.com')
     await screen.findByRole('alert')
     submit('dung@example.com')
@@ -40,6 +42,7 @@ describe('Quên mật khẩu với email chưa đăng ký', () => {
   it('link đăng ký giữ tiền tố ngôn ngữ (en/zh) và thông báo dịch được', async () => {
     mockApi({ ...base, ...notRegistered })
     renderAt('/en/forgot-password')
+    await screen.findByLabelText('Email')
     fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'x@example.com' } })
     fireEvent.click(screen.getByRole('button', { name: /Send reset email/ }))
     expect(await screen.findByRole('alert')).toHaveTextContent('This email is not registered with LAMVI.')
@@ -49,6 +52,7 @@ describe('Quên mật khẩu với email chưa đăng ký', () => {
   it('lỗi khác (mạng, 429) vẫn hiện thông báo chung, không có link đăng ký', async () => {
     mockApi({ ...base, 'POST /auth/forgot-password': () => ({ status: 429, body: { error: { code: 'RATE_LIMITED' } } }) })
     renderAt('/forgot-password')
+    await screen.findByLabelText('Email')
     submit('a@example.com')
     expect(await screen.findByRole('alert')).toHaveTextContent('quá nhanh')
     expect(screen.queryByRole('link', { name: 'Tạo tài khoản mới' })).toBeNull()

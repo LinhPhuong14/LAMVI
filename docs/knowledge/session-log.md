@@ -1,5 +1,20 @@
 # Nhật ký phiên
 
+## 2026-10-07 — Triển khai commerce readiness (feat/production-commerce-readiness)
+
+Đã triển khai checkout idempotency/UX, collection admin, outbox email, metrics serverless và đổi trả gate-off; runtime fail-closed, footer cấu hình thật, private lazy routes và hydration fixes. Không thay quyết định PO/LEGAL. Bộ test đầy đủ 3.067/3.067 qua; build qua; PostgreSQL 001–018 và concurrency được kiểm thật trên container tạm. Kiểm cuối: thêm 29 tests messages/TTL qua; browser mobile 7 samples, 0 JS errors/axe findings, keyboard xã PASS; local public-read smoke 1.000 requests/20 concurrency, 0 lỗi (memory adapter, không chứng nhận 1M). Browser mobile/axe và local load smoke được ghi trong [runbook](../production-release-1m.md).
+
+Chưa deploy hoặc nghiệm thu 1M: thiếu production bindings/schema preflight/Preview integration; cần PO chốt video/retention/phạm vi quốc tế, nội dung sản phẩm và doanh nghiệp thật. Giữ master theo gate T-59.
+
+
+## 2026-10-07 — Audit production và kế hoạch hoàn thiện
+
+- Nhánh `docs/production-feature-plan-2026-10-07`; không sửa application/schema hay quyết định BA.
+- Đối chiếu GET công khai production, BA v0.37, source; ghi rõ guard/app shell không chứng minh flow hoạt động.
+- Đọc 12 nguồn chính chủ Shopify Hydrogen, Stripe examples, W3C ARIA và Google web-vitals; website benchmark trực tiếp bị proxy chặn. Network draft save bị `stale_base`, chưa lưu; proposal bảo toàn ngoài repo.
+- Tạo [kế hoạch P00–P08](../production-feature-plan-2026-10-07.md), có schema/API đề xuất, acceptance, dependency PO/legal và rollout gate. Chưa triển khai/code các ticket.
+- Kiểm tra link nội bộ và số evidence; không chạy lại suite application cho thay đổi tài liệu. Tài liệu hiện lưu trong workspace trên nhánh docs; chưa push/merge.
+
 ## 2026-10-06 — Checkout nguyên tử và dấu vết giữ kho (nhánh `fix/checkout-atomic-inventory`)
 
 **Yêu cầu**: bắt đầu sửa theo đề xuất rà soát BA/production, ưu tiên bộ sưu tập và an toàn đơn/kho.

@@ -183,3 +183,29 @@ it('stock shortage arising after quote identifies the product requiring correcti
   expect(result.body.error.details?.slug).toBe('den-nguyet')
   expect((await product('den-nguyet')).stock).toBe(1)
 })
+
+describe('Independent checkout key replay', () => {
+  const key = 'd215a9bb-44ca-4b16-bdaa-836a8923beaf'
+  it('lost commit response replays existing order without releasing its inventory', async () => {
+    await stock('den-nguyet', 5)
+    await add('den-nguyet', 2)
+    const original = repo.createOrder.bind(repo)
+    vi.spyOn(repo, 'createOrder').mockImplementationOnce(async (...args) => {
+      await original(...args)
+      throw new Error('commit response lost')
+    })
+    const first = await place({ idempotencyKey: key })
+    const retry = await place({ idempotencyKey: key })
+    expect(retry.code).toBe(first.code)
+    expect((await product('den-nguyet')).stock).toBe(3)
+  })
+  it('same key cannot silently reuse order with different checkout details', async () => {
+    await stock('den-nguyet', 5)
+    await add('den-nguyet', 1)
+    await place({ idempotencyKey: key })
+    const result = await request(app).post('/api/orders').set('Authorization', customer).send({ ...body, idempotencyKey: key, recipientName: 'Changed recipient' })
+    expect(result.status).toBe(409)
+    expect(result.body.error.code).toBe('CHECKOUT_KEY_CONFLICT')
+    expect((await product('den-nguyet')).stock).toBe(4)
+  })
+})

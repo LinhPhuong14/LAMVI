@@ -92,3 +92,11 @@ Gói `@vercel/analytics` được nhúng ở `src/main.jsx`. Bật **Analytics**
 5. Test Preview với Supabase test đã migration: sản phẩm/collections 200, tạo đơn COD, payOS với tài khoản test được cho phép, huỷ/hết hạn, hai checkout tranh món cuối. Trên local chạy `npm test -- --maxWorkers=2`, `npm run lint`, `npm run build`; kiểm DB thật riêng bằng `python3 scripts/test-checkout-postgres.py` (cần Docker, tự tạo/xoá container, không chạm DB production).
 6. Chỉ merge vào `master` sau khi schema production đã đạt preflight và Preview được kiểm. Merge `master` kích hoạt deploy production, vì vậy không tự merge khi còn thiếu quyền xác minh migration. Sau deploy kiểm `/`, `/en`, `/zh`, `/api/products`, `/api/collections`, SSR và asset; xác minh luồng checkout được cho phép, không tạo giao dịch hoặc gửi thư cho khách thật chỉ để thử.
 7. Nếu collections thiếu schema, code mới trả 503 `CATALOG_NOT_READY` và SSR noindex/status 503; shop vẫn hiển thị sản phẩm. Đây là chẩn đoán có kiểm chứng, **không thay thế** việc chuẩn bị bảng và dữ liệu bộ sưu tập thật. Permission/network lỗi không được che thành danh sách rỗng.
+
+## Gate phát hành commerce 2026-10-07
+
+Đọc [runbook 1M và thứ tự migration](../production-release-1m.md) trước phát hành. Chạy schema preflight read-only, migration 014–018 và Preview integration trước merge master (T-59). Không chạy lại migration 013 sau 018 vì sẽ ghi đè checkout RPC mới.
+
+Outbox 015 capture ngay khi migrate, độc lập flag: pause legacy order writes/mail đang chạy, migrate, deploy với NOTIFICATION_OUTBOX_ENABLED=1, rồi resume; đối soát gap legacy bằng chứng trước drain. RETURNS_VIDEO_MAX_MB=0 giữ đổi trả tắt tới khi PO duyệt policy. @vercel/functions waitUntil trong api/index.js là wrapper cần giữ.
+
+Hosted production từ chối memory adapter, salt mặc định, thiếu HTTPS, rate limit tắt hoặc dev-role override. ALLOW_LOCAL_MEMORY=1 chỉ dành cho demo loopback không Vercel. Chưa có bindings Supabase/Vercel/Resend/cron trong phiên này: không coi local tests là production integration.

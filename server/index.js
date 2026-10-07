@@ -1,3 +1,4 @@
+import { createSupabaseReturnsRepo, createMemoryReturnsRepo } from './returns/repository.js'
 import { createClient } from '@supabase/supabase-js'
 import { createApp } from './app.js'
 import { createWeb } from './ssr.js'
@@ -8,8 +9,11 @@ import { createOpenAiClient } from './adapters/openai.js'
 import { createPayosClient } from './adapters/payos.js'
 import { createOrderService } from './orders/service.js'
 import { createOrderNotifier } from './orders/notify.js'
+import { createNotificationOutboxRepo } from './mail/outboxRepo.js'
+import { createNotificationWorker } from './mail/outbox.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { loadConfig } from './config.js'
+import { assertRuntimeReady } from './runtimeReadiness.js'
 import { createConsoleMailer, createMailer } from './mail/mailer.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
 import { createMemoryAuth } from './adapters/memory/auth.js'
@@ -19,9 +23,12 @@ import { createSupabaseStorage } from './adapters/supabase/storage.js'
 import { createMemoryStorage } from './adapters/memory/storage.js'
 
 const config = loadConfig()
+assertRuntimeReady(config)
 let repo
+let returnsRepo
 let auth
 let storage
+let notificationOutbox
 
 // T-04: có đủ biến Supabase → dùng Supabase; không thì dùng bộ nhớ (chỉ cho dev)
 if (config.useSupabase) {
@@ -29,11 +36,14 @@ if (config.useSupabase) {
   const admin = createClient(config.supabase.url, config.supabase.serviceRoleKey, opts)
   const makePublicClient = () => createClient(config.supabase.url, config.supabase.anonKey, opts)
   repo = createSupabaseRepo(admin)
+  returnsRepo = createSupabaseReturnsRepo(admin)
+  if (process.env.NOTIFICATION_OUTBOX_ENABLED === '1') notificationOutbox = createNotificationOutboxRepo(admin)
   auth = createSupabaseAuth({ admin, makePublicClient })
   storage = createSupabaseStorage(admin)
   console.log('[api] Dùng Supabase')
 } else {
   repo = createMemoryRepo()
+  returnsRepo = createMemoryReturnsRepo()
   auth = createMemoryAuth()
   storage = createMemoryStorage({ maxBytes: config.maxVideoMb * 1024 * 1024 })
   console.warn('[api] Thiếu biến SUPABASE_* — dùng dữ liệu bộ nhớ (không lưu lâu dài)')
@@ -67,25 +77,26 @@ if (!payos) console.warn('[api] Thiếu biến PAYOS_* — chỉ nhận thanh to
 // T-49: thư giao dịch. Production phải có MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY; dev (bộ nhớ) in ra console.
 const mailer = createMailer(config.mail) ?? (config.useSupabase ? null : createConsoleMailer())
 if (!mailer) console.warn('[api] Thiếu MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY — "Quên mật khẩu" và thông báo đơn hàng không gửi được thư')
+const notifications = notificationOutbox ? createNotificationWorker({ outbox: notificationOutbox, repo, mailer, siteUrl: config.publicSiteUrl, brand: config.mail?.brand }) : null
 // §20, Q-24 → email (T-56): thông báo đơn hàng cho người mua qua cùng nhà cung cấp thư
 const orders = createOrderService({
   repo,
   payos,
-  notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl, brand: config.mail?.brand }),
+  notify: createOrderNotifier({ repo, mailer, siteUrl: config.publicSiteUrl, brand: config.mail?.brand, worker: notifications }),
 })
 
 const web = process.env.API_ONLY === '1' ? undefined : await createWeb({ repo, config, dev, maintenance })
 
-metrics.start()
+if (!process.env.VERCEL) metrics.start()
 // Ghi nốt số liệu chưa flush khi tắt server
-for (const sig of ['SIGTERM', 'SIGINT']) {
+for (const sig of (process.env.VERCEL ? [] : ['SIGTERM', 'SIGINT'])) {
   process.once(sig, async () => {
     await metrics.stop()
     process.exit(0)
   })
 }
 
-export const app = createApp({ repo, auth, storage, web, config, metrics, maintenance, may, payos, orders, mailer, dev })
+export const app = createApp({ repo, returnsRepo, auth, storage, web, config, metrics, maintenance, may, payos, orders, mailer, notifications, notificationOutbox, dev })
 
 // T-33: trên Vercel, `api/index.js` dùng `app` làm hàm serverless — không tự listen
 if (!process.env.VERCEL) {

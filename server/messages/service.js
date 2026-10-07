@@ -184,19 +184,23 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
     return published[0] ? { code: published[0].code, title: published[0].title } : null
   }
 
-  async function mediaUrls(message) {
+  async function mediaUrls(message, deadline) {
     const out = {}
+    const remaining = () => deadline ? Math.min(3600, Math.floor((deadline.getTime() - now().getTime()) / 1000)) : 3600
     for (const [kind, [pathCol, typeCol]] of Object.entries(COLS)) {
       if (!message[pathCol]) continue
+      const expiresIn = remaining()
+      if (expiresIn <= 0) break
       const ext = message[pathCol].split('.').pop()
+      const url = await storage.signedUrl(message[pathCol], GIFT_MEDIA_BUCKET, { expiresIn })
+      const downloadTtl = remaining()
       out[kind] = {
         type: message[typeCol],
-        url: await storage.signedUrl(message[pathCol], GIFT_MEDIA_BUCKET, { expiresIn: 3600 }),
-        // FR-QR-004: tải về trước khi bị xoá
-        downloadUrl: await storage.signedUrl(message[pathCol], GIFT_MEDIA_BUCKET, {
-          expiresIn: 3600,
+        url,
+        ...(downloadTtl > 0 ? { downloadUrl: await storage.signedUrl(message[pathCol], GIFT_MEDIA_BUCKET, {
+          expiresIn: downloadTtl,
           download: `${DOWNLOAD_NAME[kind]}.${ext}`,
-        }),
+        }) } : {}),
       }
     }
     return out
@@ -221,7 +225,7 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
       text: message.text,
       textLang: message.textLang,
       translations: message.translations ?? {},
-      media: expired || !hasMedia(message) ? {} : await mediaUrls(message),
+      media: expired || !hasMedia(message) ? {} : await mediaUrls(message, deadline),
       mediaExpired: expired && (hasMedia(message) || Boolean(message.mediaDeletedAt)),
       mediaExpiresAt: !expired && hasMedia(message) && deadline ? deadline.toISOString() : null,
       mediaDaysLeft: !expired && hasMedia(message) ? mediaDaysLeft(order, message, now()) : null,

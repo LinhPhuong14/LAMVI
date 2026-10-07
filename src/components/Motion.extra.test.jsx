@@ -83,8 +83,8 @@ describe('Hero — tiêu đề tách từng từ nhưng không dính chữ', () 
 describe('Header — logo con dấu và tự ẩn khi cuộn', () => {
   it.each(['vi', 'en', 'zh'])('%s: .nav-mark là link về trang chủ theo ngôn ngữ, có tên truy cập được', async (lang) => {
     mockApi(handlers)
-    const { container } = renderAt(lang === 'vi' ? '/account' : `/${lang}/account`)
-    const mark = container.querySelector('.nav-mark')
+    renderAt(lang === 'vi' ? '/account' : `/${lang}/account`)
+    const mark = await screen.findByRole('link', { name: 'LAMVI' })
     expect(mark.tagName).toBe('A')
     expect(mark).toHaveAttribute('href', PREFIX[lang])
     expect(screen.getByRole('link', { name: 'LAMVI' })).toBe(mark)

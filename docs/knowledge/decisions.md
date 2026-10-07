@@ -357,3 +357,15 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - Giữ các helper reserve_stock/release_stock/claim_coupon/release_coupon cho compatibility code cũ; code mới không dùng chúng để checkout/cancel. Mọi retry sau lỗi mạng không rõ commit không được tự cộng kho/coupon. Kiểm đơn/giỏ rồi phục hồi theo trạng thái.
 - Collections schema thiếu được nhận diện từ mã DB/PostgREST cụ thể thành CATALOG_NOT_READY/503; permission/network lỗi vẫn lỗi thật, không đổi thành catalog rỗng. SSR giữ status 503 và noindex; shop vẫn có sản phẩm nếu collections lỗi.
 - Kiểm SQL bằng `python3 scripts/test-checkout-postgres.py` (Docker PostgreSQL 17 digest cố định, DB dùng một lần, tự dọn). `scripts/check-schema.js` là preflight read-only với binding môi trường đích, RPC empty-cart bị từ chối trước mọi write; không log key hay dữ liệu khách.
+
+### T-60–T-66 — Hoàn thiện commerce production (2026-10-07)
+
+- T-60: giỏ serialize mutation trong một session; checkout chặn quote cũ, combobox xã hỗ trợ keyboard/ARIA. Cross-tab atomic cart còn mở.
+- T-61: CRUD bộ sưu tập, slug bất biến và FK 014 bảo vệ liên kết; reward không lộ ra public catalog.
+- T-62: outbox 015 capture cùng transaction trạng thái đơn, lease/token fencing, provider idempotency và retry có hạn; cutover phối hợp với legacy mail trước khi bật flag.
+- T-63: Vercel waitUntil + RPC 017 atomic metrics/receipt, aggregate trong DB; buffer hữu hạn không bảo đảm zero-loss khi outage.
+- T-64: đổi trả có evidence private và admin ghi kết quả xử lý thủ công; gate mặc định tắt tới khi PO chốt video/retention. Không tự refund tiền hay quyết định chính sách mới.
+- T-65: checkout key UUID per user + fingerprint và RPC 018 cho retry trả cùng đơn; chưa tự phục hồi checkout sau full reload.
+- T-66: production startup fail closed nếu thiếu Supabase/salt/rate limit; footer cấu hình thật, private route lazy, hydration an toàn với reduced motion/session và diagnostic CWV cục bộ.
+
+Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa merge master/deploy trước schema preflight và Preview integration. Xem [runbook phát hành và nghiệm thu 1M](../production-release-1m.md).
