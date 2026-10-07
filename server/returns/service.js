@@ -8,6 +8,28 @@ export const returnEligible = (order, now = Date.now()) =>
   Number.isFinite(Date.parse(order.deliveredAt)) &&
   now >= Date.parse(order.deliveredAt) &&
   now <= Date.parse(order.deliveredAt) + 7 * 86400000
+const requestId = (id) => {
+  if (typeof id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))
+    throw notFound()
+}
+const sameSubmission = (r, input) => {
+  if (
+    input?.continuousVideo !== true ||
+    input.reason !== r.reason ||
+    typeof input.description !== 'string' ||
+    input.description.trim() !== r.description ||
+    !Array.isArray(input.items)
+  )
+    return false
+  const canonical = (items) =>
+    items.every((i) => i && typeof i === 'object' && typeof i.slug === 'string' && Number.isSafeInteger(i.quantity))
+      ? JSON.stringify(
+          items.map(({ slug, quantity }) => ({ slug, quantity })).sort((a, b) => a.slug.localeCompare(b.slug)),
+        )
+      : null
+  const incoming = canonical(input.items)
+  return incoming !== null && incoming === canonical(r.items)
+}
 const fail = (code, status = 400) => {
   throw new HttpError(status, code)
 }
@@ -33,9 +55,15 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
     return o
   }
   async function ownerRequest(id, userId) {
+    requestId(id)
     const r = await returnsRepo.get(id)
     if (!r || r.userId !== userId) throw notFound()
     return r
+  }
+  async function recoverCommitted(id, userId, input, error) {
+    const fresh = await ownerRequest(id, userId)
+    if (fresh.status !== 'uploading' && sameSubmission(fresh, input)) return view(fresh)
+    throw error
   }
   function requireEnabled() {
     if (!enabled) fail('RETURNS_NOT_CONFIGURED', 503)
@@ -89,10 +117,17 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
     async submit(id, userId, input) {
       requireEnabled()
       const r = await ownerRequest(id, userId)
-      if (r.status !== 'uploading') fail('RETURN_ALREADY_SUBMITTED', 409)
+      if (r.status !== 'uploading') {
+        if (sameSubmission(r, input)) return view(r)
+        fail('RETURN_ALREADY_SUBMITTED', 409)
+      }
       const o = await repo.getOrderById(r.orderId)
       if (!o || o.userId !== userId) throw notFound()
-      eligible(o)
+      try {
+        eligible(o)
+      } catch (error) {
+        return recoverCommitted(id, userId, input, error)
+      }
       if (
         input.continuousVideo !== true ||
         !RETURN_REASONS.includes(input.reason) ||
@@ -105,6 +140,7 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
         fail('INVALID_RETURN_ITEMS')
       const seen = new Set()
       for (const item of input.items) {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) fail('INVALID_RETURN_ITEMS')
         const purchased = o.items.find((i) => i.slug === item.slug)
         if (
           !purchased ||
@@ -123,7 +159,7 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
       })
       for (const item of input.items) {
         const already = previous
-          .filter((p) => p.status !== 'rejected')
+          .filter((p) => p.status !== 'rejected' && p.id !== id)
           .reduce((n, p) => n + (p.items.find((i) => i.slug === item.slug)?.quantity ?? 0), 0)
         if (already + item.quantity > o.items.find((i) => i.slug === item.slug).quantity)
           fail('RETURN_QUANTITY_EXCEEDED', 409)
@@ -131,13 +167,19 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
       const file = await storage.statObject(r.videoPath, RETURN_BUCKET)
       if (!file || file.size !== r.videoBytes || file.contentType !== r.videoType || file.size > maxBytes)
         fail('RETURN_VIDEO_NOT_UPLOADED')
-      const changed = await returnsRepo.submit(id, userId, {
-        reason: input.reason,
-        description: input.description.trim(),
-        items: input.items.map(({ slug, quantity }) => ({ slug, quantity })),
-        purchased: o.items,
-        submittedAt: new Date(now()).toISOString(),
-      })
+      let changed
+      try {
+        changed = await returnsRepo.submit(id, userId, {
+          reason: input.reason,
+          description: input.description.trim(),
+          items: input.items.map(({ slug, quantity }) => ({ slug, quantity })),
+          purchased: o.items,
+          submittedAt: new Date(now()).toISOString(),
+        })
+      } catch (err) {
+        if (!['RETURN_ALREADY_SUBMITTED', 'RETURN_WINDOW_CLOSED'].includes(err?.code)) throw err
+        return recoverCommitted(id, userId, input, err)
+      }
       if (!changed) fail('RETURN_ALREADY_SUBMITTED', 409)
       return view(changed)
     },
@@ -178,6 +220,7 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
       }
     },
     async resolve(id, adminId, input) {
+      requestId(id)
       if (
         !['replacement', 'refund'].includes(input.resolution) ||
         typeof input.note !== 'string' ||
@@ -192,7 +235,17 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
         resolvedBy: adminId,
         resolvedAt: new Date(now()).toISOString(),
       })
-      if (!r) fail('RETURN_RESOLUTION_CONFLICT', 409)
+      if (!r) {
+        const committed = await returnsRepo.get(id)
+        if (
+          committed?.status === 'resolved' &&
+          committed.resolution === input.resolution &&
+          committed.resolutionNote === input.note.trim() &&
+          committed.resolvedBy === adminId
+        )
+          return view(committed)
+        fail('RETURN_RESOLUTION_CONFLICT', 409)
+      }
       if (repo.appendAuditLog) {
         try {
           await repo.appendAuditLog([
@@ -213,6 +266,7 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
       return view(r)
     },
     async adminVideo(id) {
+      requestId(id)
       const r = await returnsRepo.get(id)
       if (!r || r.status === 'uploading') throw notFound()
       return {
@@ -222,6 +276,7 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
       }
     },
     async decide(id, adminId, input) {
+      requestId(id)
       if (
         !['approved', 'rejected'].includes(input.status) ||
         typeof input.note !== 'string' ||
@@ -235,7 +290,16 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
         decidedBy: adminId,
         decidedAt: new Date(now()).toISOString(),
       })
-      if (!r) fail('RETURN_DECISION_CONFLICT', 409)
+      if (!r) {
+        const committed = await returnsRepo.get(id)
+        if (
+          committed?.status === input.status &&
+          committed.decisionNote === input.note.trim() &&
+          committed.decidedBy === adminId
+        )
+          return view(committed)
+        fail('RETURN_DECISION_CONFLICT', 409)
+      }
       // Decision identity/time are durable in the request itself; global audit is supplemental.
       if (repo.appendAuditLog) {
         try {

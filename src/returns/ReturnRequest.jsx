@@ -1,5 +1,5 @@
 import './returns.css'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../auth/context.js'
 import { useI18n } from '../i18n/index.js'
 import { returnStrings } from './strings.js'
@@ -7,45 +7,55 @@ export default function ReturnRequest({ order }) {
   const { authedApi } = useAuth(),
     { lang } = useI18n(),
     s = returnStrings(lang)
-  const [data, setData] = useState(null),
+  const [result, setData] = useState(null),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(false),
     [done, setDone] = useState(false)
+  const uploadAttempt = useRef(null)
+  const data = result?.orderCode === order.code ? result : null
   useEffect(() => {
+    if (order.status !== 'delivered') return
     let alive = true
     authedApi(`/orders/${encodeURIComponent(order.code)}/returns`)
-      .then((r) => alive && setData(r))
+      .then((r) => alive && setData({ ...r, orderCode: order.code }))
       .catch(() => alive && setError(true))
     return () => {
       alive = false
     }
-  }, [authedApi, order.code])
+  }, [authedApi, order.code, order.status])
   async function submit(e) {
     e.preventDefault()
     const form = e.currentTarget,
       f = new FormData(form),
-      video = f.get('video')
+      video = form.elements.namedItem('video')?.files?.[0]
     setBusy(true)
     setError(false)
+    setDone(false)
     try {
       if (!video?.size || video.size > data.maxBytes) throw Error('size')
-      const upload = await authedApi(`/orders/${encodeURIComponent(order.code)}/returns/upload`, {
-        method: 'POST',
-        body: { contentType: video.type, size: video.size },
-      })
-      const response = await fetch(upload.uploadUrl, {
-        method: 'PUT',
-        headers: upload.headers,
-        body: video,
-      })
-      if (!response.ok) throw Error('upload')
       const items = order.items
         .filter((i) => f.has(`item:${i.slug}`))
-        .map((i) => ({
-          slug: i.slug,
-          quantity: Number(f.get(`quantity:${i.slug}`)),
-        }))
-      await authedApi(`/returns/${upload.id}/submit`, {
+        .map((i) => ({ slug: i.slug, quantity: Number(f.get(`quantity:${i.slug}`)) }))
+      if (!items.length) throw Error('items')
+      let attempt = uploadAttempt.current
+      if (!attempt || attempt.orderCode !== order.code) {
+        const upload = await authedApi(`/orders/${encodeURIComponent(order.code)}/returns/upload`, {
+          method: 'POST',
+          body: { contentType: video.type, size: video.size },
+        })
+        attempt = { ...upload, orderCode: order.code, uploaded: false }
+        uploadAttempt.current = attempt
+      }
+      if (!attempt.uploaded) {
+        // A lost upload response can still mean the object was stored. Finalize verifies the real object.
+        try {
+          const response = await fetch(attempt.uploadUrl, { method: 'PUT', headers: attempt.headers, body: video })
+          attempt.uploaded = response.ok
+        } catch {
+          attempt.uploaded = false
+        }
+      }
+      const saved = await authedApi(`/returns/${attempt.id}/submit`, {
         method: 'POST',
         body: {
           reason: f.get('reason'),
@@ -55,8 +65,19 @@ export default function ReturnRequest({ order }) {
         },
       })
       setDone(true)
-      setData(await authedApi(`/orders/${encodeURIComponent(order.code)}/returns`))
+      setData({
+        ...data,
+        orderCode: order.code,
+        items: [saved.item, ...data.items.filter((r) => r.id !== saved.item.id)],
+      })
+      uploadAttempt.current = null
       form.reset()
+      // The accepted request stays visible even if the subsequent list refresh fails.
+      try {
+        setData({ ...(await authedApi(`/orders/${encodeURIComponent(order.code)}/returns`)), orderCode: order.code })
+      } catch {
+        /* Accepted response is authoritative. */
+      }
     } catch {
       setError(true)
     } finally {
@@ -67,7 +88,28 @@ export default function ReturnRequest({ order }) {
   return (
     <section className="account-card returns-panel">
       <h2>{s.title}</h2>
-      {error && <p role="alert">{s.error}</p>}
+      {!data && !error && <p role="status">{s.loading}</p>}
+      {error && (
+        <p role="alert">
+          {s.error}{' '}
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                setData({
+                  ...(await authedApi(`/orders/${encodeURIComponent(order.code)}/returns`)),
+                  orderCode: order.code,
+                })
+                setError(false)
+              } catch {
+                setError(true)
+              }
+            }}
+          >
+            {s.retry}
+          </button>
+        </p>
+      )}
       {done && <p role="status">{s.success}</p>}
       {data?.items.map((r) => (
         <div key={r.id}>
@@ -94,7 +136,7 @@ export default function ReturnRequest({ order }) {
                   {i.name}
                 </label>
                 <input
-                  aria-label={i.name}
+                  aria-label={`${s.quantity}: ${i.name}`}
                   type="number"
                   name={`quantity:${i.slug}`}
                   min="1"
@@ -119,10 +161,18 @@ export default function ReturnRequest({ order }) {
             </label>
             <label>
               {s.video}
-              <input name="video" type="file" accept="video/mp4,video/webm,video/quicktime" required />
+              <input
+                name="video"
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime"
+                onChange={() => {
+                  uploadAttempt.current = null
+                }}
+                required
+              />
             </label>
             <p>
-              {s.limit}: {Math.floor(data.maxBytes / 1024 / 1024)} MB
+              {s.limit}: {(data.maxBytes / 1024 / 1024).toLocaleString(lang, { maximumFractionDigits: 2 })} MB
             </p>
             <label>
               <input name="continuous" type="checkbox" required />

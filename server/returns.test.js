@@ -19,6 +19,7 @@ function setup(maxBytes = 1000000) {
     returnsRepo = createMemoryReturnsRepo(),
     storage = createMemoryStorage()
   return {
+    repo,
     order,
     returnsRepo,
     storage,
@@ -210,5 +211,99 @@ describe('manual resolution and keyset support queue', () => {
     expect((await x.service.adminList({ status: 'resolved' })).items[0].status).toBe('resolved')
     await expect(x.service.adminList({ cursor: 'garbage' })).rejects.toMatchObject({ code: 'INVALID_RETURN_CURSOR' })
     await expect(x.service.adminList({ status: 'uploading' })).rejects.toMatchObject({ code: 'INVALID_RETURN_FILTER' })
+  })
+})
+
+describe('return QA malformed payloads and response-loss retries', () => {
+  it('rejects null and array item entries with400 instead of throwing TypeError', async () => {
+    const x = setup(),
+      id = await upload(x)
+    for (const items of [[null], [[]]])
+      await expect(x.service.submit(id, 'buyer', { ...body, items })).rejects.toMatchObject({
+        status: 400,
+        code: 'INVALID_RETURN_ITEMS',
+      })
+  })
+  it('malformed request identifiers never reach UUID database queries', async () => {
+    const x = setup()
+    await expect(x.service.submit('not-a-uuid', 'buyer', body)).rejects.toMatchObject({ status: 404 })
+    await expect(x.service.adminVideo('not-a-uuid')).rejects.toMatchObject({ status: 404 })
+    await expect(x.service.decide('bad', 'admin', { status: 'approved', note: 'Accepted' })).rejects.toMatchObject({
+      status: 404,
+    })
+    await expect(x.service.resolve('bad', 'admin', { resolution: 'refund', note: 'Recorded' })).rejects.toMatchObject({
+      status: 404,
+    })
+  })
+  it('same-payload retry returns existing request and prevents altered-payload replacement', async () => {
+    const x = setup(),
+      id = await upload(x)
+    const first = await x.service.submit(id, 'buyer', body)
+    expect(await x.service.submit(id, 'buyer', body)).toEqual(first)
+    expect((await x.service.ownerList('LM1', 'buyer')).items).toHaveLength(1)
+    await expect(x.service.submit(id, 'buyer', { ...body, description: 'Different claim' })).rejects.toMatchObject({
+      code: 'RETURN_ALREADY_SUBMITTED',
+    })
+    await x.service.decide(id, 'admin', { status: 'approved', note: 'Accepted' })
+    expect((await x.service.submit(id, 'buyer', body)).status).toBe('approved')
+  })
+  it('parallel retry of same request is idempotent without reserving twice', async () => {
+    const x = setup(),
+      id = await upload(x)
+    const r = await Promise.all([x.service.submit(id, 'buyer', body), x.service.submit(id, 'buyer', body)])
+    expect(r[0].id).toBe(r[1].id)
+    expect((await x.service.ownerList('LM1', 'buyer')).items).toHaveLength(1)
+  })
+})
+it('concurrent replay recovers a committed claim when stale uploading snapshot crosses deadline', async () => {
+  const x = setup(),
+    id = await upload(x)
+  x.repo.getOrderById = async () => {
+    await x.returnsRepo.change(id, 'uploading', {
+      status: 'requested',
+      reason: body.reason,
+      description: body.description,
+      items: body.items,
+      submittedAt: new Date(now).toISOString(),
+    })
+    x.order.deliveredAt = new Date(now - 8 * 86400000).toISOString()
+    return x.order
+  }
+  expect((await x.service.submit(id, 'buyer', body)).status).toBe('requested')
+})
+it('RPC deadline error after concurrent identical commit returns durable claim, not new reservation', async () => {
+  const x = setup(),
+    id = await upload(x)
+  x.returnsRepo.submit = async () => {
+    await x.returnsRepo.change(id, 'uploading', {
+      status: 'requested',
+      reason: body.reason,
+      description: body.description,
+      items: body.items,
+      submittedAt: new Date(now).toISOString(),
+    })
+    throw Object.assign(Error('boundary raced'), { code: 'RETURN_WINDOW_CLOSED' })
+  }
+  expect((await x.service.submit(id, 'buyer', body)).status).toBe('requested')
+  expect((await x.service.ownerList('LM1', 'buyer')).items).toHaveLength(1)
+})
+it('exact admin decision and resolution retries return one durable outcome and do not duplicate audit', async () => {
+  const x = setup(),
+    id = await upload(x)
+  const audit = []
+  x.repo.appendAuditLog = async (entries) => audit.push(...entries)
+  await x.service.submit(id, 'buyer', body)
+  const decision = { status: 'approved', note: 'Evidence verified' }
+  const first = await x.service.decide(id, 'admin', decision)
+  expect(await x.service.decide(id, 'admin', decision)).toEqual(first)
+  const outcome = { resolution: 'replacement', note: 'Replacement delivered manually' }
+  const done = await x.service.resolve(id, 'admin', outcome)
+  expect(await x.service.resolve(id, 'admin', outcome)).toEqual(done)
+  expect(audit).toHaveLength(2)
+  await expect(x.service.resolve(id, 'otheradmin', outcome)).rejects.toMatchObject({
+    code: 'RETURN_RESOLUTION_CONFLICT',
+  })
+  await expect(x.service.resolve(id, 'admin', { ...outcome, note: 'Changed history' })).rejects.toMatchObject({
+    code: 'RETURN_RESOLUTION_CONFLICT',
   })
 })

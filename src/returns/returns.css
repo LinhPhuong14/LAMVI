@@ -11,3 +11,5 @@
 .returns-panel nav { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .returns-panel button { min-height: 44px; }
 .returns-panel [role='alert'] { border-left: 3px solid var(--ember); padding-left: .8rem; }
+
+.returns-panel video { width: 100%; max-height: 30rem; border-radius: var(--r-sm); background: var(--ink); }

@@ -67,3 +67,17 @@ it('failed queue shows retry and then empty state after recovery', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
   expect(await screen.findByText('Không có yêu cầu trong trạng thái này.')).toBeInTheDocument()
 })
+it('private evidence plays inline rather than relying on an asynchronous popup', async () => {
+  localStorage.setItem('moc.session', JSON.stringify(session))
+  mockApi({
+    'GET /me': () => ({ body: { profile: { role: 'admin' } } }),
+    'GET /admin/returns': () => ({ body: { items: [row('evidence')], nextCursor: null } }),
+    'GET /admin/returns/evidence/video': () => ({ body: { url: 'https://storage.test/private?signed=short' } }),
+  })
+  const { container } = renderAt('/admin/returns')
+  fireEvent.click(await screen.findByRole('button', { name: 'Xem video riêng tư (5 phút)' }))
+  await waitFor(() =>
+    expect(container.querySelector('video')).toHaveAttribute('src', 'https://storage.test/private?signed=short'),
+  )
+  expect(container.querySelector('video')).toHaveAttribute('controls')
+})

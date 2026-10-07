@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/context.js'
 import { returnStrings } from '../returns/strings.js'
 export default function ReturnsPage() {
+  const [preview, setPreview] = useState(null)
   const { authedApi } = useAuth(),
     labels = returnStrings('vi')
   const [data, setData] = useState({ items: [], nextCursor: null }),
@@ -44,7 +45,7 @@ export default function ReturnsPage() {
   async function video(id) {
     try {
       const r = await authedApi(`/admin/returns/${id}/video`)
-      window.open(r.url, '_blank', 'noopener,noreferrer')
+      setPreview({ id, url: r.url })
     } catch {
       setError(true)
     }
@@ -121,6 +122,9 @@ export default function ReturnsPage() {
             <button type="button" className="btn btn-secondary" onClick={() => video(r.id)}>
               {S.returns.video}
             </button>
+            {preview?.id === r.id && (
+              <video aria-label={S.returns.video} controls preload="metadata" src={preview.url} />
+            )}
             {r.decisionNote && (
               <p>
                 {r.decisionNote} · {r.decidedAt && new Date(r.decidedAt).toLocaleString('vi-VN')}

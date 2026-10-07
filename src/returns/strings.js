@@ -1,4 +1,6 @@
 const vi = {
+  quantity: 'Số lượng',
+  retry: 'Tải lại trạng thái',
   resolved: 'Đã xử lý',
   replacement: 'Đã đổi sản phẩm',
   refund: 'Đã hoàn tiền thủ công',
@@ -21,6 +23,8 @@ const vi = {
   success: 'Đã gửi yêu cầu. Cửa hàng sẽ xem xét video và phản hồi.',
 }
 const en = {
+  quantity: 'Quantity',
+  retry: 'Reload status',
   resolved: 'Resolved',
   replacement: 'Replacement completed',
   refund: 'Refund completed manually',
@@ -43,6 +47,8 @@ const en = {
   success: 'Request submitted. The store will review your video and respond.',
 }
 const zh = {
+  quantity: '数量',
+  retry: '重新加载状态',
   resolved: '已处理',
   replacement: '已更换商品',
   refund: '已手动退款',
