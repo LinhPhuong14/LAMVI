@@ -37,9 +37,10 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
 
   /** Dòng hàng từ giỏ của khách; sản phẩm đã ẩn/xoá thì không cho đặt (D-39). */
   async function cartLines(userId) {
-    const products = new Map((await repo.listProducts()).map((p) => [p.id, p]))
+    const cart = await repo.getCart(userId)
+    const products = new Map((await repo.getProductsByIds(cart.map((item) => item.productId))).map((p) => [p.id, p]))
     const lines = []
-    for (const { productId, quantity } of await repo.getCart(userId)) {
+    for (const { productId, quantity } of cart) {
       const product = products.get(productId)
       if (!product) continue
       // G-44: `short` = tồn kho không đủ cho số lượng trong giỏ (chỉ báo; giữ chỗ nguyên tử ở createOrder)

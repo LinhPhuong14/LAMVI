@@ -89,6 +89,17 @@ export function ordersRouter({ repo, auth, orders, config, payos = null, message
     res.json(view)
   })
 
+  // Recover a committed checkout after a lost response and full reload. The key is
+  // opaque, but authorization is still always scoped to the authenticated owner.
+  r.get('/checkout/requests/:key', guard, async (req, res) => {
+    const key = req.params.key
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key)) throw notFound()
+    const found = await repo.getOrderByCheckoutKey(req.user.id, key.toLowerCase())
+    if (!found) throw notFound()
+    const order = await orders.expireIfDue(found)
+    res.json({ order: presentOrder(order, { lang: lang(req) }) })
+  })
+
   // FR-CHK-001: chỉ khách đã đăng nhập (D-36, BR-ACC-001)
   r.post('/orders', guard, orderLimit, async (req, res) => {
     const b = body(req)

@@ -11,7 +11,7 @@ import { useCart } from '../cart/context.js'
 import { useSubmit } from '../auth/useForm.js'
 import { formatVnd } from '../lib/money.js'
 import { track } from '../analytics/index.js'
-import { checkoutRequestKey, clearCheckoutRequest } from './checkoutRequest.js'
+import { checkoutRequestKey, clearCheckoutRequest, readCheckoutRequest } from './checkoutRequest.js'
 
 // D-73 (Q-15): hạn link thanh toán payOS — chỉ để hiện cho khách, server mới là nguồn sự thật
 const PAYMENT_MINUTES = 15
@@ -105,12 +105,34 @@ export default function CheckoutPage() {
     [authedApi, lang],
   )
 
-  useEffect(() => {
+  const refreshCheckout = useCallback(async () => {
     if (!user) return
-    // Đồng bộ với hệ thống ngoài (gọi API); mọi setState trong loadQuote đều nằm sau `await`.
+    const key = readCheckoutRequest(user.id)
+    if (!key) return loadQuote(appliedCoupon || undefined)
+    const id = ++quoteSeq.current
+    setQuotePending(true)
+    try {
+      const result = await authedApi(`/checkout/requests/${encodeURIComponent(key)}`, { lang })
+      if (id !== quoteSeq.current) return
+      clearCheckoutRequest(user.id)
+      reloadCart?.()
+      navigate(`${path(`/don-hang/${result.order.code}`)}?moi=1`, { replace: true })
+    } catch (err) {
+      if (id !== quoteSeq.current) return
+      if (err.status === 404) {
+        clearCheckoutRequest(user.id)
+        return loadQuote(appliedCoupon || undefined)
+      }
+      setQuoteError(err.code ?? 'INTERNAL_ERROR')
+      setQuotePending(false)
+    }
+  }, [user, authedApi, lang, appliedCoupon, loadQuote, reloadCart, navigate, path])
+
+  useEffect(() => {
     // oxlint-disable-next-line react/set-state-in-effect
-    loadQuote(appliedCoupon || undefined)
-  }, [user, appliedCoupon, loadQuote])
+    refreshCheckout()
+    return () => { quoteSeq.current += 1 }
+  }, [refreshCheckout])
 
   // FR-GA-001 §23.3: begin_checkout khi bảng giá đầu tiên hiện ra
   const tracked = useRef(false)
@@ -190,7 +212,7 @@ export default function CheckoutPage() {
         {quoteError ? (
           <p className="notice error" role="alert">
             {t(`errors.${quoteError}`)}
-            <button type="button" onClick={() => loadQuote(appliedCoupon || undefined)} disabled={quotePending}>{retryLabel}</button>
+            <button type="button" onClick={refreshCheckout} disabled={quotePending}>{retryLabel}</button>
           </p>
         ) : (
           <p>{t('checkout.loading')}</p>
@@ -426,7 +448,7 @@ export default function CheckoutPage() {
 
             {quotePending && <p role="status">{t('checkout.loading')}</p>}
             {quoteError && <p className="notice error" role="alert">
-              {t(`errors.${quoteError}`)} <button type="button" disabled={quotePending} onClick={() => loadQuote(appliedCoupon || undefined)}>{retryLabel}</button>
+              {t(`errors.${quoteError}`)} <button type="button" disabled={quotePending} onClick={refreshCheckout}>{retryLabel}</button>
             </p>}
             {quote.hasShortage && <p className="notice error" role="alert">{t('cart.hasShortage')}</p>}
             {priceChanged && (

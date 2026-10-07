@@ -186,3 +186,12 @@ describe('createSupabaseRepo với supabase-js thật (fetch giả, không gọi
     expect(urls[1]).toContain('is_published=eq.true')
   })
 })
+
+it('loads only cart product IDs even beyond the first 1000 products, and skips empty lookups', async () => {
+  const client = fakeClient({ products: Array.from({ length: 1200 }, (_, index) => productRow({ id: `p${index}`, slug: `lamp-${index}` })) })
+  const repo = createSupabaseRepo(client)
+  expect(await repo.getProductsByIds(['p1199', 'p1199'])).toEqual([expect.objectContaining({ id: 'p1199', slug: 'lamp-1199' })])
+  expect(client.calls[0].ops).toEqual([['select', '*'], ['in', 'id', ['p1199']]])
+  expect(await repo.getProductsByIds([])).toEqual([])
+  expect(client.calls).toHaveLength(1)
+})

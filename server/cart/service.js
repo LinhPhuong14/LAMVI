@@ -1,6 +1,6 @@
 import { HttpError } from '../errors.js'
 import { PUBLIC_PRODUCT_STATUSES, presentProduct } from '../domain/catalog.js'
-import { hasStock, isTracked } from '../domain/stock.js'
+import { hasStock } from '../domain/stock.js'
 
 // D-60: tối đa 10 mỗi dòng. Số dòng tối đa để chặn lạm dụng [ASSUMPTION]
 export const MAX_QTY = 10
@@ -62,8 +62,8 @@ export function createCartService({ repo }) {
     }
   }
 
-  async function productsById() {
-    return new Map((await repo.listProducts()).map((p) => [p.id, p]))
+  async function productsById(ids) {
+    return new Map((await repo.getProductsByIds(ids)).map((p) => [p.id, p]))
   }
 
   async function productBySlug(slug) {
@@ -71,9 +71,22 @@ export function createCartService({ repo }) {
   }
 
   async function userLines(userId) {
-    const map = await productsById()
+    const rows = await repo.getCart(userId)
+    const map = await productsById(rows.map((row) => row.productId))
     // Sản phẩm đã bị xoá khỏi DB thì bỏ khỏi giỏ (cascade trong Supabase; bộ nhớ lọc tại đây)
-    return (await repo.getCart(userId)).filter((l) => map.has(l.productId)).map((l) => ({ product: map.get(l.productId), quantity: l.quantity }))
+    return rows.filter((l) => map.has(l.productId)).map((l) => ({ product: map.get(l.productId), quantity: l.quantity }))
+  }
+
+  async function mutate(userId, mode, lines, lang) {
+    let rows
+    try { rows = await repo.mutateCart(userId, mode, lines) } catch (error) {
+      if (error.code === 'PRODUCT_UNAVAILABLE' || error.code === 'PRODUCT_UNAVAILABLE_INCREASE') throw new HttpError(error.code === 'PRODUCT_UNAVAILABLE' ? 404 : 409, 'PRODUCT_UNAVAILABLE', 'Sản phẩm không còn bán')
+      if (error.code === 'OUT_OF_STOCK') throw new HttpError(409, 'OUT_OF_STOCK', 'Sản phẩm không đủ hàng', { quantity: 'OUT_OF_STOCK' }, { stockLeft: Number(error.field) || 0 })
+      if (error.code === 'CART_FULL') throw new HttpError(409, 'CART_FULL', 'Giỏ đã đầy')
+      throw error
+    }
+    const products = await productsById(rows.map((row) => row.productId))
+    return present(rows.filter((row) => products.has(row.productId)).map((row) => ({ product: products.get(row.productId), quantity: row.quantity })), lang)
   }
 
   return {
@@ -84,47 +97,16 @@ export function createCartService({ repo }) {
     // PUT: đặt số lượng. Thêm mới chỉ khi sản phẩm đang bán; dòng đã ẩn chỉ được giảm/xoá
     async setQuantity(userId, slug, quantity, lang) {
       validateQuantity(quantity)
-      const product = await productBySlug(slug)
-      const current = product ? (await repo.getCart(userId)).find((l) => l.productId === product.id) : null
-      // Không tồn tại hoặc chưa/không còn bán và chưa có trong giỏ → cùng 404 (không dò được slug nháp — D-39)
-      if (!product || (!isPublic(product) && !current)) {
-        throw new HttpError(404, 'PRODUCT_UNAVAILABLE', 'Sản phẩm không còn bán')
-      }
-      if (!isPublic(product) && quantity > current.quantity) {
-        throw new HttpError(409, 'PRODUCT_UNAVAILABLE', 'Sản phẩm không còn bán')
-      }
-      // G-44, D-100: không cho thêm vượt tồn kho; giảm số lượng / xoá luôn được
-      if (isTracked(product) && quantity > (current?.quantity ?? 0) && !hasStock(product, quantity)) {
-        throw new HttpError(409, 'OUT_OF_STOCK', 'Sản phẩm không đủ hàng', { quantity: 'OUT_OF_STOCK' }, { stockLeft: Math.max(0, product.stock) })
-      }
-      if (!current && (await repo.getCart(userId)).length >= MAX_LINES) {
-        throw new HttpError(409, 'CART_FULL', 'Giỏ đã đầy')
-      }
-      await repo.setCartItem(userId, product.id, quantity)
-      return present(await userLines(userId), lang)
+      return mutate(userId, 'set', [{ slug, quantity }], lang)
     },
 
     async remove(userId, slug, lang) {
-      const product = await productBySlug(slug)
-      if (product) await repo.removeCartItem(userId, product.id)
-      return present(await userLines(userId), lang)
+      return mutate(userId, 'remove', [{ slug }], lang)
     },
 
-    // D-59: gộp giỏ trình duyệt khi đăng nhập — cộng số lượng, tối đa 10; bỏ qua sản phẩm không còn bán
+    // D-59: merge increments under the same customer lock as checkout (G-32).
     async merge(userId, lines, lang) {
-      const current = new Map((await repo.getCart(userId)).map((l) => [l.productId, l.quantity]))
-      for (const line of lines) {
-        const product = await productBySlug(line.slug)
-        if (!product || !isPublic(product)) continue
-        if (!current.has(product.id) && current.size >= MAX_LINES) continue
-        let q = Math.min(MAX_QTY, (current.get(product.id) ?? 0) + line.quantity)
-        // G-44: gộp giỏ không vượt tồn kho; hết hàng thì bỏ qua dòng
-        if (isTracked(product)) q = Math.min(q, product.stock)
-        if (q < 1) continue
-        current.set(product.id, q)
-        await repo.setCartItem(userId, product.id, q)
-      }
-      return present(await userLines(userId), lang)
+      return mutate(userId, 'merge', lines, lang)
     },
 
     // Giỏ của khách vãng lai (lưu trình duyệt): server tính giá, bỏ dòng không tồn tại

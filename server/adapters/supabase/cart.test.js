@@ -11,6 +11,40 @@ function fakeClient(init = {}, { error } = {}) {
   const client = {
     tables,
     calls,
+    async rpc(name, { p_user: userId, p_mode: mode, p_lines: lines }) {
+      calls.push({ rpc: name, mode, userId, lines })
+      if (error) return { data: null, error }
+      if (name !== 'mutate_cart') return { data: null, error: { code: '42883', message: 'function not found' } }
+      const fail = (message, details) => ({ data: null, error: { code: 'P0001', message, details } })
+      if (!['set', 'remove', 'merge'].includes(mode) || !Array.isArray(lines) || lines.length > 100 || (mode !== 'merge' && lines.length !== 1)) return fail('INVALID_CART_MUTATION')
+      // Simulate one RPC transaction: publish staged rows only after every line succeeds.
+      let staged = tables.cart_items.map((row) => ({ ...row }))
+      for (const line of lines) {
+        const product = tables.products.find((row) => row.slug === line.slug)
+        const current = product ? staged.find((row) => row.user_id === userId && row.product_id === product.id) : null
+        if (mode === 'remove') {
+          if (product) staged = staged.filter((row) => row.user_id !== userId || row.product_id !== product.id)
+          continue
+        }
+        if (!product) { if (mode === 'merge') continue; return fail('PRODUCT_UNAVAILABLE') }
+        let quantity = line.quantity
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) return fail('INVALID_CART_MUTATION')
+        if (mode === 'merge') {
+          if (product.status !== 'published' || (!current && staged.filter((row) => row.user_id === userId).length >= 50)) continue
+          quantity = Math.min(10, (current?.quantity ?? 0) + quantity, product.stock ?? Infinity)
+          if (quantity < 1) continue
+        } else {
+          if (product.status !== 'published' && !current) return fail('PRODUCT_UNAVAILABLE')
+          if (product.status !== 'published' && quantity > current.quantity) return fail('PRODUCT_UNAVAILABLE_INCREASE')
+          if (product.stock != null && quantity > (current?.quantity ?? 0) && quantity > product.stock) return fail('OUT_OF_STOCK', String(product.stock))
+          if (!current && staged.filter((row) => row.user_id === userId).length >= 50) return fail('CART_FULL')
+        }
+        if (current) current.quantity = quantity
+        else staged.push({ user_id: userId, product_id: product.id, quantity, added_at: String(++clock).padStart(6, '0') })
+      }
+      tables.cart_items = staged
+      return { data: staged.filter((row) => row.user_id === userId).sort((a, b) => a.added_at.localeCompare(b.added_at)), error: null }
+    },
     from(table) {
       const ops = []
       calls.push({ table, ops })
@@ -18,8 +52,9 @@ function fakeClient(init = {}, { error } = {}) {
       let payload = null
       let upsertOpts = null
       const filters = []
+      const inFilters = []
       let orderCol = null
-      const match = (r) => filters.every(([c, v]) => r[c] === v)
+      const match = (r) => filters.every(([c, v]) => r[c] === v) && inFilters.every(([c, values]) => values.includes(r[c]))
       const exec = () => {
         if (error) return { data: null, error }
         const rows = tables[table]
@@ -43,7 +78,7 @@ function fakeClient(init = {}, { error } = {}) {
         upsert: (row, opts) => (ops.push(['upsert', row, opts]), (mode = 'upsert'), (payload = row), (upsertOpts = opts), b),
         delete: () => (ops.push(['delete']), (mode = 'delete'), b),
         eq: (c, v) => (ops.push(['eq', c, v]), filters.push([c, v]), b),
-        in: (c, vs) => (ops.push(['in', c, vs]), b),
+        in: (c, vs) => (ops.push(['in', c, vs]), inFilters.push([c, vs]), b),
         order: (c, o) => (ops.push(['order', c, o]), (orderCol = c), b),
         maybeSingle: () => {
           const r = exec()
@@ -126,6 +161,7 @@ describe('Adapter Supabase — cart_items', () => {
     await expect(repo.getCart('u1')).rejects.toBe(err)
     await expect(repo.setCartItem('u1', 'p1', 1)).rejects.toBe(err)
     await expect(repo.removeCartItem('u1', 'p1')).rejects.toBe(err)
+    await expect(repo.mutateCart('u1', 'set', [{ slug: 'den-nguyet', quantity: 1 }])).rejects.toBe(err)
   })
 
   it('dịch vụ giỏ chạy trên adapter Supabase: thêm, gộp, giá hiện hành, sản phẩm bị xoá biến mất', async () => {
@@ -141,6 +177,8 @@ describe('Adapter Supabase — cart_items', () => {
     ])
     expect(merged.items[0].product.name).toBe('Nguyet Lantern')
     expect(merged.subtotal).toBe(8900000 + 1050000)
+    expect(client.calls.filter((call) => call.rpc).map((call) => [call.rpc, call.mode])).toEqual([['mutate_cart', 'set'], ['mutate_cart', 'merge']])
+    expect(client.calls.filter((call) => call.table === 'products').every((call) => call.ops.some((op) => op[0] === 'in' && op[1] === 'id'))).toBe(true)
     // Sản phẩm bị xoá khỏi DB (cascade) → không còn trong giỏ
     client.tables.products = client.tables.products.filter((p) => p.id !== 'p2')
     client.tables.cart_items = client.tables.cart_items.filter((r) => r.product_id !== 'p2')

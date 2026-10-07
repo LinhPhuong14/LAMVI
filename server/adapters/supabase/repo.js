@@ -262,6 +262,15 @@ export function createSupabaseRepo(client) {
       const rows = unwrap(await client.from('cart_items').select('*').eq('user_id', userId).order('added_at'))
       return rows.map((r) => ({ productId: r.product_id, quantity: r.quantity, addedAt: r.added_at }))
     },
+    async mutateCart(userId, mode, lines) {
+      const { data, error } = await client.rpc('mutate_cart', { p_user: userId, p_mode: mode, p_lines: lines })
+      if (error) {
+        const codes = ['PRODUCT_UNAVAILABLE', 'PRODUCT_UNAVAILABLE_INCREASE', 'OUT_OF_STOCK', 'CART_FULL', 'INVALID_CART_MUTATION']
+        if (error.code === 'P0001' && codes.includes(error.message)) throw new RepoError(error.message, error.details)
+        throw error
+      }
+      return data.map((row) => ({ productId: row.product_id, quantity: row.quantity, addedAt: row.added_at }))
+    },
     async setCartItem(userId, productId, quantity) {
       unwrap(
         await client
@@ -489,6 +498,11 @@ export function createSupabaseRepo(client) {
       }))
     },
 
+    async getProductsByIds(ids) {
+      if (!ids.length) return []
+      const rows = unwrap(await client.from('products').select('*').in('id', [...new Set(ids)]))
+      return rows.map(toProduct)
+    },
     getProductById: (id) => one('products', id, toProduct),
     createProduct: (p) => insert('products', toRow(p, PRODUCT_COLS), toProduct),
     updateProduct: (id, p) => patch('products', id, toRow(p, PRODUCT_COLS), toProduct),

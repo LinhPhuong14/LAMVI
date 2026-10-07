@@ -172,5 +172,36 @@ try:
     assert all(r.returncode == 0 for r in results), [r.stderr for r in results]
     assert sql("select sum(stock) from products").stdout.strip() == "6"
     print("PASS: reversed carts use stable product lock ordering without deadlock")
+    reset(stock=20)
+    cart_user = '10000000-0000-0000-0000-000000000001'
+    def cart_mutate(mode, lines):
+        return f"begin; set local statement_timeout='8s'; set local role service_role; select mutate_cart('{cart_user}','{mode}','{lines}'); select pg_sleep(0.1); commit;"
+    sql(cart_mutate('set', '[{"slug":"one","quantity":1}]'))
+    increments = parallel([cart_mutate('merge', '[{"slug":"one","quantity":2}]'), cart_mutate('merge', '[{"slug":"one","quantity":3}]')])
+    assert all(r.returncode == 0 for r in increments), [r.stderr for r in increments]
+    assert sql('select quantity from cart_items').stdout.strip() == '6'
+    print('PASS: concurrent cart merges retain both quantity increments')
+
+    reset(stock=20)
+    sql("""insert into products(id,slug,kind,status,price,name)
+      select md5('cart-cap-'||n)::uuid,'cart-cap-'||n,'single','published',1000,'{"vi":"Cart"}'::jsonb from generate_series(1,51) n;
+      insert into cart_items(user_id,product_id,quantity)
+      select '10000000-0000-0000-0000-000000000001',id,1 from products where slug like 'cart-cap-%' and split_part(slug,'-',3)::integer<=49;""")
+    capped = parallel([cart_mutate('set', '[{"slug":"cart-cap-50","quantity":1}]'), cart_mutate('set', '[{"slug":"cart-cap-51","quantity":1}]')])
+    assert sum(r.returncode == 0 for r in capped) == 1, [r.stderr for r in capped]
+    assert any('CART_FULL' in r.stderr for r in capped), [r.stderr for r in capped]
+    assert sql('select count(*) from cart_items').stdout.strip() == '50'
+    print('PASS: concurrent new lines cannot bypass the 50-line cart limit')
+
+    reset(stock=20)
+    sql(cart_mutate('set', '[{"slug":"one","quantity":1}]'))
+    raced = parallel([purchase('CART-CHECKOUT-RACE',1,[1]), cart_mutate('set', '[{"slug":"one","quantity":2}]')])
+    assert raced[1].returncode == 0, raced[1].stderr
+    assert raced[0].returncode == 0 or 'CART_HAS_UNAVAILABLE' in raced[0].stderr, raced[0].stderr
+    assert sql('select quantity from cart_items').stdout.strip() == '2'
+    committed = int(sql('select count(*) from orders').stdout.strip())
+    assert sql("select stock from products where slug='one'").stdout.strip() == str(20-committed)
+    print('PASS: checkout/cart race preserves the newer cart intent without a stock leak')
+
 finally:
     subprocess.run(["docker", "rm", "-f", NAME], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

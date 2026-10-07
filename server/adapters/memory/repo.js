@@ -135,6 +135,32 @@ export function createMemoryRepo(data = {}) {
         .map(([productId, v]) => ({ productId, quantity: v.quantity, addedAt: v.addedAt }))
         .sort((a, b) => a.addedAt.localeCompare(b.addedAt))
     },
+    async mutateCart(userId, mode, lines) {
+      // No awaits in this method: validation and the entire mutation are one commit.
+      if (!['set', 'remove', 'merge'].includes(mode) || !Array.isArray(lines) || lines.length > 100 || (mode !== 'merge' && lines.length !== 1)) throw new RepoError('INVALID_CART_MUTATION')
+      const original = state.carts.get(userId) ?? new Map()
+      const cart = new Map([...original].map(([id, value]) => [id, { ...value }]))
+      for (const line of lines) {
+        const product = state.products.find((row) => row.slug === line.slug)
+        const current = product ? cart.get(product.id) : null
+        if (mode === 'remove') { if (product) cart.delete(product.id); continue }
+        if (product && mode !== 'remove' && (!Number.isInteger(line.quantity) || line.quantity < 1 || line.quantity > 10)) throw new RepoError('INVALID_CART_MUTATION')
+        if (mode === 'set') {
+          if (!product || (product.status !== 'published' && !current)) throw new RepoError('PRODUCT_UNAVAILABLE')
+          if (product.status !== 'published' && line.quantity > current.quantity) throw new RepoError('PRODUCT_UNAVAILABLE_INCREASE')
+          if (product.stock != null && line.quantity > (current?.quantity ?? 0) && product.stock < line.quantity) throw new RepoError('OUT_OF_STOCK', String(Math.max(0, product.stock)))
+          if (!current && cart.size >= 50) throw new RepoError('CART_FULL')
+          cart.set(product.id, { quantity: line.quantity, addedAt: current?.addedAt ?? now() })
+        } else if (mode === 'merge') {
+          if (!product || product.status !== 'published' || (!current && cart.size >= 50)) continue
+          const quantity = Math.min(10, (current?.quantity ?? 0) + line.quantity, product.stock ?? Infinity)
+          if (quantity < 1) continue
+          cart.set(product.id, { quantity, addedAt: current?.addedAt ?? now() })
+        } else throw new RepoError('INVALID_CART_MUTATION')
+      }
+      state.carts.set(userId, cart)
+      return [...cart].map(([productId, value]) => ({ productId, ...value })).sort((a, b) => a.addedAt.localeCompare(b.addedAt))
+    },
     async setCartItem(userId, productId, quantity) {
       if (!state.carts.has(userId)) state.carts.set(userId, new Map())
       const c = state.carts.get(userId)
@@ -174,6 +200,10 @@ export function createMemoryRepo(data = {}) {
     },
 
     // --- Sản phẩm (FR-CAT-004)
+    async getProductsByIds(ids) {
+      const selected = new Set(ids)
+      return clone(state.products.filter((product) => selected.has(product.id)))
+    },
     async getProductById(id) {
       const p = byId(state.products, id)
       return p ? clone(p) : null
