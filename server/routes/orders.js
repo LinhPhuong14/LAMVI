@@ -208,8 +208,16 @@ export function ordersRouter({ repo, auth, orders, config, payos = null, message
     res.json(await notifications())
   })
 
+  // Frequent media maintenance without also scanning orders or sending email.
+  r.all('/internal/media-cleanup', async (req, res) => {
+    if (!['GET', 'POST'].includes(req.method)) throw new HttpError(405, 'METHOD_NOT_ALLOWED', 'Không hỗ trợ')
+    if (!config.cronSecret || !messages) throw new HttpError(404, 'NOT_FOUND', 'Không tìm thấy')
+    if (!safeEqual(req.get('authorization') ?? '', `Bearer ${config.cronSecret}`)) throw new HttpError(401, 'UNAUTHORIZED', 'Chưa xác thực')
+    res.json({ mediaPurged: await messages.purgeExpiredMedia() })
+  })
+
   // FR-PAY-001: webhook payOS. NFR-SEC-002 — xác minh chữ ký trước khi xử lý.
-  // Luôn trả 200 khi chữ ký hợp lệ để payOS không gửi lại vô hạn với case đã xử lý.
+  // ACK completed/terminal cases; unresolved CAS/storage failure propagates so provider can retry.
   r.post('/payments/payos/webhook', async (req, res) => {
     if (!payos) throw new HttpError(503, 'PAYMENT_UNAVAILABLE', 'Chưa cấu hình cổng thanh toán')
     const parsed = parseWebhook(req.body, payos.checksumKey)

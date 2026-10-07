@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { collections, products, faqEntries, demoBatches } from '../../data/seed.js'
 import { RepoError } from '../repoErrors.js'
+import { mediaExpired } from '../../domain/message.js'
 import { couponRejectReason } from '../../domain/coupon.js'
 
 const clone = (v) => structuredClone(v)
@@ -580,14 +581,16 @@ export function createMemoryRepo(data = {}) {
       if (!row.confirmedAt) row.confirmedAt = at
       return clone(row)
     },
-    async listGiftMediaCandidates() {
+    async listGiftMediaCandidates({ before = new Date().toISOString(), after = null, limit = 100 } = {}) {
       return state.giftMessages
-        .filter((m) => (m.voicePath || m.videoPath) && !m.mediaDeletedAt)
+        .filter((m) => (m.voicePath || m.videoPath) && !m.mediaDeletedAt && (!after || m.id > after))
         .map((m) => {
           const o = byId(state.orders, m.orderId)
           return o ? { message: clone(m), order: clone(o) } : null
         })
-        .filter(Boolean)
+        .filter((r) => r && mediaExpired(r.order, r.message, new Date(before)))
+        .sort((a, b) => a.message.id.localeCompare(b.message.id))
+        .slice(0, Math.max(1, Math.min(limit, 100)))
     },
   }
 }

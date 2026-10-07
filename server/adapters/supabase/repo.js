@@ -641,17 +641,11 @@ export function createSupabaseRepo(client) {
       unwrap(await client.from('gift_messages').update({ confirmed_at: at }).eq('order_id', orderId).is('confirmed_at', null))
       return this.getGiftMessage(orderId)
     },
-    async listGiftMediaCandidates() {
-      const rows = unwrap(
-        await client
-          .from('gift_messages')
-          .select('*, orders(id, status, delivered_at)')
-          .is('media_deleted_at', null)
-          .or('voice_path.not.is.null,video_path.not.is.null'),
-      )
+    async listGiftMediaCandidates({ before = new Date().toISOString(), after = null, limit = 100 } = {}) {
+      const rows = unwrap(await client.rpc('list_expired_gift_media', { before_at: before, after_id: after, batch_limit: limit })) ?? []
       return rows.map((r) => ({
-        message: toGiftMessage(r),
-        order: { id: r.orders.id, status: r.orders.status, deliveredAt: r.orders.delivered_at },
+        message: toGiftMessage(r.message),
+        order: { id: r.order.id, status: r.order.status, deliveredAt: r.order.delivered_at },
       }))
     },
   }
