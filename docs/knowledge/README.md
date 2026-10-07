@@ -57,4 +57,4 @@ npm run gen:og       # dựng lại ảnh og:image (cần python3 + Pillow)
 # Vercel: xem deploy-vercel.md (api/index.js + vercel.json, T-33)
 ```
 
-Biến môi trường: xem [`../../.env.example`](../../.env.example). Không có biến Supabase → server chạy adapter bộ nhớ với dữ liệu seed (T-04).
+Biến môi trường: xem [`../../.env.example`](../../.env.example). Development không có biến Supabase → adapter bộ nhớ với seed (T-04). Bản production fail-closed; demo build local cần `ALLOW_LOCAL_MEMORY=1` và `PUBLIC_SITE_URL` loopback, không Vercel (T-66).

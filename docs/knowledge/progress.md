@@ -1,5 +1,14 @@
 # Tiến độ tính năng
 
+## 2026-10-07 — QA/QC vòng hai (feat/production-commerce-readiness)
+
+Kết quả cuối: 3.150/3.150 tests, lint/build pass; PostgreSQL 001–020 + 10 SQL regressions/concurrency pass; browser recovery mất response/COD/cancel và 8 mẫu axe không có finding; local smoke 1.000 requests, 0 lỗi; production dependency audit 0 known advisory.
+
+Review độc lập tìm và sửa race payment/cancel/refund, signed webhook trust, atomic cart/reload recovery, cart lookup >1.000, returns response-loss replay, outbox settlement/fencing/payload cleanup, telemetry PII và bounded media cleanup. Không đổi nghiệp vụ đang chờ PO. Bằng chứng và gate còn thiếu: [báo cáo QA](../qa-qc-2026-10-07-round2.md).
+
+Không merge master/deploy khi chưa schema preflight và Preview integration T-59; cloud hiện thiếu binding thật.
+
+
 ## 2026-10-07 — Tiến độ triển khai (feat/production-commerce-readiness)
 
 Đã triển khai checkout idempotency/UX, collection admin, outbox email, metrics serverless và đổi trả gate-off; runtime fail-closed, footer cấu hình thật, private lazy routes và hydration fixes. Không thay quyết định PO/LEGAL. Bộ test đầy đủ 3.070/3.070 qua; build qua; PostgreSQL 001–018 và concurrency được kiểm thật trên container tạm. Browser mobile/axe và local load smoke được ghi trong [runbook](../production-release-1m.md).

@@ -95,8 +95,10 @@ Gói `@vercel/analytics` được nhúng ở `src/main.jsx`. Bật **Analytics**
 
 ## Gate phát hành commerce 2026-10-07
 
-Đọc [runbook 1M và thứ tự migration](../production-release-1m.md) trước phát hành. Chạy schema preflight read-only, migration 014–018 và Preview integration trước merge master (T-59). Không chạy lại migration 013 sau 018 vì sẽ ghi đè checkout RPC mới.
+Đọc [runbook 1M và thứ tự migration](../production-release-1m.md) trước phát hành. Chạy schema preflight read-only, migration 014–020 và Preview integration trước merge master (T-59). Không chạy lại migration 013 sau 018 vì sẽ ghi đè checkout RPC mới.
 
 Outbox 015 capture ngay khi migrate, độc lập flag: pause legacy order writes/mail đang chạy, migrate, deploy với NOTIFICATION_OUTBOX_ENABLED=1, rồi resume; đối soát gap legacy bằng chứng trước drain. RETURNS_VIDEO_MAX_MB=0 giữ đổi trả tắt tới khi PO duyệt policy. @vercel/functions waitUntil trong api/index.js là wrapper cần giữ.
 
 Hosted production từ chối memory adapter, salt mặc định, thiếu HTTPS, rate limit tắt hoặc dev-role override. ALLOW_LOCAL_MEMORY=1 chỉ dành cho demo loopback không Vercel. Chưa có bindings Supabase/Vercel/Resend/cron trong phiên này: không coi local tests là production integration.
+
+QA v0.39 bổ sung migration 019 atomic cart (cùng user lock với checkout) và 020 cleanup media đủ hạn + cursor private. CLI preflight cần cả hai RPC trước Preview. Không chạy RPC cart với user thật để smoke; probe invalid mode phải bị từ chối trước write. Cleanup cron phải còn hoạt động khi không có traffic; batch bounded không chứng minh đạt retention SLA trên 1M records.

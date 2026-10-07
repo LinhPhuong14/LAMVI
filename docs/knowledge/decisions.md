@@ -369,3 +369,12 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 - T-66: production startup fail closed nếu thiếu Supabase/salt/rate limit; footer cấu hình thật, private route lazy, hydration an toàn với reduced motion/session và diagnostic CWV cục bộ.
 
 Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa merge master/deploy trước schema preflight và Preview integration. Xem [runbook phát hành và nghiệm thu 1M](../production-release-1m.md).
+
+### T-67–T-72 — QA commerce lần hai (2026-10-07)
+
+- T-67: RPC 019 serialize cart mutation với checkout; bulk product lookup theo IDs, recovery lookup checkout key owner-scoped trước quote.
+- T-68: payment CAS dùng expected status/paymentStatus/flag, bounded reread và 503 khi chưa ghi nhận; paid dựa riêng signed data. Manual refund ghi nhận late-paid-cancelled theo §15.1, không tự chuyển tiền.
+- T-69: returns replay chỉ cùng payload/operator và durable outcome; mất response không upload/request/audit trùng, không mở rộng cửa sổ 7 ngày.
+- T-70: bounded URI decoding trước redaction, che email/phone quốc tế/token trong path/code/message, malformed escapes không làm lọt token.
+- T-71: RPC 020 keyset lọc media tới hạn theo chính sách hiện hành, cursor private/batch bounded; không quyết retention mới.
+- T-72: outbox đợi mọi sibling settlement, số sent chỉ tính fence thành công; worker thiếu mailer vẫn purge payload đã hết cửa sổ retry bằng batch bounded. Không có scheduler/flag tắt vẫn là limitation.

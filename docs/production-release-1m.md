@@ -1,6 +1,6 @@
 # Bản code production và gate phục vụ 1M users
 
-Nhánh `feat/production-commerce-readiness`, ngày 07/10/2026. Tham chiếu [plan P00–P08](production-feature-plan-2026-10-07.md), [BA v0.38](ba-spec.md) và [runbook deploy](knowledge/deploy-vercel.md).
+Nhánh `feat/production-commerce-readiness`, ngày 07/10/2026. Tham chiếu [plan P00–P08](production-feature-plan-2026-10-07.md), [BA v0.39](ba-spec.md) và [runbook deploy](knowledge/deploy-vercel.md).
 
 ## Phạm vi đã triển khai
 
@@ -9,11 +9,11 @@ Nhánh `feat/production-commerce-readiness`, ngày 07/10/2026. Tham chiếu [pla
 | P00 | Fail-closed production khi thiếu Supabase/HTTPS/salt/rate-limit/proxy; CLI preflight mở rộng | Chưa có binding/deployment/test account để xác minh runtime thật |
 | P01 | Footer lấy contact/social hợp lệ; SSR public settings; newsletter disabled rõ ràng; privacy HIBP conditional | Ảnh/spec/legal/support/testimonial thật cần chủ shop và pháp chế |
 | P02 | Collection CRUD, product assignment, reward private, FK + audit + admin UI | Migration 014, nội dung bộ/phần thưởng thật và E2E production |
-| P03 | Searchable wards, serial cart UI, quote pending/error protection, validation focus; checkout key/fingerprint replay | Migration 018; saved addresses/full-reload recovery và G-32 cart transaction chưa làm |
+| P03 | Searchable wards, serial cart UI, quote pending/error protection, validation focus; checkout key/fingerprint replay | Migration 018–019; saved addresses chưa làm; reload recovery và cart transaction có code, cần migration 019 |
 | P04 | Transactional email event, leases/fencing/retry, provider idempotency, IT panel và scheduler endpoint | Migration 015, phối hợp chuyển tiếp, provider quota/scheduler và hộp thư thật |
 | P05 | Giữ các quyền/QR hiện hành | Chờ PO: allocation nhiều lô, quyền đọc thiệp; chưa thay fallback latest batch hoặc ship guard |
 | P06 | Private evidence upload, buyer submit, admin approve/reject/manual resolution, cursor queue | Migration 016; gate mặc định 0. PO chốt video/retention; không có tự chuyển tiền |
-| P07 | TTL URL media lời chúc không xin dài hơn thời gian còn lại | Các thời hạn hủy/giao thất bại/evidence/orphan và pháp chế chưa được duyệt |
+| P07 | TTL URL media lời chúc không xin dài hơn thời gian còn lại; cleanup approved deadline bằng cursor/RPC 020 | Migration 020; các thời hạn hủy/giao thất bại/evidence/orphan và pháp chế chưa được duyệt |
 | P08 | Serverless metrics ACK idempotent + DB aggregate, lazy private routes, hydration ổn định, keyboard lookbook; đo web-vitals cục bộ | Migration 017; RUM collector/staging capacity/proactive alerts và nghiệm thu thiết bị thật |
 
 Đây là bản code có kiểm thử; **không phải chứng nhận production phục vụ 1M user**. Không tự thay các quyết định đang mở trong BA.
@@ -59,7 +59,7 @@ Load smoke ngày 07/10: 1.000 request, concurrency 20, 0 lỗi; 278,1 RPS, p95 1
 1. Kiểm backup và lịch sử migration, preflight credential qua environment settings; không gửi key trong chat. Chỉ áp dụng migration còn thiếu, không chạy lại toàn bộ schema/seed.
 2. Migration 014 (collection FK NOT VALID): đọc/đối soát legacy refs; không tự đổi reward identity, không drop/xóa dữ liệu để ép validate.
 3. Migration 015 (outbox) **bắt đầu capture ngay**. Phối hợp maintenance/pause writes và cutover: pause → chờ in-flight legacy mail hoàn tất → áp dụng 015 → deploy flag `NOTIFICATION_OUTBOX_ENABLED=1` → kiểm Preview/worker/provider → resume. Nếu 015 đã chạy khi legacy direct mail còn active, đối soát job của khoảng chuyển tiếp và đánh dấu đã xử lý theo bằng chứng; không drain mù quáng hoặc đánh dấu cả pending dead dựa vào suy đoán.
-4. Migration 016 (private return evidence), 017 (metric RPC/aggregate), 018 (checkout key/RPC) trước code dùng schema. **Không chạy lại 013 sau 018**, vì `create or replace` RPC cũ sẽ bỏ idempotency. Runner disposable chỉ repeat 013 tại đúng thời điểm trước migration tiếp theo.
+4. Migration 016 (private return evidence), 017 (metric RPC/aggregate), 018 (checkout key/RPC), 019 (atomic cart), 020 (bounded media cleanup) trước code dùng schema. **Không chạy lại 013 sau 018**, vì `create or replace` RPC cũ sẽ bỏ idempotency. Runner disposable chỉ repeat 013 tại đúng thời điểm trước migration tiếp theo.
 5. `RETURNS_VIDEO_MAX_MB=0` giữ tắt submit. Chỉ bật giá trị ≤100 sau PO duyệt định dạng/dung lượng, retention/evidence và legal; đây là technical ceiling, không tự duyệt 100MB.
 6. Run CLI preflight, Preview E2E real integrations; staging quota/load gate đạt mới merge master. Rollback app theo compatibility, không drop cột/tables; không bật lại legacy direct mail với outbox traffic nếu chưa xử lý capture/duplication. Khi outbox lỗi, giữ pending và sửa/drain, không xóa job để giảm dashboard.
 7. Sau deploy: schema+SHA được xác nhận, public GET/SSR/assets và test-account E2E; email accepted/delivered phân biệt, cron last-run/queue lag, provider webhook; theo dõi so sánh baseline.
@@ -70,3 +70,9 @@ Load smoke ngày 07/10: 1.000 request, concurrency 20, 0 lỗi; 278,1 RPS, p95 1
 - Các câu hỏi PO đang mở vẫn ở BA: Q-14 quyền đọc thiệp, allocation lô, video đổi trả/retention, newsletter/testimonial, các mốc media hủy/thất bại, phạm vi quốc tế/định nghĩa tải. Không lấy thời gian chờ trả lời làm chấp thuận.
 - Dữ liệu: ảnh/spec 3 SKU, collection/reward author approval, thông tin pháp nhân/kênh hỗ trợ và legal policy. Không thay bằng nội dung giả.
 - Chưa có rollout production hoặc kiểm tải staging, chưa hoàn tất P05/P07 và các mở rộng P03/P08 nêu trong bảng. Nhánh review được bàn giao để tiếp tục sau khi các prerequisite được cung cấp.
+
+## QA/QC lần hai — 07/10/2026
+
+Xem [báo cáo QA chi tiết](qa-qc-2026-10-07-round2.md). Đã sửa race payment/cancel/refund, envelope webhook không ký, lost-response returns/recovery checkout, cart concurrent cap/merge và catalog >1.000, outbox allSettled/fencing, PII URI/log và cleanup media pagination. Chưa merge/deploy hoặc nghiệm thu tải 1M; các blocker nghiệp vụ/bindings vẫn giữ.
+
+Scheduler media riêng: gọi GET/POST `/api/internal/media-cleanup` với bearer `CRON_SECRET` qua cùng Function. Mỗi lần tối đa 10 candidates, 5 workers, timeout mỗi operation 5 giây; không gửi email hoặc quét đơn. Cursor tiến qua failure/timeout và quay vòng để retry. Tần suất và backlog phải được vận hành đo/chốt; không coi daily cron mặc định là retention SLA ở tải lớn.
