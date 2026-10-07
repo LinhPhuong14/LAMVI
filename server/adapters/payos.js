@@ -51,7 +51,7 @@ export function parseWebhook(body, checksumKey) {
     orderCode,
     amount,
     // '00' = thành công theo tài liệu payOS
-    paid: String(data.code ?? body.code) === '00',
+    paid: String(data.code) === '00',
     reference: typeof data.reference === 'string' ? data.reference : null,
     transactionDateTime: typeof data.transactionDateTime === 'string' ? data.transactionDateTime : null,
   }

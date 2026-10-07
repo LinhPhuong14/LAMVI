@@ -299,7 +299,11 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
    * Xử lý webhook payOS đã xác minh chữ ký (BR-PAY-001/002). Idempotent theo mã giao dịch:
    * lần hai không đổi gì.
    */
-  async function applyPayosWebhook({ orderCode, amount, paid, reference }) {
+  async function applyPayosWebhook({ orderCode, amount, paid, reference }, attempt = 0) {
+    const retryChanged = () => {
+      if (attempt >= 2) throw new HttpError(503, 'PAYMENT_RETRY_REQUIRED', 'Trạng thái thanh toán đang thay đổi; vui lòng thử lại')
+      return applyPayosWebhook({ orderCode, amount, paid, reference }, attempt + 1)
+    }
     const found = await repo.getOrderByPayosCode(orderCode)
     if (!found) return { handled: false, reason: 'ORDER_NOT_FOUND' }
     if (!paid) return { handled: false, reason: 'NOT_PAID' }
@@ -307,11 +311,12 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     // (§15.1 — trả tiền sau khi đơn hết hạn thì gắn cờ hoàn tiền tay, dù cron đã chạy hay chưa)
     const order = await expireIfDue(found)
     // BR-PAY-002: đã ghi nhận rồi thì thôi
-    if (order.paymentStatus === 'paid') return { handled: true, idempotent: true, order }
+    if (['paid', 'refund_pending', 'refunded'].includes(order.paymentStatus)) return { handled: true, idempotent: true, order }
 
     // §15.1: số tiền lệch → không xác nhận đơn, gắn cờ cho admin
     if (amount !== order.total) {
-      await repo.updateOrder(order.id, { paymentFlag: 'AMOUNT_MISMATCH' })
+      const flagged = await repo.updateOrderIfStatus(order.id, order.status, { paymentFlag: 'AMOUNT_MISMATCH' }, order.paymentStatus)
+      if (!flagged) return retryChanged()
       await audit({
         actorRole: 'system',
         entity: 'order',
@@ -325,7 +330,8 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
 
     // §15.1: trả tiền sau khi đơn đã huỷ/hết hạn → ghi nhận PAID, gắn cờ hoàn tiền thủ công
     if (order.status === 'cancelled') {
-      await repo.updateOrder(order.id, { paymentStatus: 'paid', paymentFlag: 'PAID_AFTER_CANCEL' })
+      const recorded = await repo.updateOrderIfStatus(order.id, 'cancelled', { paymentStatus: 'paid', paymentFlag: 'PAID_AFTER_CANCEL' }, order.paymentStatus)
+      if (!recorded) return retryChanged()
       await audit({
         actorRole: 'system',
         entity: 'order',
@@ -344,7 +350,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
       // Gỡ cờ lệch tiền của lần chuyển trước, nếu có — lần này đã đúng số tiền
       paymentFlag: null,
     })
-    if (!updated) return { handled: false, reason: 'STATUS_CHANGED' }
+    if (!updated) return retryChanged()
     await audit({
       actorRole: 'system',
       entity: 'order',
@@ -365,7 +371,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
   async function expireIfDue(order) {
     if (order.status !== 'pending_payment' || !order.paymentExpiresAt) return order
     if (Date.parse(order.paymentExpiresAt) > now().getTime()) return order
-    return (await cancelExpired(order)) ?? order
+    return (await cancelExpired(order)) ?? (await repo.getOrderById(order.id)) ?? order
   }
 
   async function cancelExpired(order) {
@@ -473,17 +479,19 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
 
   /** D-74 (Q-16): hoàn tiền thủ công — admin chuyển khoản tay rồi ghi nhận trên web. */
   async function markRefunded(order, adminId, note) {
-    if (order.paymentStatus !== 'refund_pending') {
+    const paidAfterCancel = order.status === 'cancelled' && order.paymentStatus === 'paid' && order.paymentFlag === 'PAID_AFTER_CANCEL'
+    if (order.paymentStatus !== 'refund_pending' && !paidAfterCancel) {
       throw new HttpError(409, 'REFUND_NOT_PENDING', 'Đơn không ở trạng thái chờ hoàn tiền')
     }
-    const updated = await repo.updateOrder(order.id, { paymentStatus: 'refunded' })
+    const updated = await repo.updateOrderIfStatus(order.id, order.status, { paymentStatus: 'refunded' }, order.paymentStatus, paidAfterCancel ? 'PAID_AFTER_CANCEL' : undefined)
+    if (!updated) throw new HttpError(409, 'REFUND_NOT_PENDING', 'Trạng thái hoàn tiền vừa thay đổi')
     await audit({
       actorId: adminId,
       actorRole: 'admin',
       entity: 'order',
       entityId: order.id,
       action: 'refund',
-      oldValue: { paymentStatus: 'refund_pending' },
+      oldValue: { paymentStatus: order.paymentStatus },
       newValue: { paymentStatus: 'refunded', note: typeof note === 'string' ? note.slice(0, 300) : null },
     })
     await notify('refunded', updated)

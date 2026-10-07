@@ -165,9 +165,9 @@ describe('Mã đơn gửi payOS', () => {
 describe('parseWebhook — nhánh còn lại (NFR-SEC-002)', () => {
   const sign = (data) => ({ data, signature: signData(data, KEY) })
 
-  it('thiếu code trong data → lấy code ở cấp ngoài của webhook', () => {
+  it('thiếu code trong data → code unsigned ở cấp ngoài không xác nhận thanh toán', () => {
     const body = { ...sign({ orderCode: 42, amount: 1000 }), code: '00' }
-    expect(parseWebhook(body, KEY)).toMatchObject({ ok: true, paid: true })
+    expect(parseWebhook(body, KEY)).toMatchObject({ ok: true, paid: false })
     expect(parseWebhook({ ...body, code: '01' }, KEY)).toMatchObject({ ok: true, paid: false })
   })
 

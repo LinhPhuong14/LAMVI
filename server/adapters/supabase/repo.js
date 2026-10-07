@@ -445,15 +445,13 @@ export function createSupabaseRepo(client) {
      * Đổi trạng thái chỉ khi trạng thái hiện tại đúng như mong đợi (khoá lạc quan) — hai request
      * đồng thời (khách huỷ + webhook PAID) không được cùng thành công.
      */
-    async updateOrderIfStatus(id, expectedStatus, values) {
-      const data = unwrap(
-        await client
-          .from('orders')
-          .update({ ...toRow(values, ORDER_COLS), ...(values.status === 'cancelled' ? { atomic_cancellation: true } : {}) })
-          .eq('id', id)
-          .eq('status', expectedStatus)
-          .select('*, order_items(*)'),
-      )
+    async updateOrderIfStatus(id, expectedStatus, values, expectedPaymentStatus, expectedPaymentFlag) {
+      let query = client.from('orders')
+        .update({ ...toRow(values, ORDER_COLS), ...(values.status === 'cancelled' ? { atomic_cancellation: true } : {}) })
+        .eq('id', id).eq('status', expectedStatus)
+      if (expectedPaymentStatus !== undefined) query = query.eq('payment_status', expectedPaymentStatus)
+      if (expectedPaymentFlag !== undefined) query = query.eq('payment_flag', expectedPaymentFlag)
+      const data = unwrap(await query.select('*, order_items(*)'))
       return data.length ? toOrder(data[0]) : null
     },
 

@@ -423,9 +423,9 @@ export function createMemoryRepo(data = {}) {
     async updateOrder(id, values) {
       return updateOrder(id, values)
     },
-    async updateOrderIfStatus(id, expectedStatus, values) {
+    async updateOrderIfStatus(id, expectedStatus, values, expectedPaymentStatus, expectedPaymentFlag) {
       const o = byId(state.orders, id)
-      if (!o || o.status !== expectedStatus) return null
+      if (!o || o.status !== expectedStatus || (expectedPaymentStatus !== undefined && o.paymentStatus !== expectedPaymentStatus) || (expectedPaymentFlag !== undefined && o.paymentFlag !== expectedPaymentFlag)) return null
       return updateOrder(id, values)
     },
 

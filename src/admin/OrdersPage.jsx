@@ -218,7 +218,7 @@ function OrderDetail({ code }) {
 
           <h2>{S.orders.payment}</h2>
           <Row label={label.method(o.paymentMethod)}>{label.payment(o.paymentStatus)}</Row>
-          {o.paymentStatus === 'refund_pending' && (
+          {(o.paymentStatus === 'refund_pending' || (o.status === 'cancelled' && o.paymentStatus === 'paid' && o.paymentFlag === 'PAID_AFTER_CANCEL')) && (
             <>
               <p className="field-hint">{S.orders.refundHint}</p>
               <button type="button" className="btn btn-small" onClick={refund} disabled={busy}>
