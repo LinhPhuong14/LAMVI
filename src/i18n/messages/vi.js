@@ -11,6 +11,12 @@ export default {
       'Đèn giấy dó thủ công làm quà tặng, kèm lời chúc gắn mã QR và video hành trình làm đèn.',
   },
   nav: {
+    menu: "Menu",
+    menuClose: "Đóng menu",
+    menuLabel: "Điều hướng",
+    track: "Theo dõi đơn",
+    contact: "Liên hệ",
+    hotline: "Hotline",
     shop: 'Cửa hàng',
     logout: 'Đăng xuất',
     home: 'Trang chủ',
@@ -210,6 +216,17 @@ export default {
     error: 'Không tải được câu hỏi thường gặp.',
   },
   footer: {
+    contact: "Liên hệ",
+    terms: "Điều khoản sử dụng",
+    shipping: "Chính sách vận chuyển",
+    payment: "Chính sách thanh toán",
+    policies: "Chính sách",
+    legalTitle: "Thông tin doanh nghiệp",
+    registration: "Đăng ký kinh doanh",
+    workshop: "Xưởng",
+    hotline: "Hotline",
+    moit: "Đã thông báo Bộ Công Thương",
+    follow: "Theo dõi LAMVI",
     newsUnavailable: 'Đăng ký nhận tin hiện chưa mở. Bạn có thể theo dõi LAMVI qua các kênh chính thức.',
     tagline: 'Đèn giấy dó thủ công — giữ lửa ký ức, thắp sáng yêu thương.',
     products: 'Sản phẩm',
@@ -300,6 +317,11 @@ export default {
     toHome: 'Khám phá LAMVI',
   },
   auth: {
+    checkoutNote: "Đăng nhập để lưu lời chúc và theo dõi đơn hàng của bạn.",
+    checkoutNoteSub: "Giỏ hàng của bạn vẫn được giữ nguyên. Tạo tài khoản chỉ mất vài giây — hoặc tiếp tục nhanh bằng Google.",
+    cartSummary: "Giỏ hàng của bạn",
+    cartItems: "{n} sản phẩm",
+    cartTotal: "Tạm tính",
     heroLine1: 'Thắp một ngọn đèn',
     heroLine2: 'cho điều bạn muốn gửi',
     heroLead: 'Đèn giấy dó làm tay, kèm lời chúc riêng — theo dõi từng công đoạn từ xưởng tới tay người nhận.',
@@ -423,6 +445,8 @@ export default {
     mayHint: 'Bấm vào Mây ở góc màn hình để hỏi về đèn, lời chúc hay giao hàng.',
   },
   errors: {
+    MESSAGE_TOO_SHORT: "Vui lòng nhập ít nhất 10 ký tự.",
+    CONTACT_UNAVAILABLE: "Chưa gửi được lúc này. Vui lòng liên hệ qua hotline hoặc Zalo.",
     CHECKOUT_KEY_CONFLICT: 'Thông tin đặt hàng đã thay đổi. Hãy kiểm tra lại giỏ hàng trước khi thử lại.',
     CANNOT_MANAGE_SELF: 'Bạn không thể tự khoá hay tự đổi vai trò của chính mình.',
     LAST_IT: 'Phải còn ít nhất một tài khoản IT đang hoạt động.',
@@ -681,6 +705,9 @@ export default {
     lineTotal: 'Thành tiền',
   },
   may: {
+    handoff: "Chat với nhân viên",
+    handoffHint: "Mây chưa trả lời được? Nhắn trực tiếp cho nhân viên LAMVI.",
+    handoffContact: "Liên hệ nhân viên",
     open: 'Trò chuyện với Mây',
     close: 'Đóng',
     title: 'Mây',
@@ -723,6 +750,90 @@ export default {
     text: 'Chúng tôi đang nâng cấp hệ thống. Vui lòng quay lại sau ít phút.',
   },
   policy: {
+    terms: {
+      title: "Điều khoản sử dụng",
+      description: "Điều khoản khi truy cập website và đặt mua đèn giấy dó tại LAMVI.",
+      intro: "Khi truy cập website và đặt hàng tại LAMVI, bạn đồng ý với các điều khoản dưới đây. Nếu có mâu thuẫn giữa các ngôn ngữ, bản tiếng Việt được ưu tiên.",
+      sections: [
+        { h: "Phạm vi", items: [
+          "Website bán đèn giấy dó thủ công và dịch vụ kèm theo (thiệp lời chúc gắn mã QR, video hành trình mẻ đèn). Chỉ giao hàng trong lãnh thổ Việt Nam; thanh toán bằng VND."
+        ] },
+        { h: "Tài khoản", items: [
+          "Bạn cần tài khoản để đặt hàng. Bạn chịu trách nhiệm giữ bí mật mật khẩu và các hoạt động dưới tài khoản của mình.",
+          "LAMVI có quyền khoá tài khoản vi phạm điều khoản hoặc có dấu hiệu gian lận."
+        ] },
+        { h: "Đặt hàng và giá", items: [
+          "Giá niêm yết bằng VND và đã gồm VAT. Phí vận chuyển hiển thị riêng ở bước thanh toán trước khi bạn xác nhận.",
+          "Đơn hàng chỉ được ghi nhận sau khi bạn hoàn tất bước thanh toán (hoặc chọn COD). LAMVI có thể từ chối hoặc huỷ đơn khi hết hàng, sai giá do lỗi hiển thị hoặc nghi ngờ gian lận, và hoàn lại số tiền đã thu."
+        ] },
+        { h: "Lời chúc và nội dung bạn gửi", items: [
+          "Bạn chịu trách nhiệm về nội dung chữ, giọng nói, video trong lời chúc và bảo đảm không vi phạm pháp luật hay quyền của người khác.",
+          "Giọng nói và video lời chúc được xoá tự động theo thời hạn nêu trong Chính sách riêng tư."
+        ] },
+        { h: "Sở hữu trí tuệ", items: [
+          "Nội dung, hình ảnh, thiết kế, thương hiệu LAMVI thuộc LAMVI hoặc bên cấp phép. Không sao chép, sử dụng cho mục đích thương mại khi chưa được đồng ý bằng văn bản."
+        ] },
+        { h: "Trách nhiệm và giải quyết tranh chấp", items: [
+          "LAMVI nỗ lực giữ website hoạt động liên tục nhưng có thể tạm ngưng để bảo trì hoặc do sự cố ngoài kiểm soát.",
+          "Tranh chấp được ưu tiên giải quyết qua thương lượng; không đạt thì giải quyết tại cơ quan có thẩm quyền theo pháp luật Việt Nam."
+        ] },
+        { h: "Các chính sách liên quan", items: [
+          "Chính sách riêng tư, đổi trả, vận chuyển và thanh toán là một phần của điều khoản này."
+        ] }
+      ]
+    },
+    shipping: {
+      title: "Chính sách vận chuyển",
+      description: "Phí, khu vực và thời gian giao đèn LAMVI.",
+      intro: "LAMVI đóng gói và gửi đèn qua đơn vị vận chuyển. Trang này nêu phí, khu vực và các mốc trạng thái đơn.",
+      sections: [
+        { h: "Khu vực giao hàng", items: [
+          "Giao trong lãnh thổ Việt Nam. Hiện chưa giao hàng quốc tế.",
+          "Địa chỉ nhận chọn theo danh mục hành chính hiện hành (tỉnh/thành, phường/xã) ở bước thanh toán."
+        ] },
+        { h: "Phí vận chuyển", items: [
+          "Đồng giá 30.000 ₫ cho mọi tỉnh/thành. Miễn phí khi tạm tính sau giảm giá từ 1.000.000 ₫.",
+          "Phí và ngưỡng miễn phí được hiển thị ở bước thanh toán trước khi bạn xác nhận; mức hiển thị lúc đặt hàng là mức áp dụng cho đơn đó."
+        ] },
+        { h: "Thời gian giao", items: [
+          "Đèn được làm và đóng gói thủ công nên cần thời gian chuẩn bị trước khi gửi. Vui lòng liên hệ LAMVI để biết thời gian giao dự kiến cho đơn của bạn.",
+          "Bạn theo dõi trạng thái đơn (đã xác nhận, đang làm, đã đóng gói, đã gửi, đã giao) ở trang Tài khoản → Đơn hàng."
+        ] },
+        { h: "Nhận hàng", items: [
+          "Vui lòng kiểm tra kiện hàng khi nhận. Nếu đèn bị vỡ hoặc hư hỏng, hãy quay video khui hàng liên tục và gửi yêu cầu theo Chính sách đổi trả trong 7 ngày kể từ ngày giao.",
+          "Giao thất bại hoặc người nhận từ chối: LAMVI liên hệ người mua để sắp xếp lại."
+        ] },
+        { h: "Đơn tặng người khác", items: [
+          "Bạn có thể chọn người nhận khác với người mua. Đơn giao cho người khác không áp dụng thanh toán COD."
+        ] }
+      ]
+    },
+    payment: {
+      title: "Chính sách thanh toán",
+      description: "Các hình thức thanh toán, hoàn tiền và hoá đơn tại LAMVI.",
+      intro: "Trang này nêu các hình thức thanh toán, thời hạn thanh toán và cách hoàn tiền.",
+      sections: [
+        { h: "Hình thức thanh toán", items: [
+          "Thanh toán trực tuyến qua cổng payOS: quét mã QR hoặc chuyển khoản ngân hàng trên trang thanh toán của payOS. LAMVI không lưu số thẻ hay thông tin tài khoản ngân hàng của bạn.",
+          "Thanh toán khi nhận hàng (COD) cho đơn giao đúng địa chỉ của người mua; không áp dụng khi giao cho người khác.",
+          "Các hình thức khả dụng được hiển thị ở bước thanh toán."
+        ] },
+        { h: "Thời hạn thanh toán", items: [
+          "Liên kết thanh toán payOS có hiệu lực 15 phút. Quá hạn, đơn tự động bị huỷ và mã giảm giá (nếu có) được hoàn lượt dùng; bạn có thể đặt lại.",
+          "Đơn payOS chỉ được xác nhận sau khi cổng thanh toán báo đã nhận đủ tiền."
+        ] },
+        { h: "Giá và hoá đơn", items: [
+          "Giá đã gồm VAT; bảng giá ở bước thanh toán tách riêng tiền hàng, giảm giá, phí vận chuyển và VAT."
+        ] },
+        { h: "Huỷ đơn và hoàn tiền", items: [
+          "Bạn huỷ được đơn trước khi đơn được gửi đi. Đơn chưa trả tiền: huỷ ngay. Đơn đã trả tiền qua payOS: LAMVI chuyển khoản hoàn lại cho bạn; thời gian hoàn tiền do LAMVI thông báo khi xử lý yêu cầu.",
+          "Hoàn tiền do đổi trả được xử lý theo Chính sách đổi trả."
+        ] },
+        { h: "Bảo mật thanh toán", items: [
+          "Giao dịch trực tuyến do payOS xử lý. LAMVI chỉ nhận kết quả giao dịch (thành công/thất bại, số tiền, mã giao dịch)."
+        ] }
+      ]
+    },
     updated: 'Cập nhật lần cuối: 05/10/2026',
     back: 'Về trang chủ',
     privacy: {
@@ -734,6 +845,7 @@ export default {
           'Tài khoản: họ tên, email, số điện thoại, ngôn ngữ ưa dùng. Nếu đăng nhập bằng Google, chúng tôi nhận tên và email từ Google; không nhận mật khẩu Google của bạn.',
           'Đơn hàng: sản phẩm, thông tin người nhận (tên, số điện thoại, địa chỉ giao), ghi chú, phương thức thanh toán, mã giảm giá đã dùng.',
           'Lời chúc: nội dung chữ, giọng nói hoặc video bạn gửi kèm món quà.',
+          'Biểu mẫu liên hệ: họ tên, email, số điện thoại (nếu nhập), mã đơn và nội dung bạn gửi. Chúng tôi chuyển tới hộp thư hỗ trợ và không lưu trên website.',
           'Trò chuyện với Mây (trợ lý AI): câu bạn gõ. Khi bạn đăng nhập, lịch sử được lưu để bạn xem lại; khách chưa đăng nhập thì không lưu.',
           'Dữ liệu sử dụng web: trang đã xem, thiết bị, trình duyệt (qua Google Analytics 4), và nhật ký kỹ thuật phục vụ phát hiện lỗi, chống lạm dụng.'
         ] },
@@ -758,7 +870,7 @@ export default {
         ] },
         { h: 'Quyền của bạn', items: [
           'Xem và sửa thông tin cá nhân ngay trong trang Tài khoản.',
-          'Yêu cầu chúng tôi xoá hoặc ngừng xử lý thông tin của bạn bằng cách liên hệ qua kênh hỗ trợ trên website; chúng tôi giữ lại phần pháp luật bắt buộc phải giữ.',
+          'Yêu cầu chúng tôi xoá hoặc ngừng xử lý thông tin của bạn bằng cách liên hệ qua trang Liên hệ; chúng tôi giữ lại phần pháp luật bắt buộc phải giữ.',
           'Người nhận quà chỉ xem được lời chúc qua đường dẫn riêng trên thiệp, không cần tạo tài khoản.'
         ] },
         { h: 'Bảo mật', items: [
@@ -790,7 +902,7 @@ export default {
         ] },
         { h: 'Cách gửi yêu cầu', items: [
           'Người mua gửi yêu cầu cho đơn của mình; người nhận quà vui lòng nhờ người mua gửi giúp.',
-          'Chức năng gửi yêu cầu trực tuyến trong trang Tài khoản đang được hoàn thiện. Trong thời gian này, vui lòng liên hệ cửa hàng qua kênh hỗ trợ trên website và đính kèm mã đơn cùng video.'
+          'Chức năng gửi yêu cầu trực tuyến trong trang Tài khoản đang được hoàn thiện. Trong thời gian này, vui lòng gửi yêu cầu qua trang Liên hệ (hoặc Zalo/email hỗ trợ) và đính kèm mã đơn cùng video.'
         ] },
         { h: 'Kết quả', items: [
           'Chúng tôi xem xét yêu cầu và phản hồi cho người mua. Nếu được chấp nhận, bạn nhận sản phẩm đổi hoặc được hoàn tiền; nếu bị từ chối, chúng tôi nêu rõ lý do.'
@@ -813,8 +925,32 @@ export default {
     pickSingle: 'Hoặc chọn từng đèn ({n} đèn)',
   },
   notFound: {
+    contact: "Cần giúp đỡ? Liên hệ LAMVI",
     title: 'Không tìm thấy trang',
     back: 'Về trang chủ',
+  },
+  contact: {
+    title: "Liên hệ LAMVI",
+    description: "Hotline, Zalo, email hỗ trợ, giờ làm việc và biểu mẫu liên hệ của LAMVI.",
+    lead: "Bạn cần hỗ trợ về đơn hàng, đổi trả hay muốn hỏi thêm về đèn? Chọn kênh thuận tiện nhất — chúng tôi trả lời trong giờ làm việc.",
+    hotline: "Hotline",
+    zalo: "Zalo",
+    zaloOpen: "Nhắn Zalo",
+    email: "Email hỗ trợ",
+    hours: "Giờ làm việc",
+    workshop: "Địa chỉ xưởng",
+    office: "Địa chỉ đơn vị",
+    noChannels: "Thông tin liên hệ đang được cập nhật. Vui lòng quay lại sau.",
+    formTitle: "Gửi tin nhắn cho chúng tôi",
+    name: "Họ tên",
+    emailLabel: "Email của bạn",
+    phone: "Số điện thoại (không bắt buộc)",
+    orderCode: "Mã đơn (nếu hỏi về đơn hàng)",
+    message: "Nội dung",
+    submit: "Gửi",
+    sending: "Đang gửi…",
+    sent: "Đã nhận tin nhắn của bạn. Chúng tôi sẽ phản hồi qua email trong giờ làm việc.",
+    returnsNote: "Yêu cầu đổi trả: gửi qua biểu mẫu này hoặc Zalo, kèm mã đơn và video khui hàng.",
   },
   locales: { vi: 'Tiếng Việt', en: 'English', zh: '简体中文' },
 }

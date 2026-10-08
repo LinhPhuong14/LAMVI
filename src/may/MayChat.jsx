@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api/client.js'
+import { useApi } from '../api/useApi.js'
 import { useAuth } from '../auth/context.js'
 import { useI18n } from '../i18n/index.js'
 import MayAvatar from './MayAvatar.jsx'
@@ -10,8 +11,11 @@ const MAX = 500
 
 // FR-AI-001/003/005/006: khung chat với Mây
 export default function MayChat({ onClose, onTour }) {
-  const { t, lang } = useI18n()
+  const { t, lang, path } = useI18n()
   const { user, authedApi } = useAuth()
+  // Chuyển sang người thật: Zalo nếu đã cấu hình, không thì trang Liên hệ (feedback 08/10, mục 4)
+  const site = useApi('/site', lang)
+  const zalo = site.status === 'ok' ? site.data.zalo : ''
   const [messages, setMessages] = useState(() => (user ? [] : loadGuestChat()))
   const [text, setText] = useState('')
   const [pending, setPending] = useState(false)
@@ -141,6 +145,9 @@ export default function MayChat({ onClose, onTour }) {
             {t('may.startTour')}
           </button>
         </div>
+        <a className="may-handoff" href={zalo || path('/contact')} {...(zalo ? { target: '_blank', rel: 'noopener noreferrer' } : {})} title={t('may.handoffHint')}>
+          {t('may.handoff')}
+        </a>
         <small className="may-save-note">{user ? t('may.historyNote') : t('may.guestNote')}</small>
       </form>
     </section>

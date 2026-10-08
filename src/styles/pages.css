@@ -4718,3 +4718,221 @@
 .policy-page .policy-block h2 { font-size: 1.25rem; margin: 0 0 10px; }
 .policy-page .policy-block ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; line-height: 1.65; }
 .policy-page .btn { margin-top: 16px; }
+
+/* ---------- Menu di động (feedback 08/10, mục 2) ----------
+   Nút ≥44×44 hiện khi menu ngang bị ẩn (≤1240px). Ngăn kéo vẽ qua portal vào <body>. */
+.nav-menu-btn {
+  display: none;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--than);
+  cursor: pointer;
+}
+
+.nav-menu-bars,
+.nav-menu-bars::before,
+.nav-menu-bars::after {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.nav-menu-bars {
+  position: relative;
+}
+
+.nav-menu-bars::before,
+.nav-menu-bars::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+
+.nav-menu-bars::before {
+  top: -6px;
+}
+
+.nav-menu-bars::after {
+  top: 6px;
+}
+
+.nav-menu-btn:focus-visible,
+.mobile-menu-close:focus-visible,
+.mobile-menu a:focus-visible,
+.mobile-menu button:focus-visible {
+  outline: 2px solid var(--son);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1240px) {
+  .nav-menu-btn {
+    display: inline-flex;
+  }
+}
+
+/* Header gọn: ngôn ngữ chuyển vào ngăn kéo (tránh nút 24px) */
+@media (max-width: 960px) {
+  .nav-actions > .lang-switch {
+    display: none;
+  }
+  .nav-actions {
+    gap: 10px;
+  }
+}
+
+.mobile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(40, 28, 18, 0.45);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mobile-menu {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 420px);
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 20px 24px;
+  background: var(--diep);
+  box-shadow: -18px 0 40px -20px rgba(40, 28, 18, 0.5);
+}
+
+@media (max-width: 640px) {
+  .mobile-menu {
+    width: 100%;
+  }
+}
+
+.mobile-menu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin-bottom: 8px;
+}
+
+.mobile-menu-close {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--than);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu-links a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--hair-soft, rgba(0, 0, 0, 0.08));
+  color: var(--than);
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+
+.mobile-menu-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.mobile-menu .lang-switch {
+  gap: 8px;
+}
+
+.mobile-menu .lang-switch a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 0.9rem;
+}
+
+.mobile-menu-hotline {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--than);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mobile-menu-logout {
+  min-height: 44px;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mobile-menu-cta {
+  justify-content: center;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-menu {
+    animation: mobile-menu-in 0.25s var(--ease-out, ease-out);
+  }
+  @keyframes mobile-menu-in {
+    from {
+      transform: translateX(24px);
+      opacity: 0;
+    }
+  }
+}
+
+/* ---------- Trang Liên hệ (feedback 08/10, mục 4) ---------- */
+.contact-channels { display: grid; gap: 14px; margin: 0 0 20px; }
+.contact-channels > div { display: grid; grid-template-columns: minmax(110px, 160px) 1fr; gap: 12px; align-items: baseline; }
+.contact-channels dt { font-weight: 600; color: var(--ink-soft); }
+.contact-channels dd { margin: 0; overflow-wrap: anywhere; }
+.contact-channels a { color: var(--son); }
+.contact-form { margin-top: 32px; }
+.contact-form h2 { font-size: 1.25rem; margin: 0 0 8px; }
+@media (max-width: 640px) {
+  .contact-channels > div { grid-template-columns: 1fr; gap: 2px; }
+}
+
+.may-handoff {
+  display: inline-block;
+  margin-top: 6px;
+  min-height: 24px;
+  color: var(--son);
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+.notfound-contact { margin-top: 20px; }
+.notfound-contact a { color: inherit; }
+
+.login-checkout-note { display: grid; gap: 6px; margin-bottom: 16px; }
+.login-checkout-note p { margin: 0; }
+.login-cart-summary .price { display: inline-flex; flex-direction: row; gap: 6px; align-items: baseline; }

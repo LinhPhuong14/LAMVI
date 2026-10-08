@@ -11,6 +11,7 @@ export const GA_EVENTS = Object.freeze([
   'view_item',
   'add_to_cart',
   'begin_checkout',
+  'login_view',
   'purchase',
   'cancel_order',
   'open_qr_gift',

@@ -412,7 +412,7 @@ describe('sitemap.xml', () => {
     expect(doc.getElementsByTagName('parsererror')).toHaveLength(0)
     expect(res.text).not.toMatch(/&(?!amp;|lt;|gt;|quot;|apos;)/)
     const urls = [...doc.getElementsByTagName('url')]
-    expect(urls).toHaveLength(8 * 3) // trang chủ + cửa hàng + 2 chính sách + 2 bộ sưu tập + 2 sản phẩm Published
+    expect(urls).toHaveLength(12 * 3) // trang chủ + cửa hàng + 6 trang chính sách/liên hệ + 2 bộ sưu tập + 2 sản phẩm Published
     const locs = urls.map((u) => u.getElementsByTagName('loc')[0].textContent)
     expect(locs.some((l) => l.includes('/nhap'))).toBe(false)
     expect(locs.some((l) => l.endsWith('/an'))).toBe(false)
@@ -431,7 +431,7 @@ describe('sitemap.xml', () => {
     const doc = parse(res.text)
     expect(doc.getElementsByTagName('parsererror')).toHaveLength(0)
     const locs = [...doc.getElementsByTagName('loc')].map((l) => l.textContent)
-    expect(locs).toHaveLength((6 + products.length) * 3) // + cửa hàng + 2 chính sách + 2 bộ sưu tập
+    expect(locs).toHaveLength((10 + products.length) * 3) // + cửa hàng + 6 trang chính sách/liên hệ + 2 bộ sưu tập
     for (const bad of ['/lo/', '/login', '/register', '/account', '/admin', '/forgot-password', '/reset-password']) {
       expect(res.text).not.toContain(bad)
     }
@@ -442,7 +442,7 @@ describe('sitemap.xml', () => {
     const res = await get({ products: [] })
     const doc = parse(res.text)
     expect(doc.getElementsByTagName('parsererror')).toHaveLength(0)
-    expect(doc.getElementsByTagName('url')).toHaveLength(18) // trang chủ + cửa hàng + 2 chính sách + 2 bộ sưu tập × 3 ngôn ngữ
+    expect(doc.getElementsByTagName('url')).toHaveLength(30) // trang chủ + cửa hàng + 6 trang chính sách/liên hệ + 2 bộ sưu tập × 3 ngôn ngữ
   })
 
   it('robots.txt: text/plain, không Disallow trang riêng tư công khai khác, trỏ sitemap tuyệt đối', async () => {

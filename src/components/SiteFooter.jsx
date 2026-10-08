@@ -20,9 +20,17 @@ export default function SiteFooter() {
           <Seal className="seal-lg">LAMVI</Seal>
           <p>{t('footer.tagline')}</p>
           {business?.legalName && <p>{business.legalName}</p>}
+          {business?.registration && <p>{business.registration}</p>}
           {business?.address && <p>{business.address}</p>}
+          {business?.moitUrl && (
+            <p>
+              <a href={business.moitUrl} target="_blank" rel="noopener noreferrer">
+                {t('footer.moit')}
+              </a>
+            </p>
+          )}
           {business?.social?.length > 0 && <div className="social-links">
-            {business.social.map(({ label, url }) => <a key={label} href={url} rel="noopener noreferrer">{label}</a>)}
+            {business.social.map(({ label, url }) => <a key={label} href={url} target="_blank" rel="noopener noreferrer">{label}</a>)}
           </div>}
         </div>
         <div className="footer-col">
@@ -37,11 +45,16 @@ export default function SiteFooter() {
         <div className="footer-col">
           <h3>{t('footer.support')}</h3>
           <Link to={home('#faq')}>{t('footer.faq')}</Link>
+          <Link to={path('/contact')}>{t('footer.contact')}</Link>
           <Link to={path('/returns')}>{t('footer.returns')}</Link>
+          <Link to={path('/shipping')}>{t('footer.shipping')}</Link>
+          <Link to={path('/payment')}>{t('footer.payment')}</Link>
+          <Link to={path('/terms')}>{t('footer.terms')}</Link>
           <Link to={path('/privacy')}>{t('footer.privacy')}</Link>
           <Link to={path('/account?tab=orders')}>{t('footer.tracking')}</Link>
           {business?.supportEmail && <a href={`mailto:${business.supportEmail}`}>{business.supportEmail}</a>}
           {business?.phone && <a href={`tel:${business.phone.replace(/[^0-9+]/g, '')}`}>{business.phone}</a>}
+          {business?.zalo && <a href={business.zalo} target="_blank" rel="noopener noreferrer">Zalo</a>}
           {business?.hours && <p>{business.hours}</p>}
         </div>
         <div className="footer-col footer-news">

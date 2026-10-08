@@ -10,6 +10,7 @@ const AccountPage = lazy(() => import('./pages/AccountPage'))
 import BatchPage from './pages/BatchPage'
 const GiftPage = lazy(() => import('./pages/GiftPage'))
 import PolicyPage from './pages/PolicyPage'
+import ContactPage from './pages/ContactPage'
 import CollectionPage from './pages/CollectionPage'
 import ShopPage from './pages/ShopPage'
 const CartPage = lazy(() => import('./pages/CartPage'))
@@ -43,6 +44,10 @@ function localeChildren() {
       <Route path="shop" element={<ShopPage />} />
       <Route path="privacy" element={<PolicyPage kind="privacy" />} />
       <Route path="returns" element={<PolicyPage kind="returns" />} />
+      <Route path="terms" element={<PolicyPage kind="terms" />} />
+      <Route path="shipping" element={<PolicyPage kind="shipping" />} />
+      <Route path="payment" element={<PolicyPage kind="payment" />} />
+      <Route path="contact" element={<ContactPage />} />
       <Route path="collections/:slug" element={<CollectionPage />} />
       <Route path="cart" element={<RouteLoader><CartPage /></RouteLoader>} />
       <Route path="checkout" element={<RouteLoader><CheckoutPage /></RouteLoader>} />

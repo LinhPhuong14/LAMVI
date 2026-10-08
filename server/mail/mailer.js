@@ -36,8 +36,8 @@ const fromDomain = (from) => parseFrom(from).email.split('@')[1]?.toLowerCase() 
 // Resend: 3.000 thư/tháng, 100/ngày (gói miễn phí); cần xác minh tên miền gửi
 const resend = ({ apiKey, from }, fetchImpl) => ({
   provider: 'resend',
-  send: ({ to, subject, text, html, idempotencyKey }) =>
-    post('https://api.resend.com/emails', { Authorization: `Bearer ${apiKey}`, ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}) }, { from, to: [to], subject, text, html }, fetchImpl),
+  send: ({ to, subject, text, html, idempotencyKey, replyTo }) =>
+    post('https://api.resend.com/emails', { Authorization: `Bearer ${apiKey}`, ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}) }, { from, to: [to], subject, text, html, ...(replyTo ? { reply_to: replyTo } : {}) }, fetchImpl),
   // Kiểm khoá và tên miền gửi mà KHÔNG gửi thư (dashboard IT). Trả { note? }; lỗi → ném Error(mã).
   async ping() {
     const { status, data } = await get('https://api.resend.com/domains', { Authorization: `Bearer ${apiKey}` }, fetchImpl)
@@ -69,11 +69,11 @@ const brevo = ({ apiKey, from }, fetchImpl) => ({
     if (status !== 200) throw new Error(`http_${status}`)
     return {}
   },
-  send: ({ to, subject, text, html }) =>
+  send: ({ to, subject, text, html, replyTo }) =>
     post(
       'https://api.brevo.com/v3/smtp/email',
       { 'api-key': apiKey },
-      { sender: parseFrom(from), to: [{ email: to }], subject, textContent: text, htmlContent: html },
+      { sender: parseFrom(from), to: [{ email: to }], subject, textContent: text, htmlContent: html, ...(replyTo ? { replyTo: { email: replyTo } } : {}) },
       fetchImpl,
     ),
 })

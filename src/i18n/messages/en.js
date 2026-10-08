@@ -10,6 +10,12 @@ export default {
       'Handmade dó paper lanterns as gifts, with a QR-linked message and the story of how they were made.',
   },
   nav: {
+    menu: "Menu",
+    menuClose: "Close menu",
+    menuLabel: "Navigation",
+    track: "Track order",
+    contact: "Contact",
+    hotline: "Hotline",
     shop: 'Shop',
     logout: 'Sign out',
     home: 'Home',
@@ -198,6 +204,17 @@ export default {
     error: 'Could not load the FAQ.',
   },
   footer: {
+    contact: "Contact",
+    terms: "Terms of use",
+    shipping: "Shipping policy",
+    payment: "Payment policy",
+    policies: "Policies",
+    legalTitle: "Business information",
+    registration: "Business registration",
+    workshop: "Workshop",
+    hotline: "Hotline",
+    moit: "Notified to the Ministry of Industry and Trade",
+    follow: "Follow LAMVI",
     newsUnavailable: 'Newsletter sign-up is not available yet. Follow LAMVI through our official channels.',
     tagline: 'Handmade dó paper lanterns — keeping memories alight.',
     products: 'Products',
@@ -288,6 +305,11 @@ export default {
     toHome: 'Discover LAMVI',
   },
   auth: {
+    checkoutNote: "Sign in to save your gift message and track your order.",
+    checkoutNoteSub: "Your cart is kept. Creating an account takes seconds — or continue quickly with Google.",
+    cartSummary: "Your cart",
+    cartItems: "{n} items",
+    cartTotal: "Subtotal",
     heroLine1: 'Light a lantern',
     heroLine2: 'for what you want to say',
     heroLead: 'Handmade giấy dó lanterns with a personal message — follow every stage from the workshop to the one who receives it.',
@@ -409,6 +431,8 @@ export default {
     mayHint: 'Tap Mây in the corner of the screen to ask about lanterns, messages or delivery.',
   },
   errors: {
+    MESSAGE_TOO_SHORT: "Please enter at least 10 characters.",
+    CONTACT_UNAVAILABLE: "Could not send right now. Please use the hotline or Zalo.",
     CHECKOUT_KEY_CONFLICT: 'Checkout details have changed. Review your cart before trying again.',
     CANNOT_MANAGE_SELF: 'You cannot lock or change the role of your own account.',
     LAST_IT: 'At least one active IT account must remain.',
@@ -667,6 +691,9 @@ export default {
     lineTotal: 'Total',
   },
   may: {
+    handoff: "Chat with a person",
+    handoffHint: "Can't Mây help? Message the LAMVI team directly.",
+    handoffContact: "Contact the team",
     open: 'Chat with Mây',
     close: 'Close',
     title: 'Mây',
@@ -709,6 +736,90 @@ export default {
     text: 'We are upgrading our system. Please come back in a few minutes.',
   },
   policy: {
+    terms: {
+      title: "Terms of use",
+      description: "Terms for using the website and ordering paper lanterns from LAMVI.",
+      intro: "By using the website and ordering from LAMVI you agree to the terms below. If languages conflict, the Vietnamese version prevails.",
+      sections: [
+        { h: "Scope", items: [
+          "The website sells handmade dó-paper lanterns and related services (QR gift cards, lantern journey videos). We deliver within Vietnam only; payments are in VND."
+        ] },
+        { h: "Account", items: [
+          "You need an account to order. You are responsible for keeping your password secret and for activity under your account.",
+          "LAMVI may lock accounts that breach these terms or show signs of fraud."
+        ] },
+        { h: "Orders and prices", items: [
+          "Prices are in VND and include VAT. Shipping is shown separately at checkout before you confirm.",
+          "An order is recorded once you complete payment (or choose COD). LAMVI may refuse or cancel an order for stock-outs, price errors caused by display faults or suspected fraud, and will refund any amount collected."
+        ] },
+        { h: "Gift messages and your content", items: [
+          "You are responsible for the text, voice and video in your gift message and must not infringe the law or others’ rights.",
+          "Voice and video are deleted automatically within the period stated in the Privacy Policy."
+        ] },
+        { h: "Intellectual property", items: [
+          "Content, images, design and the LAMVI brand belong to LAMVI or its licensors. Do not copy or use them commercially without written consent."
+        ] },
+        { h: "Liability and disputes", items: [
+          "LAMVI works to keep the site available but it may be paused for maintenance or events beyond our control.",
+          "Disputes are first resolved by negotiation; otherwise before the competent authority under Vietnamese law."
+        ] },
+        { h: "Related policies", items: [
+          "The Privacy, Returns, Shipping and Payment policies form part of these terms."
+        ] }
+      ]
+    },
+    shipping: {
+      title: "Shipping policy",
+      description: "Fees, areas and delivery times for LAMVI lanterns.",
+      intro: "LAMVI packs and ships lanterns through a carrier. This page covers fees, areas and order stages.",
+      sections: [
+        { h: "Delivery area", items: [
+          "Within Vietnam. We do not ship internationally yet.",
+          "Choose the address from the current administrative list (province/city, ward/commune) at checkout."
+        ] },
+        { h: "Shipping fee", items: [
+          "Flat 30,000 ₫ nationwide. Free when the subtotal after discounts is 1,000,000 ₫ or more.",
+          "The fee and threshold are shown at checkout before you confirm; the amount shown when you order applies to that order."
+        ] },
+        { h: "Delivery time", items: [
+          "Lanterns are made and packed by hand, so they need preparation time before dispatch. Please contact LAMVI for the estimated delivery time of your order.",
+          "Track your order stages (confirmed, in production, packed, shipped, delivered) under Account → Orders."
+        ] },
+        { h: "Receiving your order", items: [
+          "Please check the parcel on arrival. If a lantern is broken or damaged, record a continuous unboxing video and send a request under the Returns policy within 7 days of delivery.",
+          "Failed delivery or refusal: LAMVI contacts the buyer to rearrange."
+        ] },
+        { h: "Gifts", items: [
+          "You may choose a recipient other than yourself. Orders delivered to someone else cannot use cash on delivery."
+        ] }
+      ]
+    },
+    payment: {
+      title: "Payment policy",
+      description: "Payment methods, refunds and invoices at LAMVI.",
+      intro: "This page covers payment methods, the payment window and refunds.",
+      sections: [
+        { h: "Payment methods", items: [
+          "Online through payOS: scan a QR code or make a bank transfer on the payOS payment page. LAMVI does not store your card or bank details.",
+          "Cash on delivery (COD) for orders delivered to the buyer’s own address; not available when delivering to someone else.",
+          "Available methods are shown at checkout."
+        ] },
+        { h: "Payment window", items: [
+          "A payOS payment link is valid for 15 minutes. After that the order is cancelled automatically and any coupon use is restored; you can order again.",
+          "A payOS order is confirmed only after the gateway reports the full amount received."
+        ] },
+        { h: "Prices and invoices", items: [
+          "Prices include VAT; the checkout summary separates goods, discounts, shipping and VAT."
+        ] },
+        { h: "Cancellation and refunds", items: [
+          "You can cancel before the order is shipped. Unpaid orders are cancelled immediately. Paid payOS orders are refunded by bank transfer; LAMVI tells you the refund time when it processes the request.",
+          "Refunds for returns follow the Returns policy."
+        ] },
+        { h: "Payment security", items: [
+          "Online payments are processed by payOS. LAMVI only receives the result (success/failure, amount, transaction code)."
+        ] }
+      ]
+    },
     updated: 'Last updated: 5 Oct 2026',
     back: 'Back to home',
     privacy: {
@@ -719,6 +830,7 @@ export default {
         { h: 'Information we collect', items: [
           'Account: name, email, phone number, preferred language. If you sign in with Google we receive your name and email from Google, never your Google password.',
           'Orders: products, recipient details (name, phone, delivery address), notes, payment method, coupons used.',
+          'Contact form: the name, email, phone (if given), order code and message you send. We forward it to the support mailbox and do not store it on the website.',
           'Greetings: the text, voice recording or video you attach to a gift.',
           'Chats with Mây (AI assistant): what you type. When signed in, history is saved so you can review it; guests are not saved.',
           'Usage data: pages viewed, device and browser (via Google Analytics 4), and technical logs used to detect errors and abuse.'
@@ -744,7 +856,7 @@ export default {
         ] },
         { h: 'Your rights', items: [
           'View and edit your personal information in your Account page.',
-          'Ask us to delete or stop processing your data through the support channel on the website; we keep only what the law requires.',
+          'Ask us to delete or stop processing your data through the Contact page; we keep only what the law requires.',
           'Gift recipients view a greeting only through the private link on the card, without creating an account.'
         ] },
         { h: 'Security', items: [
@@ -776,7 +888,7 @@ export default {
         ] },
         { h: 'How to submit', items: [
           'The buyer submits the request for their order; gift recipients should ask the buyer to submit it.',
-          'Online submission from your Account page is still being finished. Until then, please contact the shop through the support channel on the website with your order code and the video.'
+          'Online submission from your Account page is still being finished. Until then, please send your request through the Contact page (or our Zalo / support email) with your order code and the video.'
         ] },
         { h: 'Outcome', items: [
           'We review the request and reply to the buyer. If accepted, you receive a replacement or a refund; if declined, we explain why.'
@@ -799,8 +911,32 @@ export default {
     pickSingle: 'Or choose single lanterns ({n})',
   },
   notFound: {
+    contact: "Need help? Contact LAMVI",
     title: 'Page not found',
     back: 'Back to home',
+  },
+  contact: {
+    title: "Contact LAMVI",
+    description: "LAMVI hotline, Zalo, support email, opening hours and contact form.",
+    lead: "Need help with an order or a return, or have a question about our lanterns? Pick the most convenient channel — we reply during opening hours.",
+    hotline: "Hotline",
+    zalo: "Zalo",
+    zaloOpen: "Message on Zalo",
+    email: "Support email",
+    hours: "Opening hours",
+    workshop: "Workshop address",
+    office: "Registered address",
+    noChannels: "Contact details are being updated. Please check back soon.",
+    formTitle: "Send us a message",
+    name: "Full name",
+    emailLabel: "Your email",
+    phone: "Phone (optional)",
+    orderCode: "Order code (if about an order)",
+    message: "Message",
+    submit: "Send",
+    sending: "Sending…",
+    sent: "We received your message and will reply by email during opening hours.",
+    returnsNote: "Return requests: send them through this form or Zalo with your order code and unboxing video.",
   },
   locales: { vi: 'Tiếng Việt', en: 'English', zh: '简体中文' },
 }

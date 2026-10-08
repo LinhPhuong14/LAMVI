@@ -196,7 +196,8 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | Method | Path | Auth | Mô tả |
 |---|---|---|---|
 | GET | `/sitemap.xml`, `/robots.txt` | – | §23.2 |
-| GET | `/api/health` | – | |
+| GET | `/api/health` | – | Sống? `?deep=1` còn đọc DB (503 nếu hỏng) — dùng cho uptime monitor (T-74) |
+| POST | `/api/contact` | – | Form liên hệ → thư tới hộp thư hỗ trợ, 202; 503 nếu chưa cấu hình (T-75) |
 | GET | `/api/products?lang=` | – | Sản phẩm `published` |
 | GET | `/api/products/:slug?lang=` | – | 404 nếu không `published` |
 | GET | `/api/collections?lang=` | – | Bộ sưu tập `published` kèm `lamps[]` và `set` (D-96); không có story |
@@ -329,3 +330,7 @@ Chi tiết giới hạn, cutover và load profile: [runbook 1M](../production-re
 `mutate_cart` (019) dùng auth.users lock chung `create_checkout_order`; browser chỉ gọi server API. Cart/checkout product lookup theo IDs, không list toàn bộ catalog. Recovery API trả order projection sau xác thực owner UUID request key trước quote.
 
 `list_expired_gift_media` (020) service-role-only read RPC lọc deadline hiện hành, keyset `gift_messages.id`; cursor `gift_media_cleanup_cursor` lưu private app_settings. Cron xử lý batch 10/concurrency 5, không đổi policy cancelled/evidence. Payment CAS bổ sung expected paymentStatus/flag để không ghi đè refunded; webhook paid đọc signed envelope data. Chi tiết [QA report](../qa-qc-2026-10-07-round2.md).
+
+## Khởi động chịu lỗi (T-73, 2026-10-08)
+
+`server/index.js` (điểm vào, `api/index.js` re-export từ đây) → `import('./main.js')` (toàn bộ khởi tạo: config, `assertRuntimeReady`, adapter, SSR). Lỗi khi nạp → `server/degraded.js` (503 + `server/errorPage.js`). Trang lỗi 5xx của SSR cũng dùng `errorPage`. Frontend mới: `ContactPage` (`/contact`), `PolicyPage` thêm kind `terms|shipping|payment`, ngăn kéo menu trong `SiteHeader` (portal), chú thích checkout ở `LoginPage`, nút `may-handoff` ở `MayChat`.

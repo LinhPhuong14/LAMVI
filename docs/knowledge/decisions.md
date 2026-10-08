@@ -378,3 +378,10 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - T-70: bounded URI decoding trước redaction, che email/phone quốc tế/token trong path/code/message, malformed escapes không làm lọt token.
 - T-71: RPC 020 keyset lọc media tới hạn theo chính sách hiện hành, cursor private/batch bounded; không quyết retention mới.
 - T-72: outbox đợi mọi sibling settlement, số sent chỉ tính fence thành công; worker thiếu mailer vẫn purge payload đã hết cửa sổ retry bằng batch bounded. Không có scheduler/flag tắt vẫn là limitation.
+
+### T-73–T-76 — Feedback kiểm thử 08/10 (2026-10-08)
+
+- T-73: `server/index.js` chỉ còn `import('./main.js')` trong try/catch; khởi tạo lỗi (thiếu biến môi trường, Supabase, thiếu `dist/**`) → `createDegradedApp` (`server/degraded.js`): `/api/health` 503, API khác 503 JSON, trang web trả trang lỗi thương hiệu (`server/errorPage.js`), `no-store`. Vẫn fail-closed — không bao giờ rơi về adapter bộ nhớ. Chi tiết lỗi chỉ ghi log. `server/main.js` giữ toàn bộ khởi tạo cũ (T-33, T-66 không đổi).
+- T-74: `npm run build` chép `dist/client/assets` sang `public/assets` (`scripts/sync-cdn-assets.js`, bị `.gitignore`) để CDN Vercel phục vụ JS/CSS băm tên trực tiếp, kèm `Cache-Control` immutable ở `vercel.json`. Vẫn một function duy nhất và `outputDirectory: public` (T-33). `/api/health?deep=1` đọc DB (503 nếu hỏng) cho uptime monitor.
+- T-75: form liên hệ `POST /api/contact` không lưu DB: gửi thư tới `MAIL_SUPPORT_EMAIL` qua mailer hiện có (Reply-To = khách; mailer thêm `replyTo` cho Resend/Brevo), giới hạn `rateLimit.contact` 5/giờ/IP, bỏ ký tự điều khiển ở tiêu đề, escape HTML. Thiếu email nhận hoặc nhà cung cấp thư → 503 và `/api/site.contactForm=false` (giao diện ẩn form).
+- T-76: thông tin liên hệ/pháp lý hiển thị công khai đi qua `/api/site` (`publicSite`): thêm `registration` (`MAIL_COMPANY_REGISTRATION`), `workshopAddress` (`MAIL_WORKSHOP_ADDRESS`), `moitUrl` (`MOIT_NOTICE_URL`, chỉ https), `zalo`, `contactForm`. Không có giá trị mặc định. Menu di động vẽ qua portal vào `<body>` vì `.nav` có `backdrop-filter`/`transform` (phần tử `fixed` bên trong bị kẹt trong khung header).

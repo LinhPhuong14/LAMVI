@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../../components/Field'
 import { useI18n } from '../../i18n/index.js'
@@ -7,6 +7,9 @@ import GoogleButton from './GoogleButton'
 import { safeNext, useAuth } from '../../auth/context.js'
 import { landingPath } from '../../auth/landing.js'
 import { useSubmit } from '../../auth/useForm.js'
+import { CartContext } from '../../cart/context.js'
+import Price from '../../components/Price'
+import { track } from '../../analytics/index.js'
 
 export default function LoginPage() {
   const { t, path } = useI18n()
@@ -16,6 +19,13 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' })
   const { pending, error, run } = useSubmit()
   const next = safeNext(params.get('next'), path('/account'))
+  // Bị chuyển từ giỏ hàng/thanh toán sang đây (feedback 08/10, mục 3): giải thích lý do và nhắc giỏ hàng vẫn còn
+  const fromCheckout = /^(\/(en|zh))?\/checkout\/?$/i.test(new URL(next, 'http://x').pathname)
+  const cart = useContext(CartContext)?.cart
+  // Phễu begin_checkout → login_view → purchase (đo độ rơi ở bước đăng nhập)
+  useEffect(() => {
+    if (fromCheckout) track('login_view', { source: 'checkout' })
+  }, [fromCheckout])
 
   async function onSubmit(e) {
     e.preventDefault()
@@ -41,6 +51,17 @@ export default function LoginPage() {
         <p className="notice error" role="alert">
           {t(`errors.${urlError}`)}
         </p>
+      )}
+      {fromCheckout && (
+        <div className="notice login-checkout-note" role="note">
+          <strong>{t('auth.checkoutNote')}</strong>
+          <p>{t('auth.checkoutNoteSub')}</p>
+          {cart?.itemCount > 0 && (
+            <p className="login-cart-summary">
+              {t('auth.cartSummary')}: {t('auth.cartItems', { n: cart.itemCount })} · {t('auth.cartTotal')} <Price amount={cart.subtotal} className="login-cart-total" />
+            </p>
+          )}
+        </div>
       )}
       <GoogleButton next={params.get('next') ? next : undefined} />
       <form className="form" onSubmit={onSubmit} noValidate>

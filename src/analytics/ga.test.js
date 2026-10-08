@@ -100,11 +100,12 @@ describe('Thẻ nhúng gtag', () => {
 })
 
 describe('Danh sách sự kiện §23.3', () => {
-  it('đủ 11 sự kiện đã chốt ở D-41', () => {
+  it('đủ 11 sự kiện đã chốt ở D-41 + login_view (feedback 08/10)', () => {
     expect(GA_EVENTS).toEqual([
       'view_item',
       'add_to_cart',
       'begin_checkout',
+      'login_view',
       'purchase',
       'cancel_order',
       'open_qr_gift',

@@ -29,6 +29,7 @@ import { createMailer } from './mail/mailer.js'
 import { notificationOperationsRouter } from './routes/notificationOperations.js'
 import { isPwnedPassword } from './security/pwned.js'
 import { publicSite } from './services/site.js'
+import { contactRouter } from './routes/contact.js'
 
 // T-02: nhận adapter qua tham số để test bằng adapter bộ nhớ
 export function createApp({
@@ -79,12 +80,19 @@ export function createApp({
   })
   // D-54: bảo trì → API ghi trả 503
   api.use(maintenance.apiGuard)
-  api.get('/health', (req, res) => res.json({ ok: true }))
+  // Uptime monitor: /api/health nhanh (chỉ chứng tỏ function sống); ?deep=1 còn thử đọc DB → 503 nếu hỏng
+  api.get('/health', async (req, res) => {
+    if (req.query.deep === undefined) return res.json({ ok: true })
+    const db = await maintenance.get()
+    if (db.error) return res.status(503).json({ ok: false, db: false })
+    res.json({ ok: true, db: true })
+  })
   api.get('/site', (req, res) => {
     res.set('Cache-Control', 'public, max-age=60, s-maxage=300')
     res.json(publicSite(config))
   })
   api.use(catalogRouter({ repo }))
+  api.use(contactRouter({ repo, config, mailer }))
   api.use(geoRouter())
   if (auth && storage && returnsRepo) api.use(returnsRouter({ repo, returnsRepo, auth, storage, config }))
   if (auth) api.use(authRouter({ repo, auth, config, mailer, pwned }))

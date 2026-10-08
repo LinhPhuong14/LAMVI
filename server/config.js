@@ -47,6 +47,8 @@ export function loadConfig(env = process.env) {
       refresh: { max: 120, windowSec: 300 },
       password: { max: 10, windowSec: 3600 },
       order: { max: 20, windowSec: 3600 },
+      // Form liên hệ công khai (feedback 08/10, mục 4): chống spam hộp thư hỗ trợ
+      contact: { max: 5, windowSec: 3600 },
     },
     // BR-PAY-003: bí mật cho lịch quét đơn quá hạn (Vercel Cron). Để trống → tắt endpoint.
     cronSecret: env.CRON_SECRET || null,
@@ -77,6 +79,9 @@ export function loadConfig(env = process.env) {
         name: env.MAIL_BRAND_NAME || null,
         legalName: env.MAIL_COMPANY_LEGAL || null,
         address: env.MAIL_COMPANY_ADDRESS || null,
+        registration: env.MAIL_COMPANY_REGISTRATION || null,
+        moitUrl: env.MOIT_NOTICE_URL || null,
+        workshopAddress: env.MAIL_WORKSHOP_ADDRESS || null,
         supportEmail: env.MAIL_SUPPORT_EMAIL || null,
         phone: env.MAIL_SUPPORT_PHONE || null,
         hours: env.MAIL_SUPPORT_HOURS || null,

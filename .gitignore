@@ -28,3 +28,5 @@ dist-ssr
 
 # Vercel
 .vercel
+# Bản sao /assets cho CDN, sinh lúc build (scripts/sync-cdn-assets.js)
+public/assets/

@@ -10,6 +10,7 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 - `vercel.json`:
   - `buildCommand: npm run build` → `dist/client` + `dist/server`.
   - `functions["api/index.js"].includeFiles: "{dist/**,node_modules/react-router/dist/**,node_modules/react-router-dom/dist/**}"` — bắt buộc: `server/ssr.js` đọc `dist/client/index.html`, `dist/server/entry-server.js` lúc chạy; `react-router` nạp `dist/development/dom-export.js` động nên bộ dò phụ thuộc của Vercel bỏ sót → crash "Cannot find module .../dom-export.js".
+  - `headers`: `/assets/*` cache 1 năm immutable. `npm run build` còn chép `dist/client/assets` → `public/assets` (T-74, bị `.gitignore`) nên JS/CSS do CDN phục vụ, không đi qua function.
   - `rewrites: /(.*) → /api` — mọi đường dẫn (trang, `/api/*`, `/sitemap.xml`, `/robots.txt`) đi qua Express; Express giữ nguyên URL gốc.
   - `outputDirectory: "public"` — cố ý **không** trỏ `dist/client`, nếu không CDN sẽ trả thẳng `index.html` rỗng cho `/` và bỏ qua SSR (T-15, SEO). File trong `public/` do CDN phục vụ; `dist/client/assets` do Express phục vụ (cache 1 năm, immutable; tệp khác trong `dist/client` 1 giờ). `public/images/*` và favicon có `Cache-Control` 1 ngày + SWR 7 ngày đặt ở `vercel.json` → `headers`.
 - Node 22 (`engines`), vì script dev dùng `--env-file-if-exists`.
@@ -102,3 +103,21 @@ Outbox 015 capture ngay khi migrate, độc lập flag: pause legacy order write
 Hosted production từ chối memory adapter, salt mặc định, thiếu HTTPS, rate limit tắt hoặc dev-role override. ALLOW_LOCAL_MEMORY=1 chỉ dành cho demo loopback không Vercel. Chưa có bindings Supabase/Vercel/Resend/cron trong phiên này: không coi local tests là production integration.
 
 QA v0.39 bổ sung migration 019 atomic cart (cùng user lock với checkout) và 020 cleanup media đủ hạn + cursor private. CLI preflight cần cả hai RPC trước Preview. Không chạy RPC cart với user thật để smoke; probe invalid mode phải bị từ chối trước write. Cleanup cron phải còn hoạt động khi không có traffic; batch bounded không chứng minh đạt retention SLA trên 1M records.
+
+## Sự cố, giám sát và khôi phục (T-73, T-74, feedback 08/10)
+
+**Khởi động lỗi không còn làm sập cả site.** Lỗi khi nạp `server/main.js` (thiếu biến bắt buộc ở Production — `SUPABASE_*`, `PUBLIC_SITE_URL` https, `MAY_HASH_SALT`, `TRUST_PROXY=1`; thiếu `dist/**`; Supabase từ chối kết nối lúc khởi tạo) → function chạy chế độ dự phòng: `/api/health` trả **503** `{ok:false,degraded:true}`, API khác 503, trang web là trang lỗi thương hiệu (không cache). Chi tiết lỗi nằm ở Runtime Logs với tiền tố `[boot]`. Vẫn fail-closed: không nhận đơn.
+
+**Điều tra một sự cố 500** (làm theo thứ tự):
+1. Vercel → Project → Logs → Runtime Logs, lọc `status:500` trong khung giờ sự cố; tìm `[boot]` hoặc `Deployment configuration incomplete: …`.
+2. Đối chiếu biến môi trường Production với `.env.example`/§Quy tắc 2 (đặc biệt biến mới thêm hoặc bị xoá ở lần deploy ngay trước sự cố).
+3. Supabase → Project status (đang pause?), `node scripts/check-schema.js` với binding Production.
+4. Nếu do bản deploy lỗi: **Instant Rollback** (Deployments → bản cuối cùng tốt → ⋯ → Instant Rollback; hoặc Promote). Sau đó mới sửa tiếp.
+5. Viết postmortem ngắn (giờ bắt đầu/kết thúc, ảnh hưởng, nguyên nhân gốc, cách phát hiện, việc phòng ngừa) vào `session-log.md`.
+
+**Giám sát (vận hành tự cấu hình — cần tài khoản dịch vụ):**
+- Uptime monitor (Better Stack, UptimeRobot…) mỗi 1 phút: `GET /` (200) và `GET /api/health?deep=1` (200; 503 nghĩa là function lỗi hoặc DB không đọc được). Báo qua Telegram/Slack.
+- Stack trace: bật Vercel Log Drain hoặc thêm Sentry (chưa có trong repo — cần DSN do người vận hành cấp, đặt ở Vercel, không commit).
+- Quy trình deploy: bật *Preview → Production promotion* (tắt auto-assign domain Production) để mỗi bản được kiểm trên Preview (`/`, `/en`, `/zh`, `/api/products`, `/api/health?deep=1`) rồi mới promote.
+
+**Biến liên hệ/pháp lý công khai** (chân trang, `/contact`, form liên hệ; đều tuỳ chọn, trống thì không hiện): `MAIL_SUPPORT_PHONE`, `MAIL_SUPPORT_EMAIL` (cũng là hộp thư nhận form liên hệ — cần thêm `MAIL_FROM` + khoá Resend/Brevo), `MAIL_ZALO_URL`, `MAIL_SUPPORT_HOURS`, `MAIL_COMPANY_LEGAL`, `MAIL_COMPANY_REGISTRATION`, `MAIL_COMPANY_ADDRESS`, `MAIL_WORKSHOP_ADDRESS`, `MOIT_NOTICE_URL`. Đổi biến cần redeploy; trang công khai được CDN giữ tối đa ~5 phút (`s-maxage=60` + SWR).

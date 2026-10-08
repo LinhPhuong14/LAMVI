@@ -1,5 +1,15 @@
 # Tiến độ tính năng
 
+## 2026-10-08 — Feedback kiểm thử (feat/feedback-2026-10-08)
+
+| Mục feedback | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| P0-1 Site sập 500 | 🟡 hướng chịu lỗi xong, nguyên nhân gốc chưa rõ | `server/degraded.js`, `errorPage.js`, `index.js`/`main.js`, `scripts/sync-cdn-assets.js`; `degraded.test.js` | Đọc Runtime Logs 08/10 + postmortem; uptime monitor, Sentry/log drain, promotion (G-94, G-99) — việc vận hành; xác minh trên Vercel thật |
+| P0-2 Menu di động | ✅ | `SiteHeader.jsx` (ngăn kéo), `FeedbackP0.test.jsx`, kiểm bằng Chromium 390px | `AuthHeader` chưa có menu |
+| P0-3 Bắt buộc đăng nhập | 🟡 phương án "buộc đăng nhập" | `LoginPage` chú thích + tóm tắt giỏ, GA `login_view` | Guest checkout chờ PO (Q-41) |
+| P0-4 Kênh liên hệ | ✅ code | `/contact`, `routes/contact.js`, footer/404/Mây; `contact.test.js` | Vận hành đặt `MAIL_*` thật; form đổi trả online |
+| P0-5 Pháp lý | ✅ code | footer pháp lý, `/terms` `/shipping` `/payment`, sitemap | Dữ liệu thật + `[LEGAL]` Q-42 + thông báo Bộ Công Thương |
+
 ## 2026-10-07 — QA/QC vòng hai (feat/production-commerce-readiness)
 
 Kết quả cuối: 3.150/3.150 tests, lint/build pass; PostgreSQL 001–020 + 10 SQL regressions/concurrency pass; browser recovery mất response/COD/cancel và 8 mẫu axe không có finding; local smoke 1.000 requests, 0 lỗi; production dependency audit 0 known advisory.
@@ -97,5 +107,5 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Checkout transaction + cart consumption | ✅ code, chưa deploy | RPC/migration 013; checkoutAtomic.extra.test.js; Supabase checkout.extra.test.js; SQL PostgreSQL regressions | Chạy migration trước deploy |
 | Ledger giữ kho và huỷ atomic | ✅ cho đơn mới; legacy một phần | stock_reserved, atomic_cancellation; HTTP + SQL rollback/concurrency | Đối soát đơn legacy NULL |
 | Collections production 500 | 🟡 chẩn đoán/giảm lỗi thiếu schema | check-schema.js; lỗi 503; sản phẩm vẫn duyệt được | Cần quyền DB/log production, migration/content thật và xác minh deployment |
-| Tạm tắt payOS | ✅ code | `server/index.js`: client payOS chỉ tạo khi `PAYOS_ENABLED=1`; mặc định null → chỉ COD (checkout `payos` trả 503) | Bật lại sau khi tìm ra nguyên nhân function crash |
+| Tạm tắt payOS | ✅ code | `server/main.js`: client payOS chỉ tạo khi `PAYOS_ENABLED=1`; mặc định null → chỉ COD (checkout `payos` trả 503) | Bật lại sau khi tìm ra nguyên nhân function crash |
 | Sửa crash react-router trên Vercel | ✅ code, chưa xác minh deploy | `vercel.json` includeFiles thêm `node_modules/react-router{,-dom}/dist/**` | Xem log sau deploy; nếu còn thiếu module khác thì thêm tương tự |

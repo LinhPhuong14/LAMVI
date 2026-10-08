@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --env-file-if-exists=.env --watch-path=server server/index.js",
     "dev:api": "API_ONLY=1 node --env-file-if-exists=.env --watch-path=server server/index.js",
-    "build": "vite build --outDir dist/client && vite build --ssr src/entry-server.jsx --outDir dist/server",
+    "build": "node scripts/sync-cdn-assets.js clean && vite build --outDir dist/client && vite build --ssr src/entry-server.jsx --outDir dist/server && node scripts/sync-cdn-assets.js copy",
     "start": "NODE_ENV=production node --env-file-if-exists=.env server/index.js",
     "lint": "oxlint",
     "test": "vitest run",

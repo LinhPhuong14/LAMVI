@@ -1,5 +1,28 @@
 # Nhật ký phiên
 
+## 2026-10-08 — Xử lý feedback kiểm thử (feat/feedback-2026-10-08)
+
+**Đầu vào**: tài liệu feedback 08/10 của @linhphuong, 5 mục P0.
+
+**Đã làm**
+
+1. Chống sập: tách `server/main.js`, app dự phòng + trang lỗi thương hiệu (T-73), chép `/assets` cho CDN và `health?deep=1` (T-74).
+2. Menu di động: ngăn kéo qua portal, a11y (Esc, nền, khoá cuộn, giữ Tab, trả focus).
+3. Đăng nhập từ checkout: chú thích + tóm tắt giỏ + GA `login_view`.
+4. Liên hệ: `/contact`, `POST /api/contact` (T-75), footer, 404, nút chuyển sang người thật ở Mây, sửa chữ trang đổi trả.
+5. Pháp lý: footer (`registration`, `moitUrl`…), `/terms` `/shipping` `/payment` vi/en/zh, sitemap (T-76).
+6. Spec v0.40: D-101, Q-41, Q-42, G-94…G-99.
+
+**Quyết định / không làm**
+
+- Không làm guest checkout: thay đổi lớn (mọi bảng gắn `user_id`), đảo D-36 → hỏi PO (Q-41). Đã làm phương án thay thế trong chính feedback.
+- Không bịa hotline/Zalo/MST/địa chỉ: chỉ hiện khi vận hành đặt biến môi trường.
+- Không cài Sentry (cần tài khoản dịch vụ); không đoán số ngày giao/hoàn tiền (Q-42).
+
+**Cần người dùng / vận hành**: đặt `MAIL_SUPPORT_PHONE`, `MAIL_SUPPORT_EMAIL`, `MAIL_ZALO_URL`, `MAIL_COMPANY_LEGAL`, `MAIL_COMPANY_REGISTRATION`, `MAIL_COMPANY_ADDRESS`, `MAIL_WORKSHOP_ADDRESS`, `MAIL_SUPPORT_HOURS`, `MOIT_NOTICE_URL` ở Vercel Production; đọc Runtime Logs sự cố 08/10; bật monitor; trả lời Q-41, Q-42; pháp chế duyệt ba trang chính sách.
+
+---
+
 ## 2026-10-07 — Merge theo yêu cầu trực tiếp của người dùng
 
 Người dùng yêu cầu “commit và push, merge vào master” sau vòng QA 3.150/3.150 tests, lint/build và PostgreSQL 001–020 đạt. Yêu cầu này cho phép merge trực tiếp cho đợt này dù gate preflight/Preview T-59 chưa được xác minh. Không coi merge hoặc deploy trigger là bằng chứng migration/integration production đạt; runbook rollout và các prerequisite còn nguyên.

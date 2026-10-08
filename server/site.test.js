@@ -14,5 +14,5 @@ it('projects only validated public contact data, excluding credentials and arbit
 })
 
 it('does not invent company identity, support channels or social URLs', () => {
-  expect(publicSite()).toEqual({ name: 'LAMVI', legalName: '', address: '', supportEmail: '', phone: '', hours: '', social: [] })
+  expect(publicSite()).toEqual({ name: 'LAMVI', legalName: '', address: '', registration: '', workshopAddress: '', moitUrl: '', zalo: '', contactForm: false, supportEmail: '', phone: '', hours: '', social: [] })
 })

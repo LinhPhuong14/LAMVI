@@ -1,13 +1,14 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import express from 'express'
-import { HTML_LANG, localePath, translate } from '../src/i18n/core.js'
+import { HTML_LANG, localePath, splitLocale, translate } from '../src/i18n/core.js'
 import { classifyPath, dataKeysFor } from '../src/seo/routes.js'
 import { buildHeadTags, normalizeSiteUrl, renderHeadTags, safeJson } from '../src/seo/head.js'
 import { gaInlineScript, gaScriptSrc } from '../src/analytics/ga.js'
 import { cspHash } from './middleware/security.js'
 import { HttpError } from './errors.js'
 import { publicSite } from './services/site.js'
+import { errorPage } from './errorPage.js'
 import { getPublicBatch, getPublicCollection, getPublicProduct, listPublicCollections, listPublicFaq, listPublicProducts } from './services/catalog.js'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
@@ -198,8 +199,9 @@ export async function createWeb({ repo, config, dev, maintenance }) {
     } catch (err) {
       vite?.ssrFixStacktrace(err)
       console.error('[ssr]', err)
-      // Trang HTML ngắn thay vì JSON thô; không lộ chi tiết lỗi
-      res.status(500).type('html').send('<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>500</title><p>Có lỗi xảy ra. Vui lòng thử lại sau. / Something went wrong.</p>')
+      // Trang lỗi có thương hiệu (tiếng Việt, hotline/Zalo, nút thử lại); không lộ chi tiết lỗi, không cache
+      res.set('Cache-Control', 'no-store')
+      res.status(500).type('html').send(errorPage({ lang: splitLocale(req.path).lang, brand: config.mail?.brand }))
     }
   })
 
