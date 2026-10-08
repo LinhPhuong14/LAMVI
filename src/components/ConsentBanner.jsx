@@ -13,7 +13,7 @@ export default function ConsentBanner() {
     restoreConsent()
     // GA nhúng bởi script ngoài React → kiểm sau khi mount, không setState đồng bộ trong effect
     const timer = setTimeout(() => isEnabled() && getConsent() === null && setOpen(true), 0)
-    const reopen = () => setOpen(true)
+    const reopen = () => isEnabled() && setOpen(true) // không có GA thì không có gì để đồng ý
     window.addEventListener(CONSENT_EVENT, reopen)
     return () => {
       clearTimeout(timer)
