@@ -3,6 +3,7 @@
 // Chỉ trang trí → aria-hidden, alt rỗng; ảnh tải chậm; chuyển động bằng CSS, tắt khi giảm chuyển động.
 const DIR = '/images/scene/'
 
+// eager: ảnh ở đầu trang = ứng viên LCP → tải sớm, ưu tiên cao (feedback 08/10, mục 21)
 // photo: ảnh nền (có bản 640 và 1280) · smoke: lớp khói tách nền · rise: số đèn trời bay lên một lượt khi vào
 const SCENES = {
   hero: { photo: 'mist-terraces', eager: true, smoke: [{ src: 'smoke-ink', x: '58%', y: '-10%', w: '46%' }], rise: 7 },
@@ -16,12 +17,12 @@ const SCENES = {
   faq: { photo: 'cloud-sea' },
   // Trang khác (PageScene)
   auth: {}, // nền trơn có quầng màu (CSS), không dùng ảnh — để thẻ kính có thứ để làm mờ
-  product: { photo: 'golden-sky' },
-  shop: { photo: 'golden-sky' },
-  cart: { photo: 'lake-village' },
-  checkout: { photo: 'mist-terraces' },
-  order: { photo: 'golden-clouds', rise: 3 },
-  batch: { photo: 'valley-light' },
+  product: { photo: 'golden-sky', eager: true },
+  shop: { photo: 'golden-sky', eager: true },
+  cart: { photo: 'lake-village', eager: true },
+  checkout: { photo: 'mist-terraces', eager: true },
+  order: { photo: 'golden-clouds', eager: true, rise: 3 },
+  batch: { photo: 'valley-light', eager: true },
   notFound: { photo: 'starry', dark: true, rise: 5 },
 }
 
@@ -50,7 +51,7 @@ export default function Scene({ name, className = '' }) {
           alt=""
           decoding="async"
           loading={s.eager ? 'eager' : 'lazy'}
-          fetchPriority={s.eager ? 'low' : undefined}
+          fetchPriority={s.eager ? 'high' : undefined}
         />
       )}
       {s.smoke?.map((m, i) => (

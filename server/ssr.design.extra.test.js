@@ -42,10 +42,10 @@ describe('SSR trang chủ — nội dung chữ thật (không bị ẩn chờ an
 })
 
 describe('Font tự host', () => {
-  it('index.html (template dev): không Google Fonts, preload 6 woff2 trỏ tới file có thật trong node_modules', () => {
+  it('index.html (template dev): không Google Fonts, preload 2 woff2 trỏ tới file có thật trong node_modules', () => {
     expect(devTemplate).not.toMatch(/fonts\.googleapis\.com|fonts\.gstatic\.com/)
     const links = preloads(docOf(devTemplate))
-    expect(links).toHaveLength(6)
+    expect(links).toHaveLength(2)
     for (const l of links) {
       const href = l.getAttribute('href')
       expect(href).toMatch(/^\/node_modules\/.+\.woff2$/)
@@ -58,7 +58,7 @@ describe('Font tự host', () => {
   it('SSR với template dev: HTML trả về không có fonts.googleapis.com, vẫn giữ preload', async () => {
     const r = await page('/')
     expect(r.html).not.toContain('fonts.googleapis.com')
-    expect(preloads(docOf(r.html))).toHaveLength(6)
+    expect(preloads(docOf(r.html))).toHaveLength(2)
   })
 
   it.skipIf(!existsSync(distIndex))('bản build (dist): preload trỏ tới /assets/*.woff2 có thật và được CSS dùng tới', async () => {
@@ -68,7 +68,7 @@ describe('Font tự host', () => {
     expect(r.html).not.toContain('fonts.googleapis.com')
     expect(r.html).not.toContain('/node_modules/')
     const links = preloads(doc)
-    expect(links).toHaveLength(6)
+    expect(links).toHaveLength(2)
     const cssFiles = [...doc.querySelectorAll('link[rel="stylesheet"]')].map((l) => l.getAttribute('href'))
     const css = cssFiles.map((h) => readFileSync(`${root}dist/client${h}`, 'utf8')).join('\n')
     for (const l of links) {

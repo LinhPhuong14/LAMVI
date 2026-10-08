@@ -203,3 +203,11 @@ describe('Trạng thái tổng (feedback 08/10, mục 30)', () => {
     expect(overallStatus([{ name: 'database', status: 'error' }, { name: 'payos', status: 'not_configured' }])).toBe('degraded')
   })
 })
+
+describe('/api/it/notifications khi hàng đợi chưa bật (feedback 08/10, mục 31)', () => {
+  it('trả danh sách rỗng enabled:false thay vì 404', async () => {
+    const res = await request(app).get('/api/it/notifications?status=dead').set('Authorization', tokens.it)
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({ items: [], enabled: false })
+  })
+})

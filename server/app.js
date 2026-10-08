@@ -110,7 +110,7 @@ export function createApp({
   if (auth && storage) api.use(adminRouter({ repo, auth, storage, config, orders, gaRealtime }))
   if (auth && repo.createCollection) api.use(adminCollectionsRouter({ repo, auth }))
   if (auth && storage) api.use(adminUsersRouter({ repo, auth }))
-  if (auth && notificationOutbox) api.use(notificationOperationsRouter({ repo, auth, outbox: notificationOutbox }))
+  if (auth) api.use(notificationOperationsRouter({ repo, auth, outbox: notificationOutbox }))
   if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may, mailer, payos }))
   if (auth) api.use(mayRouter({ repo, auth, may }))
   if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))

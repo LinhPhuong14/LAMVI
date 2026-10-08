@@ -4,6 +4,7 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
   "outputDirectory": "public",
+  "regions": ["sin1"],
   "functions": {
     "api/index.js": {
       "includeFiles": "{dist/**,node_modules/react-router/dist/**,node_modules/react-router-dom/dist/**}",
@@ -17,7 +18,7 @@
     },
     {
       "source": "/images/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=2592000" }]
     },
     {
       "source": "/(favicon.svg|icons.svg)",

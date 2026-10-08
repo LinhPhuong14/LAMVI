@@ -2575,7 +2575,11 @@
     mask-image: linear-gradient(to top, #000 10%, transparent 70%);
   }
   .scene-smoke {
-    opacity: 0.18;
+    /* Feedback 08/10, mục 19: tắt lớp khói trên mobile (tốn style/layout, TBT cao) */
+    display: none;
+  }
+  .scene-rise-lantern:nth-child(n + 4) {
+    display: none;
   }
   .scene-rise-lantern:nth-child(even) {
     display: none;

@@ -304,16 +304,27 @@ describe('Adapter bộ nhớ — trả bản sao', () => {
 })
 
 describe('Định dạng lỗi {error:{code,message}}', () => {
-  it('repo ném lỗi (vd lỗi Supabase) → 500 INTERNAL_ERROR, không lộ thông điệp gốc', async () => {
+  it('repo thiếu bảng (42P01) → 503 SCHEMA_OUTDATED, không lộ thông điệp gốc (feedback 08/10, mục 31)', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     const repo = createMemoryRepo()
     repo.listProducts = async () => {
       throw Object.assign(new Error('relation "products" does not exist'), { code: '42P01' })
     }
     const res = await request(createApp({ repo })).get('/api/products')
-    expectErrorShape(res, 500, 'INTERNAL_ERROR')
+    expectErrorShape(res, 503, 'SCHEMA_OUTDATED')
     expect(JSON.stringify(res.body)).not.toContain('relation')
     expect(JSON.stringify(res.body)).not.toContain('42P01')
+  })
+
+  it('repo ném lỗi lạ → 500 INTERNAL_ERROR, không lộ thông điệp gốc', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const repo = createMemoryRepo()
+    repo.listProducts = async () => {
+      throw new Error('connection reset by peer 10.0.0.1')
+    }
+    const res = await request(createApp({ repo })).get('/api/products')
+    expectErrorShape(res, 500, 'INTERNAL_ERROR')
+    expect(JSON.stringify(res.body)).not.toContain('10.0.0.1')
   })
 
   it('JSON hỏng → 400 INVALID_JSON', async () => {

@@ -20,3 +20,15 @@ describe('GET /api/shipping-policy (feedback 08/10, 7.1)', () => {
     expect(res.body).toEqual({ fee: 25000, freeFrom: 500000 })
   })
 })
+
+describe('Cache API công khai (feedback 08/10, mục 22)', () => {
+  it('/api/products cho CDN cache ngắn, /api/cart vẫn no-store', async () => {
+    const app = createApp({ repo: createMemoryRepo(), config: { publicSiteUrl: 'https://lamvi.test' } })
+    const res = await request(app).get('/api/products')
+    expect(res.headers['cache-control']).toMatch(/s-maxage=60/)
+    expect(res.headers['cache-control']).not.toMatch(/no-store/)
+    const bad = await request(app).get('/api/products/khong-ton-tai')
+    expect(bad.status).toBe(404)
+    expect(bad.headers['cache-control']).toBe('no-store')
+  })
+})

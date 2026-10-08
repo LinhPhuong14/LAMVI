@@ -80,7 +80,7 @@ export async function runHealthChecks({ repo, auth, storage, config, may, mailer
     checks,
     system: {
       version: pkg.version,
-      commit: env.GIT_COMMIT ?? null,
+      commit: (env.GIT_COMMIT ?? env.VERCEL_GIT_COMMIT_SHA)?.slice(0, 12) ?? null,
       node: process.version,
       env: env.NODE_ENV ?? 'development',
       startedAt: startedAt.toISOString(),
