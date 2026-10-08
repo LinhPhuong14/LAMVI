@@ -24,7 +24,7 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
    - `PWNED_CHECK=1` bật kiểm mật khẩu đã lộ (mặc định **tắt** từ D-91; gọi `api.pwnedpasswords.com`, lỗi thì cho qua).
    - `PUBLIC_SITE_URL` = URL công khai thật (dùng cho link đặt lại mật khẩu, sitemap, hreflang) — Production đặt domain chính; Preview không dùng link đặt lại mật khẩu để kiểm thử thật. Thêm URL này vào Redirect URLs của Supabase (G-16).
    - `TRUST_PROXY=1` (Vercel đứng trước hàm; nếu không, hạn mức Mây theo IP và IP trong log sai).
-   - `MAY_HASH_SALT` đặt giá trị bí mật riêng; `OPENAI_*`, `PAYOS_*` khi tích hợp. Không đặt `DEV_ADMIN_*`/`DEV_IT_*` trên Vercel.
+   - `MAY_HASH_SALT` đặt giá trị bí mật riêng; `OPENAI_*`, `PAYOS_*` khi tích hợp (payOS đang TẠM TẮT: chỉ bật khi đặt `PAYOS_ENABLED=1`). Không đặt `DEV_ADMIN_*`/`DEV_IT_*` trên Vercel.
    - `GIT_COMMIT`: có thể dùng `VERCEL_GIT_COMMIT_SHA` (chưa nối tự động).
    - `GA_PROPERTY_ID` + `GA_SERVICE_ACCOUNT_JSON` (hoặc `GA_CLIENT_EMAIL` + `GA_PRIVATE_KEY`) — tuỳ chọn, bật báo cáo realtime ở `/admin/analytics` (T-43). Tạo service account trong Google Cloud, bật *Google Analytics Data API*, thêm email của nó vào GA (Admin → Property access management) vai trò Viewer. `GA_PROPERTY_ID` là số của property, không phải `G-…`. Đặt ở Production; không commit khoá.
    - `GA_MEASUREMENT_ID` (FR-GA-001, D-72): **chỉ đặt ở Production**, không đặt ở Preview để số liệu thử nghiệm không lẫn vào báo cáo. Dạng `G-XXXXXXXXXX`; sai định dạng bị `loadConfig` bỏ qua và web chạy không có GA. Trang `/admin`, `/it` không nhúng GA.

@@ -70,9 +70,10 @@ const may = createMayService({
   priceOutPer1M: config.openai.priceOutPer1M,
   hashSalt: config.mayHashSalt,
 })
-// FR-PAY-001: thiếu khoá payOS → client null, checkout chỉ cho COD
-const payos = createPayosClient(config.payos)
-if (!payos) console.warn('[api] Thiếu biến PAYOS_* — chỉ nhận thanh toán COD')
+// FR-PAY-001: thiếu khoá payOS → client null, checkout chỉ cho COD.
+// TẠM THỜI tắt payOS (function từng crash): chỉ bật khi đặt PAYOS_ENABLED=1.
+const payos = process.env.PAYOS_ENABLED === '1' ? createPayosClient(config.payos) : null
+if (!payos) console.warn('[api] payOS đang tắt hoặc thiếu biến PAYOS_* — chỉ nhận thanh toán COD')
 
 // T-49: thư giao dịch. Production phải có MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY; dev (bộ nhớ) in ra console.
 const mailer = createMailer(config.mail) ?? (config.useSupabase ? null : createConsoleMailer())

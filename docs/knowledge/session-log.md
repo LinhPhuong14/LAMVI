@@ -546,3 +546,5 @@ Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE
 - Duyệt câu thay thế §31.3 và bản dịch en/zh (G-14).
 - Cấu hình Supabase: chạy migration + seed, Redirect URLs (G-16), thêm `.env`.
 - Trả lời Q-35. Trước go-live: G-17, G-18, G-20.
+
+**Tạm tắt payOS (fix)** — function crash trên Vercel; payOS giờ tắt mặc định, bật bằng `PAYOS_ENABLED=1`. Cập nhật `.env.example`, `deploy-vercel.md`. lint/test/build xanh.
