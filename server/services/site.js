@@ -17,5 +17,7 @@ export function publicSite(config = {}) {
     phone: b.phone,
     hours: b.hours,
     social: b.social,
+    // Checkout ẩn/vô hiệu payOS khi chưa có khoá, thay vì để khách gặp lỗi ở bước cuối
+    payosEnabled: Boolean(config.payosEnabled),
   }
 }

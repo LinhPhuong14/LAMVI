@@ -10,7 +10,7 @@ export const S = {
   forbiddenText: 'Chỉ tài khoản có vai trò IT mới vào được dashboard này (D-51).',
   health: {
     title: 'Sức khoẻ hệ thống',
-    overall: { ok: 'Hoạt động bình thường', degraded: 'Có thành phần gặp sự cố' },
+    overall: { ok: 'Hoạt động bình thường', degraded: 'Có thành phần gặp sự cố', attention: 'Cần xử lý: thiếu cấu hình thành phần bắt buộc để bán hàng' },
     checks: {
       database: 'Cơ sở dữ liệu',
       auth: 'Xác thực (Auth)',

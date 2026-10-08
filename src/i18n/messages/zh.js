@@ -192,6 +192,14 @@ export default {
     loading: '正在加载问题…',
     error: '无法加载常见问题。',
   },
+  consent: {
+    title: 'Cookie 与统计。',
+    body: 'LAMVI 使用 Google Analytics 了解访客如何使用网站。仅在您同意后才会记录数据，您可随时更改。',
+    more: '隐私政策',
+    accept: '同意',
+    decline: '拒绝',
+    settings: 'Cookie 设置',
+  },
   footer: {
     contact: "联系我们",
     terms: "使用条款",
@@ -513,6 +521,8 @@ export default {
     END_BEFORE_START: '结束日期必须晚于开始日期。',
   },
   checkout: {
+    payosOff: '在线支付暂不可用——请选择货到付款。',
+    giftNeedsPayos: '送给他人的订单必须在线支付，目前暂不可用。您可选择“寄给我自己”并货到付款，或联系 LAMVI。',
     geoEmpty: '未找到街道/乡',
     geoLoading: '正在加载地址列表…',
     retry: '重试',
@@ -637,6 +647,7 @@ export default {
     helpLink: '常见问题',
   },
   cart: {
+    syncFailed: '购物车同步失败。登录前添加的商品仍保存在此设备上，请刷新页面重试。',
     eyebrow: '您的礼物篮',
     stepsLabel: '下单步骤',
     steps: ['购物车', '结账', '完成'],
@@ -687,7 +698,7 @@ export default {
     close: '关闭',
     title: 'Mây',
     subtitle: 'LAMVI 的 AI 助手',
-    aiNotice: 'Mây 是 AI 助手，只根据 LAMVI 的信息回答。Mây 不能替您下单或修改账户。',
+    aiNotice: 'Mây 是 AI 助手，只根据 LAMVI 的信息回答。您的消息由境外 AI 服务商（OpenAI）处理——请勿发送敏感个人信息。Mây 不能替您下单或修改账户。',
     suggestTitle: '推荐问题',
     suggestions: ['灯笼是用什么材料做的？', '感谢卡上的二维码有什么用？', '下单后还能写祝福吗？', '配送需要多久？'],
     greeting: '你好，我是 Mây！想了解纸灯、祝福还是二维码呢？',
@@ -835,7 +846,7 @@ export default {
           'payOS：在线支付。我们不会保存您的银行卡或银行信息。',
           'Resend（或 Brevo）：交易类邮件。',
           'OpenAI：在越南境外的服务器上处理发送给 Mây 的问题。发送前我们会屏蔽消息中的电话号码和邮箱；不会发送地址或他人的订单数据。',
-          'Google Analytics 4：访问统计。本网站不显示 Cookie 同意横幅；您可通过浏览器设置或追踪拦截工具屏蔽。',
+          'Google Analytics 4：访问统计，仅在您于 Cookie 横幅中同意后启用（Consent Mode）；可随时通过页脚“Cookie 设置”更改。与 Mây 的聊天内容由位于境外的 AI 服务商处理。',
           'Google：若您选择使用 Google 登录。'
         ] },
         { h: '保存期限', items: [

@@ -5,6 +5,7 @@ import { Seal } from './Motifs'
 import { Reveal } from './Reveal'
 import { BrandHover } from './Effects'
 import { group } from '../lib/motion.js'
+import { openConsent } from '../analytics/consent.js'
 
 export default function SiteFooter() {
   const { t, lang, path } = useI18n()
@@ -51,6 +52,7 @@ export default function SiteFooter() {
           <Link to={path('/payment')}>{t('footer.payment')}</Link>
           <Link to={path('/terms')}>{t('footer.terms')}</Link>
           <Link to={path('/privacy')}>{t('footer.privacy')}</Link>
+          <button type="button" className="link-button" onClick={openConsent}>{t('consent.settings')}</button>
           <Link to={path('/account?tab=orders')}>{t('footer.tracking')}</Link>
           {business?.supportEmail && <a href={`mailto:${business.supportEmail}`}>{business.supportEmail}</a>}
           {business?.phone && <a href={`tel:${business.phone.replace(/[^0-9+]/g, '')}`}>{business.phone}</a>}

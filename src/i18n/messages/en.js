@@ -203,6 +203,14 @@ export default {
     loading: 'Loading questions…',
     error: 'Could not load the FAQ.',
   },
+  consent: {
+    title: 'Cookies & analytics.',
+    body: 'LAMVI uses Google Analytics to understand how visitors use the site. Data is only collected if you agree, and you can change your mind at any time.',
+    more: 'Privacy policy',
+    accept: 'Accept',
+    decline: 'Decline',
+    settings: 'Cookie settings',
+  },
   footer: {
     contact: "Contact",
     terms: "Terms of use",
@@ -524,6 +532,8 @@ export default {
     END_BEFORE_START: 'The end date must come after the start date.',
   },
   checkout: {
+    payosOff: 'Online payment is temporarily unavailable — please choose cash on delivery.',
+    giftNeedsPayos: 'Gift orders for another recipient require online payment, which is temporarily unavailable. Choose “Deliver to me” with cash on delivery, or contact LAMVI.',
     geoEmpty: 'No wards found',
     geoLoading: 'Loading address list…',
     retry: 'Try again',
@@ -648,6 +658,7 @@ export default {
     helpLink: 'FAQ',
   },
   cart: {
+    syncFailed: 'We could not sync your cart. Items you added before signing in are still saved on this device — please reload to try again.',
     eyebrow: 'Your gift basket',
     stepsLabel: 'Order steps',
     steps: ['Cart', 'Checkout', 'Done'],
@@ -698,7 +709,7 @@ export default {
     close: 'Close',
     title: 'Mây',
     subtitle: 'LAMVI’s AI assistant',
-    aiNotice: 'Mây is an AI assistant and only answers from LAMVI’s information. Mây cannot place orders or change your account.',
+    aiNotice: 'Mây is an AI assistant and only answers from LAMVI’s information. Your messages are processed by an overseas AI provider (OpenAI) — please do not share sensitive personal data. Mây cannot place orders or change your account.',
     suggestTitle: 'Suggested questions',
     suggestions: ['What are the lanterns made of?', 'What is the QR code on the card for?', 'Can I write my message after ordering?', 'How long does delivery take?'],
     greeting: 'Hi, Mây here! Would you like to ask about lanterns, messages or QR codes?',
@@ -846,7 +857,7 @@ export default {
           'payOS: online payments. We never store your card or bank details.',
           'Resend (or Brevo): transactional email.',
           'OpenAI: processes questions sent to Mây on servers outside Vietnam. Before sending, we mask phone numbers and emails in your message; we never send addresses or anyone else’s order data.',
-          'Google Analytics 4: visit statistics. The site shows no cookie-consent banner; you can block it in your browser settings or with a tracking blocker.',
+          'Google Analytics 4: visit statistics, enabled only after you accept in the cookie banner (Consent Mode); change your choice any time via “Cookie settings” in the footer. Chat messages to Mây are processed by an AI provider located overseas.',
           'Google: if you choose to sign in with Google.'
         ] },
         { h: 'How long we keep it', items: [

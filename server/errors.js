@@ -14,6 +14,10 @@ export class HttpError extends Error {
 
 export const notFound = () => new HttpError(404, 'NOT_FOUND', 'Không tìm thấy')
 
+// Postgres/PostgREST: bảng, cột hoặc hàm RPC chưa có (migration chưa chạy). Trả 503 có mã rõ để
+// client giữ dữ liệu và dashboard IT thấy nguyên nhân, thay vì 500 mơ hồ (feedback 08/10 mục 6, 31, 32).
+const SCHEMA_CODES = new Set(['PGRST202', 'PGRST204', 'PGRST205', '42P01', '42703', '42883'])
+
 export function errorHandler(err, req, res, _next) {
   // Cho số liệu API (dashboard IT, D-52) — chỉ lưu phía server
   res.locals.errorCode = err?.code
@@ -29,6 +33,11 @@ export function errorHandler(err, req, res, _next) {
   }
   if (err?.type === 'entity.too.large') {
     return res.status(413).json({ error: { code: 'PAYLOAD_TOO_LARGE', message: 'Dữ liệu quá lớn' } })
+  }
+  if (SCHEMA_CODES.has(err?.code)) {
+    res.locals.errorCode = 'SCHEMA_OUTDATED'
+    console.error(err)
+    return res.status(503).json({ error: { code: 'SCHEMA_OUTDATED', message: 'Hệ thống đang cập nhật, vui lòng thử lại sau' } })
   }
   // Lỗi 4xx do Express/body-parser ném (vd URL percent-encoding hỏng)
   const status = err?.status ?? err?.statusCode

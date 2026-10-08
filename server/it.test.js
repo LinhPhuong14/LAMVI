@@ -61,7 +61,7 @@ describe('Phân quyền vai trò IT (D-51)', () => {
 describe('Sức khoẻ (D-52)', () => {
   it('trả trạng thái từng tích hợp, không lộ khoá', async () => {
     const res = await request(app).get('/api/it/health').set('Authorization', tokens.it)
-    expect(res.body.status).toBe('ok')
+    expect(res.body.status).toBe('attention')
     const byName = Object.fromEntries(res.body.checks.map((c) => [c.name, c]))
     expect(byName.database).toMatchObject({ status: 'ok', provider: 'memory' })
     expect(byName.payos).toMatchObject({ status: 'not_configured', configured: false })
@@ -189,5 +189,17 @@ describe('Nhật ký bảo trì (G-27)', () => {
     expect(res.body.items.map((e) => e.action).sort()).toEqual(['disable', 'enable'])
     expect(res.body.items.every((e) => e.entity === 'maintenance' && e.actorRole === 'it')).toBe(true)
     expect((await request(app).get('/api/it/maintenance/log').set('Authorization', tokens.admin)).status).toBe(403)
+  })
+})
+
+describe('Trạng thái tổng (feedback 08/10, mục 30)', () => {
+  it('thành phần bắt buộc chưa cấu hình → attention; lỗi → degraded; đủ → ok', async () => {
+    const { overallStatus } = await import('./monitoring/health.js')
+    const ok = (name) => ({ name, status: 'ok' })
+    expect(overallStatus([ok('database'), ok('auth'), { name: 'payos', status: 'configured' }, ok('mail')])).toBe('ok')
+    expect(overallStatus([ok('database'), { name: 'payos', status: 'not_configured' }])).toBe('attention')
+    expect(overallStatus([ok('database'), { name: 'mail', status: 'not_configured' }])).toBe('attention')
+    expect(overallStatus([{ name: 'openai', status: 'not_configured' }, ok('database')])).toBe('ok')
+    expect(overallStatus([{ name: 'database', status: 'error' }, { name: 'payos', status: 'not_configured' }])).toBe('degraded')
   })
 })

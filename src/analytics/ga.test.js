@@ -94,6 +94,9 @@ describe('Thẻ nhúng gtag', () => {
   it('mã nội tuyến tắt page_view tự động (SPA gửi tay đường dẫn đã làm sạch)', () => {
     const js = gaInlineScript('G-ABC1234')
     expect(js).toContain('send_page_view:false')
+    expect(js.indexOf('"consent","default"')).toBeGreaterThan(-1)
+    expect(js.indexOf('"consent","default"')).toBeLessThan(js.indexOf('"config"'))
+    expect(js).toContain('analytics_storage:"denied"')
     expect(js).toContain('"G-ABC1234"')
     expect(js).not.toContain('</script')
   })

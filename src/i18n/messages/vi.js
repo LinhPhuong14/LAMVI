@@ -215,6 +215,14 @@ export default {
     loading: 'Đang tải câu hỏi…',
     error: 'Không tải được câu hỏi thường gặp.',
   },
+  consent: {
+    title: 'Cookie & thống kê.',
+    body: 'LAMVI dùng Google Analytics để hiểu cách khách xem trang. Dữ liệu chỉ được ghi nhận khi bạn đồng ý; bạn có thể thay đổi bất cứ lúc nào.',
+    more: 'Chính sách riêng tư',
+    accept: 'Đồng ý',
+    decline: 'Từ chối',
+    settings: 'Cài đặt cookie',
+  },
   footer: {
     contact: "Liên hệ",
     terms: "Điều khoản sử dụng",
@@ -538,6 +546,8 @@ export default {
     END_BEFORE_START: 'Ngày kết thúc phải sau ngày bắt đầu.',
   },
   checkout: {
+    payosOff: 'Tạm thời chưa nhận thanh toán online — vui lòng chọn thanh toán khi nhận hàng.',
+    giftNeedsPayos: 'Đơn tặng cho người khác bắt buộc thanh toán online, hiện tạm thời chưa mở. Bạn có thể chọn “Giao cho tôi” với thanh toán khi nhận hàng, hoặc liên hệ LAMVI.',
     geoEmpty: 'Không tìm thấy phường / xã',
     geoLoading: 'Đang tải danh mục địa chỉ…',
     retry: 'Thử lại',
@@ -662,6 +672,7 @@ export default {
     helpLink: 'Hỏi đáp',
   },
   cart: {
+    syncFailed: 'Không đồng bộ được giỏ hàng. Món bạn chọn khi chưa đăng nhập vẫn được giữ trên thiết bị này — vui lòng tải lại trang để thử lại.',
     eyebrow: 'Giỏ quà của bạn',
     stepsLabel: 'Các bước đặt hàng',
     steps: ['Giỏ hàng', 'Thanh toán', 'Hoàn tất'],
@@ -712,7 +723,7 @@ export default {
     close: 'Đóng',
     title: 'Mây',
     subtitle: 'Trợ lý AI của LAMVI',
-    aiNotice: 'Mây là trợ lý AI, chỉ trả lời dựa trên thông tin của LAMVI. Mây không đặt hàng hay sửa tài khoản giúp bạn được.',
+    aiNotice: 'Mây là trợ lý AI, chỉ trả lời dựa trên thông tin của LAMVI. Nội dung bạn nhắn được xử lý bởi nhà cung cấp AI ở nước ngoài (OpenAI) — đừng gửi thông tin cá nhân nhạy cảm. Mây không đặt hàng hay sửa tài khoản giúp bạn được.',
     suggestTitle: 'Gợi ý câu hỏi',
     suggestions: ['Đèn làm từ chất liệu gì?', 'Mã QR trên thiệp dùng để làm gì?', 'Tôi có thể viết lời chúc sau khi đặt không?', 'Giao hàng mất bao lâu?'],
     greeting: 'Chào bạn, Mây đây! Bạn muốn hỏi về đèn, lời chúc hay mã QR nè?',
@@ -860,7 +871,7 @@ export default {
           'payOS: xử lý thanh toán trực tuyến. Chúng tôi không lưu số thẻ hay thông tin ngân hàng của bạn.',
           'Resend (hoặc Brevo): gửi email giao dịch.',
           'OpenAI: xử lý câu hỏi gửi cho Mây tại máy chủ ngoài Việt Nam. Trước khi gửi, chúng tôi che số điện thoại và email trong tin nhắn; chúng tôi không gửi địa chỉ hay thông tin đơn hàng của người khác.',
-          'Google Analytics 4: thống kê lượt truy cập. Website không hiển thị banner đồng ý cookie; bạn có thể chặn qua cài đặt trình duyệt hoặc tiện ích chặn theo dõi.',
+          'Google Analytics 4: thống kê lượt truy cập, chỉ bật sau khi bạn đồng ý ở banner cookie (Consent Mode); bạn có thể đổi lựa chọn ở mục “Cài đặt cookie” cuối trang. Nội dung chat với Mây được xử lý bởi nhà cung cấp AI đặt ở nước ngoài.',
           'Google: nếu bạn chọn đăng nhập bằng Google.'
         ] },
         { h: 'Thời gian lưu trữ', items: [

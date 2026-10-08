@@ -9,6 +9,7 @@ import { LOCALES, useI18n } from '../i18n/index.js'
 import { useAuth } from '../auth/context.js'
 import { useCart } from '../cart/context.js'
 import { useSubmit } from '../auth/useForm.js'
+import { useApi } from '../api/useApi.js'
 import { formatVnd } from '../lib/money.js'
 import { track } from '../analytics/index.js'
 import { checkoutRequestKey, clearCheckoutRequest, readCheckoutRequest } from './checkoutRequest.js'
@@ -55,6 +56,7 @@ function StepLegend({ n, children }) {
 /** FR-CHK-001…008 (§12): checkout — noindex (BR-SEO-001), chỉ cho khách đã đăng nhập (D-36). */
 export default function CheckoutPage() {
   const { t, lang, path } = useI18n()
+  const site = useApi('/site', lang)
   const { user, authedApi } = useAuth()
   const { reload: reloadCart } = useCart()
   const navigate = useNavigate()
@@ -195,6 +197,9 @@ export default function CheckoutPage() {
 
   const hasMessage = form.orderKind === 'gift' || form.hasMessage
   const codBlocked = !form.recipientIsSelf
+  // payOS chưa có khoá → vô hiệu lựa chọn kèm lý do (feedback 08/10, mục 30)
+  const payosOff = site.status === 'ok' && site.data?.payosEnabled === false
+  const noPayment = payosOff && codBlocked
 
   if (!user) return null
 
@@ -350,17 +355,18 @@ export default function CheckoutPage() {
           {/* FR-CHK-007 (D-35) */}
           <Reveal as="fieldset" className="account-card">
             <StepLegend n={3}>{t('checkout.paymentLegend')}</StepLegend>
-            <label className="check-row">
+            <label className={`check-row${payosOff ? ' is-disabled' : ''}`}>
               <input
                 type="radio"
                 name="paymentMethod"
                 value="payos"
+                disabled={payosOff}
                 checked={form.paymentMethod === 'payos'}
                 onChange={setBool('paymentMethod', 'payos')}
               />
               <span>
                 {t('checkout.payos')}
-                <small className="field-hint">{t('checkout.payosHint', { minutes: PAYMENT_MINUTES })}</small>
+                <small className="field-hint">{payosOff ? t('checkout.payosOff') : t('checkout.payosHint', { minutes: PAYMENT_MINUTES })}</small>
               </span>
             </label>
             <label className={`check-row${codBlocked ? ' is-disabled' : ''}`}>
@@ -378,6 +384,7 @@ export default function CheckoutPage() {
                 <small className="field-hint">{codBlocked ? t('checkout.codBlocked') : t('checkout.codHint')}</small>
               </span>
             </label>
+            {noPayment && <p className="notice error" role="alert">{t('checkout.giftNeedsPayos')}</p>}
             {fields.paymentMethod && <p className="field-error">{t(`errors.${fields.paymentMethod}`)}</p>}
           </Reveal>
         </div>
@@ -462,7 +469,7 @@ export default function CheckoutPage() {
               </p>
             )}
 
-            <button className="btn btn-primary btn-block" type="submit" disabled={pending || quotePending || Boolean(quoteError) || quotedCoupon !== appliedCoupon || Boolean(quote?.hasShortage)}>
+            <button className="btn btn-primary btn-block" type="submit" disabled={pending || noPayment || quotePending || Boolean(quoteError) || quotedCoupon !== appliedCoupon || Boolean(quote?.hasShortage)}>
               {pending ? t('checkout.submitting') : t('checkout.submit')}
             </button>
           </div>
