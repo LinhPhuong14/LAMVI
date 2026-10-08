@@ -50,6 +50,11 @@ afterEach(() => {
 
 const wait = (ms = 1500) => act(() => vi.advanceTimersByTimeAsync(ms))
 const openChat = async () => fireEvent.click(await screen.findByRole('button', FAB))
+// Tour không tự bật nữa (feedback 08/10, mục 10) → bật qua nút “Dẫn tour” trong khung chat
+const startTour = async () => {
+  await openChat()
+  fireEvent.click(await screen.findByRole('button', { name: 'Dẫn tour' }))
+}
 
 describe('Tour — không tự bật ngoài trang chủ (BR-AI-007, US-010 AC-003)', () => {
   it.each(['/lo/L-01', '/products/den-vong', '/en/products/den-vong', '/account', '/login', '/zh/khong-co'])('%s → không tự bật', async (url) => {
@@ -83,7 +88,7 @@ describe('Tour — không tự bật ngoài trang chủ (BR-AI-007, US-010 AC-00
   it('Esc đóng tour và nhớ đã đóng', async () => {
     mockApi(base)
     renderAt('/')
-    await wait()
+    await startTour()
     expect(screen.getByRole('dialog', TOUR)).toBeInTheDocument()
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(screen.queryByRole('dialog', TOUR)).toBeNull()
@@ -93,7 +98,7 @@ describe('Tour — không tự bật ngoài trang chủ (BR-AI-007, US-010 AC-00
   it('rời trang chủ khi tour đang chạy → tour ẩn; bỏ nổi bật phần tử', async () => {
     mockApi(base)
     const { container } = renderAt('/')
-    await wait()
+    await startTour()
     expect(container.querySelector('.tour-highlight')).not.toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp' }))
     expect(container.querySelectorAll('.tour-highlight')).toHaveLength(1)
@@ -114,7 +119,7 @@ describe('Tour — không tự bật ngoài trang chủ (BR-AI-007, US-010 AC-00
     vi.stubGlobal('matchMedia', mm(true))
     mockApi(base)
     const first = renderAt('/')
-    await wait()
+    await startTour()
     expect(spy).toHaveBeenCalled()
     expect(spy.mock.calls.every(([o]) => o.behavior === 'auto')).toBe(true)
     first.unmount()
@@ -122,7 +127,7 @@ describe('Tour — không tự bật ngoài trang chủ (BR-AI-007, US-010 AC-00
     spy.mockClear()
     vi.stubGlobal('matchMedia', mm(false))
     renderAt('/')
-    await wait()
+    await startTour()
     expect(spy.mock.calls.at(-1)[0].behavior).toBe('smooth')
   })
 })

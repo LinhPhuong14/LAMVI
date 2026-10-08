@@ -39,10 +39,10 @@ describe.each(['vi', 'en', 'zh'])('SSR %s — phòng tranh và hoạ tiết', (l
     // Ghi chú: tranh trong Reveal có opacity:0 trong HTML SSR tới khi JS chạy — khoảng trống đã biết G-34 (decisions T-22), không kiểm ở đây
   })
 
-  it('9 lớp cảnh .scene (ảnh thật) aria-hidden, không phần tử focus được, mỗi lớp nằm trong phần has-motifs', async () => {
+  it('8 lớp cảnh .scene (ảnh thật) aria-hidden, không phần tử focus được, mỗi lớp nằm trong phần has-motifs', async () => {
     const d = await doc(PREFIX[lang])
     const layers = [...d.querySelectorAll('.scene')]
-    expect(layers).toHaveLength(9)
+    expect(layers).toHaveLength(8)
     for (const layer of layers) {
       expect(layer.getAttribute('aria-hidden')).toBe('true')
       expect(layer.querySelectorAll('a, button, input, select, textarea, [tabindex], [href], svg')).toHaveLength(0)

@@ -871,7 +871,8 @@
   color: var(--la);
 }
 
-.it-overall.it-degraded {
+.it-overall.it-degraded,
+.it-overall.it-attention {
   color: var(--son);
 }
 
@@ -1039,7 +1040,7 @@
   cursor: pointer;
   display: grid;
   place-items: center;
-  animation: may-float 4s ease-in-out infinite;
+  animation: may-float 4s ease-in-out 3; /* dừng sau 3 vòng (~12 giây) — feedback 08/10, mục 16 */
 }
 
 @keyframes may-float {
@@ -4936,3 +4937,149 @@
 .login-checkout-note { display: grid; gap: 6px; margin-bottom: 16px; }
 .login-checkout-note p { margin: 0; }
 .login-cart-summary .price { display: inline-flex; flex-direction: row; gap: 6px; align-items: baseline; }
+
+/* Banner đồng ý cookie (feedback 08/10 mục 24) */
+.consent-banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--cream);
+  color: var(--ink);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  font-size: 0.9rem;
+}
+.consent-banner p { margin: 0; flex: 1 1 280px; }
+.consent-actions { display: flex; gap: 8px; }
+.consent-actions .btn { min-height: 44px; min-width: 44px; }
+.link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Thanh đặt hàng / mua cố định ở đáy trên mobile (feedback 08/10: 7.5, 9) */
+.sticky-buy,
+.checkout-bar {
+  display: none;
+}
+@media (max-width: 640px) {
+  .sticky-buy,
+  .checkout-bar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--cream);
+    border-top: 1px solid var(--line);
+  }
+  .sticky-buy > span,
+  .checkout-bar > span {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .sticky-buy strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sticky-buy .btn,
+  .checkout-bar .btn {
+    min-height: 44px;
+    white-space: nowrap;
+  }
+  .checkout {
+    padding-bottom: 88px;
+  }
+}
+
+/* Tab Mô tả / Thông số / Giao hàng trên trang sản phẩm (feedback 08/10, mục 8) */
+.pdp-tabs {
+  max-width: 880px;
+  margin: 40px auto 0;
+}
+.pdp-tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.pdp-tablist button {
+  min-height: 44px;
+  padding: 0 16px;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font: inherit;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.pdp-tablist button.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--son);
+}
+.pdp-tabs [role='tabpanel'] {
+  padding: 20px 4px;
+}
+.pdp-specs {
+  margin: 0;
+}
+.pdp-specs > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 200px) 1fr;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.pdp-specs dt {
+  color: var(--ink-soft);
+}
+.pdp-specs dd {
+  margin: 0;
+}
+.admin-specs {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+/* Menu admin trên mobile: một hàng cuộn ngang thay vì chiếm nửa màn hình (feedback 08/10, 33.12) */
+@media (max-width: 640px) {
+  .admin-nav nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    scrollbar-width: none;
+  }
+  .admin-nav nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    min-height: 44px;
+  }
+  .admin-nav {
+    gap: 8px 12px;
+    padding: 12px 16px;
+  }
+}

@@ -12,6 +12,7 @@ export default function CartProvider({ children }) {
   // SSR + lần render đầu: chưa đọc localStorage (tránh lệch hydrate)
   const [cart, setCart] = useState(null)
   const [error, setError] = useState(null)
+  const [syncError, setSyncError] = useState(false)
   // Sự kiện "vừa thêm" cho bong bóng của Mây (D-83); `id` tăng mỗi lần để thêm cùng món vẫn hiện lại
   const [lastAdded, setLastAdded] = useState(null)
   const localRef = useRef([])
@@ -76,6 +77,7 @@ export default function CartProvider({ children }) {
     const id = ++seq.current
     const doLoad = async () => {
       if (!user) {
+        setSyncError(false) // đăng xuất: bỏ cảnh báo của tài khoản cũ
         localRef.current = loadLocalCart()
         await quoteLocal(id)
         return
@@ -87,10 +89,13 @@ export default function CartProvider({ children }) {
           // D-59: gộp giỏ trình duyệt vào tài khoản rồi xoá bản trình duyệt
           const merged = await authedApi(`/cart/merge?lang=${lang}`, { method: 'POST', body: { items: local } })
           saveLocalCart([])
+          setSyncError(false)
           return apply(id, merged)
         } catch (err) {
           // Gộp lỗi (vd bảo trì 503): vẫn hiện giỏ tài khoản, giữ giỏ trình duyệt để gộp lần sau
           if (err.status === 401) throw err
+          // Báo cho khách biết món vừa chọn chưa vào giỏ tài khoản (feedback 08/10 mục 6)
+          setSyncError(true)
         }
       }
       apply(id, await authedApi(`/cart?lang=${lang}`))
@@ -151,8 +156,8 @@ export default function CartProvider({ children }) {
   )
 
   const value = useMemo(
-    () => ({ cart, error, pendingLines, lineErrors, add, setQuantity, remove, reload: load, lastAdded, dismissAdded }),
-    [cart, error, pendingLines, lineErrors, add, setQuantity, remove, load, lastAdded, dismissAdded],
+    () => ({ cart, error, syncError, pendingLines, lineErrors, add, setQuantity, remove, reload: load, lastAdded, dismissAdded }),
+    [cart, error, syncError, pendingLines, lineErrors, add, setQuantity, remove, load, lastAdded, dismissAdded],
   )
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

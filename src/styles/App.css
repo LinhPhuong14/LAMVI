@@ -2575,7 +2575,11 @@
     mask-image: linear-gradient(to top, #000 10%, transparent 70%);
   }
   .scene-smoke {
-    opacity: 0.18;
+    /* Feedback 08/10, mục 19: tắt lớp khói trên mobile (tốn style/layout, TBT cao) */
+    display: none;
+  }
+  .scene-rise-lantern:nth-child(n + 4) {
+    display: none;
   }
   .scene-rise-lantern:nth-child(even) {
     display: none;
@@ -3355,4 +3359,23 @@
   .page-auth .auth-foot {
     background: rgba(244, 237, 224, 0.92);
   }
+}
+
+/* Vùng bấm tối thiểu 44×44px trên cảm ứng (feedback 08/10, mục 15) */
+.nav-cart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+}
+.footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }

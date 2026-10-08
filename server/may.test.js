@@ -299,3 +299,15 @@ describe('Hồi quy sau kiểm thử độc lập (Mây)', () => {
     expect(u.body).toMatchObject({ budgetPct: 1, alert: 'exhausted' })
   })
 })
+
+describe('Kênh người thật mặc định (feedback 08/10, 33.2)', () => {
+  it('admin để trống kênh → dùng liên hệ doanh nghiệp trong câu trả lời "không biết"', async () => {
+    await enable()
+    openai = fakeOpenAi([say('Đèn giá 555.000 ₫ nhé')])
+    const may = createMayService({ repo, openai, now: () => clock, random: () => 0, defaultChannel: '0901 234 567 · hotro@lamvi.example' })
+    app = createApp({ repo, auth, storage: createMemoryStorage(), config: { publicSiteUrl: 'https://moc.test' }, may })
+    const res = await chat({ message: 'giá?' })
+    expect(res.body.reply.kind).toBe('unknown')
+    expect(res.body.reply.text).toContain('0901 234 567 · hotro@lamvi.example')
+  })
+})

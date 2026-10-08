@@ -418,7 +418,7 @@ describe('Sức khoẻ (D-52)', () => {
     expect(json).not.toMatch(/bi-mat/)
     expect(h.checks.find((c) => c.name === 'openai')).toEqual({ name: 'openai', status: 'not_integrated', configured: true })
     expect(h.checks.find((c) => c.name === 'payos')).toMatchObject({ status: 'not_configured', configured: true })
-    expect(h.status).toBe('ok')
+    expect(h.status).toBe('attention')
   })
 
   it('payOS thiếu một biến → configured false', async () => {

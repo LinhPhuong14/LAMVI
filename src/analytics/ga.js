@@ -106,6 +106,8 @@ export function gaInlineScript(id) {
   return [
     'window.dataLayer=window.dataLayer||[];',
     'function gtag(){dataLayer.push(arguments);}',
+    // Consent Mode v2: mặc định từ chối, chỉ bật sau khi khách đồng ý (src/analytics/consent.js)
+    'gtag("consent","default",{analytics_storage:"denied",ad_storage:"denied",ad_user_data:"denied",ad_personalization:"denied"});',
     'gtag("js",new Date());',
     `gtag("config",${JSON.stringify(id)},{send_page_view:false});`,
   ].join('')

@@ -55,7 +55,7 @@ describe('Giỏ khách vãng lai (D-59)', () => {
     mockApi(base)
     renderAt('/cart')
     expect(await screen.findByText(/3\.460\.000/)).toBeInTheDocument()
-    expect(screen.getByText('Giá đã gồm VAT. Phí vận chuyển được tính ở bước thanh toán.')).toBeInTheDocument()
+    expect(screen.getByText('Giá đã gồm VAT. Phí giao hàng chính xác được chốt ở bước thanh toán.')).toBeInTheDocument()
     const line = screen.getByText('Đèn Nguyệt', { selector: 'strong' }).closest('li')
     fireEvent.click(within(line).getByRole('button', { name: 'Tăng số lượng' }))
     await waitFor(() => expect(JSON.parse(localStorage.getItem('moc.cart'))[0]).toEqual({ slug: 'den-nguyet', quantity: 3 }))

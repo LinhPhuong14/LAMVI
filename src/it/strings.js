@@ -7,10 +7,10 @@ export const S = {
   autoRefresh: 'Tự làm mới mỗi 30 giây',
   updatedAt: 'Cập nhật lúc {time}',
   forbiddenTitle: 'Không có quyền truy cập',
-  forbiddenText: 'Chỉ tài khoản có vai trò IT mới vào được dashboard này (D-51).',
+  forbiddenText: 'Chỉ tài khoản có vai trò IT mới vào được dashboard này.',
   health: {
     title: 'Sức khoẻ hệ thống',
-    overall: { ok: 'Hoạt động bình thường', degraded: 'Có thành phần gặp sự cố' },
+    overall: { ok: 'Hoạt động bình thường', degraded: 'Có thành phần gặp sự cố', attention: 'Cần xử lý: thiếu cấu hình thành phần bắt buộc để bán hàng' },
     checks: {
       database: 'Cơ sở dữ liệu',
       auth: 'Xác thực (Auth)',
@@ -61,7 +61,7 @@ export const S = {
     turnOff: 'Tắt bảo trì',
     confirmOn: 'Bật chế độ bảo trì? Khách sẽ không dùng được web cho tới khi tắt.',
     confirmOff: 'Tắt chế độ bảo trì?',
-    hint: 'Khi bật: trang công khai trả 503; API chỉ cho đọc. Đăng nhập, /admin và /it vẫn dùng được (D-54).',
+    hint: 'Khi bật: trang công khai trả 503; API chỉ cho đọc. Đăng nhập, /admin và /it vẫn dùng được.',
     changedAt: 'Đổi lần cuối: {time}',
   },
   metrics: {

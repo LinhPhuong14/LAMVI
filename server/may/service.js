@@ -63,13 +63,15 @@ function systemPrompt(lang, channel) {
  * FR-AI-003/005/006: một lượt chat với Mây.
  * deps: repo, openai (null nếu thiếu khoá), env (giá token), now, random, timeoutMs (D-57: 15 giây)
  */
-export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPer1M = 0.6, hashSalt = 'moc', now = () => Date.now(), random = Math.random, timeoutMs = 15_000 }) {
+export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPer1M = 0.6, hashSalt = 'moc', now = () => Date.now(), random = Math.random, timeoutMs = 15_000, defaultChannel = '' }) {
+  // Kênh người thật: cấu hình trong admin; để trống thì dùng liên hệ của doanh nghiệp (feedback 08/10, 33.2)
+  const channelOf = (config, lang) => config.supportChannel[lang] || config.supportChannel.vi || defaultChannel || ''
   const canned = (config, lang, group) => {
     const text = pick(config.messages[group][lang] ?? config.messages[group].vi, random)
-    return text.replace('{channel}', config.supportChannel[lang] || config.supportChannel.vi || '')
+    return text.replace('{channel}', channelOf(config, lang))
   }
   const unknownReply = (config, lang) =>
-    config.supportChannel[lang] || config.supportChannel.vi ? canned(config, lang, 'unknown') : canned(config, lang, 'unknownNoChannel')
+    channelOf(config, lang) ? canned(config, lang, 'unknown') : canned(config, lang, 'unknownNoChannel')
 
   // §22.4: hạn mức tin nhắn — vượt thì trả nhóm "mệt"
   async function overLimit(config, { user, sessionId, ip }) {
@@ -95,7 +97,7 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
     const phones = [...new Set([...history.filter((h) => h.role === 'user').flatMap((h) => extractPhones(h.content)), ...extractPhones(message)])]
     const failKey = user ? `u:${user.id}` : `ip:${hash(ip, hashSalt)}`
     const messages = [
-      { role: 'system', content: systemPrompt(lang, config.supportChannel[lang] || config.supportChannel.vi) },
+      { role: 'system', content: systemPrompt(lang, channelOf(config, lang)) },
       ...history.map((h) => ({ role: h.role, content: redactPii(h.content) })),
       { role: 'user', content: redactPii(message) },
     ]

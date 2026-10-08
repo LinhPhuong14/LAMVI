@@ -89,10 +89,10 @@ describe('CountUp', () => {
     expect(container.querySelector('[aria-hidden="true"]')).not.toBeNull()
   })
 
-  it('chưa tới khung nhìn → về 0 để lần sau đếm lại', () => {
+  it('chưa tới khung nhìn → vẫn hiện số thật (không bao giờ "0+" cho ảnh chụp trang/Googlebot)', () => {
     stubObserver()
     const { container } = render(<CountUp value="100+" />)
-    expect(container.querySelector('[aria-hidden="true"]').textContent).toBe('0+')
+    expect(container.querySelector('[aria-hidden="true"]').textContent).toBe('100+')
   })
 
   it('NFR-A11Y-001: giảm chuyển động → giữ nguyên giá trị thật, không đếm', () => {

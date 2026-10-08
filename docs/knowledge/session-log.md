@@ -1,5 +1,19 @@
 # Nhật ký phiên
 
+## 2026-10-08 (phiên 2) — Feedback kiểm thử, đợt 2 (nhánh `fix/feedback-2026-10-08`)
+
+**Mục tiêu**: sửa các mục còn mở của feedback kiểm thử 08/10 (P0 → P2) trong phạm vi làm được bằng mã.
+
+**Quyết định từ người dùng**: "Sửa theo feedback trên" (PO @linhphuong). D-102 (banner cookie, thay D-72) và D-103 (tour không tự bật, gỡ đánh giá, reveal hiển thị sẵn…) ghi theo yêu cầu đó; Q-43 `[LEGAL]` chờ pháp chế.
+
+**Đã làm**: xem `progress.md` (đợt v0.41) và `ba-spec.md` G-100…G-107. Subagent kiểm thử độc lập (T-11) rà toàn bộ thay đổi; kết quả ghi ở mục "Subagent" bên dưới.
+
+**Không tự quyết**: mua không tài khoản (Q-41 `[BA DECISION REQUIRED]`), thông tin pháp lý/liên hệ thật (dữ liệu vận hành), khoá payOS/Resend, Sentry/uptime (cần tài khoản dịch vụ).
+
+**Còn lại / cần người dùng**: chạy migration (016, 017, 019, 021) trên production rồi xem log `/api/cart/merge`; cấu hình payOS + email + DNS; điền `MAIL_*`/`MOIT_NOTICE_URL`; nhập thông số sản phẩm; đo lại Lighthouse sau deploy.
+
+---
+
 ## 2026-10-08 — Xử lý feedback kiểm thử (feat/feedback-2026-10-08)
 
 **Đầu vào**: tài liệu feedback 08/10 của @linhphuong, 5 mục P0.

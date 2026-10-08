@@ -9,6 +9,7 @@ import SiteFooter from './SiteFooter'
 import PageTransition from './PageTransition'
 import Scene from './Scene'
 import May from '../may/May.jsx'
+import ConsentBanner from './ConsentBanner'
 import CartProvider from '../cart/CartProvider.jsx'
 
 // Trang dạng ứng dụng (dashboard tài khoản) tự có thanh bên, không dùng header/footer của trang giới thiệu
@@ -52,6 +53,7 @@ export default function LocaleLayout({ lang }) {
               </PageTransition>
               {!app && (auth ? <AuthFooter /> : <SiteFooter />)}
               <May />
+              {!app && <ConsentBanner />}
             </div>
           </CartProvider>
         </MotionConfig>

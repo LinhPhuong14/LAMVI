@@ -86,7 +86,7 @@ export function securityHeaders({ config, dev = false }) {
     if (!dev) {
       // Chỉ gửi HSTS khi request thật sự qua HTTPS (sau proxy: X-Forwarded-Proto)
       if (req.secure || req.get('x-forwarded-proto') === 'https') {
-        res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+        res.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload')
       }
       // Mặc định: không cho phép script nội tuyến nào. Trang HTML do SSR dựng sẽ đặt lại header
       // này kèm hash của đúng các script nội tuyến của nó (res.locals.setCsp).

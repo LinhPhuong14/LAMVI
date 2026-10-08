@@ -53,6 +53,8 @@ export function loadConfig(env = process.env) {
     // BR-PAY-003: bí mật cho lịch quét đơn quá hạn (Vercel Cron). Để trống → tắt endpoint.
     cronSecret: env.CRON_SECRET || null,
     // Thanh toán payOS (FR-PAY-001, D-35). Thiếu khoá → checkout chỉ cho COD.
+    // payOS thật sự dùng được: bật cờ PAYOS_ENABLED=1 và đủ 3 khoá (feedback 08/10, mục 30)
+    payosEnabled: env.PAYOS_ENABLED === '1' && Boolean(env.PAYOS_CLIENT_ID && env.PAYOS_API_KEY && env.PAYOS_CHECKSUM_KEY),
     payos: {
       clientId: env.PAYOS_CLIENT_ID || null,
       apiKey: env.PAYOS_API_KEY || null,

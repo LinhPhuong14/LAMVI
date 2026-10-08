@@ -121,3 +121,13 @@ QA v0.39 bổ sung migration 019 atomic cart (cùng user lock với checkout) v�
 - Quy trình deploy: bật *Preview → Production promotion* (tắt auto-assign domain Production) để mỗi bản được kiểm trên Preview (`/`, `/en`, `/zh`, `/api/products`, `/api/health?deep=1`) rồi mới promote.
 
 **Biến liên hệ/pháp lý công khai** (chân trang, `/contact`, form liên hệ; đều tuỳ chọn, trống thì không hiện): `MAIL_SUPPORT_PHONE`, `MAIL_SUPPORT_EMAIL` (cũng là hộp thư nhận form liên hệ — cần thêm `MAIL_FROM` + khoá Resend/Brevo), `MAIL_ZALO_URL`, `MAIL_SUPPORT_HOURS`, `MAIL_COMPANY_LEGAL`, `MAIL_COMPANY_REGISTRATION`, `MAIL_COMPANY_ADDRESS`, `MAIL_WORKSHOP_ADDRESS`, `MOIT_NOTICE_URL`. Đổi biến cần redeploy; trang công khai được CDN giữ tối đa ~5 phút (`s-maxage=60` + SWR).
+
+## Cập nhật 08/10/2026 (đợt 2, T-77…T-82)
+
+- `vercel.json`: `"regions": ["sin1"]` (Singapore, gần khách Việt Nam). Kiểm tra project Supabase cũng ở `ap-southeast-1`; nếu khác, mỗi truy vấn vẫn vòng qua vùng khác.
+- **Chạy migration trước khi deploy** (`supabase db push`): `20261007000016` (đổi trả), `…017` (số liệu API), `…019` (`mutate_cart`), `20261008000021` (`products.specs`). Thiếu migration → API trả 503 `SCHEMA_OUTDATED` (T-77) thay vì 500.
+- `/images/*` cache 7 ngày + SWR 30 ngày (tên tệp chưa có hash → đổi ảnh thì đổi tên tệp).
+- HSTS `max-age=63072000; includeSubDomains; preload`. Bước thủ công còn lại: đăng ký tại hstspreload.org khi chắc chắn mọi subdomain đều HTTPS.
+- Dashboard IT: `commit` lấy từ `GIT_COMMIT` hoặc `VERCEL_GIT_COMMIT_SHA` (tự có trên Vercel).
+- Cần để dashboard IT báo "Hoạt động bình thường": `PAYOS_ENABLED=1` + `PAYOS_CLIENT_ID/API_KEY/CHECKSUM_KEY`, `MAIL_FROM` + `RESEND_API_KEY` (SPF/DKIM/DMARC cho tên miền gửi).
+

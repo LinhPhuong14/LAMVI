@@ -71,15 +71,6 @@ const sun = {
   above: { opacity: 0, scale: 0.6, transition: { duration: 0.4 } },
 }
 
-function Initials({ name }) {
-  const letters = name
-    .split(' ')
-    .map((w) => w[0])
-    .slice(-2)
-    .join('')
-  return <span className="avatar-initials">{letters}</span>
-}
-
 // Cuộn tới mục theo #hash khi vào trang chủ từ trang khác
 function useScrollToHash() {
   const { hash } = useLocation()
@@ -529,29 +520,7 @@ export default function HomePage() {
         </Reveal>
       </section>
 
-      <section className="testimonials has-motifs">
-        <Scene name="testimonials" />
-        <Reveal variants={group}>
-          <SectionHead eyebrow={t('testimonials.eyebrow')} title={t('testimonials.title')} />
-        </Reveal>
-        <Reveal className="testimonial-grid" variants={group}>
-          {t('testimonials.items').map((item, i) => (
-            <m.figure className="testimonial-card" key={item.name} variants={stamp} custom={i}>
-              <div className="stars">★★★★★</div>
-              <blockquote>{item.quote}</blockquote>
-              <figcaption>
-                <span className="avatar">
-                  <Initials name={item.name} />
-                </span>
-                <span>
-                  <strong>{item.name}</strong>
-                  <span className="testimonial-context">{item.context}</span>
-                </span>
-              </figcaption>
-            </m.figure>
-          ))}
-        </Reveal>
-      </section>
+      {/* Feedback 08/10 mục 14: gỡ đánh giá khi chưa có khách thật; sẽ lấy từ đơn đã giao ('Đã mua hàng') */}
 
       <section id="faq" className="faq has-motifs">
         <Scene name="faq" />

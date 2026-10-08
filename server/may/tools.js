@@ -70,6 +70,8 @@ const productForMay = (p, lang) => ({
   name: p.name,
   kind: p.kind,
   description: p.description,
+  // Thông số do admin nhập (kích thước, chất liệu, nguồn sáng…); thiếu thì Mây phải nói chưa có thông tin
+  specs: p.specs ?? {},
   price: p.price,
   currency: 'VND',
   priceNote: 'VAT included (D-68)',

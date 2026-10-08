@@ -15,10 +15,13 @@ afterEach(() => vi.useRealTimers())
 const openChat = async () => fireEvent.click(await screen.findByRole('button', { name: 'Trò chuyện với Mây' }))
 
 describe('Tour Mây (US-010)', () => {
-  it('AC-001: lần đầu vào trang chủ → tour tự bật; AC-002: đóng rồi thì không tự bật lại', async () => {
+  it('feedback 08/10 mục 10: lần đầu vào trang chủ KHÔNG tự bật tour; bật qua “Dẫn tour”, đóng rồi nhớ', async () => {
     mockApi(base)
     const first = renderAt('/')
-    await act(() => vi.advanceTimersByTimeAsync(1000))
+    await act(() => vi.advanceTimersByTimeAsync(2000))
+    expect(screen.queryByRole('dialog', { name: 'Tour cùng Mây' })).toBeNull()
+    await openChat()
+    fireEvent.click(await screen.findByRole('button', { name: 'Dẫn tour' }))
     expect(screen.getByRole('dialog', { name: 'Tour cùng Mây' })).toBeInTheDocument()
     expect(screen.getByText('Bước 1/5')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Bỏ qua tour' }))
@@ -40,7 +43,8 @@ describe('Tour Mây (US-010)', () => {
   it('đi qua các bước, bước cuối "Xong"; làm nổi bật phần tử đích', async () => {
     mockApi(base)
     const { container } = renderAt('/en')
-    await act(() => vi.advanceTimersByTimeAsync(1000))
+    fireEvent.click(await screen.findByRole('button', { name: 'Chat with Mây' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Take the tour' }))
     expect(container.querySelector('.hero').classList.contains('tour-highlight')).toBe(true)
     for (let i = 0; i < 4; i++) fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(screen.getByText('Step 5/5')).toBeInTheDocument()

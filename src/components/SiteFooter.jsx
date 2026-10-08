@@ -5,6 +5,7 @@ import { Seal } from './Motifs'
 import { Reveal } from './Reveal'
 import { BrandHover } from './Effects'
 import { group } from '../lib/motion.js'
+import { openConsent } from '../analytics/consent.js'
 
 export default function SiteFooter() {
   const { t, lang, path } = useI18n()
@@ -51,6 +52,7 @@ export default function SiteFooter() {
           <Link to={path('/payment')}>{t('footer.payment')}</Link>
           <Link to={path('/terms')}>{t('footer.terms')}</Link>
           <Link to={path('/privacy')}>{t('footer.privacy')}</Link>
+          <button type="button" className="link-button" onClick={openConsent}>{t('consent.settings')}</button>
           <Link to={path('/account?tab=orders')}>{t('footer.tracking')}</Link>
           {business?.supportEmail && <a href={`mailto:${business.supportEmail}`}>{business.supportEmail}</a>}
           {business?.phone && <a href={`tel:${business.phone.replace(/[^0-9+]/g, '')}`}>{business.phone}</a>}
@@ -60,19 +62,14 @@ export default function SiteFooter() {
         <div className="footer-col footer-news">
           <h3>{t('footer.newsTitle')}</h3>
           <p>{t('footer.newsUnavailable')}</p>
-          {/* G-11: newsletter chưa có backend — giữ hay bỏ form chờ PO (§30 P2) */}
-          <form className="news-form" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder={t('footer.newsPlaceholder')}
-              aria-label={t('footer.newsPlaceholder')}
-              required
-              disabled
-            />
-            <button type="submit" className="btn btn-small" disabled>
-              {t('footer.newsSubmit')}
-            </button>
-          </form>
+          {/* Feedback 08/10, mục 13: chưa có đăng ký nhận tin → bỏ form, dẫn tới kênh mạng xã hội */}
+          {business?.social?.length > 0 && (
+            <p className="footer-social">
+              {business.social.map((x) => (
+                <a key={x.label} href={x.url} target="_blank" rel="noopener noreferrer">{x.label}</a>
+              ))}
+            </p>
+          )}
         </div>
       </div>
       <Reveal className="footer-brandmark" variants={group} margin="0px">

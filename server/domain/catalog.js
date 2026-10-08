@@ -17,12 +17,24 @@ export function presentProduct(p, lang) {
     pieceOrder: p.pieceOrder ?? 0,
     // D-100: tồn kho (inStock=false → "tạm hết hàng"; stockLeft chỉ có khi sắp hết)
     ...presentStock(p),
+    // Thông số (feedback 08/10, mục 8): chỉ trả khoá có nội dung, đã chọn ngôn ngữ
+    specs: presentSpecs(p.specs, lang),
     // D-68 / T-09: giá niêm yết ĐÃ gồm VAT, số nguyên VND
     price: p.price,
     currency: 'VND',
     // G-23: ảnh thật của sản phẩm; chưa có thì frontend dùng hình minh hoạ SVG (G-33)
     image: p.imageUrl ? { url: p.imageUrl, alt: pick(p.imageAlt, lang) } : null,
   }
+}
+
+export function presentSpecs(specs, lang) {
+  if (!specs || typeof specs !== 'object') return {}
+  const out = {}
+  for (const [k, v] of Object.entries(specs)) {
+    const text = pick(v, lang)
+    if (text) out[k] = text
+  }
+  return out
 }
 
 export function presentFaq(f, lang) {

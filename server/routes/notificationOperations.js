@@ -8,9 +8,12 @@ export function notificationOperationsRouter({ repo, auth, outbox }) {
   r.get('/it/notifications', async (req, res) => {
     const status = req.query.status ?? 'dead'
     if (!['pending', 'leased', 'sent', 'dead'].includes(status)) throw new HttpError(400, 'VALIDATION_ERROR', 'Trạng thái không hợp lệ')
+    // Hàng đợi email chưa bật (thiếu cấu hình): trả rỗng + enabled:false thay vì 404 (feedback 08/10, mục 31)
+    if (!outbox) return res.json({ items: [], enabled: false })
     res.json({ items: await outbox.list({ status, limit: 50 }) })
   })
   r.post('/it/notifications/:id/retry', async (req, res) => {
+    if (!outbox) throw new HttpError(409, 'NOTIFICATIONS_DISABLED', 'Hàng đợi email chưa được bật')
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.id)) throw new HttpError(400, 'VALIDATION_ERROR', 'Mã không hợp lệ')
     if (!await outbox.retry(req.params.id, req.user.id)) throw new HttpError(409, 'NOTIFICATION_NOT_RETRYABLE', 'Chỉ thử lại thư lỗi trong cửa sổ an toàn của nhà cung cấp; cần đối soát thư cũ')
     res.json({ queued: true })

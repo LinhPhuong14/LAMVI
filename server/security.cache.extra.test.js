@@ -58,7 +58,7 @@ describe('CSP — chính sách mặc định và chế độ dev', () => {
     expect(runMiddleware({ headers: { 'x-forwarded-proto': 'http' } }).headers['Strict-Transport-Security']).toBeUndefined()
     expect(runMiddleware({ headers: { 'x-forwarded-proto': 'https,http' } }).headers['Strict-Transport-Security']).toBeUndefined()
     expect(runMiddleware({ headers: { 'x-forwarded-proto': 'https' } }).headers['Strict-Transport-Security']).toContain(
-      'max-age=31536000',
+      'max-age=63072000; includeSubDomains; preload',
     )
   })
 })

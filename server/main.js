@@ -5,6 +5,7 @@ import { createWeb } from './ssr.js'
 import { createMetrics } from './monitoring/metrics.js'
 import { createMaintenance } from './monitoring/maintenance.js'
 import { createMayService } from './may/service.js'
+import { publicSite } from './services/site.js'
 import { createOpenAiClient } from './adapters/openai.js'
 import { createPayosClient } from './adapters/payos.js'
 import { createOrderService } from './orders/service.js'
@@ -69,10 +70,11 @@ const may = createMayService({
   priceInPer1M: config.openai.priceInPer1M,
   priceOutPer1M: config.openai.priceOutPer1M,
   hashSalt: config.mayHashSalt,
+  defaultChannel: [publicSite(config).phone, publicSite(config).supportEmail].filter(Boolean).join(' · '),
 })
 // FR-PAY-001: thiếu khoá payOS → client null, checkout chỉ cho COD.
 // TẠM THỜI tắt payOS (function từng crash): chỉ bật khi đặt PAYOS_ENABLED=1.
-const payos = process.env.PAYOS_ENABLED === '1' ? createPayosClient(config.payos) : null
+const payos = config.payosEnabled ? createPayosClient(config.payos) : null
 if (!payos) console.warn('[api] payOS đang tắt hoặc thiếu biến PAYOS_* — chỉ nhận thanh toán COD')
 
 // T-49: thư giao dịch. Production phải có MAIL_FROM + RESEND_API_KEY/BREVO_API_KEY; dev (bộ nhớ) in ra console.

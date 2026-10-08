@@ -28,7 +28,7 @@ import { securityHeaders } from './middleware/security.js'
 import { createMailer } from './mail/mailer.js'
 import { notificationOperationsRouter } from './routes/notificationOperations.js'
 import { isPwnedPassword } from './security/pwned.js'
-import { publicSite } from './services/site.js'
+import { getShippingPolicy, publicSite } from './services/site.js'
 import { contactRouter } from './routes/contact.js'
 
 // T-02: nhận adapter qua tham số để test bằng adapter bộ nhớ
@@ -91,6 +91,16 @@ export function createApp({
     res.set('Cache-Control', 'public, max-age=60, s-maxage=300')
     res.json(publicSite(config))
   })
+  // Phí ship công khai (feedback 08/10, 7.1): đọc cùng cấu hình tính giá với checkout
+  api.get('/shipping-policy', async (_req, res, next) => {
+    try {
+      const policy = await getShippingPolicy(repo)
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=3600')
+      res.json(policy)
+    } catch (err) {
+      next(err)
+    }
+  })
   api.use(catalogRouter({ repo }))
   api.use(contactRouter({ repo, config, mailer }))
   api.use(geoRouter())
@@ -99,7 +109,7 @@ export function createApp({
   if (auth && storage) api.use(adminRouter({ repo, auth, storage, config, orders, gaRealtime }))
   if (auth && repo.createCollection) api.use(adminCollectionsRouter({ repo, auth }))
   if (auth && storage) api.use(adminUsersRouter({ repo, auth }))
-  if (auth && notificationOutbox) api.use(notificationOperationsRouter({ repo, auth, outbox: notificationOutbox }))
+  if (auth) api.use(notificationOperationsRouter({ repo, auth, outbox: notificationOutbox }))
   if (auth && storage) api.use(itRouter({ repo, auth, storage, config, metrics, maintenance, may, mailer, payos }))
   if (auth) api.use(mayRouter({ repo, auth, may }))
   if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))

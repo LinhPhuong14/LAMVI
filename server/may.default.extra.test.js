@@ -123,11 +123,11 @@ describe('PUT /api/admin/may/config một phần không lật cờ', () => {
 })
 
 describe('Health IT mặc định', () => {
-  it('cài mới + có khoá → ok (không phải disabled), tổng ok', async () => {
+  it('cài mới + có khoá → ok (không phải disabled), tổng cần xử lý (payOS/email chưa cấu hình)', async () => {
     build([say('x')])
     const h = await health()
     expect(h.openai.status).toBe('ok')
-    expect(h.overall).toBe('ok')
+    expect(h.overall).toBe('attention')
   })
   it('cài mới + không khoá → not_configured', async () => {
     build(null)

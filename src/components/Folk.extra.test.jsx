@@ -165,16 +165,16 @@ describe('D-66 — cảnh nền ảnh thật (thay hoạ tiết SVG)', () => {
     expect(container.innerHTML).toBe('')
   })
 
-  it('HomePage: 9 phần gắn Scene khác nhau, mỗi phần có class has-motifs; không còn FloatingMotifs', () => {
+  it('HomePage: 8 phần gắn Scene khác nhau, mỗi phần có class has-motifs; không còn FloatingMotifs', () => {
     const src = read('src/pages/HomePage.jsx')
     expect(src).not.toMatch(/FloatingMotifs/)
     const uses = [...src.matchAll(/<Scene name="([\w-]+)" \/>/g)]
-    expect(uses).toHaveLength(9)
+    expect(uses).toHaveLength(8)
     for (const u of uses) {
       const prevLine = src.slice(0, u.index).trimEnd().split('\n').at(-1)
       expect(prevLine, u[1]).toMatch(/<(section|Reveal as="section")[^>]*className="[^"]*\bhas-motifs\b/)
     }
-    expect(new Set(uses.map((u) => u[1])).size).toBe(9)
+    expect(new Set(uses.map((u) => u[1])).size).toBe(8)
   })
 
   it('CSS: .has-motifs tạo stacking context; .scene nằm dưới nội dung; giảm chuyển động tắt khói và đèn bay', () => {

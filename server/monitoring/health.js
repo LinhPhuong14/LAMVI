@@ -46,6 +46,14 @@ async function mailCheck(mailer, config, timeoutMs) {
 }
 
 // D-52: trạng thái tích hợp — chỉ báo đã cấu hình/kết nối được, không bao giờ trả giá trị khoá
+// Thành phần bắt buộc để bán hàng: thiếu cấu hình hoặc lỗi → "cần xử lý" (feedback 08/10, mục 30)
+const REQUIRED = ['database', 'auth', 'payos', 'mail']
+export function overallStatus(checks) {
+  if (checks.some((c) => c.status === 'error')) return 'degraded'
+  if (checks.some((c) => REQUIRED.includes(c.name) && c.status === 'not_configured')) return 'attention'
+  return 'ok'
+}
+
 export async function runHealthChecks({ repo, auth, storage, config, may, mailer = null, payos = null, env = process.env, timeoutMs = 3000 }) {
   const supabase = config.useSupabase ? 'supabase' : 'memory'
   const [database, authCheck, storageCheck] = await Promise.all([
@@ -68,11 +76,11 @@ export async function runHealthChecks({ repo, auth, storage, config, may, mailer
   ]
   const mem = process.memoryUsage()
   return {
-    status: checks.every((c) => c.status !== 'error') ? 'ok' : 'degraded',
+    status: overallStatus(checks),
     checks,
     system: {
       version: pkg.version,
-      commit: env.GIT_COMMIT ?? null,
+      commit: (env.GIT_COMMIT ?? env.VERCEL_GIT_COMMIT_SHA)?.slice(0, 12) ?? null,
       node: process.version,
       env: env.NODE_ENV ?? 'development',
       startedAt: startedAt.toISOString(),

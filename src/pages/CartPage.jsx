@@ -1,3 +1,4 @@
+import ShippingNote from '../components/ShippingNote.jsx'
 import { Link, useNavigate } from 'react-router-dom'
 import Lantern from '../components/Lantern'
 import { Lotus } from '../components/Motifs'
@@ -30,12 +31,13 @@ function Steps({ current = 0 }) {
 export default function CartPage() {
   const { t, path } = useI18n()
   const { user } = useAuth()
-  const { cart, error, pendingLines = {}, lineErrors = {}, setQuantity, remove } = useCart()
+  const { cart, error, syncError, pendingLines = {}, lineErrors = {}, setQuantity, remove } = useCart()
   const navigate = useNavigate()
 
   // D-61 / FR-CHK-001: chưa đăng nhập → đăng nhập rồi quay lại giỏ (US-001 AC-003)
   function onCheckout() {
     if (!user) return navigate(`${path('/login')}?next=${encodeURIComponent(path('/cart'))}`)
+    if (syncError) return // giỏ chưa đồng bộ: ở lại giỏ để khách thấy thông báo, không sang thanh toán với giỏ thiếu
     navigate(path('/checkout'))
   }
 
@@ -91,6 +93,7 @@ export default function CartPage() {
           {t(`errors.${error}`)}
         </p>
       )}
+      {syncError && <p className="notice error" role="alert">{t('cart.syncFailed')}</p>}
       {cart.hasUnavailable && <p className="notice error">{t('cart.hasUnavailable')}</p>}
       {cart.hasShortage && <p className="notice error" role="alert">{t('cart.hasShortage')}</p>}
       <div className="cart-layout">
@@ -158,6 +161,7 @@ export default function CartPage() {
               <dd className="cart-shipping">{t('cart.shippingAtCheckout')}</dd>
             </div>
           </dl>
+          <ShippingNote />
           <p className="field-hint">{t('cart.shippingNote')}</p>
           {!user && <p className="field-hint">{t('cart.guestNote')}</p>}
           <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0 || cart.hasShortage || Object.keys(pendingLines).length > 0}>

@@ -1,4 +1,11 @@
 import { normalizeBrand } from '../mail/layout.js'
+import { PRICING_SETTING_KEY, normalizePricingConfig } from '../domain/pricing.js'
+
+// Phí ship công khai (đọc cùng cấu hình tính giá với checkout)
+export async function getShippingPolicy(repo) {
+  const { shippingFee, freeShippingFrom } = normalizePricingConfig((await repo.getSetting?.(PRICING_SETTING_KEY))?.value)
+  return { fee: shippingFee, freeFrom: freeShippingFrom }
+}
 
 // Deliberately project only public business data, never spread config/mail objects.
 export function publicSite(config = {}) {
@@ -17,5 +24,7 @@ export function publicSite(config = {}) {
     phone: b.phone,
     hours: b.hours,
     social: b.social,
+    // Checkout ẩn/vô hiệu payOS khi chưa có khoá, thay vì để khách gặp lỗi ở bước cuối
+    payosEnabled: Boolean(config.payosEnabled),
   }
 }

@@ -94,6 +94,10 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
     assertValid(errors)
     const before = found(await repo.getProductById(req.params.id))
     if (values.collectionSlug !== before.collectionSlug) await assertCollection(values.collectionSlug)
+    // Đổi slug của sản phẩm đã xuất bản làm hỏng link đã chia sẻ, link Google và giỏ hàng đang lưu (feedback 08/10, 33.6)
+    if (values.slug !== undefined && values.slug !== before.slug && before.status === 'published') {
+      throw new HttpError(409, 'SLUG_LOCKED', 'Không đổi được slug của sản phẩm đang bán', { slug: 'SLUG_LOCKED' })
+    }
     if (!Object.keys(values).length) return res.json({ item: before })
     const item = found(await write(() => repo.updateProduct(before.id, values)))
     const diff = changed(before, values)
@@ -103,6 +107,8 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
   // §3.2: admin được xoá sản phẩm. Khi có đơn hàng, sản phẩm đã bán phải ẩn thay vì xoá [ASSUMPTION]
   r.delete('/admin/products/:id', async (req, res) => {
     const before = found(await repo.getProductById(req.params.id))
+    // Đã có đơn → không xoá (giữ lịch sử đơn), chuyển sang "Đã ẩn"; sản phẩm đang bán cũng phải ẩn trước
+    if (await repo.productHasOrders?.(before.id)) throw new HttpError(409, 'PRODUCT_HAS_ORDERS', 'Sản phẩm đã có đơn hàng, hãy chuyển sang Đã ẩn thay vì xoá')
     if (!(await repo.deleteProduct(before.id))) throw notFound()
     await logAdmin(req, 'product', before.id, 'delete', { slug: before.slug, status: before.status }, null)
     res.status(204).end()

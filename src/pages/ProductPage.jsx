@@ -1,3 +1,4 @@
+import ShippingNote from '../components/ShippingNote.jsx'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ProductCards from '../components/ProductCards'
@@ -12,6 +13,77 @@ import QuantityInput from '../cart/QuantityInput.jsx'
 import { breadcrumbJsonLd, productJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
 import { track } from '../analytics/index.js'
+
+const SPEC_ORDER = ['size', 'material', 'light', 'weight', 'leadTime', 'care']
+
+// Feedback 08/10, mục 8: tab Mô tả / Thông số / Giao hàng & đổi trả. Cả ba panel nằm sẵn trong HTML (SSR/SEO);
+// tab chỉ chuyển hiển thị bằng thuộc tính hidden.
+function ProductTabs({ product }) {
+  const { t, path } = useI18n()
+  const [tab, setTab] = useState('desc')
+  const rows = SPEC_ORDER.filter((k) => product.specs?.[k])
+  const tabs = [
+    ['desc', t('pdpTabs.tabDesc')],
+    ['specs', t('pdpTabs.tabSpecs')],
+    ['ship', t('pdpTabs.tabShip')],
+  ]
+  return (
+    <section className="pdp-tabs">
+      <div role="tablist" aria-label={product.name} className="pdp-tablist">
+        {tabs.map(([id, label]) => (
+          <button key={id} type="button" role="tab" id={`pdp-tab-${id}`} aria-selected={tab === id} aria-controls={`pdp-panel-${id}`} className={tab === id ? 'is-active' : undefined} onClick={() => setTab(id)}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" id="pdp-panel-desc" aria-labelledby="pdp-tab-desc" hidden={tab !== 'desc'}>
+        <p>{product.description}</p>
+      </div>
+      <div role="tabpanel" id="pdp-panel-specs" aria-labelledby="pdp-tab-specs" hidden={tab !== 'specs'}>
+        {rows.length ? (
+          <dl className="pdp-specs">
+            {rows.map((k) => (
+              <div key={k}>
+                <dt>{t(`pdpTabs.${k}`)}</dt>
+                <dd>{product.specs[k]}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : (
+          <p>{t('pdpTabs.specsEmpty')}</p>
+        )}
+      </div>
+      <div role="tabpanel" id="pdp-panel-ship" aria-labelledby="pdp-tab-ship" hidden={tab !== 'ship'}>
+        <ShippingNote className="" />
+        <p>
+          <Link to={path('/shipping')}>{t('pdpTabs.shipLink')}</Link> · <Link to={path('/returns')}>{t('pdpTabs.returnsLink')}</Link>
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// Feedback 08/10, mục 9: thanh mua cố định ở đáy (chỉ mobile qua CSS), hiện khi nút chính ra khỏi màn hình
+function StickyBuy({ product, quantity }) {
+  const [show, setShow] = useState(false)
+  useEffect(() => {
+    const target = document.querySelector('.pdp-buy .product-buy')
+    if (!target || typeof IntersectionObserver === 'undefined') return undefined
+    const io = new IntersectionObserver(([entry]) => setShow(!entry.isIntersecting))
+    io.observe(target)
+    return () => io.disconnect()
+  }, [])
+  if (!show) return null
+  return (
+    <div className="sticky-buy" role="region" aria-label={product.name}>
+      <span>
+        <strong>{product.name}</strong>
+        <Price amount={product.price} className="product-price" />
+      </span>
+      <AddToCart slug={product.slug} quantity={quantity} className="btn btn-primary" soldOut={product.inStock === false} />
+    </div>
+  )
+}
 
 // FR-GA-001 §23.3: view_item. Component riêng để hook không nằm sau nhánh return sớm ở trên.
 function TrackViewItem({ slug, name, price }) {
@@ -112,6 +184,7 @@ export default function ProductPage() {
             <QuantityInput value={qty} onChange={setQty} />
             <AddToCart slug={p.slug} quantity={qty} className="btn btn-primary" soldOut={p.inStock === false} />
           </div>
+          <ShippingNote className="pdp-note" />
           <p className="pdp-note">{t('pdp.checkoutNote')}</p>
           <ul className="shop-perks pdp-perks">
             {t('shop.perks').map((x) => (
@@ -120,6 +193,8 @@ export default function ProductPage() {
           </ul>
         </div>
       </div>
+      <ProductTabs product={p} />
+      <StickyBuy product={p} quantity={qty} />
       <Related slug={p.slug} />
     </section>
   )

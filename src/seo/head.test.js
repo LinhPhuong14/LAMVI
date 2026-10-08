@@ -6,14 +6,14 @@ import { classifyPath, dataKeysFor } from './routes.js'
 describe('head', () => {
   it('trang noindex không có canonical/hreflang; meta robots chỉ do renderHeadTags thêm', () => {
     const tags = buildHeadTags({ lang: 'vi', siteUrl: 'https://x', path: '/a', title: 'T', noindex: true })
-    expect(tags).toEqual([{ tag: 'title', text: 'T' }])
+    expect(tags).toEqual([{ tag: 'title', text: 'T — LAMVI' }])
     expect(renderHeadTags(tags, { noindex: true })).toContain('name="robots" content="noindex"')
   })
 
   it('applyHeadTags thay thẻ data-seo cũ, không đụng meta noindex của useNoIndex', () => {
     document.head.innerHTML = '<link rel="canonical" href="/cu" data-seo><meta name="robots" content="noindex" data-noindex>'
     applyHeadTags(document, buildHeadTags({ lang: 'en', siteUrl: 'https://x', path: '/', title: 'Home' }))
-    expect(document.title).toBe('Home')
+    expect(document.title).toBe('Home — LAMVI')
     expect(document.querySelector('link[rel=canonical]').href).toBe('https://x/en')
     expect(document.querySelectorAll('link[rel=canonical]')).toHaveLength(1)
     expect(document.querySelector('meta[data-noindex]')).not.toBeNull()
@@ -41,6 +41,6 @@ describe('phân loại đường dẫn SSR', () => {
   })
 
   it('key dữ liệu khớp useApi', () => {
-    expect(dataKeysFor({ kind: 'product', lang: 'vi', slug: 'a b' })).toEqual(['/products', '/site', '/products/a%20b'])
+    expect(dataKeysFor({ kind: 'product', lang: 'vi', slug: 'a b' })).toEqual(['/products', '/site', '/products/a%20b', '/shipping-policy'])
   })
 })

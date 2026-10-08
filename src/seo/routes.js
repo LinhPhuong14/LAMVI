@@ -44,7 +44,7 @@ export function classifyPath(pathname) {
 export function dataKeysFor(route) {
   const keys = ['/products', '/site'] // footer: catalog + verified public business fields
   if (route.kind === 'home') keys.push('/faq')
-  if (route.kind === 'product') keys.push(`/products/${encodeURIComponent(route.slug)}`)
+  if (route.kind === 'product') keys.push(`/products/${encodeURIComponent(route.slug)}`, '/shipping-policy')
   if (route.kind === 'collection') keys.push(`/collections/${encodeURIComponent(route.slug)}`)
   if (route.kind === 'shop') keys.push('/collections')
   if (route.kind === 'batch') keys.push(`/batches/${encodeURIComponent(route.code)}`)

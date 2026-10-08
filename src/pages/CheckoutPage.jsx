@@ -9,6 +9,7 @@ import { LOCALES, useI18n } from '../i18n/index.js'
 import { useAuth } from '../auth/context.js'
 import { useCart } from '../cart/context.js'
 import { useSubmit } from '../auth/useForm.js'
+import { useApi } from '../api/useApi.js'
 import { formatVnd } from '../lib/money.js'
 import { track } from '../analytics/index.js'
 import { checkoutRequestKey, clearCheckoutRequest, readCheckoutRequest } from './checkoutRequest.js'
@@ -19,6 +20,7 @@ const PAYMENT_MINUTES = 15
 const EMPTY = {
   orderKind: 'self',
   hasMessage: false,
+  messageText: '',
   qrLang: 'vi',
   recipientIsSelf: true,
   recipientName: '',
@@ -55,6 +57,7 @@ function StepLegend({ n, children }) {
 /** FR-CHK-001…008 (§12): checkout — noindex (BR-SEO-001), chỉ cho khách đã đăng nhập (D-36). */
 export default function CheckoutPage() {
   const { t, lang, path } = useI18n()
+  const site = useApi('/site', lang)
   const { user, authedApi } = useAuth()
   const { reload: reloadCart } = useCart()
   const navigate = useNavigate()
@@ -81,6 +84,21 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!user) navigate(`${path('/login')}?next=${encodeURIComponent(path('/checkout'))}`, { replace: true })
   }, [user, navigate, path])
+
+  // Feedback 08/10, 7.4: “Giao cho tôi” tự điền tên + số điện thoại từ hồ sơ (chỉ khi khách chưa gõ gì)
+  useEffect(() => {
+    if (!user) return undefined
+    let alive = true
+    authedApi('/me')
+      .then(({ profile }) => {
+        if (!alive || !profile) return
+        setForm((f) => (f.recipientIsSelf && !f.recipientName && !f.recipientPhone ? { ...f, recipientName: profile.fullName ?? '', recipientPhone: profile.phone ?? '' } : f))
+      })
+      .catch(() => {}) // hồ sơ không tải được thì khách tự nhập, không chặn thanh toán
+    return () => {
+      alive = false
+    }
+  }, [user, authedApi])
 
   // Mỗi lần xin bảng giá tăng một số thứ tự; phản hồi của lần cũ về muộn sẽ bị bỏ, nếu không
   // khách bấm áp/bỏ mã liên tục có thể thấy bảng giá của lần trước.
@@ -185,6 +203,12 @@ export default function CheckoutPage() {
     clearCheckoutRequest(user.id)
     setPriceChanged(false)
     reloadCart?.()
+    // Feedback 08/10, 7.2: lời chúc chữ soạn ngay trong checkout, lưu ngay sau khi có mã đơn.
+    // Lưu lỗi thì đơn vẫn đặt được; khách soạn lại ở trang đơn hàng (nhắc ở trang cảm ơn).
+    const wishText = (form.orderKind === 'gift' || form.hasMessage) ? form.messageText.trim() : ''
+    if (wishText) {
+      await authedApi(`/orders/${encodeURIComponent(res.order.code)}/message`, { method: 'PUT', body: { text: wishText, textLang: form.qrLang } }).catch(() => {})
+    }
     // payOS: chuyển sang trang thanh toán; COD: sang trang cảm ơn
     if (res.payment?.checkoutUrl) {
       window.location.assign(res.payment.checkoutUrl)
@@ -195,6 +219,10 @@ export default function CheckoutPage() {
 
   const hasMessage = form.orderKind === 'gift' || form.hasMessage
   const codBlocked = !form.recipientIsSelf
+  // payOS chưa có khoá → vô hiệu lựa chọn kèm lý do (feedback 08/10, mục 30)
+  const payosOff = site.status === 'ok' && site.data?.payosEnabled === false
+  const noPayment = payosOff && codBlocked
+  const submitBlocked = pending || noPayment || quotePending || Boolean(quoteError) || (quote ? quotedCoupon !== appliedCoupon || Boolean(quote.hasShortage) : true)
 
   if (!user) return null
 
@@ -240,7 +268,7 @@ export default function CheckoutPage() {
         {t('checkout.backToCart')}
       </Link>
 
-      <form ref={checkoutForm} className="form checkout-form" onSubmit={onSubmit} noValidate>
+      <form id="checkout-form" ref={checkoutForm} className="form checkout-form" onSubmit={onSubmit} noValidate>
         <div className="checkout-main">
           {/* FR-CHK-002 (C-02) */}
           <Reveal as="fieldset" className="account-card">
@@ -274,6 +302,15 @@ export default function CheckoutPage() {
             {hasMessage && (
               <>
                 <p className="field-hint">{t('checkout.addMessageHint')}</p>
+                <Field
+                  as="textarea"
+                  rows={3}
+                  maxLength={300}
+                  label={t('checkout.messageText')}
+                  value={form.messageText}
+                  onChange={set('messageText')}
+                  hint={t('checkout.messageTextHint', { n: form.messageText.length })}
+                />
                 {/* FR-CHK-005 (D-24) */}
                 <Field
                   as="select"
@@ -350,17 +387,18 @@ export default function CheckoutPage() {
           {/* FR-CHK-007 (D-35) */}
           <Reveal as="fieldset" className="account-card">
             <StepLegend n={3}>{t('checkout.paymentLegend')}</StepLegend>
-            <label className="check-row">
+            <label className={`check-row${payosOff ? ' is-disabled' : ''}`}>
               <input
                 type="radio"
                 name="paymentMethod"
                 value="payos"
+                disabled={payosOff}
                 checked={form.paymentMethod === 'payos'}
                 onChange={setBool('paymentMethod', 'payos')}
               />
               <span>
                 {t('checkout.payos')}
-                <small className="field-hint">{t('checkout.payosHint', { minutes: PAYMENT_MINUTES })}</small>
+                <small className="field-hint">{payosOff ? t('checkout.payosOff') : t('checkout.payosHint', { minutes: PAYMENT_MINUTES })}</small>
               </span>
             </label>
             <label className={`check-row${codBlocked ? ' is-disabled' : ''}`}>
@@ -378,6 +416,7 @@ export default function CheckoutPage() {
                 <small className="field-hint">{codBlocked ? t('checkout.codBlocked') : t('checkout.codHint')}</small>
               </span>
             </label>
+            {noPayment && <p className="notice error" role="alert">{t('checkout.giftNeedsPayos')}</p>}
             {fields.paymentMethod && <p className="field-error">{t(`errors.${fields.paymentMethod}`)}</p>}
           </Reveal>
         </div>
@@ -462,11 +501,22 @@ export default function CheckoutPage() {
               </p>
             )}
 
-            <button className="btn btn-primary btn-block" type="submit" disabled={pending || quotePending || Boolean(quoteError) || quotedCoupon !== appliedCoupon || Boolean(quote?.hasShortage)}>
+            <button className="btn btn-primary btn-block" type="submit" disabled={submitBlocked}>
               {pending ? t('checkout.submitting') : t('checkout.submit')}
             </button>
           </div>
         </aside>
+        {/* Feedback 08/10, 7.5: trên mobile, tổng tiền + nút Đặt hàng luôn nằm ở đáy màn hình */}
+        {/* aria-hidden: lối tắt thị giác cho mobile; người dùng bàn phím/trình đọc màn hình dùng nút Đặt hàng thật ở trên */}
+        <div className="checkout-bar" aria-hidden="true">
+          <span>
+            <small>{t('checkout.total')}</small>
+            <strong>{formatVnd(quote.total)}</strong>
+          </span>
+          <button className="btn btn-primary" type="submit" form="checkout-form" tabIndex={-1} disabled={submitBlocked}>
+            {pending ? t('checkout.submitting') : t('checkout.submit')}
+          </button>
+        </div>
       </form>
     </section>
   )

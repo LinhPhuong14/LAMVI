@@ -7,9 +7,11 @@ export const EASE_IN = [0.55, 0, 0.75, 0.2]
  * Vị trí của phần tử so với khung nhìn: 'below' (chưa tới), 'in' (đang thấy), 'above' (đã cuộn qua).
  * Dùng để phần tử hiện ra khi cuộn tới và tan đi theo hướng cuộn khi rời khỏi màn hình.
  * Không có IntersectionObserver (SSR, trình duyệt cũ) → luôn 'in' để nội dung không bị ẩn.
+ * `initial`: trạng thái trước khi trình duyệt báo vị trí lần đầu. Reveal truyền 'in' để HTML từ SSR và
+ * lần render đầu luôn hiển thị nội dung (feedback 08/10, mục 12); chỉ phần ở ngoài màn hình mới ẩn đi chờ cuộn tới.
  */
-export function useViewState(ref, margin = '-12% 0px -12% 0px') {
-  const [state, setState] = useState('below')
+export function useViewState(ref, margin = '-12% 0px -12% 0px', initial = 'below') {
+  const [state, setState] = useState(initial)
   useEffect(() => {
     const el = ref.current
     if (!el || typeof IntersectionObserver === 'undefined') {
