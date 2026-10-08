@@ -4972,3 +4972,45 @@
   cursor: pointer;
   text-decoration: underline;
 }
+
+/* Thanh đặt hàng / mua cố định ở đáy trên mobile (feedback 08/10: 7.5, 9) */
+.sticky-buy,
+.checkout-bar {
+  display: none;
+}
+@media (max-width: 640px) {
+  .sticky-buy,
+  .checkout-bar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--cream);
+    border-top: 1px solid var(--line);
+  }
+  .sticky-buy > span,
+  .checkout-bar > span {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .sticky-buy strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sticky-buy .btn,
+  .checkout-bar .btn {
+    min-height: 44px;
+    white-space: nowrap;
+  }
+  .checkout {
+    padding-bottom: 88px;
+  }
+}

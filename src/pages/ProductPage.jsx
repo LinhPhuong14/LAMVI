@@ -14,6 +14,28 @@ import { breadcrumbJsonLd, productJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
 import { track } from '../analytics/index.js'
 
+// Feedback 08/10, mục 9: thanh mua cố định ở đáy (chỉ mobile qua CSS), hiện khi nút chính ra khỏi màn hình
+function StickyBuy({ product, quantity }) {
+  const [show, setShow] = useState(false)
+  useEffect(() => {
+    const target = document.querySelector('.pdp-buy .product-buy')
+    if (!target || typeof IntersectionObserver === 'undefined') return undefined
+    const io = new IntersectionObserver(([entry]) => setShow(!entry.isIntersecting))
+    io.observe(target)
+    return () => io.disconnect()
+  }, [])
+  if (!show) return null
+  return (
+    <div className="sticky-buy" role="region" aria-label={product.name}>
+      <span>
+        <strong>{product.name}</strong>
+        <Price amount={product.price} className="product-price" />
+      </span>
+      <AddToCart slug={product.slug} quantity={quantity} className="btn btn-primary" soldOut={product.inStock === false} />
+    </div>
+  )
+}
+
 // FR-GA-001 §23.3: view_item. Component riêng để hook không nằm sau nhánh return sớm ở trên.
 function TrackViewItem({ slug, name, price }) {
   useEffect(() => {
@@ -122,6 +144,7 @@ export default function ProductPage() {
           </ul>
         </div>
       </div>
+      <StickyBuy product={p} quantity={qty} />
       <Related slug={p.slug} />
     </section>
   )

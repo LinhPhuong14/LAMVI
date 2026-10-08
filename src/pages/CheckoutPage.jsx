@@ -200,6 +200,7 @@ export default function CheckoutPage() {
   // payOS chưa có khoá → vô hiệu lựa chọn kèm lý do (feedback 08/10, mục 30)
   const payosOff = site.status === 'ok' && site.data?.payosEnabled === false
   const noPayment = payosOff && codBlocked
+  const submitBlocked = pending || noPayment || quotePending || Boolean(quoteError) || (quote ? quotedCoupon !== appliedCoupon || Boolean(quote.hasShortage) : true)
 
   if (!user) return null
 
@@ -245,7 +246,7 @@ export default function CheckoutPage() {
         {t('checkout.backToCart')}
       </Link>
 
-      <form ref={checkoutForm} className="form checkout-form" onSubmit={onSubmit} noValidate>
+      <form id="checkout-form" ref={checkoutForm} className="form checkout-form" onSubmit={onSubmit} noValidate>
         <div className="checkout-main">
           {/* FR-CHK-002 (C-02) */}
           <Reveal as="fieldset" className="account-card">
@@ -469,11 +470,22 @@ export default function CheckoutPage() {
               </p>
             )}
 
-            <button className="btn btn-primary btn-block" type="submit" disabled={pending || noPayment || quotePending || Boolean(quoteError) || quotedCoupon !== appliedCoupon || Boolean(quote?.hasShortage)}>
+            <button className="btn btn-primary btn-block" type="submit" disabled={submitBlocked}>
               {pending ? t('checkout.submitting') : t('checkout.submit')}
             </button>
           </div>
         </aside>
+        {/* Feedback 08/10, 7.5: trên mobile, tổng tiền + nút Đặt hàng luôn nằm ở đáy màn hình */}
+        {/* aria-hidden: lối tắt thị giác cho mobile; người dùng bàn phím/trình đọc màn hình dùng nút Đặt hàng thật ở trên */}
+        <div className="checkout-bar" aria-hidden="true">
+          <span>
+            <small>{t('checkout.total')}</small>
+            <strong>{formatVnd(quote.total)}</strong>
+          </span>
+          <button className="btn btn-primary" type="submit" form="checkout-form" tabIndex={-1} disabled={submitBlocked}>
+            {pending ? t('checkout.submitting') : t('checkout.submit')}
+          </button>
+        </div>
       </form>
     </section>
   )

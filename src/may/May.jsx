@@ -30,7 +30,10 @@ function MayInner() {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [touring, setTouring] = useState(false)
-  const isHome = splitLocale(location.pathname).rest === '/'
+  const rest = splitLocale(location.pathname).rest
+  const isHome = rest === '/'
+  // Feedback 08/10, 7.5/16: nút Mây nổi đè lên form giỏ hàng/thanh toán trên mobile → ẩn ở hai trang này
+  const hideFab = rest === '/cart' || rest === '/checkout'
 
   // Feedback 08/10 mục 10: không tự bật tour (che hero/CTA, tự cuộn trang). Tour là lựa chọn trong Mây (“Dẫn tour”).
 
@@ -56,7 +59,7 @@ function MayInner() {
           <MayChat onClose={() => setOpen(false)} onTour={startTour} />
         </Suspense>
       )}
-      <button
+      {!hideFab && <button
         type="button"
         className="may-fab"
         onClick={() => {
@@ -68,7 +71,7 @@ function MayInner() {
         aria-expanded={open}
       >
         <MayAvatar size={60} />
-      </button>
+      </button>}
     </>
   )
 }
