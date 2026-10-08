@@ -98,3 +98,4 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Ledger giữ kho và huỷ atomic | ✅ cho đơn mới; legacy một phần | stock_reserved, atomic_cancellation; HTTP + SQL rollback/concurrency | Đối soát đơn legacy NULL |
 | Collections production 500 | 🟡 chẩn đoán/giảm lỗi thiếu schema | check-schema.js; lỗi 503; sản phẩm vẫn duyệt được | Cần quyền DB/log production, migration/content thật và xác minh deployment |
 | Tạm tắt payOS | ✅ code | `server/index.js`: client payOS chỉ tạo khi `PAYOS_ENABLED=1`; mặc định null → chỉ COD (checkout `payos` trả 503) | Bật lại sau khi tìm ra nguyên nhân function crash |
+| Sửa crash react-router trên Vercel | ✅ code, chưa xác minh deploy | `vercel.json` includeFiles thêm `node_modules/react-router{,-dom}/dist/**` | Xem log sau deploy; nếu còn thiếu module khác thì thêm tương tự |

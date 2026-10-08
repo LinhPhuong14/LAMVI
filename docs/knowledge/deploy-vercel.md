@@ -9,7 +9,7 @@ Quyết định: T-33 ([`decisions.md`](decisions.md)). Đây là nguồn quy t�
 - Một Vercel Function duy nhất `api/index.js` re-export `app` từ `server/index.js` (Express: web SSR + API, T-15). `server/index.js` **không** `listen` khi có `process.env.VERCEL`.
 - `vercel.json`:
   - `buildCommand: npm run build` → `dist/client` + `dist/server`.
-  - `functions["api/index.js"].includeFiles: "dist/**"` — bắt buộc, vì `server/ssr.js` đọc `dist/client/index.html` và `dist/server/entry-server.js` lúc chạy.
+  - `functions["api/index.js"].includeFiles: "{dist/**,node_modules/react-router/dist/**,node_modules/react-router-dom/dist/**}"` — bắt buộc: `server/ssr.js` đọc `dist/client/index.html`, `dist/server/entry-server.js` lúc chạy; `react-router` nạp `dist/development/dom-export.js` động nên bộ dò phụ thuộc của Vercel bỏ sót → crash "Cannot find module .../dom-export.js".
   - `rewrites: /(.*) → /api` — mọi đường dẫn (trang, `/api/*`, `/sitemap.xml`, `/robots.txt`) đi qua Express; Express giữ nguyên URL gốc.
   - `outputDirectory: "public"` — cố ý **không** trỏ `dist/client`, nếu không CDN sẽ trả thẳng `index.html` rỗng cho `/` và bỏ qua SSR (T-15, SEO). File trong `public/` do CDN phục vụ; `dist/client/assets` do Express phục vụ (cache 1 năm, immutable; tệp khác trong `dist/client` 1 giờ). `public/images/*` và favicon có `Cache-Control` 1 ngày + SWR 7 ngày đặt ở `vercel.json` → `headers`.
 - Node 22 (`engines`), vì script dev dùng `--env-file-if-exists`.
