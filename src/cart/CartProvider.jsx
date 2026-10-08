@@ -77,6 +77,7 @@ export default function CartProvider({ children }) {
     const id = ++seq.current
     const doLoad = async () => {
       if (!user) {
+        setSyncError(false) // đăng xuất: bỏ cảnh báo của tài khoản cũ
         localRef.current = loadLocalCart()
         await quoteLocal(id)
         return
