@@ -197,6 +197,7 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 |---|---|---|---|
 | GET | `/sitemap.xml`, `/robots.txt` | – | §23.2 |
 | GET | `/api/health` | – | Sống? `?deep=1` còn đọc DB (503 nếu hỏng) — dùng cho uptime monitor (T-74) |
+| GET | `/api/shipping-policy` | – | Phí ship + ngưỡng miễn phí (cùng cấu hình `pricing` với checkout), cache CDN 300 giây (T-80) |
 | POST | `/api/contact` | – | Form liên hệ → thư tới hộp thư hỗ trợ, 202; 503 nếu chưa cấu hình (T-75) |
 | GET | `/api/products?lang=` | – | Sản phẩm `published` |
 | GET | `/api/products/:slug?lang=` | – | 404 nếu không `published` |

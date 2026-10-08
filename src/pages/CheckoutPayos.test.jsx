@@ -52,3 +52,20 @@ describe('Checkout khi payOS chưa cấu hình', () => {
     expect(payos).not.toBeDisabled()
   })
 })
+
+describe('Tự điền người nhận từ hồ sơ (feedback 08/10, 7.4)', () => {
+  it('Giao cho tôi: điền tên + SĐT từ hồ sơ', async () => {
+    mockApi({
+      'GET /me': () => ({ body: { profile: { ...profile, fullName: 'Nguyễn An', phone: '0912345678' } } }),
+      'GET /cart': () => ({ body: { items: [], subtotal: 0, currency: 'VND', itemCount: 0, hasUnavailable: false, maxQuantity: 10 } }),
+      'GET /products': () => ({ body: { items: [] } }),
+      'GET /site': () => ({ body: { name: 'LAMVI', payosEnabled: true } }),
+      'GET /may/history': () => ({ body: { items: [] } }),
+      'POST /checkout/quote': () => ({ body: quote }),
+      'GET /geo/provinces': () => ({ body: { items: [] } }),
+    })
+    renderAt('/checkout')
+    expect(await screen.findByDisplayValue('Nguyễn An')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('0912345678')).toBeInTheDocument()
+  })
+})

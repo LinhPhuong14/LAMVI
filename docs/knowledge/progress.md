@@ -109,3 +109,14 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Collections production 500 | 🟡 chẩn đoán/giảm lỗi thiếu schema | check-schema.js; lỗi 503; sản phẩm vẫn duyệt được | Cần quyền DB/log production, migration/content thật và xác minh deployment |
 | Tạm tắt payOS | ✅ code | `server/main.js`: client payOS chỉ tạo khi `PAYOS_ENABLED=1`; mặc định null → chỉ COD (checkout `payos` trả 503) | Bật lại sau khi tìm ra nguyên nhân function crash |
 | Sửa crash react-router trên Vercel | ✅ code, chưa xác minh deploy | `vercel.json` includeFiles thêm `node_modules/react-router{,-dom}/dist/**` | Xem log sau deploy; nếu còn thiếu module khác thì thêm tương tự |
+
+| Đợt v0.41 (feedback 08/10, đợt 2) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Lỗi thiếu schema → 503 `SCHEMA_OUTDATED`; gộp giỏ giữ giỏ local + thông báo (G-100) | ✅ code | `server/errors.js`, `src/cart/CartProvider.jsx`, `src/pages/CartPage.jsx`; `server/errors.test.js` | Chạy migration 016/017/019 trên production, xem log |
+| Banner đồng ý cookie + GA Consent Mode v2 (D-102, G-101) | ✅ code | `src/analytics/consent.js`, `src/components/ConsentBanner.jsx`, `src/analytics/ga.js`; `ConsentBanner.test.jsx` | `[LEGAL]` Q-43 |
+| payOS ẩn khi chưa cấu hình; trạng thái tổng "Cần xử lý"; kênh Mây mặc định (G-102) | ✅ code | `server/config.js`, `server/monitoring/health.js`, `src/pages/CheckoutPage.jsx`, `server/may/service.js`; `CheckoutPayos.test.jsx`, `server/it.test.js` | Khoá payOS, email + DNS (vận hành) |
+| Phí ship công khai, lời chúc chữ trong checkout, tự điền hồ sơ, thanh mua/đặt hàng cố định, tour không tự bật, reveal hiển thị sẵn, gỡ đánh giá (G-103, D-103) | ✅ code | `ShippingNote.jsx`, `ProductPage.jsx`, `CheckoutPage.jsx`, `Reveal.jsx`, `May.jsx`; `MobileBars.test.jsx`, `RevealVisible.test.jsx`, `server/shippingPolicy.test.js` | 7.3, 7.6, 7.8 |
+| Hiệu năng: LCP ưu tiên, font, khói mobile, cache API, region `sin1`, HSTS (G-104) | ✅ code | `Scene.jsx`, `index.html`, `vercel.json`, `server/routes/catalog.js`, `server/middleware/security.js` | Đo lại Lighthouse sau deploy; subset font, AVIF |
+| Thông số sản phẩm (T-81, G-105) | ✅ code | migration `…021`, `server/domain/admin.js`, `ProductPage.jsx`, `ProductsPage.jsx`; `server/productSpecs.test.js`, `ProductTabs.test.jsx` | Chạy migration, nhập dữ liệu thật |
+| Quản trị: khoá slug, không xoá sản phẩm có đơn, bỏ mã đặc tả khỏi UI, `/it/notifications` (G-106) | ✅ code | `server/routes/admin.js`, `notificationOperations.js`, `src/admin/*`; `server/admin.extra.test.js`, `AdminStrings.test.js` | 33.1, 33.3, 33.9–33.11 |
+

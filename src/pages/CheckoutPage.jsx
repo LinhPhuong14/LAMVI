@@ -20,6 +20,7 @@ const PAYMENT_MINUTES = 15
 const EMPTY = {
   orderKind: 'self',
   hasMessage: false,
+  messageText: '',
   qrLang: 'vi',
   recipientIsSelf: true,
   recipientName: '',
@@ -83,6 +84,21 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!user) navigate(`${path('/login')}?next=${encodeURIComponent(path('/checkout'))}`, { replace: true })
   }, [user, navigate, path])
+
+  // Feedback 08/10, 7.4: “Giao cho tôi” tự điền tên + số điện thoại từ hồ sơ (chỉ khi khách chưa gõ gì)
+  useEffect(() => {
+    if (!user) return undefined
+    let alive = true
+    authedApi('/me')
+      .then(({ profile }) => {
+        if (!alive || !profile) return
+        setForm((f) => (f.recipientIsSelf && !f.recipientName && !f.recipientPhone ? { ...f, recipientName: profile.fullName ?? '', recipientPhone: profile.phone ?? '' } : f))
+      })
+      .catch(() => {}) // hồ sơ không tải được thì khách tự nhập, không chặn thanh toán
+    return () => {
+      alive = false
+    }
+  }, [user, authedApi])
 
   // Mỗi lần xin bảng giá tăng một số thứ tự; phản hồi của lần cũ về muộn sẽ bị bỏ, nếu không
   // khách bấm áp/bỏ mã liên tục có thể thấy bảng giá của lần trước.
@@ -187,6 +203,12 @@ export default function CheckoutPage() {
     clearCheckoutRequest(user.id)
     setPriceChanged(false)
     reloadCart?.()
+    // Feedback 08/10, 7.2: lời chúc chữ soạn ngay trong checkout, lưu ngay sau khi có mã đơn.
+    // Lưu lỗi thì đơn vẫn đặt được; khách soạn lại ở trang đơn hàng (nhắc ở trang cảm ơn).
+    const wishText = (form.orderKind === 'gift' || form.hasMessage) ? form.messageText.trim() : ''
+    if (wishText) {
+      await authedApi(`/orders/${encodeURIComponent(res.order.code)}/message`, { method: 'PUT', body: { text: wishText, textLang: form.qrLang } }).catch(() => {})
+    }
     // payOS: chuyển sang trang thanh toán; COD: sang trang cảm ơn
     if (res.payment?.checkoutUrl) {
       window.location.assign(res.payment.checkoutUrl)
@@ -280,6 +302,15 @@ export default function CheckoutPage() {
             {hasMessage && (
               <>
                 <p className="field-hint">{t('checkout.addMessageHint')}</p>
+                <Field
+                  as="textarea"
+                  rows={3}
+                  maxLength={300}
+                  label={t('checkout.messageText')}
+                  value={form.messageText}
+                  onChange={set('messageText')}
+                  hint={t('checkout.messageTextHint', { n: form.messageText.length })}
+                />
                 {/* FR-CHK-005 (D-24) */}
                 <Field
                   as="select"

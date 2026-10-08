@@ -187,6 +187,26 @@ describe('Đặt hàng', () => {
     })
   })
 
+  it('feedback 08/10, 7.2: soạn lời chúc chữ trong checkout → lưu ngay sau khi tạo đơn; đơn lỗi lưu thì vẫn sang trang cảm ơn', async () => {
+    const puts = []
+    api({
+      order: () => ({ status: 201, body: { order: { code: 'LV2610-ACDEFGH' }, payment: null } }),
+      extra: {
+        'PUT /orders/LV2610-ACDEFGH/message': (url, init) => (puts.push(JSON.parse(init.body)), { status: 500, body: { error: { code: 'INTERNAL_ERROR' } } }),
+        'GET /orders/LV2610-ACDEFGH': () => ({ status: 404, body: { error: { code: 'NOT_FOUND' } } }),
+      },
+    })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    await address()
+    fireEvent.click(screen.getByRole('radio', { name: /Thanh toán khi nhận hàng/ }))
+    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.change(await screen.findByLabelText('Lời chúc (chữ)'), { target: { value: '  Chúc mẹ luôn khỏe  ' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
+    await waitFor(() => expect(puts).toHaveLength(1))
+    expect(puts[0]).toEqual({ text: 'Chúc mẹ luôn khỏe', textLang: 'vi' })
+  })
+
   it('lỗi theo trường từ server hiện ngay dưới ô tương ứng', async () => {
     api({
       order: () => ({

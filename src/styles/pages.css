@@ -1040,7 +1040,7 @@
   cursor: pointer;
   display: grid;
   place-items: center;
-  animation: may-float 4s ease-in-out infinite;
+  animation: may-float 4s ease-in-out 3; /* dừng sau 3 vòng (~12 giây) — feedback 08/10, mục 16 */
 }
 
 @keyframes may-float {
@@ -5063,4 +5063,23 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 12px 16px;
+}
+
+/* Menu admin trên mobile: một hàng cuộn ngang thay vì chiếm nửa màn hình (feedback 08/10, 33.12) */
+@media (max-width: 640px) {
+  .admin-nav nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    scrollbar-width: none;
+  }
+  .admin-nav nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    min-height: 44px;
+  }
+  .admin-nav {
+    gap: 8px 12px;
+    padding: 12px 16px;
+  }
 }

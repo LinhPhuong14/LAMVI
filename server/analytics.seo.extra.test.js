@@ -147,7 +147,7 @@ describe('Security headers (T-37)', () => {
     const plain = await request(app()).get('/api/health')
     expect(plain.headers['strict-transport-security']).toBeUndefined()
     const https = await request(app()).get('/api/health').set('x-forwarded-proto', 'https')
-    expect(https.headers['strict-transport-security']).toContain('max-age=31536000')
+    expect(https.headers['strict-transport-security']).toContain('max-age=63072000')
   })
 
   it('CSP chỉ mở đúng host Supabase và GA khi có cấu hình, không dùng ký tự đại diện', () => {
