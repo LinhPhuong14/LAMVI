@@ -31,10 +31,12 @@ describe('Nhúng Google Analytics (FR-GA-001, D-72)', () => {
     expect(r.html).toContain('send_page_view:false')
   })
 
-  it('D-72: không có banner đồng ý cookie và không gọi consent mode', async () => {
+  it('D-102 (thay D-72): Consent Mode v2 mặc định denied, đặt trước lệnh config; banner do client dựng', async () => {
     const r = await page('/', { config: { ...baseConfig, gaMeasurementId: GA_ID } })
-    expect(r.html).not.toContain('gtag("consent"')
-    expect(r.html).not.toContain('cookie-banner')
+    expect(r.html).toContain('gtag("consent","default"')
+    expect(r.html.indexOf('gtag("consent","default"')).toBeLessThan(r.html.indexOf('gtag("config"'))
+    expect(r.html).toContain('analytics_storage:"denied"')
+    expect(r.html).not.toContain('analytics_storage:"granted"')
   })
 
   it('trang nội bộ /admin và /it không nhúng GA', async () => {

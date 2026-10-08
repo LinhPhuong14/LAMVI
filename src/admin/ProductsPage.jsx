@@ -10,7 +10,7 @@ import PageHead from './PageHead.jsx'
 import { S, fmt } from './strings.js'
 import { uploadFile } from './uploadFile.js'
 
-const EMPTY = { collectionSlug: '', pieceOrder: 0, slug: '', kind: 'single', status: 'draft', price: '', stock: '', tone: '', sortOrder: 0, name: {}, description: {}, badge: {}, imageAlt: {} }
+const EMPTY = { collectionSlug: '', pieceOrder: 0, slug: '', kind: 'single', status: 'draft', price: '', stock: '', tone: '', sortOrder: 0, name: {}, description: {}, badge: {}, imageAlt: {}, specs: {} }
 
 // Giới hạn phía client chỉ để báo sớm; server mới là nơi quyết định (MAX_IMAGE_MB)
 const MAX_IMAGE_MB = 5
@@ -107,9 +107,10 @@ function ProductForm({ initial, onDone, onCancel, onImageChange }) {
   const collections = useAdminList('/admin/collections')
   const { authedApi } = useAuth()
   const { t } = useI18n()
-  const [form, setForm] = useState(() => ({ ...EMPTY, ...initial, tone: initial?.tone ?? '', collectionSlug: initial?.collectionSlug ?? '', stock: initial?.stock ?? '', name: initial?.name ?? {}, description: initial?.description ?? {}, badge: initial?.badge ?? {}, imageAlt: initial?.imageAlt ?? {} }))
+  const [form, setForm] = useState(() => ({ ...EMPTY, ...initial, tone: initial?.tone ?? '', collectionSlug: initial?.collectionSlug ?? '', stock: initial?.stock ?? '', name: initial?.name ?? {}, description: initial?.description ?? {}, badge: initial?.badge ?? {}, imageAlt: initial?.imageAlt ?? {}, specs: initial?.specs ?? {} }))
   const { pending, error, fields, run } = useSubmit()
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
+  const slugLocked = Boolean(initial?.id) && initial.status === 'published'
 
   async function onSubmit(e) {
     e.preventDefault()
@@ -126,7 +127,8 @@ function ProductForm({ initial, onDone, onCancel, onImageChange }) {
   return (
     <form className="form admin-form" onSubmit={onSubmit} noValidate>
       <div className="admin-grid">
-        <Field label={S.products.slug} value={form.slug} onChange={set('slug')} error={fields.slug} hint={S.products.slugHint} />
+        {/* Slug sản phẩm đang bán bị khoá: đổi sẽ làm hỏng link đã chia sẻ, link Google, giỏ hàng đang lưu */}
+        <Field label={S.products.slug} value={form.slug} onChange={set('slug')} error={fields.slug} hint={slugLocked ? S.products.slugLocked : S.products.slugHint} disabled={slugLocked} />
         <Field label={S.products.price} type="number" min="0" step="1000" value={form.price} onChange={set('price')} error={fields.price} />
         <Field as="select" label={S.products.kind} value={form.kind} onChange={set('kind')} error={fields.kind}>
           {Object.entries(S.products.kinds).map(([k, l]) => (
@@ -162,6 +164,13 @@ function ProductForm({ initial, onDone, onCancel, onImageChange }) {
       <p className="field-hint">{S.common.viRequiredHint}</p>
       <I18nInput label={S.products.name} required value={form.name} onChange={(v) => setForm({ ...form, name: v })} error={fields.name} />
       <I18nInput label={S.products.description} multiline value={form.description} onChange={(v) => setForm({ ...form, description: v })} error={fields.description} />
+      <fieldset className="admin-specs">
+        <legend>{S.products.specs}</legend>
+        <p className="field-hint">{S.products.specsHint}</p>
+        {Object.entries(S.products.specKeys).map(([k, label]) => (
+          <I18nInput key={k} label={label} value={form.specs?.[k]} onChange={(v) => setForm({ ...form, specs: { ...form.specs, [k]: v } })} error={fields.specs} />
+        ))}
+      </fieldset>
       <I18nInput label={S.products.badge} value={form.badge} onChange={(v) => setForm({ ...form, badge: v })} error={fields.badge} />
       <I18nInput
         label={S.products.imageAlt}

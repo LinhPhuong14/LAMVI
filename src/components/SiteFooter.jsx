@@ -62,19 +62,14 @@ export default function SiteFooter() {
         <div className="footer-col footer-news">
           <h3>{t('footer.newsTitle')}</h3>
           <p>{t('footer.newsUnavailable')}</p>
-          {/* G-11: newsletter chưa có backend — giữ hay bỏ form chờ PO (§30 P2) */}
-          <form className="news-form" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder={t('footer.newsPlaceholder')}
-              aria-label={t('footer.newsPlaceholder')}
-              required
-              disabled
-            />
-            <button type="submit" className="btn btn-small" disabled>
-              {t('footer.newsSubmit')}
-            </button>
-          </form>
+          {/* Feedback 08/10, mục 13: chưa có đăng ký nhận tin → bỏ form, dẫn tới kênh mạng xã hội */}
+          {business?.social?.length > 0 && (
+            <p className="footer-social">
+              {business.social.map((x) => (
+                <a key={x.label} href={x.url} target="_blank" rel="noopener noreferrer">{x.label}</a>
+              ))}
+            </p>
+          )}
         </div>
       </div>
       <Reveal className="footer-brandmark" variants={group} margin="0px">

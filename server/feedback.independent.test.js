@@ -167,7 +167,7 @@ describe('publicSite / normalizeBrand new fields', () => {
     const s = publicSite(cfg({ zaloUrl: 'javascript:alert(1)', supportEmail: 'a@b.co' }))
     expect(s.zalo).toBe('')
     expect(JSON.stringify(s)).not.toMatch(/SECRET|BREVO|resendApiKey/)
-    expect(Object.keys(s).sort()).toEqual(['address', 'contactForm', 'hours', 'legalName', 'moitUrl', 'name', 'phone', 'registration', 'social', 'supportEmail', 'workshopAddress', 'zalo'].sort())
+    expect(Object.keys(s).sort()).toEqual(['address', 'contactForm', 'hours', 'legalName', 'moitUrl', 'name', 'payosEnabled', 'phone', 'registration', 'social', 'supportEmail', 'workshopAddress', 'zalo'].sort())
   })
   it('contactForm false without provider key or from or email', () => {
     const base = { from: 'x@y.co', resendApiKey: 'k', brand: { supportEmail: 'a@b.co' } }

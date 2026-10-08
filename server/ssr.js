@@ -7,7 +7,7 @@ import { buildHeadTags, normalizeSiteUrl, renderHeadTags, safeJson } from '../sr
 import { gaInlineScript, gaScriptSrc } from '../src/analytics/ga.js'
 import { cspHash } from './middleware/security.js'
 import { HttpError } from './errors.js'
-import { publicSite } from './services/site.js'
+import { getShippingPolicy, publicSite } from './services/site.js'
 import { errorPage } from './errorPage.js'
 import { getPublicBatch, getPublicCollection, getPublicProduct, listPublicCollections, listPublicFaq, listPublicProducts } from './services/catalog.js'
 
@@ -21,6 +21,7 @@ async function loadData(repo, route, config) {
     try {
       let data
       if (path === '/site') data = publicSite(config)
+      else if (path === '/shipping-policy') data = await getShippingPolicy(repo)
       else if (path === '/products') data = await listPublicProducts(repo, route.lang)
       else if (path === '/collections') data = await listPublicCollections(repo, route.lang)
       else if (route.kind === 'collection') data = await getPublicCollection(repo, route.slug, route.lang)

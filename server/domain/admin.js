@@ -40,6 +40,22 @@ export function parseI18n(value, { required = false, max }) {
   return { value: out }
 }
 
+// Thông số sản phẩm: chỉ nhận các khoá này, mỗi khoá là văn bản đa ngôn ngữ (feedback 08/10, 33.5)
+export const SPEC_KEYS = ['size', 'material', 'light', 'weight', 'leadTime', 'care']
+
+export function parseSpecs(value) {
+  if (value === null || value === undefined) return { value: null }
+  if (typeof value !== 'object' || Array.isArray(value)) return { error: 'INVALID' }
+  const out = {}
+  for (const [k, v] of Object.entries(value)) {
+    if (!SPEC_KEYS.includes(k)) return { error: 'INVALID' }
+    const r = parseI18n(v, { max: 200 })
+    if (r.error) return { error: r.error }
+    if (r.value) out[k] = r.value
+  }
+  return { value: Object.keys(out).length ? out : null }
+}
+
 const isInt = (v, min, max) => Number.isInteger(v) && v >= min && v <= max
 
 function field(body, key, partial, errors, values, check) {
@@ -83,6 +99,7 @@ export function validateProduct(body, { partial = false } = {}) {
   field(body, 'badge', partial, errors, values, (v) => parseI18n(v, { max: 40 }))
   // Chú thích ảnh (alt) — a11y + SEO; ảnh và đường dẫn đặt qua endpoint tải ảnh, không qua form
   field(body, 'imageAlt', partial, errors, values, (v) => parseI18n(v, { max: 160 }))
+  field(body, 'specs', partial, errors, values, parseSpecs)
   return { errors, values }
 }
 

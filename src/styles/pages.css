@@ -5014,3 +5014,53 @@
     padding-bottom: 88px;
   }
 }
+
+/* Tab Mô tả / Thông số / Giao hàng trên trang sản phẩm (feedback 08/10, mục 8) */
+.pdp-tabs {
+  max-width: 880px;
+  margin: 40px auto 0;
+}
+.pdp-tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.pdp-tablist button {
+  min-height: 44px;
+  padding: 0 16px;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font: inherit;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.pdp-tablist button.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--son);
+}
+.pdp-tabs [role='tabpanel'] {
+  padding: 20px 4px;
+}
+.pdp-specs {
+  margin: 0;
+}
+.pdp-specs > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 200px) 1fr;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.pdp-specs dt {
+  color: var(--ink-soft);
+}
+.pdp-specs dd {
+  margin: 0;
+}
+.admin-specs {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 16px;
+}

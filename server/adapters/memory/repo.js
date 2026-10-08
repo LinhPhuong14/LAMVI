@@ -218,6 +218,9 @@ export function createMemoryRepo(data = {}) {
     async deleteProduct(id) {
       return remove(state.products, id)
     },
+    async productHasOrders(productId) {
+      return state.orders.some((o) => (o.items ?? []).some((i) => i.productId === productId))
+    },
 
     // --- FAQ
     async getFaq(id) {

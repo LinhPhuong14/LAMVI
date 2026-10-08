@@ -16,6 +16,7 @@ const toProduct = (r) => ({
   imageUrl: r.image_url,
   imagePath: r.image_path,
   imageAlt: r.image_alt,
+  specs: r.specs ?? null,
   stock: r.stock ?? null,
   collectionSlug: r.collection_slug ?? null,
   pieceOrder: r.piece_order ?? 0,
@@ -160,7 +161,7 @@ const GIFT_COLS = { text: 'text', textLang: 'text_lang', voicePath: 'voice_path'
 
 // camelCase → snake_case cho các trường được phép ghi
 const COLLECTION_COLS = { slug: 'slug', status: 'status', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', storyTitle: 'story_title', story: 'story' }
-const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge', imageUrl: 'image_url', imagePath: 'image_path', imageAlt: 'image_alt', stock: 'stock', collectionSlug: 'collection_slug', pieceOrder: 'piece_order' }
+const PRODUCT_COLS = { slug: 'slug', kind: 'kind', status: 'status', price: 'price', tone: 'tone', sortOrder: 'sort_order', name: 'name', description: 'description', badge: 'badge', imageUrl: 'image_url', imagePath: 'image_path', imageAlt: 'image_alt', specs: 'specs', stock: 'stock', collectionSlug: 'collection_slug', pieceOrder: 'piece_order' }
 const FAQ_COLS = { sortOrder: 'sort_order', isPublished: 'is_published', question: 'question', answer: 'answer' }
 const BATCH_COLS = { code: 'code', status: 'status', videoUrl: 'video_url', videoPath: 'video_path', producedOn: 'produced_on', title: 'title', story: 'story' }
 const COUPON_COLS = { code: 'code', type: 'type', value: 'value', maxDiscount: 'max_discount', minOrder: 'min_order', productIds: 'product_ids', usageLimit: 'usage_limit', perUserLimit: 'per_user_limit', startsAt: 'starts_at', endsAt: 'ends_at', status: 'status' }
@@ -507,6 +508,12 @@ export function createSupabaseRepo(client) {
     createProduct: (p) => insert('products', toRow(p, PRODUCT_COLS), toProduct),
     updateProduct: (id, p) => patch('products', id, toRow(p, PRODUCT_COLS), toProduct),
     deleteProduct: (id) => del('products', id),
+    // Sản phẩm đã có trong đơn → chỉ được ẩn, không xoá (feedback 08/10, 33.7)
+    async productHasOrders(productId) {
+      const { count, error } = await client.from('order_items').select('id', { count: 'exact', head: true }).eq('product_id', productId)
+      if (error) throw error
+      return (count ?? 0) > 0
+    },
 
     getFaq: (id) => one('faq_entries', id, toFaq),
     createFaq: (f) => insert('faq_entries', toRow(f, FAQ_COLS), toFaq),

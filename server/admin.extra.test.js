@@ -217,11 +217,14 @@ describe('Bảo mật — mọi endpoint /api/admin/* (D-38, §3.2)', () => {
     build(leaky)
     admin = (await login('admin2@moc.test', 'admin')).header
     vi.spyOn(console, 'error').mockImplementation(() => {})
-    for (const res of [await as('post', '/api/admin/products').send(product), await as('get', '/api/admin/batches')]) {
-      expect(res.status).toBe(500)
-      expect(res.body).toEqual({ error: { code: 'INTERNAL_ERROR', message: 'Lỗi hệ thống' } })
-      expect(JSON.stringify(res.body)).not.toMatch(/secret|password|relation|constraint/)
-    }
+    const generic = await as('post', '/api/admin/products').send(product)
+    expect(generic.status).toBe(500)
+    expect(generic.body).toEqual({ error: { code: 'INTERNAL_ERROR', message: 'Lỗi hệ thống' } })
+    // Thiếu bảng (42P01) → 503 SCHEMA_OUTDATED (feedback 08/10, mục 31), vẫn không lộ chi tiết DB
+    const schema = await as('get', '/api/admin/batches')
+    expect(schema.status).toBe(503)
+    expect(schema.body.error.code).toBe('SCHEMA_OUTDATED')
+    for (const res of [generic, schema]) expect(JSON.stringify(res.body)).not.toMatch(/secret|password|relation|constraint/)
   })
 
   it('lỗi 409 trùng slug/mã lô không chứa chi tiết DB', async () => {
@@ -590,5 +593,40 @@ describe('Migration SQL admin (D-46, D-47)', () => {
 
   it('bucket batch-videos công khai', () => {
     expect(sql).toMatch(/insert into storage\.buckets \(id, name, public[^)]*\)\s*values \('batch-videos', 'batch-videos', true/)
+  })
+})
+
+describe('Slug khoá khi đang bán, không xoá sản phẩm đã có đơn (feedback 08/10, 33.6/33.7)', () => {
+  async function setup() {
+    const repo = createMemoryRepo()
+    const auth = createMemoryAuth()
+    const { user } = await auth.signUp({ email: 'ad@lamvi.test', password: 'Gio-Hoa#Sen2026' })
+    await repo.upsertProfile({ id: user.id, fullName: 'Ad', role: 'admin' })
+    const token = `Bearer ${(await auth.signIn({ email: 'ad@lamvi.test', password: 'Gio-Hoa#Sen2026' })).accessToken}`
+    const app = createApp({ repo, auth, storage: createMemoryStorage(), config: { publicSiteUrl: 'https://lamvi.test' } })
+    return { repo, app, token }
+  }
+
+  it('PATCH đổi slug của sản phẩm published → 409 SLUG_LOCKED; draft đổi được', async () => {
+    const { repo, app, token } = await setup()
+    const pub = (await repo.listProducts({ publishedOnly: true }))[0]
+    const res = await request(app).patch(`/api/admin/products/${pub.id}`).set('Authorization', token).send({ slug: 'slug-moi' })
+    expect(res.status).toBe(409)
+    expect(res.body.error.code).toBe('SLUG_LOCKED')
+    const same = await request(app).patch(`/api/admin/products/${pub.id}`).set('Authorization', token).send({ slug: pub.slug, sortOrder: 7 })
+    expect(same.status).toBe(200)
+    const hidden = await request(app).patch(`/api/admin/products/${pub.id}`).set('Authorization', token).send({ status: 'hidden' })
+    expect(hidden.status).toBe(200)
+    const renamed = await request(app).patch(`/api/admin/products/${pub.id}`).set('Authorization', token).send({ slug: 'slug-moi' })
+    expect(renamed.status).toBe(200)
+  })
+
+  it('DELETE sản phẩm đã có trong đơn → 409 PRODUCT_HAS_ORDERS', async () => {
+    const { repo, app, token } = await setup()
+    const p = (await repo.listProducts({ publishedOnly: false }))[0]
+    repo.productHasOrders = async (id) => id === p.id
+    const res = await request(app).delete(`/api/admin/products/${p.id}`).set('Authorization', token)
+    expect(res.status).toBe(409)
+    expect(res.body.error.code).toBe('PRODUCT_HAS_ORDERS')
   })
 })

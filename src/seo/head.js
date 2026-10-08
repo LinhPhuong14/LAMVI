@@ -19,6 +19,9 @@ export function safeJson(value) {
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
+// Feedback 08/10, mục 18: mọi tiêu đề trang đều có tên thương hiệu ("… — LAMVI")
+const withBrand = (title) => (title && !title.toUpperCase().includes('LAMVI') ? `${title} — LAMVI` : title)
+
 /**
  * @param {object} p
  * @param {string} p.lang    vi | en | zh
@@ -34,7 +37,7 @@ export function buildHeadTags({
   lang,
   siteUrl,
   path,
-  title,
+  title: rawTitle,
   description,
   noindex = false,
   type = 'website',
@@ -42,6 +45,7 @@ export function buildHeadTags({
   image,
 }) {
   const tags = []
+  const title = withBrand(rawTitle)
   if (title) tags.push({ tag: 'title', text: title })
   if (description) tags.push({ tag: 'meta', attrs: { name: 'description', content: description } })
   // BR-SEO-001: trang noindex không cần canonical/hreflang. Meta robots do useNoIndex (client)

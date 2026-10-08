@@ -1,4 +1,11 @@
 import { normalizeBrand } from '../mail/layout.js'
+import { PRICING_SETTING_KEY, normalizePricingConfig } from '../domain/pricing.js'
+
+// Phí ship công khai (đọc cùng cấu hình tính giá với checkout)
+export async function getShippingPolicy(repo) {
+  const { shippingFee, freeShippingFrom } = normalizePricingConfig((await repo.getSetting?.(PRICING_SETTING_KEY))?.value)
+  return { fee: shippingFee, freeFrom: freeShippingFrom }
+}
 
 // Deliberately project only public business data, never spread config/mail objects.
 export function publicSite(config = {}) {
