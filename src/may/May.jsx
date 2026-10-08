@@ -1,10 +1,10 @@
-import { Component, lazy, Suspense, useCallback, useEffect, useState } from 'react'
+import { Component, lazy, Suspense, useCallback, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useI18n } from '../i18n/index.js'
 import { splitLocale } from '../i18n/core.js'
 import MayAvatar from './MayAvatar.jsx'
 import Tour from './Tour.jsx'
-import { markTourDone, tourDone } from './storage.js'
+import { markTourDone } from './storage.js'
 import { track } from '../analytics/index.js'
 
 // Khung chat tải khi mở (không làm nặng trang)
@@ -32,12 +32,7 @@ function MayInner() {
   const [touring, setTouring] = useState(false)
   const isHome = splitLocale(location.pathname).rest === '/'
 
-  // US-010 AC-001/002/003: tự bật tour ở lần truy cập đầu, chỉ tại trang chủ
-  useEffect(() => {
-    if (!isHome || tourDone()) return
-    const id = setTimeout(() => setTouring(true), 800)
-    return () => clearTimeout(id)
-  }, [isHome])
+  // Feedback 08/10 mục 10: không tự bật tour (che hero/CTA, tự cuộn trang). Tour là lựa chọn trong Mây (“Dẫn tour”).
 
   // §23.3: mascot_tour_complete — `completed` phân biệt xem hết tour hay bỏ giữa chừng
   const closeTour = useCallback((completed = false) => {

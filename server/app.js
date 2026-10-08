@@ -24,6 +24,7 @@ import { createGaRealtime } from './adapters/gaRealtime.js'
 import { createMaintenance } from './monitoring/maintenance.js'
 import { classifyPath } from '../src/seo/routes.js'
 import { errorHandler, notFound } from './errors.js'
+import { PRICING_SETTING_KEY, normalizePricingConfig } from './domain/pricing.js'
 import { securityHeaders } from './middleware/security.js'
 import { createMailer } from './mail/mailer.js'
 import { notificationOperationsRouter } from './routes/notificationOperations.js'
@@ -90,6 +91,16 @@ export function createApp({
   api.get('/site', (req, res) => {
     res.set('Cache-Control', 'public, max-age=60, s-maxage=300')
     res.json(publicSite(config))
+  })
+  // Phí ship công khai (feedback 08/10, 7.1): đọc cùng cấu hình tính giá với checkout
+  api.get('/shipping-policy', async (_req, res, next) => {
+    try {
+      const { shippingFee, freeShippingFrom } = normalizePricingConfig((await repo.getSetting?.(PRICING_SETTING_KEY))?.value)
+      res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=3600')
+      res.json({ fee: shippingFee, freeFrom: freeShippingFrom })
+    } catch (err) {
+      next(err)
+    }
   })
   api.use(catalogRouter({ repo }))
   api.use(contactRouter({ repo, config, mailer }))

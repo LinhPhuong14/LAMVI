@@ -1,3 +1,4 @@
+import ShippingNote from '../components/ShippingNote.jsx'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ProductCards from '../components/ProductCards'
@@ -112,6 +113,7 @@ export default function ProductPage() {
             <QuantityInput value={qty} onChange={setQty} />
             <AddToCart slug={p.slug} quantity={qty} className="btn btn-primary" soldOut={p.inStock === false} />
           </div>
+          <ShippingNote className="pdp-note" />
           <p className="pdp-note">{t('pdp.checkoutNote')}</p>
           <ul className="shop-perks pdp-perks">
             {t('shop.perks').map((x) => (

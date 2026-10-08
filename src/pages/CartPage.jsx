@@ -1,3 +1,4 @@
+import ShippingNote from '../components/ShippingNote.jsx'
 import { Link, useNavigate } from 'react-router-dom'
 import Lantern from '../components/Lantern'
 import { Lotus } from '../components/Motifs'
@@ -160,6 +161,7 @@ export default function CartPage() {
               <dd className="cart-shipping">{t('cart.shippingAtCheckout')}</dd>
             </div>
           </dl>
+          <ShippingNote />
           <p className="field-hint">{t('cart.shippingNote')}</p>
           {!user && <p className="field-hint">{t('cart.guestNote')}</p>}
           <button type="button" className="btn btn-primary" onClick={onCheckout} disabled={cart.itemCount === 0 || cart.hasShortage || Object.keys(pendingLines).length > 0}>

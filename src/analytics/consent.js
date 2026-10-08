@@ -1,7 +1,7 @@
 // Đồng ý phân tích (GA4 Consent Mode v2) — feedback 08/10 mục 24. Mặc định "denied" ở mã nhúng
 // (src/analytics/ga.js); chỉ chuyển sang "granted" sau khi khách bấm Đồng ý.
-const KEY = 'lamvi.consent'
-export const CONSENT_EVENT = 'lamvi:consent-open'
+const KEY = 'moc.consent'
+export const CONSENT_EVENT = 'moc.consent-open'
 
 const safe = (fn, fallback) => {
   try {

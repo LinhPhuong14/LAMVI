@@ -27,7 +27,7 @@ describe('Banner đồng ý cookie (feedback mục 24)', () => {
     expect(dialog).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Đồng ý' }))
     expect(window.gtag).toHaveBeenCalledWith('consent', 'update', expect.objectContaining({ analytics_storage: 'granted', ad_storage: 'denied' }))
-    expect(localStorage.getItem('lamvi.consent')).toBe('granted')
+    expect(localStorage.getItem('moc.consent')).toBe('granted')
     await waitFor(() => expect(screen.queryByRole('dialog', { name: /Cookie/ })).toBeNull())
   })
 
@@ -38,12 +38,12 @@ describe('Banner đồng ý cookie (feedback mục 24)', () => {
     await screen.findByRole('dialog', { name: /Cookie/ })
     fireEvent.click(screen.getByRole('button', { name: 'Từ chối' }))
     expect(window.gtag).toHaveBeenCalledWith('consent', 'update', expect.objectContaining({ analytics_storage: 'denied' }))
-    expect(localStorage.getItem('lamvi.consent')).toBe('denied')
+    expect(localStorage.getItem('moc.consent')).toBe('denied')
   })
 
   it('đã chọn thì không hiện lại; nút Cài đặt cookie ở chân trang mở lại', async () => {
     window.gtag = vi.fn()
-    localStorage.setItem('lamvi.consent', 'granted')
+    localStorage.setItem('moc.consent', 'granted')
     mockApi(base)
     renderAt('/')
     fireEvent.click(await screen.findByRole('button', { name: 'Cài đặt cookie' }))
