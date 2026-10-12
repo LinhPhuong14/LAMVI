@@ -3,6 +3,14 @@
 > Bản lập ngày 2026-10-12, từ hiện trạng code + `docs/ba-spec.md` (v0.41) + ảnh chụp web chạy thật (dữ liệu mẫu).
 > Mục đích: để client biết **mỗi đoạn chữ / hình đang thấy trên web thuộc phần nào** và **cần gửi lại gì** để thay bản mẫu bằng nội dung thật.
 
+## Các file đi kèm
+
+| File | Dùng để |
+|---|---|
+| `LAMVI-checklist-gui-client.pdf` | Bản đọc: toàn bộ checklist + phụ lục ảnh chụp có nhãn mã khối |
+| `LAMVI-noi-dung-web-client-sua.xlsx` | Client **sửa nội dung**: tab "Nội dung web" gom toàn bộ chữ của mọi trang (VI/EN/ZH) theo trang → khối, cột vàng để điền nội dung mới; thêm các tab sản phẩm, bộ sưu tập, FAQ, email, Mây. Gửi lại nguyên file |
+| `LAMVI-task-tracker-client.xlsx` | Client **theo dõi tiến độ**: 92 việc, trạng thái (Chưa bắt đầu / Đang làm / Chờ duyệt / Bị chặn / Xong), người phụ trách, hạn, tab Tổng quan tự tính % hoàn thành |
+
 ## Cách đọc tài liệu này
 
 - Mỗi vùng nội dung có **mã** (ví dụ `HOME-04`) — mã này cũng in ở góc trái trên của ảnh chụp tương ứng trong thư mục [`screenshots/`](screenshots/). Khi gửi phản hồi, client chỉ cần ghi "HOME-04: đổi thành …".
