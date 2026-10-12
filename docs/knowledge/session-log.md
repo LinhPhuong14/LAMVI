@@ -1,5 +1,15 @@
 # Nhật ký phiên
 
+## 2026-10-12 — Checklist việc cho bên business (nhánh `docs/client-checklist`)
+
+**Mục tiêu**: liệt kê mọi thứ client cần gửi/duyệt/quyết (logo, sản phẩm, category, nội dung từng section web, Mây, pháp lý, tài khoản dịch vụ…), kèm ảnh chụp web có nhãn mã khối.
+
+**Đã làm**: `docs/client-checklist/README.md` + `docs/client-checklist/screenshots/` (chụp bằng Playwright từ bản chạy local, dữ liệu mẫu). Không đổi code, không có quyết định nghiệp vụ mới.
+
+**Phát hiện đáng chú ý**: `public/favicon.svg` vẫn là logo mặc định của Vite; khối Nghệ nhân (`HOME-05`) và số liệu `HOME-04` là dữ liệu mẫu chưa kiểm chứng; chân trang/Liên hệ trống vì thiếu `MAIL_*`; trang đơn hàng và trang lời chúc chưa có ảnh chụp (cần đơn đã thanh toán).
+
+---
+
 ## 2026-10-08 (phiên 2) — Feedback kiểm thử, đợt 2 (nhánh `fix/feedback-2026-10-08`)
 
 **Mục tiêu**: sửa các mục còn mở của feedback kiểm thử 08/10 (P0 → P2) trong phạm vi làm được bằng mã.
