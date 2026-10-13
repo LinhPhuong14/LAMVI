@@ -26,7 +26,7 @@ const withBrand = (title) => (title && !title.toUpperCase().includes('LAMVI') ? 
  * @param {object} p
  * @param {string} p.lang    vi | en | zh
  * @param {string} p.siteUrl gốc URL, vd https://moc.vn
- * @param {string} [p.path]  đường dẫn không có tiền tố ngôn ngữ, vd /products/den-nguyet
+ * @param {string} [p.path]  đường dẫn không có tiền tố ngôn ngữ, vd /products/den-thu-hoach
  * @param {string} [p.title]
  * @param {string} [p.description]
  * @param {boolean} [p.noindex]

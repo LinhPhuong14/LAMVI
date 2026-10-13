@@ -10,7 +10,7 @@ Dùng đúng tên trong cột "Code" cho biến, bảng, endpoint.
 | Cấu hình tính giá | Pricing config | `app_settings.key = 'pricing'` | Thuế suất, phí ship, ngưỡng miễn ship (D-69, D-70) |
 | Trạng thái hiển thị sản phẩm | Product status | `status`: `draft` / `published` / `hidden` | D-39 |
 | Câu hỏi thường gặp | FAQ entry | `faq_entries` | Mây đọc từ đây |
-| Lô sản xuất | Batch | `batch`, bảng `batches`, URL `/lo/:code` | QR khắc trên đèn là mã chung của lô (D-43) |
+| Lô sản xuất | Batch | `batch`, bảng `batches`, URL `/lo/:code` | mã lô là mã chung của lô (D-43); QR chỉ ở thiệp cảm ơn, không khắc trên đèn (D-104) |
 | Video lô | Batch video | `video_url` | Lưu vĩnh viễn (D-10) |
 | Tài khoản / hồ sơ | Profile | bảng `profiles` (1-1 `auth.users`) | Vai trò `customer` / `admin` / `it` (D-38, D-51) |
 | Chế độ bảo trì | Maintenance mode | `app_settings.key = 'maintenance'` | D-54 |

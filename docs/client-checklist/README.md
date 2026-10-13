@@ -1,6 +1,6 @@
 # Danh sách việc cần bên Business (client) cung cấp / duyệt / quyết định — LAMVI
 
-> Bản lập ngày 2026-10-12, từ hiện trạng code + `docs/ba-spec.md` (v0.41) + ảnh chụp web chạy thật (dữ liệu mẫu).
+> Bản lập ngày 2026-10-12; **cập nhật 2026-10-13** sau khi đồng bộ web với tài liệu nhóm (Content Plan, báo cáo GRP490, nội dung tranh Đông Hồ) — xem mục [Đã đồng bộ](#đã-đồng-bộ-từ-tài-liệu-nhóm-13102026). Dữ liệu từ `docs/ba-spec.md` (v0.42) + ảnh chụp web chạy thật.
 > Mục đích: để client biết **mỗi đoạn chữ / hình đang thấy trên web thuộc phần nào** và **cần gửi lại gì** để thay bản mẫu bằng nội dung thật.
 
 ## Các file đi kèm
@@ -11,12 +11,24 @@
 | `LAMVI-noi-dung-web-client-sua.xlsx` | Client **sửa nội dung**: tab "Nội dung web" gom toàn bộ chữ của mọi trang (VI/EN/ZH) theo trang → khối, cột vàng để điền nội dung mới; thêm các tab sản phẩm, bộ sưu tập, FAQ, email, Mây. Gửi lại nguyên file |
 | `LAMVI-task-tracker-client.xlsx` | Client **theo dõi tiến độ**: 92 việc, trạng thái (Chưa bắt đầu / Đang làm / Chờ duyệt / Bị chặn / Xong), người phụ trách, hạn, tab Tổng quan tự tính % hoàn thành |
 
+## Đã đồng bộ từ tài liệu nhóm (13/10/2026)
+
+Nguồn: `LAMVI_Content_Plan.xlsm`, báo cáo `GRP490 G30 - LAMVI`, `Nội dung tranh Đông Hồ`. Quyết định PO: **D-104** trong `docs/ba-spec.md`.
+
+| Việc đã làm trên web | Client cần xác nhận / bổ sung |
+|---|---|
+| Danh mục 5 đèn thật (Thu Hoạch, Tứ Linh, Phúc Lộc Song Toàn, Gà Tam Dương Khai Thái, Lợn Đàn) thay 8 sản phẩm mẫu; 1 bộ sưu tập "Bộ sưu tập đầu tiên" | Giá thật từng mẫu (tạm 1.400.000 đ cho cả 5); ảnh thật; mô tả dài từng đèn |
+| Thông số: thân đèn cao 20 cm, đường kính 12 cm; đế gỗ cao 5 cm, đường kính 12 cm; LED vàng ấm cắm điện trực tiếp; giấy dó Dương Ổ – Phong Khê phủ điệp, artwork Đông Hồ; làm 5–7 ngày | Cân nặng, cách bảo quản; báo cáo ghi 12×12×20 cm là prototype "chưa phải thông số thương mại cuối cùng" — xác nhận số chốt |
+| **QR chỉ ở thiệp/thư cảm ơn, không khắc lên đèn** — đã sửa mọi chỗ chữ trên web (trang chủ, Cửa hàng, Giỏ hàng, tour Mây, FAQ, en/zh); trang lời chúc luôn có nút "Xem video mẻ đèn" | Trang kể chuyện **theo từng mẫu đèn** (Content Plan 30/10) **chưa làm** — cần quyết định phạm vi và nội dung (G-108) |
+| Khối Nghệ nhân dùng tên thật; quy trình 4 bước; lookbook = 5 đèn; số liệu trang chủ chỉ giữ số kiểm chứng được; FAQ thêm 4 câu (giấy dó ≠ giấy điệp, nguồn giấy, QR ở đâu, kích thước/nguồn sáng) | Ảnh + đồng ý của nghệ nhân; duyệt các câu mới; bản en/zh do dev dịch |
+| Bài "Đàn Lợn Âm Dương" và "Tam Dương Khai Thái" (do nhóm viết) chưa đưa lên web — là nguồn cho mô tả dài/gallery | Phần "Tài liệu tham khảo" trong file là trích nguồn ngoài, **không đưa lên web** khi chưa xin phép |
+
 ## Cách đọc tài liệu này
 
 - Mỗi vùng nội dung có **mã** (ví dụ `HOME-04`) — mã này cũng in ở góc trái trên của ảnh chụp tương ứng trong thư mục [`screenshots/`](screenshots/). Khi gửi phản hồi, client chỉ cần ghi "HOME-04: đổi thành …".
 - Cột **Ưu tiên**: 🔴 chặn go-live (thiếu là không mở bán được / vi phạm pháp lý) · 🟠 nên có trước khi mở bán · 🟡 có thể làm sau.
 - Mọi nội dung hiện trên web **đều là bản mẫu do đội dev soạn** trừ khi ghi khác. Nội dung tiếng Anh/Trung do dev dịch, chưa ai duyệt (G-14).
-- Ảnh chụp dùng dữ liệu demo (7–8 mẫu đèn minh hoạ vẽ tay, lô `DEMO-2026-01`) ở độ rộng 1366px. Chữ nằm trong ảnh là chữ đang chạy trên web.
+- Ảnh chụp dùng dữ liệu thật đã đồng bộ (5 đèn của bộ sưu tập đầu tiên — nhưng **ảnh sản phẩm vẫn là hình vẽ minh hoạ**, giá là giá tạm 1.400.000 đ, lô video là lô demo `DEMO-2026-01`) ở độ rộng 1366px. Chữ nằm trong ảnh là chữ đang chạy trên web.
 - Nơi sửa: nội dung giao diện nằm ở `src/i18n/messages/{vi,en,zh}.js`; sản phẩm / bộ sưu tập / FAQ / lô quản lý trong trang **/admin** (client tự nhập được, không cần dev); thông tin doanh nghiệp là biến môi trường `MAIL_*` (dev đặt giúp).
 
 ## Mục lục
@@ -58,7 +70,7 @@
 
 ## 2. Danh mục sản phẩm (đèn)
 
-Hiện web có **8 sản phẩm mẫu** (Đèn Nguyệt, Vọng, Tịnh, bộ Sum Vầy; Đèn Xuân, Hạ, Thu, Đông) — tên, giá và mô tả là **dữ liệu giả định**, ảnh là hình vẽ minh hoạ (xem `SHOP-02`, `PDP-01`).
+Web hiện có **5 đèn của bộ sưu tập đầu tiên** (đã lấy từ Content Plan): **Thu Hoạch, Tứ Linh, Phúc Lộc Song Toàn, Gà Tam Dương Khai Thái, Lợn Đàn**. Tên, mô tả ngắn, thông số kích thước/chất liệu/nguồn sáng/thời gian làm đã điền theo tài liệu nhóm; **giá đang là giá tạm 1.400.000 đ (trung điểm 1,3–1,5 triệu của báo cáo) cho cả 5 mẫu**; ảnh là hình vẽ minh hoạ (xem `SHOP-02`, `PDP-01`).
 
 Client gửi **một bảng (Excel/Google Sheet)** — mỗi dòng một sản phẩm — với các cột:
 
@@ -85,13 +97,13 @@ Client gửi **một bảng (Excel/Google Sheet)** — mỗi dòng một sản p
 - Quyền sử dụng ảnh: ai chụp, có cho phép dùng thương mại không.
 - Sau khi có ảnh, client tự tải lên ở **/admin → Sản phẩm** (không cần dev). Giới hạn 5 MB/ảnh.
 
-**Quyết định cần chốt** (đang `[BA DECISION REQUIRED]`): **Q-05** — bộ **Sum Vầy** gồm đèn nào, giá lẻ từng đèn bao nhiêu (ảnh hưởng hoàn tiền khi trả 1 đèn trong bộ — Q-06).
+**Còn thiếu cần client chốt**: giá thật từng mẫu · cân nặng và cách bảo quản (2 trong 6 thông số) · ảnh thật · mô tả dài/câu chuyện từng đèn (Content Plan có bài dài, web mới có 1 câu) · tồn kho. *(Q-05 về bộ Sum Vầy không còn áp dụng — D-104.)*
 
 ---
 
 ## 3. Bộ sưu tập (category)
 
-Hiện có **2 bộ mẫu**: *Sum Vầy* (3 đèn) và *Hội Làng* (4 mùa: Xuân/Hạ/Thu/Đông). Hiện ở `HOME-06` (trang chủ), `SHOP-02` (cửa hàng), `COL-01` (trang bộ sưu tập). Nội dung mẫu đánh dấu `[ASSUMPTION]`.
+Hiện có **1 bộ**: *Bộ sưu tập đầu tiên* (5 đèn), câu chuyện bộ "Từ một tờ giấy đến ánh sáng" do dev soạn từ Content Plan — cần duyệt. Hiện ở `HOME-06` (trang chủ), `SHOP-02` (cửa hàng), `COL-01` (trang bộ sưu tập). Hai bộ mẫu cũ (Sum Vầy, Hội Làng) đã bỏ.
 
 Client gửi cho **mỗi bộ sưu tập**:
 
@@ -99,7 +111,7 @@ Client gửi cho **mỗi bộ sưu tập**:
 |---|---|
 | Tên (VI/EN/ZH) | |
 | Mô tả ngắn 1–2 câu | Hiện trên thẻ bộ |
-| **Câu chuyện của bộ** (tiêu đề + 1 đoạn 60–120 chữ) | Hiện ở trang bộ sưu tập `COL-01`. Hiện là văn mẫu ("Mâm cơm ngày Tết", "Đêm hội đình làng") |
+| **Câu chuyện của bộ** (tiêu đề + 1 đoạn 60–120 chữ) | Hiện ở trang bộ sưu tập `COL-01` và là phần thưởng Gallery khi đủ 5 đèn. Hiện: "Từ một tờ giấy đến ánh sáng" (dev soạn) |
 | Ảnh bìa bộ (ngang, ≥1600px) | Hiện là hình vẽ ghép các đèn |
 | Danh sách đèn thuộc bộ + giá mua trọn bộ vs. mua lẻ | Rule hiện tại: mua lẻ từng đèn trong bộ được (D-96) |
 | Thứ tự hiển thị | |
@@ -118,14 +130,14 @@ Toàn bộ trang chủ: ảnh tổng quát từng khối ở thư mục `screens
 | **HOME-01** | Thanh menu (logo, Câu chuyện · Nghệ nhân · Cửa hàng · Lookbook · Trải nghiệm QR · Hỏi đáp, VI/EN/ZH, Giỏ hàng, Tài khoản, nút **Đặt đèn**) | [home-01](screenshots/home-01.jpg) | Nhãn menu như trên | Duyệt tên các mục menu; logo thật (1.1) |
 | **HOME-02** | **Hero** — màn hình đầu: dòng nhỏ + tiêu đề + mô tả + 2 nút | [home-02](screenshots/home-02.jpg) | Dòng nhỏ: "Giấy dó thủ công · Làng nghề trăm năm" · Tiêu đề: "Mỗi chiếc đèn, một câu chuyện được thắp lên" · Mô tả: "Đèn giấy dó thủ công dành tặng người thân — kèm theo hành trình đèn được làm ra và lời chúc của riêng bạn, mở ra chỉ bằng một lần quét mã." · Nút: "Khám phá bộ sưu tập", "Nghe câu chuyện làng nghề" | Duyệt tiêu đề + mô tả; **ảnh/ video hero thật** (hiện là đèn vẽ + tranh phong cảnh). Xác nhận "làng nghề trăm năm" có đúng sự thật không |
 | **HOME-03** | Dải chữ chạy ngang (marquee) | [home-03](screenshots/home-03.jpg) | GIẤY DÓ THỦ CÔNG · KỂ CHUYỆN BẰNG ÁNH SÁNG · LÀM QUÀ TẶNG Ý NGHĨA · MỖI LỜI CHÚC, MỘT KỶ NIỆM · LÀNG NGHỀ TRĂM NĂM | Duyệt 5 cụm từ |
-| **HOME-04** | **Di sản / Câu chuyện** + 3 con số | [home-04-1](screenshots/home-04-1.jpg) [home-04-2](screenshots/home-04-2.jpg) | Tiêu đề "Từ làng nghề giấy dó trăm năm" · Đoạn: "Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ, lưu giữ ký ức của bao thế hệ. Chúng tôi mang chất liệu ấy trở lại trong hình hài một chiếc đèn…" · **Số liệu: 79+ năm nghề giấy dó · 10 nghệ nhân đồng hành · 1 lời chúc riêng cho mỗi món quà** | **Số liệu thật** (năm nghề, số nghệ nhân — hiện là số mẫu, **không được để số chưa kiểm chứng**); câu chuyện thật của làng nghề/xưởng (nguồn gốc, địa danh, năm thành lập) |
-| **HOME-05** | **Nghệ nhân** — chân dung + trích dẫn + 2 con số | [home-05](screenshots/home-05.jpg) | "Nghệ nhân Nguyễn Văn Tài, Làng Yên Thái, Hà Nội" · trích dẫn "Mỗi tờ giấy dó đều có tính khí riêng — ẩm quá thì rách, khô quá thì giòn…" · **32 năm trong nghề · 4.000+ chiếc đèn đã ra lò** | 🔴 **Toàn bộ khối này là nhân vật/ câu trích mẫu, hình là tranh vẽ.** Cần: tên + ảnh chân dung thật, câu nói thật (có đồng ý của nghệ nhân), số năm/ số đèn thật, hoặc bỏ khối. Cần văn bản cho phép dùng tên/hình ảnh nghệ nhân |
+| **HOME-04** | **Di sản / Câu chuyện** + 3 con số | [home-04-1](screenshots/home-04-1.jpg) [home-04-2](screenshots/home-04-2.jpg) | Tiêu đề "Từ làng nghề giấy dó trăm năm" · Đoạn: "Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ…" · **Số liệu (đã đổi 13/10 sang số kiểm chứng được): 5 chiếc đèn trong bộ sưu tập đầu tiên · 3 chặng hành trình (Dương Ổ – Phong Khê → Đông Hồ → LAMVI) · 1 lời chúc riêng cho mỗi món quà** | Duyệt câu chuyện làng nghề/xưởng (nguồn gốc, năm thành lập). Cụm "làng nghề trăm năm" ở tiêu đề: xác nhận còn đúng không |
+| **HOME-05** | **Nghệ nhân** — chân dung + mô tả vai trò | [home-05](screenshots/home-05.jpg) | **Đã đổi 13/10 theo Content Plan**: "Nghệ nhân Ưu tú Nguyễn Hữu Quả — Làng tranh Đông Hồ" + mô tả: giấy dó từ Dương Ổ – Phong Khê được đưa tới Đông Hồ, nơi ông trực tiếp phủ điệp và thực hiện phần nghệ thuật. Đã bỏ câu trích và số liệu mẫu | 🔴 Gửi **ảnh chân dung thật** (hiện vẫn là hình minh hoạ chung) + **văn bản đồng ý dùng tên/hình ảnh**; xác nhận chức danh "Nghệ nhân Ưu tú" và nội dung mô tả |
 | **HOME-06** | **Bộ sưu tập** — lưới sản phẩm, nút "Xem thêm" | [1](screenshots/home-06-1.jpg) [2](screenshots/home-06-2.jpg) [3](screenshots/home-06-3.jpg) | Tiêu đề "Chọn chiếc đèn bạn muốn thắp" · "Mỗi chiếc đèn có thể thắp cho chính bạn hoặc gửi tặng người thương — bạn chọn “mua tặng” hay “mua cho mình” ở bước thanh toán." | Dữ liệu sản phẩm ở [mục 2–3](#2-danh-mục-sản-phẩm-đèn); duyệt câu giới thiệu |
-| **HOME-07** | **Lookbook** — 5 tông màu đèn | [1](screenshots/home-07-1.jpg) [2](screenshots/home-07-2.jpg) | "Sắc màu của ánh sáng thủ công": Hổ phách · Hoàng hôn · Bình minh · Trầm mộc · Lửa ấm | **Ảnh lookbook thật** (đèn trong không gian sống) cho từng tông; chốt 5 tên màu hoặc đổi. Hiện chỉ là hình minh hoạ phát sáng |
-| **HOME-08** | **Hành trình thủ công** — 4 công đoạn | [home-08](screenshots/home-08.jpg) | Chọn giấy dó · Lên khung tre · Phơi nắng · Đóng gói & khắc QR (mỗi bước 1 câu mô tả) | 🟠 Xác nhận quy trình thật có đúng 4 bước này không; ảnh/video thật cho từng bước. Hiện câu mô tả là văn mẫu |
+| **HOME-07** | **Lookbook** — 5 đèn | [1](screenshots/home-07-1.jpg) [2](screenshots/home-07-2.jpg) | "Năm bức tranh, năm ánh sáng": Thu Hoạch · Tứ Linh · Phúc Lộc Song Toàn · Tam Dương Khai Thái · Lợn Đàn (đã đổi 13/10, thay 5 tên màu cũ) | **Ảnh lookbook thật** (đèn bật sáng, trong không gian sống) cho từng mẫu. Hiện chỉ là hình minh hoạ phát sáng |
+| **HOME-08** | **Hành trình thủ công** — 4 công đoạn | [home-08](screenshots/home-08.jpg) | Đã đổi 13/10: Giấy dó Dương Ổ – Phong Khê · Phủ điệp & artwork Đông Hồ · Lắp đèn & kiểm tra sáng · Đóng gói & thiệp cảm ơn (mỗi bước 1 câu) | 🟠 Xác nhận 4 bước và câu mô tả đúng quy trình thật; ảnh/video thật cho từng bước (Content Plan đã có kế hoạch quay) |
 | **HOME-09** | **Trải nghiệm QR** — mô phỏng điện thoại mở lời chúc | [home-09](screenshots/home-09.jpg) | "Quét mã, thấy cả một câu chuyện" + 3 gạch đầu dòng + mockup "Lời chúc từ Minh Anh: Chúc chị luôn ấm áp như ánh đèn này…" | Duyệt chữ (nhất là câu về thời hạn lưu 30 ngày — đã chốt D-12/D-26); câu lời chúc mẫu |
 | **HOME-10** | **Cảm nhận khách hàng** (testimonials) | *(đang không hiển thị)* | 3 câu mẫu: Thu Hà (tặng mẹ 20/10), Minh Quân, Bảo Trân | 🟠 **Đánh giá hiện là giả** nên đã bị ẩn (D-103). Muốn hiện: gửi đánh giá **thật** + tên, bối cảnh, **đồng ý của người đánh giá** (Q-23) |
-| **HOME-11** | **Hỏi đáp (FAQ)** | [1](screenshots/home-11-1.jpg) [2](screenshots/home-11-2.jpg) | 5 câu: thời hạn lưu video/lời chúc · sửa lời chúc sau khi đặt · người nhận cần tải app? · đèn có dễ vỡ? · thời gian làm 5–7 ngày | Duyệt 5 câu + **thêm câu hỏi thực tế khách hay hỏi** (cách bảo quản, thay bóng, độ an toàn/ cháy, đặt số lượng lớn, in logo công ty, đổi trả…). Có thể tự nhập ở **/admin → FAQ** (VI/EN/ZH) |
+| **HOME-11** | **Hỏi đáp (FAQ)** | [1](screenshots/home-11-1.jpg) [2](screenshots/home-11-2.jpg) | **9 câu** (13/10 thêm 4 câu): thời hạn lưu video/lời chúc · sửa lời chúc · người nhận cần tải app? · đèn có dễ vỡ? · thời gian làm 5–7 ngày · giấy dó ≠ giấy điệp · nguồn giấy và tranh · QR ở đâu · kích thước và nguồn sáng | Duyệt 9 câu + **thêm câu hỏi thực tế khách hay hỏi** (cách bảo quản, thay bóng, độ an toàn/cháy, đặt số lượng lớn, in logo công ty, đổi trả…). Tự nhập ở **/admin → FAQ** (VI/EN/ZH) |
 | **FOOT-01** | **Chân trang** (xuất hiện ở mọi trang) | [foot-01-1](screenshots/foot-01-1.jpg) [2](screenshots/foot-01-2.jpg) | Mô tả thương hiệu, cột Sản phẩm, cột Hỗ trợ (FAQ, Liên hệ, Đổi trả, Vận chuyển, Thanh toán, Điều khoản, Riêng tư, Cài đặt cookie, Theo dõi đơn), ô "Nhận tin tức" (đang **chưa mở**), © 2026 | Thông tin doanh nghiệp ([mục 8](#8-thông-tin-doanh-nghiệp--pháp-lý)) — **hiện chân trang chưa có địa chỉ, MST, hotline, MXH vì chưa được cung cấp**; quyết định có làm **newsletter** không (G-11) |
 | — | **Phòng tranh dân gian** (ảnh tư liệu Đông Hồ, 11 tranh, có chú thích nguồn) | *(trong `HOME-04` và chăn Đông Hồ)* | Ảnh Wikimedia Commons CC0/public domain của Bảo tàng Mỹ thuật VN | 🔴 `[LEGAL]` **Q-36**: xác nhận có cần xin phép bảo tàng; hoặc thay bằng ảnh/tranh do chính LAMVI sở hữu |
 
@@ -147,7 +159,7 @@ Toàn bộ trang chủ: ảnh tổng quát từng khối ở thư mục `screens
 | **AUTH** | **Đăng nhập / Đăng ký / Quên mật khẩu** | [login 1](screenshots/auth-login-1.jpg) [2](screenshots/auth-login-2.jpg) · [register](screenshots/auth-reg-1.jpg) · [quên MK](screenshots/auth-forgot-1.jpg) | Form + ảnh nền "đèn lụa phản chiếu trên sông Hội An" (CC) | Duyệt chữ; **ảnh nền thật của thương hiệu** (hiện là ảnh stock); quyết định có dùng đăng nhập Google không (đã làm, cần tài khoản Google Cloud — mục 11) |
 | **CT-01** | **Liên hệ** `/contact` | [ct-01](screenshots/ct-01.jpg) | Hotline, Zalo, email hỗ trợ, giờ làm việc, địa chỉ xưởng, địa chỉ đơn vị, **form gửi tin nhắn** | 🔴 Hiện **trống kênh liên hệ** ("Thông tin liên hệ đang được cập nhật") — xem mục 8 |
 | **POL-*** | **5 trang chính sách** `/privacy` `/returns` `/terms` `/shipping` `/payment` | [riêng tư](screenshots/pol-privacy-1.jpg) · [đổi trả](screenshots/pol-returns-1.jpg) · [điều khoản](screenshots/pol-terms-1.jpg) · [vận chuyển](screenshots/pol-ship-1.jpg) · [thanh toán](screenshots/pol-pay-1.jpg) | Do dev soạn theo hiện trạng hệ thống | 🔴 **Pháp chế duyệt** (Q-40, Q-42, Q-43) — xem mục 9 |
-| **QR-BATCH** | **Trang video lô đèn** `/lo/<mã lô>` (người nhận quét mã **khắc trên đèn**) | [qr-batch-1](screenshots/qr-batch-1.jpg) [2](screenshots/qr-batch-2.jpg) | "Hành trình làm đèn": video, ngày làm, mã lô, ghi chú "Video ghi lại quá trình làm cả lô đèn, trong đó có chiếc đèn của bạn." | Video thật từng lô (mục 7). Hiện là lô demo |
+| **QR-BATCH** | **Trang video lô đèn** `/lo/<mã lô>` (mở từ nút "Xem video mẻ đèn" trên trang lời chúc và từ Gallery; **QR không khắc trên đèn** — D-104) | [qr-batch-1](screenshots/qr-batch-1.jpg) [2](screenshots/qr-batch-2.jpg) | "Hành trình làm đèn": video, ngày làm, mã lô, ghi chú "Video ghi lại quá trình làm cả lô đèn, trong đó có chiếc đèn của bạn." | Video thật từng lô (mục 7). Hiện là lô demo |
 | **QR-GIFT** | **Trang lời chúc** `/qr/<token>` (người nhận quét mã **trên thiệp cảm ơn**) | *(cần có đơn mua tặng đã thanh toán)* | "Có một lời chúc đang chờ bạn" → nút **"Tôi đã nhận được quà"** → hiện lời chúc chữ / giọng nói / video, nút Tải về, đếm ngược 30 ngày, nút Dịch tự động | Duyệt toàn bộ chữ (trang này là **điểm chạm cảm xúc nhất** — nên do copywriter của client viết) |
 | **404** | Trang không tìm thấy | [404](screenshots/404.jpg) | "Không tìm thấy trang" + nút về trang chủ + "Cần giúp đỡ? Liên hệ LAMVI" | Duyệt chữ |
 | — | **Trang lỗi / bảo trì** | | "LAMVI đang bảo trì — Chúng tôi đang nâng cấp hệ thống…" | Duyệt chữ |
@@ -180,7 +192,7 @@ Mây là chatbot ở góc phải dưới mọi trang ([may-01](screenshots/may-0
 | # | Việc client cần làm | Ghi chú | Ưu tiên |
 |---|---|---|---|
 | 7.1 | **Video quy trình cho từng lô (mẻ) đèn** | Mỗi lô: mã lô (ví dụ `2026-10-A`), ngày làm, tiêu đề (VI/EN/ZH), 1 đoạn câu chuyện, **file video** (MP4/WebM/MOV, ≤500 MB). Tải lên ở **/admin → Lô** (qua signed URL, không cần dev). Hiện chỉ có lô demo | 🔴 |
-| 7.2 | **Quy tắc đặt mã lô** và cách khắc/in QR lên đèn (mã QR dẫn tới `/lo/<mã lô>`, là mã **chung của cả lô**, D-43) | Cần xưởng xác nhận quy trình in/khắc | 🟠 |
+| 7.2 | **Quy tắc đặt mã lô** (mã in trên thiệp/tem, **không khắc lên đèn** — D-104; `/lo/<mã lô>` là mã **chung của cả lô**) và quy trình in thiệp có QR | Cần xưởng xác nhận quy trình in thiệp + mã lô | 🟠 |
 | 7.3 | **Thiết kế thiệp cảm ơn có mã QR** (in kèm đơn mua tặng): kích thước, mặt trước/sau, mẫu viết tay hay in | Thiệp viết tay do xưởng viết bằng tiếng Việt (D-28). Cần mẫu thiệp + câu mẫu | 🟠 |
 | 7.4 | **Chính sách lưu trữ**: giọng nói/video lời chúc xoá sau 30 ngày kể từ khi người nhận xác nhận (hoặc 90 ngày sau giao nếu không ai xác nhận); chữ + video lô lưu mãi — client xác nhận còn đúng | Đã chốt D-12/D-26 | 🟡 |
 | 7.5 | Quyết định **Q-12** thiệp/lời chúc có tính phí không (đang miễn phí), **Q-14** admin có xem/kiểm duyệt lời chúc không, **Q-27** người mua xem trước trang QR không, **Q-29** lời chúc không phải tiếng Việt xử lý thế nào, **Q-33** có PIN bảo vệ trang lời chúc không, **Q-25** QR của đơn tự mua dẫn tới đâu | Xem [mục 13](#13-câu-hỏi-nghiệp-vụ-còn-mở-cần-client-quyết) | 🟠 |
@@ -270,7 +282,7 @@ Lấy từ `docs/ba-spec.md` §30 (còn mở tại v0.41). Mỗi câu trả lờ
 | Mã | Câu hỏi | Mức |
 |---|---|---|
 | **Q-41** | **Cho phép mua không cần tài khoản (guest checkout)?** Feedback kiểm thử đề xuất chỉ cần họ tên + SĐT + email; hiện bắt buộc đăng nhập. Đổi là thay đổi lớn nên cần quyết định rõ | `[BA DECISION REQUIRED]` — P0 |
-| **Q-05** | Bộ **Sum Vầy** gồm đèn nào, giá lẻ từng đèn | P0 |
+| ~~**Q-05**~~ | ~~Bộ Sum Vầy gồm đèn nào, giá lẻ~~ — **không còn áp dụng (D-104)**: danh mục thật là 5 đèn lẻ | — |
 | Q-06 | Hoàn tiền thế nào khi trả 1 đèn trong bộ | P1 |
 | Q-12 | Thiệp/lời chúc có tính phí? | P1 |
 | Q-14 | Admin có xem/kiểm duyệt lời chúc? (tạm: không) | P1 |
@@ -311,7 +323,7 @@ Lấy từ `docs/ba-spec.md` §30 (còn mở tại v0.41). Mỗi câu trả lờ
 
 - [ ] Bộ logo chính thức + favicon (1.1, 1.2)
 - [ ] Bảng sản phẩm đầy đủ (tên, giá, mô tả, thông số, tồn kho) + **ảnh sản phẩm thật** (mục 2)
-- [ ] Chốt bộ **Sum Vầy** gồm gì (Q-05)
+- [x] ~~Chốt bộ Sum Vầy gồm gì (Q-05)~~ — không còn áp dụng; **thay bằng: chốt giá thật từng mẫu trong 5 đèn (tạm 1.400.000 đ)**
 - [ ] Nội dung bộ sưu tập thật (mục 3)
 - [ ] Số liệu thật & câu chuyện làng nghề; nghệ nhân thật (hoặc bỏ khối) — `HOME-04`, `HOME-05`
 - [ ] FAQ đầy đủ — `HOME-11`, kiến thức cho Mây (6.2)
@@ -322,7 +334,7 @@ Lấy từ `docs/ba-spec.md` §30 (còn mở tại v0.41). Mỗi câu trả lờ
 - [ ] Giấy phép ảnh tư liệu / ảnh nghệ nhân (8.10, Q-36)
 - [ ] Phí ship, vận chuyển, thời gian giao & làm đèn, VAT/hoá đơn (9.1–9.4)
 - [ ] Mở payOS + quyết định COD (9.5)
-- [ ] Video lô đầu tiên + quy trình QR khắc lên đèn (7.1, 7.2)
+- [ ] Video lô đầu tiên + quy trình in thiệp có QR và mã lô (7.1, 7.2)
 - [ ] Tên miền, Vercel, Supabase, email gửi (mục 11, 10.2)
 - [ ] Quyết định **Q-41** (guest checkout)
 - [ ] Danh sách admin + phân công + UAT (14.1, 14.2, 14.4)

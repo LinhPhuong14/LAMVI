@@ -856,17 +856,6 @@
   height: auto;
 }
 
-.portrait-quote-mark {
-  position: absolute;
-  top: -18px;
-  right: -14px;
-  font-family: var(--serif);
-  font-weight: 800;
-  font-size: 4.5rem;
-  line-height: 1;
-  color: var(--son);
-}
-
 .artisan-quote {
   font-family: var(--serif);
   font-style: italic;
@@ -908,30 +897,6 @@
 
 .artisan-meta > div:first-child span {
   font-size: 0.88rem;
-  color: var(--than-soft);
-}
-
-.artisan-stats {
-  display: flex;
-  gap: 32px;
-}
-
-.artisan-stats div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.artisan-stats strong {
-  font-family: var(--serif);
-  font-variant-numeric: oldstyle-nums;
-  font-weight: 800;
-  font-size: 1.9rem;
-  color: var(--son);
-}
-
-.artisan-stats > div > span {
-  font-size: 0.8rem;
   color: var(--than-soft);
 }
 

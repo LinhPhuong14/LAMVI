@@ -9,7 +9,7 @@ import { createMemoryRepo } from './adapters/memory/repo.js'
 import { buildCsp, cspHash, securityHeaders } from './middleware/security.js'
 import { loadConfig } from './config.js'
 import { render } from '../src/entry-server.jsx'
-import { products } from './data/seed.js'
+import { products } from './data/demoCatalog.js'
 
 const GA_ID = 'G-TEST12345'
 const config = { publicSiteUrl: 'https://lamvi.test', gaMeasurementId: GA_ID }

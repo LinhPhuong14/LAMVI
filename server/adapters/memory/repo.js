@@ -1,8 +1,12 @@
 import { randomUUID } from 'node:crypto'
-import { collections, products, faqEntries, demoBatches } from '../../data/seed.js'
+import * as realSeed from '../../data/seed.js'
+import * as demoSeed from '../../data/demoCatalog.js'
 import { RepoError } from '../repoErrors.js'
 import { mediaExpired } from '../../domain/message.js'
 import { couponRejectReason } from '../../domain/coupon.js'
+
+// D-104: test chạy trên danh mục demo (LAMVI_SEED=demo, xem vitest.setup.js); dev/demo local dùng seed thật
+const { collections, products, faqEntries, demoBatches } = process.env.LAMVI_SEED === 'demo' ? demoSeed : realSeed
 
 const clone = (v) => structuredClone(v)
 

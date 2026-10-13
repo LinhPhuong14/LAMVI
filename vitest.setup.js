@@ -1,5 +1,8 @@
 import { afterEach, vi } from 'vitest'
 
+// D-104: test server dùng danh mục demo (server/data/demoCatalog.js), không phụ thuộc nội dung thật
+process.env.LAMVI_SEED = 'demo'
+
 // Chỉ nạp jest-dom + cleanup khi test chạy trong jsdom
 if (typeof window !== 'undefined') {
   await import('@testing-library/jest-dom/vitest')

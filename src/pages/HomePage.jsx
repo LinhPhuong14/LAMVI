@@ -374,8 +374,8 @@ export default function HomePage() {
         </m.p>
         <m.div className="story-stats" variants={group}>
           {[
-            ['100+', 'story.statYears'],
-            ['12', 'story.statArtisans'],
+            ['5', 'story.statLamps'],
+            ['3', 'story.statStages'],
             ['1', 'story.statStory'],
           ].map(([value, key], i) => (
             <m.div key={key} variants={stamp} custom={i}>
@@ -411,9 +411,6 @@ export default function HomePage() {
               strokeLinecap="round"
             />
           </OldPhoto>
-          <span className="portrait-quote-mark" aria-hidden="true">
-            ”
-          </span>
         </m.div>
         <m.div className="artisan-copy" variants={group}>
           <Eyebrow>{t('artisan.eyebrow')}</Eyebrow>
@@ -425,16 +422,6 @@ export default function HomePage() {
             <div>
               <strong>{t('artisan.name')}</strong>
               <span>{t('artisan.place')}</span>
-            </div>
-            <div className="artisan-stats">
-              <div>
-                <CountUp value="32" />
-                <span>{t('artisan.years')}</span>
-              </div>
-              <div>
-                <CountUp value="4.000+" />
-                <span>{t('artisan.made')}</span>
-              </div>
             </div>
           </m.div>
         </m.div>

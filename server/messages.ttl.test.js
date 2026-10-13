@@ -4,7 +4,7 @@ import { createMessageService } from './messages/service.js'
 function fixture(remainingMs) {
   const now = new Date('2026-10-07T00:00:00Z')
   const message = { text: 'Greeting', confirmedAt: new Date(now.getTime() - 30 * 86400_000 + remainingMs).toISOString(), voicePath: 'owner/order/audio.mp3', voiceType: 'audio/mpeg' }
-  const repo = { getOrderByQrToken: async () => ({ id: 'order', status: 'delivered', orderKind: 'gift', hasMessage: true }), getGiftMessage: async () => message }
+  const repo = { getOrderByQrToken: async () => ({ id: 'order', status: 'delivered', orderKind: 'gift', hasMessage: true }), getGiftMessage: async () => message, listBatches: async () => [] }
   const storage = { signedUrl: vi.fn(async () => 'private-signed-url'), removeObject: vi.fn() }
   return { service: createMessageService({ repo, storage, now: () => now }), storage }
 }

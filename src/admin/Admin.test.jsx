@@ -86,7 +86,7 @@ describe('Admin — lô & video (FR-QR-007, D-46, D-47)', () => {
     expect(within(screen.getByText('L-01').closest('tr')).getByRole('button', { name: 'Xoá' })).toBeInTheDocument()
 
     fireEvent.click(within(pubRow).getByRole('button', { name: 'Sửa' }))
-    expect(screen.getByLabelText('Mã lô (in trên QR khắc đèn)')).toBeDisabled()
+    expect(screen.getByLabelText('Mã lô (in trên thiệp cảm ơn)')).toBeDisabled()
     expect(screen.getByText('Thay video')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Xuất bản' })).toBeNull()
   })

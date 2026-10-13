@@ -8,7 +8,7 @@ import { createMemoryRepo } from './adapters/memory/repo.js'
 import { renderPage } from './ssr.js'
 import { render } from '../src/entry-server.jsx'
 import { classifyPath, dataKeysFor } from '../src/seo/routes.js'
-import { products, demoBatches, faqEntries } from './data/seed.js'
+import { products, demoBatches, faqEntries } from './data/demoCatalog.js'
 
 const SITE = 'https://moc.test'
 const config = { publicSiteUrl: SITE }

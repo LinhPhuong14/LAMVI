@@ -13,7 +13,7 @@ import { buildHeadTags, renderHeadTags, safeJson } from './head.js'
 import { HTML_LANG, translate } from '../i18n/core.js'
 import { getPublicBatch, getPublicProduct, listPublicFaq, listPublicProducts } from '../../server/services/catalog.js'
 import { createMemoryRepo } from '../../server/adapters/memory/repo.js'
-import { products } from '../../server/data/seed.js'
+import { products } from '../../server/data/demoCatalog.js'
 
 const SITE = 'http://localhost:3000'
 const template = readFileSync(`${process.cwd()}/index.html`, 'utf8')

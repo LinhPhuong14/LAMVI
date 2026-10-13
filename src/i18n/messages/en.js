@@ -50,8 +50,8 @@ export default {
     eyebrow: 'Heritage',
     title: 'From a century-old dó paper village',
     text: 'Dó paper once recorded history, carried Đông Hồ paintings and kept the memories of generations. We bring that material back in the form of a lantern — so your family’s story can be lit by that same enduring material.',
-    statYears: 'years of dó papermaking',
-    statArtisans: 'partner artisans',
+    statLamps: 'lanterns in the first collection',
+    statStages: 'stages of the journey: Duong O – Phong Khe → Dong Ho → LAMVI',
     statStory: 'personal message for every gift',
   },
   // Phòng tranh: ảnh tư liệu public domain/CC0 (src/data/folkArt.js). Chú thích do dev soạn — chờ Marketing duyệt
@@ -121,11 +121,9 @@ export default {
     eyebrow: 'Keeper of the craft',
     title: 'The hands that make the light',
     quote:
-      '“Every sheet of dó paper has its own temper — too damp and it tears, too dry and it cracks. It takes decades of practice to frame a perfectly round lantern.”',
-    name: 'Artisan Nguyễn Văn Tài',
-    place: 'Yên Thái village, Hà Nội',
-    years: 'years in the craft',
-    made: 'lanterns made',
+      'Dó paper from Duong O – Phong Khe is taken to Dong Ho, where Meritorious Artisan Nguyễn Hữu Quả personally carries out the điệp coating and the Dong Ho artwork made for each LAMVI lantern.',
+    name: 'Meritorious Artisan Nguyễn Hữu Quả',
+    place: 'Dong Ho painting village',
   },
   products: {
     viewAll: 'View more',
@@ -147,23 +145,23 @@ export default {
   },
   lookbook: {
     eyebrow: 'Lookbook',
-    title: 'The colours of handmade light',
-    items: ['Amber', 'Sunset', 'Dawn', 'Deep wood', 'Warm fire'],
+    title: 'Five paintings, five lights',
+    items: ['Thu Hoach (Harvest)', 'Tu Linh (Four Sacred Creatures)', 'Phuc Loc Song Toan (Blessings & Fortune)', 'Tam Duong Khai Thai (Rooster)', 'Lon Dan (Pig Herd)'],
   },
   process: {
     eyebrow: 'The handmade journey',
     title: 'Follow your order through each stage',
     steps: [
-      { label: 'Choosing dó paper', note: 'Each hand-made sheet is checked for flaws' },
-      { label: 'Bamboo framing', note: 'Splitting and bending bamboo into traditional shapes' },
-      { label: 'Sun drying', note: 'Natural sunlight tightens every layer of paper' },
-      { label: 'Packing & QR engraving', note: 'An engraved code opens the video of the batch’s journey' },
+      { label: 'Dó paper from Duong O – Phong Khe', note: 'Handmade dó paper taken straight from the papermaking workshop' },
+      { label: 'Điệp coating & Dong Ho artwork', note: 'The paper goes to Dong Ho for the điệp coating and the artwork' },
+      { label: 'Assembly & light test', note: 'Body, wooden base and warm-white LED are assembled, aligned and tested' },
+      { label: 'Packing & thank-you card', note: 'The lantern and a thank-you card with a QR code are boxed' },
     ],
   },
   qr: {
     eyebrow: 'The unwrapping moment',
     title: 'Scan a code, discover a whole story',
-    text: 'The QR code on the thank-you card opens your message, while the code engraved on the lantern opens the video of how its batch was made. The recipient just points a phone at it — no app needed.',
+    text: 'The QR code on the accompanying thank-you card opens the giver’s message and the video of how the batch was made. LAMVI does not engrave a QR code or a message on the lantern. The recipient just points a phone at it — no app needed.',
     points: [
       'Video of how the lantern batch was made, to watch any time',
       'A text, voice or video message from the giver',
@@ -662,7 +660,7 @@ export default {
     eyebrow: 'Shop',
     title: 'Handmade dó paper lanterns',
     lead: 'Choose the lantern you want to light — for yourself or for someone you love. You pick “gift” or “for myself” at checkout.',
-    perks: ['A thank-you card with a QR code that opens your message', 'A QR code engraved on the lantern opens the batch video', 'Prices include VAT; delivery within Vietnam'],
+    perks: ['A thank-you card with a QR code that opens your message', 'Scan the QR code on the card to watch how the batch was made', 'Prices include VAT; delivery within Vietnam'],
     filterLabel: 'Filter by type',
     filters: {
       all: 'All',
@@ -690,7 +688,7 @@ export default {
     shippingAtCheckout: 'See rates below',
     emptyCopy: 'Mây suggests a visit to the collection — every lantern is a story waiting to be lit.',
     mayTitle: 'A little note from Mây: every gift comes with',
-    perks: ['A thank-you card with a QR code that opens your message', 'A QR code engraved on the lantern that opens the video of its batch', 'Prices include VAT; delivery within Vietnam'],
+    perks: ['A thank-you card with a QR code that opens your message', 'Scan the QR code on the card to watch how the batch was made', 'Prices include VAT; delivery within Vietnam'],
     unavailableName: 'Product no longer available',
     title: 'Cart',
     nav: 'Cart',
@@ -754,7 +752,7 @@ export default {
       steps: [
         'Welcome to LAMVI! Let Mây show you around: handmade dó paper lanterns, made as story-telling gifts.',
         'This is the collection. Tap “View more” to open the Shop with every lantern; tap a lantern for details and to add it to your cart. Prices shown include VAT.',
-        'Each gift has two QR codes: the one on the thank-you card opens your message, the one engraved on the lantern opens the video of how its batch was made.',
+        'Each gift comes with a thank-you card carrying a QR code: scanning it opens your message and the video of how the batch was made. LAMVI does not engrave a QR code on the lantern.',
         'Any other questions? Have a look at the FAQ.',
         'Mây is always here in the corner. Tap Mây to ask anything or replay the tour.',
       ],

@@ -12,7 +12,7 @@ if (!['127.0.0.1', 'localhost', '[::1]'].includes(base.hostname) || !['http:', '
 }
 const requests = Math.min(100_000, Math.max(1, Number(args.requests) || 1000))
 const concurrency = Math.min(100, Math.max(1, Number(args.concurrency) || 20))
-const paths = ['/api/products', '/shop', '/api/collections', '/api/geo/provinces', '/products/den-nguyet']
+const paths = ['/api/products', '/shop', '/api/collections', '/api/geo/provinces', '/products/den-thu-hoach']
 const latencies = []
 const failures = []
 let next = 0

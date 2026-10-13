@@ -7,7 +7,7 @@ import { createMemoryAuth } from './adapters/memory/auth.js'
 import { createMemoryStorage } from './adapters/memory/storage.js'
 import { createOrderService, PAYMENT_WINDOW_MS } from './orders/service.js'
 import { signData } from './adapters/payos.js'
-import { products } from './data/seed.js'
+import { products } from './data/demoCatalog.js'
 
 const CHECKSUM = 'khoa-checksum-thu'
 const config = { publicSiteUrl: 'https://lamvi.test', cronSecret: 'bimat-cron', rateLimit: { enabled: false } }

@@ -230,10 +230,10 @@ describe('G-08: file mới không có chuỗi tiếng Việt viết cứng', () 
 })
 
 describe('Số liệu CountUp trên trang', () => {
-  it('trình đọc màn hình đọc "100+", "12", "32", "4.000+" (sr-only)', async () => {
+  it('trình đọc màn hình đọc "5", "3", "1" (sr-only)', async () => {
     mockApi(handlers)
     const { container } = renderAt('/')
     const sr = [...container.querySelectorAll('strong > .sr-only')].map((s) => s.textContent)
-    expect(sr).toEqual(expect.arrayContaining(['100+', '12', '1', '32', '4.000+']))
+    expect(sr).toEqual(expect.arrayContaining(['5', '3', '1']))
   })
 })

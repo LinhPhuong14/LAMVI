@@ -12,7 +12,7 @@ import { createMayService, vnDay, vnMonth } from './may/service.js'
 import { MAY_TOOLS, runTool } from './may/tools.js'
 import { DEFAULT_MAY_CONFIG, MAY_SETTING_KEY, loadMayConfig, validateMayConfig } from './may/config.js'
 import { redactPii, unverifiedNumbers } from './may/guard.js'
-import { products, faqEntries } from './data/seed.js'
+import { products, faqEntries } from './data/demoCatalog.js'
 
 const SID = 'sess-extra-0001'
 let repo, auth, openai, app, tokens, clock, maintenance

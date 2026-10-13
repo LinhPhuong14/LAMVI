@@ -98,7 +98,7 @@ export function StepArt({ step, size = 64 }) {
         <rect x="34" y="33" width="14" height="20" rx="1.5" fill={PAPER_DEEP} transform="rotate(4 41 43)" />
       </Svg>
     )
-  // Đóng gói & khắc QR: hộp có ô mã
+  // Đóng gói & thiệp cảm ơn: hộp có ô mã
   return (
     <Svg size={size}>
       <path d="M10 22l22-10 22 10v26L32 58 10 48z" fill={PAPER} />

@@ -131,3 +131,7 @@ QA v0.39 bổ sung migration 019 atomic cart (cùng user lock với checkout) v�
 - Dashboard IT: `commit` lấy từ `GIT_COMMIT` hoặc `VERCEL_GIT_COMMIT_SHA` (tự có trên Vercel).
 - Cần để dashboard IT báo "Hoạt động bình thường": `PAYOS_ENABLED=1` + `PAYOS_CLIENT_ID/API_KEY/CHECKSUM_KEY`, `MAIL_FROM` + `RESEND_API_KEY` (SPF/DKIM/DMARC cho tên miền gửi).
 
+## Seed danh mục thật (D-104, v0.42)
+
+`supabase/seed.sql` dùng `on conflict (id) do nothing`: trên DB **đã seed bản demo cũ**, các đèn demo (den-nguyet, den-vong, den-sum-vay…) và FAQ id 000…001/004 (nội dung cũ) **không bị ghi đè**. Sau khi chạy seed mới, vào `/admin` ẩn (đã có đơn) hoặc xoá các sản phẩm demo cũ, và sửa lại FAQ 1 và 4 theo nội dung mới. Seed mới dùng id `…0000000000a1…a5` nên 5 đèn thật luôn được thêm. Script `scripts/load-smoke.js` gọi `/products/den-thu-hoach`.
+

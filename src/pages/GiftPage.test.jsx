@@ -134,6 +134,20 @@ describe('Trang QR lời chúc', () => {
     expect(link.getAttribute('href')).toBe('/lo/L-01')
   })
 
+  it('đơn có lời chúc → vẫn có link video mẻ đèn dưới lời chúc (D-104)', async () => {
+    mockApi({ ...base, [`GET /qr/${TOKEN}`]: () => ({ body: { item: active({ batch: { code: 'L-01', title: 'Lô 1' } }) } }) })
+    renderAt(`/qr/${TOKEN}`)
+    await screen.findByText('Chúc mừng sinh nhật!')
+    expect(screen.getByRole('link', { name: 'Xem video mẻ đèn' }).getAttribute('href')).toBe('/lo/L-01')
+  })
+
+  it('không có lô công khai → không có link video', async () => {
+    mockApi({ ...base, [`GET /qr/${TOKEN}`]: () => ({ body: { item: active({ batch: null }) } }) })
+    renderAt(`/qr/${TOKEN}`)
+    await screen.findByText('Chúc mừng sinh nhật!')
+    expect(screen.queryByRole('link', { name: 'Xem video mẻ đèn' })).toBeNull()
+  })
+
   it('bản en/zh có chữ riêng', async () => {
     mockApi({ ...base, [`GET /qr/${TOKEN}`]: () => ({ body: { item: { state: 'greeting', lang: 'en', orderKind: 'gift' } } }) })
     renderAt(`/en/qr/${TOKEN}`)

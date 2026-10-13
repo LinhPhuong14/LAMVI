@@ -5,7 +5,7 @@ import { createApp } from './app.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
 import { renderPage } from './ssr.js'
 import { render } from '../src/entry-server.jsx'
-import { products } from './data/seed.js'
+import { products } from './data/demoCatalog.js'
 
 const config = { publicSiteUrl: 'https://moc.test' }
 const template = readFileSync(new URL('../index.html', import.meta.url), 'utf8')

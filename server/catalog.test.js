@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import request from 'supertest'
 import { createApp } from './app.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
-import { products } from './data/seed.js'
+import { products } from './data/demoCatalog.js'
 
 const makeApp = (data) => createApp({ repo: createMemoryRepo(data) })
 

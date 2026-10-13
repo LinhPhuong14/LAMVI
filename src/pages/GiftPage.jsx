@@ -229,6 +229,11 @@ export default function GiftPage() {
             </p>
           )}
           {m.mediaExpired && <p className="notice">{t('gift.mediaExpired')}</p>}
+          {m.batch && (
+            <Link to={path(`/lo/${encodeURIComponent(m.batch.code)}`)} className="btn btn-ghost" style={{ marginTop: 16 }}>
+              {t('gift.watchBatch')}
+            </Link>
+          )}
         </>
       )}
       <p className="field-hint" style={{ marginTop: 24 }}>

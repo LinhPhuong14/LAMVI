@@ -3,7 +3,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import request from 'supertest'
 import { createApp } from './app.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
-import { products, faqEntries, demoBatches } from './data/seed.js'
+import { products, faqEntries, demoBatches } from './data/demoCatalog.js'
 import { pick, normalizeLang } from './i18n.js'
 import { isBatchPublic } from './domain/catalog.js'
 

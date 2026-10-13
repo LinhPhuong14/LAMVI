@@ -5,7 +5,7 @@ import { createApp } from './app.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
 import { createWeb } from './ssr.js'
 import { translate } from '../src/i18n/core.js'
-import { products } from './data/seed.js'
+import { products } from './data/demoCatalog.js'
 
 const SITE = 'https://moc.test'
 const config = { publicSiteUrl: SITE }

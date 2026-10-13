@@ -53,8 +53,8 @@ export default {
     title: 'Từ làng nghề giấy dó trăm năm',
     // §31.3 (mới phát hiện): bỏ ý "được lưu giữ theo cách bền bỉ" (D-26)
     text: 'Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ, lưu giữ ký ức của bao thế hệ. Chúng tôi mang chất liệu ấy trở lại trong hình hài một chiếc đèn — để câu chuyện của gia đình bạn được thắp lên từ chính chất liệu bền bỉ ấy.',
-    statYears: 'năm nghề giấy dó',
-    statArtisans: 'nghệ nhân đồng hành',
+    statLamps: 'chiếc đèn trong bộ sưu tập đầu tiên',
+    statStages: 'chặng hành trình: Dương Ổ – Phong Khê → Đông Hồ → LAMVI',
     // §31.3: thay "câu chuyện riêng mỗi đèn" (D-01, D-45)
     statStory: 'lời chúc riêng cho mỗi món quà',
   },
@@ -125,11 +125,9 @@ export default {
     eyebrow: 'Người giữ lửa nghề',
     title: 'Bàn tay tạo nên ánh sáng',
     quote:
-      '“Mỗi tờ giấy dó đều có tính khí riêng — ẩm quá thì rách, khô quá thì giòn. Phải quen tay hàng chục năm mới lên khung được một chiếc đèn tròn đều.”',
-    name: 'Nghệ nhân Nguyễn Văn Tài',
-    place: 'Làng Yên Thái, Hà Nội',
-    years: 'năm trong nghề',
-    made: 'chiếc đèn đã ra lò',
+      'Giấy dó lấy từ Dương Ổ – Phong Khê được đưa tới Đông Hồ, nơi Nghệ nhân Ưu tú Nguyễn Hữu Quả trực tiếp thực hiện công đoạn phủ điệp và phần nghệ thuật Đông Hồ phù hợp với từng chiếc đèn LAMVI.',
+    name: 'Nghệ nhân Ưu tú Nguyễn Hữu Quả',
+    place: 'Làng tranh Đông Hồ',
   },
   products: {
     viewAll: 'Xem thêm',
@@ -152,26 +150,26 @@ export default {
   },
   lookbook: {
     eyebrow: 'Lookbook',
-    title: 'Sắc màu của ánh sáng thủ công',
-    items: ['Hổ phách', 'Hoàng hôn', 'Bình minh', 'Trầm mộc', 'Lửa ấm'],
+    title: 'Năm bức tranh, năm ánh sáng',
+    items: ['Thu Hoạch', 'Tứ Linh', 'Phúc Lộc Song Toàn', 'Tam Dương Khai Thái', 'Lợn Đàn'],
   },
   process: {
     eyebrow: 'Hành trình thủ công',
     // §31.3: thay "Theo dõi đèn của bạn từng bước" (D-01)
     title: 'Theo dõi đơn của bạn qua từng công đoạn',
     steps: [
-      { label: 'Chọn giấy dó', note: 'Lọc từng tấm giấy dệt tay không tì vết' },
-      { label: 'Lên khung tre', note: 'Vót nan, uốn khung theo dáng cổ truyền' },
-      { label: 'Phơi nắng', note: 'Đợi nắng tự nhiên làm săn từng lớp giấy' },
-      // §31.3: thay "Gắn mã riêng lưu câu chuyện của bạn" (D-01, D-43)
-      { label: 'Đóng gói & khắc QR', note: 'Khắc mã mở video hành trình của mẻ đèn' },
+      { label: 'Giấy dó Dương Ổ – Phong Khê', note: 'Giấy dó thủ công lấy trực tiếp từ cơ sở làm giấy' },
+      { label: 'Phủ điệp & artwork Đông Hồ', note: 'Giấy được đưa tới Đông Hồ để phủ điệp và thực hiện phần nghệ thuật' },
+      { label: 'Lắp đèn & kiểm tra sáng', note: 'Thân đèn, đế gỗ và LED vàng ấm được lắp, căn chỉnh và thử sáng' },
+      // D-104: QR nằm trên thiệp cảm ơn, không khắc trên đèn
+      { label: 'Đóng gói & thiệp cảm ơn', note: 'Đèn và thiệp cảm ơn có mã QR được đóng hộp' },
     ],
   },
   qr: {
     eyebrow: 'Khoảnh khắc mở quà',
     title: 'Quét mã, thấy cả một câu chuyện',
     // §31.3: thay "Mỗi chiếc đèn mang một mã QR riêng … được lưu giữ lâu dài" (D-01, D-26, D-28)
-    text: 'Mã QR trên thiệp cảm ơn mở ra lời chúc của bạn, còn mã khắc trên đèn mở ra video hành trình mẻ đèn được làm ra. Người nhận chỉ cần đưa điện thoại lên, không cần cài ứng dụng.',
+    text: 'Mã QR trên thiệp cảm ơn đi kèm mở ra lời chúc của người tặng và video hành trình mẻ đèn được làm ra. LAMVI không khắc QR hay lời nhắn lên đèn. Người nhận chỉ cần đưa điện thoại lên, không cần cài ứng dụng.',
     points: [
       // §31.3: thay "Video quá trình làm đèn của chính chiếc đèn này" (D-01)
       'Video quá trình làm ra mẻ đèn, xem lại bất cứ lúc nào',
@@ -676,7 +674,7 @@ export default {
     eyebrow: 'Cửa hàng',
     title: 'Đèn giấy dó thủ công',
     lead: 'Chọn chiếc đèn bạn muốn thắp — cho chính mình hoặc gửi tặng người thương. Bạn chọn mua tặng hay mua cho mình ở bước thanh toán.',
-    perks: ['Thiệp cảm ơn có mã QR mở lời chúc', 'Mã QR khắc trên đèn mở video mẻ đèn', 'Giá đã gồm VAT, giao trong nước'],
+    perks: ['Thiệp cảm ơn có mã QR mở lời chúc', 'Quét QR trên thiệp để xem video hành trình mẻ đèn', 'Giá đã gồm VAT, giao trong nước'],
     filterLabel: 'Lọc theo loại',
     filters: {
       all: 'Tất cả',
@@ -704,7 +702,7 @@ export default {
     shippingAtCheckout: 'Xem mức phí bên dưới',
     emptyCopy: 'Mây gợi ý bạn ghé bộ sưu tập — mỗi chiếc đèn là một câu chuyện để thắp lên.',
     mayTitle: 'Mây nhắc nhỏ: mỗi món quà đi kèm',
-    perks: ['Thiệp cảm ơn có mã QR mở lời chúc của bạn', 'Mã QR khắc trên đèn mở video mẻ đèn được làm ra', 'Giá đã gồm VAT, giao trong nước'],
+    perks: ['Thiệp cảm ơn có mã QR mở lời chúc của bạn', 'Quét QR trên thiệp để xem video hành trình mẻ đèn được làm ra', 'Giá đã gồm VAT, giao trong nước'],
     unavailableName: 'Sản phẩm không còn bán',
     title: 'Giỏ hàng',
     nav: 'Giỏ hàng',
@@ -768,7 +766,7 @@ export default {
       steps: [
         'Chào mừng bạn đến với LAMVI! Mây dẫn bạn đi một vòng nhé: đây là đèn giấy dó thủ công làm quà tặng kể chuyện.',
         'Đây là bộ sưu tập. Bấm “Xem thêm” để vào Cửa hàng xem toàn bộ đèn; bấm vào một chiếc đèn để xem chi tiết và thêm vào giỏ. Giá hiển thị đã gồm VAT.',
-        'Mỗi món quà có hai mã QR: mã trên thiệp cảm ơn mở lời chúc của bạn, mã khắc trên đèn mở video hành trình làm ra mẻ đèn.',
+        'Mỗi món quà đi kèm thiệp cảm ơn có mã QR: quét mã sẽ mở lời chúc của bạn và video hành trình làm ra mẻ đèn. LAMVI không khắc QR lên đèn.',
         'Còn thắc mắc gì, bạn xem phần hỏi đáp này nha.',
         'Mây luôn ở góc này. Bấm vào Mây để hỏi bất cứ lúc nào, hoặc xem lại tour.',
       ],

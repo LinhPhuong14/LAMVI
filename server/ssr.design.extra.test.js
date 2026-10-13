@@ -32,10 +32,10 @@ describe('SSR trang chủ — nội dung chữ thật (không bị ẩn chờ an
     expect(h1.textContent).toBe(`${m.hero.title1}${m.hero.title2}`)
     expect(doc.querySelector('#story').textContent).toContain(m.story.text)
     const sr = [...doc.querySelectorAll('strong > .sr-only')].map((s) => s.textContent)
-    expect(sr).toEqual(expect.arrayContaining(['100+', '12', '1', '32', '4.000+']))
+    expect(sr).toEqual(expect.arrayContaining(['5', '3', '1']))
     // Số chạy (aria-hidden) cũng là giá trị thật lúc SSR — không phải 0
     const visible = [...doc.querySelectorAll('strong > [aria-hidden="true"]')].map((s) => s.textContent)
-    expect(visible).toEqual(expect.arrayContaining(['100+', '4.000+']))
+    expect(visible).toEqual(expect.arrayContaining(['5', '3']))
     expect(doc.querySelector('.nav-mark').getAttribute('href')).toBe(PREFIX[lang])
     expect(doc.body.textContent).toContain(m.products.collectionCopy)
   })

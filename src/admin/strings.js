@@ -55,7 +55,7 @@ export const S = {
       care: 'Cách bảo quản',
     },
     slugLocked: 'Sản phẩm đang bán nên không đổi slug (giữ link đã chia sẻ và giỏ hàng). Muốn đổi, hãy chuyển sang Đã ẩn trước.',
-    slugHint: 'Chữ thường không dấu, số, gạch nối. Ví dụ: den-nguyet',
+    slugHint: 'Chữ thường không dấu, số, gạch nối. Ví dụ: den-thu-hoach',
     kind: 'Loại',
     kinds: { single: 'Đèn đơn', set: 'Bộ đèn' },
     status: 'Trạng thái',
@@ -265,7 +265,7 @@ export const S = {
   },
   batches: {
     title: 'Lô đèn & video lô',
-    code: 'Mã lô (in trên QR khắc đèn)',
+    code: 'Mã lô (in trên thiệp cảm ơn)',
     codeHint: 'Chữ in hoa, số, gạch nối. Không đổi được sau khi xuất bản.',
     producedOn: 'Ngày làm',
     batchTitle: 'Tiêu đề',

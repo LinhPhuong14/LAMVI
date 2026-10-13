@@ -1,5 +1,17 @@
 # Nhật ký phiên
 
+## 2026-10-13 — Đồng bộ web với tài liệu nhóm (nhánh `feat/sync-real-content`)
+
+**Mục tiêu**: đưa nội dung thật từ tài liệu nhóm G30 (Content Plan, báo cáo đồ án, nội dung tranh Đông Hồ) vào web; cập nhật docs/checklist client/task tracker theo.
+
+**Quyết định từ người dùng (D-104)**: QR theo content plan (chỉ ở thiệp cảm ơn, không khắc trên đèn); giá tạm 1.400.000 đ cả 5 đèn; thay seed demo bằng 5 đèn thật.
+
+**Đã làm**: seed thật (1 bộ + 5 đèn + thông số + FAQ 9), sửa chữ i18n vi/en/zh (nghệ nhân, quy trình, lookbook, QR, số liệu), trang lời chúc luôn có nút video mẻ đèn, test chạy trên `demoCatalog` (T-83), test mới `realCatalog`, `messages.batchLink`, GiftPage. Spec v0.42: D-104, G-108…G-114, §9, §21.6, §31.3.
+
+**Còn lại / cần người dùng**: giá thật, ảnh sản phẩm thật, ảnh + đồng ý của nghệ nhân, duyệt bản en/zh, trang kể chuyện theo mẫu đèn (G-108), ẩn sản phẩm demo cũ trên DB thật (G-112), pháp lý ảnh/tư liệu (Q-36, G-113).
+
+---
+
 ## 2026-10-12 — Checklist việc cho bên business (nhánh `docs/client-checklist`)
 
 **Mục tiêu**: liệt kê mọi thứ client cần gửi/duyệt/quyết (logo, sản phẩm, category, nội dung từng section web, Mây, pháp lý, tài khoản dịch vụ…), kèm ảnh chụp web có nhãn mã khối.

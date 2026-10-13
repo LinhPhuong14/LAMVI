@@ -26,7 +26,7 @@ function BatchForm({ initial, onSaved, onCancel }) {
   async function onSubmit(e) {
     e.preventDefault()
     const body = { ...form }
-    if (locked) delete body.code // D-47: mã lô đã khắc không đổi
+    if (locked) delete body.code // D-47: mã lô đã in trên thiệp/tem không đổi
     const res = await run(() =>
       initial?.id
         ? authedApi(`/admin/batches/${initial.id}`, { method: 'PATCH', body })

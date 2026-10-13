@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import request from 'supertest'
 import { createApp } from './app.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
-import { demoBatches } from './data/seed.js'
+import { demoBatches } from './data/demoCatalog.js'
 
 // Feature 4 — GET /api/batches/:code (FR-QR-006, D-40, D-43, [ASSUMPTION] video_published + videoUrl)
 

@@ -120,3 +120,9 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Thông số sản phẩm (T-81, G-105) | ✅ code | migration `…021`, `server/domain/admin.js`, `ProductPage.jsx`, `ProductsPage.jsx`; `server/productSpecs.test.js`, `ProductTabs.test.jsx` | Chạy migration, nhập dữ liệu thật |
 | Quản trị: khoá slug, không xoá sản phẩm có đơn, bỏ mã đặc tả khỏi UI, `/it/notifications` (G-106) | ✅ code | `server/routes/admin.js`, `notificationOperations.js`, `src/admin/*`; `server/admin.extra.test.js`, `AdminStrings.test.js` | 33.1, 33.3, 33.9–33.11 |
 
+| Đợt v0.42 (đồng bộ tài liệu nhóm, D-104) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Danh mục thật 5 đèn + bộ sưu tập đầu tiên + thông số + FAQ 9 câu (D-104, G-109, G-110, G-112) | ✅ code | `server/data/seed.js`, `supabase/seed.sql`, `scripts/gen-seed-sql.js` (cột `specs`); `server/realCatalog.test.js` | Giá thật, ảnh thật, cân nặng/bảo quản; ẩn demo cũ trên DB thật |
+| QR chỉ ở thiệp cảm ơn, trang lời chúc luôn có nút video mẻ đèn (D-104) | ✅ code | `server/messages/service.js`, `src/pages/GiftPage.jsx`, i18n vi/en/zh; `messages.batchLink.test.js`, `GiftPage.test.jsx` | G-108: trang kể chuyện theo từng mẫu đèn |
+| Nội dung trang chủ: nghệ nhân, quy trình, lookbook, số liệu (G-111, G-114) | ✅ code | `HomePage.jsx`, i18n; `ssr.design.extra.test.js`, `Motion.extra.test.jsx` | Ảnh nghệ nhân thật + đồng ý; duyệt bản en/zh |
+| Test chạy trên danh mục demo (T-83) | ✅ | `server/data/demoCatalog.js`, `vitest.setup.js`, `server/adapters/memory/repo.js` | — |

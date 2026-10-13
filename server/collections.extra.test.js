@@ -6,7 +6,7 @@ import { createApp } from './app.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
 import { createMemoryAuth } from './adapters/memory/auth.js'
 import { createMemoryStorage } from './adapters/memory/storage.js'
-import { collections as seedCols, products as seedProducts } from './data/seed.js'
+import { collections as seedCols, products as seedProducts } from './data/demoCatalog.js'
 import { renderPage } from './ssr.js'
 import { render } from '../src/entry-server.jsx'
 

@@ -14,7 +14,7 @@ function TrackOpenBatch({ code }) {
   return null
 }
 
-// FR-QR-006, US-005: trang QR khắc trên đèn — public, video của lô (D-01, D-10, D-43), noindex (D-44)
+// FR-QR-006, US-005: trang video lô — public, video của lô (D-01, D-10, D-43), noindex (D-44). D-104: mở từ thiệp cảm ơn, không khắc trên đèn
 export default function BatchPage() {
   const { code } = useParams()
   const { t, lang, path } = useI18n()

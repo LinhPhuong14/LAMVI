@@ -230,8 +230,9 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
       mediaExpiresAt: !expired && hasMedia(message) && deadline ? deadline.toISOString() : null,
       mediaDaysLeft: !expired && hasMedia(message) ? mediaDaysLeft(order, message, now()) : null,
     }
-    // D-76: đơn không có lời chúc → QR dẫn tới video mẻ đèn
-    if (!message.text && !hasMedia(message) && !message.mediaDeletedAt) item.batch = await latestBatch()
+    // D-76: đơn không có lời chúc → QR dẫn tới video mẻ đèn. D-104: QR chỉ ở thiệp cảm ơn nên
+    // mọi trang lời chúc đều kèm lối tới video mẻ đèn mới nhất (không chỉ khi trống)
+    item.batch = await latestBatch()
     return item
   }
 

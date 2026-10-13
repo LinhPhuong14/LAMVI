@@ -204,7 +204,7 @@ describe('Lỗi theo trường hiện đúng chỗ', () => {
     })
     renderAt('/admin/batches')
     fireEvent.click(await screen.findByRole('button', { name: 'Thêm mới' }))
-    const code = screen.getByLabelText('Mã lô (in trên QR khắc đèn)')
+    const code = screen.getByLabelText('Mã lô (in trên thiệp cảm ơn)')
     fireEvent.change(code, { target: { value: 'l 1' } })
     expect(code).toHaveValue('L 1') // tự viết hoa
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }))

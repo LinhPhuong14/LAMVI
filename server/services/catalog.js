@@ -25,7 +25,7 @@ export async function listPublicFaq(repo, lang) {
   return { items: items.map((f) => presentFaq(f, lang)) }
 }
 
-// D-43: QR khắc trên đèn là mã chung của lô; trang công khai, không cần đăng nhập (US-005)
+// D-43 (D-104: QR ở thiệp cảm ơn, không khắc trên đèn): mã lô là mã chung của lô; trang công khai, không cần đăng nhập (US-005)
 export async function getPublicBatch(repo, code, lang) {
   const b = await repo.getBatchByCode(code)
   if (!b || !isBatchPublic(b)) throw notFound()

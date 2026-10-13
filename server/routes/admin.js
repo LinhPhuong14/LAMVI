@@ -209,7 +209,7 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
     const { errors, values } = validateBatch(body(req), { partial: true })
     assertValid(errors)
     const batch = found(await repo.getBatchById(req.params.id))
-    // Mã lô đã khắc trên đèn sau khi xuất bản → không đổi được (D-43, D-47)
+    // Mã lô đã in trên thiệp/tem sau khi xuất bản → không đổi được (D-43, D-47, D-104)
     if (isPublished(batch) && values.code !== undefined && values.code !== batch.code) {
       throw new HttpError(409, 'BATCH_CODE_LOCKED', 'Không đổi mã lô đã xuất bản', { code: 'BATCH_CODE_LOCKED' })
     }

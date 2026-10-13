@@ -14,7 +14,7 @@ export const IMAGE_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/web
 export const isImageType = (t) => typeof t === 'string' && Object.hasOwn(IMAGE_TYPES, t)
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-// Mã lô in trên QR khắc đèn: chữ in hoa, số, gạch nối [ASSUMPTION]
+// Mã lô in trên thiệp/tem (D-104): chữ in hoa, số, gạch nối [ASSUMPTION]
 const BATCH_CODE_RE = /^[A-Z0-9]+(?:-[A-Z0-9]+)*$/
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
