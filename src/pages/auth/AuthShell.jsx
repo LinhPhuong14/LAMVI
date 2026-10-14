@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom'
-import { Lotus, Seal } from '../../components/Motifs'
+import { Lotus } from '../../components/Motifs'
+import Logo from '../../components/Logo.jsx'
 import { useI18n } from '../../i18n/index.js'
 import Seo from '../../seo/Seo.jsx'
 
@@ -38,7 +39,7 @@ export default function AuthShell({ eyebrow, title, lead, tab, children, footer 
             <em>{t('auth.heroLine2')}</em>
           </p>
           <p className="auth-aside-quote">{t('auth.heroLead')}</p>
-          <Seal className="auth-aside-seal">LAMVI</Seal>
+          <Logo size={72} className="auth-aside-logo" />
         </aside>
         <div className="auth-panel">
           {tab && (

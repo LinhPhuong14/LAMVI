@@ -1,5 +1,15 @@
 # Nhật ký phiên
 
+## 2026-10-14 (phiên 2) — Protect router + ảnh fanpage (nhánh `feat/protected-routes-fanpage-images`)
+
+**Yêu cầu PO**: "thêm protect router, và thay ảnh fanpage vào trong web" → D-106.
+
+**Đã làm**: `ProtectedRoute`/`GuestRoute` + cờ `ready` (T-85); logo fanpage thay con dấu chữ ở header/footer/đăng nhập/dashboard, ảnh bìa ở mục Di sản, og:image dựng từ ảnh bìa, poster 5 đèn làm ảnh mặc định (hero, lookbook, trang sản phẩm…) (T-86). Subagent kiểm thử độc lập (T-11).
+
+**Còn lại / cần người dùng**: ảnh gốc độ phân giải cao (ảnh nguồn chỉ 206 px, phóng lên nên mềm); xác nhận poster dùng được làm ảnh sản phẩm; logo vector; thông tin liên hệ (G-115).
+
+---
+
 ## 2026-10-14 — Trang kể chuyện từng mẫu đèn + ảnh fanpage (nhánh `feat/lamp-story-pages`)
 
 **Mục tiêu**: G-108 (QR thiệp → câu chuyện mẫu đèn → lời chúc) và lấy ảnh từ fanpage chính thức.

@@ -23,6 +23,8 @@ Nguồn: `LAMVI_Content_Plan.xlsm`, báo cáo `GRP490 G30 - LAMVI`, `Nội dung 
 | Khối Nghệ nhân dùng tên thật; quy trình 4 bước; lookbook = 5 đèn; số liệu trang chủ chỉ giữ số kiểm chứng được; FAQ thêm 4 câu (giấy dó ≠ giấy điệp, nguồn giấy, QR ở đâu, kích thước/nguồn sáng) | Ảnh + đồng ý của nghệ nhân; duyệt các câu mới; bản en/zh do dev dịch |
 | Bài "Đàn Lợn Âm Dương" và "Tam Dương Khai Thái" (do nhóm viết) chưa đưa lên web — là nguồn cho mô tả dài/gallery | Phần "Tài liệu tham khảo" trong file là trích nguồn ngoài, **không đưa lên web** khi chưa xin phép |
 | **(14/10) Trang kể chuyện theo từng mẫu đèn**: quét QR thiệp → câu chuyện của mẫu → lời chúc; tab "Câu chuyện" ở trang sản phẩm; admin nhập; Mây dùng làm nguồn | Duyệt 5 câu chuyện + bản en/zh; ảnh riêng từng mẫu (mục 7.7) |
+| **(14/10) Bảo vệ route**: trang tài khoản, thanh toán, đơn hàng, admin, IT yêu cầu đăng nhập (chuyển tới đăng nhập rồi quay lại); khách đã đăng nhập mở trang đăng nhập/đăng ký thì được chuyển đi | Không cần client làm gì |
+| **(14/10) Ảnh từ fanpage chính thức đã vào web**: logo (header/footer/đăng nhập), ảnh bìa (mục Di sản + ảnh chia sẻ), poster 5 đèn (hero, lookbook, trang sản phẩm…) | Ảnh gốc độ phân giải cao; xác nhận quyền dùng poster làm ảnh sản phẩm |
 | **(14/10) Ảnh từ fanpage chính thức**: logo đại diện → favicon/apple-touch-icon (thay logo Vite); ảnh bìa lưu ở `public/images/brand/` | Logo vector gốc; ảnh sản phẩm gốc (fanpage chỉ cho ≤206 px khi chưa đăng nhập); xác nhận thông tin liên hệ trên banner (7.8) |
 
 ## Cách đọc tài liệu này
@@ -58,7 +60,7 @@ Nguồn: `LAMVI_Content_Plan.xlsm`, báo cáo `GRP490 G30 - LAMVI`, `Nội dung 
 | # | Việc client cần làm | Hiện trạng | Ưu tiên |
 |---|---|---|---|
 | 1.1 | **Gửi bộ logo chính thức**: SVG (vector) + PNG nền trong, bản ngang / dọc / một màu (trắng, đen) | Logo hiện là chữ "LAMVI" dạng triện đỏ do dev vẽ bằng code (thấy ở thanh menu `HOME-01` và chân trang `FOOT-01`), **chưa phải logo thật** | 🔴 |
-| 1.1b | Logo trên **thanh menu** hiện vẫn là chữ triện đỏ dev vẽ tạm; logo thật của LAMVI (fanpage) là vòng tròn nâu–vàng "LV LAMVI — Ánh sáng từ di sản Việt" kèm wordmark có ngọn lửa. Quyết định: thay logo trên web bằng logo thật? (cần file vector) | Chưa đổi — chờ client quyết | 🔴 |
+| 1.1b | Logo trên **thanh menu / chân trang / trang đăng nhập / dashboard**: từ 14/10 đã thay con dấu chữ bằng **logo tròn nâu–vàng lấy từ fanpage** (200 px, hơi mềm khi phóng to). Cần file vector/PNG lớn để thay bản này | Đã đưa lên web — cần file gốc | 🟠 |
 | 1.2 | **Favicon / icon tab trình duyệt** (32×32, 180×180 cho iOS, 512×512) | Từ 14/10 đã dùng **logo đại diện fanpage (200 px)** làm favicon 64 px + apple-touch-icon 180 px, thay logo mặc định của Vite. Cần file gốc độ phân giải cao để làm bản 512 px | 🟠 |
 | 1.3 | Xác nhận / cung cấp **brand guideline**: bảng màu, font, quy tắc dùng logo, khoảng trắng tối thiểu | Dev suy ra từ landing cũ, ghi ở `docs/BRAND_GUIDELINE.md` (nền kem giấy, đỏ son chu sa, nâu mực, navy đêm). Cần client xác nhận đúng ý | 🟠 |
 | 1.4 | Font chữ: xác nhận dùng **Fraunces** (tiêu đề) + **Be Vietnam Pro** (nội dung) hoặc gửi font bản quyền khác (kèm giấy phép dùng web) | Đang dùng 2 font mã nguồn mở trên | 🟡 |
@@ -200,7 +202,7 @@ Mây là chatbot ở góc phải dưới mọi trang ([may-01](screenshots/may-0
 | 7.4 | **Chính sách lưu trữ**: giọng nói/video lời chúc xoá sau 30 ngày kể từ khi người nhận xác nhận (hoặc 90 ngày sau giao nếu không ai xác nhận); chữ + video lô lưu mãi — client xác nhận còn đúng | Đã chốt D-12/D-26 | 🟡 |
 | 7.5 | Quyết định **Q-12** thiệp/lời chúc có tính phí không (đang miễn phí), **Q-14** admin có xem/kiểm duyệt lời chúc không, **Q-27** người mua xem trước trang QR không, **Q-29** lời chúc không phải tiếng Việt xử lý thế nào, **Q-33** có PIN bảo vệ trang lời chúc không, **Q-25** QR của đơn tự mua dẫn tới đâu | Xem [mục 13](#13-câu-hỏi-nghiệp-vụ-còn-mở-cần-client-quyết) | 🟠 |
 | 7.6 | **Duyệt câu chuyện 5 đèn** (VI/EN/ZH) — đã làm trang kể chuyện: quét QR trên thiệp → câu chuyện của đúng mẫu đèn → lời chúc; tab "Câu chuyện" ở trang sản phẩm. Nội dung soạn từ Content Plan + hai bài của nhóm. Sửa trực tiếp ở **/admin → Sản phẩm → Câu chuyện của mẫu đèn** hoặc trong file Excel nội dung | Đã lên web (D-105) — chờ duyệt nội dung | 🟠 |
-| 7.7 | **Ảnh gốc từng mẫu đèn**: poster trên fanpage chỉ lấy được bản thu nhỏ ≤ 206 px khi chưa đăng nhập → không dùng cho web. Gửi ảnh gốc (đèn bật/tắt, cận cảnh). Lưu ý: sản phẩm thật là **đèn trụ** trên đế gỗ tối màu, trong khi hình minh hoạ trên web đang là **lồng đèn** → cần thay bằng ảnh thật | Chưa có | 🔴 |
+| 7.7 | **Ảnh gốc từng mẫu đèn**: từ 14/10 web đã dùng **poster 5 đèn từ fanpage** (thumbnail 206 px phóng lên) ở hero, lookbook, trang sản phẩm, cửa hàng, giỏ, lời chúc — nên ảnh mềm và có chữ in sẵn. Cần ảnh gốc độ phân giải cao (đèn bật/tắt, cận cảnh) và xác nhận poster được dùng làm ảnh sản phẩm. Hình dựng trông như ảnh tạo bằng công cụ AI hơn là ảnh chụp thật — xác nhận | Đã đưa lên web (tạm) — cần ảnh gốc | 🔴 |
 | 7.8 | **Xác nhận thông tin liên hệ** đọc được từ banner fanpage: địa chỉ "Làng Khánh S, Vinhomes Thăng Long, An Khánh, Hà Nội"; hotline 0962 254 128; email lamvi6866@gmail.com (**mục Giới thiệu của fanpage ghi lamvi6886@gmail.com** — khác nhau); website lamvi.com.vn; TikTok @lamvi360. Chưa đưa lên web/email cho tới khi xác nhận | Chờ xác nhận (G-115) | 🔴 |
 
 ---

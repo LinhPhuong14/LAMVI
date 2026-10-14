@@ -126,7 +126,8 @@ describe('MessageService.view — lamps (QR trên thiệp mở câu chuyện tr�
     const item = await view([{ slug: 'den-thu-hoach' }, { slug: 'den-lon-dan' }])
     expect(item.lamps.map((l) => l.slug)).toEqual(['den-thu-hoach', 'den-lon-dan'])
     expect(item.lamps[0]).toMatchObject({ name: 'Đèn Thu Hoạch', story: 'Truyện 1\n\nTruyện 2', image: { url: 'https://img/x.jpg', alt: 'Ảnh' } })
-    expect(item.lamps[1]).toMatchObject({ story: null, image: null, description: 'Mô tả 2' })
+    // đèn không có ảnh admin → ảnh mặc định từ fanpage (server/domain/photos.js)
+    expect(item.lamps[1]).toMatchObject({ story: null, image: { url: '/images/lamps/lon-dan.jpg', alt: 'Đèn Lợn Đàn' }, description: 'Mô tả 2' })
   })
   it('theo ngôn ngữ trang lời chúc (qrLang), rơi về tiếng Việt', async () => {
     const item = await view([{ slug: 'den-thu-hoach' }, { slug: 'den-lon-dan' }], { lang: 'en' })

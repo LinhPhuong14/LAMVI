@@ -178,7 +178,7 @@ export default function ProductPage() {
         <div className={`pdp-art tone-${p.tone}`}>
           {p.badge && <Seal className="product-badge">{p.badge}</Seal>}
           <div className="pdp-art-stage">
-            <ProductImage image={p.image} size={300} tone={p.tone} name={p.name} priority swing />
+            <ProductImage image={p.image} size={300} tone={p.tone} name={p.name} priority swing fill />
           </div>
         </div>
         <div className="pdp-buy">

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
-import { Seal } from './Motifs'
+import Logo from './Logo.jsx'
 import { Reveal } from './Reveal'
 import { BrandHover } from './Effects'
 import { group } from '../lib/motion.js'
@@ -18,7 +18,7 @@ export default function SiteFooter() {
     <footer className="footer">
       <div className="footer-grid">
         <div className="footer-brand">
-          <Seal className="seal-lg">LAMVI</Seal>
+          <Logo size={104} className="brand-logo-lg" />
           <p>{t('footer.tagline')}</p>
           {business?.legalName && <p>{business.legalName}</p>}
           {business?.registration && <p>{business.registration}</p>}

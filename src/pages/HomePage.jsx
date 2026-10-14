@@ -38,6 +38,8 @@ import { useSiteUrl } from '../seo/context.js'
 import ProductCards from '../components/ProductCards'
 
 const TONES = ['amber', 'dusk', 'dawn', 'moss', 'dusk']
+// Ảnh 5 đèn từ fanpage chính thức (public/images/lamps/CREDITS.md) — cùng thứ tự với lookbook.items
+const LOOKBOOK_PHOTOS = ['thu-hoach', 'tu-linh', 'phuc-loc-song-toan', 'tam-duong-khai-thai', 'lon-dan']
 const SIZES = ['tall', 'short', 'short', 'tall', 'short']
 
 // Màn hình đầu chạy bằng CSS (class `intro`, `word`): hiện ngay khi HTML server tới trình duyệt,
@@ -278,7 +280,8 @@ function Hero() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 55, damping: 11, delay: 0.3 }}
           >
-            <Lantern size={250} tone="dusk" swing flicker />
+            {/* Ảnh đèn thật từ fanpage (mẫu Tứ Linh), thay lồng đèn minh hoạ — public/images/lamps/CREDITS.md */}
+            <img className="hero-photo" src="/images/lamps/tu-linh.jpg" alt={t('lookbook.items')[1]} width={300} height={300} fetchPriority="high" decoding="async" />
           </m.div>
         </m.div>
         <m.div
@@ -384,6 +387,11 @@ export default function HomePage() {
             </m.div>
           ))}
         </m.div>
+        {/* Ảnh bìa fanpage chính thức (đã cắt bỏ dải thông tin liên hệ chưa xác nhận — G-115) */}
+        <m.figure className="story-cover" variants={rise}>
+          <img src="/images/brand/cover-960x460.jpg" alt={t('story.coverAlt')} width={960} height={460} loading="lazy" decoding="async" />
+          <figcaption>{t('story.coverCaption')}</figcaption>
+        </m.figure>
         <FolkGallery />
       </Reveal>
 
@@ -454,7 +462,11 @@ export default function HomePage() {
               >
                 <m.span className="lookbook-halo" aria-hidden="true" variants={lampHalo} />
                 <m.div className="lookbook-lamp" variants={lampBody}>
-                  <Lantern size={SIZES[i] === 'tall' ? 140 : 104} tone={TONES[i]} swing />
+                  {LOOKBOOK_PHOTOS[i] ? (
+                    <img className="lookbook-photo" src={`/images/lamps/${LOOKBOOK_PHOTOS[i]}.jpg`} alt={label} width={150} height={150} loading="lazy" decoding="async" />
+                  ) : (
+                    <Lantern size={SIZES[i] === 'tall' ? 140 : 104} tone={TONES[i]} swing />
+                  )}
                 </m.div>
                 <span className="lookbook-caption">{label}</span>
               </m.div>

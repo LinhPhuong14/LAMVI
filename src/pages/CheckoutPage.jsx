@@ -80,10 +80,7 @@ export default function CheckoutPage() {
     if (Object.keys(fields).length) checkoutForm.current?.querySelector('[aria-invalid="true"]')?.focus()
   }, [fields])
 
-  // D-36 / FR-CHK-001: chưa đăng nhập → đăng nhập rồi quay lại
-  useEffect(() => {
-    if (!user) navigate(`${path('/login')}?next=${encodeURIComponent(path('/checkout'))}`, { replace: true })
-  }, [user, navigate, path])
+  // D-36 / FR-CHK-001: chưa đăng nhập → <ProtectedRoute> (routes.jsx) chuyển tới đăng nhập rồi quay lại
 
   // Feedback 08/10, 7.4: “Giao cho tôi” tự điền tên + số điện thoại từ hồ sơ (chỉ khi khách chưa gõ gì)
   useEffect(() => {

@@ -138,7 +138,8 @@ describe('D-62: trang chủ (client) /, /en, /zh', () => {
     const logo = screen.getByRole('link', { name: 'LAMVI' })
     expect(logo).toHaveClass('nav-mark')
     expect(logo).toHaveAttribute('href', PREFIX[lang])
-    expect(logo.querySelector('.seal').textContent).toBe('LAMVI')
+    // 14/10: logo chính thức (ảnh fanpage) thay con dấu chữ ở header
+    expect(logo.querySelector('img.brand-logo')).toHaveAttribute('src', '/images/brand/logo-round-200.jpg')
 
     // Ấn triện dọc
     const vseal = container.querySelector('.hero-seal .vseal')
@@ -146,7 +147,7 @@ describe('D-62: trang chủ (client) /, /en, /zh', () => {
 
     // Footer: Seal LAMVI + chữ lớn BrandHover
     const footer = container.querySelector('footer.footer')
-    expect(footer.querySelector('.footer-brand .seal').textContent).toBe('LAMVI')
+    expect(footer.querySelector('.footer-brand img.brand-logo')).toHaveAttribute('alt', 'LAMVI')
     const brand = footer.querySelector('.footer-brandmark svg.brand-hover')
     expect(brand).not.toBeNull()
     expect(brand.textContent).toContain('LAMVI')

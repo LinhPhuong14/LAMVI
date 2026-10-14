@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet } from 'react-router-dom'
 import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import { useAuth } from '../auth/context.js'
 import { Seal } from '../components/Motifs'
@@ -25,7 +25,6 @@ const NAV = [
 // BR-SEO-001: admin noindex
 function Gate() {
   const { user, authedApi } = useAuth()
-  const location = useLocation()
   const [state, setState] = useState({ status: 'loading' })
 
   useEffect(() => {
@@ -42,9 +41,8 @@ function Gate() {
   }, [user, authedApi])
 
   const seo = <Seo title={S.title} noindex />
-  if (!user) {
-    return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />
-  }
+  // Chưa đăng nhập → <ProtectedRoute> (routes.jsx) chuyển hướng; ở đây chỉ kiểm quyền hiển thị
+  if (!user) return null
   if (state.status === 'loading') {
     return (
       <p className="admin-main">

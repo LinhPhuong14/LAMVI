@@ -1,5 +1,6 @@
 import { pick } from '../i18n.js'
 import { presentStock } from './stock.js'
+import { productImage } from './photos.js'
 
 // D-39: chỉ sản phẩm Published được hiển thị và bán; Hidden/Draft coi như không tồn tại với khách
 export const PUBLIC_PRODUCT_STATUSES = ['published']
@@ -25,7 +26,7 @@ export function presentProduct(p, lang, { withStory = false } = {}) {
     price: p.price,
     currency: 'VND',
     // G-23: ảnh thật của sản phẩm; chưa có thì frontend dùng hình minh hoạ SVG (G-33)
-    image: p.imageUrl ? { url: p.imageUrl, alt: pick(p.imageAlt, lang) } : null,
+    image: productImage(p, lang),
   }
 }
 

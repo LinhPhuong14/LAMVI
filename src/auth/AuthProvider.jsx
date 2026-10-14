@@ -19,6 +19,9 @@ export default function AuthProvider({ children }) {
   const hydrated = useHydrated()
   const restoreStoredSession = useRef(!hydrated)
   const [session, setSession] = useState(() => hydrated ? initialSession() : null)
+  // ready: phiên đã được khôi phục từ localStorage (SSR/lần render hydrate đầu luôn là khách) — ProtectedRoute
+  // chỉ quyết định chuyển hướng khi ready, tránh đá người đã đăng nhập về trang đăng nhập
+  const [ready, setReady] = useState(hydrated)
   const sessionRef = useRef(session)
   const refreshing = useRef(null)
 
@@ -32,7 +35,10 @@ export default function AuthProvider({ children }) {
     if (hydrated && restoreStoredSession.current) {
       restoreStoredSession.current = false
       // The public SSR header is anonymous. Restore only after it has hydrated.
-      queueMicrotask(() => update(initialSession()))
+      queueMicrotask(() => {
+        update(initialSession())
+        setReady(true)
+      })
     }
   }, [hydrated, update])
 
@@ -87,8 +93,8 @@ export default function AuthProvider({ children }) {
   }, [update])
 
   const value = useMemo(
-    () => ({ session, user: session?.user ?? null, login, refreshSession: refresh, logout, authedApi }),
-    [session, login, refresh, logout, authedApi],
+    () => ({ session, user: session?.user ?? null, ready, login, refreshSession: refresh, logout, authedApi }),
+    [session, ready, login, refresh, logout, authedApi],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

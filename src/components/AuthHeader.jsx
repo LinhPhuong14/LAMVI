@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { splitLocale, useI18n } from '../i18n/index.js'
-import { Seal } from './Motifs'
+import Logo from './Logo.jsx'
 import { LanguageSwitcher } from './SiteHeader'
 
 // Header riêng cho đăng nhập / đăng ký / quên / đặt lại mật khẩu (D-80): không có link tới các phần
@@ -12,7 +12,7 @@ export default function AuthHeader() {
   return (
     <header className="nav nav-auth">
       <Link to={path('/')} className="nav-mark" aria-label="LAMVI">
-        <Seal>LAMVI</Seal>
+        <Logo size={42} decorative />
       </Link>
       <div className="nav-actions">
         <LanguageSwitcher />

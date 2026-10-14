@@ -131,7 +131,6 @@ describe('Form — trạng thái gửi', () => {
 
   it('nút đăng ký, quên mật khẩu, lưu hồ sơ cũng disabled khi đang gửi', async () => {
     const pending = () => new Promise(() => {})
-    localStorage.setItem('moc.session', JSON.stringify(session))
     mockApi({ ...base, 'POST /auth/register': pending, 'POST /auth/forgot-password': pending, 'GET /me': () => ({ body: { profile } }), 'PATCH /me': pending })
 
     const r1 = renderAt('/register')
@@ -147,6 +146,8 @@ describe('Form — trạng thái gửi', () => {
     expect(await screen.findByRole('button', { name: 'Đang xử lý…' })).toBeDisabled()
     r2.unmount()
 
+    // GuestRoute: đã có phiên thì /register, /forgot-password bị chuyển đi — chỉ đặt phiên cho trang tài khoản
+    localStorage.setItem('moc.session', JSON.stringify(session))
     renderAt('/account?tab=profile')
     fireEvent.click(await screen.findByRole('button', { name: 'Lưu thay đổi' }))
     expect(await screen.findByRole('button', { name: 'Đang xử lý…' })).toBeDisabled()

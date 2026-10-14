@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, Navigate, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import LocaleProvider from '../i18n/LocaleProvider.jsx'
 import { useI18n } from '../i18n/index.js'
 import { useAuth } from '../auth/context.js'
@@ -301,7 +301,6 @@ function Dashboard() {
 
 function Gate() {
   const { user, authedApi } = useAuth()
-  const location = useLocation()
   const [state, setState] = useState({ status: 'loading' })
 
   useEffect(() => {
@@ -317,7 +316,7 @@ function Gate() {
   }, [user, authedApi])
 
   const seo = <Seo title={S.title} noindex />
-  if (!user) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />
+  if (!user) return null // chuyển hướng do <ProtectedRoute> (routes.jsx)
   if (state.status === 'loading') {
     return (
       <p className="admin-main">

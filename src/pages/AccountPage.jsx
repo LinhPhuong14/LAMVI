@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../components/Field'
 import Lantern from '../components/Lantern'
 import { GiftArt, HeroScene, LetterArt } from '../components/DashArt'
 import DashSky from '../components/DashSky'
 import Price from '../components/Price'
-import { Lotus, Seal } from '../components/Motifs'
+import { Lotus } from '../components/Motifs'
+import Logo from '../components/Logo.jsx'
 import { LanguageSwitcher } from '../components/SiteHeader'
 import MayAvatar from '../may/MayAvatar'
 import { HTML_LANG, LOCALES, useI18n } from '../i18n/index.js'
@@ -440,7 +441,6 @@ export default function AccountPage() {
   const { user, authedApi, logout } = useAuth()
   const { cart } = useCart()
   const myOrders = useMyOrders()
-  const location = useLocation()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
   const [state, setState] = useState({ status: 'loading' })
@@ -467,10 +467,8 @@ export default function AccountPage() {
     }
   }, [user, authedApi])
 
-  if (!user) {
-    const next = encodeURIComponent(location.pathname + location.search)
-    return <Navigate to={`${path('/login')}?next=${next}`} replace />
-  }
+  // Chuyển hướng khi chưa đăng nhập do <ProtectedRoute> (routes.jsx) lo
+  if (!user) return null
 
   function go(next, { focusTab = false } = {}) {
     setParams(next === 'overview' ? {} : { tab: next })
@@ -516,7 +514,7 @@ export default function AccountPage() {
       <aside className="dash-side">
         <div className="dash-brand">
           <Link to={path('/')} className="nav-mark" aria-label="LAMVI">
-            <Seal>LAMVI</Seal>
+            <Logo size={40} decorative />
           </Link>
           <div className="dash-brand-tools">
             <LanguageSwitcher />

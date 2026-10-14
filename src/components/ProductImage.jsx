@@ -9,9 +9,10 @@ import Lantern from './Lantern.jsx'
  * @param {number} p.size cạnh của khung vuông (px)
  * @param {string} [p.tone] tông màu cho hình minh hoạ
  * @param {string} [p.name] tên sản phẩm — dùng làm alt dự phòng khi chưa đặt chú thích ảnh
+ * @param {boolean} [p.fill] ảnh thật phủ kín khung cha (trang chi tiết); hình minh hoạ vẫn theo `size`
  * @param {boolean} [p.priority] ảnh ở màn hình đầu (không lazy-load, tránh chậm LCP)
  */
-export default function ProductImage({ image, size, tone = 'amber', name, priority = false, swing = false }) {
+export default function ProductImage({ image, size, tone = 'amber', name, priority = false, swing = false, fill = false }) {
   if (!image?.url) return <Lantern size={size} tone={tone} swing={swing} />
   return (
     <img
@@ -24,7 +25,7 @@ export default function ProductImage({ image, size, tone = 'amber', name, priori
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
       // Ảnh vuông, cắt theo khung (CSS object-fit) để lưới sản phẩm không bị lệch
-      style={{ width: size, height: size }}
+      style={fill ? { width: '100%', height: 'auto', aspectRatio: '1' } : { width: size, height: size }}
     />
   )
 }

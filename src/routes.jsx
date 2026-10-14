@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import RouteLoader from './components/RouteLoader.jsx'
+import { GuestRoute, ProtectedRoute } from './auth/ProtectedRoute.jsx'
 const ReturnsPage = lazy(() => import('./admin/ReturnsPage'))
 import { Navigate, Route, Routes } from 'react-router-dom'
 import LocaleLayout from './components/LocaleLayout'
@@ -50,14 +51,14 @@ function localeChildren() {
       <Route path="contact" element={<ContactPage />} />
       <Route path="collections/:slug" element={<CollectionPage />} />
       <Route path="cart" element={<RouteLoader><CartPage /></RouteLoader>} />
-      <Route path="checkout" element={<RouteLoader><CheckoutPage /></RouteLoader>} />
-      <Route path="don-hang/:code" element={<RouteLoader><OrderPage /></RouteLoader>} />
-      <Route path="login" element={<RouteLoader><LoginPage /></RouteLoader>} />
+      <Route path="checkout" element={<ProtectedRoute><RouteLoader><CheckoutPage /></RouteLoader></ProtectedRoute>} />
+      <Route path="don-hang/:code" element={<ProtectedRoute><RouteLoader><OrderPage /></RouteLoader></ProtectedRoute>} />
+      <Route path="login" element={<GuestRoute><RouteLoader><LoginPage /></RouteLoader></GuestRoute>} />
       <Route path="auth/callback" element={<RouteLoader><AuthCallbackPage /></RouteLoader>} />
-      <Route path="register" element={<RouteLoader><RegisterPage /></RouteLoader>} />
-      <Route path="forgot-password" element={<RouteLoader><ForgotPasswordPage /></RouteLoader>} />
+      <Route path="register" element={<GuestRoute><RouteLoader><RegisterPage /></RouteLoader></GuestRoute>} />
+      <Route path="forgot-password" element={<GuestRoute><RouteLoader><ForgotPasswordPage /></RouteLoader></GuestRoute>} />
       <Route path="reset-password" element={<RouteLoader><ResetPasswordPage /></RouteLoader>} />
-      <Route path="account" element={<RouteLoader><AccountPage /></RouteLoader>} />
+      <Route path="account" element={<ProtectedRoute><RouteLoader><AccountPage /></RouteLoader></ProtectedRoute>} />
       <Route path="*" element={<NotFoundPage />} />
     </>
   )
@@ -68,9 +69,9 @@ export default function AppRoutes() {
   return (
     <Routes>
       {/* D-51: dashboard IT */}
-      <Route path="/it" element={<RouteLoader><ItDashboard /></RouteLoader>} />
+      <Route path="/it" element={<ProtectedRoute><RouteLoader><ItDashboard /></RouteLoader></ProtectedRoute>} />
       {/* D-48: admin chỉ tiếng Việt */}
-      <Route path="/admin" element={<RouteLoader><AdminLayout /></RouteLoader>}>
+      <Route path="/admin" element={<ProtectedRoute><RouteLoader><AdminLayout /></RouteLoader></ProtectedRoute>}>
         <Route index element={<Navigate to="orders" replace />} />
         <Route path="orders" element={<RouteLoader><AdminOrdersPage /></RouteLoader>} />
         <Route path="orders/:code" element={<RouteLoader><AdminOrdersPage /></RouteLoader>} />

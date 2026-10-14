@@ -1,6 +1,6 @@
 import ReturnRequest from '../returns/ReturnRequest.jsx'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { Reveal } from '../components/Reveal'
 import Seo from '../seo/Seo.jsx'
 import { useI18n } from '../i18n/index.js'
@@ -27,17 +27,12 @@ export default function OrderPage() {
   const { code } = useParams()
   const { t, lang, path } = useI18n()
   const { user, authedApi } = useAuth()
-  const navigate = useNavigate()
   const [params] = useSearchParams()
   const isNew = params.get('moi') === '1'
 
   const [order, setOrder] = useState(null)
   const [error, setError] = useState(null)
   const [cancelling, setCancelling] = useState(false)
-
-  useEffect(() => {
-    if (!user) navigate(`${path('/login')}?next=${encodeURIComponent(path(`/don-hang/${code}`))}`, { replace: true })
-  }, [user, navigate, path, code])
 
   const load = useCallback(async () => {
     try {

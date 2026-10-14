@@ -1,5 +1,6 @@
 import { PUBLIC_PRODUCT_STATUSES, isBatchPublic } from '../domain/catalog.js'
 import { localePath, pick } from '../i18n.js'
+import { productImage } from '../domain/photos.js'
 
 const GALLERY_ORDER_LIMIT = 200
 
@@ -43,7 +44,7 @@ export async function buildGallery(repo, userId, lang) {
     slug: p.slug,
     name: pick(p.name, lang),
     tone: p.tone,
-    image: p.imageUrl ? { url: p.imageUrl, alt: pick(p.imageAlt, lang) } : null,
+    image: productImage(p, lang),
     collection: p.collectionSlug ?? null,
     orderCode: entry.order.code,
     receivedAt: entry.order.deliveredAt ?? entry.order.createdAt,

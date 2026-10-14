@@ -1,10 +1,9 @@
 # Ảnh chia sẻ mạng xã hội — public/images/og
 
-| File | Cách tạo | Nguồn ảnh nền | Giấy phép |
+| File | Cách tạo | Nguồn ảnh | Giấy phép |
 |---|---|---|---|
-| `default.png` (1200×630) | Dựng bằng `npm run gen:og` (`scripts/gen_og_image.py`): ảnh nền làm mờ + phủ chàm đêm, khung viền đôi, chữ LAMVI và câu giới thiệu theo bảng màu ở `docs/knowledge/design-rules.md` §2.1 | `public/images/scene/lanterns-night-1280.webp` — "Festive lattern, festivity lamp", rawpixel | CC0 1.0 |
+| `default.png` (1200×630) | **Từ 14/10/2026**: `npm run gen:og` (`scripts/gen_og_from_cover.py`) — ảnh bìa fanpage chính thức đã cắt bỏ dải thông tin liên hệ (`public/images/brand/cover-960x460.jpg`), đặt giữa trên nền chính ảnh đó làm mờ | Fanpage chính thức của LAMVI (tài sản của chính LAMVI — xem `public/images/brand/CREDITS.md`) | Của LAMVI |
 
-**[ASSUMPTION]** Đây là ảnh không khí, **không phải ảnh sản phẩm LAMVI** (design-rules §7). Khi có ảnh
-sản phẩm thật thì thay bằng ảnh thật; ảnh riêng của từng sản phẩm đặt qua trang admin (G-23).
+Bản cũ (ảnh nền CC0 `public/images/scene/lanterns-night-1280.webp` + chữ LAMVI) vẫn dựng lại được bằng `npm run gen:og:scene`.
 
-`[LEGAL]` Q-36 — ảnh nền CC0 cần pháp chế xác nhận cùng đợt với `public/images/scene`.
+Ảnh bìa gốc chỉ 960×540 nên ảnh chia sẻ hơi mềm — thay khi có bản độ phân giải cao (G-110). Ảnh riêng của từng sản phẩm: đặt ở `/admin/products` (G-23) hoặc dùng ảnh mặc định ở `public/images/lamps/`.

@@ -133,3 +133,8 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Trang lời chúc hiện câu chuyện trước lời chúc; tab "Câu chuyện" ở trang sản phẩm | ✅ code | `server/messages/service.js` (`lamps`), `LampStory.jsx`, `GiftPage.jsx`, `ProductPage.jsx`; `src/pages/LampStory.test.jsx` | Ảnh riêng từng mẫu (G-110) |
 | Ảnh thương hiệu từ fanpage: logo → favicon/apple-touch-icon, ảnh bìa lưu `public/images/brand/` (G-116) | ✅ code | `index.html`, `vercel.json`, `public/*` | Logo vector gốc; ảnh sản phẩm gốc (fanpage chỉ cho ≤206 px khi chưa đăng nhập); xác nhận thông tin liên hệ (G-115) |
 
+| Đợt v0.44 (D-106) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Bảo vệ route phía client (T-85) | ✅ code | `src/auth/ProtectedRoute.jsx`, `AuthProvider.jsx` (`ready`), `routes.jsx`; `src/auth/ProtectedRoute.test.jsx` (21 test) | — |
+| Ảnh fanpage vào web: logo, ảnh bìa, ảnh 5 đèn, og:image (T-86, G-116) | ✅ code | `Logo.jsx`, `HomePage.jsx`, `ProductImage.jsx`, `server/domain/photos.js`, `scripts/gen_og_from_cover.py`; `server/fanpagePhotos.test.js` | Ảnh gốc độ phân giải cao + xác nhận quyền dùng poster làm ảnh sản phẩm (G-110) |
+

@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto'
 import { HttpError, notFound } from '../errors.js'
 import { pick } from '../i18n.js'
+import { productImage } from '../domain/photos.js'
 import { GIFT_MEDIA_BUCKET } from '../adapters/supabase/storage.js'
 import {
   MESSAGE_LANGS,
@@ -222,7 +223,7 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
         description: pick(p.description, lang),
         story: pick(p.story, lang) || null,
         tone: p.tone ?? null,
-        image: p.imageUrl ? { url: p.imageUrl, alt: pick(p.imageAlt, lang) } : null,
+        image: productImage(p, lang),
       })
     }
     return lamps

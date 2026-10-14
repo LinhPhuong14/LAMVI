@@ -7,7 +7,7 @@ import { AuthContext } from '../auth/context.js'
 import { useApi } from '../api/useApi.js'
 import { useCart } from '../cart/context.js'
 import CartBubble from '../cart/CartBubble.jsx'
-import { Seal } from './Motifs'
+import Logo from './Logo.jsx'
 
 // 'shop' dẫn tới trang Cửa hàng riêng (D-86); các mục còn lại là phần trên trang chủ
 const SECTIONS = ['story', 'artisan', 'shop', 'lookbook', 'qr', 'faq']
@@ -129,7 +129,7 @@ function MobileMenu({ open, onClose, triggerRef }) {
       <div id="mobile-menu" className="mobile-menu" role="dialog" aria-modal="true" aria-label={t('nav.menuLabel')} ref={panel}>
         <div className="mobile-menu-head">
           <Link to={path('/')} className="nav-mark" aria-label="LAMVI">
-            <Seal>LAMVI</Seal>
+            <Logo size={46} decorative />
           </Link>
           <button type="button" className="mobile-menu-close" onClick={onClose} aria-label={t('nav.menuClose')}>
             <span aria-hidden="true">×</span>
@@ -177,7 +177,7 @@ export default function SiteHeader() {
   return (
     <header className={`nav${scrolled ? ' is-scrolled' : ''}`}>
       <Link to={path('/')} className="nav-mark" aria-label="LAMVI">
-        <Seal>LAMVI</Seal>
+        <Logo size={46} decorative />
       </Link>
       <nav className="nav-links">
         {SECTIONS.map((s) => (
