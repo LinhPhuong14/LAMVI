@@ -17,7 +17,7 @@ export default function ProductImage({ image, size, tone = 'amber', name, priori
   // Thẻ nhỏ: đèn đã tách nền (chỉ có với ảnh mặc định từ fanpage) đặt trên nền màu + quầng sáng; `size` là cạnh khung nên đèn cao ~1,35×
   if (cutout && image?.cutout) {
     const h = Math.round(size * 1.35)
-    return <img className="lamp-cutout product-cutout" src={image.cutout} alt={image.alt ?? name ?? ''} width={Math.round(h * 0.44)} height={h} loading={priority ? 'eager' : 'lazy'} decoding="async" />
+    return <img className="lamp-cutout product-cutout" src={image.cutout} alt={image.alt ?? name ?? ''} style={{ height: h, width: 'auto' }} height={h} loading={priority ? 'eager' : 'lazy'} decoding="async" />
   }
   if (!image?.url) return <Lantern size={size} tone={tone} swing={swing} />
   return (

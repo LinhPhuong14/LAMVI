@@ -41,7 +41,8 @@ export default function CollectionPage() {
   }
 
   const c = res.data.item
-  const lowest = c.lamps.length ? Math.min(...c.lamps.map((l) => l.price)) : null
+  const prices = c.lamps.map((l) => l.price).filter(Number.isFinite)
+  const lowest = prices.length ? Math.min(...prices) : null
   const pagePath = `/collections/${c.slug}`
   return (
     <section className={`page-section collection-page tone-${c.tone ?? 'amber'}`}>

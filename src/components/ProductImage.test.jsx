@@ -11,7 +11,9 @@ describe('<ProductImage>', () => {
     const img = container.querySelector('img.lamp-cutout')
     expect(img.getAttribute('src')).toBe(photo.cutout)
     expect(img.getAttribute('height')).toBe('135')
-    expect(img.getAttribute('width')).toBe('59')
+    // chiều cao cố định (không dịch bố cục khi ảnh tải), chiều rộng theo tỉ lệ từng ảnh
+    expect(img.style.height).toBe('135px')
+    expect(img.style.width).toBe('auto')
     expect(img.getAttribute('alt')).toBe('Đèn Tứ Linh')
     expect(img.getAttribute('loading')).toBe('lazy')
     expect(container.querySelector('img.product-photo')).toBeNull()
