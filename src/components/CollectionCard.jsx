@@ -12,7 +12,7 @@ export default function CollectionCard({ collection: c, index = 0 }) {
       <div className="collection-lamps" aria-hidden="true">
         {c.lamps.slice(0, 5).map((l, i) => (
           <span key={l.slug} className="collection-lamp" style={{ '--i': i }}>
-            <ProductImage image={l.image} size={72} tone={l.tone} name="" />
+            <ProductImage image={l.image} size={72} tone={l.tone} name="" cutout />
           </span>
         ))}
       </div>

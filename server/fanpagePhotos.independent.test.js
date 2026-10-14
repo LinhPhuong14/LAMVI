@@ -42,7 +42,7 @@ describe('lampPhotoUrl / productImage', () => {
   it('ảnh admin ưu tiên; chuỗi rỗng coi như chưa có; alt đúng ngôn ngữ', () => {
     const p = { slug: 'den-tu-linh', name: { vi: 'Tứ Linh', en: 'Four Sacred' }, imageUrl: 'https://cdn/x.jpg', imageAlt: { vi: 'alt vi', en: 'alt en' } }
     expect(productImage(p, 'en')).toEqual({ url: 'https://cdn/x.jpg', alt: 'alt en' })
-    expect(productImage({ ...p, imageUrl: '' }, 'en')).toEqual({ url: '/images/lamps/tu-linh.jpg', alt: 'Four Sacred' })
+    expect(productImage({ ...p, imageUrl: '' }, 'en')).toEqual({ url: '/images/lamps/tu-linh.jpg', alt: 'Four Sacred', cutout: '/images/lamps/tu-linh-cutout.webp' })
     expect(productImage({ ...p, slug: 'khac', imageUrl: null }, 'vi')).toBeNull()
   })
   it('presentProduct dùng ảnh mặc định, không đụng sản phẩm khác', () => {

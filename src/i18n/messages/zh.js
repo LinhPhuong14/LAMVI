@@ -44,7 +44,6 @@ export default {
     title: '来自百年纸艺村',
     text: '这种纸曾用于记录历史、印制东湖年画，承载了几代人的记忆。我们让这种材料以灯的形式重现——让您家庭的故事，由这份坚韧的材料点亮。',
     coverAlt: 'LAMVI 灯置于木桌上，身后是在阳光下晾晒的 dó 纸',
-    coverCaption: '图片：LAMVI 官方粉丝专页',
     statLamps: '盏灯，来自首个系列',
     statStages: '段旅程：杨坞—风溪 → 东湖 → LAMVI',
     statStory: '份专属祝福，伴随每份礼物',

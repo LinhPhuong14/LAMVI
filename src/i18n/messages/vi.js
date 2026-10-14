@@ -54,7 +54,6 @@ export default {
     // §31.3 (mới phát hiện): bỏ ý "được lưu giữ theo cách bền bỉ" (D-26)
     text: 'Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ, lưu giữ ký ức của bao thế hệ. Chúng tôi mang chất liệu ấy trở lại trong hình hài một chiếc đèn — để câu chuyện của gia đình bạn được thắp lên từ chính chất liệu bền bỉ ấy.',
     coverAlt: 'Đèn LAMVI đặt trên bàn gỗ, phía sau là những tờ giấy dó phơi nắng bên hiên nhà',
-    coverCaption: 'Ảnh: fanpage chính thức của LAMVI',
     statLamps: 'chiếc đèn trong bộ sưu tập đầu tiên',
     statStages: 'chặng hành trình: Dương Ổ – Phong Khê → Đông Hồ → LAMVI',
     // §31.3: thay "câu chuyện riêng mỗi đèn" (D-01, D-45)

@@ -14,6 +14,8 @@
 .collection-lamps { display: flex; justify-content: center; align-items: flex-end; min-height: 96px; }
 .collection-lamp { display: inline-block; margin: 0 -10px; transform-origin: top center; animation: collection-sway 5s ease-in-out infinite; animation-delay: calc(var(--i) * -0.9s); }
 .collection-lamp:nth-child(even) { margin-bottom: 18px; }
+/* đèn đứng (ảnh đã tách nền) không đung đưa như lồng đèn treo */
+.collection-lamp:has(.lamp-cutout) { animation: none; margin: 0 6px; }
 @keyframes collection-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 .collection-body h3 { font-size: 1.6rem; margin: 6px 0; }
 .collection-count { display: inline-block; }

@@ -13,3 +13,7 @@ Tệp gốc chỉ là **thumbnail 206×206 px** (poster từng mẫu: tên đèn
 | `lon-dan.jpg` | den-lon-dan |
 
 Ảnh trông giống dựng bằng công cụ tạo ảnh (poster quảng bá) hơn là ảnh chụp sản phẩm thật — cần PO xác nhận được dùng làm ảnh sản phẩm.
+
+## Bản tách nền (D-107)
+
+`<tên>-cutout.webp` (nền trong, ~350×800 px) dựng bằng `scripts/gen_lamp_cutouts.py` từ các ảnh `.jpg` ở trên: rembg tách chao đèn sáng; **đế gỗ được lấy lại từ điểm ảnh gốc** (đế tối trùng màu nền nên rembg không tách được) và cắt bằng mặt nạ bầu dục. Dùng ở hero, lookbook, thẻ sản phẩm và thẻ bộ sưu tập để giữ quầng sáng/hiệu ứng; trang chi tiết dùng ảnh đầy đủ phủ kín khung. Cắt tự động từ ảnh 206 px nên biên hơi mềm — thay bằng ảnh gốc/ảnh đã tách nền chuẩn khi có.

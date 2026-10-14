@@ -19,7 +19,7 @@ export default function ProductCards({ items, className = '' }) {
           {p.badge && <Seal className="product-badge lift">{p.badge}</Seal>}
           <div className="product-art worn">
             <div className="lift">
-              <ProductImage image={p.image} size={112} tone={p.tone} name={p.name} swing />
+              <ProductImage image={p.image} size={112} tone={p.tone} name={p.name} swing cutout />
             </div>
           </div>
           <div className="product-body">

@@ -51,7 +51,6 @@ export default {
     title: 'From a century-old dó paper village',
     text: 'Dó paper once recorded history, carried Đông Hồ paintings and kept the memories of generations. We bring that material back in the form of a lantern — so your family’s story can be lit by that same enduring material.',
     coverAlt: 'A LAMVI lamp on a wooden table, with sheets of dó paper drying in the sun behind it',
-    coverCaption: 'Photo: LAMVI’s official fanpage',
     statLamps: 'lanterns in the first collection',
     statStages: 'stages of the journey: Duong O – Phong Khe → Dong Ho → LAMVI',
     statStory: 'personal message for every gift',

@@ -3365,15 +3365,6 @@
   }
 }
 
-/* Ảnh lookbook = ảnh đèn từ fanpage (thay hình minh hoạ lồng đèn) */
-.lookbook-photo {
-  display: block;
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 14px;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
-}
 
 /* Ảnh bìa fanpage ở mục Di sản */
 .story-cover {
@@ -3387,23 +3378,39 @@
   border-radius: 18px;
   box-shadow: 0 14px 40px rgba(58, 32, 24, 0.28);
 }
-.story-cover figcaption {
-  margin-top: 10px;
-  text-align: center;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
+
+/* Đèn thật đã tách nền (ảnh fanpage): quầng sáng thở nhẹ thay cho đung đưa của lồng đèn treo (D-107) */
+.lamp-cutout {
+  display: block;
+  height: auto;
+  filter: drop-shadow(0 0 22px rgba(255, 190, 90, 0.5)) drop-shadow(0 14px 14px rgba(0, 0, 0, 0.35));
+  animation: lamp-glow 4.6s ease-in-out infinite;
+}
+.hero-lamp {
+  width: min(172px, 38vw);
+}
+.lookbook-lamp-img {
+  width: 74px;
+  height: 170px;
+  object-fit: contain;
+}
+@keyframes lamp-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 18px rgba(255, 190, 90, 0.4)) drop-shadow(0 14px 14px rgba(0, 0, 0, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 34px rgba(255, 200, 110, 0.8)) drop-shadow(0 14px 14px rgba(0, 0, 0, 0.35));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lamp-cutout {
+    animation: none;
+  }
 }
 
-/* Ảnh đèn thật (fanpage) ở màn hình đầu */
-.hero-photo {
-  display: block;
-  width: min(300px, 62vw);
-  height: auto;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 22px;
-  box-shadow: 0 0 60px 6px rgba(240, 170, 70, 0.35), 0 18px 44px rgba(58, 32, 24, 0.4);
-}
-.story-cover figcaption {
-  color: rgba(255, 255, 255, 0.78);
+/* Đèn tách nền trong thẻ sản phẩm / thẻ bộ sưu tập: quầng nhỏ hơn ở hero */
+.product-cutout {
+  filter: drop-shadow(0 0 14px rgba(255, 200, 110, 0.6)) drop-shadow(0 8px 8px rgba(0, 0, 0, 0.3));
+  animation: none;
 }

@@ -15,9 +15,17 @@ export function lampPhotoUrl(slug) {
   return f ? `/images/lamps/${f}.jpg` : null
 }
 
-/** Ảnh hiển thị của sản phẩm: ảnh admin tải lên → ảnh fanpage mặc định → null (frontend vẽ hình minh hoạ). */
+export function lampCutoutUrl(slug) {
+  const f = Object.hasOwn(LAMP_PHOTOS, slug) ? LAMP_PHOTOS[slug] : null
+  return f ? `/images/lamps/${f}-cutout.webp` : null
+}
+
+/**
+ * Ảnh hiển thị của sản phẩm: ảnh admin tải lên → ảnh fanpage mặc định (kèm `cutout` — đèn đã tách nền, để
+ * giữ quầng sáng/hiệu ứng ở thẻ nhỏ; D-107) → null (frontend vẽ hình minh hoạ).
+ */
 export function productImage(p, lang) {
   if (p.imageUrl) return { url: p.imageUrl, alt: pick(p.imageAlt, lang) }
   const url = lampPhotoUrl(p.slug)
-  return url ? { url, alt: pick(p.name, lang) } : null
+  return url ? { url, alt: pick(p.name, lang), cutout: lampCutoutUrl(p.slug) } : null
 }

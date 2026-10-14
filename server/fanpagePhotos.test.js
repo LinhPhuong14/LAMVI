@@ -5,7 +5,7 @@ import { createApp } from './app.js'
 import { createMemoryRepo } from './adapters/memory/repo.js'
 import { createMemoryAuth } from './adapters/memory/auth.js'
 import { createMemoryStorage } from './adapters/memory/storage.js'
-import { lampPhotoUrl, productImage } from './domain/photos.js'
+import { lampCutoutUrl, lampPhotoUrl, productImage } from './domain/photos.js'
 import { collections, products } from './data/seed.js'
 
 // G-116: ảnh 5 đèn lấy từ fanpage chính thức làm ảnh mặc định
@@ -30,7 +30,7 @@ describe('lampPhotoUrl / productImage', () => {
   })
   it('ảnh admin tải lên được ưu tiên; không có thì ảnh fanpage kèm alt = tên đèn theo ngôn ngữ; không có cả hai → null', () => {
     const p = { slug: 'den-lon-dan', name: { vi: 'Đèn Lợn Đàn', en: 'Pig Herd' } }
-    expect(productImage(p, 'vi')).toEqual({ url: '/images/lamps/lon-dan.jpg', alt: 'Đèn Lợn Đàn' })
+    expect(productImage(p, 'vi')).toEqual({ url: '/images/lamps/lon-dan.jpg', alt: 'Đèn Lợn Đàn', cutout: '/images/lamps/lon-dan-cutout.webp' })
     expect(productImage(p, 'en').alt).toBe('Pig Herd')
     expect(productImage({ ...p, imageUrl: 'https://cdn/x.jpg', imageAlt: { vi: 'Ảnh riêng' } }, 'vi')).toEqual({ url: 'https://cdn/x.jpg', alt: 'Ảnh riêng' })
     expect(productImage({ slug: 'khac', name: { vi: 'X' } }, 'vi')).toBeNull()
@@ -55,5 +55,36 @@ describe('API trả ảnh fanpage', () => {
     // dev/test không có public → 404 cũng chấp nhận; nếu 200 thì phải là ảnh
     if (r.status === 200) expect(r.headers['content-type']).toMatch(/image\/jpeg/)
     else expect([404]).toContain(r.status)
+  })
+})
+
+// D-107: đèn đã tách nền (hero, lookbook, thẻ nhỏ) để giữ quầng sáng/hiệu ứng
+describe('đèn tách nền (cutout)', () => {
+  const webpAlpha = (buf) => buf.subarray(0, 4).toString() === 'RIFF' && buf.subarray(8, 12).toString() === 'WEBP'
+  it('5 tệp -cutout.webp tồn tại, đúng định dạng WEBP, nhẹ, và có kênh alpha (VP8X/VP8L)', () => {
+    for (const s of SLUGS) {
+      const url = lampCutoutUrl(s)
+      expect(url).toMatch(/^\/images\/lamps\/[a-z-]+-cutout\.webp$/)
+      const buf = readFileSync(new URL(`../public${url}`, import.meta.url))
+      expect(webpAlpha(buf), url).toBe(true)
+      expect(buf.length).toBeGreaterThan(5_000)
+      expect(buf.length).toBeLessThan(150_000)
+      // WebP có alpha dùng chunk VP8X (cờ alpha) hoặc VP8L
+      const chunk = buf.subarray(12, 16).toString()
+      expect(['VP8X', 'VP8L']).toContain(chunk)
+      if (chunk === 'VP8X') expect(buf[20] & 0x10).toBe(0x10)
+    }
+  })
+  it('slug lạ / khoá nguyên mẫu → null', () => {
+    for (const s of ['den-nguyet', '__proto__', 'constructor', undefined]) expect(lampCutoutUrl(s)).toBeNull()
+  })
+  it('API trả image.cutout cho cả 5 đèn; ảnh admin tải lên không có cutout', async () => {
+    const a = app()
+    const list = await request(a).get('/api/products')
+    expect(list.body.items.map((i) => i.image.cutout)).toEqual(SLUGS.map(lampCutoutUrl))
+    const repo = createMemoryRepo({ products: products.map((p) => (p.slug === 'den-lon-dan' ? { ...p, imageUrl: 'https://cdn/x.jpg' } : p)), collections })
+    const b = createApp({ repo, auth: createMemoryAuth(), storage: createMemoryStorage(), config: { publicSiteUrl: 'https://lamvi.test' } })
+    const one = await request(b).get('/api/products/den-lon-dan')
+    expect(one.body.item.image).toEqual({ url: 'https://cdn/x.jpg', alt: null })
   })
 })

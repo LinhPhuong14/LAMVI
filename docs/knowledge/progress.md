@@ -138,3 +138,6 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Bảo vệ route phía client (T-85) | ✅ code | `src/auth/ProtectedRoute.jsx`, `AuthProvider.jsx` (`ready`), `routes.jsx`; `src/auth/ProtectedRoute.test.jsx` (21 test) | — |
 | Ảnh fanpage vào web: logo, ảnh bìa, ảnh 5 đèn, og:image (T-86, G-116) | ✅ code | `Logo.jsx`, `HomePage.jsx`, `ProductImage.jsx`, `server/domain/photos.js`, `scripts/gen_og_from_cover.py`; `server/fanpagePhotos.test.js` | Ảnh gốc độ phân giải cao + xác nhận quyền dùng poster làm ảnh sản phẩm (G-110) |
 
+| Đợt v0.45 (D-107) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Bỏ chú thích nguồn ảnh; tách nền đèn (hero, lookbook, thẻ nhỏ) (T-87) | ✅ code | `scripts/gen_lamp_cutouts.py`, `photos.js`, `ProductImage.jsx`, `HomePage.jsx`; `fanpagePhotos.test.js`, `ProductImage.test.jsx` | Ảnh gốc/ảnh tách nền chuẩn (G-110) |
