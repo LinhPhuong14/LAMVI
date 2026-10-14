@@ -84,7 +84,7 @@ export default function CollectionPage() {
               <Link to={path(`/products/${l.slug}`)} tabIndex={-1} className="cp-lamp">
                 <span className="cp-halo" />
                 <ProductImage image={l.image} size={150} tone={l.tone} name="" cutout />
-                <span className="cp-lamp-name">{l.name.replace(/^Đèn\s+/, '')}</span>
+                <span className="cp-lamp-name">{l.name}</span>
               </Link>
             </li>
           ))}
