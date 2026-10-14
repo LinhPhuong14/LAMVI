@@ -4,6 +4,7 @@ import { useI18n } from '../i18n/index.js'
 import { api, ApiError } from '../api/client.js'
 import Seo from '../seo/Seo.jsx'
 import { track } from '../analytics/index.js'
+import LampStory from '../components/LampStory.jsx'
 
 // FR-QR-002…005, US-004: trang QR lời chúc cho người nhận. Không cần tài khoản — bảo vệ bằng token
 // ngẫu nhiên (BR-QR-001). Luôn noindex (BR-SEO-001, D-44). Token không bao giờ gửi sang GA
@@ -162,6 +163,14 @@ export default function GiftPage() {
   return (
     <section className="page-section narrow gift-page">
       {head}
+      {/* G-108, D-105: câu chuyện của mẫu đèn hiện trước, rồi mới tới lớp lời chúc dành riêng cho người nhận */}
+      {m.lamps?.length > 0 && (
+        <div className="lamp-stories">
+          {m.lamps.map((lamp) => (
+            <LampStory key={lamp.slug} lamp={lamp} />
+          ))}
+        </div>
+      )}
       <span className="eyebrow">{t('gift.eyebrow')}</span>
 
       {empty ? (

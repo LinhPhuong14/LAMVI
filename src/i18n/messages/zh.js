@@ -203,7 +203,9 @@ export default {
     flat: '全国统一运费 {fee}。',
     tiered: '满 {from} 免运费，不满则收取 {fee}。',
   },
+  lampStory: { eyebrow: '这盏灯的故事', view: '查看这盏灯' },
   pdpTabs: {
+    tabStory: '故事',
     tabDesc: '描述',
     tabSpecs: '规格',
     tabShip: '配送与退换',

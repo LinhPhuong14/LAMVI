@@ -226,7 +226,10 @@ export default {
     flat: 'Phí giao hàng đồng giá {fee} toàn quốc.',
     tiered: 'Miễn phí giao cho đơn từ {from}, dưới mức này {fee}.',
   },
+  // G-108, D-105: câu chuyện từng mẫu đèn
+  lampStory: { eyebrow: 'Câu chuyện của chiếc đèn', view: 'Xem đèn này' },
   pdpTabs: {
+    tabStory: 'Câu chuyện',
     tabDesc: 'Mô tả',
     tabSpecs: 'Thông số',
     tabShip: 'Giao hàng & đổi trả',

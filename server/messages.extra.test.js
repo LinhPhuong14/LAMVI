@@ -491,7 +491,7 @@ describe('Không lộ token/nội dung qua API khác (BR-QR-001, Q-14, Q-27)', (
     await setStatus(code, 'shipped')
     const t = await tokenOf(code)
     const r = await confirm(t)
-    const allowed = ['state', 'lang', 'orderKind', 'text', 'textLang', 'translations', 'media', 'mediaExpired', 'mediaExpiresAt', 'mediaDaysLeft', 'batch']
+    const allowed = ['state', 'lang', 'orderKind', 'text', 'textLang', 'translations', 'media', 'mediaExpired', 'mediaExpiresAt', 'mediaDaysLeft', 'batch', 'lamps']
     expect(Object.keys(r.body.item).filter((k) => !allowed.includes(k))).toEqual([])
     const raw = JSON.stringify(r.body)
     for (const secret of [code, 'Nguyễn Văn A', '0912345678', 'Hàng Bông', customer.id, 'khach@lamvi.test', t]) {

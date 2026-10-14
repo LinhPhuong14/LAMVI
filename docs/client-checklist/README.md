@@ -22,6 +22,8 @@ Nguồn: `LAMVI_Content_Plan.xlsm`, báo cáo `GRP490 G30 - LAMVI`, `Nội dung 
 | **QR chỉ ở thiệp/thư cảm ơn, không khắc lên đèn** — đã sửa mọi chỗ chữ trên web (trang chủ, Cửa hàng, Giỏ hàng, tour Mây, FAQ, en/zh); trang lời chúc luôn có nút "Xem video mẻ đèn" | Trang kể chuyện **theo từng mẫu đèn** (Content Plan 30/10) **chưa làm** — cần quyết định phạm vi và nội dung (G-108) |
 | Khối Nghệ nhân dùng tên thật; quy trình 4 bước; lookbook = 5 đèn; số liệu trang chủ chỉ giữ số kiểm chứng được; FAQ thêm 4 câu (giấy dó ≠ giấy điệp, nguồn giấy, QR ở đâu, kích thước/nguồn sáng) | Ảnh + đồng ý của nghệ nhân; duyệt các câu mới; bản en/zh do dev dịch |
 | Bài "Đàn Lợn Âm Dương" và "Tam Dương Khai Thái" (do nhóm viết) chưa đưa lên web — là nguồn cho mô tả dài/gallery | Phần "Tài liệu tham khảo" trong file là trích nguồn ngoài, **không đưa lên web** khi chưa xin phép |
+| **(14/10) Trang kể chuyện theo từng mẫu đèn**: quét QR thiệp → câu chuyện của mẫu → lời chúc; tab "Câu chuyện" ở trang sản phẩm; admin nhập; Mây dùng làm nguồn | Duyệt 5 câu chuyện + bản en/zh; ảnh riêng từng mẫu (mục 7.7) |
+| **(14/10) Ảnh từ fanpage chính thức**: logo đại diện → favicon/apple-touch-icon (thay logo Vite); ảnh bìa lưu ở `public/images/brand/` | Logo vector gốc; ảnh sản phẩm gốc (fanpage chỉ cho ≤206 px khi chưa đăng nhập); xác nhận thông tin liên hệ trên banner (7.8) |
 
 ## Cách đọc tài liệu này
 
@@ -56,7 +58,8 @@ Nguồn: `LAMVI_Content_Plan.xlsm`, báo cáo `GRP490 G30 - LAMVI`, `Nội dung 
 | # | Việc client cần làm | Hiện trạng | Ưu tiên |
 |---|---|---|---|
 | 1.1 | **Gửi bộ logo chính thức**: SVG (vector) + PNG nền trong, bản ngang / dọc / một màu (trắng, đen) | Logo hiện là chữ "LAMVI" dạng triện đỏ do dev vẽ bằng code (thấy ở thanh menu `HOME-01` và chân trang `FOOT-01`), **chưa phải logo thật** | 🔴 |
-| 1.2 | **Favicon / icon tab trình duyệt** (32×32, 180×180 cho iOS, 512×512) | `public/favicon.svg` đang là **logo mặc định của Vite** — phải thay | 🔴 |
+| 1.1b | Logo trên **thanh menu** hiện vẫn là chữ triện đỏ dev vẽ tạm; logo thật của LAMVI (fanpage) là vòng tròn nâu–vàng "LV LAMVI — Ánh sáng từ di sản Việt" kèm wordmark có ngọn lửa. Quyết định: thay logo trên web bằng logo thật? (cần file vector) | Chưa đổi — chờ client quyết | 🔴 |
+| 1.2 | **Favicon / icon tab trình duyệt** (32×32, 180×180 cho iOS, 512×512) | Từ 14/10 đã dùng **logo đại diện fanpage (200 px)** làm favicon 64 px + apple-touch-icon 180 px, thay logo mặc định của Vite. Cần file gốc độ phân giải cao để làm bản 512 px | 🟠 |
 | 1.3 | Xác nhận / cung cấp **brand guideline**: bảng màu, font, quy tắc dùng logo, khoảng trắng tối thiểu | Dev suy ra từ landing cũ, ghi ở `docs/BRAND_GUIDELINE.md` (nền kem giấy, đỏ son chu sa, nâu mực, navy đêm). Cần client xác nhận đúng ý | 🟠 |
 | 1.4 | Font chữ: xác nhận dùng **Fraunces** (tiêu đề) + **Be Vietnam Pro** (nội dung) hoặc gửi font bản quyền khác (kèm giấy phép dùng web) | Đang dùng 2 font mã nguồn mở trên | 🟡 |
 | 1.5 | **Tagline & thông điệp thương hiệu** chính thức (VI/EN/ZH) | Đang dùng: "Mỗi chiếc đèn, một câu chuyện được thắp lên", "Đèn giấy dó thủ công — giữ lửa ký ức, thắp sáng yêu thương" | 🟠 |
@@ -150,7 +153,7 @@ Toàn bộ trang chủ: ảnh tổng quát từng khối ở thư mục `screens
 | Mã | Trang / URL | Ảnh chụp | Nội dung đang có | Client cần |
 |---|---|---|---|---|
 | **SHOP-01/02** | **Cửa hàng** `/shop` | [shop-01](screenshots/shop-01.jpg) [shop-02-1](screenshots/shop-02-1.jpg) [2](screenshots/shop-02-2.jpg) | Tiêu đề "Đèn giấy dó thủ công" · đoạn dẫn "Chọn chiếc đèn bạn muốn thắp — cho chính mình hoặc gửi tặng người thương…" · 3 chip "Thiệp cảm ơn có mã QR mở lời chúc / Mã QR khắc trên đèn mở video mẻ đèn / Giá đã gồm VAT, giao trong nước" · bộ lọc + sắp xếp | Duyệt chữ; chốt bộ lọc (xem mục 3) |
-| **PDP-01/02** | **Chi tiết sản phẩm** `/products/<slug>` | [pdp-01](screenshots/pdp-01.jpg) [pdp-02-1](screenshots/pdp-02-1.jpg) [2](screenshots/pdp-02-2.jpg) [3](screenshots/pdp-02-3.jpg) | Ảnh, tên, giá "đã gồm VAT", mô tả ngắn, nút "Thêm vào giỏ", dòng freeship, 3 chip lợi ích, 3 tab (**Mô tả · Thông số · Giao hàng & đổi trả**), "Có thể bạn cũng thích" | Dữ liệu sản phẩm (mục 2): ảnh, mô tả dài, **thông số**. Nội dung tab "Giao hàng & đổi trả" lấy từ chính sách ([mục 9](#9-chính-sách--vận-hành-bán-hàng)) |
+| **PDP-01/02** | **Chi tiết sản phẩm** `/products/<slug>` | [pdp-01](screenshots/pdp-01.jpg) [pdp-02-1](screenshots/pdp-02-1.jpg) [2](screenshots/pdp-02-2.jpg) [3](screenshots/pdp-02-3.jpg) · [tab Câu chuyện](screenshots/pdp-story.jpg) | Ảnh, tên, giá "đã gồm VAT", mô tả ngắn, nút "Thêm vào giỏ", dòng freeship, 3 chip lợi ích, 3 tab (**Mô tả · Thông số · Giao hàng & đổi trả**), "Có thể bạn cũng thích" | Dữ liệu sản phẩm (mục 2): ảnh, mô tả dài, **thông số**. Nội dung tab "Giao hàng & đổi trả" lấy từ chính sách ([mục 9](#9-chính-sách--vận-hành-bán-hàng)) |
 | **COL-01** | **Trang bộ sưu tập** `/collections/<slug>` | [col-01-1](screenshots/col-01-1.jpg) [2](screenshots/col-01-2.jpg) | Tên, mô tả, câu chuyện bộ, "Mua cả bộ", "Hoặc chọn từng đèn" | Nội dung ở mục 3 |
 | **CART-01** | **Giỏ hàng** `/cart` | [cart-01](screenshots/cart-01.jpg) | "Giỏ quà của bạn", các bước Giỏ hàng → Thanh toán → Hoàn tất, nhắc "mỗi món quà đi kèm: thiệp cảm ơn có mã QR…" | Duyệt chữ; giới hạn số lượng tối đa mỗi loại (hiện có mức giới hạn) |
 | **CHK-01** | **Thanh toán** `/checkout` | [chk-01](screenshots/chk-01.jpg) | Mua tặng / mua cho mình · tuỳ chọn "Thêm lời chúc gắn mã QR" (tối đa 300 ký tự) · người nhận · địa chỉ (tỉnh → phường/xã, danh mục hành chính 2 cấp mới) · mã giảm giá · phương thức thanh toán · tóm tắt đơn (VAT, phí ship) | Duyệt chữ; phương thức thanh toán thật ([mục 9](#9-chính-sách--vận-hành-bán-hàng)). **Quyết định Q-41**: có cho **mua không cần tài khoản (guest checkout)** không |
@@ -160,12 +163,12 @@ Toàn bộ trang chủ: ảnh tổng quát từng khối ở thư mục `screens
 | **CT-01** | **Liên hệ** `/contact` | [ct-01](screenshots/ct-01.jpg) | Hotline, Zalo, email hỗ trợ, giờ làm việc, địa chỉ xưởng, địa chỉ đơn vị, **form gửi tin nhắn** | 🔴 Hiện **trống kênh liên hệ** ("Thông tin liên hệ đang được cập nhật") — xem mục 8 |
 | **POL-*** | **5 trang chính sách** `/privacy` `/returns` `/terms` `/shipping` `/payment` | [riêng tư](screenshots/pol-privacy-1.jpg) · [đổi trả](screenshots/pol-returns-1.jpg) · [điều khoản](screenshots/pol-terms-1.jpg) · [vận chuyển](screenshots/pol-ship-1.jpg) · [thanh toán](screenshots/pol-pay-1.jpg) | Do dev soạn theo hiện trạng hệ thống | 🔴 **Pháp chế duyệt** (Q-40, Q-42, Q-43) — xem mục 9 |
 | **QR-BATCH** | **Trang video lô đèn** `/lo/<mã lô>` (mở từ nút "Xem video mẻ đèn" trên trang lời chúc và từ Gallery; **QR không khắc trên đèn** — D-104) | [qr-batch-1](screenshots/qr-batch-1.jpg) [2](screenshots/qr-batch-2.jpg) | "Hành trình làm đèn": video, ngày làm, mã lô, ghi chú "Video ghi lại quá trình làm cả lô đèn, trong đó có chiếc đèn của bạn." | Video thật từng lô (mục 7). Hiện là lô demo |
-| **QR-GIFT** | **Trang lời chúc** `/qr/<token>` (người nhận quét mã **trên thiệp cảm ơn**) | *(cần có đơn mua tặng đã thanh toán)* | "Có một lời chúc đang chờ bạn" → nút **"Tôi đã nhận được quà"** → hiện lời chúc chữ / giọng nói / video, nút Tải về, đếm ngược 30 ngày, nút Dịch tự động | Duyệt toàn bộ chữ (trang này là **điểm chạm cảm xúc nhất** — nên do copywriter của client viết) |
+| **QR-GIFT** | **Trang lời chúc** `/qr/<token>` (người nhận quét mã **trên thiệp cảm ơn**) | [qr-gift](screenshots/qr-gift.jpg) *(mô phỏng đơn mua tặng 2 đèn)* | "Có một lời chúc đang chờ bạn" → nút **"Tôi đã nhận được quà"** → **(14/10) câu chuyện của từng mẫu đèn trong đơn** → hiện lời chúc chữ / giọng nói / video, nút Tải về, đếm ngược 30 ngày, nút Dịch tự động | Duyệt toàn bộ chữ (trang này là **điểm chạm cảm xúc nhất** — nên do copywriter của client viết) |
 | **404** | Trang không tìm thấy | [404](screenshots/404.jpg) | "Không tìm thấy trang" + nút về trang chủ + "Cần giúp đỡ? Liên hệ LAMVI" | Duyệt chữ |
 | — | **Trang lỗi / bảo trì** | | "LAMVI đang bảo trì — Chúng tôi đang nâng cấp hệ thống…" | Duyệt chữ |
 | — | **Banner cookie** (hiện ở lần vào đầu tiên) | | "Cookie & thống kê. LAMVI dùng Google Analytics…" + Đồng ý / Từ chối | Pháp chế duyệt (Q-43) |
 
-> **Ảnh chụp chưa có**: trang đơn hàng (`ORD`) và trang lời chúc (`QR-GIFT`) cần đơn thật đã thanh toán (payOS đang tắt ở môi trường demo). Sẽ bổ sung ảnh khi có dữ liệu thật.
+> **Ảnh chụp chưa có**: trang đơn hàng (`ORD`) cần đơn thật (payOS đang tắt ở môi trường demo). Ảnh `QR-GIFT` là **mô phỏng** (dữ liệu giả lập từ API thật của 2 đèn); sẽ chụp lại khi có đơn thật.
 
 ---
 
@@ -196,6 +199,9 @@ Mây là chatbot ở góc phải dưới mọi trang ([may-01](screenshots/may-0
 | 7.3 | **Thiết kế thiệp cảm ơn có mã QR** (in kèm đơn mua tặng): kích thước, mặt trước/sau, mẫu viết tay hay in | Thiệp viết tay do xưởng viết bằng tiếng Việt (D-28). Cần mẫu thiệp + câu mẫu | 🟠 |
 | 7.4 | **Chính sách lưu trữ**: giọng nói/video lời chúc xoá sau 30 ngày kể từ khi người nhận xác nhận (hoặc 90 ngày sau giao nếu không ai xác nhận); chữ + video lô lưu mãi — client xác nhận còn đúng | Đã chốt D-12/D-26 | 🟡 |
 | 7.5 | Quyết định **Q-12** thiệp/lời chúc có tính phí không (đang miễn phí), **Q-14** admin có xem/kiểm duyệt lời chúc không, **Q-27** người mua xem trước trang QR không, **Q-29** lời chúc không phải tiếng Việt xử lý thế nào, **Q-33** có PIN bảo vệ trang lời chúc không, **Q-25** QR của đơn tự mua dẫn tới đâu | Xem [mục 13](#13-câu-hỏi-nghiệp-vụ-còn-mở-cần-client-quyết) | 🟠 |
+| 7.6 | **Duyệt câu chuyện 5 đèn** (VI/EN/ZH) — đã làm trang kể chuyện: quét QR trên thiệp → câu chuyện của đúng mẫu đèn → lời chúc; tab "Câu chuyện" ở trang sản phẩm. Nội dung soạn từ Content Plan + hai bài của nhóm. Sửa trực tiếp ở **/admin → Sản phẩm → Câu chuyện của mẫu đèn** hoặc trong file Excel nội dung | Đã lên web (D-105) — chờ duyệt nội dung | 🟠 |
+| 7.7 | **Ảnh gốc từng mẫu đèn**: poster trên fanpage chỉ lấy được bản thu nhỏ ≤ 206 px khi chưa đăng nhập → không dùng cho web. Gửi ảnh gốc (đèn bật/tắt, cận cảnh). Lưu ý: sản phẩm thật là **đèn trụ** trên đế gỗ tối màu, trong khi hình minh hoạ trên web đang là **lồng đèn** → cần thay bằng ảnh thật | Chưa có | 🔴 |
+| 7.8 | **Xác nhận thông tin liên hệ** đọc được từ banner fanpage: địa chỉ "Làng Khánh S, Vinhomes Thăng Long, An Khánh, Hà Nội"; hotline 0962 254 128; email lamvi6866@gmail.com (**mục Giới thiệu của fanpage ghi lamvi6886@gmail.com** — khác nhau); website lamvi.com.vn; TikTok @lamvi360. Chưa đưa lên web/email cho tới khi xác nhận | Chờ xác nhận (G-115) | 🔴 |
 
 ---
 
@@ -363,3 +369,4 @@ Lấy từ `docs/ba-spec.md` §30 (còn mở tại v0.41). Mỗi câu trả lờ
 ---
 
 *Ghi chú kỹ thuật cho dev*: ảnh trong `screenshots/` chụp bằng Playwright từ bản chạy local (dữ liệu bộ nhớ) ở 1366×900; góc trái trên của mỗi ảnh có nhãn mã khối. Khi nội dung thật thay vào, chụp lại và cập nhật tài liệu này.
+

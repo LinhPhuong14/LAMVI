@@ -40,6 +40,9 @@ export function parseI18n(value, { required = false, max }) {
   return { value: out }
 }
 
+// Câu chuyện mẫu đèn (G-108): tối đa số ký tự mỗi ngôn ngữ
+export const STORY_MAX = 4000
+
 // Thông số sản phẩm: chỉ nhận các khoá này, mỗi khoá là văn bản đa ngôn ngữ (feedback 08/10, 33.5)
 export const SPEC_KEYS = ['size', 'material', 'light', 'weight', 'leadTime', 'care']
 
@@ -100,6 +103,8 @@ export function validateProduct(body, { partial = false } = {}) {
   // Chú thích ảnh (alt) — a11y + SEO; ảnh và đường dẫn đặt qua endpoint tải ảnh, không qua form
   field(body, 'imageAlt', partial, errors, values, (v) => parseI18n(v, { max: 160 }))
   field(body, 'specs', partial, errors, values, parseSpecs)
+  // G-108: câu chuyện từng mẫu đèn — các đoạn cách nhau bằng dòng trống
+  field(body, 'story', partial, errors, values, (v) => parseI18n(v, { max: STORY_MAX }))
   return { errors, values }
 }
 

@@ -107,7 +107,7 @@ function ProductForm({ initial, onDone, onCancel, onImageChange }) {
   const collections = useAdminList('/admin/collections')
   const { authedApi } = useAuth()
   const { t } = useI18n()
-  const [form, setForm] = useState(() => ({ ...EMPTY, ...initial, tone: initial?.tone ?? '', collectionSlug: initial?.collectionSlug ?? '', stock: initial?.stock ?? '', name: initial?.name ?? {}, description: initial?.description ?? {}, badge: initial?.badge ?? {}, imageAlt: initial?.imageAlt ?? {}, specs: initial?.specs ?? {} }))
+  const [form, setForm] = useState(() => ({ ...EMPTY, ...initial, tone: initial?.tone ?? '', collectionSlug: initial?.collectionSlug ?? '', stock: initial?.stock ?? '', name: initial?.name ?? {}, description: initial?.description ?? {}, badge: initial?.badge ?? {}, imageAlt: initial?.imageAlt ?? {}, specs: initial?.specs ?? {}, story: initial?.story ?? {} }))
   const { pending, error, fields, run } = useSubmit()
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
   const slugLocked = Boolean(initial?.id) && initial.status === 'published'
@@ -164,6 +164,8 @@ function ProductForm({ initial, onDone, onCancel, onImageChange }) {
       <p className="field-hint">{S.common.viRequiredHint}</p>
       <I18nInput label={S.products.name} required value={form.name} onChange={(v) => setForm({ ...form, name: v })} error={fields.name} />
       <I18nInput label={S.products.description} multiline value={form.description} onChange={(v) => setForm({ ...form, description: v })} error={fields.description} />
+      <I18nInput label={S.products.story} multiline rows={8} value={form.story} onChange={(v) => setForm({ ...form, story: v })} error={fields.story} />
+      <p className="field-hint">{S.products.storyHint}</p>
       <fieldset className="admin-specs">
         <legend>{S.products.specs}</legend>
         <p className="field-hint">{S.products.specsHint}</p>

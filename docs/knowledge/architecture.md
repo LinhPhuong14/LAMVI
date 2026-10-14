@@ -200,7 +200,7 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET | `/api/shipping-policy` | – | Phí ship + ngưỡng miễn phí (cùng cấu hình `pricing` với checkout), cache CDN 300 giây (T-80) |
 | POST | `/api/contact` | – | Form liên hệ → thư tới hộp thư hỗ trợ, 202; 503 nếu chưa cấu hình (T-75) |
 | GET | `/api/products?lang=` | – | Sản phẩm `published` |
-| GET | `/api/products/:slug?lang=` | – | 404 nếu không `published` |
+| GET | `/api/products/:slug?lang=` | – | 404 nếu không `published`. Chi tiết có `story` (câu chuyện mẫu đèn, G-108); danh sách thì không |
 | GET | `/api/collections?lang=` | – | Bộ sưu tập `published` kèm `lamps[]` và `set` (D-96); không có story |
 | GET | `/api/collections/:slug?lang=` | – | 404 nếu không công khai |
 | GET | `/api/geo/provinces` | – | Tỉnh/thành (mã, tên) — D-99, cache dài |
@@ -250,7 +250,7 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET/PUT | `/api/orders/:code/message` | Bearer | Đọc / lưu chữ lời chúc `{ text, textLang? }`. 409 `MESSAGE_TEXT_LOCKED` (từ PACKED), `NO_MESSAGE`; đơn người khác → 404 |
 | POST | `/api/orders/:code/message/media-upload` | Bearer | `{ kind: voice\|video, contentType, size }` → `{ path, uploadUrl, headers }`; 409 `MESSAGE_LOCKED` (từ SHIPPED) |
 | POST/DELETE | `/api/orders/:code/message/media[/:kind]` | Bearer | Gắn media đã tải (kiểm lại kiểu/size thật) / gỡ |
-| GET | `/api/qr/:token` | – (token) | Trang người nhận: `preparing` \| `greeting` \| `active` (chữ, media signed URL, đếm ngược). Token sai/đơn huỷ → 404 chung |
+| GET | `/api/qr/:token` | – (token) | Trang người nhận: `preparing` \| `greeting` \| `active` (chữ, media signed URL, đếm ngược, `batch` lô công khai mới nhất, `lamps[]` câu chuyện các mẫu đèn trong đơn — D-104/D-105). Token sai/đơn huỷ → 404 chung |
 | POST | `/api/qr/:token/confirm` | – (token) | "Tôi đã nhận được quà": ghi `confirmed_at` lần đầu; 409 `GIFT_NOT_READY` nếu chưa SHIPPED |
 | POST | `/api/qr/:token/translate` | – (token) | `{ lang }` → `{ lang, text, cached }`; 503 `TRANSLATE_UNAVAILABLE` |
 | GET | `/api/admin/users?q=&role=&status=&page=` | Admin, IT | Danh sách 20 người/trang kèm số đơn (D-90) |

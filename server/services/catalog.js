@@ -17,7 +17,7 @@ export async function listPublicProducts(repo, lang) {
 export async function getPublicProduct(repo, slug, lang) {
   const p = await repo.getProductBySlug(slug)
   if (!p || !PUBLIC_PRODUCT_STATUSES.includes(p.status)) throw notFound()
-  return { item: presentProduct(p, lang) }
+  return { item: presentProduct(p, lang, { withStory: true }) }
 }
 
 export async function listPublicFaq(repo, lang) {

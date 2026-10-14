@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto'
 import { HttpError, notFound } from '../errors.js'
+import { pick } from '../i18n.js'
 import { GIFT_MEDIA_BUCKET } from '../adapters/supabase/storage.js'
 import {
   MESSAGE_LANGS,
@@ -21,6 +22,7 @@ import {
   validateMessageText,
 } from '../domain/message.js'
 
+const LAMPS_MAX = 10 // chặn đơn nhiều dòng hàng kéo dài trang (G-108)
 const COLS = { voice: ['voicePath', 'voiceType'], video: ['videoPath', 'videoType'] }
 const DOWNLOAD_NAME = { voice: 'loi-chuc-giong-noi', video: 'loi-chuc-video' }
 
@@ -206,6 +208,26 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
     return out
   }
 
+  // G-108, D-105: câu chuyện của (các) mẫu đèn trong đơn — hiện TRƯỚC lời chúc khi người nhận quét QR trên thiệp.
+  // Dòng hàng đã bán vẫn hiện câu chuyện kể cả khi sản phẩm bị ẩn sau đó (người nhận đã có chiếc đèn này).
+  async function lampsOf(order, lang) {
+    const slugs = [...new Set((order.items ?? []).map((i) => i.slug).filter(Boolean))].slice(0, LAMPS_MAX)
+    const lamps = []
+    for (const slug of slugs) {
+      const p = await repo.getProductBySlug(slug)
+      if (!p) continue
+      lamps.push({
+        slug: p.slug,
+        name: pick(p.name, lang),
+        description: pick(p.description, lang),
+        story: pick(p.story, lang) || null,
+        tone: p.tone ?? null,
+        image: p.imageUrl ? { url: p.imageUrl, alt: pick(p.imageAlt, lang) } : null,
+      })
+    }
+    return lamps
+  }
+
   async function view(token) {
     const order = await openOrder(token)
     const lang = order.qrLang ?? 'vi'
@@ -229,6 +251,7 @@ export function createMessageService({ repo, storage, may = null, now = () => ne
       mediaExpired: expired && (hasMedia(message) || Boolean(message.mediaDeletedAt)),
       mediaExpiresAt: !expired && hasMedia(message) && deadline ? deadline.toISOString() : null,
       mediaDaysLeft: !expired && hasMedia(message) ? mediaDaysLeft(order, message, now()) : null,
+      lamps: await lampsOf(order, lang),
     }
     // D-76: đơn không có lời chúc → QR dẫn tới video mẻ đèn. D-104: QR chỉ ở thiệp cảm ơn nên
     // mọi trang lời chúc đều kèm lối tới video mẻ đèn mới nhất (không chỉ khi trống)

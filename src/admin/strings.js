@@ -44,6 +44,8 @@ export const S = {
   products: {
     title: 'Sản phẩm',
     slug: 'Slug (đường dẫn)',
+    story: 'Câu chuyện của mẫu đèn',
+    storyHint: 'Hiện ở tab Câu chuyện trên trang sản phẩm và ở trang lời chúc khi người nhận quét QR trên thiệp cảm ơn (trước lời chúc). Các đoạn cách nhau bằng một dòng trống; tối đa 4.000 ký tự mỗi ngôn ngữ; tiếng Việt bắt buộc nếu có bản en/zh. Mây cũng dùng nội dung này để nói về ý nghĩa tranh.',
     specs: 'Thông số sản phẩm',
     specsHint: 'Hiện ở tab Thông số trên trang sản phẩm và là dữ liệu để Mây trả lời về kích thước, chất liệu… Để trống mục nào thì mục đó không hiện.',
     specKeys: {

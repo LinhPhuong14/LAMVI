@@ -126,3 +126,10 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | QR chỉ ở thiệp cảm ơn, trang lời chúc luôn có nút video mẻ đèn (D-104) | ✅ code | `server/messages/service.js`, `src/pages/GiftPage.jsx`, i18n vi/en/zh; `messages.batchLink.test.js`, `GiftPage.test.jsx` | G-108: trang kể chuyện theo từng mẫu đèn |
 | Nội dung trang chủ: nghệ nhân, quy trình, lookbook, số liệu (G-111, G-114) | ✅ code | `HomePage.jsx`, i18n; `ssr.design.extra.test.js`, `Motion.extra.test.jsx` | Ảnh nghệ nhân thật + đồng ý; duyệt bản en/zh |
 | Test chạy trên danh mục demo (T-83) | ✅ | `server/data/demoCatalog.js`, `vitest.setup.js`, `server/adapters/memory/repo.js` | — |
+
+| Đợt v0.43 (trang kể chuyện từng mẫu đèn, D-105, G-108) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Cột `products.story` + admin nhập + API chi tiết + seed 5 câu chuyện vi/en/zh (T-84) | ✅ code, chưa chạy migration trên Supabase | migration `…0022`, `server/domain/{admin,catalog}.js`, `ProductsPage.jsx`; `server/lampStory.test.js`, `src/admin/ProductStory.test.jsx` | Chạy migration 022; duyệt nội dung/bản dịch |
+| Trang lời chúc hiện câu chuyện trước lời chúc; tab "Câu chuyện" ở trang sản phẩm | ✅ code | `server/messages/service.js` (`lamps`), `LampStory.jsx`, `GiftPage.jsx`, `ProductPage.jsx`; `src/pages/LampStory.test.jsx` | Ảnh riêng từng mẫu (G-110) |
+| Ảnh thương hiệu từ fanpage: logo → favicon/apple-touch-icon, ảnh bìa lưu `public/images/brand/` (G-116) | ✅ code | `index.html`, `vercel.json`, `public/*` | Logo vector gốc; ảnh sản phẩm gốc (fanpage chỉ cho ≤206 px khi chưa đăng nhập); xác nhận thông tin liên hệ (G-115) |
+

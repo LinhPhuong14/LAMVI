@@ -4,7 +4,8 @@ import { presentStock } from './stock.js'
 // D-39: chỉ sản phẩm Published được hiển thị và bán; Hidden/Draft coi như không tồn tại với khách
 export const PUBLIC_PRODUCT_STATUSES = ['published']
 
-export function presentProduct(p, lang) {
+// withStory: câu chuyện dài (G-108) chỉ nằm ở trang chi tiết — không đưa vào danh sách/giỏ/đơn cho nhẹ payload
+export function presentProduct(p, lang, { withStory = false } = {}) {
   return {
     slug: p.slug,
     kind: p.kind,
@@ -19,6 +20,7 @@ export function presentProduct(p, lang) {
     ...presentStock(p),
     // Thông số (feedback 08/10, mục 8): chỉ trả khoá có nội dung, đã chọn ngôn ngữ
     specs: presentSpecs(p.specs, lang),
+    ...(withStory ? { story: pick(p.story, lang) || null } : {}),
     // D-68 / T-09: giá niêm yết ĐÃ gồm VAT, số nguyên VND
     price: p.price,
     currency: 'VND',

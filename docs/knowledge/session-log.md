@@ -1,5 +1,15 @@
 # Nhật ký phiên
 
+## 2026-10-14 — Trang kể chuyện từng mẫu đèn + ảnh fanpage (nhánh `feat/lamp-story-pages`)
+
+**Mục tiêu**: G-108 (QR thiệp → câu chuyện mẫu đèn → lời chúc) và lấy ảnh từ fanpage chính thức.
+
+**Đã làm**: `products.story` (migration 022, admin nhập, seed 5 câu chuyện vi/en/zh), `lamps[]` ở `/api/qr/:token`, `LampStory` + tab "Câu chuyện", Mây dùng story; spec v0.43 (D-105, §21.8, G-108 đã xử lý, G-115, G-116). Fanpage: chỉ lấy được phần công khai khi chưa đăng nhập — logo 200 px (đã làm favicon/apple-touch-icon thay logo Vite), ảnh bìa 960×540, thumbnail poster ≤ 206 px (không dùng được). Không đăng nhập, không vượt lớp chặn đăng nhập của Facebook.
+
+**Còn lại / cần người dùng**: ảnh sản phẩm gốc + logo vector; xác nhận thông tin liên hệ (email 6866 ≠ 6886); duyệt 5 câu chuyện và bản en/zh; chạy migration 022.
+
+---
+
 ## 2026-10-13 — Đồng bộ web với tài liệu nhóm (nhánh `feat/sync-real-content`)
 
 **Mục tiêu**: đưa nội dung thật từ tài liệu nhóm G30 (Content Plan, báo cáo đồ án, nội dung tranh Đông Hồ) vào web; cập nhật docs/checklist client/task tracker theo.

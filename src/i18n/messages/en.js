@@ -214,7 +214,9 @@ export default {
     flat: 'Flat delivery fee of {fee} nationwide.',
     tiered: 'Free delivery for orders from {from}; below that, {fee}.',
   },
+  lampStory: { eyebrow: 'The story of this lantern', view: 'View this lantern' },
   pdpTabs: {
+    tabStory: 'Story',
     tabDesc: 'Description',
     tabSpecs: 'Specifications',
     tabShip: 'Delivery & returns',

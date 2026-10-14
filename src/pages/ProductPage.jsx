@@ -13,6 +13,7 @@ import QuantityInput from '../cart/QuantityInput.jsx'
 import { breadcrumbJsonLd, productJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
 import { track } from '../analytics/index.js'
+import { storyParagraphs } from '../lib/story.js'
 
 const SPEC_ORDER = ['size', 'material', 'light', 'weight', 'leadTime', 'care']
 
@@ -22,8 +23,10 @@ function ProductTabs({ product }) {
   const { t, path } = useI18n()
   const [tab, setTab] = useState('desc')
   const rows = SPEC_ORDER.filter((k) => product.specs?.[k])
+  const story = storyParagraphs(product.story)
   const tabs = [
     ['desc', t('pdpTabs.tabDesc')],
+    ...(story.length ? [['story', t('pdpTabs.tabStory')]] : []),
     ['specs', t('pdpTabs.tabSpecs')],
     ['ship', t('pdpTabs.tabShip')],
   ]
@@ -39,6 +42,13 @@ function ProductTabs({ product }) {
       <div role="tabpanel" id="pdp-panel-desc" aria-labelledby="pdp-tab-desc" hidden={tab !== 'desc'}>
         <p>{product.description}</p>
       </div>
+      {story.length > 0 && (
+        <div role="tabpanel" id="pdp-panel-story" aria-labelledby="pdp-tab-story" hidden={tab !== 'story'} className="pdp-story">
+          {story.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
+        </div>
+      )}
       <div role="tabpanel" id="pdp-panel-specs" aria-labelledby="pdp-tab-specs" hidden={tab !== 'specs'}>
         {rows.length ? (
           <dl className="pdp-specs">

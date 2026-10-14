@@ -24,12 +24,11 @@ describe('Sản phẩm — edge case', () => {
     const app = makeApp()
     const list = await request(app).get('/api/products')
     const detail = await request(app).get('/api/products/den-nguyet')
-    for (const item of [...list.body.items, detail.body.item]) {
-      expect(Object.keys(item).sort()).toEqual(
-        // 'image' là { url, alt } — không lộ imagePath (đường dẫn trong Storage)
-        ['badge', 'collection', 'currency', 'description', 'image', 'inStock', 'kind', 'name', 'pieceOrder', 'price', 'slug', 'specs', 'stockLeft', 'tone'].sort(),
-      )
-    }
+    // 'image' là { url, alt } — không lộ imagePath (đường dẫn trong Storage)
+    const base = ['badge', 'collection', 'currency', 'description', 'image', 'inStock', 'kind', 'name', 'pieceOrder', 'price', 'slug', 'specs', 'stockLeft', 'tone']
+    for (const item of list.body.items) expect(Object.keys(item).sort()).toEqual(base.sort())
+    // G-108: câu chuyện dài chỉ có ở trang chi tiết, không nằm trong danh sách
+    expect(Object.keys(detail.body.item).sort()).toEqual([...base, 'story'].sort())
   })
 
   it('FR-CAT-001: sắp xếp theo sortOrder, không theo thứ tự nhập', async () => {

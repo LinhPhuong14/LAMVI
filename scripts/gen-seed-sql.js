@@ -24,8 +24,8 @@ export function buildSeedSql() {
   lines.push('')
   for (const p of products) {
     lines.push(
-      `insert into public.products (id, slug, kind, status, price, tone, sort_order, name, description, badge, collection_slug, piece_order, specs) values (${[
-        p.id, p.slug, p.kind, p.status, p.price, p.tone, p.sortOrder, p.name, p.description, p.badge, p.collectionSlug ?? null, p.pieceOrder ?? 0, p.specs ?? null,
+      `insert into public.products (id, slug, kind, status, price, tone, sort_order, name, description, badge, collection_slug, piece_order, specs, story) values (${[
+        p.id, p.slug, p.kind, p.status, p.price, p.tone, p.sortOrder, p.name, p.description, p.badge, p.collectionSlug ?? null, p.pieceOrder ?? 0, p.specs ?? null, p.story ?? null,
       ].map(lit).join(', ')}) on conflict (id) do nothing;`,
     )
   }

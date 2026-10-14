@@ -5,7 +5,7 @@ import { S } from './strings.js'
 const LANGS = ['vi', 'en', 'zh']
 
 // Nhập văn bản đa ngôn ngữ {vi, en, zh} (T-06)
-export default function I18nInput({ label, value, onChange, error, multiline = false, required = false }) {
+export default function I18nInput({ label, value, onChange, error, multiline = false, rows = 3, required = false }) {
   const id = useId()
   const { t } = useI18n()
   const v = value ?? {}
@@ -23,7 +23,7 @@ export default function I18nInput({ label, value, onChange, error, multiline = f
             id={`${id}-${l}`}
             aria-label={`${label} — ${S.common.langs[l]}`}
             value={v[l] ?? ''}
-            rows={multiline ? 3 : undefined}
+            rows={multiline ? rows : undefined}
             onChange={(e) => onChange({ ...v, [l]: e.target.value })}
           />
         </label>

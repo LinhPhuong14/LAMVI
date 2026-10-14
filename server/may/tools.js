@@ -72,6 +72,8 @@ const productForMay = (p, lang) => ({
   description: p.description,
   // Thông số do admin nhập (kích thước, chất liệu, nguồn sáng…); thiếu thì Mây phải nói chưa có thông tin
   specs: p.specs ?? {},
+  // G-108: câu chuyện/ý nghĩa artwork do admin nhập — nguồn duy nhất để Mây nói về ý nghĩa tranh
+  story: p.story ? String(p.story).slice(0, 1500) : null,
   price: p.price,
   currency: 'VND',
   priceNote: 'VAT included (D-68)',
