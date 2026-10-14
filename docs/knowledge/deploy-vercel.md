@@ -135,3 +135,5 @@ QA v0.39 bổ sung migration 019 atomic cart (cùng user lock với checkout) v�
 
 `supabase/seed.sql` dùng `on conflict (id) do nothing`: trên DB **đã seed bản demo cũ**, các đèn demo (den-nguyet, den-vong, den-sum-vay…) và FAQ id 000…001/004 (nội dung cũ) **không bị ghi đè**. Sau khi chạy seed mới, vào `/admin` ẩn (đã có đơn) hoặc xoá các sản phẩm demo cũ, và sửa lại FAQ 1 và 4 theo nội dung mới. Seed mới dùng id `…0000000000a1…a5` nên 5 đèn thật luôn được thêm. Script `scripts/load-smoke.js` gọi `/products/den-thu-hoach`.
 
+
+Sau khi seed: chạy thêm [`supabase/hide-demo-catalog.sql`](../../supabase/hide-demo-catalog.sql) để ẩn 8 đèn demo và 2 bộ sưu tập demo cũ (an toàn chạy lại). Chưa chạy thì production vẫn hiện "Đèn Nguyệt" 890.000đ với ảnh minh hoạ cũ.

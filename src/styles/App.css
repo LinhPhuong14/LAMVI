@@ -1218,6 +1218,8 @@
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--hoe-light);
+  text-align: center;
+  text-wrap: balance;
 }
 
 /* ---------- Process ---------- */
