@@ -463,7 +463,7 @@ export default function HomePage() {
                 <m.span className="lookbook-halo" aria-hidden="true" variants={lampHalo} />
                 <m.div className="lookbook-lamp" variants={lampBody}>
                   {LOOKBOOK_PHOTOS[i] ? (
-                    <img className="lookbook-photo" src={`/images/lamps/${LOOKBOOK_PHOTOS[i]}.jpg`} alt={label} width={150} height={150} loading="lazy" decoding="async" />
+                    <img className="lookbook-photo" src={`/images/lamps/${LOOKBOOK_PHOTOS[i]}.jpg`} alt="" width={150} height={150} loading="lazy" decoding="async" />
                   ) : (
                     <Lantern size={SIZES[i] === 'tall' ? 140 : 104} tone={TONES[i]} swing />
                   )}
