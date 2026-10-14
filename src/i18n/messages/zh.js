@@ -933,6 +933,9 @@ export default {
     setNote: '购买整套即可拥有本系列的全部灯笼。',
     addSet: '购买整套',
     pickSingle: '或单独挑选（共 {n} 盏）',
+    from: '起价',
+    choose: '挑选灯笼',
+    readStory: '阅读故事',
   },
   notFound: {
     contact: "需要帮助？联系 LAMVI",

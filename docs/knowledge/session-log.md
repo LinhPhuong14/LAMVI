@@ -1,5 +1,13 @@
 # Nhật ký phiên
 
+## 2026-10-14 (phiên 3) — Bỏ chú thích ảnh, tách nền đèn, thiết kế lại trang bộ sưu tập (D-107, D-108)
+
+**Yêu cầu PO**: bỏ dòng caption nguồn ảnh fanpage; tách nền ảnh đèn (hoặc ảnh phủ khung) để giữ hiệu ứng; thiết kế lại trang bộ sưu tập.
+
+**Đã làm**: xoá `story.coverCaption`; `scripts/gen_lamp_cutouts.py` + `*-cutout.webp` dùng ở hero, lookbook, thẻ nhỏ, thẻ bộ sưu tập (`image.cutout`, T-87); trang chi tiết ảnh phủ khung; trang `/collections/:slug` mới (sân khấu + danh sách biên tập).
+
+---
+
 ## 2026-10-14 (phiên 2) — Protect router + ảnh fanpage (nhánh `feat/protected-routes-fanpage-images`)
 
 **Yêu cầu PO**: "thêm protect router, và thay ảnh fanpage vào trong web" → D-106.

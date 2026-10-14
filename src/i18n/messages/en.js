@@ -944,6 +944,9 @@ export default {
     setNote: 'Buy the full set to own every lantern in this collection.',
     addSet: 'Buy the full set',
     pickSingle: 'Or choose single lanterns ({n})',
+    from: 'From',
+    choose: 'Choose a lantern',
+    readStory: 'Read the story',
   },
   notFound: {
     contact: "Need help? Contact LAMVI",

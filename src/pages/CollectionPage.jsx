@@ -1,6 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
 import { Lotus } from '../components/Motifs'
-import ProductCards from '../components/ProductCards'
 import Price from '../components/Price'
 import ProductImage from '../components/ProductImage'
 import AddToCart from '../cart/AddToCart.jsx'
@@ -42,6 +41,7 @@ export default function CollectionPage() {
   }
 
   const c = res.data.item
+  const lowest = c.lamps.length ? Math.min(...c.lamps.map((l) => l.price)) : null
   const pagePath = `/collections/${c.slug}`
   return (
     <section className={`page-section collection-page tone-${c.tone ?? 'amber'}`}>
@@ -58,12 +58,38 @@ export default function CollectionPage() {
         ]}
       />
       {back}
-      <header className="collection-hero">
-        <p className="eyebrow">
-          <Lotus /> {t('collection.eyebrow')}
-        </p>
-        <h1 className="page-title">{c.name}</h1>
-        <p className="shop-lead">{c.description}</p>
+      {/* Sân khấu: tên bộ + hàng đèn đã tách nền đứng trên kệ gỗ, mỗi đèn một quầng sáng (D-108) */}
+      <header className="cp-stage">
+        <div className="cp-stage-copy">
+          <p className="eyebrow">
+            <Lotus /> {t('collection.eyebrow')}
+          </p>
+          <h1 className="page-title">{c.name}</h1>
+          <p className="shop-lead">{c.description}</p>
+          <ul className="cp-chips">
+            <li>{t('collection.count', { n: c.lamps.length })}</li>
+            {lowest != null && (
+              <li>
+                {t('collection.from')} <Price amount={lowest} />
+              </li>
+            )}
+          </ul>
+          <a href="#chon-den" className="btn btn-primary">
+            {t('collection.choose')}
+          </a>
+        </div>
+        <ul className="cp-lineup" aria-hidden="true">
+          {c.lamps.map((l, i) => (
+            <li key={l.slug} style={{ '--i': i }}>
+              <Link to={path(`/products/${l.slug}`)} tabIndex={-1} className="cp-lamp">
+                <span className="cp-halo" />
+                <ProductImage image={l.image} size={150} tone={l.tone} name="" cutout />
+                <span className="cp-lamp-name">{l.name.replace(/^Đèn\s+/, '')}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <div className="cp-shelf" aria-hidden="true" />
       </header>
 
       {c.set && (
@@ -83,8 +109,39 @@ export default function CollectionPage() {
         </div>
       )}
 
-      <h2 className="collection-sub">{t('collection.pickSingle', { n: c.lamps.length })}</h2>
-      <ProductCards items={c.lamps} className="shop-grid" />
+      <h2 className="collection-sub" id="chon-den">
+        {t('collection.pickSingle', { n: c.lamps.length })}
+      </h2>
+      <div className="cp-rows">
+        {c.lamps.map((l, i) => (
+          <article key={l.slug} className={`cp-row tone-${l.tone ?? 'amber'}${i % 2 ? ' is-flip' : ''}`}>
+            {/* Ảnh phủ kín khung; tên đèn đã có ở tiêu đề nên liên kết ảnh bị ẩn khỏi trình đọc màn hình */}
+            <Link to={path(`/products/${l.slug}`)} className="cp-photo" tabIndex={-1} aria-hidden="true">
+              <ProductImage image={l.image} size={300} tone={l.tone} name="" fill />
+            </Link>
+            <div className="cp-info">
+              <span className="cp-index" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3>
+                <Link to={path(`/products/${l.slug}`)} className="product-link">
+                  {l.name}
+                </Link>
+              </h3>
+              <p className="cp-desc">{l.description}</p>
+              {l.specs?.size && <p className="cp-spec">{l.specs.size}</p>}
+              {l.stockLeft != null && <p className="stock-left">{t('cart.lowStock', { n: l.stockLeft })}</p>}
+              <div className="cp-buy">
+                <Price amount={l.price} className="product-price large" />
+                <AddToCart slug={l.slug} className="btn btn-primary" soldOut={l.inStock === false} />
+                <Link to={path(`/products/${l.slug}`)} className="btn btn-ghost">
+                  {t('collection.readStory')}
+                </Link>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
     </section>
   )
 }

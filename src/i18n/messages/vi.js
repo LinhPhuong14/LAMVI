@@ -959,6 +959,9 @@ export default {
     setNote: 'Mua trọn bộ để có đủ các đèn của bộ sưu tập này.',
     addSet: 'Mua cả bộ',
     pickSingle: 'Hoặc chọn từng đèn ({n} đèn)',
+    from: 'Từ',
+    choose: 'Chọn đèn',
+    readStory: 'Xem câu chuyện',
   },
   notFound: {
     contact: "Cần giúp đỡ? Liên hệ LAMVI",

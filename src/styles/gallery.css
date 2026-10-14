@@ -87,3 +87,285 @@
   .quilt.is-complete, .quilt-patch.is-new::before, .quilt-burst i, .reward-rays, .reward-sparks i, .reward-caret { animation: none; }
   .quilt-patch.is-new .quilt-stitch { animation: none; stroke-dashoffset: 0; }
 }
+
+/* ---------- Trang bộ sưu tập (D-108) ---------- */
+.cp-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(340px, 1.05fr) 1.25fr;
+  align-items: center;
+  gap: 24px 32px;
+  margin: 8px 0 36px;
+  padding: 48px 48px 78px;
+  border-radius: 32px;
+  overflow: hidden;
+  color: #f6ead2;
+  background:
+    radial-gradient(ellipse 60% 70% at 70% 48%, rgba(255, 190, 90, 0.28), transparent 70%),
+    linear-gradient(160deg, #1b2a45 0%, #2a2230 55%, #3a2418 100%);
+  box-shadow: 0 24px 60px rgba(40, 24, 16, 0.35);
+}
+.cp-stage .eyebrow,
+.cp-stage .shop-lead,
+.cp-stage h1 {
+  color: inherit;
+}
+.cp-stage .eyebrow {
+  opacity: 0.85;
+}
+.cp-stage h1 {
+  margin: 6px 0 12px;
+  font-size: clamp(2rem, 3.6vw, 2.9rem);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.cp-stage .shop-lead {
+  opacity: 0.88;
+  max-width: 34ch;
+}
+.cp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 22px;
+}
+.cp-chips li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid rgba(246, 234, 210, 0.35);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.07);
+}
+.cp-chips .price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.cp-chips .product-price {
+  color: #ffd99a;
+  font-size: 1rem;
+}
+.cp-chips .price-note {
+  color: inherit;
+  opacity: 0.7;
+}
+.cp-lineup {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(4px, 1.6vw, 22px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cp-lineup li:nth-child(odd) {
+  margin-bottom: 14px;
+}
+.cp-lamp {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.35s var(--ease-out);
+}
+.cp-lamp:hover {
+  transform: translateY(-8px);
+}
+.cp-lamp .lamp-cutout {
+  position: relative;
+  max-height: 210px;
+  width: auto;
+}
+.cp-halo {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 190, 90, 0.55) 0%, transparent 68%);
+  animation: lamp-glow-halo 4.6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -0.7s);
+}
+@keyframes lamp-glow-halo {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.cp-lamp-name {
+  font-family: var(--serif);
+  font-size: 0.88rem;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 9ch;
+  opacity: 0.9;
+}
+/* Kệ gỗ dưới hàng đèn */
+.cp-shelf {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 54px;
+  background: linear-gradient(180deg, rgba(20, 10, 6, 0) 0%, rgba(20, 10, 6, 0.55) 55%, rgba(14, 7, 4, 0.9) 100%);
+  border-top: 1px solid rgba(255, 190, 90, 0.18);
+}
+
+/* Danh sách đèn dạng biên tập: ảnh phủ khung + nội dung, xen kẽ trái/phải */
+.cp-rows {
+  display: grid;
+  gap: 28px;
+}
+.cp-row {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.8fr) 1.2fr;
+  gap: 0;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  overflow: hidden;
+  background: rgba(255, 252, 245, 0.78);
+  box-shadow: 0 10px 30px rgba(58, 32, 24, 0.12);
+}
+.cp-row.is-flip {
+  grid-template-columns: 1.2fr minmax(240px, 0.8fr);
+}
+.cp-row.is-flip .cp-photo {
+  order: 2;
+}
+.cp-photo {
+  position: relative;
+  display: block;
+  min-height: 300px;
+  overflow: hidden;
+  background: var(--tone, var(--hoe));
+}
+.cp-photo .product-photo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100% !important; /* ProductImage đặt style nội tuyến theo `size`/`fill` */
+  height: 100% !important;
+  aspect-ratio: auto !important;
+  border: 0;
+  border-radius: 0;
+  object-fit: cover;
+  transition: transform 0.7s var(--ease-out);
+}
+.cp-row:hover .cp-photo .product-photo {
+  transform: scale(1.05);
+}
+.cp-info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 34px 40px;
+}
+.cp-index {
+  font-family: var(--serif);
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--son);
+  opacity: 0.35;
+}
+.cp-info h3 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+}
+.cp-desc {
+  margin: 0;
+  line-height: 1.7;
+  max-width: 46ch;
+}
+.cp-spec {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.72;
+}
+.cp-buy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 10px;
+}
+@media (max-width: 860px) {
+  .cp-stage {
+    grid-template-columns: 1fr;
+    padding: 32px 22px 70px;
+  }
+  .cp-lineup {
+    gap: 2px;
+  }
+  .cp-lamp .lamp-cutout {
+    max-height: 150px;
+  }
+  .cp-lamp-name {
+    font-size: 0.74rem;
+  }
+  .cp-row,
+  .cp-row.is-flip {
+    grid-template-columns: 1fr;
+  }
+  .cp-row.is-flip .cp-photo {
+    order: 0;
+  }
+  .cp-photo,
+  .cp-photo .product-photo {
+    min-height: 240px;
+    max-height: 300px;
+  }
+  .cp-info {
+    padding: 24px 22px 28px;
+  }
+}
+@media (max-width: 520px) {
+  .cp-stage {
+    padding: 28px 16px 64px;
+  }
+  .cp-lineup {
+    gap: 0;
+    justify-content: space-between;
+  }
+  .cp-lamp {
+    gap: 6px;
+  }
+  .cp-lamp .lamp-cutout {
+    max-height: 112px;
+  }
+  .cp-lamp-name {
+    font-size: 0.66rem;
+    max-width: 7ch;
+  }
+  .cp-halo {
+    width: 100px;
+    height: 100px;
+    margin: -50px 0 0 -50px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cp-halo {
+    animation: none;
+  }
+  .cp-lamp,
+  .cp-photo .product-photo {
+    transition: none;
+  }
+}
