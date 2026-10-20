@@ -1,5 +1,14 @@
 # Nhật ký phiên
 
+## 2026-10-20 (phiên 2) — Chốt gate đổi trả (nhánh `feat/returns-retention`, D-109)
+
+**Quyết định PO**: video đổi trả tối đa 50 MB; lưu 90 ngày sau khi xử lý xong.
+
+**Đã làm**: migration `…0023` (`video_purged_at`), `purgeExpiredVideos` + repo (memory/Supabase), gắn vào cron, admin hiện "Video đã xoá", `adminVideo` 410; `RETURNS_VIDEO_MAX_MB` vẫn là biến môi trường (đặt 50 ở Vercel).
+
+**Còn lại**: chạy migration 023 và đặt biến trên Vercel; thử luồng đổi trả trên Preview.
+
+---
 ## 2026-10-20 — Menu di động header auth, nhật ký bảo trì (nhánh `feat/returns-maintenance-authmenu`)
 
 **Yêu cầu PO**: hoàn thiện menu di động, nhật ký bảo trì, giao diện luồng đổi trả (Resend đã cấu hình).

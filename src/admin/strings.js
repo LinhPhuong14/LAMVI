@@ -2,7 +2,7 @@
 export const S = {
   title: 'Quản trị LAMVI',
   nav: { returns: 'Đổi trả', collections: 'Bộ sưu tập', orders: 'Đơn hàng', users: 'Người dùng', products: 'Sản phẩm', faq: 'Hỏi đáp', batches: 'Lô đèn', coupons: 'Mã giảm giá', analytics: 'Truy cập (GA)', may: 'Mây (AI)', it: 'Dashboard IT', site: 'Về trang web' },
-  returns: { filter: 'Trạng thái', retry: 'Thử lại', empty: 'Không có yêu cầu trong trạng thái này.', pages: 'Phân trang yêu cầu đổi trả', previous: 'Trang trước', next: 'Trang sau', outcome: 'Kết quả xử lý thủ công', outcomes: { replacement: 'Đã đổi sản phẩm', refund: 'Đã hoàn tiền thủ công' }, title: 'Yêu cầu đổi trả', note: 'Chỉ duyệt yêu cầu. Không tự động chuyển tiền hoặc tính hoàn tiền một phần.', error: 'Không thể xử lý. Hãy tải lại hoặc thử lại.', video: 'Xem video riêng tư (5 phút)', decision: 'Quyết định', approved: 'Duyệt', rejected: 'Từ chối', reason: 'Lý do / hướng xử lý', save: 'Lưu quyết định' },
+  returns: { filter: 'Trạng thái', retry: 'Thử lại', empty: 'Không có yêu cầu trong trạng thái này.', pages: 'Phân trang yêu cầu đổi trả', previous: 'Trang trước', next: 'Trang sau', outcome: 'Kết quả xử lý thủ công', outcomes: { replacement: 'Đã đổi sản phẩm', refund: 'Đã hoàn tiền thủ công' }, title: 'Yêu cầu đổi trả', note: 'Chỉ duyệt yêu cầu. Không tự động chuyển tiền hoặc tính hoàn tiền một phần.', error: 'Không thể xử lý. Hãy tải lại hoặc thử lại.', video: 'Xem video riêng tư (5 phút)', videoPurged: 'Video đã xoá theo chính sách lưu 90 ngày sau khi xử lý xong.', decision: 'Quyết định', approved: 'Duyệt', rejected: 'Từ chối', reason: 'Lý do / hướng xử lý', save: 'Lưu quyết định' },
   common: {
     loading: 'Đang tải…',
     save: 'Lưu',

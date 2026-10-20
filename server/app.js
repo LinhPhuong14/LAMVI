@@ -1,3 +1,4 @@
+import { createReturnsService } from './returns/service.js'
 import { returnsRouter } from './returns/routes.js'
 import express from 'express'
 import { catalogRouter } from './routes/catalog.js'
@@ -114,7 +115,18 @@ export function createApp({
   if (auth) api.use(mayRouter({ repo, auth, may }))
   if (auth) api.use(cartRouter({ auth, cart: createCartService({ repo }) }))
   // FR-CHK-*, FR-ORD-*, FR-PAY-*: cần repo có bảng đơn hàng (adapter cũ trong test không có)
-  if (auth && repo.createOrder) api.use(ordersRouter({ repo, auth, orders, config, payos, messages, notifications, metrics }))
+  if (auth && repo.createOrder) api.use(
+      ordersRouter({
+        repo, auth, orders, config, payos, messages, notifications, metrics,
+        purgeReturnVideos:
+          storage && returnsRepo
+            ? () =>
+                createReturnsService({ repo, returnsRepo, storage, maxBytes: 0 }).purgeExpiredVideos({
+                  days: config.returnsVideoRetentionDays ?? 90,
+                })
+            : null,
+      }),
+    )
   if (auth && repo.createOrder && repo.listCollections) api.use(galleryRouter({ repo, auth }))
   // Trang QR lời chúc: người nhận, không đăng nhập (US-004)
   if (messages && repo.getOrderByQrToken) api.use(qrRouter({ repo, messages, config }))

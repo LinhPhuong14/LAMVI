@@ -24,6 +24,8 @@ export function loadConfig(env = process.env) {
     maxVideoMb: Number(env.MAX_VIDEO_MB) || 500,
     // FR-RET-001: 0 keeps submission disabled until PO approves video limits and retention.
     returnsVideoMaxMb: Number(env.RETURNS_VIDEO_MAX_MB) || 0,
+    // D-109: video đổi trả xoá sau 90 ngày kể từ khi xử lý xong
+    returnsVideoRetentionDays: 90,
     // Giới hạn ảnh sản phẩm [ASSUMPTION] — ảnh web nên ≤ 5 MB (G-23)
     maxImageMb: Number(env.MAX_IMAGE_MB) || 5,
     // Số proxy phía trước (vd 1 khi sau load balancer); không đặt → không tin X-Forwarded-For

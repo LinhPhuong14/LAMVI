@@ -137,3 +137,9 @@ QA v0.39 bổ sung migration 019 atomic cart (cùng user lock với checkout) v�
 
 
 Sau khi seed: chạy thêm [`supabase/hide-demo-catalog.sql`](../../supabase/hide-demo-catalog.sql) để ẩn 8 đèn demo và 2 bộ sưu tập demo cũ (an toàn chạy lại). Chưa chạy thì production vẫn hiện "Đèn Nguyệt" 890.000đ với ảnh minh hoạ cũ.
+
+## Bật đổi trả (D-109, T-88)
+
+1. Chạy migration `supabase/migrations/20261020000023_return_video_purge.sql` trên Supabase (idempotent) **trước** khi deploy. Thiếu cột `video_purged_at` thì cron xoá video lỗi.
+2. Đặt `RETURNS_VIDEO_MAX_MB=50` ở Production rồi redeploy. Để `0` thì form đổi trả bị tắt.
+3. Video tự xoá 90 ngày sau khi xử lý xong, chạy trong cron hằng ngày `expire-orders`.

@@ -61,7 +61,7 @@ function presentOrder(o, { lang = 'vi' } = {}) {
  * Checkout, đơn hàng của tôi (FR-CHK-*, FR-ORD-001, FR-ACC-002) và webhook payOS (FR-PAY-001).
  * Webhook KHÔNG yêu cầu đăng nhập — bảo vệ bằng chữ ký (NFR-SEC-002).
  */
-export function ordersRouter({ repo, auth, orders, config, payos = null, messages = null, notifications = null, metrics = null }) {
+export function ordersRouter({ repo, auth, orders, config, payos = null, messages = null, notifications = null, metrics = null, purgeReturnVideos = null }) {
   const r = Router()
   const guard = requireAuth(auth)
   const lang = (req) => normalizeLang(req.query.lang)
@@ -195,9 +195,11 @@ export function ordersRouter({ repo, auth, orders, config, payos = null, message
     const cancelled = await orders.expirePendingOrders()
     // D-26, D-75: dùng chung lịch cron này để xoá media lời chúc quá hạn (Hobby chỉ có 1 cron/ngày)
     const mediaPurged = messages ? await messages.purgeExpiredMedia() : 0
+    // D-109: video đổi trả quá 90 ngày sau khi xử lý xong
+    const returnVideosPurged = purgeReturnVideos ? await purgeReturnVideos() : 0
     if (metrics?.cleanup) await metrics.cleanup()
     const notificationResult = notifications ? await notifications() : undefined
-    res.json({ cancelled: cancelled.length, mediaPurged, ...(notificationResult ? { notifications: notificationResult } : {}) })
+    res.json({ cancelled: cancelled.length, mediaPurged, returnVideosPurged, ...(notificationResult ? { notifications: notificationResult } : {}) })
   })
 
   // Optional external scheduler: same Express/Vercel function, same cron credential.

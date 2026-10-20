@@ -23,6 +23,7 @@ const fromRow = (r) =>
     resolutionNote: r.resolution_note,
     resolvedAt: r.resolved_at,
     resolvedBy: r.resolved_by,
+    videoPurgedAt: r.video_purged_at ?? null,
   }
 const fields = {
   orderId: 'order_id',
@@ -38,6 +39,7 @@ const fields = {
   resolutionNote: 'resolution_note',
   resolvedAt: 'resolved_at',
   resolvedBy: 'resolved_by',
+  videoPurgedAt: 'video_purged_at',
 }
 const toRow = (v) => Object.fromEntries(Object.entries(v).map(([k, x]) => [fields[k] ?? k, x]))
 export function createSupabaseReturnsRepo(admin) {
@@ -87,6 +89,26 @@ export function createSupabaseReturnsRepo(admin) {
     },
     async create(v) {
       return fromRow(await result(admin.from('return_requests').insert(toRow(v)).select().single()))
+    },
+    // D-109: yêu cầu đã xử lý xong (resolved: resolved_at, rejected: decided_at) từ `cutoff` trở về trước, chưa xoá video
+    async listPurgeable({ cutoff, limit = 50 }) {
+      const q = admin
+        .from('return_requests')
+        .select('*')
+        .is('video_purged_at', null)
+        .or(
+          `and(status.eq.resolved,resolved_at.lte.${cutoff}),and(status.eq.rejected,decided_at.lte.${cutoff})`,
+        )
+        .order('created_at', { ascending: true })
+        .limit(Math.min(limit, 100))
+      return (await result(q)).map(fromRow)
+    },
+    async markPurged(id, at) {
+      return fromRow(
+        await result(
+          admin.from('return_requests').update({ video_purged_at: at }).eq('id', id).is('video_purged_at', null).select().maybeSingle(),
+        ),
+      )
     },
     async change(id, expected, patch) {
       return fromRow(
@@ -142,6 +164,21 @@ export function createMemoryReturnsRepo() {
       const row = { id: randomUUID(), ...v }
       rows.set(row.id, row)
       return structuredClone(row)
+    },
+    async listPurgeable({ cutoff, limit = 50 }) {
+      const done = (r) => (r.status === 'resolved' ? r.resolvedAt : r.status === 'rejected' ? r.decidedAt : null)
+      return structuredClone(
+        [...rows.values()]
+          .filter((r) => !r.videoPurgedAt && done(r) && Date.parse(done(r)) <= Date.parse(cutoff))
+          .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+          .slice(0, limit),
+      )
+    },
+    async markPurged(id, at) {
+      const r = rows.get(id)
+      if (!r || r.videoPurgedAt) return null
+      r.videoPurgedAt = at
+      return structuredClone(r)
     },
     async change(id, expected, patch) {
       const r = rows.get(id)

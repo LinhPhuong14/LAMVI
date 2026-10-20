@@ -48,6 +48,7 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
     resolution: r.resolution ?? null,
     resolutionNote: r.resolutionNote ?? null,
     resolvedAt: r.resolvedAt ?? null,
+    videoPurged: Boolean(r.videoPurgedAt),
   })
   async function ownerOrder(code, userId) {
     const o = await repo.getOrderByCode(code)
@@ -269,11 +270,28 @@ export function createReturnsService({ repo, returnsRepo, storage, maxBytes = 0,
       requestId(id)
       const r = await returnsRepo.get(id)
       if (!r || r.status === 'uploading') throw notFound()
+      if (r.videoPurgedAt) fail('RETURN_VIDEO_PURGED', 410)
       return {
         url: await storage.signedUrl(r.videoPath, RETURN_BUCKET, {
           expiresIn: 300,
         }),
       }
+    },
+    // D-109: xoá video của yêu cầu đã xử lý xong quá `days` ngày; giữ dòng yêu cầu. Lỗi một tệp không chặn các tệp khác
+    // (lần cron sau thử lại vì chưa đánh dấu `video_purged_at`).
+    async purgeExpiredVideos({ days = 90, limit = 50 } = {}) {
+      const cutoff = new Date(now() - days * 86400000).toISOString()
+      const rows = await returnsRepo.listPurgeable({ cutoff, limit })
+      let purged = 0
+      for (const r of rows) {
+        try {
+          await storage.removeObject(r.videoPath, RETURN_BUCKET)
+          if (await returnsRepo.markPurged(r.id, new Date(now()).toISOString())) purged += 1
+        } catch {
+          console.error('[returns] purge video failed')
+        }
+      }
+      return purged
     },
     async decide(id, adminId, input) {
       requestId(id)

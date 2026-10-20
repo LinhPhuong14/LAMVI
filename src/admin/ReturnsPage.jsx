@@ -119,9 +119,13 @@ export default function ReturnsPage() {
                 </li>
               ))}
             </ul>
-            <button type="button" className="btn btn-secondary" onClick={() => video(r.id)}>
-              {S.returns.video}
-            </button>
+            {r.videoPurged ? (
+              <p className="field-hint">{S.returns.videoPurged}</p>
+            ) : (
+              <button type="button" className="btn btn-secondary" onClick={() => video(r.id)}>
+                {S.returns.video}
+              </button>
+            )}
             {preview?.id === r.id && (
               <video aria-label={S.returns.video} controls preload="metadata" src={preview.url} />
             )}
