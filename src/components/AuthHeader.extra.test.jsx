@@ -149,3 +149,23 @@ describe('CREDITS.md', () => {
     })
   }
 })
+
+describe('AuthHeader menu di động', () => {
+  it('nút menu mở ngăn kéo có trang chủ/cửa hàng/liên hệ + nút chuyển đăng ký; Esc đóng', async () => {
+    mockApi(base)
+    renderAt('/login')
+    await waitFor(() => expect(hdr()).toBeTruthy())
+    const btn = hdr().querySelector('.nav-menu-btn')
+    expect(btn.getAttribute('aria-expanded')).toBe('false')
+    btn.click()
+    await waitFor(() => expect(document.getElementById('mobile-menu')).toBeTruthy())
+    const menu = document.getElementById('mobile-menu')
+    const hrefs = [...menu.querySelectorAll('a')].map((a) => a.getAttribute('href'))
+    expect(hrefs).toEqual(expect.arrayContaining(['/', '/shop', '/contact', '/register']))
+    expect(hrefs).not.toContain('/account')
+    expect(menu.querySelector('.mobile-menu-logout')).toBeNull()
+    expect(menu.querySelector('.lang-switch')).toBeTruthy()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await waitFor(() => expect(document.getElementById('mobile-menu')).toBeNull())
+  })
+})

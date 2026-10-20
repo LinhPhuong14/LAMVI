@@ -70,7 +70,9 @@ const FOCUSABLE = 'a[href], button:not([disabled])'
 // Menu di động (feedback 08/10, mục 2): ngăn kéo toàn màn hình. Vẽ qua portal vào <body> vì .nav có
 // backdrop-filter/transform — phần tử `fixed` bên trong sẽ bị kẹt trong khung của header thay vì phủ màn hình.
 // Đóng bằng Esc, bấm nền, hoặc khi chuyển trang; khoá cuộn nền; giữ Tab trong ngăn kéo; trả focus về nút mở.
-function MobileMenu({ open, onClose, triggerRef }) {
+// variant 'auth': header của đăng nhập/đăng ký (D-80) — chỉ có trang chủ, cửa hàng, liên hệ, ngôn ngữ và
+// nút chuyển đăng nhập ↔ đăng ký (`cta`), không có tài khoản/đăng xuất/giỏ.
+export function MobileMenu({ open, onClose, triggerRef, variant = 'site', cta = null }) {
   const { t, lang, path } = useI18n()
   const auth = useContext(AuthContext)
   const site = useApi('/site', lang)
@@ -136,14 +138,24 @@ function MobileMenu({ open, onClose, triggerRef }) {
           </button>
         </div>
         <nav className="mobile-menu-links" aria-label={t('nav.menuLabel')}>
-          {SECTIONS.map((s) => (
-            <Link key={s} to={s === 'shop' ? path('/shop') : { pathname: path('/'), hash: `#${s}` }}>
-              {t(`nav.${s}`)}
-            </Link>
-          ))}
-          <Link to={path('/account')}>{t('nav.account')}</Link>
-          <Link to={path('/account?tab=orders')}>{t('nav.track')}</Link>
-          <Link to={path('/contact')}>{t('nav.contact')}</Link>
+          {variant === 'auth' ? (
+            <>
+              <Link to={path('/')}>{t('nav.home')}</Link>
+              <Link to={path('/shop')}>{t('nav.shop')}</Link>
+              <Link to={path('/contact')}>{t('nav.contact')}</Link>
+            </>
+          ) : (
+            <>
+              {SECTIONS.map((s) => (
+                <Link key={s} to={s === 'shop' ? path('/shop') : { pathname: path('/'), hash: `#${s}` }}>
+                  {t(`nav.${s}`)}
+                </Link>
+              ))}
+              <Link to={path('/account')}>{t('nav.account')}</Link>
+              <Link to={path('/account?tab=orders')}>{t('nav.track')}</Link>
+              <Link to={path('/contact')}>{t('nav.contact')}</Link>
+            </>
+          )}
         </nav>
         <div className="mobile-menu-foot">
           <LanguageSwitcher />
@@ -152,14 +164,20 @@ function MobileMenu({ open, onClose, triggerRef }) {
               {t('nav.hotline')}: {business.phone}
             </a>
           )}
-          {auth?.user && (
+          {variant !== 'auth' && auth?.user && (
             <button type="button" className="mobile-menu-logout" onClick={() => auth.logout()}>
               {t('nav.logout')}
             </button>
           )}
-          <Link to={path('/shop')} className="btn btn-primary mobile-menu-cta">
-            {t('nav.cta')}
-          </Link>
+          {variant === 'auth' && cta ? (
+            <Link to={cta.to} className="btn btn-primary mobile-menu-cta">
+              {cta.label}
+            </Link>
+          ) : (
+            <Link to={path('/shop')} className="btn btn-primary mobile-menu-cta">
+              {t('nav.cta')}
+            </Link>
+          )}
         </div>
       </div>
     </div>,

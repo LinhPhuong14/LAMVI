@@ -29,6 +29,7 @@ const base = (role = 'it', extra = {}) => ({
   'GET /it/health': () => ({ body: health() }),
   'GET /it/metrics': () => ({ body: metrics }),
   'GET /it/errors': () => ({ body: errors }),
+  'GET /it/maintenance/log': () => ({ body: { items: [] } }),
   ...extra,
 })
 
@@ -80,6 +81,34 @@ describe('Dashboard IT (D-51, D-52)', () => {
     expect(await screen.findByText(/ĐANG BẬT/)).toBeInTheDocument()
     expect(puts).toEqual([{ enabled: true }])
     expect(confirm).toHaveBeenCalledTimes(2)
+  })
+
+  it('nhật ký bảo trì: liệt kê lần bật/tắt, mới nhất trước (G-27)', async () => {
+    mockApi(
+      base('it', {
+        'GET /it/maintenance/log': () => ({
+          body: {
+            items: [
+              { id: 2, at: '2026-09-28T11:00:00Z', actorId: 'abcdef12-0000', actorRole: 'it', action: 'disable' },
+              { id: 1, at: '2026-09-28T10:00:00Z', actorId: 'abcdef12-0000', actorRole: 'it', action: 'enable' },
+            ],
+          },
+        }),
+      }),
+    )
+    renderAt('/it')
+    const log = (await screen.findByRole('heading', { name: 'Nhật ký bảo trì' })).closest('section')
+    const rows = within(log).getAllByRole('listitem')
+    expect(rows).toHaveLength(2)
+    expect(rows[0]).toHaveTextContent('Tắt bảo trì')
+    expect(rows[1]).toHaveTextContent('Bật bảo trì')
+    expect(rows[0]).toHaveTextContent('bởi it (abcdef12)')
+  })
+
+  it('nhật ký bảo trì rỗng: báo chưa có lần nào', async () => {
+    mockApi(base('it'))
+    renderAt('/it')
+    expect(await screen.findByText('Chưa có lần bật/tắt nào.')).toBeInTheDocument()
   })
 
   it('IT vào được /admin và có link sang /it', async () => {

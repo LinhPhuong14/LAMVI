@@ -876,6 +876,25 @@
   color: var(--son);
 }
 
+.it-maint-log {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+
+.it-maint-log li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--dash-line);
+}
+
+.it-maint-log li:last-child {
+  border-bottom: 0;
+}
+
 .it-checks {
   list-style: none;
   padding: 0;

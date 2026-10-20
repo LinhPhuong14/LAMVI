@@ -63,6 +63,11 @@ export const S = {
     confirmOff: 'Tắt chế độ bảo trì?',
     hint: 'Khi bật: trang công khai trả 503; API chỉ cho đọc. Đăng nhập, /admin và /it vẫn dùng được.',
     changedAt: 'Đổi lần cuối: {time}',
+    logTitle: 'Nhật ký bảo trì',
+    logEmpty: 'Chưa có lần bật/tắt nào.',
+    logOn: 'Bật bảo trì',
+    logOff: 'Tắt bảo trì',
+    logBy: 'bởi {role} ({id})',
   },
   metrics: {
     title: 'Số liệu API',

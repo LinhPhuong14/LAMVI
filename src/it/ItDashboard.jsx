@@ -130,6 +130,33 @@ function MaintenancePanel({ state, onChanged }) {
   )
 }
 
+// G-27: nhật ký bật/tắt bảo trì (audit_log entity `maintenance`), mới nhất trước
+function MaintenanceLog({ tick, version }) {
+  const res = useItData(`/it/maintenance/log?v=${encodeURIComponent(version ?? '')}`, tick)
+  if (res.status === 'loading') return null
+  if (res.status === 'error') return <ErrorNote error={res.error} />
+  const items = (res.data?.items ?? []).slice(0, 20)
+  return (
+    <section className="account-card it-card" aria-label={S.maintenance.logTitle}>
+      <h2>{S.maintenance.logTitle}</h2>
+      {items.length === 0 ? (
+        <p className="field-hint">{S.maintenance.logEmpty}</p>
+      ) : (
+        <ul className="it-maint-log">
+          {items.map((e) => (
+            <li key={e.id}>
+              <strong>{e.action === 'enable' ? S.maintenance.logOn : S.maintenance.logOff}</strong>
+              <small>
+                {time(e.at)} · {fmt(S.maintenance.logBy, { role: e.actorRole ?? '—', id: String(e.actorId ?? '').slice(0, 8) || '—' })}
+              </small>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
 function MetricsPanel({ range, setRange, tick }) {
   const res = useItData(`/it/metrics?range=${range}`, tick)
   return (
@@ -291,6 +318,7 @@ function Dashboard() {
         {health.status === 'error' && <ErrorNote error={health.error} />}
         {health.status === 'ok' && <HealthPanel health={health.data} />}
         {maint && <MaintenancePanel state={maint} onChanged={setMaintenance} />}
+        {maint && <MaintenanceLog tick={tick} version={maint.updatedAt} />}
         <MetricsPanel range={range} setRange={setRange} tick={tick} />
         <ErrorsPanel range={range} tick={tick} />
         <NotificationPanel tick={tick} />

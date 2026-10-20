@@ -5,7 +5,7 @@
 | Mục feedback | Trạng thái | Code / kiểm tra | Còn lại |
 |---|---|---|---|
 | P0-1 Site sập 500 | 🟡 hướng chịu lỗi xong, nguyên nhân gốc chưa rõ | `server/degraded.js`, `errorPage.js`, `index.js`/`main.js`, `scripts/sync-cdn-assets.js`; `degraded.test.js` | Đọc Runtime Logs 08/10 + postmortem; uptime monitor, Sentry/log drain, promotion (G-94, G-99) — việc vận hành; xác minh trên Vercel thật |
-| P0-2 Menu di động | ✅ | `SiteHeader.jsx` (ngăn kéo), `FeedbackP0.test.jsx`, kiểm bằng Chromium 390px | `AuthHeader` chưa có menu |
+| P0-2 Menu di động | ✅ | `SiteHeader.jsx` (ngăn kéo), `FeedbackP0.test.jsx`, kiểm bằng Chromium 390px | `AuthHeader` có menu riêng (variant auth, v0.47) |
 | P0-3 Bắt buộc đăng nhập | 🟡 phương án "buộc đăng nhập" | `LoginPage` chú thích + tóm tắt giỏ, GA `login_view` | Guest checkout chờ PO (Q-41) |
 | P0-4 Kênh liên hệ | ✅ code | `/contact`, `routes/contact.js`, footer/404/Mây; `contact.test.js` | Vận hành đặt `MAIL_*` thật; form đổi trả online |
 | P0-5 Pháp lý | ✅ code | footer pháp lý, `/terms` `/shipping` `/payment`, sitemap | Dữ liệu thật + `[LEGAL]` Q-42 + thông báo Bộ Công Thương |
@@ -62,7 +62,7 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Admin | Quản lý người dùng: tìm, khoá/mở khoá, đổi vai trò (D-90, G-19) | ✅ | `server/routes/adminUsers.js`, `server/security/lockedAccounts.js`, `src/admin/UsersPage.jsx` | `server/adminUsers.test.js`, `src/admin/AdminUsers.test.jsx` | Migration 010 (G-55) |
 | Admin | Đổi trả | ⬜ | — | — | G-75 |
 | Admin | Audit log sản phẩm/FAQ/lô (G-21) | ✅ | `server/routes/admin.js` | `server/admin.audit*.test.js` | — |
-| IT | Nhật ký bảo trì (G-27) | 🟡 | `server/routes/it.js` | `server/it.test.js`, `server/admin.audit.extra.test.js` | Chưa có giao diện |
+| IT | Nhật ký bảo trì (G-27) | ✅ | `server/routes/it.js` | `server/it.test.js`, `server/admin.audit.extra.test.js`, `src/it/It.test.jsx`, `src/it/ItDashboard.independent.test.jsx` | Giao diện `/it` xong (v0.47) |
 | AI Mây | FR-AI-001…003, 005…007 | ✅ | `server/may/*`, `server/routes/may.js`, `src/may/*`, `src/admin/MayConfigPage.jsx` | `server/may*.test.js`, `src/may/May*.test.jsx` | Cần `OPENAI_API_KEY` + Supabase trên Vercel |
 | AI Mây | FR-AI-004 (tra đơn, G-29) | ✅ | `server/may/{tools,guard,service}.js` | `server/may.orders*.test.js` | — |
 | Coupon | FR-CPN-001/002 | ✅ | `server/domain/{coupon,couponValidate}.js`, `server/routes/admin.js`, `src/admin/CouponsPage.jsx` | `server/orders*.test.js`, `server/pricing*.test.js` | — |

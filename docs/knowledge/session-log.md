@@ -1,5 +1,16 @@
 # Nhật ký phiên
 
+## 2026-10-20 — Menu di động header auth, nhật ký bảo trì (nhánh `feat/returns-maintenance-authmenu`)
+
+**Yêu cầu PO**: hoàn thiện menu di động, nhật ký bảo trì, giao diện luồng đổi trả (Resend đã cấu hình).
+
+**Đã làm**: `AuthHeader` có nút menu + `MobileMenu variant="auth"` (trang chủ, cửa hàng, liên hệ, ngôn ngữ, nút chuyển đăng nhập ↔ đăng ký) — trước đó dưới 960px ngôn ngữ biến mất vì không có ngăn kéo; thẻ "Nhật ký bảo trì" ở `/it` (20 dòng mới nhất từ `GET /api/it/maintenance/log`, G-27 xong). Test độc lập: `AuthHeader.independent.test.jsx`, `ItDashboard.independent.test.jsx`.
+
+**Phát hiện**: giao diện đổi trả (`src/returns/ReturnRequest.jsx` ở trang đơn, `/admin/returns`) **đã có sẵn** từ v0.38; thứ chặn là gate `RETURNS_VIDEO_MAX_MB=0`, chờ PO chốt dung lượng/định dạng video và thời hạn lưu (không tự quyết).
+
+**Còn lại**: PO chốt giới hạn video đổi trả để bật tính năng.
+
+---
 ## 2026-10-14 (phiên 3) — Bỏ chú thích ảnh, tách nền đèn, thiết kế lại trang bộ sưu tập (D-107, D-108)
 
 **Yêu cầu PO**: bỏ dòng caption nguồn ảnh fanpage; tách nền ảnh đèn (hoặc ảnh phủ khung) để giữ hiệu ứng; thiết kế lại trang bộ sưu tập.
