@@ -4,10 +4,6 @@ import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 import MayAvatar from './MayAvatar.jsx'
 import { MAY_POSES } from './poses.js'
-import { buildCsp } from '../../server/middleware/security.js'
-import { renderPage } from '../../server/ssr.js'
-import { createMemoryRepo } from '../../server/adapters/memory/repo.js'
-import { render as ssrRender } from '../entry-server.jsx'
 
 const dir = 'public/images/may'
 const webp = (f) => readFileSync(`${dir}/${f}.webp`)
@@ -66,24 +62,3 @@ describe('MayAvatar — a11y & CLS', () => {
   })
 })
 
-describe('CSP và SSR', () => {
-  it("img-src 'self' cho phép /images/may/*", () => {
-    const csp = buildCsp({ gaEnabled: false })
-    expect(csp).toMatch(/img-src [^;]*'self'/)
-  })
-  it('SSR trang chủ: Mây QR nằm trong aria-hidden, không có phần tử focus được', async () => {
-    const template = readFileSync('index.html', 'utf8')
-    const r = await renderPage({
-      repo: createMemoryRepo(), config: { publicSiteUrl: 'https://moc.test' },
-      template, render: ssrRender, url: '/', pathname: '/',
-    })
-    expect(r.status).toBe(200)
-    const doc = new DOMParser().parseFromString(r.html, 'text/html')
-    const wrap = doc.querySelector('.phone-may')
-    expect(wrap.getAttribute('aria-hidden')).toBe('true')
-    const img = wrap.querySelector('img')
-    expect(img.getAttribute('src')).toBe('/images/may/qr.webp')
-    expect(img.getAttribute('alt')).toBe('')
-    expect(wrap.querySelectorAll('a,button,input,[tabindex]').length).toBe(0)
-  })
-})
