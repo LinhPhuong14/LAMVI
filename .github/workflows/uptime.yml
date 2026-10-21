@@ -1,0 +1,28 @@
+name: Uptime
+
+# Giám sát ngoài ứng dụng, không cần dịch vụ trả phí. Chạy trên nhánh mặc định (master).
+# GitHub tối thiểu 5 phút/lần và có thể trễ khi tải cao — đủ để phát hiện sập, không thay uptime monitor 1 phút.
+# Job đỏ => GitHub gửi email cho người theo dõi repo (Settings → Notifications → Actions).
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uptime
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: production smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/prod-smoke.js https://www.lamvi.com.vn

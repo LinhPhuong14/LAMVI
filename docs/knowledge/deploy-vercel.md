@@ -116,6 +116,7 @@ QA v0.39 bổ sung migration 019 atomic cart (cùng user lock với checkout) v�
 5. Viết postmortem ngắn (giờ bắt đầu/kết thúc, ảnh hưởng, nguyên nhân gốc, cách phát hiện, việc phòng ngừa) vào `session-log.md`.
 
 **Giám sát (vận hành tự cấu hình — cần tài khoản dịch vụ):**
+- **Đã có sẵn trong repo (T-83)**: `.github/workflows/uptime.yml` chạy `scripts/prod-smoke.js` (13 kiểm tra GET, chỉ đọc) mỗi 5 phút trên `master`; job đỏ => GitHub gửi email cho người theo dõi repo. Chạy tay sau deploy: `node scripts/prod-smoke.js [url]`. GitHub Actions có thể trễ vài phút nên vẫn nên thêm monitor ngoài (mục dưới) khi có đơn thật.
 - Uptime monitor (Better Stack, UptimeRobot…) mỗi 1 phút: `GET /` (200) và `GET /api/health?deep=1` (200; 503 nghĩa là function lỗi hoặc DB không đọc được). Báo qua Telegram/Slack.
 - Stack trace: bật Vercel Log Drain hoặc thêm Sentry (chưa có trong repo — cần DSN do người vận hành cấp, đặt ở Vercel, không commit).
 - Quy trình deploy: bật *Preview → Production promotion* (tắt auto-assign domain Production) để mỗi bản được kiểm trên Preview (`/`, `/en`, `/zh`, `/api/products`, `/api/health?deep=1`) rồi mới promote.

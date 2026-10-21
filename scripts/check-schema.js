@@ -19,6 +19,8 @@ for (const [table, columns, migration] of [
   ['notification_jobs', 'id,event,status,lease_token,delivery_started_at', '015'],
   ['return_requests', 'id,status,resolution,resolved_at', '016'],
   ['api_metric_batches', 'id,created_at', '017'],
+  ['products', 'id,specs,story', '021–022'],
+  ['return_requests', 'id,video_purged_at', '023'],
 ]) {
   const { error } = await client.from(table).select(columns).limit(0)
   console.log(`${table}: ${error ? `FAIL (${error.code ?? 'network'}); verify migration ${migration} and permissions` : 'PASS'}`)
