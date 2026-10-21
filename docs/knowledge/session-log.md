@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-21 (phiên 4) — Xác nhận thông tin liên hệ (nhánh `docs/contact-info-d111`, D-111)
+
+**PO** gửi lại banner làm nguồn thông tin liên hệ. Ghi D-111; email giữ `lamvi6886@` (D-110) dù banner in `6866@`; địa chỉ vào `MAIL_WORKSHOP_ADDRESS` (không phải địa chỉ đăng ký kinh doanh); Facebook dùng URL fanpage thật. Chỉ đổi tài liệu — giá trị đặt ở Vercel. **Còn lại** `[LEGAL]`: pháp nhân, MST, giờ hỗ trợ.
+
+---
 ## 2026-10-21 (phiên 3) — Mascot Mây (nhánh `feat/may-mascot`, G-117)
 
 **Đầu vào**: gói `MASCOT` (7 tư thế PNG 1254² nền trong suốt, 4 bong bóng thoại, 2 trang tham khảo) và bản docx mới của "Nội dung tranh Đông Hồ" (chỉ đổi cấu trúc tiêu đề, nội dung trùng bản cũ → không cần đồng bộ lại).
