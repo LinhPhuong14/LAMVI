@@ -14,6 +14,9 @@
   /* Đỏ son (sỏi son): điểm nhấn duy nhất — nút chính, ấn triện, số liệu then chốt */
   --son: #a3321f;
   --son-deep: #7c2617;
+  /* Ấn triện (con dấu LAMVI, huy hiệu): nâu be thay cho đỏ son (21/10) */
+  --nau-be: #8a6a4b;
+  --nau-be-light: #a98763;
   /* Vàng hoè ngả đồng: ánh đèn, nét mảnh trên nền tối — dùng ít */
   --hoe: #bf8a3a;
   --hoe-light: #e2c68f;

@@ -85,7 +85,7 @@
   display: inline-grid;
   place-items: center;
   padding: 3px;
-  background: var(--son);
+  background: var(--nau-be);
   border-radius: 3px;
   transform: rotate(-2deg);
 }
@@ -402,17 +402,17 @@
   pointer-events: none;
 }
 
-/* Ấn triện dọc: nền son, chỉ sáng chạy trong mép, chữ xếp đứng */
+/* Ấn triện dọc: nền nâu be, chỉ sáng chạy trong mép, chữ xếp đứng */
 .vseal {
   position: relative;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   padding: 12px 9px;
-  background: var(--son);
+  background: var(--nau-be);
   border-radius: 2px;
   box-shadow:
-    inset 0 0 0 3px var(--son),
+    inset 0 0 0 3px var(--nau-be),
     inset 0 0 0 4px rgba(248, 239, 217, 0.7);
   font-family: var(--serif);
   font-weight: 700;

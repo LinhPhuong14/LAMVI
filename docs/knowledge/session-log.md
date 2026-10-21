@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-21 (phiên 7) — Ấn triện nâu be (nhánh `feat/seal-brown`, D-112)
+
+PO: "Đổi màu ấn triện từ đỏ sang nâu be". Thêm token `--nau-be` (#8a6a4b) và `--nau-be-light` (#a98763) ở `src/index.css`; `.seal`, `.vseal` (+ viền trong) và dấu ở giao diện tối dùng token mới. Chữ kem trên nền #8a6a4b đạt tương phản ≥ 4,5:1. Không đổi nút/chữ đỏ khác.
+
+---
 ## 2026-10-21 (phiên 6) — Nâng chất lượng ảnh (nhánh `feat/image-enhance`)
 
 PO: "Enhance quality để không ảnh nào bị vỡ". Quét bằng Playwright (so `naturalWidth` với kích thước hiển thị × DPR) rồi nâng cấp bằng **Real-ESRGAN** chạy cục bộ (venv torch CPU + spandrel, không thêm dependency vào dự án): ảnh 5 đèn (x4plus trên bản 206 px → 824 px), cutout dựng lại (`scripts/gen_lamp_cutouts.py` nay có hệ số `k` theo cỡ ảnh, cao 1000 px), logo tròn → `logo-round-400.jpg` + favicon/apple-touch, ảnh nền `scene/` + `auth/` (x4v3; bản "-640" thành 1280 px, "-1280" thành 1920 px, `srcSet` đổi sang 1280w/1920w). Test `server/imageQuality.test.js`. Ảnh nền phong cảnh chỉ hiện ở độ mờ 20–34% nên đã đủ.

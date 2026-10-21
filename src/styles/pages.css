@@ -2863,7 +2863,7 @@
 }
 
 .dash[data-theme='dark'] .seal {
-  background: #b3402a;
+  background: var(--nau-be-light);
 }
 
 .dash[data-theme='dark'] .seal-inner {
