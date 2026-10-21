@@ -3358,6 +3358,23 @@
 .nav-mark:hover .brand-logo {
   transform: rotate(4deg) scale(1.06);
 }
+.brand-wordmark {
+  display: block;
+  width: auto;
+  transition: transform 0.3s var(--ease-out);
+}
+.nav-mark:hover .brand-wordmark {
+  transform: scale(1.04);
+}
+/* Header trang đăng nhập/đăng ký nằm trên ảnh tối → đổi logotype nâu sang kem để đọc được */
+.page-auth .nav-auth .brand-wordmark {
+  filter: brightness(0) invert(0.94) sepia(0.18);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-mark:hover .brand-wordmark {
+    transform: none;
+  }
+}
 .brand-logo-lg {
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
 }

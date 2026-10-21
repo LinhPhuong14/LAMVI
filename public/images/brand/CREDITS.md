@@ -4,7 +4,8 @@ Lấy ngày 2026-10-14 từ **fanpage chính thức của LAMVI** (https://www.f
 
 | Tệp | Nguồn | Kích thước | Ghi chú |
 |---|---|---|---|
-| `logo-round-200.jpg` | Ảnh đại diện của fanpage | 200×200 | Logo tròn nâu–vàng "LV LAMVI — Ánh sáng từ di sản Việt". Độ phân giải thấp: cần file vector/PNG gốc từ nhóm thiết kế |
+| `logotype.svg` | `LAMVI_logotype_vector_chuan.pdf` do nhóm LAMVI gửi (2026-10-21), đổi PDF → SVG bằng `pdftocairo -svg`, làm tròn toạ độ 2 chữ số | 180,75×49,5 (vector) | Logotype chuẩn, màu nâu #8A543A. Dùng ở thanh điều hướng (`Wordmark.jsx`); header đăng nhập/đăng ký đổi sang màu kem bằng CSS filter |
+| `logo-round-200.jpg` | Ảnh đại diện của fanpage | 200×200 | Logo tròn nâu–vàng "LV LAMVI — Ánh sáng từ di sản Việt". Độ phân giải thấp; dùng cho favicon, chân trang, khung đăng nhập và tài khoản. Logotype vector đã có (`logotype.svg`), logo tròn vector vẫn chưa có |
 | *(không còn trong `public/`)* `docs/brand-source/cover-960.jpg` | Bài đăng cập nhật ảnh bìa | 960×540 | **Bản gốc để ngoài `public/` vì dải dưới in thông tin liên hệ chưa xác nhận (G-115) — không phục vụ công khai.** Banner "LAMVI — Mang câu chuyện Việt sống lại bằng ánh sáng và công nghệ" kèm dải thông tin liên hệ in sẵn trong ảnh (địa chỉ, hotline, email, website, TikTok) — thông tin này chưa được xác nhận (xem ba-spec G-115) |
 | `cover-960x460.jpg` | Cắt từ `docs/brand-source/cover-960.jpg` (bỏ 80 px dải thông tin liên hệ phía dưới) | 960×460 | Dùng ở mục Di sản trên trang chủ và dựng `og/default.png` |
 

@@ -88,7 +88,7 @@ describe('Header — logo con dấu và tự ẩn khi cuộn', () => {
     expect(mark.tagName).toBe('A')
     expect(mark).toHaveAttribute('href', PREFIX[lang])
     expect(screen.getByRole('link', { name: 'LAMVI' })).toBe(mark)
-    expect(mark.querySelector('img.brand-logo')).not.toBeNull()
+    expect(mark.querySelector('img.brand-wordmark')).not.toBeNull()
   })
 
   // jsdom không có document.scrollingElement → framer useScroll() không gắn listener (noop).

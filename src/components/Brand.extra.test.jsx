@@ -138,8 +138,8 @@ describe('D-62: trang chủ (client) /, /en, /zh', () => {
     const logo = screen.getByRole('link', { name: 'LAMVI' })
     expect(logo).toHaveClass('nav-mark')
     expect(logo).toHaveAttribute('href', PREFIX[lang])
-    // 14/10: logo chính thức (ảnh fanpage) thay con dấu chữ ở header
-    expect(logo.querySelector('img.brand-logo')).toHaveAttribute('src', '/images/brand/logo-round-200.jpg')
+    // 21/10: header dùng logotype vector chuẩn (logotype.svg); logo tròn còn ở chân trang
+    expect(logo.querySelector('img.brand-wordmark')).toHaveAttribute('src', '/images/brand/logotype.svg')
 
     // Ấn triện dọc
     const vseal = container.querySelector('.hero-seal .vseal')

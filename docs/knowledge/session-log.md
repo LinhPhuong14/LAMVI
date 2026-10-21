@@ -1,5 +1,14 @@
 # Nhật ký phiên
 
+## 2026-10-21 (phiên 2) — Logotype vector (nhánh `feat/logo-vector`)
+
+**Đầu vào**: `LAMVI_logotype_vector_chuan.pdf` (nhóm gửi) và 9 ảnh đèn chất lượng cao dán thẳng vào khung chat.
+
+**Đã làm**: PDF → `public/images/brand/logotype.svg` (`pdftocairo -svg`, 444 đường nét vector, làm tròn 2 chữ số, ~134 KB); `Wordmark.jsx` dùng ở `SiteHeader` (thanh + ngăn kéo) và `AuthHeader`; header đăng nhập/đăng ký đổi sang màu kem bằng CSS filter vì nằm trên ảnh tối. Logo tròn giữ ở favicon, chân trang, khung đăng nhập, tài khoản. Test: `Wordmark.test.jsx`, `Wordmark.independent.test.jsx`.
+
+**Chưa làm được**: 9 ảnh đèn chỉ có trong khung chat, **không có tệp trên đĩa** nên không đưa vào web được — cần gửi lại dạng tệp đính kèm (hoặc zip). Logo tròn vector vẫn chưa có.
+
+---
 ## 2026-10-21 — Giá 1.499.000 đ và email liên hệ (nhánh `feat/price-contact-email`, D-110)
 
 **Quyết định PO**: giá 5 đèn 1.499.000 đ (gồm VAT); email lamvi6886@gmail.com.
