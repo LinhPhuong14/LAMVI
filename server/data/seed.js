@@ -1,9 +1,9 @@
 // Dữ liệu khởi tạo — phải khớp supabase/seed.sql (T-04).
 // Bản dịch en/zh do đội dev soạn, chờ PO duyệt (xem ba-spec §31.2 G-14).
 // v0.42 (D-104): danh mục lấy từ tài liệu nhóm (Content Plan, báo cáo đồ án) — 5 đèn của bộ sưu tập đầu tiên.
-// Giá 1.400.000 đ là trung điểm khoảng giá dự kiến 1.300.000–1.500.000 đ `[ASSUMPTION]` (D-104) — chưa phải giá đã kiểm chứng.
+// Giá 1.499.000 đ (đã gồm VAT) do PO/client chốt cho cả 5 mẫu (D-110).
 
-const PRICE = 1400000
+const PRICE = 1499000
 
 // Thông số chung của 5 đèn (Content Plan 04/10 + báo cáo mục 1.3). Cân nặng và cách bảo quản chưa có dữ liệu.
 const SPECS = {

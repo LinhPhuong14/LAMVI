@@ -24,9 +24,9 @@ describe('Seed thật — bộ sưu tập đầu tiên (D-104)', () => {
     for (const p of products) expect(p.slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/)
   })
 
-  it('giá 1.400.000 đ [ASSUMPTION] nằm trong khoảng dự kiến 1,3–1,5 triệu của báo cáo', () => {
+  it('giá 1.499.000 đ do PO chốt (D-110)', () => {
     for (const p of products) {
-      expect(p.price).toBe(1400000)
+      expect(p.price).toBe(1499000)
       expect(p.price).toBeGreaterThanOrEqual(1300000)
       expect(p.price).toBeLessThanOrEqual(1500000)
     }

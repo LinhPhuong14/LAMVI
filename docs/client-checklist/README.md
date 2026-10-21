@@ -331,7 +331,7 @@ Lấy từ `docs/ba-spec.md` §30 (còn mở tại v0.41). Mỗi câu trả lờ
 
 - [ ] Bộ logo chính thức + favicon (1.1, 1.2)
 - [ ] Bảng sản phẩm đầy đủ (tên, giá, mô tả, thông số, tồn kho) + **ảnh sản phẩm thật** (mục 2)
-- [x] ~~Chốt bộ Sum Vầy gồm gì (Q-05)~~ — không còn áp dụng; **thay bằng: chốt giá thật từng mẫu trong 5 đèn (tạm 1.400.000 đ)**
+- [x] ~~Chốt bộ Sum Vầy gồm gì (Q-05)~~ — không còn áp dụng; **thay bằng: chốt giá thật từng mẫu trong 5 đèn** — ✅ đã chốt 1.499.000 đ cho cả 5 (D-110)
 - [ ] Nội dung bộ sưu tập thật (mục 3)
 - [ ] Số liệu thật & câu chuyện làng nghề; nghệ nhân thật (hoặc bỏ khối) — `HOME-04`, `HOME-05`
 - [ ] FAQ đầy đủ — `HOME-11`, kiến thức cho Mây (6.2)

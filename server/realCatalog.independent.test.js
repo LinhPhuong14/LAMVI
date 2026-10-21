@@ -38,13 +38,13 @@ describe('cơ chế LAMVI_SEED', () => {
 describe('API công khai trên seed thật', () => {
   const app = createApp({ repo: createMemoryRepo(), config })
 
-  it('/api/products: 5 đèn lẻ, 1.400.000, không có gói set; ba ngôn ngữ', async () => {
+  it('/api/products: 5 đèn lẻ, 1.499.000, không có gói set; ba ngôn ngữ', async () => {
     for (const lang of ['vi', 'en', 'zh']) {
       const res = await request(app).get(`/api/products?lang=${lang}`)
       expect(res.status).toBe(200)
       const items = res.body.items
       expect(items.map((p) => p.slug)).toEqual(SLUGS)
-      expect(items.every((p) => p.kind === 'single' && p.price === 1400000 && p.collection === COL)).toBe(true)
+      expect(items.every((p) => p.kind === 'single' && p.price === 1499000 && p.collection === COL)).toBe(true)
       expect(items.every((p) => typeof p.name === 'string' && p.name.length > 0)).toBe(true)
     }
   })
@@ -82,13 +82,13 @@ describe('API công khai trên seed thật', () => {
 })
 
 describe('SSR / SEO / sitemap trên seed thật', () => {
-  it('/products/den-thu-hoach 200, có JSON-LD Product giá 1400000 VND; slug cũ 404', async () => {
+  it('/products/den-thu-hoach 200, có JSON-LD Product giá 1499000 VND; slug cũ 404', async () => {
     const r = await page('/products/den-thu-hoach')
     expect(r.status).toBe(200)
     const ld = [...r.html.matchAll(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)].map((m) => JSON.parse(m[1]))
     const prod = ld.flat().find((o) => o['@type'] === 'Product')
     expect(prod, 'có Product JSON-LD').toBeTruthy()
-    expect(JSON.stringify(prod)).toContain('1400000')
+    expect(JSON.stringify(prod)).toContain('1499000')
     for (const old of ['/products/den-nguyet', '/en/products/den-sum-vay']) {
       const o = await page(old)
       expect(o.status, old).toBe(404)

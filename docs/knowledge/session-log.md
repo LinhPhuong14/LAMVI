@@ -1,5 +1,14 @@
 # Nhật ký phiên
 
+## 2026-10-21 — Giá 1.499.000 đ và email liên hệ (nhánh `feat/price-contact-email`, D-110)
+
+**Quyết định PO**: giá 5 đèn 1.499.000 đ (gồm VAT); email lamvi6886@gmail.com.
+
+**Đã làm**: `server/data/seed.js` `PRICE=1499000`, `supabase/seed.sql` sinh lại, `supabase/set-lamp-price.sql` để cập nhật DB production (seed `on conflict do nothing` không ghi đè giá), test `realCatalog*`. Email đặt qua `MAIL_SUPPORT_EMAIL` ở Vercel (không hard-code vào code).
+
+**Còn lại**: chạy `set-lamp-price.sql` trên Supabase; đặt `MAIL_SUPPORT_EMAIL` + redeploy.
+
+---
 ## 2026-10-20 (phiên 2) — Chốt gate đổi trả (nhánh `feat/returns-retention`, D-109)
 
 **Quyết định PO**: video đổi trả tối đa 50 MB; lưu 90 ngày sau khi xử lý xong.
