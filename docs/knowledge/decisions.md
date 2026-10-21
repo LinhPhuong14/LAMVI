@@ -401,3 +401,10 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - T-86: ảnh mặc định 5 đèn ở `public/images/lamps/*.jpg`, chọn bằng slug ở `server/domain/photos.js` (`productImage`: ảnh admin → ảnh fanpage → null) dùng trong `presentProduct`, `messages.lampsOf`, `gallery`. `ProductImage` thêm prop `fill`. Logo `src/components/Logo.jsx`. Tên tệp ảnh không chứa chữ "lamvi" (test D-62 cấm biến thể thương hiệu sai).
 - T-87: ảnh đèn tách nền `public/images/lamps/<tên>-cutout.webp` (`scripts/gen_lamp_cutouts.py`, cần rembg ngoài dependencies); `productImage()` trả thêm `image.cutout` chỉ cho ảnh mặc định fanpage; `ProductImage` prop `cutout` (thẻ nhỏ) và `fill` (trang chi tiết). Lớp CSS `.lamp-cutout` (quầng sáng thở, tắt khi `prefers-reduced-motion`). Đèn đứng không dùng animation đung đưa của lồng đèn treo.
 - T-88: xoá video đổi trả quá hạn (D-109): migration `20261020000023_return_video_purge.sql` thêm `return_requests.video_purged_at`; `returnsService.purgeExpiredVideos` (repo `listPurgeable`/`markPurged`) chạy trong cron `expire-orders` (`returnVideosPurged` trong phản hồi; `media-cleanup` giữ nguyên chỉ dọn media lời chúc); lỗi một tệp không chặn tệp khác, tệp lỗi không bị đánh dấu nên lần sau thử lại; `adminVideo` trả 410 `RETURN_VIDEO_PURGED`. Số ngày ở `config.returnsVideoRetentionDays` (90).
+
+### T-83 — Giám sát chủ động bằng GitHub Actions (2026-10-21)
+
+- `scripts/prod-smoke.js`: 13 kiểm tra GET chỉ đọc (trang, `/api/health?deep=1`, sản phẩm có `specs` => migration 021, bộ sưu tập, FAQ, tỉnh, sitemap, cổng 401). Thử lại 1 lần mỗi kiểm tra. Không tạo đơn, không gửi thư.
+- `.github/workflows/uptime.yml`: chạy mỗi 5 phút trên `master`. Chọn Actions vì không cần tài khoản/khoá mới; hạn chế: trễ best-effort, tối thiểu 5 phút. Sentry/Log Drain chưa thêm (cần DSN hoặc gói Pro do người vận hành cấp).
+- `scripts/check-schema.js` thêm kiểm `products.specs/story` (021–022) và `return_requests.video_purged_at` (023).
+

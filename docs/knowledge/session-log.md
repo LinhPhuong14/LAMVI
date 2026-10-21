@@ -10,6 +10,17 @@ PO: "đổi ảnh trên web sang các ảnh full hd đã gửi hôm nay". Trên 
 **PO** gửi lại banner làm nguồn thông tin liên hệ. Ghi D-111; email giữ `lamvi6886@` (D-110) dù banner in `6866@`; địa chỉ vào `MAIL_WORKSHOP_ADDRESS` (không phải địa chỉ đăng ký kinh doanh); Facebook dùng URL fanpage thật. Chỉ đổi tài liệu — giá trị đặt ở Vercel. **Còn lại** `[LEGAL]`: pháp nhân, MST, giờ hỗ trợ.
 
 ---
+## 2026-10-21 (phiên 4) — Giám sát và đánh giá production (nhánh `feat/ops-monitoring`, T-83)
+
+**Đầu vào**: đánh giá mức production của lamvi.com.vn; làm các mục giám sát, xác minh migration, kiểm tra email (pháp lý chưa cần).
+
+**Postmortem 500 ngày 08/10 (suy luận từ git, chưa đối chiếu Runtime Logs)**: có hai nguyên nhân khớp lịch sử commit — `dfe8e9b` (bundle Vercel function thiếu `react-router/dist/dom-export.js` => `FUNCTION_INVOCATION_FAILED`) và `9387878` (khởi tạo client payOS làm function crash). Cả hai đã sửa (`includeFiles`, `PAYOS_ENABLED`) và `4d36a89` thêm app dự phòng 503. Còn thiếu: cảnh báo chủ động — nay có `uptime.yml`.
+
+**Kiểm tra production 21/10 (chỉ GET)**: 13/13 smoke đạt; `/api/health?deep=1` => `{"ok":true,"db":true}`; sản phẩm có `specs` (migration 021 đã chạy), bộ sưu tập 5 đèn, 1.499.000đ. DNS: DKIM `resend._domainkey` và SPF/MX ở `send.` có; DMARC `p=none` (chưa có `rua`). Không xác minh được: migration 013–020/022–023 (ghi), khoá Resend, `payosEnabled:false`.
+
+**Còn lại**: chạy `node scripts/check-schema.js` với binding production; thử đơn COD thật và thư thật (cần người dùng đồng ý vì ghi dữ liệu/gửi thư); Sentry/Log Drain; DMARC `rua`.
+
+---
 ## 2026-10-21 (phiên 3) — Mascot Mây (nhánh `feat/may-mascot`, G-117)
 
 **Đầu vào**: gói `MASCOT` (7 tư thế PNG 1254² nền trong suốt, 4 bong bóng thoại, 2 trang tham khảo) và bản docx mới của "Nội dung tranh Đông Hồ" (chỉ đổi cấu trúc tiêu đề, nội dung trùng bản cũ → không cần đồng bộ lại).

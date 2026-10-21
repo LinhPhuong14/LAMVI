@@ -1,5 +1,13 @@
 # Tiến độ tính năng
 
+## 2026-10-21 — Giám sát chủ động (feat/ops-monitoring)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Uptime / smoke production (T-83) | ✅ | `scripts/prod-smoke.js`, `.github/workflows/uptime.yml`; 13/13 đạt trên www.lamvi.com.vn ngày 21/10 | Sentry/Log Drain; monitor 1 phút ngoài GitHub |
+| Preflight schema 021–023 | ✅ code | `scripts/check-schema.js` | Chạy với binding production |
+| Email giao dịch | 🟡 | DNS Resend (DKIM, SPF/MX `send.`) có; DMARC `p=none` | Gửi thư thật qua form liên hệ/đơn thử; xác minh khoá Resend ở dashboard IT |
+
 ## 2026-10-08 — Feedback kiểm thử (feat/feedback-2026-10-08)
 
 | Mục feedback | Trạng thái | Code / kiểm tra | Còn lại |
