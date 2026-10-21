@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-21 (phiên 8) — Hạt nhiễu không đè lên đèn (nhánh `fix/card-noise-over-lamp`)
+
+PO: "đừng để hiệu ứng noise đè lên ảnh đèn". Nguyên nhân: `.worn::before` (hạt nhiễu `--tex-worn`, `z-index:1`) phủ cả ô `.product-art` gồm ảnh đèn. Sửa: `.product-art.worn::before { z-index: 0 }` và `.product-art > .lift { position: relative; z-index: 1 }` — nhiễu chỉ còn ở nền, nằm dưới đèn. PO cũng gợi ý lấy nền thẻ theo ảnh đèn nền đỏ đã gửi: **chờ tệp ảnh gốc** (ảnh dán trong chat không có trên đĩa).
+
+---
 ## 2026-10-21 (phiên 7) — Ấn triện nâu be (nhánh `feat/seal-brown`, D-112)
 
 PO: "Đổi màu ấn triện từ đỏ sang nâu be". Thêm token `--nau-be` (#8a6a4b) và `--nau-be-light` (#a98763) ở `src/index.css`; `.seal`, `.vseal` (+ viền trong) và dấu ở giao diện tối dùng token mới. Chữ kem trên nền #8a6a4b đạt tương phản ≥ 4,5:1. Không đổi nút/chữ đỏ khác.

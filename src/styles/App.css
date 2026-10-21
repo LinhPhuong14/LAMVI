@@ -1052,6 +1052,13 @@
 
 .product-art.worn::before {
   border-radius: inherit;
+  /* Hạt nhiễu chỉ nằm trên nền ô hộc, nằm DƯỚI ảnh đèn (không phủ lên đèn) */
+  z-index: 0;
+}
+
+.product-art > .lift {
+  position: relative;
+  z-index: 1;
 }
 
 /* Khung ô hộc góc lõm: bốn góc khoét tròn bằng màu lụa của thẻ (không dùng mask để giữ lớp 3D) */
