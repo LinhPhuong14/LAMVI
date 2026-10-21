@@ -144,3 +144,18 @@ Sau khi seed: chạy thêm [`supabase/hide-demo-catalog.sql`](../../supabase/hid
 1. Chạy migration `supabase/migrations/20261020000023_return_video_purge.sql` trên Supabase (idempotent) **trước** khi deploy. Thiếu cột `video_purged_at` thì cron xoá video lỗi.
 2. Đặt `RETURNS_VIDEO_MAX_MB=50` ở Production rồi redeploy. Để `0` thì form đổi trả bị tắt.
 3. Video tự xoá 90 ngày sau khi xử lý xong, chạy trong cron hằng ngày `expire-orders`.
+
+## Biến liên hệ đã xác nhận (D-111)
+
+Đặt ở Vercel → Production rồi redeploy (không có giá trị mặc định trong code):
+
+| Biến | Giá trị |
+|---|---|
+| `MAIL_SUPPORT_EMAIL` | `lamvi6886@gmail.com` (D-110) |
+| `MAIL_SUPPORT_PHONE` | `0962 254 128` |
+| `MAIL_WORKSHOP_ADDRESS` | `Làng Khánh S, Vinhomes Thăng Long, An Khánh, Hà Nội` |
+| `MAIL_TIKTOK_URL` | `https://www.tiktok.com/@lamvi360` |
+| `MAIL_FACEBOOK_URL` | `https://www.facebook.com/profile.php?id=61593996136514` |
+
+Còn trống chờ client (`[LEGAL]`): `MAIL_COMPANY_LEGAL`, `MAIL_COMPANY_REGISTRATION`, `MAIL_COMPANY_ADDRESS`, `MAIL_SUPPORT_HOURS`, `MOIT_NOTICE_URL`. Trống thì web không hiện mục đó.
+

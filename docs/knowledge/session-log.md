@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-21 (phiên 4) — Xác nhận thông tin liên hệ (nhánh `docs/contact-info-d111`, D-111)
+
+**PO** gửi lại banner làm nguồn thông tin liên hệ. Ghi D-111; email giữ `lamvi6886@` (D-110) dù banner in `6866@`; địa chỉ vào `MAIL_WORKSHOP_ADDRESS` (không phải địa chỉ đăng ký kinh doanh); Facebook dùng URL fanpage thật. Chỉ đổi tài liệu — giá trị đặt ở Vercel. **Còn lại** `[LEGAL]`: pháp nhân, MST, giờ hỗ trợ.
+
+---
 ## 2026-10-21 (phiên 4) — Giám sát và đánh giá production (nhánh `feat/ops-monitoring`, T-83)
 
 **Đầu vào**: đánh giá mức production của lamvi.com.vn; làm các mục giám sát, xác minh migration, kiểm tra email (pháp lý chưa cần).
