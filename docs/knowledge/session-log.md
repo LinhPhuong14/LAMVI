@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-21 (phiên 5) — Ảnh bìa full HD (nhánh `feat/cover-fullhd`)
+
+PO: "đổi ảnh trên web sang các ảnh full hd đã gửi hôm nay". Trên đĩa chỉ có banner 1672×941 (2.jpg); 9 ảnh đèn full HD chỉ có trong khung chat, không có tệp. Đã thay ảnh bìa mục Di sản + dựng lại `og/default.png` từ `cover-1672x800.jpg` (cắt dải liên hệ từ y=803). **Còn lại**: ảnh 5 đèn full HD — cần gửi dạng tệp/zip kèm ghi chú đèn nào.
+
+---
 ## 2026-10-21 (phiên 4) — Xác nhận thông tin liên hệ (nhánh `docs/contact-info-d111`, D-111)
 
 **PO** gửi lại banner làm nguồn thông tin liên hệ. Ghi D-111; email giữ `lamvi6886@` (D-110) dù banner in `6866@`; địa chỉ vào `MAIL_WORKSHOP_ADDRESS` (không phải địa chỉ đăng ký kinh doanh); Facebook dùng URL fanpage thật. Chỉ đổi tài liệu — giá trị đặt ở Vercel. **Còn lại** `[LEGAL]`: pháp nhân, MST, giờ hỗ trợ.

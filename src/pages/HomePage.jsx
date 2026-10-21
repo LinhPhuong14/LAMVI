@@ -390,7 +390,7 @@ export default function HomePage() {
         </m.div>
         {/* Ảnh bìa fanpage chính thức (đã cắt bỏ dải thông tin liên hệ chưa xác nhận — G-115) */}
         <m.figure className="story-cover" variants={rise}>
-          <img src="/images/brand/cover-960x460.jpg" alt={t('story.coverAlt')} width={960} height={460} loading="lazy" decoding="async" />
+          <img src="/images/brand/cover-1672x800.jpg" alt={t('story.coverAlt')} width={1672} height={800} loading="lazy" decoding="async" />
         </m.figure>
         <FolkGallery />
       </Reveal>

@@ -72,7 +72,7 @@ describe('API với danh mục thật', () => {
 describe('Tệp ảnh', () => {
   it('kích thước đúng, tên tệp không chứa "lamvi"', () => {
     for (const d of ['lamps', 'brand', 'og']) for (const f of readdirSync(join(pub, 'images', d))) expect(f.toLowerCase(), f).not.toContain('lamvi')
-    expect(jpegSize(join(pub, 'images/brand/cover-960x460.jpg'))).toEqual({ w: 960, h: 460 })
+    expect(jpegSize(join(pub, 'images/brand/cover-1672x800.jpg'))).toEqual({ w: 1672, h: 800 })
     expect(jpegSize(join(pub, 'images/brand/logo-round-200.jpg'))).toEqual({ w: 200, h: 200 })
     const og = PNG.sync.read(readFileSync(join(pub, 'images/og/default.png')))
     expect([og.width, og.height]).toEqual([1200, 630])
