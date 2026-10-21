@@ -36,6 +36,7 @@ import Seo from '../seo/Seo.jsx'
 import { organizationJsonLd, webSiteJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
 import ProductCards from '../components/ProductCards'
+import MayAvatar from '../may/MayAvatar.jsx'
 
 const TONES = ['amber', 'dusk', 'dawn', 'moss', 'dusk']
 // Ảnh 5 đèn từ fanpage chính thức (public/images/lamps/CREDITS.md) — cùng thứ tự với lookbook.items
@@ -515,6 +516,10 @@ export default function HomePage() {
               </div>
             </div>
           </m.div>
+          {/* Mây chỉ đường quét QR (trang trí, không cần đọc cho trình đọc màn hình) */}
+          <span className="phone-may" aria-hidden="true">
+            <MayAvatar pose="qr" size={150} />
+          </span>
         </Reveal>
       </section>
 

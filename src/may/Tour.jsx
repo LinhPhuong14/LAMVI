@@ -30,7 +30,7 @@ export default function Tour({ onClose }) {
   const last = i === steps.length - 1
   return (
     <div className="tour-pop" role="dialog" aria-label={t('may.tour.label')}>
-      <MayAvatar size={44} />
+      <MayAvatar size={44} pose="welcome" />
       <div className="tour-body">
         <small>{t('may.tour.step', { n: i + 1, total: steps.length })}</small>
         <p>{steps[i]}</p>

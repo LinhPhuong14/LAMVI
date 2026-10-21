@@ -136,7 +136,7 @@ export default function CartPage() {
           <p className="field-hint">{t('cart.maxNote', { max: cart.maxQuantity })}</p>
           {/* Lời nhắn của Mây: những gì đi kèm mỗi món quà (không quảng cáo coupon — BR-AI-005) */}
           <aside className="cart-may">
-            <MayAvatar size={44} />
+            <MayAvatar size={44} pose="gift" />
             <div>
               <strong>{t('cart.mayTitle')}</strong>
               <ul>

@@ -1,5 +1,14 @@
 # Nhật ký phiên
 
+## 2026-10-21 (phiên 3) — Mascot Mây (nhánh `feat/may-mascot`, G-117)
+
+**Đầu vào**: gói `MASCOT` (7 tư thế PNG 1254² nền trong suốt, 4 bong bóng thoại, 2 trang tham khảo) và bản docx mới của "Nội dung tranh Đông Hồ" (chỉ đổi cấu trúc tiêu đề, nội dung trùng bản cũ → không cần đồng bộ lại).
+
+**Đã làm**: cắt sát viền + WebP ≤ 560 px (~50–70 KB/tư thế) ở `public/images/may/`; `MayAvatar` nhận `pose` (hình SVG cũ vẫn dùng cho `mood="sleepy"`); nút Mây nổi/chat = `chat`, tour = `welcome`, giỏ hàng = `gift`; Mây `qr` đứng cạnh điện thoại ở mục QR trang chủ (trang trí, `aria-hidden`).
+
+**Còn lại**: thiếu tư thế thinking/loading; bong bóng thoại dựng HTML/CSS; gắn `paper`/`dongho`/`memory` vào trang (câu chuyện, lời chúc).
+
+---
 ## 2026-10-21 (phiên 2) — Logotype vector (nhánh `feat/logo-vector`)
 
 **Đầu vào**: `LAMVI_logotype_vector_chuan.pdf` (nhóm gửi) và 9 ảnh đèn chất lượng cao dán thẳng vào khung chat.

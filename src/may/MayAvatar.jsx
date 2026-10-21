@@ -1,6 +1,22 @@
-// Mây — nhân vật đám mây (FR-AI-001)
-export default function MayAvatar({ size = 56, mood = 'happy' }) {
+import { MAY_POSES } from './poses.js'
+
+// Mây — nhân vật đám mây (FR-AI-001). Tư thế mascot do nhóm LAMVI bàn giao (public/images/may/CREDITS.md);
+// `pose` chọn tư thế. Chưa có tư thế "ngủ/đang nghĩ" nên mood="sleepy" vẫn dùng hình SVG cũ.
+export default function MayAvatar({ size = 56, mood = 'happy', pose = 'chat' }) {
   const sleepy = mood === 'sleepy'
+  if (!sleepy && MAY_POSES.includes(pose)) {
+    return (
+      <img
+        className="may-avatar may-avatar-img"
+        src={`/images/may/${pose}.webp`}
+        alt=""
+        width={size}
+        height={size}
+        decoding="async"
+        loading="lazy"
+      />
+    )
+  }
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" className="may-avatar">
       <path

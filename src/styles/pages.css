@@ -5151,3 +5151,10 @@
   border: 0;
   border-radius: 0;
 }
+
+/* Mascot Mây (ảnh) — giữ tỉ lệ trong khung vuông, không bóp méo */
+.may-avatar-img {
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(120, 80, 30, 0.25));
+}

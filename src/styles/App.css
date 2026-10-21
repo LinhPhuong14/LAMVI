@@ -1395,6 +1395,38 @@
   position: relative;
 }
 
+.phone-may {
+  position: absolute;
+  left: calc(50% - 262px);
+  bottom: -30px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@media (max-width: 960px) {
+  .phone-may {
+    left: calc(50% - 250px);
+  }
+  .phone-may .may-avatar {
+    width: 124px;
+    height: 124px;
+  }
+}
+
+@media (max-width: 520px) {
+  .phone-may {
+    left: -4px;
+    bottom: -84px;
+  }
+  .phone-may .may-avatar {
+    width: 104px;
+    height: 104px;
+  }
+  .phone-mock {
+    margin-bottom: 70px;
+  }
+}
+
 .phone-sun {
   position: absolute;
   width: 330px;
