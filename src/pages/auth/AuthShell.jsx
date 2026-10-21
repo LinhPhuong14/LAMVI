@@ -21,10 +21,10 @@ export default function AuthShell({ eyebrow, title, lead, tab, children, footer 
           <img
             className="auth-aside-photo"
             src="/images/auth/lantern-river-1024.webp"
-            srcSet="/images/auth/lantern-river-640.webp 640w, /images/auth/lantern-river-1024.webp 1024w"
+            srcSet="/images/auth/lantern-river-640.webp 1280w, /images/auth/lantern-river-1024.webp 1920w"
             sizes="100vw"
-            width="1024"
-            height="684"
+            width="1920"
+            height="1282"
             alt=""
             decoding="async"
           />

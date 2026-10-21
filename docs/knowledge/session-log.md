@@ -1,5 +1,12 @@
 # Nhật ký phiên
 
+## 2026-10-21 (phiên 6) — Nâng chất lượng ảnh (nhánh `feat/image-enhance`)
+
+PO: "Enhance quality để không ảnh nào bị vỡ". Quét bằng Playwright (so `naturalWidth` với kích thước hiển thị × DPR) rồi nâng cấp bằng **Real-ESRGAN** chạy cục bộ (venv torch CPU + spandrel, không thêm dependency vào dự án): ảnh 5 đèn (x4plus trên bản 206 px → 824 px), cutout dựng lại (`scripts/gen_lamp_cutouts.py` nay có hệ số `k` theo cỡ ảnh, cao 1000 px), logo tròn → `logo-round-400.jpg` + favicon/apple-touch, ảnh nền `scene/` + `auth/` (x4v3; bản "-640" thành 1280 px, "-1280" thành 1920 px, `srcSet` đổi sang 1280w/1920w). Test `server/imageQuality.test.js`. Ảnh nền phong cảnh chỉ hiện ở độ mờ 20–34% nên đã đủ.
+
+**Giới hạn**: AI suy diễn chi tiết, không phải ảnh thật — vẫn cần ảnh gốc 5 đèn (G-110). Ảnh Đông Hồ trong `folk/` (330–960 px) chưa đổi: hiển thị ≤ cỡ thật ở DPR 2, chỉ hơi mềm trên điện thoại DPR 3.
+
+---
 ## 2026-10-21 (phiên 5) — Ảnh bìa full HD (nhánh `feat/cover-fullhd`)
 
 PO: "đổi ảnh trên web sang các ảnh full hd đã gửi hôm nay". Trên đĩa chỉ có banner 1672×941 (2.jpg); 9 ảnh đèn full HD chỉ có trong khung chat, không có tệp. Đã thay ảnh bìa mục Di sản + dựng lại `og/default.png` từ `cover-1672x800.jpg` (cắt dải liên hệ từ y=803). **Còn lại**: ảnh 5 đèn full HD — cần gửi dạng tệp/zip kèm ghi chú đèn nào.

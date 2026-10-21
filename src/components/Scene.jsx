@@ -46,7 +46,8 @@ export default function Scene({ name, className = '' }) {
         <img
           className="scene-photo"
           src={`${DIR}${s.photo}-1280.webp`}
-          srcSet={`${DIR}${s.photo}-640.webp 640w, ${DIR}${s.photo}-1280.webp 1280w`}
+          // 21/10: bản "-640" nay thật sự rộng 1280 px và bản "-1280" rộng 1920 px (nâng cấp Real-ESRGAN) — descriptor theo bề rộng thật
+          srcSet={`${DIR}${s.photo}-640.webp 1280w, ${DIR}${s.photo}-1280.webp 1920w`}
           sizes="100vw"
           alt=""
           decoding="async"

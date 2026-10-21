@@ -2,7 +2,7 @@
 
 Lấy ngày 2026-10-14 từ **fanpage chính thức của LAMVI** (https://www.facebook.com/profile.php?id=61593996136514), mục Ảnh hiển thị công khai khi chưa đăng nhập. Chủ sở hữu: nhóm LAMVI.
 
-Tệp gốc chỉ là **thumbnail 206×206 px** (poster từng mẫu: tên đèn + câu giới thiệu in trên ảnh). Đã phóng lên 618×618 (Lanczos + unsharp nhẹ) để trình duyệt không nội suy thô — chữ trong poster vì vậy hơi mềm. **Cần thay bằng ảnh gốc độ phân giải cao** (G-110); khi admin tải ảnh riêng ở `/admin/products` thì ảnh admin được ưu tiên (`server/domain/photos.js`).
+Tệp gốc chỉ là **thumbnail 206×206 px** (poster từng mẫu: tên đèn + câu giới thiệu in trên ảnh). **Từ 21/10/2026**: nâng cấp bằng Real-ESRGAN (x4plus) lên **824×824** (chạy trên bản 206 px thu từ ảnh 618 cũ; bản 618 Lanczos cũ không còn). Mô hình AI vẽ thêm chi tiết nên hoạ tiết nhỏ và chữ in trên poster có thể khác ảnh gốc đôi chút — vẫn cần ảnh gốc độ phân giải cao thật (G-110). **Cần thay bằng ảnh gốc độ phân giải cao** (G-110); khi admin tải ảnh riêng ở `/admin/products` thì ảnh admin được ưu tiên (`server/domain/photos.js`).
 
 | Tệp | Mẫu đèn (slug) |
 |---|---|
@@ -16,4 +16,4 @@ Tệp gốc chỉ là **thumbnail 206×206 px** (poster từng mẫu: tên đèn
 
 ## Bản tách nền (D-107)
 
-`<tên>-cutout.webp` (nền trong, ~350×800 px) dựng bằng `scripts/gen_lamp_cutouts.py` từ các ảnh `.jpg` ở trên: rembg tách chao đèn sáng; **đế gỗ được lấy lại từ điểm ảnh gốc** (đế tối trùng màu nền nên rembg không tách được) và cắt bằng mặt nạ bầu dục. Dùng ở hero, lookbook, thẻ sản phẩm và thẻ bộ sưu tập để giữ quầng sáng/hiệu ứng; trang chi tiết dùng ảnh đầy đủ phủ kín khung. Cắt tự động từ ảnh 206 px nên biên hơi mềm — thay bằng ảnh gốc/ảnh đã tách nền chuẩn khi có.
+`<tên>-cutout.webp` (nền trong, cao 1000 px, rộng ~440–465 px) dựng bằng `scripts/gen_lamp_cutouts.py` từ các ảnh `.jpg` ở trên: rembg tách chao đèn sáng; **đế gỗ được lấy lại từ điểm ảnh gốc** (đế tối trùng màu nền nên rembg không tách được) và cắt bằng mặt nạ bầu dục. Dùng ở hero, lookbook, thẻ sản phẩm và thẻ bộ sưu tập để giữ quầng sáng/hiệu ứng; trang chi tiết dùng ảnh đầy đủ phủ kín khung. Cắt tự động từ ảnh 206 px nên biên hơi mềm — thay bằng ảnh gốc/ảnh đã tách nền chuẩn khi có.
