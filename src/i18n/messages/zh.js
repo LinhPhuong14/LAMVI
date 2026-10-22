@@ -527,6 +527,7 @@ export default {
     ORDER_NOT_CANCELLABLE: '订单已发出，无法取消。',
     INVALID_STATUS_TRANSITION: '不允许这样变更状态。',
     REFUND_NOT_PENDING: '该订单不处于待退款状态。',
+    COD_NOT_COLLECTABLE: '该订单不处于待收货款（COD）状态。',
     COUPON_NOT_FOUND: '找不到该优惠码。',
     COUPON_INACTIVE: '该优惠码已停用。',
     COUPON_NOT_STARTED: '该优惠码尚未开始生效。',

@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-22 (phiên 4) — Chuyển trạng thái đơn thủ công + thu tiền COD (nhánh `feat/admin-order-status`, D-114)
+
+PO: "thêm mục chuyển trạng thái đơn hàng thủ công trong admin để phòng trường hợp COD xong admin phải chuyển trạng thái". Đã có sẵn chọn trạng thái kế tiếp (từng bước). Thêm: nhảy cóc về phía trước (`ADMIN_TRANSITIONS`), COD → DELIVERED tự `paymentStatus='paid'`, `markCodCollected` + route `cod-collected`, UI khối "Chuyển nhanh" và thẻ "Thu tiền khi nhận hàng (COD)", lỗi `COD_NOT_COLLECTABLE` (vi/en/zh). Cập nhật test §16 theo bảng mới. Không cần migration.
+
+---
 ## 2026-10-22 (phiên 3) — Ảnh banner landing (nhánh `fix/hero-images`)
 
 PO: "các ảnh ở banner landing nữa". Đo hero (1920@1x và 1440@2x): đèn hero cutout 440×1000 hiển thị 172×391 nên sắc nét; phần mềm là nền phong cảnh `mist-terraces` (phóng 1,3× ở retina) và lớp khói `smoke-ink` 720 px (phóng 1,6×). Làm: bản `-2560` cho 13 ảnh nền (từ bản gốc nhỏ, x4v3), khói ×2 (RGB nâng AI, alpha Lanczos). Nặng thêm chỉ với màn hình lớn/retina (srcset `2560w`); khói tăng ~100 KB/ảnh nên giảm quality 48–55.
