@@ -5158,3 +5158,190 @@
   object-fit: contain;
   filter: drop-shadow(0 2px 6px rgba(120, 80, 30, 0.25));
 }
+
+/* ======================================================================
+   Giao diện điện thoại (UX): thanh điều hướng đáy, vùng chạm ≥ 44px, chân trang gọn, cỡ chữ tối thiểu 12px
+   ====================================================================== */
+.tabbar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  /* Thanh điều hướng đáy — vùng ngón cái */
+  .tabbar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--cream) 94%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 24px -18px rgba(60, 40, 20, 0.5);
+  }
+  .tabbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 52px;
+    border-radius: var(--r-sm);
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tabbar-item.is-active {
+    color: var(--brown-deep);
+    font-weight: 600;
+  }
+  .tabbar-item.is-active .tabbar-icon::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 18px;
+    height: 3px;
+    margin-left: -9px;
+    border-radius: 2px;
+    background: var(--brown-deep);
+  }
+  .tabbar-item:active {
+    background: rgba(122, 93, 60, 0.1);
+  }
+  .tabbar-icon {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+  }
+  .tabbar-badge {
+    position: absolute;
+    top: -6px;
+    right: -11px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--son);
+    color: var(--diep-light);
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+  }
+
+  /* Chừa chỗ cho thanh đáy; Mây nổi và banner cookie nằm trên thanh */
+  .page.has-tabbar {
+    padding-bottom: calc(66px + env(safe-area-inset-bottom));
+  }
+  .page.has-tabbar .may-fab {
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    width: 52px;
+    height: 52px;
+  }
+  .page.has-tabbar .may-panel,
+  .page.has-tabbar .tour-pop {
+    bottom: calc(138px + env(safe-area-inset-bottom));
+  }
+  .page.has-tabbar .consent-banner {
+    bottom: calc(74px + env(safe-area-inset-bottom));
+  }
+
+  /* Vùng chạm tối thiểu 44×44px */
+  .nav-mark {
+    min-height: 44px;
+  }
+  .qty button {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+  }
+  .qty input {
+    width: 48px;
+    height: 44px;
+    font-size: 1rem;
+  }
+  .field-pw-toggle {
+    min-width: 56px;
+    min-height: 44px;
+  }
+  .product-link,
+  .cp-lamp-name-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .link-button {
+    min-height: 44px;
+  }
+
+  /* Chân trang: hai cột, mỗi dòng cao ≥ 44px (trước đây 25px, rất khó chạm) */
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .footer-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+    align-content: start;
+  }
+  .footer-col > h3 {
+    grid-column: 1 / -1;
+    margin-bottom: 4px;
+  }
+  .footer-col > a,
+  .footer-col > .link-button,
+  .footer-news .footer-social a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 2px 0;
+    line-height: 1.25;
+  }
+  .footer-col > a[href^='mailto:'],
+  .footer-col > a[href^='tel:'],
+  .footer-col > p,
+  .footer-col > .link-button {
+    grid-column: 1 / -1;
+  }
+  .social-links a,
+  .footer-social a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Cỡ chữ tối thiểu 12px */
+  .cp-lamp-name,
+  .phone-message-label {
+    font-size: 0.75rem;
+  }
+
+  /* Cửa hàng/chi tiết: chip cam kết thành một hàng cuộn ngang → sản phẩm lên cao hơn trong màn hình đầu */
+  .shop-perks {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin-inline: -16px;
+    padding: 2px 16px 6px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .shop-perks::-webkit-scrollbar {
+    display: none;
+  }
+  .shop-perks li {
+    flex: none;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+}

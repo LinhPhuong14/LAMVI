@@ -33,7 +33,8 @@ function MayInner() {
   const rest = splitLocale(location.pathname).rest
   const isHome = rest === '/'
   // Feedback 08/10, 7.5/16: nút Mây nổi đè lên form giỏ hàng/thanh toán trên mobile → ẩn ở hai trang này
-  const hideFab = rest === '/cart' || rest === '/checkout'
+  // Mobile UX: nút nổi cũng đè lên nút chính của form đăng nhập/đăng ký → ẩn ở các trang auth
+  const hideFab = rest === '/cart' || rest === '/checkout' || ['/login', '/register', '/forgot-password', '/reset-password', '/auth/callback'].includes(rest.replace(/\/+$/, ''))
 
   // Feedback 08/10 mục 10: không tự bật tour (che hero/CTA, tự cuộn trang). Tour là lựa chọn trong Mây (“Dẫn tour”).
 

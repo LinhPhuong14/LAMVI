@@ -6,6 +6,8 @@ import AuthHeader from './AuthHeader'
 import AuthFooter from './AuthFooter'
 import SiteHeader from './SiteHeader'
 import SiteFooter from './SiteFooter'
+import MobileTabBar from './MobileTabBar'
+import { showsTabBar } from './tabbarRoutes.js'
 import PageTransition from './PageTransition'
 import Scene from './Scene'
 import May from '../may/May.jsx'
@@ -36,13 +38,14 @@ export default function LocaleLayout({ lang }) {
   const app = APP_PAGES.has(clean)
   const auth = AUTH_PAGES.has(clean)
   const scene = app ? null : pageScene(clean)
+  const tabs = !app && !auth && showsTabBar(clean)
   return (
     <LocaleProvider lang={lang}>
       {/* NFR-A11Y-001: tắt hiệu ứng framer-motion khi người dùng bật giảm chuyển động */}
       <LazyMotion features={domAnimation} strict>
         <MotionConfig reducedMotion="user">
           <CartProvider>
-            <div className={app ? 'page page-app' : auth ? 'page page-auth' : 'page'}>
+            <div className={`${app ? 'page page-app' : auth ? 'page page-auth' : 'page'}${tabs ? ' has-tabbar' : ''}`}>
               {!app && (auth ? <AuthHeader /> : <SiteHeader />)}
               <PageTransition
                 pageKey={`${lang}${clean}`}
@@ -52,6 +55,7 @@ export default function LocaleLayout({ lang }) {
                 {outlet}
               </PageTransition>
               {!app && (auth ? <AuthFooter /> : <SiteFooter />)}
+              {tabs && <MobileTabBar />}
               <May />
               {!app && <ConsentBanner />}
             </div>
