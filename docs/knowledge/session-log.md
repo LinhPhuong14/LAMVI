@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-22 (phiên 2) — Duyệt lại ảnh desktop (nhánh `fix/lamp-hero-no-garbled-text`)
+
+PO: "duyệt lại một lượt ảnh trên desktop, vẫn bị vỡ". Đo kích thước tệp thật (tạo `Image()` từ `currentSrc`, tránh sai số của `srcset`) ở 1920×1080@1x và 1440×900@2x. Nguyên nhân thật: chữ trên poster đèn bị Real-ESRGAN vẽ méo, thấy rõ ở trang sản phẩm. Dựng lại ảnh chính (`gen_lamp_heroes.py`). Ảnh nền phong cảnh phóng 1,3–2,7× nhưng chỉ ở độ mờ 20–40% nên giữ.
+
+---
 ## 2026-10-22 — Checkout chỉ COD (nhánh `feat/checkout-cod-only`, D-113)
 
 PO: "checkout tạm thời chỉ ship COD, không có thanh toán trước". Hỏi lại PO về đơn tặng (BR-PAY-004 cấm COD cho đơn tặng) → PO chọn **cho phép COD cả đơn tặng** và **ẩn payOS, giữ code**. Làm: `validateCheckout(body,{onlinePayment})` + route truyền `Boolean(payos)`; `CheckoutPage` ẩn radio payOS khi `/site.payosEnabled≠true`, ép `paymentMethod:'cod'`; i18n `checkout.codOnlyHint`; viết lại trang `/payment` (vi/en/zh) theo COD; migration `…0024` bỏ `orders_cod_self_only`. Test: `orders*.test.js`, `CheckoutPage.extra`, `CheckoutPayos`. **Còn lại**: chạy migration 024 trên Supabase trước khi deploy; câu hỏi về mail/xác nhận đơn COD tặng (G-?).
