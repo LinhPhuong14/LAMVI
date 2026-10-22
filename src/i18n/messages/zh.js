@@ -543,8 +543,6 @@ export default {
     END_BEFORE_START: '结束日期必须晚于开始日期。',
   },
   checkout: {
-    payosOff: '在线支付暂不可用——请选择货到付款。',
-    giftNeedsPayos: '送给他人的订单必须在线支付，目前暂不可用。您可选择“寄给我自己”并货到付款，或联系 LAMVI。',
     geoEmpty: '未找到街道/乡',
     geoLoading: '正在加载地址列表…',
     retry: '重试',

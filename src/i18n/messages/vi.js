@@ -569,8 +569,6 @@ export default {
     END_BEFORE_START: 'Ngày kết thúc phải sau ngày bắt đầu.',
   },
   checkout: {
-    payosOff: 'Tạm thời chưa nhận thanh toán online — vui lòng chọn thanh toán khi nhận hàng.',
-    giftNeedsPayos: 'Đơn tặng cho người khác bắt buộc thanh toán online, hiện tạm thời chưa mở. Bạn có thể chọn “Giao cho tôi” với thanh toán khi nhận hàng, hoặc liên hệ LAMVI.',
     geoEmpty: 'Không tìm thấy phường / xã',
     geoLoading: 'Đang tải danh mục địa chỉ…',
     retry: 'Thử lại',

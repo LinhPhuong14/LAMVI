@@ -554,8 +554,6 @@ export default {
     END_BEFORE_START: 'The end date must come after the start date.',
   },
   checkout: {
-    payosOff: 'Online payment is temporarily unavailable — please choose cash on delivery.',
-    giftNeedsPayos: 'Gift orders for another recipient require online payment, which is temporarily unavailable. Choose “Deliver to me” with cash on delivery, or contact LAMVI.',
     geoEmpty: 'No wards found',
     geoLoading: 'Loading address list…',
     retry: 'Try again',
