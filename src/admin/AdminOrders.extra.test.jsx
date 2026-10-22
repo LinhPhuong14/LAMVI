@@ -511,3 +511,64 @@ describe('Admin — coupon: danh sách rỗng, lỗi và form đổi loại', ()
   })
 })
 
+
+describe('Admin — chuyển trạng thái thủ công và thu tiền COD (D-114)', () => {
+  const codOrder = (over = {}) => order({ paymentMethod: 'cod', paymentStatus: 'pending', orderKind: 'self', recipientIsSelf: true, hasMessage: false, qrLang: null, ...over })
+  const detail = (over) => ({
+    'GET /me': me,
+    'GET /admin/orders/LV2610-ACDEFGH': () => ({ body: { item: codOrder(over), audit: [] } }),
+  })
+
+  it('có nút chuyển nhanh cho từng trạng thái kế tiếp, bấm gọi đúng API sau khi xác nhận', async () => {
+    const posts = []
+    mockApi({
+      ...detail({ nextStatuses: ['shipped', 'delivered', 'cancelled'] }),
+      'POST /admin/orders/LV2610-ACDEFGH/status': (url, init) => {
+        posts.push(JSON.parse(init.body))
+        return { body: { item: codOrder({ status: 'delivered', paymentStatus: 'paid', nextStatuses: [] }) } }
+      },
+    })
+    vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true)
+    renderAt('/admin/orders/LV2610-ACDEFGH')
+    const quick = (await screen.findByRole('heading', { name: 'Chuyển nhanh' })).closest('.account-card')
+    expect(within(quick).getAllByRole('button').map((b) => b.textContent)).toEqual(['→ Đang giao', '→ Đã giao', '→ Đã huỷ'])
+    fireEvent.click(within(quick).getByRole('button', { name: '→ Đã giao' }))
+    expect(posts).toHaveLength(0) // từ chối xác nhận → không gọi
+    fireEvent.click(within(quick).getByRole('button', { name: '→ Đã giao' }))
+    await waitFor(() => expect(posts).toHaveLength(1))
+    expect(posts[0]).toMatchObject({ status: 'delivered' })
+  })
+
+  it('đơn COD đã gửi mà chưa thu tiền: hiện thẻ "Thu tiền khi nhận hàng" và nút ghi nhận gọi cod-collected', async () => {
+    const posts = []
+    mockApi({
+      ...detail({ status: 'shipped', nextStatuses: ['delivered', 'delivery_failed'] }),
+      'POST /admin/orders/LV2610-ACDEFGH/cod-collected': () => {
+        posts.push(true)
+        return { body: { item: codOrder({ status: 'shipped', paymentStatus: 'paid' }) } }
+      },
+    })
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    renderAt('/admin/orders/LV2610-ACDEFGH')
+    const card = (await screen.findByRole('heading', { name: 'Thu tiền khi nhận hàng (COD)' })).closest('.account-card')
+    fireEvent.click(within(card).getByRole('button', { name: 'Đã thu tiền COD' }))
+    await waitFor(() => expect(posts).toHaveLength(1))
+  })
+
+  it('không hiện thẻ COD với đơn payOS, đơn COD chưa gửi hoặc đã thu tiền', async () => {
+    for (const over of [{ paymentMethod: 'payos', paymentStatus: 'paid', status: 'shipped' }, { status: 'confirmed' }, { status: 'delivered', paymentStatus: 'paid', nextStatuses: [] }]) {
+      mockApi(detail(over))
+      const { unmount } = renderAt('/admin/orders/LV2610-ACDEFGH')
+      await screen.findByRole('heading', { name: 'LV2610-ACDEFGH' })
+      expect(screen.queryByRole('heading', { name: 'Thu tiền khi nhận hàng (COD)' })).toBeNull()
+      unmount?.()
+    }
+  })
+
+  it('đơn ở trạng thái cuối: không có khối chuyển nhanh', async () => {
+    mockApi(detail({ status: 'delivered', paymentStatus: 'paid', nextStatuses: [] }))
+    renderAt('/admin/orders/LV2610-ACDEFGH')
+    await screen.findByRole('heading', { name: 'LV2610-ACDEFGH' })
+    expect(screen.queryByRole('heading', { name: 'Chuyển nhanh' })).toBeNull()
+  })
+})

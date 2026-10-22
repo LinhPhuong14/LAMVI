@@ -19,14 +19,16 @@ export const ORDER_KINDS = Object.freeze(['gift', 'self'])
 export const QR_LANGS = Object.freeze(['vi', 'en', 'zh'])
 
 // Chuyển trạng thái admin được phép làm (§16). Khách chỉ được huỷ (BR-ORD-001).
+// D-114: admin được nhảy cóc về phía trước (ví dụ CONFIRMED → DELIVERED khi đơn COD đã giao xong mà chưa kịp cập nhật
+// từng bước) và đơn giao thất bại có thể giao lại hoặc ghi nhận đã giao.
 const ADMIN_TRANSITIONS = {
   pending_payment: ['cancelled'],
-  confirmed: ['in_production', 'cancelled'],
-  in_production: ['packed', 'cancelled'],
-  packed: ['shipped', 'cancelled'],
+  confirmed: ['in_production', 'packed', 'shipped', 'delivered', 'cancelled'],
+  in_production: ['packed', 'shipped', 'delivered', 'cancelled'],
+  packed: ['shipped', 'delivered', 'cancelled'],
   shipped: ['delivered', 'delivery_failed'],
   delivered: [],
-  delivery_failed: [],
+  delivery_failed: ['shipped', 'delivered'],
   cancelled: [],
 }
 

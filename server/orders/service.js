@@ -453,7 +453,11 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     }
     if (trackingCode !== undefined) values.trackingCode = trackingCode
     // D-75: mốc "giao thành công" để tính hạn xoá media khi không ai xác nhận
-    if (next === 'delivered') values.deliveredAt = now().toISOString()
+    if (next === 'delivered') {
+      values.deliveredAt = now().toISOString()
+      // D-114: đơn COD giao thành công = đã thu tiền mặt → ghi nhận đã thanh toán
+      if (order.paymentMethod === 'cod' && order.paymentStatus === 'pending') values.paymentStatus = 'paid'
+    }
 
     const updated = await repo.updateOrderIfStatus(order.id, order.status, values)
     if (!updated) throw new HttpError(409, 'INVALID_STATUS_TRANSITION', 'Trạng thái đơn vừa thay đổi')
@@ -475,6 +479,25 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     // §20: "đã gửi" (kèm mã vận đơn) và "bị huỷ" báo ngay cho người mua
     if (next === 'shipped') await notify('shipped', updated)
     else if (next === 'cancelled') await notify('cancelled', updated)
+    return updated
+  }
+
+  /** D-114: ghi nhận đã thu tiền COD (đơn đã gửi/đã giao mà tiền chưa được ghi nhận, ví dụ đơn giao trước khi có quy tắc tự ghi). */
+  async function markCodCollected(order, adminId, note) {
+    if (order.paymentMethod !== 'cod' || order.paymentStatus !== 'pending' || !['shipped', 'delivered'].includes(order.status)) {
+      throw new HttpError(409, 'COD_NOT_COLLECTABLE', 'Đơn không ở trạng thái chờ thu tiền COD')
+    }
+    const updated = await repo.updateOrderIfStatus(order.id, order.status, { paymentStatus: 'paid' }, 'pending')
+    if (!updated) throw new HttpError(409, 'COD_NOT_COLLECTABLE', 'Trạng thái thanh toán vừa thay đổi')
+    await audit({
+      actorId: adminId,
+      actorRole: 'admin',
+      entity: 'order',
+      entityId: order.id,
+      action: 'cod_collected',
+      oldValue: { paymentStatus: 'pending' },
+      newValue: { paymentStatus: 'paid', note: typeof note === 'string' ? note.slice(0, 300) : null },
+    })
     return updated
   }
 
@@ -508,6 +531,7 @@ export function createOrderService({ repo, payos = null, now = () => new Date(),
     paymentLinkFor,
     cancelByCustomer,
     setStatusByAdmin,
+    markCodCollected,
     markRefunded,
     pricingConfig,
     COUPON_ERRORS,

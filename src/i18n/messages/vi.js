@@ -553,6 +553,7 @@ export default {
     ORDER_NOT_CANCELLABLE: 'Đơn đã được gửi đi nên không huỷ được nữa.',
     INVALID_STATUS_TRANSITION: 'Không chuyển được sang trạng thái này.',
     REFUND_NOT_PENDING: 'Đơn không ở trạng thái chờ hoàn tiền.',
+    COD_NOT_COLLECTABLE: 'Đơn không ở trạng thái chờ thu tiền COD.',
     COUPON_NOT_FOUND: 'Không tìm thấy mã giảm giá này.',
     COUPON_INACTIVE: 'Mã giảm giá đã ngừng áp dụng.',
     COUPON_NOT_STARTED: 'Mã giảm giá chưa tới ngày áp dụng.',

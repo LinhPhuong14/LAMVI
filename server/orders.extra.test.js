@@ -591,12 +591,13 @@ describe('Vòng đời đơn §16: toàn bộ cặp chuyển trạng thái', () 
   // Bảng §16 — nguồn đối chiếu độc lập với ADMIN_TRANSITIONS trong code
   const SPEC = {
     pending_payment: ['cancelled'],
-    confirmed: ['in_production', 'cancelled'],
-    in_production: ['packed', 'cancelled'],
-    packed: ['shipped', 'cancelled'],
+    // D-114: admin được nhảy cóc về phía trước; đơn giao thất bại giao lại hoặc ghi nhận đã giao
+    confirmed: ['in_production', 'packed', 'shipped', 'delivered', 'cancelled'],
+    in_production: ['packed', 'shipped', 'delivered', 'cancelled'],
+    packed: ['shipped', 'delivered', 'cancelled'],
     shipped: ['delivered', 'delivery_failed'],
     delivered: [],
-    delivery_failed: [],
+    delivery_failed: ['shipped', 'delivered'],
     cancelled: [],
   }
 

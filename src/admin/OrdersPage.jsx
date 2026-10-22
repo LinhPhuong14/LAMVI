@@ -130,6 +130,39 @@ function OrderDetail({ code }) {
     }
   }
 
+  // D-114: chuyển nhanh một bước bằng nút (cùng API /status, có xác nhận)
+  async function quickMove(to) {
+    if (!window.confirm(fmt(S.orders.statusConfirm, { code, status: label.status(to) }))) return
+    setBusy(true)
+    setError(null)
+    try {
+      await authedApi(`/admin/orders/${encodeURIComponent(code)}/status`, {
+        method: 'POST',
+        body: { status: to, trackingCode: tracking || null },
+      })
+      await load()
+    } catch (err) {
+      setError(err.code)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  // D-114: ghi nhận đã thu tiền COD
+  async function codCollected() {
+    if (!window.confirm(fmt(S.orders.codConfirm, { code }))) return
+    setBusy(true)
+    setError(null)
+    try {
+      await authedApi(`/admin/orders/${encodeURIComponent(code)}/cod-collected`, { method: 'POST', body: {} })
+      await load()
+    } catch (err) {
+      setError(err.code)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function refund() {
     if (!window.confirm(fmt(S.orders.refundConfirm, { code }))) return
     setBusy(true)
@@ -230,6 +263,36 @@ function OrderDetail({ code }) {
       </div>
 
       <GiftCard order={o} />
+
+      {o.paymentMethod === 'cod' && o.paymentStatus === 'pending' && ['shipped', 'delivered'].includes(o.status) && (
+        <div className="account-card">
+          <h2>{S.orders.codTitle}</h2>
+          <p className="field-hint">{S.orders.codPending}</p>
+          <button type="button" className="btn btn-primary" onClick={codCollected} disabled={busy}>
+            {S.orders.codCollect}
+          </button>
+        </div>
+      )}
+
+      {o.nextStatuses.length > 0 && (
+        <div className="account-card">
+          <h2>{S.orders.quickTitle}</h2>
+          <p className="field-hint">{S.orders.quickHint}</p>
+          <div className="admin-actions">
+            {o.nextStatuses.map((st) => (
+              <button
+                key={st}
+                type="button"
+                className={`btn ${st === 'cancelled' || st === 'delivery_failed' ? 'btn-ghost' : 'btn-secondary'}`}
+                onClick={() => quickMove(st)}
+                disabled={busy}
+              >
+                {fmt(S.orders.quickBtn, { status: label.status(st) })}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="account-card">
         <h2>{S.orders.nextStatus}</h2>

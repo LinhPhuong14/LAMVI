@@ -538,6 +538,7 @@ export default {
     ORDER_NOT_CANCELLABLE: 'This order has already shipped and can no longer be cancelled.',
     INVALID_STATUS_TRANSITION: 'That status change is not allowed.',
     REFUND_NOT_PENDING: 'This order is not awaiting a refund.',
+    COD_NOT_COLLECTABLE: 'This order is not awaiting COD collection.',
     COUPON_NOT_FOUND: 'We could not find that discount code.',
     COUPON_INACTIVE: 'That discount code is no longer active.',
     COUPON_NOT_STARTED: 'That discount code is not valid yet.',

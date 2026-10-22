@@ -352,6 +352,13 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
     const updated = await orders.setStatusByAdmin(o, req.user.id, b.status, { trackingCode })
     res.json({ item: { ...presentOrder(updated), nextStatuses: adminNextStatuses(updated.status) } })
   })
+  // D-114: ghi nhận đã thu tiền COD
+  r.post('/admin/orders/:code/cod-collected', async (req, res) => {
+    if (!orders) throw new HttpError(503, 'UNAVAILABLE', 'Chưa bật module đơn hàng')
+    const o = found(await repo.getOrderByCode(req.params.code))
+    const updated = await orders.markCodCollected(o, req.user.id, body(req).note)
+    res.json({ item: { ...presentOrder(updated), nextStatuses: adminNextStatuses(updated.status) } })
+  })
   // D-74 (Q-16): hoàn tiền thủ công — admin chuyển khoản tay rồi ghi nhận
   r.post('/admin/orders/:code/refund', async (req, res) => {
     if (!orders) throw new HttpError(503, 'UNAVAILABLE', 'Chưa bật module đơn hàng')

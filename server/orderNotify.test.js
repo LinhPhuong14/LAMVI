@@ -172,6 +172,8 @@ describe('Đơn đã gửi, huỷ, hoàn tiền, hết hạn thanh toán (§20)'
 
   it('chuyển SHIPPED không hợp lệ (409) → không báo', async () => {
     const code = await place()
+    // D-114: từ CONFIRMED đã nhảy cóc tới SHIPPED được; đơn đã DELIVERED thì không quay lại SHIPPED
+    expect((await adminMove(code, 'delivered')).status).toBe(200)
     mailer.outbox.length = 0
     expect((await adminMove(code, 'shipped')).status).toBe(409)
     expect(mailer.outbox).toHaveLength(0)

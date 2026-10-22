@@ -477,11 +477,11 @@ describe('Admin — đơn hàng (FR-ORD-002, §16)', () => {
 
   it('đi đúng luồng §16 và gợi ý trạng thái kế tiếp', async () => {
     const list = await request(app).get('/api/admin/orders').set('Authorization', admin)
-    expect(list.body.items[0].nextStatuses).toEqual(['in_production', 'cancelled'])
+    expect(list.body.items[0].nextStatuses).toEqual(['in_production', 'packed', 'shipped', 'delivered', 'cancelled'])
 
     for (const [status, next] of [
-      ['in_production', ['packed', 'cancelled']],
-      ['packed', ['shipped', 'cancelled']],
+      ['in_production', ['packed', 'shipped', 'delivered', 'cancelled']],
+      ['packed', ['shipped', 'delivered', 'cancelled']],
       ['shipped', ['delivered', 'delivery_failed']],
       ['delivered', []],
     ]) {
@@ -494,13 +494,47 @@ describe('Admin — đơn hàng (FR-ORD-002, §16)', () => {
     }
   })
 
-  it('bước nhảy không hợp lệ → 409', async () => {
+  it('bước không hợp lệ → 409 (đi lùi hoặc sang trạng thái không kế tiếp được)', async () => {
     const r = await request(app)
       .post(`/api/admin/orders/${code}/status`)
       .set('Authorization', admin)
-      .send({ status: 'delivered' })
+      .send({ status: 'delivery_failed' })
     expect(r.status).toBe(409)
     expect(r.body.error.code).toBe('INVALID_STATUS_TRANSITION')
+    await request(app).post(`/api/admin/orders/${code}/status`).set('Authorization', admin).send({ status: 'packed' })
+    const back = await request(app).post(`/api/admin/orders/${code}/status`).set('Authorization', admin).send({ status: 'in_production' })
+    expect(back.status).toBe(409)
+  })
+
+  it('D-114: đơn COD nhảy thẳng CONFIRMED → DELIVERED: ghi nhận đã thu tiền, có mốc giao và nhật ký', async () => {
+    const r = await request(app).post(`/api/admin/orders/${code}/status`).set('Authorization', admin).send({ status: 'delivered' })
+    expect(r.status).toBe(200)
+    expect(r.body.item).toMatchObject({ status: 'delivered', paymentStatus: 'paid', paymentMethod: 'cod' })
+    const saved = await repo.getOrderByCode(code)
+    expect(saved.deliveredAt).toBeTruthy()
+    const log = await repo.listAuditLog({ entity: 'order', entityId: saved.id })
+    expect(log.some((e) => e.action === 'status' && e.newValue.paymentStatus === 'paid')).toBe(true)
+  })
+
+  it('D-114: ghi nhận đã thu tiền COD cho đơn đã gửi mà tiền chưa ghi (cod-collected)', async () => {
+    const o = await repo.getOrderByCode(code)
+    await repo.updateOrder(o.id, { status: 'shipped', paymentStatus: 'pending' })
+    const r = await request(app).post(`/api/admin/orders/${code}/cod-collected`).set('Authorization', admin).send({ note: 'Shipper nộp tiền' })
+    expect(r.status).toBe(200)
+    expect(r.body.item.paymentStatus).toBe('paid')
+    expect(r.body.item.status).toBe('shipped')
+    const log = await repo.listAuditLog({ entity: 'order', entityId: o.id })
+    expect(log.some((e) => e.action === 'cod_collected')).toBe(true)
+    // lần hai: đã thu → 409
+    const again = await request(app).post(`/api/admin/orders/${code}/cod-collected`).set('Authorization', admin).send({})
+    expect(again.status).toBe(409)
+    expect(again.body.error.code).toBe('COD_NOT_COLLECTABLE')
+  })
+
+  it('D-114: cod-collected bị từ chối khi đơn chưa gửi, khách gọi → 403', async () => {
+    const early = await request(app).post(`/api/admin/orders/${code}/cod-collected`).set('Authorization', admin).send({})
+    expect(early.status).toBe(409)
+    expect((await request(app).post(`/api/admin/orders/${code}/cod-collected`).set('Authorization', customer).send({})).status).toBe(403)
   })
 
   it('mã vận đơn nhập tay lưu cùng lúc chuyển SHIPPED (§17)', async () => {
