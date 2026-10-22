@@ -58,6 +58,8 @@ function StepLegend({ n, children }) {
 export default function CheckoutPage() {
   const { t, lang, path } = useI18n()
   const site = useApi('/site', lang)
+  // D-113: chỉ hiện thanh toán online khi server báo bật (PAYOS_ENABLED + đủ khoá); chưa tải xong thì coi như tắt
+  const payosOn = site.status === 'ok' && site.data?.payosEnabled === true
   const { user, authedApi } = useAuth()
   const { reload: reloadCart } = useCart()
   const navigate = useNavigate()
@@ -161,9 +163,10 @@ export default function CheckoutPage() {
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
   const setBool = (k, v) => () => setForm((f) => ({ ...f, [k]: v }))
 
-  // BR-PAY-004: đơn giao người khác không chọn COD được — tự chuyển sang payOS khi khách đổi
+  // BR-PAY-004: khi CÓ thanh toán online, đơn giao người khác không chọn COD được — tự chuyển sang payOS khi khách đổi.
+  // D-113: khi payOS đang tắt, chỉ còn COD và đơn tặng cũng dùng COD (không ép sang payOS)
   function setRecipientIsSelf(v) {
-    setForm((f) => ({ ...f, recipientIsSelf: v, paymentMethod: v ? f.paymentMethod : 'payos' }))
+    setForm((f) => ({ ...f, recipientIsSelf: v, paymentMethod: v || !payosOn ? f.paymentMethod : 'payos' }))
   }
 
   // BR-MSG-002: đơn tặng luôn có lời chúc
@@ -177,6 +180,7 @@ export default function CheckoutPage() {
     submitting.current = true
     const body = {
       ...form,
+      paymentMethod: payosOn ? form.paymentMethod : 'cod',
       hasMessage: form.orderKind === 'gift' ? true : form.hasMessage,
       qrLang: form.orderKind === 'gift' || form.hasMessage ? form.qrLang : undefined,
       couponCode: appliedCoupon || undefined,
@@ -215,11 +219,9 @@ export default function CheckoutPage() {
   }
 
   const hasMessage = form.orderKind === 'gift' || form.hasMessage
-  const codBlocked = !form.recipientIsSelf
-  // payOS chưa có khoá → vô hiệu lựa chọn kèm lý do (feedback 08/10, mục 30)
-  const payosOff = site.status === 'ok' && site.data?.payosEnabled === false
-  const noPayment = payosOff && codBlocked
-  const submitBlocked = pending || noPayment || quotePending || Boolean(quoteError) || (quote ? quotedCoupon !== appliedCoupon || Boolean(quote.hasShortage) : true)
+  // D-113: payOS tắt → ẩn hẳn lựa chọn thanh toán online, chỉ còn COD (kể cả đơn tặng)
+  const codBlocked = payosOn && !form.recipientIsSelf
+  const submitBlocked = pending || quotePending || Boolean(quoteError) || (quote ? quotedCoupon !== appliedCoupon || Boolean(quote.hasShortage) : true)
 
   if (!user) return null
 
@@ -384,36 +386,36 @@ export default function CheckoutPage() {
           {/* FR-CHK-007 (D-35) */}
           <Reveal as="fieldset" className="account-card">
             <StepLegend n={3}>{t('checkout.paymentLegend')}</StepLegend>
-            <label className={`check-row${payosOff ? ' is-disabled' : ''}`}>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="payos"
-                disabled={payosOff}
-                checked={form.paymentMethod === 'payos'}
-                onChange={setBool('paymentMethod', 'payos')}
-              />
-              <span>
-                {t('checkout.payos')}
-                <small className="field-hint">{payosOff ? t('checkout.payosOff') : t('checkout.payosHint', { minutes: PAYMENT_MINUTES })}</small>
-              </span>
-            </label>
+            {payosOn && (
+              <label className="check-row">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="payos"
+                  checked={form.paymentMethod === 'payos'}
+                  onChange={setBool('paymentMethod', 'payos')}
+                />
+                <span>
+                  {t('checkout.payos')}
+                  <small className="field-hint">{t('checkout.payosHint', { minutes: PAYMENT_MINUTES })}</small>
+                </span>
+              </label>
+            )}
             <label className={`check-row${codBlocked ? ' is-disabled' : ''}`}>
               <input
                 type="radio"
                 name="paymentMethod"
                 value="cod"
                 disabled={codBlocked}
-                checked={form.paymentMethod === 'cod'}
+                checked={payosOn ? form.paymentMethod === 'cod' : true}
                 onChange={setBool('paymentMethod', 'cod')}
               />
               <span>
                 {t('checkout.cod')}
                 {/* BR-PAY-004 */}
-                <small className="field-hint">{codBlocked ? t('checkout.codBlocked') : t('checkout.codHint')}</small>
+                <small className="field-hint">{codBlocked ? t('checkout.codBlocked') : payosOn ? t('checkout.codHint') : t('checkout.codOnlyHint')}</small>
               </span>
             </label>
-            {noPayment && <p className="notice error" role="alert">{t('checkout.giftNeedsPayos')}</p>}
             {fields.paymentMethod && <p className="field-error">{t(`errors.${fields.paymentMethod}`)}</p>}
           </Reveal>
         </div>

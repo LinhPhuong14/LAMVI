@@ -103,7 +103,7 @@ export function ordersRouter({ repo, auth, orders, config, payos = null, message
   // FR-CHK-001: chỉ khách đã đăng nhập (D-36, BR-ACC-001)
   r.post('/orders', guard, orderLimit, async (req, res) => {
     const b = body(req)
-    const { errors, values } = validateCheckout(b)
+    const { errors, values } = validateCheckout(b, { onlinePayment: Boolean(payos) })
     if (Object.keys(errors).length) {
       throw new HttpError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', errors)
     }

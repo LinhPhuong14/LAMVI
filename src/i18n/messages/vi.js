@@ -611,6 +611,7 @@ export default {
     payosHint: 'Bạn sẽ được chuyển sang trang thanh toán. Liên kết có hiệu lực {minutes} phút.',
     cod: 'Thanh toán khi nhận hàng',
     codHint: 'Chỉ áp dụng khi giao cho chính bạn.',
+    codOnlyHint: 'Trả tiền mặt cho người giao hàng khi nhận đơn. Hiện LAMVI chỉ nhận thanh toán khi nhận hàng (COD), kể cả đơn tặng.',
     codBlocked: 'Đơn giao cho người khác chưa hỗ trợ thanh toán khi nhận hàng.',
     summary: 'Tóm tắt đơn',
     subtotal: 'Tạm tính',
@@ -850,23 +851,22 @@ export default {
       intro: "Trang này nêu các hình thức thanh toán, thời hạn thanh toán và cách hoàn tiền.",
       sections: [
         { h: "Hình thức thanh toán", items: [
-          "Thanh toán trực tuyến qua cổng payOS: quét mã QR hoặc chuyển khoản ngân hàng trên trang thanh toán của payOS. LAMVI không lưu số thẻ hay thông tin tài khoản ngân hàng của bạn.",
-          "Thanh toán khi nhận hàng (COD) cho đơn giao đúng địa chỉ của người mua; không áp dụng khi giao cho người khác.",
+          "Hiện LAMVI chỉ nhận thanh toán khi nhận hàng (COD): bạn trả tiền mặt cho người giao hàng khi nhận đơn, kể cả đơn tặng giao tới người khác. Không cần thanh toán trước.",
+          "Chưa có thanh toán trực tuyến; hình thức này sẽ được bổ sung sau và được thông báo ở bước thanh toán.",
           "Các hình thức khả dụng được hiển thị ở bước thanh toán."
         ] },
-        { h: "Thời hạn thanh toán", items: [
-          "Liên kết thanh toán payOS có hiệu lực 15 phút. Quá hạn, đơn tự động bị huỷ và mã giảm giá (nếu có) được hoàn lượt dùng; bạn có thể đặt lại.",
-          "Đơn payOS chỉ được xác nhận sau khi cổng thanh toán báo đã nhận đủ tiền."
+        { h: "Xác nhận đơn", items: [
+          "Đơn COD được xác nhận ngay khi bạn đặt hàng. Số tiền cần thanh toán khi nhận hàng là tổng cộng hiển thị ở bước thanh toán."
         ] },
         { h: "Giá và hoá đơn", items: [
           "Giá đã gồm VAT; bảng giá ở bước thanh toán tách riêng tiền hàng, giảm giá, phí vận chuyển và VAT."
         ] },
         { h: "Huỷ đơn và hoàn tiền", items: [
-          "Bạn huỷ được đơn trước khi đơn được gửi đi. Đơn chưa trả tiền: huỷ ngay. Đơn đã trả tiền qua payOS: LAMVI chuyển khoản hoàn lại cho bạn; thời gian hoàn tiền do LAMVI thông báo khi xử lý yêu cầu.",
+          "Bạn huỷ được đơn trước khi đơn được gửi đi. Vì không thanh toán trước nên việc huỷ đơn không phát sinh hoàn tiền.",
           "Hoàn tiền do đổi trả được xử lý theo Chính sách đổi trả."
         ] },
         { h: "Bảo mật thanh toán", items: [
-          "Giao dịch trực tuyến do payOS xử lý. LAMVI chỉ nhận kết quả giao dịch (thành công/thất bại, số tiền, mã giao dịch)."
+          "Với đơn COD, LAMVI không thu thập số thẻ hay thông tin tài khoản ngân hàng của bạn."
         ] }
       ]
     },

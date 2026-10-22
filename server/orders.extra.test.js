@@ -344,6 +344,20 @@ describe('payOS: cổng lỗi, chưa cấu hình, webhook biên (§15.1, NFR-SEC
     expect((await getOrder(saved.code)).body.item.status).toBe('pending_payment')
   })
 
+  it('D-113: payOS tắt → đơn tặng giao người khác dùng COD được, CONFIRMED ngay; chọn payos vẫn 503', async () => {
+    const svc = createOrderService({ repo, payos: null, now: () => clock })
+    const app2 = createApp({ repo, auth, storage: createMemoryStorage(), config, payos: null, orders: svc })
+    await addToCart('den-nguyet', 1)
+    const gift = { ...CHECKOUT, paymentMethod: 'cod', recipientIsSelf: false, orderKind: 'gift', qrLang: 'vi' }
+    const r = await request(app2).post('/api/orders').set('Authorization', customer).send(gift)
+    expect(r.status).toBe(201)
+    expect(r.body.order).toMatchObject({ paymentMethod: 'cod', status: 'confirmed', recipientIsSelf: false })
+    // Có payOS thì BR-PAY-004 vẫn chặn (kiểm ở test BR-PAY-004 trong orders.test.js)
+    await addToCart('den-nguyet', 1)
+    const online = await request(app2).post('/api/orders').set('Authorization', customer).send({ ...gift, paymentMethod: 'payos' })
+    expect(online.status).toBe(503)
+  })
+
   it('chưa cấu hình payOS: chọn payos → 503 và KHÔNG có đơn mồ côi; webhook → 503', async () => {
     const svc = createOrderService({ repo, payos: null, now: () => clock })
     const app2 = createApp({ repo, auth, storage: createMemoryStorage(), config, payos: null, orders: svc })
@@ -732,8 +746,9 @@ describe('Migration 20260930000008_orders.sql khớp logic JS', () => {
     }
   })
 
-  it('BR-PAY-004: orders_cod_self_only khớp validateCheckout (COD + giao người khác bị chặn)', async () => {
+  it('BR-PAY-004: orders_cod_self_only khớp validateCheckout khi có payOS (migration 024 bỏ ràng buộc DB — D-113)', async () => {
     expect(sql).toContain("constraint orders_cod_self_only check (payment_method <> 'cod' or recipient_is_self)")
+    expect(readFileSync('supabase/migrations/20261022000024_cod_gift_orders.sql', 'utf8')).toContain('drop constraint if exists orders_cod_self_only')
     await addToCart('den-nguyet', 1)
     const r = await createOrder({ paymentMethod: 'cod', recipientIsSelf: false, orderKind: 'gift', qrLang: 'vi' })
     expect(r.status).toBe(400)

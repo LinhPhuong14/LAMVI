@@ -26,23 +26,25 @@ function api(payosEnabled) {
 
 beforeEach(() => localStorage.setItem('moc.session', JSON.stringify(session)))
 
-describe('Checkout khi payOS chưa cấu hình', () => {
-  it('khoá lựa chọn payOS, COD vẫn dùng được', async () => {
+describe('Checkout khi payOS chưa cấu hình (D-113: chỉ COD)', () => {
+  it('ẩn hẳn lựa chọn payOS, COD là lựa chọn duy nhất', async () => {
     api(false)
     renderAt('/checkout')
-    const payos = await screen.findByRole('radio', { name: /payOS/i })
-    await screen.findByText(/chưa nhận thanh toán online/)
-    expect(payos).toBeDisabled()
-    expect(screen.getByRole('radio', { name: /^Thanh toán khi nhận hàng/i })).not.toBeDisabled()
+    const cod = await screen.findByRole('radio', { name: /^Thanh toán khi nhận hàng/i })
+    expect(cod).not.toBeDisabled()
+    expect(cod).toBeChecked()
+    expect(screen.queryByRole('radio', { name: /payOS/i })).toBeNull()
+    expect(screen.getAllByRole('radio').filter((r) => r.name === 'paymentMethod')).toHaveLength(1)
   })
 
-  it('đơn giao người khác (bắt buộc payOS) → báo rõ và khoá nút Đặt hàng', async () => {
+  it('đơn giao người khác vẫn đặt được bằng COD: không còn cảnh báo, nút Đặt hàng không bị khoá vì thanh toán', async () => {
     api(false)
     renderAt('/checkout')
-    await screen.findByText(/chưa nhận thanh toán online/)
+    await screen.findByRole('radio', { name: /^Thanh toán khi nhận hàng/i })
     fireEvent.click(screen.getByRole('button', { name: 'Giao cho người khác' }))
-    expect(await screen.findByText(/bắt buộc thanh toán online/)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Đặt hàng' })).toBeDisabled()
+    expect(screen.queryByText(/bắt buộc thanh toán online/)).toBeNull()
+    expect(screen.getByRole('radio', { name: /^Thanh toán khi nhận hàng/i })).not.toBeDisabled()
+    expect(await screen.findByRole('button', { name: 'Đặt hàng' })).not.toBeDisabled()
   })
 
   it('payOS bật → lựa chọn dùng được', async () => {

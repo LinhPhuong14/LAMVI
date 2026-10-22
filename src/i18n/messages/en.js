@@ -596,6 +596,7 @@ export default {
     payosHint: 'You will be taken to the payment page. The link is valid for {minutes} minutes.',
     cod: 'Cash on delivery',
     codHint: 'Available only when the order is delivered to you.',
+    codOnlyHint: 'Pay the courier in cash when the parcel arrives. LAMVI currently accepts cash on delivery (COD) only, including gift orders.',
     codBlocked: 'Cash on delivery is not available for orders shipped to someone else.',
     summary: 'Order summary',
     subtotal: 'Subtotal',
@@ -835,23 +836,22 @@ export default {
       intro: "This page covers payment methods, the payment window and refunds.",
       sections: [
         { h: "Payment methods", items: [
-          "Online through payOS: scan a QR code or make a bank transfer on the payOS payment page. LAMVI does not store your card or bank details.",
-          "Cash on delivery (COD) for orders delivered to the buyer’s own address; not available when delivering to someone else.",
+          "LAMVI currently accepts cash on delivery (COD) only: you pay the courier in cash when the parcel arrives, including gift orders delivered to someone else. No prepayment is needed.",
+          "Online payment is not available yet; it will be added later and announced at checkout.",
           "Available methods are shown at checkout."
         ] },
-        { h: "Payment window", items: [
-          "A payOS payment link is valid for 15 minutes. After that the order is cancelled automatically and any coupon use is restored; you can order again.",
-          "A payOS order is confirmed only after the gateway reports the full amount received."
+        { h: "Order confirmation", items: [
+          "A COD order is confirmed as soon as you place it. The amount due on delivery is the total shown at checkout."
         ] },
         { h: "Prices and invoices", items: [
           "Prices include VAT; the checkout summary separates goods, discounts, shipping and VAT."
         ] },
         { h: "Cancellation and refunds", items: [
-          "You can cancel before the order is shipped. Unpaid orders are cancelled immediately. Paid payOS orders are refunded by bank transfer; LAMVI tells you the refund time when it processes the request.",
+          "You can cancel before the order is shipped. Because nothing is paid in advance, cancelling does not involve a refund.",
           "Refunds for returns follow the Returns policy."
         ] },
         { h: "Payment security", items: [
-          "Online payments are processed by payOS. LAMVI only receives the result (success/failure, amount, transaction code)."
+          "For COD orders LAMVI does not collect your card or bank account details."
         ] }
       ]
     },

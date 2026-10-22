@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-22 — Checkout chỉ COD (nhánh `feat/checkout-cod-only`, D-113)
+
+PO: "checkout tạm thời chỉ ship COD, không có thanh toán trước". Hỏi lại PO về đơn tặng (BR-PAY-004 cấm COD cho đơn tặng) → PO chọn **cho phép COD cả đơn tặng** và **ẩn payOS, giữ code**. Làm: `validateCheckout(body,{onlinePayment})` + route truyền `Boolean(payos)`; `CheckoutPage` ẩn radio payOS khi `/site.payosEnabled≠true`, ép `paymentMethod:'cod'`; i18n `checkout.codOnlyHint`; viết lại trang `/payment` (vi/en/zh) theo COD; migration `…0024` bỏ `orders_cod_self_only`. Test: `orders*.test.js`, `CheckoutPage.extra`, `CheckoutPayos`. **Còn lại**: chạy migration 024 trên Supabase trước khi deploy; câu hỏi về mail/xác nhận đơn COD tặng (G-?).
+
+---
 ## 2026-10-21 (phiên 8) — Hạt nhiễu không đè lên đèn (nhánh `fix/card-noise-over-lamp`)
 
 PO: "đừng để hiệu ứng noise đè lên ảnh đèn". Nguyên nhân: `.worn::before` (hạt nhiễu `--tex-worn`, `z-index:1`) phủ cả ô `.product-art` gồm ảnh đèn. Sửa: `.product-art.worn::before { z-index: 0 }` và `.product-art > .lift { position: relative; z-index: 1 }` — nhiễu chỉ còn ở nền, nằm dưới đèn. PO cũng gợi ý lấy nền thẻ theo ảnh đèn nền đỏ đã gửi: **chờ tệp ảnh gốc** (ảnh dán trong chat không có trên đĩa).

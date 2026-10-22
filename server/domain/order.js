@@ -96,7 +96,8 @@ const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '')
  * Kiểm tra dữ liệu checkout (§12). Trả { errors, values } — errors là map trường → mã lỗi.
  * Không kiểm giỏ hàng/coupon ở đây (cần DB); xem server/orders/service.js.
  */
-export function validateCheckout(body) {
+// onlinePayment=false (payOS tắt, D-113): chỉ còn COD nên không chặn COD cho đơn giao người khác
+export function validateCheckout(body, { onlinePayment = true } = {}) {
   const b = body && typeof body === 'object' && !Array.isArray(body) ? body : {}
   const errors = {}
   const values = {}
@@ -148,8 +149,8 @@ export function validateCheckout(body) {
   if (!PAYMENT_METHODS.includes(b.paymentMethod)) errors.paymentMethod = 'INVALID'
   else values.paymentMethod = b.paymentMethod
 
-  // BR-PAY-004: COD chỉ cho đơn giao cho chính người mua
-  if (values.paymentMethod === 'cod' && values.recipientIsSelf === false) {
+  // BR-PAY-004: COD chỉ cho đơn giao cho chính người mua — khi có thanh toán online để thay thế (D-113)
+  if (onlinePayment && values.paymentMethod === 'cod' && values.recipientIsSelf === false) {
     errors.paymentMethod = 'COD_NOT_ALLOWED_FOR_GIFT'
   }
 

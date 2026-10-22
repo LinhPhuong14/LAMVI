@@ -159,3 +159,8 @@ Sau khi seed: chạy thêm [`supabase/hide-demo-catalog.sql`](../../supabase/hid
 
 Còn trống chờ client (`[LEGAL]`): `MAIL_COMPANY_LEGAL`, `MAIL_COMPANY_REGISTRATION`, `MAIL_COMPANY_ADDRESS`, `MAIL_SUPPORT_HOURS`, `MOIT_NOTICE_URL`. Trống thì web không hiện mục đó.
 
+## Checkout chỉ COD (D-113)
+
+1. **Chạy migration `supabase/migrations/20261022000024_cod_gift_orders.sql` TRƯỚC khi deploy**: bỏ ràng buộc DB `orders_cod_self_only`. Thiếu thì đơn tặng COD (người nhận ≠ người mua) bị Postgres từ chối → lỗi 500. Chạy lại an toàn.
+2. Không đặt `PAYOS_ENABLED=1` (mặc định tắt): checkout chỉ hiện COD, `/api/site` trả `payosEnabled:false`. Khi bật lại payOS: đặt biến + khoá, trang `/payment` cần viết lại phần thanh toán online (nội dung hiện là COD-only).
+

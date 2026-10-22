@@ -31,6 +31,8 @@ const emptyCart = { items: [], subtotal: 0, currency: 'VND', itemCount: 0, hasUn
 function api({ quoteBody = quote(), order: orderHandler, extra = {} } = {}) {
   return mockApi({
     'GET /me': () => ({ body: { profile } }),
+    // Mặc định như production hiện nay: payOS tắt (D-113). Test cần thanh toán online truyền extra 'GET /site' payosEnabled: true.
+    'GET /site': () => ({ body: { name: 'LAMVI', payosEnabled: false } }),
     'GET /cart': () => ({ body: emptyCart }),
     'GET /products': () => ({ body: { items: [] } }),
     'GET /may/history': () => ({ body: { items: [] } }),
@@ -105,19 +107,71 @@ describe('Loại đơn và lời chúc (FR-CHK-002/003/005)', () => {
   })
 })
 
-describe('BR-PAY-004: giao cho người khác không dùng COD', () => {
+const withPayos = { 'GET /site': () => ({ body: { name: 'LAMVI', payosEnabled: true } }) }
+
+describe('BR-PAY-004: giao cho người khác không dùng COD (khi có payOS)', () => {
   it('chọn "Giao cho người khác" → COD bị khoá và tự chuyển sang payOS', async () => {
-    api()
+    api({ extra: withPayos })
     renderAt('/checkout')
     await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
-    const cod = document.querySelector('input[value="cod"]')
-    const payos = document.querySelector('input[value="payos"]')
+    const cod = await waitFor(() => document.querySelector('input[value="cod"]'))
+    const payos = await waitFor(() => {
+      const el = document.querySelector('input[value="payos"]')
+      if (!el) throw new Error('chưa có payOS')
+      return el
+    })
     expect(cod.checked).toBe(true)
 
     fireEvent.click(screen.getByRole('button', { name: 'Giao cho người khác' }))
     expect(cod.disabled).toBe(true)
     expect(payos.checked).toBe(true)
     expect(screen.getByText('Đơn giao cho người khác chưa hỗ trợ thanh toán khi nhận hàng.')).toBeInTheDocument()
+  })
+})
+
+describe('D-113: tạm thời chỉ COD (payOS tắt)', () => {
+  const address = async () => {
+    fill('Họ tên người nhận', 'Nguyễn Văn A')
+    fill('Số điện thoại', '0912345678')
+    fill('Địa chỉ (số nhà, đường)', '12 Hàng Bông')
+    await screen.findByRole('option', { name: 'Thành phố Hà Nội' })
+    fill('Tỉnh / thành phố', '1')
+    fireEvent.focus(screen.getByRole('combobox', { name: 'Phường / xã' }))
+    await screen.findByRole('option', { name: 'Phường Ba Đình' })
+    fireEvent.click(screen.getByRole('option', { name: 'Phường Ba Đình' }))
+  }
+
+  it('không hiện lựa chọn thanh toán online; COD là lựa chọn duy nhất và dùng được', async () => {
+    api()
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    await screen.findByText(/chỉ nhận thanh toán khi nhận hàng/)
+    expect(document.querySelector('input[value="payos"]')).toBeNull()
+    expect(screen.queryByText(/payOS/i)).toBeNull()
+    const cod = document.querySelector('input[value="cod"]')
+    expect(cod.checked).toBe(true)
+    expect(cod.disabled).toBe(false)
+  })
+
+  it('đơn tặng giao người khác vẫn dùng COD, không bị khoá, gửi paymentMethod cod', async () => {
+    let sent
+    api({
+      order: (url, init) => {
+        sent = JSON.parse(init.body)
+        return { status: 201, body: { order: { code: 'LV2610-ACDEFGH' }, payment: null } }
+      },
+    })
+    renderAt('/checkout')
+    await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
+    fireEvent.click(screen.getByRole('button', { name: 'Giao cho người khác' }))
+    const cod = document.querySelector('input[value="cod"]')
+    expect(cod.disabled).toBe(false)
+    expect(cod.checked).toBe(true)
+    expect(screen.queryByText('Đơn giao cho người khác chưa hỗ trợ thanh toán khi nhận hàng.')).toBeNull()
+    await address()
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
+    await waitFor(() => expect(sent).toBeTruthy())
+    expect(sent).toMatchObject({ paymentMethod: 'cod', recipientIsSelf: false })
   })
 })
 
@@ -249,6 +303,7 @@ describe('Đặt hàng', () => {
     const assign = vi.fn()
     vi.spyOn(window, 'location', 'get').mockReturnValue({ ...window.location, assign, origin: 'http://localhost' })
     api({
+      extra: withPayos,
       order: () => ({
         status: 201,
         body: { order: { code: 'LV2610-ACDEFGH' }, payment: { checkoutUrl: 'https://pay.test/1' } },
@@ -257,7 +312,11 @@ describe('Đặt hàng', () => {
     renderAt('/checkout')
     await screen.findByRole('heading', { name: 'Tóm tắt đơn' })
     await address()
-    fireEvent.click(document.querySelector('input[value="payos"]'))
+    fireEvent.click(await waitFor(() => {
+      const el = document.querySelector('input[value="payos"]')
+      if (!el) throw new Error('chưa có payOS')
+      return el
+    }))
     fireEvent.click(screen.getByRole('button', { name: 'Đặt hàng' }))
     await waitFor(() => expect(assign).toHaveBeenCalledWith('https://pay.test/1'))
     vi.restoreAllMocks()
