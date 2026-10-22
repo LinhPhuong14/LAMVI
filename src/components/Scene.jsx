@@ -4,7 +4,9 @@
 const DIR = '/images/scene/'
 
 // eager: ảnh ở đầu trang = ứng viên LCP → tải sớm, ưu tiên cao (feedback 08/10, mục 21)
-// photo: ảnh nền (có bản 640 và 1280) · smoke: lớp khói tách nền · rise: số đèn trời bay lên một lượt khi vào
+// Ảnh nền có thêm bản `-2560` (từ bản gốc nhỏ, nâng bằng Real-ESRGAN) cho màn hình ≥1920 px hoặc retina
+const HI_RES = new Set(['bay-green', 'cloud-sea', 'dawn-lake', 'golden-clouds', 'golden-sky', 'halong-mist', 'hills-gold', 'lake-village', 'lantern-glow', 'lanterns-night', 'mist-terraces', 'starry', 'valley-light'])
+// photo: ảnh nền (có bản 640, 1280 và 2560) · smoke: lớp khói tách nền · rise: số đèn trời bay lên một lượt khi vào
 const SCENES = {
   hero: { photo: 'mist-terraces', eager: true, smoke: [{ src: 'smoke-ink', x: '58%', y: '-10%', w: '46%' }], rise: 7 },
   story: { photo: 'bay-green', dark: true, smoke: [{ src: 'incense-smoke', x: '84%', y: '4%', w: '14%' }] },
@@ -47,7 +49,7 @@ export default function Scene({ name, className = '' }) {
           className="scene-photo"
           src={`${DIR}${s.photo}-1280.webp`}
           // 21/10: bản "-640" nay thật sự rộng 1280 px và bản "-1280" rộng 1920 px (nâng cấp Real-ESRGAN) — descriptor theo bề rộng thật
-          srcSet={`${DIR}${s.photo}-640.webp 1280w, ${DIR}${s.photo}-1280.webp 1920w`}
+          srcSet={`${DIR}${s.photo}-640.webp 1280w, ${DIR}${s.photo}-1280.webp 1920w${HI_RES.has(s.photo) ? `, ${DIR}${s.photo}-2560.webp 2560w` : ''}`}
           sizes="100vw"
           alt=""
           decoding="async"

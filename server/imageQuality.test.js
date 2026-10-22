@@ -56,6 +56,17 @@ describe('ảnh nền phong cảnh: srcSet khớp bề rộng thật', () => {
     expect(size(`images/scene/${n}-640.webp`).w).toBeGreaterThanOrEqual(1280)
     expect(size(`images/scene/${n}-1280.webp`).w).toBeGreaterThanOrEqual(1920)
   })
+  it.each(scenes)('%s: có thêm bản -2560 (≥2560 px) cho màn hình lớn/retina và Scene.jsx khai báo 2560w', (n) => {
+    if (!['bay-green', 'cloud-sea', 'dawn-lake', 'golden-clouds', 'golden-sky', 'halong-mist', 'hills-gold', 'lake-village', 'lantern-glow', 'lanterns-night', 'mist-terraces', 'starry', 'valley-light'].includes(n)) return
+    expect(size(`images/scene/${n}-2560.webp`).w).toBeGreaterThanOrEqual(2560)
+    expect(readFileSync('src/components/Scene.jsx', 'utf8')).toContain(`'${n}'`)
+  })
+  it('khói (lớp trong suốt) đã nâng gấp đôi và còn kênh alpha', () => {
+    expect(size('images/scene/smoke-ink.webp').w).toBeGreaterThanOrEqual(1440)
+    expect(size('images/scene/smoke-ember.webp').w).toBeGreaterThanOrEqual(1440)
+    const buf = readFileSync(join(PUB, 'images/scene/smoke-ink.webp'))
+    expect(['VP8X', 'VP8L']).toContain(buf.toString('ascii', 12, 16)) // VP8 thường không có alpha
+  })
   it('lantern-river (trang auth) cũng vậy và component khai báo đúng descriptor', () => {
     expect(size('images/auth/lantern-river-640.webp').w).toBeGreaterThanOrEqual(1280)
     expect(size('images/auth/lantern-river-1024.webp').w).toBeGreaterThanOrEqual(1920)

@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-22 (phiên 3) — Ảnh banner landing (nhánh `fix/hero-images`)
+
+PO: "các ảnh ở banner landing nữa". Đo hero (1920@1x và 1440@2x): đèn hero cutout 440×1000 hiển thị 172×391 nên sắc nét; phần mềm là nền phong cảnh `mist-terraces` (phóng 1,3× ở retina) và lớp khói `smoke-ink` 720 px (phóng 1,6×). Làm: bản `-2560` cho 13 ảnh nền (từ bản gốc nhỏ, x4v3), khói ×2 (RGB nâng AI, alpha Lanczos). Nặng thêm chỉ với màn hình lớn/retina (srcset `2560w`); khói tăng ~100 KB/ảnh nên giảm quality 48–55.
+
+---
 ## 2026-10-22 (phiên 2) — Duyệt lại ảnh desktop (nhánh `fix/lamp-hero-no-garbled-text`)
 
 PO: "duyệt lại một lượt ảnh trên desktop, vẫn bị vỡ". Đo kích thước tệp thật (tạo `Image()` từ `currentSrc`, tránh sai số của `srcset`) ở 1920×1080@1x và 1440×900@2x. Nguyên nhân thật: chữ trên poster đèn bị Real-ESRGAN vẽ méo, thấy rõ ở trang sản phẩm. Dựng lại ảnh chính (`gen_lamp_heroes.py`). Ảnh nền phong cảnh phóng 1,3–2,7× nhưng chỉ ở độ mờ 20–40% nên giữ.

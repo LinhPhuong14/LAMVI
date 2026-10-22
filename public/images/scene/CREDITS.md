@@ -5,17 +5,17 @@ Chỉ là nền không khí — **không** phải ảnh sản phẩm, ảnh ngh�
 
 | File | Ảnh gốc | Tác giả / nguồn | Giấy phép | Trang gốc | Xử lý |
 |---|---|---|---|---|---|
-| `mist-terraces-1280.webp`, `mist-terraces-640.webp` | Rolling farm field hills covered | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/3288128/free-photo-image-rice-field-agriculture-cc0 | Nén WebP 1280px và 640px |
-| `halong-mist-1280.webp`, `halong-mist-640.webp` | (không có tên trên trang gốc) | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/5945288/free-public-domain-cc0-photo | Nén WebP 1280px và 640px |
-| `lanterns-night-1280.webp`, `lanterns-night-640.webp` | Festive lattern, festivity lamp | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/6036308/photo-image-light-public-domain-celebration | Nén WebP 1280px và 640px |
-| `valley-light-1280.webp`, `valley-light-640.webp` | Lake Lakeside | eberhard grossgasteiger / StockSnap | CC0 1.0 | https://stocksnap.io/photo/lake-lakeside-VH7WM9GNWA | Nén WebP 1280px và 640px |
-| `golden-clouds-1280.webp`, `golden-clouds-640.webp` | A breathtaking sunset sky with vibrant orange and golden clouds streaking across a blue and purple horizon. | Elena Zheng / WordPress Photo Directory | CC0 1.0 | https://wordpress.org/photos/photo/8869de9bb3/ | Nén WebP 1280px và 640px |
-| `dawn-lake-1280.webp`, `dawn-lake-640.webp` | Harrisville Pond misty morning | Sergeant Matt Hecht / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/3583239/free-photo-image-lake-abies | Nén WebP 1280px và 640px |
-| `cloud-sea-1280.webp`, `cloud-sea-640.webp` | Sunset Sky | Sergei Gussev / StockSnap | CC0 1.0 | https://stocksnap.io/photo/sunset-sky-FYL96LKOKP | Nén WebP 1280px và 640px |
-| `golden-sky-1280.webp`, `golden-sky-640.webp` | Sunset Clouds | Free Nature Stock / StockSnap | CC0 1.0 | https://stocksnap.io/photo/sunset-clouds-SQWW8JRIKN | Nén WebP 1280px và 640px |
-| `lake-village-1280.webp`, `lake-village-640.webp` | Fog Lake | Sergei Gussev / StockSnap | CC0 1.0 | https://stocksnap.io/photo/fog-lake-8TMXNMEQXJ | Nén WebP 1280px và 640px |
-| `lantern-glow-1280.webp`, `lantern-glow-640.webp` | Festive lattern, festivity lamp | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/6036316/photo-image-light-public-domain-celebration | Nén WebP 1280px và 640px |
-| `starry-1280.webp`, `starry-640.webp` | Blue starry night sky background | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/5924322/photo-image-background-public-domain-blue | Nén WebP 1280px và 640px |
+| `mist-terraces-2560.webp`, `mist-terraces-1280.webp`, `mist-terraces-640.webp` | Rolling farm field hills covered | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/3288128/free-photo-image-rice-field-agriculture-cc0 | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `halong-mist-2560.webp`, `halong-mist-1280.webp`, `halong-mist-640.webp` | (không có tên trên trang gốc) | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/5945288/free-public-domain-cc0-photo | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `lanterns-night-2560.webp`, `lanterns-night-1280.webp`, `lanterns-night-640.webp` | Festive lattern, festivity lamp | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/6036308/photo-image-light-public-domain-celebration | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `valley-light-2560.webp`, `valley-light-1280.webp`, `valley-light-640.webp` | Lake Lakeside | eberhard grossgasteiger / StockSnap | CC0 1.0 | https://stocksnap.io/photo/lake-lakeside-VH7WM9GNWA | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `golden-clouds-2560.webp`, `golden-clouds-1280.webp`, `golden-clouds-640.webp` | A breathtaking sunset sky with vibrant orange and golden clouds streaking across a blue and purple horizon. | Elena Zheng / WordPress Photo Directory | CC0 1.0 | https://wordpress.org/photos/photo/8869de9bb3/ | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `dawn-lake-2560.webp`, `dawn-lake-1280.webp`, `dawn-lake-640.webp` | Harrisville Pond misty morning | Sergeant Matt Hecht / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/3583239/free-photo-image-lake-abies | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `cloud-sea-2560.webp`, `cloud-sea-1280.webp`, `cloud-sea-640.webp` | Sunset Sky | Sergei Gussev / StockSnap | CC0 1.0 | https://stocksnap.io/photo/sunset-sky-FYL96LKOKP | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `golden-sky-2560.webp`, `golden-sky-1280.webp`, `golden-sky-640.webp` | Sunset Clouds | Free Nature Stock / StockSnap | CC0 1.0 | https://stocksnap.io/photo/sunset-clouds-SQWW8JRIKN | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `lake-village-2560.webp`, `lake-village-1280.webp`, `lake-village-640.webp` | Fog Lake | Sergei Gussev / StockSnap | CC0 1.0 | https://stocksnap.io/photo/fog-lake-8TMXNMEQXJ | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `lantern-glow-2560.webp`, `lantern-glow-1280.webp`, `lantern-glow-640.webp` | Festive lattern, festivity lamp | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/6036316/photo-image-light-public-domain-celebration | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `starry-2560.webp`, `starry-1280.webp`, `starry-640.webp` | Blue starry night sky background | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/5924322/photo-image-background-public-domain-blue | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
 | `incense-smoke.webp` | Incense stick smoke | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/5921598/photo-image-background-public-domain-smoke | Nền đen → trong suốt theo độ sáng, đổi sang trắng ngà, làm mờ mép |
 | `smoke-ember.webp` | Abstract smoke background | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/5919527/photo-image-background-public-domain-abstract | Nền đen → trong suốt theo độ sáng, làm mờ mép |
 | `smoke-ink.webp` | Blue smoke background | — / rawpixel | CC0 1.0 | https://www.rawpixel.com/image/5919539/photo-image-background-public-domain-blue | Nền trắng → trong suốt theo độ đậm, tô màu mực sepia, làm mờ mép |
@@ -33,8 +33,8 @@ Tải ngày 2026-10-01 qua Openverse (lọc CC0 1.0). Dùng làm lớp phủ đ�
 
 | File | Ảnh gốc | Tác giả / nguồn | Giấy phép | Trang gốc | Xử lý |
 |---|---|---|---|---|---|
-| `bay-green-1280.webp`, `bay-green-640.webp` | Halong Bay, Vietnam | Reyes Martínez / WordPress Photo Directory | CC0 1.0 | https://wordpress.org/photos/photo/99162aa53d/ | Nén WebP 1280px và 640px |
-| `hills-gold-1280.webp`, `hills-gold-640.webp` | Foggy mountain Vietnam (đồi sương lúc bình minh) | — / rawpixel (bản gốc từ Wikimedia Commons) | CC0 1.0 | https://www.rawpixel.com/image/3289307/free-photo-image-brown-background-cc0-countryside | Nén WebP; bản gốc 1024px nên bản 1280px là phóng nhẹ (chỉ dùng độ đậm thấp) |
+| `bay-green-2560.webp`, `bay-green-1280.webp`, `bay-green-640.webp` | Halong Bay, Vietnam | Reyes Martínez / WordPress Photo Directory | CC0 1.0 | https://wordpress.org/photos/photo/99162aa53d/ | Nén WebP 1280px và 640px ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
+| `hills-gold-2560.webp`, `hills-gold-1280.webp`, `hills-gold-640.webp` | Foggy mountain Vietnam (đồi sương lúc bình minh) | — / rawpixel (bản gốc từ Wikimedia Commons) | CC0 1.0 | https://www.rawpixel.com/image/3289307/free-photo-image-brown-background-cc0-countryside | Nén WebP; bản gốc 1024px nên bản 1280px là phóng nhẹ (chỉ dùng độ đậm thấp) ; bản 2560 px (21/10/2026) nâng từ bản gốc nhỏ bằng Real-ESRGAN, nguồn và giấy phép không đổi |
 
 `halong-mist-*` và `lanterns-night-*` không còn dùng ở trang chủ (giữ lại trong thư mục).
 
@@ -42,3 +42,6 @@ Tải ngày 2026-10-01 qua Openverse (lọc CC0 1.0). Dùng làm lớp phủ đ�
 
 - `public/images/mail/banner.jpg` (banner đầu thư, T-56) dựng từ `lanterns-night-1280.webp` bằng `npm run gen:mail-banner` (cần python3 + Pillow): làm mờ, phủ chàm đêm, thêm chữ. Cùng giấy phép với ảnh nguồn; thay bằng ảnh sản phẩm thật khi có (G-33).
 
+
+
+`smoke-ink.webp`, `smoke-ember.webp`, `incense-smoke.webp`: nâng gấp đôi (21/10/2026) bằng Real-ESRGAN cho kênh màu, kênh alpha phóng Lanczos; nguồn/giấy phép giữ như bản cũ.
