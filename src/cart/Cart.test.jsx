@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
 import { productsVi } from '../test/fixtures.js'
+const findHeaderLink = (name) => waitFor(() => within(document.querySelector('header.nav')).getByRole('link', { name }))
 
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'an@moc.test' } }
 const PRICES = { 'den-nguyet': 890000, 'den-sum-vay': 1680000 }
@@ -45,7 +46,7 @@ describe('Giỏ khách vãng lai (D-59)', () => {
     fireEvent.click(within(card).getByRole('button', { name: 'Thêm vào giỏ' }))
     expect(await screen.findByText(/Mây đã bỏ/)).toBeInTheDocument()
     expect(JSON.parse(localStorage.getItem('moc.cart'))).toEqual([{ slug: 'den-nguyet', quantity: 1 }])
-    expect(await screen.findByRole('link', { name: 'Giỏ hàng (1)' })).toHaveAttribute('href', '/cart')
+    expect(await findHeaderLink('Giỏ hàng (1)')).toHaveAttribute('href', '/cart')
     const quote = f.mock.calls.filter(([u]) => String(u).startsWith('/api/cart/quote')).at(-1)
     expect(JSON.parse(quote[1].body)).toEqual({ items: [{ slug: 'den-nguyet', quantity: 1 }] })
   })
@@ -95,7 +96,7 @@ describe('Giỏ tài khoản (D-41, D-59, D-61)', () => {
       },
     })
     renderAt('/cart')
-    expect(await screen.findByRole('link', { name: 'Giỏ hàng (3)' })).toBeInTheDocument()
+    expect(await findHeaderLink('Giỏ hàng (3)')).toBeInTheDocument()
     expect(merged).toEqual([{ items: [{ slug: 'den-nguyet', quantity: 2 }] }])
     expect(localStorage.getItem('moc.cart')).toBeNull()
   })
@@ -126,7 +127,7 @@ describe('Giỏ tài khoản (D-41, D-59, D-61)', () => {
       },
     })
     renderAt('/products/den-nguyet')
-    await screen.findByRole('link', { name: 'Giỏ hàng (1)' })
+    await findHeaderLink('Giỏ hàng (1)')
     fireEvent.click(screen.getByRole('button', { name: 'Tăng số lượng' }))
     // Nút chính nằm trong khung mua hàng; phía dưới còn thẻ "Có thể bạn cũng thích" cũng có nút thêm vào giỏ
     fireEvent.click(within(document.querySelector('.pdp-buy')).getByRole('button', { name: 'Thêm vào giỏ' }))

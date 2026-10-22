@@ -5177,9 +5177,8 @@
     bottom: 0;
     z-index: 45;
     padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
-    background: color-mix(in srgb, var(--cream) 94%, transparent);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    /* Nền đặc, không backdrop-filter: phần tử fixed có blur gây giật khi cuộn (xem test CSS giao diện tối) */
+    background: var(--cream);
     border-top: 1px solid var(--line);
     box-shadow: 0 -8px 24px -18px rgba(60, 40, 20, 0.5);
   }
@@ -5343,5 +5342,13 @@
     flex: none;
     scroll-snap-align: start;
     white-space: nowrap;
+  }
+
+  /* Liên kết nhỏ trong form / chú thích nguồn ảnh: vùng chạm ≥ 44px */
+  .auth-footer a,
+  .folk-print-source {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 }

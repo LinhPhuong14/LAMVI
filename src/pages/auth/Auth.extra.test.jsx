@@ -6,6 +6,7 @@ import { mockApi, renderAt } from '../../test/renderApp.jsx'
 import { productsVi } from '../../test/fixtures.js'
 import AuthProvider from '../../auth/AuthProvider.jsx'
 import { useAuth } from '../../auth/context.js'
+const findHeaderLink = (name) => waitFor(() => within(document.querySelector('header.nav')).getByRole('link', { name }))
 
 // Thanh chuyển đăng nhập ↔ đăng ký (D-82) thay cho link cuối form
 const tab = (name) => within(screen.getByRole('navigation', { name: /Chọn đăng nhập/ })).getByRole('link', { name })
@@ -200,7 +201,7 @@ describe('Header & URL ngôn ngữ (D-37)', () => {
   ])('trên %s link header "%s" trỏ tới %s', async (path, name, href) => {
     mockApi(base)
     renderAt(path)
-    const link = await screen.findByRole('link', { name })
+    const link = await findHeaderLink(name)
     expect(link).toHaveAttribute('href', href)
   })
 
@@ -242,7 +243,7 @@ describe('Header & URL ngôn ngữ (D-37)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
     await waitFor(() => expect(screen.queryByRole('heading', { name: 'My account' })).toBeNull())
     // Trong lúc chờ API đăng xuất, trang tài khoản có thể chuyển qua /login trước khi về /en — chờ tới khi về trang chủ
-    expect(await screen.findByRole('link', { name: 'Account' })).toHaveAttribute('href', '/en/account')
+    expect(await findHeaderLink('Account')).toHaveAttribute('href', '/en/account')
     expect(localStorage.getItem('moc.session')).toBeNull()
   })
 

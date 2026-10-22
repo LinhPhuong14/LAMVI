@@ -2,7 +2,7 @@
 // Kiểm thử độc lập: giỏ hàng phía trình duyệt (FR-CART-001, §11, D-49, D-59…D-61, US-001 AC-003, US-010 AC-003)
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within, waitFor } from '@testing-library/react'
 import { hydrateRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { useState } from 'react'
@@ -17,6 +17,7 @@ import { classifyPath, dataKeysFor } from '../seo/routes.js'
 import { listPublicFaq, listPublicProducts } from '../../server/services/catalog.js'
 import { createMemoryRepo } from '../../server/adapters/memory/repo.js'
 import { MAX_LINES, createCartService, parseLine } from '../../server/cart/service.js'
+const findHeaderLink = (name) => waitFor(() => within(document.querySelector('header.nav')).getByRole('link', { name }))
 
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'an@moc.test' } }
 
@@ -140,7 +141,7 @@ describe('localStorage hỏng / bị chặn', () => {
     const card = (await screen.findByText('Đèn Nguyệt', { selector: '.product-card a' })).closest('.product-card')
     fireEvent.click(within(card).getByRole('button', { name: 'Thêm vào giỏ' }))
     expect(await screen.findByText(/Mây đã bỏ/)).toBeInTheDocument()
-    expect(await screen.findByRole('link', { name: 'Giỏ hàng (1)' })).toBeInTheDocument()
+    expect(await findHeaderLink('Giỏ hàng (1)')).toBeInTheDocument()
   })
 
   it('giỏ trình duyệt quá dài (>100 dòng, bị sửa tay) → trang giỏ không kẹt ở lỗi', async () => {
@@ -156,7 +157,7 @@ describe('Header và ngôn ngữ', () => {
     localStorage.setItem('moc.cart', JSON.stringify([{ slug: 'den-nguyet', quantity: 2 }, { slug: 'den-sum-vay', quantity: 3 }]))
     mockApi(fakeServer().handlers)
     renderAt('/en')
-    expect(await screen.findByRole('link', { name: 'Cart (5)' })).toHaveAttribute('href', '/en/cart')
+    expect(await findHeaderLink('Cart (5)')).toHaveAttribute('href', '/en/cart')
   })
 
   it('header không đếm dòng không còn bán', async () => {
@@ -166,7 +167,7 @@ describe('Header và ngôn ngữ', () => {
     localStorage.setItem('moc.cart', JSON.stringify([{ slug: 'den-nguyet', quantity: 2 }, { slug: 'den-vong', quantity: 3 }]))
     mockApi(srv.handlers)
     renderAt('/')
-    expect(await screen.findByRole('link', { name: 'Giỏ hàng (2)' })).toBeInTheDocument()
+    expect(await findHeaderLink('Giỏ hàng (2)')).toBeInTheDocument()
   })
 
   it('đổi ngôn ngữ → tên sản phẩm trong giỏ đổi theo', async () => {
@@ -195,7 +196,7 @@ describe('Thanh toán (D-61, US-001 AC-003)', () => {
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'Gio-Hoa#Sen2026' } })
     fireEvent.click(screen.getByRole('button', { name: 'Sign in' }))
     expect(await screen.findByRole('heading', { name: 'Cart' })).toBeInTheDocument()
-    expect(await screen.findByRole('link', { name: 'Cart (3)' })).toHaveAttribute('href', '/en/cart')
+    expect(await findHeaderLink('Cart (3)')).toHaveAttribute('href', '/en/cart')
     expect(srv.log.filter((l) => l.key === 'merge').map((l) => l.body)).toEqual([{ items: [{ slug: 'den-nguyet', quantity: 2 }] }])
     expect(srv.log.find((l) => l.key === 'merge').url).toContain('lang=en')
     expect(localStorage.getItem('moc.cart')).toBeNull()
@@ -219,10 +220,10 @@ describe('Thanh toán (D-61, US-001 AC-003)', () => {
     fireEvent.change(await screen.findByLabelText('Email'), { target: { value: 'an@moc.test' } })
     fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'Gio-Hoa#Sen2026' } })
     fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }))
-    expect(await screen.findByRole('link', { name: 'Giỏ hàng (5)' })).toBeInTheDocument()
+    expect(await findHeaderLink('Giỏ hàng (5)')).toBeInTheDocument()
     await act(async () => release())
     await flush()
-    expect(screen.getByRole('link', { name: /^Giỏ hàng/ })).toHaveAttribute('aria-label', 'Giỏ hàng (5)')
+    expect(within(document.querySelector('header.nav')).getByRole('link', { name: /^Giỏ hàng/ })).toHaveAttribute('aria-label', 'Giỏ hàng (5)')
   })
 
   it('mọi dòng đều không còn bán → nút Thanh toán bị vô hiệu', async () => {
@@ -256,7 +257,7 @@ describe('Lỗi mạng', () => {
     const f = mockApi(srv.handlers)
     renderAt('/')
     const card = (await screen.findByText('Đèn Nguyệt', { selector: '.product-card a' })).closest('.product-card')
-    await screen.findByRole('link', { name: 'Giỏ hàng (1)' })
+    await findHeaderLink('Giỏ hàng (1)')
     f.mockImplementation(async () => {
       throw new TypeError('Failed to fetch')
     })
@@ -273,10 +274,10 @@ describe('Lỗi mạng', () => {
     mockApi(srv.handlers)
     renderAt('/')
     const card = (await screen.findByText('Đèn Nguyệt', { selector: '.product-card a' })).closest('.product-card')
-    await screen.findByRole('link', { name: 'Giỏ hàng (2)' })
+    await findHeaderLink('Giỏ hàng (2)')
     fireEvent.click(within(card).getByRole('button', { name: 'Thêm vào giỏ' }))
     expect(await within(card).findByText(/Vui lòng thử lại/)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Giỏ hàng (2)' })).toBeInTheDocument()
+    expect(within(document.querySelector('header.nav')).getByRole('link', { name: 'Giỏ hàng (2)' })).toBeInTheDocument()
   })
 
   it('tải giỏ lỗi → trang giỏ hiện lỗi, không vỡ', async () => {

@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-22 (phiên 5) — Giao diện điện thoại đợt 1 (nhánh `feat/mobile-ux`, D-115)
+
+PO: thiết kế kĩ hơn UI điện thoại, ưu tiên trải nghiệm. Kiểm toán bằng Playwright ở 390×844@2x (đo vùng chạm < 40 px, chữ < 12 px, tràn ngang): nút Mây nổi đè nút "Đăng nhập", 12+ liên kết chân trang cao 25 px, bộ chọn số lượng 34 px, trang chủ dài 13.600 px, không có điều hướng vùng ngón cái. Làm: `MobileTabBar` + `tabbarRoutes.js`, CSS ở cuối `pages.css`, `May.jsx` ẩn nút nổi ở trang auth. Bài học: `AccountTheme.extra.test` cấm `backdrop-filter` trên phần tử `position: fixed` → thanh đáy dùng nền đặc; hai liên kết trùng tên (header + thanh đáy) nên test cũ của giỏ/auth phải khoanh vùng `header.nav`. **Còn lại (đợt 2)**: rút ngắn trang chủ trên điện thoại (khoảng cách mục), bố cục trang sản phẩm (CTA lên trước mô tả), checkout/giỏ trên điện thoại, kiểm bằng thiết bị thật.
+
+---
 ## 2026-10-22 (phiên 4) — Chuyển trạng thái đơn thủ công + thu tiền COD (nhánh `feat/admin-order-status`, D-114)
 
 PO: "thêm mục chuyển trạng thái đơn hàng thủ công trong admin để phòng trường hợp COD xong admin phải chuyển trạng thái". Đã có sẵn chọn trạng thái kế tiếp (từng bước). Thêm: nhảy cóc về phía trước (`ADMIN_TRANSITIONS`), COD → DELIVERED tự `paymentStatus='paid'`, `markCodCollected` + route `cod-collected`, UI khối "Chuyển nhanh" và thẻ "Thu tiền khi nhận hàng (COD)", lỗi `COD_NOT_COLLECTABLE` (vi/en/zh). Cập nhật test §16 theo bảng mới. Không cần migration.
