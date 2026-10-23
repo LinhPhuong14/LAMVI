@@ -1565,6 +1565,56 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
+}
+
+/* D-120: clip hành trình mẻ đèn phủ kín màn hình điện thoại */
+.phone-video video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Đang dừng: nút son giữa khung; đang phát: nút nhỏ mờ ở góc để vẫn dừng được */
+.phone-video-toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.phone-video.is-playing .phone-video-toggle {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.phone-video.is-playing .phone-video-toggle:hover,
+.phone-video.is-playing .phone-video-toggle:focus-visible {
+  opacity: 1;
+}
+
+.phone-video.is-playing .play-icon {
+  width: 32px;
+  height: 32px;
+  padding-left: 0;
+  font-size: 0.62rem;
+  letter-spacing: -0.1em;
+}
+
+.phone-video-toggle:focus-visible {
+  outline: 2px solid var(--hoe-light);
+  outline-offset: 2px;
+  border-radius: 50%;
 }
 
 .play-glow {

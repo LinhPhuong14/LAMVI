@@ -178,6 +178,8 @@ export default {
       'Text messages are kept forever; voice and video are kept for 30 days after the recipient confirms receiving the gift, and can be downloaded to keep',
     ],
     phoneCaption: 'The journey of your lantern batch',
+    videoPlay: 'Play the batch journey video',
+    videoPause: 'Pause the batch journey video',
     phoneFrom: 'A message from Minh Anh',
     phoneMessage: '“May you always be as warm as this lantern’s light. With all my love.”',
   },

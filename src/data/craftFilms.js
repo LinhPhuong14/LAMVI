@@ -12,4 +12,6 @@ export const CRAFT_FILMS = {
   dongho: film('tranh-dong-ho'),
   // "làng nghề giấy dó 2.mp4" — mục #films (cách làm đèn, công đoạn giấy dó)
   paper: film('lang-giay-do'),
+  // Khung điện thoại mục QR (D-120): 7 đoạn ~2,6 s ghép từ hai video trên, cắt dọc 3:4 (bỏ dải phụ đề), 480×640, không tiếng
+  journey: { src: '/videos/hanh-trinh-me-den.mp4', poster: '/videos/hanh-trinh-me-den-poster.webp' },
 }

@@ -14,7 +14,7 @@ import Marquee from '../components/Marquee'
 import Particles from '../components/Particles'
 import Faq from '../components/Faq'
 import FolkGallery from '../components/FolkGallery'
-import CraftFilms, { CraftVideo } from '../components/CraftFilms'
+import CraftFilms, { CraftVideo, PhoneVideo } from '../components/CraftFilms'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import Scene from '../components/Scene'
 import { CountUp, Reveal } from '../components/Reveal'
@@ -55,24 +55,24 @@ const lampHalo = {
   in: {
     opacity: [0, 0.85, 0.3, 1, 0.8],
     scale: 1,
-    transition: { duration: 1.3, times: [0, 0.2, 0.35, 0.6, 1], ease: 'easeOut' },
+    transition: { duration: 2.1, times: [0, 0.2, 0.35, 0.6, 1], ease: 'easeOut' },
   },
   above: { opacity: 0, scale: 0.8, transition: { duration: 0.6, ease: EASE_IN } },
 }
 const lampBody = {
   below: { filter: 'brightness(0.45) saturate(0.3)', transition: { duration: 0.5 } },
-  in: { filter: 'brightness(1) saturate(1)', transition: { duration: 1.1, delay: 0.1, ease: EASE_OUT } },
+  in: { filter: 'brightness(1) saturate(1)', transition: { duration: 1.8, delay: 0.2, ease: EASE_OUT } },
   above: { filter: 'brightness(0.45) saturate(0.3)', transition: { duration: 0.6 } },
 }
 
 const phone = {
   below: { opacity: 0, y: 70, rotate: -7, transition: { duration: 0.45, ease: EASE_IN } },
-  in: { opacity: 1, y: 0, rotate: -2, transition: { type: 'spring', stiffness: 90, damping: 16 } },
+  in: { opacity: 1, y: 0, rotate: -2, transition: { type: 'spring', stiffness: 38, damping: 14, mass: 1.2 } },
   above: { opacity: 0, y: -50, rotate: 3, transition: { duration: 0.45, ease: EASE_IN } },
 }
 const sun = {
   below: { opacity: 0, scale: 0.4, transition: { duration: 0.4 } },
-  in: { opacity: 1, scale: 1, transition: { duration: 1, ease: EASE_OUT } },
+  in: { opacity: 1, scale: 1, transition: { duration: 1.8, ease: EASE_OUT } },
   above: { opacity: 0, scale: 0.6, transition: { duration: 0.4 } },
 }
 
@@ -496,10 +496,7 @@ export default function HomePage() {
           <m.div className="phone-frame" variants={phone}>
             <div className="phone-notch" />
             <div className="phone-screen">
-              <div className="phone-video">
-                <span className="play-glow" />
-                <span className="play-icon">▶</span>
-              </div>
+              <PhoneVideo title={t('qr.phoneCaption')} playLabel={t('qr.videoPlay')} pauseLabel={t('qr.videoPause')} />
               <p className="phone-caption">{t('qr.phoneCaption')}</p>
               <div className="phone-message">
                 <span className="phone-message-label">{t('qr.phoneFrom')}</span>

@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render } from '@testing-library/react'
 import { LazyMotion, domAnimation } from 'framer-motion'
 import { LocaleContext } from '../i18n/index.js'
-import CraftFilms, { CraftVideo } from './CraftFilms.jsx'
+import CraftFilms, { CraftVideo, PhoneVideo } from './CraftFilms.jsx'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import viMsg from '../i18n/messages/vi.js'
 import enMsg from '../i18n/messages/en.js'
@@ -113,5 +113,44 @@ describe('CraftVideo — tự phát khi cuộn tới', () => {
     const { video } = setup()
     expect(video.hasAttribute('autoplay')).toBe(false)
     expect(video).toHaveAttribute('preload', 'none')
+  })
+})
+
+describe('PhoneVideo — clip hành trình mẻ đèn trong khung điện thoại (D-120)', () => {
+  const setup = () => {
+    const { container, getByRole } = render(<PhoneVideo title="Hành trình" playLabel="Phát" pauseLabel="Dừng" />)
+    const video = container.querySelector('video')
+    let paused = true
+    Object.defineProperty(video, 'paused', { get: () => paused })
+    video.play = vi.fn(() => {
+      paused = false
+      fireEvent.play(video)
+      return Promise.resolve()
+    })
+    video.pause = vi.fn(() => {
+      paused = true
+      fireEvent.pause(video)
+    })
+    return { container, video, getByRole }
+  }
+
+  it('tắt tiếng, phát lặp, không tải trước, không thanh điều khiển — dùng nút riêng', () => {
+    const { video, getByRole } = setup()
+    expect(video.muted).toBe(true)
+    expect(video).toHaveAttribute('loop')
+    expect(video).toHaveAttribute('preload', 'none')
+    expect(video.hasAttribute('controls')).toBe(false)
+    expect(video.querySelector('source')).toHaveAttribute('src', CRAFT_FILMS.journey.src)
+    expect(getByRole('button', { name: 'Phát' })).toBeInTheDocument()
+  })
+
+  it('bấm nút: phát → nhãn thành Dừng; bấm lại → dừng', () => {
+    const { container, video, getByRole } = setup()
+    fireEvent.click(getByRole('button', { name: 'Phát' }))
+    expect(video.play).toHaveBeenCalledTimes(1)
+    expect(container.querySelector('.phone-video')).toHaveClass('is-playing')
+    fireEvent.click(getByRole('button', { name: 'Dừng' }))
+    expect(video.pause).toHaveBeenCalledTimes(1)
+    expect(getByRole('button', { name: 'Phát' })).toBeInTheDocument()
   })
 })

@@ -115,6 +115,7 @@ Người dùng không muốn nền tự vẽ bằng SVG → mỗi phần trang c
 | Lookbook (đêm) | (v0.23) Đồi sương bình minh `hills-gold` 34% ở nửa dưới + khói lửa; đèn trời bay lên là ảnh đèn thật tách nền |
 | Công đoạn | Thung lũng sương có nắng |
 | Nghệ nhân (D-118) | Video tranh Đông Hồ trong khung tranh bồi thay chân dung minh hoạ (cột trái rộng 1.1fr) |
+| QR — khung điện thoại (D-120) | Clip "hành trình mẻ đèn" 3:4 phủ kín màn hình điện thoại, tự phát không tiếng khi cuộn tới, nút son phát/dừng (≥ 44 px) |
 | Video làng giấy dó (`#films`, D-118) | Không có ảnh nền; một khung tranh bồi 960px chứa video tự host, poster là khung hình thật |
 | QR | Mây hoàng hôn (từ phải, mờ về trái) |
 | Lời khách | Hồ sương bình minh |
@@ -160,6 +161,7 @@ Quy tắc:
 | Loại | Quy tắc |
 |---|---|
 | Xuất hiện/biến mất | `Reveal` + biến thể `rise` / `ink` / `stamp` / `group` (`src/lib/motion.js`); hiện khi cuộn tới, tan theo hướng cuộn |
+| Nhịp (D-120) | Chậm để kịp ngắm khi cuộn: hiện `rise` 1,3 s, `ink` 1,5 s, `stamp` lò xo mềm (stiffness 70), con lệch nhau 0,22 s, chữ từng từ 0,06 s; rời đi 0,6 s. Điện thoại mục QR lò xo stiffness 38, đèn lookbook sáng dần 2,1 s. Không rút ngắn lại khi thêm phần mới — dùng biến thể có sẵn |
 | Thời lượng | vào 0.7–0.9s (`EASE_OUT`), ra 0.4–0.45s (`EASE_IN`); lò xo thẻ `stiffness 170, damping 18` |
 | Lặp nền | CSS transform/opacity: đèn đung đưa 5.5s, trống đồng 140s, marquee 34s, đèn trời 22–30s |
 | Theo con trỏ (T-24) | Chỉ khi `useFinePointer()` và không giảm chuyển động; qua motion value, không re-render |

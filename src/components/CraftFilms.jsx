@@ -1,68 +1,66 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { m } from 'framer-motion'
-import { useHydratedReducedMotion } from '../lib/hydration.js'
+import { useAutoplayInView } from '../lib/useAutoplayInView.js'
 import { useI18n } from '../i18n/index.js'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import { rise, group } from '../lib/motion.js'
 import { Reveal } from './Reveal'
 import { Lotus } from './Motifs'
 
-// Video tự host, `preload="none"`: lúc vào trang chỉ tải poster. Cuộn tới (≥ 50% khung trong màn hình) thì
-// tự phát **không tiếng** (trình duyệt chỉ cho tự phát khi tắt tiếng), cuộn qua thì dừng. Người xem bấm dừng
-// thì không tự phát lại cho tới khi họ bấm phát; bật tiếng thì giữ nguyên. Giảm chuyển động → không tự phát.
+// Video tự host, `preload="none"`: lúc vào trang chỉ tải poster; tự phát khi cuộn tới (useAutoplayInView)
 export function CraftVideo({ film, title, className = '' }) {
   const ref = useRef(null)
-  const reduce = useHydratedReducedMotion()
-
-  useEffect(() => {
-    const video = ref.current
-    if (!video || reduce || typeof IntersectionObserver === 'undefined') return
-    let userPaused = false
-    let autoPausing = false
-    let userUnmuted = false
-    const onPause = () => {
-      if (autoPausing) autoPausing = false
-      else userPaused = true
-    }
-    const onPlay = () => {
-      userPaused = false
-    }
-    const onVolume = () => {
-      if (!video.muted) userUnmuted = true
-    }
-    video.addEventListener('pause', onPause)
-    video.addEventListener('play', onPlay)
-    video.addEventListener('volumechange', onVolume)
-    const io = new IntersectionObserver(
-      (entries) => {
-        // Cuộn nhanh có thể dồn nhiều entry (vào rồi ra) trong một lần gọi → lấy entry mới nhất
-        const entry = entries[entries.length - 1]
-        if (entry.isIntersecting) {
-          if (userPaused || !video.paused) return
-          // Người xem đã bật tiếng thì giữ tiếng (họ đã tương tác nên trình duyệt cho phát có tiếng)
-          if (!userUnmuted) video.muted = true
-          video.play()?.catch(() => {})
-        } else if (!video.paused) {
-          autoPausing = true
-          video.pause()
-        }
-      },
-      { threshold: 0.5 },
-    )
-    io.observe(video)
-    return () => {
-      io.disconnect()
-      video.removeEventListener('pause', onPause)
-      video.removeEventListener('play', onPlay)
-      video.removeEventListener('volumechange', onVolume)
-    }
-  }, [reduce])
+  useAutoplayInView(ref)
 
   return (
     <div className={`film-frame ${className}`.trim()}>
       <video ref={ref} controls preload="none" playsInline loop poster={film.poster} aria-label={title}>
         <source src={film.src} type="video/mp4" />
       </video>
+    </div>
+  )
+}
+
+// Khung điện thoại ở mục QR: clip ngắn "hành trình mẻ đèn" ghép từ hai video làng nghề, không tiếng, phát lặp.
+// Không có thanh điều khiển của trình duyệt (khung quá nhỏ) → nút phát/dừng riêng (WCAG 2.2.2: dừng được chuyển động).
+export function PhoneVideo({ title, playLabel, pauseLabel }) {
+  const ref = useRef(null)
+  const [paused, setPaused] = useState(true)
+  useAutoplayInView(ref)
+  // Không dùng prop `muted`: React render thuộc tính khác nhau ở SSR và client → lệch hydrate
+  useEffect(() => {
+    if (ref.current) ref.current.muted = true
+  }, [])
+
+  const toggle = () => {
+    const video = ref.current
+    if (!video) return
+    if (video.paused) {
+      video.muted = true
+      video.play()?.catch(() => {})
+    } else video.pause()
+  }
+
+  return (
+    <div className={`phone-video${paused ? '' : ' is-playing'}`}>
+      <video
+        ref={ref}
+        playsInline
+        loop
+        preload="none"
+        poster={CRAFT_FILMS.journey.poster}
+        aria-label={title}
+        onPlay={() => setPaused(false)}
+        onPause={() => setPaused(true)}
+      >
+        <source src={CRAFT_FILMS.journey.src} type="video/mp4" />
+      </video>
+      <button type="button" className="phone-video-toggle" onClick={toggle} aria-label={paused ? playLabel : pauseLabel}>
+        {paused && <span className="play-glow" aria-hidden="true" />}
+        <span className="play-icon" aria-hidden="true">
+          {paused ? '▶' : '❚❚'}
+        </span>
+      </button>
     </div>
   )
 }

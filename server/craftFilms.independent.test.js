@@ -31,7 +31,8 @@ describe('D-118 — tệp video trong public/', () => {
   for (const [key, film] of Object.entries(CRAFT_FILMS)) {
     it(`${key}: mp4 và poster tồn tại, dung lượng hợp lý`, () => {
       const mp4 = statSync(`${root}public${film.src}`)
-      expect(mp4.size).toBeGreaterThan(1 * MB)
+      // journey là clip 15 s cho khung điện thoại (D-120) nên nhỏ hơn
+      expect(mp4.size).toBeGreaterThan(key === 'journey' ? 0.3 * MB : 1 * MB)
       expect(mp4.size).toBeLessThan(30 * MB)
       const poster = statSync(`${root}public${film.poster}`)
       expect(poster.size).toBeGreaterThan(1024)
@@ -53,14 +54,16 @@ describe('D-118 — tệp video trong public/', () => {
 })
 
 describe('D-118 — SSR trang chủ', () => {
-  it('vi: hai video, preload="none", có poster/aria-label, không iframe', async () => {
+  it('vi: ba video (2 làng nghề + clip điện thoại), preload="none", có poster/aria-label, không iframe', async () => {
     const doc = await ssrHome('/')
     const videos = [...doc.querySelectorAll('video')]
     const srcs = videos.map((v) => v.querySelector('source')?.getAttribute('src'))
-    expect(srcs).toEqual(expect.arrayContaining([CRAFT_FILMS.dongho.src, CRAFT_FILMS.paper.src]))
+    expect(srcs).toEqual(expect.arrayContaining([CRAFT_FILMS.dongho.src, CRAFT_FILMS.paper.src, CRAFT_FILMS.journey.src]))
     for (const v of videos) {
       expect(v.getAttribute('preload')).toBe('none')
-      expect(v.hasAttribute('controls')).toBe(true)
+      // Clip trong khung điện thoại dùng nút phát/dừng riêng (.phone-video-toggle) thay thanh điều khiển
+      if (v.closest('.phone-video')) expect(v.parentElement.querySelector('.phone-video-toggle')).toBeTruthy()
+      else expect(v.hasAttribute('controls')).toBe(true)
       expect(v.getAttribute('poster')).toMatch(/^\/videos\/.+\.webp$/)
       expect(v.getAttribute('aria-label')).toBeTruthy()
       expect(v.hasAttribute('autoplay')).toBe(false)
