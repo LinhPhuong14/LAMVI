@@ -5497,3 +5497,12 @@
     display: none;
   }
 }
+
+/* Màn hình rất hẹp (≤ 380px): hàng số lượng chiếm cả cột ảnh để không chồng lên thành tiền */
+@media (max-width: 380px) {
+  .cart-line {
+    grid-template-areas:
+      'art info info'
+      'qty qty total';
+  }
+}
