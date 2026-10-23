@@ -5352,3 +5352,148 @@
     min-height: 44px;
   }
 }
+
+/* ======================================================================
+   Giao diện điện thoại — đợt 2: trang chủ gọn hơn, thẻ sản phẩm vuốt ngang, nút mua lên trước mô tả
+   ====================================================================== */
+@media (max-width: 640px) {
+  /* Khoảng cách giữa các mục: trước đây 110–120px mỗi phía → trang chủ dài hơn 13.600px */
+  .hero {
+    padding-bottom: 56px;
+  }
+  .story {
+    padding-bottom: 64px;
+  }
+  .artisan,
+  .products,
+  .process,
+  .qr-experience,
+  .testimonials,
+  .faq {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+  .lookbook-inner {
+    padding-top: 56px;
+    padding-bottom: 64px;
+  }
+
+  /* Năm thẻ đèn xếp dọc (~3.100px) → dải vuốt ngang, thẻ kế bên ló ra để biết còn nữa */
+  .products .product-grid,
+  .pdp-related .product-grid {
+    display: flex;
+    gap: 14px;
+    margin: 24px -16px 0;
+    padding: 6px 16px 18px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .products .product-grid::-webkit-scrollbar,
+  .pdp-related .product-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .products .product-grid > .product-card,
+  .pdp-related .product-grid > .product-card {
+    flex: 0 0 80%;
+    scroll-snap-align: start;
+  }
+
+  /* Trang sản phẩm: tên → giá → số lượng + nút mua → mô tả → ghi chú (nút mua lên trước mô tả).
+     min-width: 0 — nếu thiếu, hàng chip cuộn ngang (nowrap) làm cột lưới rộng hơn màn hình và nội dung bị cắt mép phải */
+  .pdp-grid,
+  .pdp-grid > *,
+  .shop-page,
+  .shop-page > * {
+    min-width: 0;
+  }
+  .pdp-buy {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+  }
+  .pdp-buy > .product-buy,
+  .pdp-buy > .stock-left {
+    order: 1;
+  }
+  .pdp-buy > .pdp-desc {
+    order: 2;
+    margin-top: 18px;
+  }
+  .pdp-buy > .pdp-note,
+  .pdp-buy > .pdp-perks {
+    order: 3;
+  }
+  /* Trong thẻ trắng của trang sản phẩm các chip tự xuống dòng (hàng cuộn ngang chỉ dùng ở Cửa hàng) */
+  .pdp-perks {
+    flex-wrap: wrap;
+    margin-inline: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  .pdp-perks li {
+    white-space: normal;
+  }
+}
+
+/* Giỏ hàng trên điện thoại: ba bước một hàng, mỗi dòng sản phẩm gọn hai tầng
+   (ảnh | tên + đơn giá  /  số lượng | thành tiền + Xoá) thay vì xếp dọc 5 khối */
+@media (max-width: 640px) {
+  .cart-steps {
+    flex-wrap: nowrap;
+    gap: 6px;
+    font-size: 0.78rem;
+    margin-bottom: 20px;
+  }
+  .cart-steps li {
+    gap: 6px;
+    padding: 5px 10px 5px 5px;
+    white-space: nowrap;
+  }
+  .cart-line {
+    grid-template-columns: 72px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'art info info'
+      'art qty total';
+    align-items: center;
+    gap: 6px 12px;
+    padding: 12px;
+  }
+  .cart-line-art {
+    grid-area: art;
+    grid-row: auto;
+    align-self: start;
+  }
+  .cart-line-info {
+    grid-area: info;
+    min-width: 0;
+  }
+  .cart-line-info strong {
+    font-size: 1.05rem;
+  }
+  .cart-line .qty {
+    grid-area: qty;
+    grid-column: auto;
+    justify-self: start;
+  }
+  .cart-line-total {
+    grid-area: total;
+    grid-column: auto;
+    justify-self: end;
+    align-items: flex-end;
+    text-align: right;
+  }
+  .cart-remove {
+    min-height: 36px;
+    padding: 6px 0 2px;
+  }
+  /* Đơn giá nhỏ lại, thành tiền của dòng mới là số nổi bật; "đã gồm VAT" chỉ giữ ở thành tiền */
+  .cart-line-info .product-price {
+    font-size: 0.98rem;
+  }
+  .cart-line-info .price-note {
+    display: none;
+  }
+}

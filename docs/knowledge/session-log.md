@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-23 — Giao diện điện thoại đợt 2 (nhánh `feat/mobile-ux2`, D-116)
+
+Đo từng mục trang chủ ở 390 px: sản phẩm 3.103 px, story 1.907, faq 1.405… → giảm padding mục (110–120 → 64), dải vuốt ngang cho thẻ đèn, đưa nút mua lên trước mô tả, gọn giỏ hàng. Chụp giỏ/thanh toán bằng tài khoản thử tạo qua API (`/api/auth/register` + `/login`, `PUT /api/cart/items/:slug`). **Lỗi tự gây ra ở đợt 1 và đã sửa**: hàng chip `.shop-perks` (nowrap, cuộn ngang) làm cột lưới trang sản phẩm rộng hơn màn hình → nội dung bị cắt mép phải; sửa bằng `min-width: 0` trên `.pdp-grid > *`. **Còn lại (đợt 3 nếu cần)**: trang chủ còn ~11.100 px (story 1.860, qr 1.420, faq 1.310), thanh toán trên điện thoại, kiểm bằng máy thật.
+
+---
 ## 2026-10-22 (phiên 5) — Giao diện điện thoại đợt 1 (nhánh `feat/mobile-ux`, D-115)
 
 PO: thiết kế kĩ hơn UI điện thoại, ưu tiên trải nghiệm. Kiểm toán bằng Playwright ở 390×844@2x (đo vùng chạm < 40 px, chữ < 12 px, tràn ngang): nút Mây nổi đè nút "Đăng nhập", 12+ liên kết chân trang cao 25 px, bộ chọn số lượng 34 px, trang chủ dài 13.600 px, không có điều hướng vùng ngón cái. Làm: `MobileTabBar` + `tabbarRoutes.js`, CSS ở cuối `pages.css`, `May.jsx` ẩn nút nổi ở trang auth. Bài học: `AccountTheme.extra.test` cấm `backdrop-filter` trên phần tử `position: fixed` → thanh đáy dùng nền đặc; hai liên kết trùng tên (header + thanh đáy) nên test cũ của giỏ/auth phải khoanh vùng `header.nav`. **Còn lại (đợt 2)**: rút ngắn trang chủ trên điện thoại (khoảng cách mục), bố cục trang sản phẩm (CTA lên trước mô tả), checkout/giỏ trên điện thoại, kiểm bằng thiết bị thật.
