@@ -2,8 +2,11 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   plugins: [react()],
+  // Bản SSR (dist/server) chỉ cần entry-server.js; không chép public/ (ảnh, video làng nghề ~35 MB)
+  // vào đó → gói Vercel Function nhẹ hơn (T-84). Tệp tĩnh đã có ở dist/client và CDN (public/).
+  publicDir: isSsrBuild ? false : 'public',
   test: {
     environment: 'node',
     include: ['server/**/*.test.js', 'src/**/*.test.{js,jsx}', 'scripts/**/*.test.js'],
@@ -16,4 +19,4 @@ export default defineConfig({
     // máy ít RAM bị OOM giữa chừng. Giới hạn một nửa số CPU để chạy được ở cả máy dev và CI.
     maxWorkers: '50%',
   },
-})
+}))

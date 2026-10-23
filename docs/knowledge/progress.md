@@ -4,7 +4,7 @@
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |
 |---|---|---|---|
-| Video Đông Hồ thay chân dung Nghệ nhân + mục `#films` (giấy dó), tự host | 🟡 code xong, thiếu tệp video | `src/components/CraftFilms.jsx`, `src/data/craftFilms.js`, `src/pages/HomePage.jsx`, i18n `films.*`/`artisan.video*` (T-84); `src/components/CraftFilms.test.jsx` | G-118: đưa tệp nén vào `public/videos/` rồi mới merge master |
+| Video Đông Hồ thay chân dung Nghệ nhân + mục `#films` (giấy dó), tự host | ✅ | `public/videos/*`, `src/components/CraftFilms.jsx`, `src/data/craftFilms.js`, `src/pages/HomePage.jsx`, i18n `films.*`/`artisan.video*`, `vite.config.js` + `vercel.json` (T-84); `src/components/CraftFilms*.test.jsx` | G-118: phụ đề sai "Beijing", quyền chia sẻ Drive, `[LEGAL]` hình ảnh người trong video; thử phát trên Preview thật |
 
 ## 2026-10-21 — Giám sát chủ động (feat/ops-monitoring)
 
