@@ -29,7 +29,16 @@ export function unverifiedNumbers(reply, toolOutputs) {
     for (const m of text.match(/\d+/g) ?? []) allowed.add(m)
     for (const m of text.match(NUMBER) ?? []) allowed.add(digits(m))
   }
-  return (String(reply).match(NUMBER) ?? []).map(digits).filter((n) => !allowed.has(n))
+  const text = String(reply)
+  const out = []
+  for (const m of text.matchAll(NUMBER)) {
+    const n = digits(m[0])
+    if (allowed.has(n)) continue
+    // Năm lịch sử (1000-1999) trong kiến thức văn hoá chung ("năm 1904") không phải số liệu của cửa hàng; năm 20xx vẫn bị chặn (có thể là ngày hứa hẹn)
+    if (/^1\d{3}$/.test(n) && /(?:năm|year|in|since|从|自)\s*$/i.test(text.slice(Math.max(0, m.index - 8), m.index))) continue
+    out.push(n)
+  }
+  return out
 }
 
 // BR-AI-005: Mây không đưa giảm giá/coupon; số tiền viết tắt (799k, 1,05 triệu) không có trong dữ liệu

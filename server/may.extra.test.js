@@ -55,7 +55,7 @@ const chat = (body, token) => {
 }
 const putConfig = (body, token = tokens.admin.bearer) => request(app).put('/api/admin/may/config').set('Authorization', token).send(body)
 
-const UNKNOWN_NO_CHANNEL = 'Cái này Mây chưa biết rùi, bạn xem thử phần hỏi đáp trên web nha'
+const UNKNOWN_NO_CHANNEL = 'Hì, câu này Mây chưa biết chắc rồi. Bạn xem thử phần hỏi đáp trên web nha, hoặc hỏi Mây chuyện khác cũng được'
 
 beforeEach(async () => {
   clock = Date.parse('2026-09-28T03:00:00Z')
@@ -564,7 +564,7 @@ describe('Cấu hình (FR-AI-007)', () => {
   it('D-56: kênh vi có, en trống → câu en vẫn gợi ý kênh vi; không kênh nào → câu không có {channel}', async () => {
     await enable({ supportChannel: { vi: 'Zalo Mộc' } })
     build([say('')])
-    expect((await chat({ message: 'x', lang: 'en' })).body.reply.text).toBe('Mây doesn’t know this yet — please contact Zalo Mộc')
+    expect((await chat({ message: 'x', lang: 'en' })).body.reply.text).toBe('Hehe, Mây isn’t sure about this one. Please message Zalo Mộc and a real person will help you')
     await enable({ supportChannel: { vi: '', en: '', zh: '' } })
     const r = await chat({ message: 'x', lang: 'en' })
     expect(r.body.reply.text).not.toContain('{channel}')

@@ -2,7 +2,7 @@
 
 ## 2026-10-23 (phiên 3) — Mây trả lời "chưa biết" quá nhiều (nhánh `fix/may-knowledge`, G-118)
 
-PO: "chưa bật OpenAI cho Mây hay sao, hỏi gì cũng không biết, trả lời liên hệ email". Gọi thử `POST /api/may/chat` trên production: OpenAI **đang bật** (câu về giá, mẫu đèn, "giấy dó là gì" trả lời được); câu "ship bao lâu", "đặt hàng thế nào", "Tứ Linh gồm linh vật nào" trả về câu "chưa biết". Nguyên nhân trong code: Mây không có nguồn về chính sách; bộ chặn BR-AI-003/005 trả ngay "chưa biết" khi câu đầu vướng. Sửa: `get_policies`, thử lại một lần có nhắc luật, prompt. Không có khoá OpenAI trong phiên nên kiểm bằng OpenAI giả; **sau deploy cần gọi lại 5 câu trên production để xác nhận**.
+PO: "chưa bật OpenAI cho Mây hay sao, hỏi gì cũng không biết, trả lời liên hệ email". Gọi thử `POST /api/may/chat` trên production: OpenAI **đang bật** (câu về giá, mẫu đèn, "giấy dó là gì" trả lời được); câu "ship bao lâu", "đặt hàng thế nào", "Tứ Linh gồm linh vật nào" trả về câu "chưa biết". Nguyên nhân trong code: Mây không có nguồn về chính sách; bộ chặn BR-AI-003/005 trả ngay "chưa biết" khi câu đầu vướng. Sửa: `get_policies`, thử lại một lần có nhắc luật, prompt. Không có khoá OpenAI trong phiên nên kiểm bằng OpenAI giả; **sau deploy cần gọi lại 5 câu trên production để xác nhận**. PO thêm: "đừng strict quá, để Mây thú vị" → D-118: prompt có tính cách, cho phép kiến thức văn hoá chung, câu mẫu thân thiện, nhiệt độ 0,7; giữ nguyên BR-AI-003/005/006.
 
 ---
 ## 2026-10-23 (phiên 5) — Video khung điện thoại + motion chậm (nhánh `feat/qr-video-slow-motion`, D-120)

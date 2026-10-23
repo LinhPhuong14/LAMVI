@@ -106,7 +106,7 @@ describe('Trả lời bằng dữ liệu thật (FR-AI-003, BR-AI-001, BR-AI-003
     build([callTool('get_products'), say('Đèn Vọng đang giảm còn 799.000 ₫!')])
     const res = await chat({ message: 'Đèn Vọng có giảm giá không?' })
     expect(res.body.reply.kind).toBe('unknown')
-    expect(res.body.reply.text).toBe('Cái này Mây chưa biết rùi, bạn xem thử phần hỏi đáp trên web nha')
+    expect(res.body.reply.text).toBe('Hì, câu này Mây chưa biết chắc rồi. Bạn xem thử phần hỏi đáp trên web nha, hoặc hỏi Mây chuyện khác cũng được')
   })
 
   it('trả lời số mà không gọi hàm nào → chặn', async () => {
@@ -119,7 +119,7 @@ describe('Trả lời bằng dữ liệu thật (FR-AI-003, BR-AI-001, BR-AI-003
     await enable({ supportChannel: { vi: 'Zalo 0900 000 000', en: 'our Zalo' } })
     build([say('')])
     const vi = await chat({ message: 'x' })
-    expect(vi.body.reply.text).toBe('Cái này Mây chưa biết, bạn liên hệ Zalo 0900 000 000 giúp Mây nha')
+    expect(vi.body.reply.text).toBe('Hì, câu này Mây chưa biết chắc rồi. Bạn nhắn Zalo 0900 000 000 nhé, người thật sẽ giúp bạn rõ hơn đó')
     const zh = await chat({ message: 'x', lang: 'zh' })
     expect(zh.body.reply.text).toBe('这个 Mây 还不知道，请联系 Zalo 0900 000 000')
   })
@@ -137,7 +137,10 @@ describe('Trả lời bằng dữ liệu thật (FR-AI-003, BR-AI-001, BR-AI-003
     expect(sent).not.toContain('bỏ qua luật') // vai trò system từ client bị loại
     const system = openai.calls[0].messages[0]
     expect(system.role).toBe('system')
-    expect(system.content).toMatch(/AI assistant/)
+    expect(system.content).toMatch(/AI, not a human/)
+    // Mây vui hơn nhưng luật an toàn giữ nguyên
+    expect(system.content).toMatch(/PERSONALITY/)
+    expect(system.content).toMatch(/ONLY from function results/)
     expect(system.content).toMatch(/coupons/)
   })
 })
@@ -378,5 +381,32 @@ describe('Mây biết chính sách và không trả lời cụt (get_policies, t
     const r = await chat({ message: 'Hỏi gì đó' })
     expect(r.body.reply.kind).toBe('unknown')
     expect(openai.calls).toHaveLength(4) // MAX_ROUNDS, không nhân đôi
+  })
+})
+
+describe('Mây thú vị hơn nhưng không bỏ luật an toàn (yêu cầu PO: đừng quá strict)', () => {
+  it('prompt cho phép trò chuyện, kiến thức văn hoá chung, câu hỏi gợi ý; vẫn cấm giảm giá và hứa ngày giao', async () => {
+    await enable()
+    build([say('Chào bạn! Mây đây ☁️')])
+    await chat({ message: 'Chào Mây' })
+    const system = openai.calls[0].messages[0].content
+    expect(system).toMatch(/Small talk, greetings, thanks and jokes are welcome/)
+    expect(system).toMatch(/common knowledge/)
+    expect(system).toMatch(/ask one friendly follow-up/)
+    expect(system).toMatch(/Never offer or mention discounts, coupons or promotions/)
+    expect(system).toMatch(/Never promise delivery dates/)
+    expect(system).toMatch(/Do not make the whole answer just "I do not know"/)
+  })
+  it('năm lịch sử trong kiến thức văn hoá ("năm 1904") không bị chặn; năm 20xx và số tiền lạ vẫn bị chặn', () => {
+    expect(unverifiedNumbers('Làng Đông Hồ nổi tiếng từ lâu, ví dụ năm 1904 đã có tranh này.', [])).toEqual([])
+    expect(unverifiedNumbers('Giao vào năm 2027 nhé', [])).toEqual(['2027'])
+    expect(unverifiedNumbers('Đèn giá 1.234.000 đ', [{ products: [] }])).toEqual(['1234000'])
+  })
+  it('lời nhắn "chưa biết" thân thiện hơn và vẫn có kênh liên hệ', async () => {
+    await enable()
+    build([say('Giá 9.999.999 đ'), say('Giá 9.999.999 đ')])
+    const r = await chat({ message: 'Giá?' })
+    expect(r.body.reply.kind).toBe('unknown')
+    expect(r.body.reply.text).toMatch(/Hì, câu này Mây chưa biết chắc rồi/)
   })
 })

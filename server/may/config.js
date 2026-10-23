@@ -23,12 +23,12 @@ const DEFAULT_MESSAGES = {
     zh: ['Mây 正在休息，先看看这些常见问题吧'],
   },
   unknown: {
-    vi: ['Cái này Mây chưa biết, bạn liên hệ {channel} giúp Mây nha'],
-    en: ['Mây doesn’t know this yet — please contact {channel}'],
+    vi: ['Hì, câu này Mây chưa biết chắc rồi. Bạn nhắn {channel} nhé, người thật sẽ giúp bạn rõ hơn đó', 'Mây gãi đầu một cái… câu này Mây chưa có thông tin. Bạn liên hệ {channel} giúp Mây nha'],
+    en: ['Hehe, Mây isn’t sure about this one. Please message {channel} and a real person will help you', 'Mây is scratching its head… no info on this yet. Could you contact {channel}?'],
     zh: ['这个 Mây 还不知道，请联系 {channel}'],
   },
   unknownNoChannel: {
-    vi: ['Cái này Mây chưa biết rùi, bạn xem thử phần hỏi đáp trên web nha'],
+    vi: ['Hì, câu này Mây chưa biết chắc rồi. Bạn xem thử phần hỏi đáp trên web nha, hoặc hỏi Mây chuyện khác cũng được', 'Mây gãi đầu một cái… câu này Mây chưa có thông tin. Bạn xem phần hỏi đáp trên web giúp Mây nha'],
     en: ['Mây doesn’t know this yet — you could check the FAQ on our site'],
     zh: ['这个 Mây 还不知道，可以看看网站上的常见问题'],
   },

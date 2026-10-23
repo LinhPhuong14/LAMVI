@@ -168,7 +168,7 @@ describe('Đăng nhập tra đơn qua POST /api/may/chat (AC-001, AC-002)', () =
 
   it('khách vãng lai gọi get_my_orders → login_required, không có đơn nào', async () => {
     const outs = []
-    buildApp(fakeOpenAi([{ name: 'get_my_orders' }], ([t]) => (outs.push(t), 'Bạn đăng nhập giúp Mây nha')))
+    buildApp(fakeOpenAi([{ name: 'get_my_orders' }], ([t]) => (outs.push(t), 'Bạn đăng nhập nhé, người thật sẽ giúp bạn rõ hơn đó')))
     await chat({ message: 'đơn của tôi' }).expect(200)
     expect(outs).toEqual([{ error: 'login_required' }])
   })
