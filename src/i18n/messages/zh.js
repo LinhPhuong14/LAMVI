@@ -117,6 +117,8 @@ export default {
     quote: '取自杨坞—风溪的 dó 纸被送往东湖，由优秀匠人阮有果亲自完成涂贝壳粉（điệp）与适合每盏 LAMVI 灯的东湖图案。',
     name: '优秀匠人 阮有果',
     place: '东湖版画村',
+    videoTitle: '视频：东湖村的版画制作',
+    videoCaption: '东湖版画村——为 LAMVI 灯涂贝壳粉并印制图案的地方。',
   },
   products: {
     viewAll: '查看更多',
@@ -150,6 +152,13 @@ export default {
       { label: '组装与试亮', note: '灯身、木底座与暖黄 LED 经组装、校准与试亮' },
       { label: '包装与感谢卡', note: '灯与带二维码的感谢卡一同装盒' },
     ],
+  },
+  films: {
+    eyebrow: '亲眼看手艺',
+    title: '化作灯身的 dó 纸',
+    intro: '每盏 LAMVI 灯都始于杨坞—风溪手艺村的手工 dó 纸。',
+    paperTitle: 'dó 纸手艺村',
+    paperNote: '手工 dó 纸——LAMVI 灯身的材料。',
   },
   qr: {
     eyebrow: '拆礼时刻',

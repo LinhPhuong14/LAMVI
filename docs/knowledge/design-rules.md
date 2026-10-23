@@ -114,6 +114,8 @@ Người dùng không muốn nền tự vẽ bằng SVG → mỗi phần trang c
 | Sản phẩm | Trời mây vàng (dải trên, mờ dần) |
 | Lookbook (đêm) | (v0.23) Đồi sương bình minh `hills-gold` 34% ở nửa dưới + khói lửa; đèn trời bay lên là ảnh đèn thật tách nền |
 | Công đoạn | Thung lũng sương có nắng |
+| Nghệ nhân (D-118) | Video tranh Đông Hồ trong khung tranh bồi thay chân dung minh hoạ (cột trái rộng 1.1fr) |
+| Video làng giấy dó (`#films`, D-118) | Không có ảnh nền; một khung tranh bồi 960px chứa video tự host, poster là khung hình thật |
 | QR | Mây hoàng hôn (từ phải, mờ về trái) |
 | Lời khách | Hồ sương bình minh |
 | Hỏi đáp | Biển mây (dưới) |

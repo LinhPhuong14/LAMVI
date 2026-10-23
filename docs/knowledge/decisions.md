@@ -408,3 +408,11 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - `.github/workflows/uptime.yml`: chạy mỗi 5 phút trên `master`. Chọn Actions vì không cần tài khoản/khoá mới; hạn chế: trễ best-effort, tối thiểu 5 phút. Sentry/Log Drain chưa thêm (cần DSN hoặc gói Pro do người vận hành cấp).
 - `scripts/check-schema.js` thêm kiểm `products.specs/story` (021–022) và `return_requests.video_purged_at` (023).
 
+
+### T-89 — Video làng nghề tự host trong `public/videos/` (2026-10-23)
+
+- D-118: `src/data/craftFilms.js` (đường dẫn), `src/components/CraftFilms.jsx` (`CraftVideo` + mục `#films`). `<video controls preload="none" playsInline poster>` → trang chủ chỉ tải poster (~100 KB); video tải khi bấm phát. Cùng origin nên CSP `media-src 'self'` đã đủ, không mở host ngoài.
+- `public/` là `outputDirectory` của Vercel → CDN phục vụ trực tiếp (có Range/206), không qua function. `vercel.json`: `excludeFiles: "dist/client/videos/**"` + cache 7 ngày; `vite.config.js`: SSR build `publicDir: false` (trước đây `dist/server` chép cả `public/`, 43 MB thừa trong gói function → còn ~0,7 MB).
+- Đã cân nhắc nhúng trình phát Google Drive: bỏ, vì PO muốn video nằm trên web; Drive có hạn mức lượt xem, hiện giao diện Drive và cần mở `frame-src`.
+- Nén từ tệp gốc 2560×1440 (154–182 MB): `ffmpeg -i in.mp4 -vf scale=-2:720 -c:v libx264 -preset slow -crf 27|29 -profile:v high -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart <slug>-720.mp4` (Đông Hồ 84 s → 15 MB, CRF 27; giấy dó 99 s → 20 MB, CRF 29). Poster: `ffmpeg -ss <t> -i in.mp4 -frames:v 1 -vf scale=1280:-2 -c:v libwebp -quality 78 <slug>-poster.webp` (Đông Hồ t=12 s — khung tiêu đề nghệ nhân; giấy dó t=50 s — xeo giấy).
+- Chromium của Playwright không có H.264 → không kiểm phát video tự động được; trình duyệt thật (Chrome, Safari, Edge, Firefox) đều phát H.264.

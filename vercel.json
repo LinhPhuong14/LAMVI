@@ -8,6 +8,7 @@
   "functions": {
     "api/index.js": {
       "includeFiles": "{dist/**,node_modules/react-router/dist/**,node_modules/react-router-dom/dist/**}",
+      "excludeFiles": "dist/client/videos/**",
       "maxDuration": 30
     }
   },
@@ -18,6 +19,10 @@
     },
     {
       "source": "/images/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=2592000" }]
+    },
+    {
+      "source": "/videos/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=2592000" }]
     },
     {
