@@ -1,5 +1,12 @@
 # Tiến độ tính năng
 
+## 2026-10-23 — Video khung điện thoại + motion chậm (feat/qr-video-slow-motion, D-120)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Clip hành trình mẻ đèn trong khung điện thoại mục QR | ✅ | `public/videos/hanh-trinh-me-den*`, `src/components/CraftFilms.jsx` (`PhoneVideo`), `src/lib/useAutoplayInView.js` (T-91); `src/components/CraftFilms.test.jsx` | Thử trên trình duyệt thật |
+| Motion cuộn chậm hơn | ✅ | `src/lib/motion.js`, `src/pages/HomePage.jsx` | PO duyệt cảm giác nhịp trên máy thật |
+
 ## 2026-10-23 — Tự phát video + ảnh đèn thật (feat/lamp-photos-autoplay, D-119)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |

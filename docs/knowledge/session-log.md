@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-23 (phiên 5) — Video khung điện thoại + motion chậm (nhánh `feat/qr-video-slow-motion`, D-120)
+
+PO: thay ô video giả trong khung điện thoại mục QR bằng video; motion chậm hơn khi cuộn. Không có video riêng cho mẻ đèn → ghép clip 15 s từ hai video làng nghề (cắt dọc 3:4, bỏ phụ đề). Phát hiện prop `muted` gây lệch hydrate (15 test SSR đỏ) → đặt bằng effect. Motion: pha hiện ~1,6×, lò xo mềm hơn, pha rời đi 0,6 s. Trước đó cùng phiên: ảnh thật Lợn Đàn (v0.65).
+
+---
+
 ## 2026-10-23 (phiên 4) — Tự phát video + ảnh đèn thật (nhánh `feat/lamp-photos-autoplay`, D-119)
 
 PO: tự phát video khi cuộn tới; ảnh đèn trông giả → dùng ảnh chụp thật PO gửi. Video tự phát tắt tiếng (chính sách trình duyệt), dừng khi cuộn qua. 5 ảnh đầu lưu được thành tệp: 4 mẫu khớp catalog (ảnh lợn mẹ–lợn con không phải mẫu Lợn Đàn). 4 ảnh gửi sau (có Lợn Đàn) không có tệp trong môi trường → Lợn Đàn giữ ảnh cũ, chờ PO gửi lại tệp. PO gửi lại tệp → v0.65 (nhánh `feat/lamp-photo-lon-dan`) đủ 5/5 ảnh thật.

@@ -189,6 +189,8 @@ export default {
     ],
     // D-45
     phoneCaption: 'Hành trình mẻ đèn của bạn',
+    videoPlay: 'Phát video hành trình mẻ đèn',
+    videoPause: 'Dừng video hành trình mẻ đèn',
     phoneFrom: 'Lời chúc từ Minh Anh',
     phoneMessage: '“Chúc chị luôn ấm áp như ánh đèn này. Em thương chị rất nhiều.”',
   },

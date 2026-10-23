@@ -421,3 +421,9 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 
 - D-119: `CraftVideo` dùng `IntersectionObserver` (ngưỡng 0,5): vào khung → `muted = true` + `play()` (chính sách autoplay của Chrome/Safari chỉ cho tự phát khi tắt tiếng); ra khỏi khung → `pause()`. Phân biệt dừng do cuộn và do người xem bấm (cờ `autoPausing`) để không tự phát lại khi người xem đã dừng; người xem đã bật tiếng (`volumechange`) thì không ép tắt tiếng lại; đọc entry mới nhất của observer (cuộn nhanh dồn nhiều entry). Không dùng thuộc tính `autoplay` (SSR sẽ khiến trình duyệt tải video ngay khi vào trang); giữ `preload="none"`. `useHydratedReducedMotion` → không tự phát. Có `loop`.
 - Ảnh đèn: `scripts/gen_lamp_photos.py` (rembg `isnet-general-use`, ngoài dependencies). Dây điện dính liền đế nên đế cắt đối xứng quanh tâm chao (nửa rộng phía ngắn hơn). Giữ tên tệp cũ → `server/domain/photos.js`, hero, lookbook không đổi code.
+
+### T-91 — Clip điện thoại mục QR + nhịp motion chậm (2026-10-23)
+
+- D-120: `public/videos/hanh-trinh-me-den.mp4` (0,9 MB, 480×640, 15,2 s, không tiếng) ghép bằng ffmpeg từ hai tệp gốc làng nghề: 7 đoạn 2,6 s (giấy dó t=36,5/49/68; Đông Hồ t=20/36/60/68), `crop=900:1200:(iw-900)/2:0` (bỏ dải phụ đề ở đáy), `xfade` 0,5 s, CRF 30, `+faststart`. Poster t=4 s.
+- `src/lib/useAutoplayInView.js`: tách logic tự phát khi thấy (T-90) để `CraftVideo` và `PhoneVideo` dùng chung. `PhoneVideo` không có `controls` (khung 212 px) → nút phát/dừng riêng. **Không dùng prop `muted`** trên `<video>`: React render thuộc tính này khác nhau giữa SSR và client → lỗi lệch hydrate; đặt `video.muted = true` trong effect.
+- Nhịp motion ở `src/lib/motion.js` (hằng `OUT` = 0,6 s cho pha rời đi) và các biến thể riêng của trang chủ (`phone`, `sun`, `lampHalo`, `lampBody`).

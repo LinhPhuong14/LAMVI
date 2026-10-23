@@ -170,6 +170,8 @@ export default {
       '文字祝福永久保存；语音和视频自收礼人确认收到礼物起保存 30 天，可下载长期保留',
     ],
     phoneCaption: '您这批灯的制作历程',
+    videoPlay: '播放这批灯的制作视频',
+    videoPause: '暂停这批灯的制作视频',
     phoneFrom: '来自明英的祝福',
     phoneMessage: '“愿你永远像这盏灯光一样温暖。非常爱你。”',
   },

@@ -31,43 +31,47 @@ export function useViewState(ref, margin = '-12% 0px -12% 0px', initial = 'below
   return state
 }
 
+// D-120: nhịp chậm để người xem kịp thấy chuyển động khi cuộn — pha hiện ~1,6× trước đây, pha rời đi chậm vừa
+// (không làm nội dung "đuổi theo" khi cuộn nhanh). Giảm chuyển động vẫn tắt hết (Reveal, MotionConfig).
+const OUT = 0.6
+
 // Hiện: trồi lên nhẹ. Biến mất: trôi tiếp theo hướng cuộn rồi mờ đi.
 export const rise = {
-  below: { opacity: 0, y: 40, transition: { duration: 0.45, ease: EASE_IN } },
-  in: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE_OUT } },
-  above: { opacity: 0, y: -32, transition: { duration: 0.45, ease: EASE_IN } },
+  below: { opacity: 0, y: 40, transition: { duration: OUT, ease: EASE_IN } },
+  in: { opacity: 1, y: 0, transition: { duration: 1.3, ease: EASE_OUT } },
+  above: { opacity: 0, y: -32, transition: { duration: OUT, ease: EASE_IN } },
 }
 
 // Mực loang: chữ nhoè rồi nét dần như mực thấm vào giấy dó
 export const ink = {
-  below: { opacity: 0, y: 18, filter: 'blur(8px)', transition: { duration: 0.4, ease: EASE_IN } },
-  in: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.9, ease: EASE_OUT } },
-  above: { opacity: 0, y: -14, filter: 'blur(6px)', transition: { duration: 0.4, ease: EASE_IN } },
+  below: { opacity: 0, y: 18, filter: 'blur(8px)', transition: { duration: OUT, ease: EASE_IN } },
+  in: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.5, ease: EASE_OUT } },
+  above: { opacity: 0, y: -14, filter: 'blur(6px)', transition: { duration: OUT, ease: EASE_IN } },
 }
 
 // Đóng dấu: thẻ rơi xuống, xoay về khuôn; khi rời đi thì nhấc lên như gỡ tờ giấy
 export const stamp = {
-  below: { opacity: 0, y: 56, rotate: -3, scale: 0.96, transition: { duration: 0.4, ease: EASE_IN } },
+  below: { opacity: 0, y: 56, rotate: -3, scale: 0.96, transition: { duration: OUT, ease: EASE_IN } },
   in: (i = 0) => ({
     opacity: 1,
     y: 0,
     rotate: i % 2 === 0 ? -0.6 : 0.6,
     scale: 1,
-    transition: { type: 'spring', stiffness: 170, damping: 18, mass: 0.8 },
+    transition: { type: 'spring', stiffness: 70, damping: 16, mass: 1 },
   }),
   above: (i = 0) => ({
     opacity: 0,
     y: -36,
     rotate: i % 2 === 0 ? 2 : -2,
     scale: 0.97,
-    transition: { duration: 0.4, ease: EASE_IN },
+    transition: { duration: OUT, ease: EASE_IN },
   }),
 }
 
 // Khung chứa: con xuất hiện lần lượt; khi biến mất thì con cuối đi trước
 export const group = {
   below: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
-  in: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
+  in: { transition: { staggerChildren: 0.22, delayChildren: 0.1 } },
   above: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
 }
 
@@ -103,23 +107,23 @@ export function useFinePointer() {
 // Chữ hiện dần từng từ như mực thấm (ý tưởng "Text Generate Effect")
 export const wordGroup = {
   below: { transition: { staggerChildren: 0.01, staggerDirection: -1 } },
-  in: { transition: { staggerChildren: 0.035, delayChildren: 0.15 } },
+  in: { transition: { staggerChildren: 0.06, delayChildren: 0.3 } },
   above: { transition: { staggerChildren: 0.01, staggerDirection: -1 } },
 }
 export const inkWord = {
   below: { opacity: 0.08, filter: 'blur(5px)', transition: { duration: 0.3 } },
-  in: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.55, ease: EASE_OUT } },
+  in: { opacity: 1, filter: 'blur(0px)', transition: { duration: 0.9, ease: EASE_OUT } },
   above: { opacity: 0.08, filter: 'blur(4px)', transition: { duration: 0.3 } },
 }
 
 // Luồng sáng của đèn treo (ý tưởng "Lamp Effect"): nón sáng mở rộng từ đèn xuống tiêu đề
 export const lampBeam = {
   below: { opacity: 0, scaleX: 0.35, transition: { duration: 0.5, ease: EASE_IN } },
-  in: { opacity: 1, scaleX: 1, transition: { duration: 1.2, ease: EASE_OUT, delay: 0.25 } },
+  in: { opacity: 1, scaleX: 1, transition: { duration: 2, ease: EASE_OUT, delay: 0.4 } },
   above: { opacity: 0, scaleX: 0.5, transition: { duration: 0.5, ease: EASE_IN } },
 }
 export const lampOrb = {
   below: { opacity: 0, scale: 0.5, transition: { duration: 0.5 } },
-  in: { opacity: [0, 1, 0.55, 1], scale: 1, transition: { duration: 1.1, times: [0, 0.3, 0.45, 1] } },
+  in: { opacity: [0, 1, 0.55, 1], scale: 1, transition: { duration: 1.8, times: [0, 0.3, 0.45, 1] } },
   above: { opacity: 0, scale: 0.6, transition: { duration: 0.5 } },
 }
