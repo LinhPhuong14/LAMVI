@@ -1,5 +1,21 @@
 # Ảnh 5 mẫu đèn (tài sản của chính LAMVI)
 
+## Ảnh chụp thật (23/10/2026, D-119) — thay ảnh dựng bằng AI
+
+Nhóm LAMVI gửi ảnh chụp sản phẩm thật (nền đỏ, 1086×1448). `scripts/gen_lamp_photos.py` dựng lại từ ảnh đó:
+`<tên>.jpg` = ảnh chụp cắt vuông 1086×1086 quanh đèn (không chỉnh sửa nội dung), `<tên>-cutout.webp` = đèn tách nền bằng rembg (bỏ dây điện), cao ≤ 1000 px.
+
+| Mẫu | Nguồn |
+|---|---|
+| `thu-hoach` | Ảnh chụp thật (cảnh làng, trâu) |
+| `tu-linh` | Ảnh chụp thật (rồng/phượng) |
+| `phuc-loc-song-toan` | Ảnh chụp thật (em bé ôm cá chép) |
+| `tam-duong-khai-thai` | Ảnh chụp thật (gà trống) |
+| `lon-dan` | **Chưa thay** — vẫn là ảnh dựng từ thumbnail fanpage (mô tả bên dưới); chờ tệp ảnh chụp thật mẫu đàn lợn |
+
+Các mục dưới đây mô tả bộ ảnh cũ, nay chỉ còn áp dụng cho `lon-dan`.
+
+
 Lấy ngày 2026-10-14 từ **fanpage chính thức của LAMVI** (https://www.facebook.com/profile.php?id=61593996136514), mục Ảnh hiển thị công khai khi chưa đăng nhập. Chủ sở hữu: nhóm LAMVI.
 
 Tệp gốc chỉ là **thumbnail 206×206 px** (poster từng mẫu: tên đèn + câu giới thiệu in trên ảnh). **Từ 21/10/2026**: nâng cấp bằng Real-ESRGAN (x4plus) lên **824×824** (chạy trên bản 206 px thu từ ảnh 618 cũ; bản 618 Lanczos cũ không còn). Mô hình AI vẽ thêm chi tiết nên hoạ tiết nhỏ và chữ in trên poster có thể khác ảnh gốc đôi chút — vẫn cần ảnh gốc độ phân giải cao thật (G-110). **Cần thay bằng ảnh gốc độ phân giải cao** (G-110); khi admin tải ảnh riêng ở `/admin/products` thì ảnh admin được ưu tiên (`server/domain/photos.js`).

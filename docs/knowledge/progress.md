@@ -1,5 +1,12 @@
 # Tiến độ tính năng
 
+## 2026-10-23 — Tự phát video + ảnh đèn thật (feat/lamp-photos-autoplay, D-119)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Video tự phát (tắt tiếng) khi cuộn tới | ✅ | `src/components/CraftFilms.jsx`; `src/components/CraftFilms.test.jsx` (IO giả lập) | Thử trên trình duyệt thật (Playwright Chromium không có H.264) |
+| Ảnh chụp thật 4/5 mẫu đèn | 🟡 | `public/images/lamps/*`, `scripts/gen_lamp_photos.py` (T-90) | Lợn Đàn: cần tệp ảnh chụp thật (G-110) |
+
 ## 2026-10-23 — Video làng nghề trên trang chủ (feat/craft-videos, D-118)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |
