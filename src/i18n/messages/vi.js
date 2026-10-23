@@ -129,6 +129,8 @@ export default {
       'Giấy dó lấy từ Dương Ổ – Phong Khê được đưa tới Đông Hồ, nơi Nghệ nhân Ưu tú Nguyễn Hữu Quả trực tiếp thực hiện công đoạn phủ điệp và phần nghệ thuật Đông Hồ phù hợp với từng chiếc đèn LAMVI.',
     name: 'Nghệ nhân Ưu tú Nguyễn Hữu Quả',
     place: 'Làng tranh Đông Hồ',
+    videoTitle: 'Video: làm tranh ở làng Đông Hồ',
+    videoCaption: 'Làng tranh Đông Hồ — nơi phủ điệp và in phần nghệ thuật cho đèn LAMVI.',
   },
   products: {
     viewAll: 'Xem thêm',
@@ -165,6 +167,13 @@ export default {
       // D-104: QR nằm trên thiệp cảm ơn, không khắc trên đèn
       { label: 'Đóng gói & thiệp cảm ơn', note: 'Đèn và thiệp cảm ơn có mã QR được đóng hộp' },
     ],
+  },
+  films: {
+    eyebrow: 'Xem tận mắt nghề',
+    title: 'Từ tờ giấy dó làm nên thân đèn',
+    intro: 'Mỗi chiếc đèn LAMVI bắt đầu từ giấy dó thủ công của làng nghề Dương Ổ – Phong Khê.',
+    paperTitle: 'Làng nghề giấy dó',
+    paperNote: 'Giấy dó thủ công — chất liệu làm thân đèn LAMVI.',
   },
   qr: {
     eyebrow: 'Khoảnh khắc mở quà',

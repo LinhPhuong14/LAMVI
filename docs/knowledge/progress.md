@@ -1,5 +1,11 @@
 # Tiến độ tính năng
 
+## 2026-10-23 — Video làng nghề trên trang chủ (feat/craft-videos, D-118)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Video Đông Hồ thay chân dung Nghệ nhân + mục `#films` (giấy dó), tự host | 🟡 code xong, thiếu tệp video | `src/components/CraftFilms.jsx`, `src/data/craftFilms.js`, `src/pages/HomePage.jsx`, i18n `films.*`/`artisan.video*` (T-84); `src/components/CraftFilms.test.jsx` | G-118: đưa tệp nén vào `public/videos/` rồi mới merge master |
+
 ## 2026-10-21 — Giám sát chủ động (feat/ops-monitoring)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |

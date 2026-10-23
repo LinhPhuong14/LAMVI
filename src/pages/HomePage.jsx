@@ -14,10 +14,12 @@ import Marquee from '../components/Marquee'
 import Particles from '../components/Particles'
 import Faq from '../components/Faq'
 import FolkGallery from '../components/FolkGallery'
+import CraftFilms, { CraftVideo } from '../components/CraftFilms'
+import { CRAFT_FILMS } from '../data/craftFilms.js'
 import Scene from '../components/Scene'
 import { CountUp, Reveal } from '../components/Reveal'
 import { PointerGlow } from '../components/Effects'
-import { Cloud, DrumSun, Lotus, OldPhoto, VerticalSeal } from '../components/Motifs'
+import { Cloud, DrumSun, Lotus, VerticalSeal } from '../components/Motifs'
 import {
   EASE_IN,
   EASE_OUT,
@@ -397,29 +399,13 @@ export default function HomePage() {
 
       <Reveal as="section" id="artisan" className="artisan has-motifs" variants={group}>
         <Scene name="artisan" />
-        <m.div className="artisan-portrait" variants={stamp} custom={1}>
-          {/* Ảnh cũ ngả sepia: chỉ là minh hoạ, không phải ảnh thật của nghệ nhân */}
-          <OldPhoto>
-            <rect width="200" height="248" fill="#c9a877" />
-            <circle cx="100" cy="104" r="80" fill="#e2c592" />
-            <path
-              d="M34 248 C34 170 66 144 100 144 C134 144 166 170 166 248 Z"
-              fill="#5b4330"
-              stroke="#2b2119"
-              strokeWidth="3"
-            />
-            <path d="M84 144 L100 176 L116 144" fill="none" stroke="#2b2119" strokeWidth="3" />
-            <circle cx="100" cy="100" r="34" fill="#b08660" stroke="#2b2119" strokeWidth="3" />
-            <path d="M58 80 C60 52 140 52 142 80 C122 72 78 72 58 80 Z" fill="#2b2119" />
-            <path
-              d="M86 106 q5 3 9 0 M105 106 q5 3 9 0 M92 120 q8 6 16 0"
-              stroke="#2b2119"
-              strokeWidth="2.4"
-              fill="none"
-              strokeLinecap="round"
-            />
-          </OldPhoto>
-        </m.div>
+        {/* D-118: video thật ở làng tranh Đông Hồ thay chân dung minh hoạ */}
+        <m.figure className="artisan-film film-card" variants={stamp} custom={1}>
+          <CraftVideo film={CRAFT_FILMS.dongho} title={t('artisan.videoTitle')} />
+          <figcaption>
+            <span>{t('artisan.videoCaption')}</span>
+          </figcaption>
+        </m.figure>
         <m.div className="artisan-copy" variants={group}>
           <Eyebrow>{t('artisan.eyebrow')}</Eyebrow>
           <m.h2 variants={ink}>{t('artisan.title')}</m.h2>
@@ -481,6 +467,11 @@ export default function HomePage() {
           <SectionHead eyebrow={t('process.eyebrow')} title={t('process.title')} />
         </Reveal>
         <ProcessTimeline steps={t('process.steps')} />
+      </section>
+
+      {/* D-118: video làng giấy dó (cách làm đèn) — src/data/craftFilms.js */}
+      <section id="films" className="films has-motifs">
+        <CraftFilms />
       </section>
 
       <section id="qr" className="qr-experience has-motifs">

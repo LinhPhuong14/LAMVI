@@ -125,6 +125,8 @@ export default {
       'Dó paper from Duong O – Phong Khe is taken to Dong Ho, where Meritorious Artisan Nguyễn Hữu Quả personally carries out the điệp coating and the Dong Ho artwork made for each LAMVI lantern.',
     name: 'Meritorious Artisan Nguyễn Hữu Quả',
     place: 'Dong Ho painting village',
+    videoTitle: 'Video: printmaking in Dong Ho village',
+    videoCaption: 'Dong Ho painting village — where the điệp coating and artwork for LAMVI lanterns are made.',
   },
   products: {
     viewAll: 'View more',
@@ -158,6 +160,13 @@ export default {
       { label: 'Assembly & light test', note: 'Body, wooden base and warm-white LED are assembled, aligned and tested' },
       { label: 'Packing & thank-you card', note: 'The lantern and a thank-you card with a QR code are boxed' },
     ],
+  },
+  films: {
+    eyebrow: 'See the craft',
+    title: 'The dó paper that becomes the lantern',
+    intro: 'Every LAMVI lantern begins with handmade dó paper from the Duong O – Phong Khe craft village.',
+    paperTitle: 'The dó paper village',
+    paperNote: 'Handmade dó paper — the material of every LAMVI lantern body.',
   },
   qr: {
     eyebrow: 'The unwrapping moment',

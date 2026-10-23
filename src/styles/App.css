@@ -836,8 +836,9 @@
 
 .artisan {
   display: grid;
-  grid-template-columns: 0.75fr 1.25fr;
-  gap: 72px;
+  /* D-118: cột trái là video (thay chân dung minh hoạ) nên rộng hơn */
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 56px;
   align-items: center;
   padding: 120px 56px;
   max-width: 1160px;
@@ -1354,6 +1355,76 @@
   font-size: 0.88rem;
   color: var(--than-soft);
   line-height: 1.55;
+}
+
+/* ---------- Films (video làng nghề, D-118) ---------- */
+
+.films {
+  padding: 40px 56px 110px;
+}
+
+.films-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Khung tranh bồi: nền lụa, đường chỉ trong (design-rules §5) */
+.film-card {
+  margin: 0;
+  padding: 12px;
+  background: var(--diep-light);
+  border: 1px solid var(--hair);
+  border-radius: var(--r-md);
+  box-shadow: var(--print-lg);
+}
+
+.film-frame {
+  overflow: hidden;
+  border-radius: var(--r-sm);
+  background: var(--cham-deep);
+}
+
+.film-frame video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--cham-deep);
+}
+
+.film-card figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 8px 4px;
+}
+
+.film-card figcaption strong {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  color: var(--than);
+}
+
+.film-card figcaption span {
+  color: var(--than-soft);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 960px) {
+  .films {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .films {
+    padding: 8px 16px 64px;
+  }
+  .film-card {
+    padding: 8px;
+  }
 }
 
 /* ---------- QR ---------- */

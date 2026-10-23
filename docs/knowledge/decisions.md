@@ -408,3 +408,10 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - `.github/workflows/uptime.yml`: chạy mỗi 5 phút trên `master`. Chọn Actions vì không cần tài khoản/khoá mới; hạn chế: trễ best-effort, tối thiểu 5 phút. Sentry/Log Drain chưa thêm (cần DSN hoặc gói Pro do người vận hành cấp).
 - `scripts/check-schema.js` thêm kiểm `products.specs/story` (021–022) và `return_requests.video_purged_at` (023).
 
+
+### T-84 — Video làng nghề tự host trong `public/videos/` (2026-10-23)
+
+- D-118: `src/data/craftFilms.js` (đường dẫn), `src/components/CraftFilms.jsx` (`CraftVideo` + mục `#films`). `<video controls preload="none" playsInline poster>` → trang chủ chỉ tải poster; video tải khi bấm phát. Cùng origin nên CSP `media-src 'self'` đã đủ, không mở host ngoài.
+- `public/` là `outputDirectory` của Vercel → CDN phục vụ trực tiếp, không qua function (không vướng giới hạn 4,5 MB của function).
+- Đã cân nhắc nhúng trình phát Google Drive: bỏ, vì PO muốn video nằm trên web; Drive có hạn mức lượt xem, hiện giao diện Drive và cần mở `frame-src`.
+- Nén từ tệp gốc (154–182 MB): `ffmpeg -i in.mp4 -vf "scale=-2:720" -c:v libx264 -preset slow -crf 28 -c:a aac -b:a 96k -movflags +faststart <slug>-720.mp4`; poster: `ffmpeg -ss 3 -i in.mp4 -frames:v 1 -vf scale=1280:-2 <slug>-poster.webp`. Mục tiêu ≤ ~25 MB mỗi tệp; dài quá thì cân nhắc Supabase Storage (`media-src` đã mở Supabase).
