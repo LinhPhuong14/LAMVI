@@ -37,7 +37,8 @@ export function PhoneVideo({ title, playLabel, pauseLabel }) {
     if (!video) return
     if (video.paused) {
       video.muted = true
-      video.play()?.catch(() => {})
+      // Tệp tải lỗi: trình duyệt có thể đã bắn `play` trước khi promise bị từ chối → dừng để nút về "Phát"
+      video.play()?.catch(() => video.pause())
     } else video.pause()
   }
 
