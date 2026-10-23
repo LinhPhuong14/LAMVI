@@ -409,7 +409,7 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - `scripts/check-schema.js` thêm kiểm `products.specs/story` (021–022) và `return_requests.video_purged_at` (023).
 
 
-### T-84 — Video làng nghề tự host trong `public/videos/` (2026-10-23)
+### T-89 — Video làng nghề tự host trong `public/videos/` (2026-10-23)
 
 - D-118: `src/data/craftFilms.js` (đường dẫn), `src/components/CraftFilms.jsx` (`CraftVideo` + mục `#films`). `<video controls preload="none" playsInline poster>` → trang chủ chỉ tải poster (~100 KB); video tải khi bấm phát. Cùng origin nên CSP `media-src 'self'` đã đủ, không mở host ngoài.
 - `public/` là `outputDirectory` của Vercel → CDN phục vụ trực tiếp (có Range/206), không qua function. `vercel.json`: `excludeFiles: "dist/client/videos/**"` + cache 7 ngày; `vite.config.js`: SSR build `publicDir: false` (trước đây `dist/server` chép cả `public/`, 43 MB thừa trong gói function → còn ~0,7 MB).

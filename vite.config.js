@@ -5,7 +5,7 @@ import { defineConfig } from 'vite'
 export default defineConfig(({ isSsrBuild }) => ({
   plugins: [react()],
   // Bản SSR (dist/server) chỉ cần entry-server.js; không chép public/ (ảnh, video làng nghề ~35 MB)
-  // vào đó → gói Vercel Function nhẹ hơn (T-84). Tệp tĩnh đã có ở dist/client và CDN (public/).
+  // vào đó → gói Vercel Function nhẹ hơn (T-89). Tệp tĩnh đã có ở dist/client và CDN (public/).
   publicDir: isSsrBuild ? false : 'public',
   test: {
     environment: 'node',

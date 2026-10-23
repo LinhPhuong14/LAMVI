@@ -4,7 +4,7 @@
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |
 |---|---|---|---|
-| Video Đông Hồ thay chân dung Nghệ nhân + mục `#films` (giấy dó), tự host | ✅ | `public/videos/*`, `src/components/CraftFilms.jsx`, `src/data/craftFilms.js`, `src/pages/HomePage.jsx`, i18n `films.*`/`artisan.video*`, `vite.config.js` + `vercel.json` (T-84); `src/components/CraftFilms*.test.jsx` | G-118: phụ đề sai "Beijing", quyền chia sẻ Drive, `[LEGAL]` hình ảnh người trong video; thử phát trên Preview thật |
+| Video Đông Hồ thay chân dung Nghệ nhân + mục `#films` (giấy dó), tự host | ✅ | `public/videos/*`, `src/components/CraftFilms.jsx`, `src/data/craftFilms.js`, `src/pages/HomePage.jsx`, i18n `films.*`/`artisan.video*`, `vite.config.js` + `vercel.json` (T-89); `src/components/CraftFilms*.test.jsx` | G-118: phụ đề sai "Beijing", quyền chia sẻ Drive, `[LEGAL]` hình ảnh người trong video; thử phát trên Preview thật |
 
 ## 2026-10-21 — Giám sát chủ động (feat/ops-monitoring)
 
@@ -143,7 +143,7 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 
 | Đợt v0.43 (trang kể chuyện từng mẫu đèn, D-105, G-108) | Trạng thái | Code / kiểm tra | Còn lại |
 |---|---|---|---|
-| Cột `products.story` + admin nhập + API chi tiết + seed 5 câu chuyện vi/en/zh (T-84) | ✅ code, chưa chạy migration trên Supabase | migration `…0022`, `server/domain/{admin,catalog}.js`, `ProductsPage.jsx`; `server/lampStory.test.js`, `src/admin/ProductStory.test.jsx` | Chạy migration 022; duyệt nội dung/bản dịch |
+| Cột `products.story` + admin nhập + API chi tiết + seed 5 câu chuyện vi/en/zh (T-89) | ✅ code, chưa chạy migration trên Supabase | migration `…0022`, `server/domain/{admin,catalog}.js`, `ProductsPage.jsx`; `server/lampStory.test.js`, `src/admin/ProductStory.test.jsx` | Chạy migration 022; duyệt nội dung/bản dịch |
 | Trang lời chúc hiện câu chuyện trước lời chúc; tab "Câu chuyện" ở trang sản phẩm | ✅ code | `server/messages/service.js` (`lamps`), `LampStory.jsx`, `GiftPage.jsx`, `ProductPage.jsx`; `src/pages/LampStory.test.jsx` | Ảnh riêng từng mẫu (G-110) |
 | Ảnh thương hiệu từ fanpage: logo → favicon/apple-touch-icon, ảnh bìa lưu `public/images/brand/` (G-116) | ✅ code | `index.html`, `vercel.json`, `public/*` | Logo vector gốc; ảnh sản phẩm gốc (fanpage chỉ cho ≤206 px khi chưa đăng nhập); xác nhận thông tin liên hệ (G-115) |
 

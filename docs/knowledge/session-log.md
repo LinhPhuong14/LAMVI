@@ -2,7 +2,7 @@
 
 ## 2026-10-23 (phiên 3) — Video làng nghề trên trang chủ (nhánh `feat/craft-videos`, D-118)
 
-PO gửi thư mục Drive 2 video (Tranh Đông Hồ 154 MB, làng nghề giấy dó 182 MB). Bản đầu nhúng trình phát Drive; PO yêu cầu tự host và thay chân dung minh hoạ nghệ nhân bằng video → `CraftVideo` (`preload="none"`), video Đông Hồ ở khối Nghệ nhân, giấy dó ở mục `#films`. PO mở mạng (`drive.google.com`, `drive.usercontent.google.com`) → tải, nén 720p H.264 (15 MB, 20 MB), poster webp từ khung hình thật. Phát hiện SSR build chép cả `public/` vào `dist/server` → `publicDir: false` cho SSR, `excludeFiles` video (T-84). Xem nội dung video: phụ đề Đông Hồ ghi sai "ancient Beijing" (G-118). Tệp Drive chia sẻ quyền "Người chỉnh sửa" cho mọi người — đã báo PO.
+PO gửi thư mục Drive 2 video (Tranh Đông Hồ 154 MB, làng nghề giấy dó 182 MB). Bản đầu nhúng trình phát Drive; PO yêu cầu tự host và thay chân dung minh hoạ nghệ nhân bằng video → `CraftVideo` (`preload="none"`), video Đông Hồ ở khối Nghệ nhân, giấy dó ở mục `#films`. PO mở mạng (`drive.google.com`, `drive.usercontent.google.com`) → tải, nén 720p H.264 (15 MB, 20 MB), poster webp từ khung hình thật. Phát hiện SSR build chép cả `public/` vào `dist/server` → `publicDir: false` cho SSR, `excludeFiles` video (T-89). Xem nội dung video: phụ đề Đông Hồ ghi sai "ancient Beijing" (G-118). Tệp Drive chia sẻ quyền "Người chỉnh sửa" cho mọi người — đã báo PO.
 
 ---
 

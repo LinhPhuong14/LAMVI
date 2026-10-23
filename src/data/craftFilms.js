@@ -1,6 +1,6 @@
 // Video làng nghề ở trang chủ (D-118), tự host trong public/videos/ → CDN Vercel phục vụ trực tiếp,
 // không qua function. Tệp gốc ở Google Drive của nhóm (154–182 MB) được nén cho web bằng ffmpeg
-// (720p H.264, `+faststart`, xem docs/knowledge/decisions.md T-84). Chữ ở i18n.
+// (720p H.264, `+faststart`, xem docs/knowledge/decisions.md T-89). Chữ ở i18n.
 
 const film = (slug) => ({
   src: `/videos/${slug}-720.mp4`,

@@ -470,7 +470,7 @@ export default function HomePage() {
       </section>
 
       {/* D-118: video làng giấy dó (cách làm đèn) — src/data/craftFilms.js */}
-      <section id="films" className="films has-motifs">
+      <section id="films" className="films">
         <CraftFilms />
       </section>
 
