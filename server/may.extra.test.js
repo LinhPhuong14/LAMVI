@@ -127,7 +127,7 @@ describe('Prompt injection & chống bịa (BR-AI-001/003/005, R-07, R-12)', () 
   })
 
   it('BR-AI-006: chỉ có hàm đọc; chạy mọi hàm không gọi phương thức ghi nào của repo', async () => {
-    expect(MAY_TOOLS.map((t) => t.function.name)).toEqual(['get_products', 'get_product', 'get_faq', 'get_my_orders', 'lookup_order'])
+    expect(MAY_TOOLS.map((t) => t.function.name)).toEqual(['get_products', 'get_product', 'get_faq', 'get_policies', 'get_my_orders', 'lookup_order'])
     for (const t of MAY_TOOLS) expect(t.function.name).toMatch(/^(get|lookup)_/)
     const called = []
     const spy = new Proxy(repo, {
@@ -136,7 +136,7 @@ describe('Prompt injection & chống bịa (BR-AI-001/003/005, R-07, R-12)', () 
         return typeof v === 'function' ? (...a) => (called.push(prop), v.apply(target, a)) : v
       },
     })
-    for (const name of ['get_products', 'get_product', 'get_faq', 'get_my_orders', 'lookup_order', 'add_to_cart', 'update_profile']) {
+    for (const name of ['get_products', 'get_product', 'get_faq', 'get_policies', 'get_my_orders', 'lookup_order', 'add_to_cart', 'update_profile']) {
       await runTool(name, { slug: 'den-vong', code: 'LV2610-ABCDEFG' }, { repo: spy, lang: 'vi', user: { id: 'u1' }, failKey: 'k' })
     }
     // incrementMayCounter chỉ là bộ đếm chống dò mã đơn, không đổi dữ liệu nghiệp vụ

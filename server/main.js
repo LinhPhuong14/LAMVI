@@ -71,6 +71,8 @@ const may = createMayService({
   priceOutPer1M: config.openai.priceOutPer1M,
   hashSalt: config.mayHashSalt,
   defaultChannel: [publicSite(config).phone, publicSite(config).supportEmail].filter(Boolean).join(' · '),
+  payosEnabled: Boolean(config.payosEnabled),
+  returnsEnabled: config.returnsVideoMaxMb > 0,
 })
 // FR-PAY-001: thiếu khoá payOS → client null, checkout chỉ cho COD.
 // TẠM THỜI tắt payOS (function từng crash): chỉ bật khi đặt PAYOS_ENABLED=1.

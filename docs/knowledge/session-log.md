@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-23 (phiên 3) — Mây trả lời "chưa biết" quá nhiều (nhánh `fix/may-knowledge`, G-118)
+
+PO: "chưa bật OpenAI cho Mây hay sao, hỏi gì cũng không biết, trả lời liên hệ email". Gọi thử `POST /api/may/chat` trên production: OpenAI **đang bật** (câu về giá, mẫu đèn, "giấy dó là gì" trả lời được); câu "ship bao lâu", "đặt hàng thế nào", "Tứ Linh gồm linh vật nào" trả về câu "chưa biết". Nguyên nhân trong code: Mây không có nguồn về chính sách; bộ chặn BR-AI-003/005 trả ngay "chưa biết" khi câu đầu vướng. Sửa: `get_policies`, thử lại một lần có nhắc luật, prompt. Không có khoá OpenAI trong phiên nên kiểm bằng OpenAI giả; **sau deploy cần gọi lại 5 câu trên production để xác nhận**.
+
+---
 ## 2026-10-23 (phiên 5) — Video khung điện thoại + motion chậm (nhánh `feat/qr-video-slow-motion`, D-120)
 
 PO: thay ô video giả trong khung điện thoại mục QR bằng video; motion chậm hơn khi cuộn. Không có video riêng cho mẻ đèn → ghép clip 15 s từ hai video làng nghề (cắt dọc 3:4, bỏ phụ đề). Phát hiện prop `muted` gây lệch hydrate (15 test SSR đỏ) → đặt bằng effect. Motion: pha hiện ~1,6×, lò xo mềm hơn, pha rời đi 0,6 s. Trước đó cùng phiên: ảnh thật Lợn Đàn (v0.65).

@@ -48,7 +48,7 @@ function systemPrompt(lang, channel) {
     'You are an AI assistant, not a human. Be warm, short (max ~80 words), friendly.',
     `Always answer in ${LANG_NAME[lang]}.`,
     'RULES (strict):',
-    '- Only state facts (prices, product details, policies, numbers, dates) that appear in function results from THIS turn. Call get_products / get_product / get_faq before answering anything factual.',
+    '- Only state facts (prices, product details, policies, numbers, dates) that appear in function results from THIS turn. Call get_products / get_product / get_faq / get_policies before answering anything factual (get_policies: delivery fee, payment, returns, cancellation, how to order, contact).',
     '- Prices are VND and INCLUDE VAT (as returned by the functions): you may say so.',
     '- Never offer or mention discounts/coupons. Never promise delivery dates, returns, refunds or exceptions.',
     '- You cannot change anything: no adding to cart, no orders, no account changes.',
@@ -63,7 +63,7 @@ function systemPrompt(lang, channel) {
  * FR-AI-003/005/006: một lượt chat với Mây.
  * deps: repo, openai (null nếu thiếu khoá), env (giá token), now, random, timeoutMs (D-57: 15 giây)
  */
-export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPer1M = 0.6, hashSalt = 'moc', now = () => Date.now(), random = Math.random, timeoutMs = 15_000, defaultChannel = '' }) {
+export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPer1M = 0.6, hashSalt = 'moc', now = () => Date.now(), random = Math.random, timeoutMs = 15_000, defaultChannel = '', payosEnabled = false, returnsEnabled = false }) {
   // Kênh người thật: cấu hình trong admin; để trống thì dùng liên hệ của doanh nghiệp (feedback 08/10, 33.2)
   const channelOf = (config, lang) => config.supportChannel[lang] || config.supportChannel.vi || defaultChannel || ''
   const canned = (config, lang, group) => {
@@ -92,7 +92,7 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
     return { kind: group, text: canned(config, lang, group), faq: matchFaq(message, items) }
   }
 
-  async function online(config, lang, message, history, { user, ip }) {
+  async function online(config, lang, message, history, { user, ip, correction = false }) {
     // BR-AI-002: SĐT khách gõ chỉ dùng để đối chiếu ở server, không gửi sang OpenAI (redactPii)
     const phones = [...new Set([...history.filter((h) => h.role === 'user').flatMap((h) => extractPhones(h.content)), ...extractPhones(message)])]
     const failKey = user ? `u:${user.id}` : `ip:${hash(ip, hashSalt)}`
@@ -101,6 +101,14 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
       ...history.map((h) => ({ role: h.role, content: redactPii(h.content) })),
       { role: 'user', content: redactPii(message) },
     ]
+    // Lần thử lại sau khi câu trả lời đầu bị chặn (số không có trong dữ liệu, nhắc giảm giá, rỗng): nhắc luật rồi trả lời lại
+    if (correction) {
+      messages.push({
+        role: 'system',
+        content:
+          'Your previous draft was rejected by a safety check. Answer again using ONLY facts and numbers that appear in function results, write prices with full digits and dots (for example 1.499.000), never use abbreviations like k/tr/triệu, never use percent signs or mention discounts. If the function results do not contain the answer, say briefly that you do not know. Call the functions first.',
+      })
+    }
     const toolOutputs = []
     const usage = { promptTokens: 0, completionTokens: 0 }
     const ctrl = new AbortController()
@@ -125,7 +133,7 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
             } catch {
               args = {}
             }
-            return withSignal(runTool(call.function?.name, args, { repo, lang, user, phones, failKey, now: now() }), ctrl.signal)
+            return withSignal(runTool(call.function?.name, args, { repo, lang, user, phones, failKey, now: now(), facts: { payosEnabled, returnsEnabled, contact: channelOf(config, lang) } }), ctrl.signal)
           }),
         )
         calls.forEach((call, idx) => {
@@ -180,17 +188,26 @@ export function createMayService({ repo, openai, priceInPer1M = 0.15, priceOutPe
         reply = await offline(config, lang, message)
       } else {
         try {
-          const r = await online(config, lang, message, capHistory(history, config.limits.maxChars), { user, ip })
-          await soft('record usage', () => recordUsage(config, r.usage))
-          const bad = unverifiedNumbers(r.text, r.toolOutputs)
-          const forbidden = forbiddenContent(r.text)
-          if (!r.text || bad.length || forbidden) {
+          const capped = capHistory(history, config.limits.maxChars)
+          const check = (r) => {
+            const bad = unverifiedNumbers(r.text, r.toolOutputs)
+            const forbidden = forbiddenContent(r.text)
             if (bad.length) console.warn('[may] Chặn câu trả lời có số không có trong dữ liệu (BR-AI-003):', bad)
             if (forbidden) console.warn('[may] Chặn câu trả lời nhắc giảm giá/số tiền viết tắt (BR-AI-005)')
-            reply = { kind: 'unknown', text: unknownReply(config, lang) }
-          } else {
-            reply = { kind: 'answer', text: r.text }
+            return Boolean(r.text) && !bad.length && !forbidden
           }
+          let r = await online(config, lang, message, capped, { user, ip })
+          await soft('record usage', () => recordUsage(config, r.usage))
+          let ok = check(r)
+          // Chỉ thử lại khi model ĐÃ trả lời nhưng bị chặn (số lạ, nhắc giảm giá). Rỗng do lặp hàm hết vòng thì không thử lại (tốn chi phí)
+          if (!ok && r.text) {
+            // Một lần thử lại có nhắc luật trước khi nhận "chưa biết" (tránh trả lời cụt ở những câu hỏi có trong dữ liệu)
+            console.warn('[may] câu trả lời đầu bị chặn/rỗng → thử lại một lần')
+            r = await online(config, lang, message, capped, { user, ip, correction: true })
+            await soft('record usage', () => recordUsage(config, r.usage))
+            ok = check(r)
+          }
+          reply = ok ? { kind: 'answer', text: r.text } : { kind: 'unknown', text: unknownReply(config, lang) }
         } catch (err) {
           // US-009 AC-001: OpenAI lỗi / quá 15 giây → nhóm "ốm"
           console.error('[may] openai', err?.name === 'AbortError' ? 'timeout' : (err?.message ?? err))

@@ -2,9 +2,10 @@ import { localePath } from '../i18n.js'
 import { phoneKey } from './guard.js'
 import { HttpError } from '../errors.js'
 import { getPublicProduct, listPublicFaq, listPublicProducts } from '../services/catalog.js'
+import { getShippingPolicy } from '../services/site.js'
 
 // D-29, BR-AI-001: danh sách hàm backend duy nhất Mây được gọi. Chỉ đọc (BR-AI-006).
-// Chưa có: get_policy (chưa có nội dung chính sách — G-10).
+// get_policies: chính sách giao hàng/thanh toán/đổi trả/cách đặt hàng (trang /shipping, /payment, /returns).
 // FR-AI-004, BR-AI-002: get_my_orders / lookup_order chỉ trả đơn của người đã xác thực, không trả địa chỉ, SĐT.
 export const MAY_TOOLS = [
   {
@@ -33,6 +34,14 @@ export const MAY_TOOLS = [
     function: {
       name: 'get_faq',
       description: 'Các câu hỏi thường gặp và câu trả lời chính thức (lưu giữ lời chúc, sửa lời chúc, vận chuyển, thời gian làm đèn…).',
+      parameters: { type: 'object', properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'get_policies',
+      description: 'Chính sách chính thức: phí và phạm vi giao hàng, hình thức thanh toán, đổi trả, huỷ đơn, các bước đặt hàng, liên hệ. Gọi khi khách hỏi ship, phí vận chuyển, thanh toán, đổi trả, cách đặt hàng.',
       parameters: { type: 'object', properties: {}, additionalProperties: false },
     },
   },
@@ -110,7 +119,41 @@ async function lookupOrder(args, { repo, lang, user, phones = [], failKey, now }
   return ok ? { order: orderForMay(order, lang, now) } : { error: 'not_found' }
 }
 
-export async function runTool(name, args, { repo, lang, user = null, phones = [], failKey = null, now = Date.now() }) {
+// Sự thật về chính sách, lấy từ cùng nguồn với trang /shipping, /payment, /returns. Mọi con số Mây được nói đều phải
+// nằm ở đây (BR-AI-003). Không hứa ngày giao cụ thể (prompt cấm).
+async function policies(repo, { payosEnabled = false, returnsEnabled = false, contact = '' } = {}) {
+  const { fee, freeFrom } = await getShippingPolicy(repo)
+  return {
+    delivery: {
+      scope: 'Giao toàn quốc Việt Nam',
+      flatFeeVnd: fee,
+      freeShippingFromVnd: freeFrom,
+      note: 'Phí vận chuyển đồng giá toàn quốc; miễn phí khi tạm tính (sau giảm giá) từ mức freeShippingFromVnd (bằng 0 nghĩa là không có mức miễn phí). LAMVI chưa cam kết thời gian giao cụ thể — không hứa ngày giao.',
+    },
+    payment: {
+      methods: payosEnabled ? ['Thanh toán khi nhận hàng (COD)', 'Chuyển khoản / quét mã (payOS)'] : ['Thanh toán khi nhận hàng (COD)'],
+      note: payosEnabled
+        ? 'Đơn giao cho người khác phải thanh toán online.'
+        : 'Hiện chỉ nhận thanh toán khi nhận hàng (COD): trả tiền mặt cho người giao hàng, không cần thanh toán trước, kể cả đơn tặng giao cho người khác. Chưa có thanh toán online.',
+    },
+    returns: {
+      windowDays: 7,
+      note: 'Trong 7 ngày kể từ khi đơn giao thành công. Chấp nhận khi lỗi sản xuất, vỡ/hỏng khi vận chuyển, giao sai hàng; không nhận đổi vì đổi ý (đặc biệt đèn có lời chúc cá nhân hoá). Kết quả: đổi sản phẩm hoặc hoàn tiền. Cần video khui hàng liên tục.',
+      requestOnline: returnsEnabled ? 'Gửi yêu cầu ở trang chi tiết đơn hàng trong Tài khoản.' : 'Gửi yêu cầu qua trang Liên hệ hoặc email của cửa hàng.',
+    },
+    cancellation: 'Khách huỷ được đơn trước khi đơn được gửi đi (khi đơn còn ở bước chuẩn bị). Từ khi đã gửi đi thì không huỷ được.',
+    orderingSteps: [
+      'Chọn đèn trên trang Cửa hàng rồi bấm Thêm vào giỏ.',
+      'Đăng nhập hoặc tạo tài khoản (bắt buộc để đặt hàng).',
+      'Vào Giỏ hàng, bấm thanh toán: chọn Mua tặng hay Mua cho mình, nhập người nhận và địa chỉ, chọn hình thức thanh toán.',
+      'Có thể thêm lời chúc (chữ, giọng nói hoặc video) gắn mã QR trên thiệp cảm ơn; soạn hoặc sửa lời chúc sau khi đặt, đến khi đèn được đóng gói.',
+      'Theo dõi đơn trong Tài khoản, mục Đơn hàng.',
+    ],
+    contact: contact || null,
+  }
+}
+
+export async function runTool(name, args, { repo, lang, user = null, phones = [], failKey = null, now = Date.now(), facts = {} }) {
   switch (name) {
     case 'get_products': {
       const { items } = await listPublicProducts(repo, lang)
@@ -129,6 +172,8 @@ export async function runTool(name, args, { repo, lang, user = null, phones = []
       const { items } = await listPublicFaq(repo, lang)
       return { faq: items.map((f) => ({ question: f.question, answer: f.answer })) }
     }
+    case 'get_policies':
+      return policies(repo, facts)
     case 'get_my_orders': {
       if (!user) return { error: 'login_required' }
       const list = await repo.listOrdersByUser(user.id, { limit: 5 })

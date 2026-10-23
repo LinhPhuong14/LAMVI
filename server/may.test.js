@@ -98,7 +98,7 @@ describe('Trả lời bằng dữ liệu thật (FR-AI-003, BR-AI-001, BR-AI-003
     expect(res.body.reply).toEqual({ kind: 'answer', text: 'Đèn Vọng giá 1.050.000 ₫ (đã gồm VAT).' })
     const toolMsg = openai.calls[1].messages.find((m) => m.role === 'tool')
     expect(JSON.parse(toolMsg.content).products.map((p) => p.slug)).toEqual(['den-nguyet', 'den-vong', 'den-sum-vay', 'den-tinh', 'den-hoi-xuan', 'den-hoi-ha', 'den-hoi-thu', 'den-hoi-dong'])
-    expect(openai.calls[0].tools.map((t) => t.function.name)).toEqual(['get_products', 'get_product', 'get_faq', 'get_my_orders', 'lookup_order'])
+    expect(openai.calls[0].tools.map((t) => t.function.name)).toEqual(['get_products', 'get_product', 'get_faq', 'get_policies', 'get_my_orders', 'lookup_order'])
   })
 
   it('BR-AI-003: số không có trong kết quả hàm của lượt đó → chặn, trả câu "chưa biết"', async () => {
@@ -309,5 +309,74 @@ describe('Kênh người thật mặc định (feedback 08/10, 33.2)', () => {
     const res = await chat({ message: 'giá?' })
     expect(res.body.reply.kind).toBe('unknown')
     expect(res.body.reply.text).toContain('0901 234 567 · hotro@lamvi.example')
+  })
+})
+
+// D-67 + hotfix "Mây chỉ trả lời chưa biết": get_policies và thử lại một lần khi câu trả lời đầu bị chặn
+describe('Mây biết chính sách và không trả lời cụt (get_policies, thử lại)', () => {
+  it('get_policies: COD-only khi payOS tắt, có phí ship và mốc miễn phí từ cấu hình giá, 7 ngày đổi trả', async () => {
+    await enable()
+    let toolOut
+    build([
+      callTool('get_policies'),
+      (messages) => {
+        toolOut = JSON.parse(messages.at(-1).content)
+        return say('Phí ship đồng giá 30.000 đ, miễn phí từ 1.000.000 đ. Bạn thanh toán khi nhận hàng nhé.')()
+      },
+    ])
+    const r = await chat({ message: 'Ship bao nhiêu tiền?' })
+    expect(r.body.reply.kind).toBe('answer')
+    expect(toolOut.payment.methods).toEqual(['Thanh toán khi nhận hàng (COD)'])
+    expect(toolOut.payment.note).toMatch(/kể cả đơn tặng/)
+    expect(toolOut.returns.windowDays).toBe(7)
+    expect(toolOut.delivery.flatFeeVnd).toBeGreaterThan(0)
+    expect(toolOut.orderingSteps.length).toBeGreaterThanOrEqual(4)
+    // 30.000 và 1.000.000 nằm trong dữ liệu hàm → không bị chặn bởi BR-AI-003
+    expect(r.body.reply.text).toContain('30.000')
+  })
+
+  it('payOS bật: liệt kê cả payOS; đổi trả bật: chỉ lối gửi yêu cầu trực tuyến', async () => {
+    await enable()
+    openai = fakeOpenAi([callTool('get_policies'), say('ok')])
+    const may = createMayService({ repo, openai, now: () => clock, random: () => 0, payosEnabled: true, returnsEnabled: true })
+    app = createApp({ repo, auth, storage: createMemoryStorage(), config: { publicSiteUrl: 'https://moc.test' }, may })
+    await chat({ message: 'Thanh toán thế nào?' })
+    const out = JSON.parse(openai.calls[1].messages.at(-1).content)
+    expect(out.payment.methods).toHaveLength(2)
+    expect(out.returns.requestOnline).toMatch(/trang chi tiết đơn hàng/)
+  })
+
+  it('câu trả lời đầu có số lạ bị chặn → thử lại một lần có nhắc luật → trả lời được nhận', async () => {
+    await enable()
+    build([
+      callTool('get_products'),
+      say('Đèn Thu Hoạch giá 9.999.999 đ'), // số không có trong dữ liệu → chặn
+      callTool('get_products'),
+      (messages) => {
+        // lần thử lại có thông điệp hệ thống nhắc luật
+        expect(messages.some((m) => m.role === 'system' && /rejected by a safety check/.test(m.content))).toBe(true)
+        return say('Đèn có nhiều mẫu, bạn xem trang Cửa hàng nhé.')()
+      },
+    ])
+    const r = await chat({ message: 'Đèn nào giá rẻ nhất?' })
+    expect(r.body.reply).toMatchObject({ kind: 'answer', text: 'Đèn có nhiều mẫu, bạn xem trang Cửa hàng nhé.' })
+    expect(openai.calls).toHaveLength(4)
+  })
+
+  it('cả hai lần đều bị chặn → "chưa biết" kèm kênh liên hệ; chi phí tính cả hai lần', async () => {
+    await enable()
+    build([callTool('get_products'), say('Giá 8.888.888 đ'), callTool('get_products'), say('Giá 7.777.777 đ')])
+    const r = await chat({ message: 'Giá?' })
+    expect(r.body.reply.kind).toBe('unknown')
+    const usage = await repo.getMayUsage('2026-09')
+    expect(usage.promptTokens).toBeGreaterThanOrEqual(400)
+  })
+
+  it('model lặp hàm hết vòng (không có chữ) → không thử lại, "chưa biết"', async () => {
+    await enable()
+    build([callTool('get_faq')])
+    const r = await chat({ message: 'Hỏi gì đó' })
+    expect(r.body.reply.kind).toBe('unknown')
+    expect(openai.calls).toHaveLength(4) // MAX_ROUNDS, không nhân đôi
   })
 })
