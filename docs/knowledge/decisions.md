@@ -416,3 +416,8 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - Đã cân nhắc nhúng trình phát Google Drive: bỏ, vì PO muốn video nằm trên web; Drive có hạn mức lượt xem, hiện giao diện Drive và cần mở `frame-src`.
 - Nén từ tệp gốc 2560×1440 (154–182 MB): `ffmpeg -i in.mp4 -vf scale=-2:720 -c:v libx264 -preset slow -crf 27|29 -profile:v high -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart <slug>-720.mp4` (Đông Hồ 84 s → 15 MB, CRF 27; giấy dó 99 s → 20 MB, CRF 29). Poster: `ffmpeg -ss <t> -i in.mp4 -frames:v 1 -vf scale=1280:-2 -c:v libwebp -quality 78 <slug>-poster.webp` (Đông Hồ t=12 s — khung tiêu đề nghệ nhân; giấy dó t=50 s — xeo giấy).
 - Chromium của Playwright không có H.264 → không kiểm phát video tự động được; trình duyệt thật (Chrome, Safari, Edge, Firefox) đều phát H.264.
+
+### T-90 — Tự phát video khi cuộn tới; ảnh đèn từ ảnh chụp thật (2026-10-23)
+
+- D-119: `CraftVideo` dùng `IntersectionObserver` (ngưỡng 0,5): vào khung → `muted = true` + `play()` (chính sách autoplay của Chrome/Safari chỉ cho tự phát khi tắt tiếng); ra khỏi khung → `pause()`. Phân biệt dừng do cuộn và do người xem bấm (cờ `autoPausing`) để không tự phát lại khi người xem đã dừng; người xem đã bật tiếng (`volumechange`) thì không ép tắt tiếng lại; đọc entry mới nhất của observer (cuộn nhanh dồn nhiều entry). Không dùng thuộc tính `autoplay` (SSR sẽ khiến trình duyệt tải video ngay khi vào trang); giữ `preload="none"`. `useHydratedReducedMotion` → không tự phát. Có `loop`.
+- Ảnh đèn: `scripts/gen_lamp_photos.py` (rembg `isnet-general-use`, ngoài dependencies). Dây điện dính liền đế nên đế cắt đối xứng quanh tâm chao (nửa rộng phía ngắn hơn). Giữ tên tệp cũ → `server/domain/photos.js`, hero, lookbook không đổi code.

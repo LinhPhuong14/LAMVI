@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from 'vitest'
-import { render } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render } from '@testing-library/react'
 import { LazyMotion, domAnimation } from 'framer-motion'
 import { LocaleContext } from '../i18n/index.js'
 import CraftFilms, { CraftVideo } from './CraftFilms.jsx'
@@ -51,5 +51,67 @@ describe('CraftFilms — video làng nghề tự host (D-118)', () => {
       expect(msg.artisan.videoTitle).toBeTruthy()
       expect(msg.artisan.videoCaption).toBeTruthy()
     }
+  })
+})
+
+describe('CraftVideo — tự phát khi cuộn tới', () => {
+  let observers = []
+  const realIO = window.IntersectionObserver
+  const setup = () => {
+    observers = []
+    window.IntersectionObserver = class {
+      constructor(cb, opts) {
+        this.cb = cb
+        this.opts = opts
+        observers.push(this)
+      }
+      observe() {}
+      disconnect() {}
+    }
+    const { container } = render(<CraftVideo film={CRAFT_FILMS.paper} title="Giấy dó" />)
+    const video = container.querySelector('video')
+    let paused = true
+    Object.defineProperty(video, 'paused', { get: () => paused })
+    video.play = vi.fn(() => {
+      paused = false
+      fireEvent.play(video)
+      return Promise.resolve()
+    })
+    video.pause = vi.fn(() => {
+      paused = true
+      fireEvent.pause(video)
+    })
+    const see = (isIntersecting) => act(() => observers[0].cb([{ isIntersecting }]))
+    return { video, see }
+  }
+  afterEach(() => {
+    window.IntersectionObserver = realIO
+  })
+
+  it('vào khung nhìn ≥ 50% → tự phát không tiếng; ra khỏi → dừng; vào lại → phát tiếp', () => {
+    const { video, see } = setup()
+    expect(observers[0].opts.threshold).toBe(0.5)
+    see(true)
+    expect(video.play).toHaveBeenCalledTimes(1)
+    expect(video.muted).toBe(true)
+    see(false)
+    expect(video.pause).toHaveBeenCalledTimes(1)
+    see(true)
+    expect(video.play).toHaveBeenCalledTimes(2)
+  })
+
+  it('người xem bấm dừng thì cuộn ra vào không tự phát lại', () => {
+    const { video, see } = setup()
+    see(true)
+    act(() => video.pause()) // người xem bấm dừng (không phải do cuộn)
+    see(false)
+    see(true)
+    expect(video.play).toHaveBeenCalledTimes(1)
+  })
+
+  it('không gắn thuộc tính autoplay (chỉ phát khi thấy, SSR không tự tải video)', () => {
+    const { video } = setup()
+    expect(video.hasAttribute('autoplay')).toBe(false)
+    expect(video).toHaveAttribute('preload', 'none')
   })
 })
