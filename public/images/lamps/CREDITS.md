@@ -11,9 +11,9 @@ Nhóm LAMVI gửi ảnh chụp sản phẩm thật (nền đỏ, 1086×1448). `s
 | `tu-linh` | Ảnh chụp thật (rồng/phượng) |
 | `phuc-loc-song-toan` | Ảnh chụp thật (em bé ôm cá chép) |
 | `tam-duong-khai-thai` | Ảnh chụp thật (gà trống) |
-| `lon-dan` | **Chưa thay** — vẫn là ảnh dựng từ thumbnail fanpage (mô tả bên dưới); chờ tệp ảnh chụp thật mẫu đàn lợn |
+| `lon-dan` | Ảnh chụp thật (đàn lợn vàng/xanh/đỏ) |
 
-Các mục dưới đây mô tả bộ ảnh cũ, nay chỉ còn áp dụng cho `lon-dan`.
+Các mục dưới đây mô tả bộ ảnh cũ (dựng từ thumbnail fanpage), **không còn tệp nào dùng** — giữ làm lịch sử.
 
 
 Lấy ngày 2026-10-14 từ **fanpage chính thức của LAMVI** (https://www.facebook.com/profile.php?id=61593996136514), mục Ảnh hiển thị công khai khi chưa đăng nhập. Chủ sở hữu: nhóm LAMVI.
