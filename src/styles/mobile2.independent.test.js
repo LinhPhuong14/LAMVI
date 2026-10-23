@@ -7,9 +7,9 @@ const tail = css.slice(start)
 const blocks = tail.split(/@media \(max-width: 640px\) \{/).slice(1)
 
 describe('mobile phase 2 CSS (static)', () => {
-  it('có hai khối @media (max-width: 640px) ở cuối pages.css', () => {
+  it('có ít nhất hai khối @media (max-width: 640px) sau tiêu đề đợt 2 (đợt 3 thêm khối khác)', () => {
     expect(start).toBeGreaterThan(0)
-    expect(blocks.length).toBe(2)
+    expect(blocks.length).toBeGreaterThanOrEqual(2)
   })
   it('min-width: 0 cho con của .pdp-grid', () => {
     expect(blocks[0]).toMatch(/\.pdp-grid,\s*\.pdp-grid > \*,[\s\S]*?\{\s*min-width: 0;/)

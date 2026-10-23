@@ -1,5 +1,10 @@
 # Nhật ký phiên
 
+## 2026-10-23 (phiên 2) — Giao diện điện thoại đợt 3 (nhánh `feat/mobile-ux3`, D-117)
+
+Đo từng khối trong các mục dài: số liệu 5/3/1 xếp 3 tầng 352px → lưới 3 cột; timeline 751px, hỏi đáp 1.015px → bớt padding. Trang chủ 11.156 → 10.495px. Không rút thêm: phần còn lại là chữ và ảnh nội dung. Thử trên máy thật là bước còn thiếu.
+
+---
 ## 2026-10-23 — Giao diện điện thoại đợt 2 (nhánh `feat/mobile-ux2`, D-116)
 
 Đo từng mục trang chủ ở 390 px: sản phẩm 3.103 px, story 1.907, faq 1.405… → giảm padding mục (110–120 → 64), dải vuốt ngang cho thẻ đèn, đưa nút mua lên trước mô tả, gọn giỏ hàng. Chụp giỏ/thanh toán bằng tài khoản thử tạo qua API (`/api/auth/register` + `/login`, `PUT /api/cart/items/:slug`). **Lỗi tự gây ra ở đợt 1 và đã sửa**: hàng chip `.shop-perks` (nowrap, cuộn ngang) làm cột lưới trang sản phẩm rộng hơn màn hình → nội dung bị cắt mép phải; sửa bằng `min-width: 0` trên `.pdp-grid > *`. **Còn lại (đợt 3 nếu cần)**: trang chủ còn ~11.100 px (story 1.860, qr 1.420, faq 1.310), thanh toán trên điện thoại, kiểm bằng máy thật.

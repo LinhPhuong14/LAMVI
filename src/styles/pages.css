@@ -5506,3 +5506,59 @@
       'qty qty total';
   }
 }
+
+/* ======================================================================
+   Giao diện điện thoại — đợt 3: số liệu một hàng ba cột, các mục chữ gọn hơn
+   ====================================================================== */
+@media (max-width: 640px) {
+  /* Số liệu 5 / 3 / 1: ba cột ngăn bằng nét chấm dọc (trước đây xếp 3 tầng, ~350px) */
+  .story-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 36px;
+    gap: 0;
+  }
+  .story-stats > div {
+    min-width: 0;
+    width: auto;
+    padding: 4px 8px;
+    gap: 4px;
+    text-align: center;
+  }
+  .story-stats > div + div {
+    border-top: 0;
+    border-left: 1px dashed rgba(226, 198, 143, 0.35);
+  }
+  .story-stats strong {
+    font-size: 2rem;
+  }
+  .story-stats > div > span {
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+  .story-cover {
+    margin-top: 28px;
+  }
+  .folk-gallery {
+    margin-top: 36px;
+  }
+
+  /* Quy trình: bước gọn hơn */
+  .timeline li {
+    padding: 16px 4px 6px;
+    gap: 6px;
+  }
+  .timeline-index {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+  }
+
+  /* Hỏi đáp: hàng câu hỏi thấp hơn nhưng vẫn ≥ 44px để chạm */
+  .faq-question {
+    padding: 12px 4px;
+    font-size: 1.04rem;
+    min-height: 48px;
+  }
+}
