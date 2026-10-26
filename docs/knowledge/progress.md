@@ -174,3 +174,9 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 |---|---|---|---|
 | Thiết kế lại trang bộ sưu tập: sân khấu + danh sách biên tập | ✅ code | `src/pages/CollectionPage.jsx`, `src/styles/gallery.css` (`.cp-*`); `src/pages/CollectionPage.test.jsx` | Ảnh gốc từng đèn (G-110) |
 
+| Đợt v0.67 (D-121) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Bảng màu theo brand guideline (T-92) | ✅ code | `src/index.css`, `App.css`, `pages.css`, `server/mail/layout.js`; `Palette.extra.test.jsx` | og:image, minh hoạ đèn/mẫu (G-119) |
+| Font Cormorant Garamond | ✅ code | `src/main.jsx`, `index.html` | gỡ gói Fraunces |
+| Video giới thiệu đầu trang chủ | ✅ code | `IntroFilm` ở `CraftFilms.jsx`, `HomePage.jsx`; `server/craftFilms.independent.test.js` | bản mobile nhẹ, video không phụ đề (G-119) |
+

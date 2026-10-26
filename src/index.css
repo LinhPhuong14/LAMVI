@@ -1,34 +1,36 @@
 /*
- * Bảng màu LAMVI — lấy từ bột màu tự nhiên của tranh Đông Hồ (xem docs/knowledge/design-rules.md).
- * Tỉ lệ dùng: ~70% giấy · ~20% mực (than, chàm) · ~7% son · ~3% hoè. Lá và hồng chỉ dùng trong minh hoạ.
+ * Bảng màu LAMVI theo brand guideline (xem docs/knowledge/design-rules.md §2):
+ * Cream Ivory #F4E8CF · Light Beige #EAD6B7 · Caramel #C89A63 · Warm Brown #8B5E3C · Deep Brown #3F200B.
+ * Tên token giữ nguyên để không phải sửa component. Tỉ lệ dùng: ~70% ivory/beige · ~20% deep brown · ~7% warm brown · ~3% caramel.
+ * Lá và hồng chỉ dùng trong minh hoạ.
  */
 :root {
-  /* Giấy điệp: nền trắng ngà, để tranh và ảnh thật nổi lên */
-  --diep: #f4ede0;
-  --diep-deep: #e9dfcb;
-  --diep-light: #fbf7ef;
-  /* Mực than tre: chữ và mảng tối */
-  --than: #2a211b;
-  --than-2: #3a2c22;
-  --than-soft: #5a4b3e;
-  /* Đỏ son (sỏi son): điểm nhấn duy nhất — nút chính, ấn triện, số liệu then chốt */
-  --son: #a3321f;
-  --son-deep: #7c2617;
-  /* Ấn triện (con dấu LAMVI, huy hiệu): nâu be thay cho đỏ son (21/10) */
-  --nau-be: #8a6a4b;
-  --nau-be-light: #a98763;
-  /* Vàng hoè ngả đồng: ánh đèn, nét mảnh trên nền tối — dùng ít */
-  --hoe: #bf8a3a;
-  --hoe-light: #e2c68f;
-  /* Xanh chàm: mảng nền tối (Di sản, Lookbook) */
-  --cham: #26374a;
-  --cham-deep: #1a2735;
+  /* Cream Ivory / Light Beige: nền ngà, để tranh và ảnh thật nổi lên */
+  --diep: #f4e8cf;
+  --diep-deep: #ead6b7;
+  --diep-light: #faf3e1;
+  /* Deep Brown: chữ và mảng tối */
+  --than: #3f200b;
+  --than-2: #55331a;
+  --than-soft: #6b4426;
+  /* Warm Brown: điểm nhấn chính — nút chính, ấn triện, số liệu then chốt (chữ trắng ngà trên nền này đạt 4,6:1) */
+  --son: #8b5e3c;
+  --son-deep: #5f3e22;
+  /* Ấn triện (con dấu LAMVI, huy hiệu) */
+  --nau-be: #8b5e3c;
+  --nau-be-light: #c89a63;
+  /* Caramel: ánh đèn, nét mảnh trên nền tối — dùng ít (không dùng làm chữ trên nền sáng) */
+  --hoe: #c89a63;
+  --hoe-light: #ead6b7;
+  /* Mảng nền tối (Di sản, Lookbook): Deep Brown */
+  --cham: #3f200b;
+  --cham-deep: #2b1607;
   /* Chỉ dùng trong minh hoạ và nhãn nhỏ */
   --la: #5b6b4c;
   --hong: #c97f66;
   /* Sepia: nét mảnh, nhãn phụ (đạt 4,5:1 trên --diep) */
-  --sepia: #7a5d3c;
-  --line: #d6c7a8;
+  --sepia: #7a5233;
+  --line: #d9bf96;
 
   /* Bí danh cho các trang khác (tài khoản, lô, admin, IT) vẫn dùng tên biến cũ */
   --paper: var(--diep);
@@ -45,12 +47,12 @@
   --shadow-soft: var(--print);
   --shadow-glow: 0 0 70px 10px rgba(214, 156, 52, 0.35);
 
-  --serif: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+  --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Nét mảnh và bóng mềm như tranh treo — không dùng viền đen dày, bóng đổ cứng */
-  --hair: rgba(122, 93, 60, 0.42);
-  --hair-soft: rgba(122, 93, 60, 0.2);
+  --hair: rgba(122, 82, 51, 0.42);
+  --hair-soft: rgba(122, 82, 51, 0.2);
   --print: 0 1px 2px rgba(60, 40, 20, 0.06), 0 12px 28px -18px rgba(60, 40, 20, 0.4);
   --print-lg: 0 2px 4px rgba(60, 40, 20, 0.06), 0 26px 50px -30px rgba(60, 40, 20, 0.5);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -62,14 +64,14 @@
   --r-lg: 28px;
 
   /* Kính mờ (T-45): thẻ trên giấy/cảnh nền. Phần tử dính/cố định KHÔNG dùng blur (design-rules §9) */
-  --g-bg: rgba(251, 247, 239, 0.62);
-  --g-bg-strong: rgba(251, 247, 239, 0.8);
+  --g-bg: rgba(250, 243, 225, 0.62);
+  --g-bg-strong: rgba(250, 243, 225, 0.8);
   --g-border: rgba(255, 255, 255, 0.7);
   --g-blur: blur(14px) saturate(140%);
   --g-shadow: 0 1px 0 rgba(255, 255, 255, 0.75) inset, 0 24px 48px -30px rgba(96, 62, 28, 0.45);
 
   /* Vân giấy dó: sợi dó ngắn uốn cong nhiều hướng + lấm tấm bột giấy */
-  --tex-fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cg fill='none' stroke='%237a5530' stroke-linecap='round'%3E%3Cpath d='M145 179Q147 196 148 211' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M152 196Q148 203 154 209' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M314 309Q305 314 305 332' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M11 281Q-0 290 -7 297' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M75 94Q81 94 83 96' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M81 243Q93 238 103 245' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M124 307Q135 312 154 307' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M314 127Q316 128 310 136' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M106 309Q116 308 132 319' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M255 57Q253 71 259 79' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M206 37Q210 50 221 49' stroke-opacity='0.16' stroke-width='0.6'/%3E%3Cpath d='M67 126Q55 147 54 153' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M83 247Q82 248 93 261' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M192 119Q182 121 173 121' stroke-opacity='0.2' stroke-width='0.6'/%3E%3Cpath d='M201 99Q202 101 196 113' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M304 282Q301 287 310 305' stroke-opacity='0.16' stroke-width='0.6'/%3E%3Cpath d='M237 125Q228 128 219 131' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M73 179Q65 199 62 207' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M5 86Q10 86 25 90' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M116 285Q111 301 100 315' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M11 6Q8 12 -7 31' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M22 100Q26 99 33 102' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M236 41Q238 56 252 70' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M302 10Q315 8 323 11' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M23 29Q26 31 31 37' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M148 173Q145 178 147 195' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M306 36Q299 54 293 61' stroke-opacity='0.16' stroke-width='0.8'/%3E%3Cpath d='M46 196Q36 209 30 211' stroke-opacity='0.2' stroke-width='0.6'/%3E%3Cpath d='M105 213Q110 225 107 226' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M70 295Q74 303 83 300' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M21 314Q34 325 48 324' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M200 158Q200 161 186 166' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M89 194Q95 206 105 214' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M43 146Q36 143 36 150' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M37 35Q30 39 28 55' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M264 82Q255 85 245 100' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M249 173Q256 184 249 205' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M131 286Q129 300 134 304' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M176 209Q165 212 158 220' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M231 262Q219 277 215 281' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M172 253Q169 253 156 258' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M141 176Q135 194 142 204' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M256 55Q244 56 243 66' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M185 221Q189 239 191 248' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M165 290Q167 302 157 303' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M272 310Q266 321 267 331' stroke-opacity='0.1' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  --tex-fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cg fill='none' stroke='%237a5233' stroke-linecap='round'%3E%3Cpath d='M145 179Q147 196 148 211' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M152 196Q148 203 154 209' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M314 309Q305 314 305 332' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M11 281Q-0 290 -7 297' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M75 94Q81 94 83 96' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M81 243Q93 238 103 245' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M124 307Q135 312 154 307' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M314 127Q316 128 310 136' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M106 309Q116 308 132 319' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M255 57Q253 71 259 79' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M206 37Q210 50 221 49' stroke-opacity='0.16' stroke-width='0.6'/%3E%3Cpath d='M67 126Q55 147 54 153' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M83 247Q82 248 93 261' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M192 119Q182 121 173 121' stroke-opacity='0.2' stroke-width='0.6'/%3E%3Cpath d='M201 99Q202 101 196 113' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M304 282Q301 287 310 305' stroke-opacity='0.16' stroke-width='0.6'/%3E%3Cpath d='M237 125Q228 128 219 131' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M73 179Q65 199 62 207' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M5 86Q10 86 25 90' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M116 285Q111 301 100 315' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M11 6Q8 12 -7 31' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M22 100Q26 99 33 102' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M236 41Q238 56 252 70' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M302 10Q315 8 323 11' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M23 29Q26 31 31 37' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M148 173Q145 178 147 195' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M306 36Q299 54 293 61' stroke-opacity='0.16' stroke-width='0.8'/%3E%3Cpath d='M46 196Q36 209 30 211' stroke-opacity='0.2' stroke-width='0.6'/%3E%3Cpath d='M105 213Q110 225 107 226' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M70 295Q74 303 83 300' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M21 314Q34 325 48 324' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M200 158Q200 161 186 166' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M89 194Q95 206 105 214' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M43 146Q36 143 36 150' stroke-opacity='0.1' stroke-width='1'/%3E%3Cpath d='M37 35Q30 39 28 55' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M264 82Q255 85 245 100' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M249 173Q256 184 249 205' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M131 286Q129 300 134 304' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M176 209Q165 212 158 220' stroke-opacity='0.13' stroke-width='0.6'/%3E%3Cpath d='M231 262Q219 277 215 281' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M172 253Q169 253 156 258' stroke-opacity='0.1' stroke-width='0.6'/%3E%3Cpath d='M141 176Q135 194 142 204' stroke-opacity='0.1' stroke-width='0.8'/%3E%3Cpath d='M256 55Q244 56 243 66' stroke-opacity='0.2' stroke-width='0.8'/%3E%3Cpath d='M185 221Q189 239 191 248' stroke-opacity='0.13' stroke-width='1'/%3E%3Cpath d='M165 290Q167 302 157 303' stroke-opacity='0.13' stroke-width='0.8'/%3E%3Cpath d='M272 310Q266 321 267 331' stroke-opacity='0.1' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
   --tex-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.28 0 0 0 0 0.14 0 0 0 0.11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   /* Vết ố (foxing) của giấy để lâu năm */
   --tex-foxing: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='9'/%3E%3C/filter%3E%3Cg fill='%23a0682c' filter='url(%23b)'%3E%3Ccircle cx='120' cy='160' r='30' opacity='.07'/%3E%3Ccircle cx='700' cy='520' r='46' opacity='.05'/%3E%3Ccircle cx='330' cy='720' r='22' opacity='.07'/%3E%3C/g%3E%3Cg fill='%238b5a2b'%3E%3Ccircle cx='470' cy='360' r='1.6' opacity='.25'/%3E%3Ccircle cx='190' cy='520' r='1.2' opacity='.3'/%3E%3Ccircle cx='820' cy='140' r='1.4' opacity='.25'/%3E%3C/g%3E%3C/svg%3E");
@@ -77,10 +79,10 @@
   --tex-worn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.97 0 0 0 0 0.93 0 0 0 0 0.84 0 0 0 -22 8.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E");
 
   /* Góc hoa văn triện (móc vuông) cho khung viền đôi */
-  --corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath transform='' d='M1.5 26 V1.5 H26 M7 26 V7 H20 V14 H14' fill='none' stroke='%238b6a45' stroke-opacity='.75' stroke-width='1.2'/%3E%3C/svg%3E");
-  --corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath transform='translate(28 0) scale(-1 1)' d='M1.5 26 V1.5 H26 M7 26 V7 H20 V14 H14' fill='none' stroke='%238b6a45' stroke-opacity='.75' stroke-width='1.2'/%3E%3C/svg%3E");
-  --corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath transform='translate(0 28) scale(1 -1)' d='M1.5 26 V1.5 H26 M7 26 V7 H20 V14 H14' fill='none' stroke='%238b6a45' stroke-opacity='.75' stroke-width='1.2'/%3E%3C/svg%3E");
-  --corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath transform='translate(28 28) scale(-1 -1)' d='M1.5 26 V1.5 H26 M7 26 V7 H20 V14 H14' fill='none' stroke='%238b6a45' stroke-opacity='.75' stroke-width='1.2'/%3E%3C/svg%3E");
+  --corner-tl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath transform='' d='M1.5 26 V1.5 H26 M7 26 V7 H20 V14 H14' fill='none' stroke='%238b5e3c' stroke-opacity='.75' stroke-width='1.2'/%3E%3C/svg%3E");
+  --corner-tr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath transform='translate(28 0) scale(-1 1)' d='M1.5 26 V1.5 H26 M7 26 V7 H20 V14 H14' fill='none' stroke='%238b5e3c' stroke-opacity='.75' stroke-width='1.2'/%3E%3C/svg%3E");
+  --corner-bl: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath transform='translate(0 28) scale(1 -1)' d='M1.5 26 V1.5 H26 M7 26 V7 H20 V14 H14' fill='none' stroke='%238b5e3c' stroke-opacity='.75' stroke-width='1.2'/%3E%3C/svg%3E");
+  --corner-br: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath transform='translate(28 28) scale(-1 -1)' d='M1.5 26 V1.5 H26 M7 26 V7 H20 V14 H14' fill='none' stroke='%238b5e3c' stroke-opacity='.75' stroke-width='1.2'/%3E%3C/svg%3E");
 
   /* Hoa văn mây chìm cùng tông cho mảng màu tối */
   --pat-cloud: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='170'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='0.07' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M10 58 H150 C150 44 138 36 126 40 C124 22 104 14 92 26 C86 10 62 8 54 26 C44 18 28 24 30 38 C18 36 10 46 10 58 Z M62 44 C62 34 76 32 78 42 C79 48 70 49 70 44'/%3E%3Cpath transform='translate(150 95) scale(.8)' d='M10 58 H150 C150 44 138 36 126 40 C124 22 104 14 92 26 C86 10 62 8 54 26 C44 18 28 24 30 38 C18 36 10 46 10 58 Z M62 44 C62 34 76 32 78 42 C79 48 70 49 70 44'/%3E%3C/g%3E%3C/svg%3E");

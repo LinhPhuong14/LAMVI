@@ -71,10 +71,10 @@ export function maintenancePage(lang) {
     <meta name="robots" content="noindex" />
     <title>${t('maintenance.title')}</title>
     <style>
-      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f7f0e4; color: #3a2c22;
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f4e8cf; color: #55331a;
         font: 17px/1.6 'Be Vietnam Pro', system-ui, sans-serif; text-align: center; padding: 24px; }
       h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 2.4rem; margin: 0 0 12px; }
-      .mark { letter-spacing: 0.08em; color: #6b4226; font-family: Georgia, serif; font-size: 1.4rem; }
+      .mark { letter-spacing: 0.08em; color: #6b4426; font-family: Georgia, serif; font-size: 1.4rem; }
     </style>
   </head>
   <body>

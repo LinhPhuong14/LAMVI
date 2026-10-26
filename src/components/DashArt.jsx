@@ -2,10 +2,10 @@
 // biểu tượng nhỏ trong thẻ là SVG nét mảnh cùng bảng màu (design-rules §2). Chỉ trang trí → aria-hidden.
 
 const INK = '#3a2a1e'
-const PAPER = '#f4ede0'
-const PAPER_DEEP = '#e9dfcb'
-const HOE = '#e2c68f'
-const SON = '#a3321f'
+const PAPER = '#f4e8cf'
+const PAPER_DEEP = '#ead6b7'
+const HOE = '#ead6b7'
+const SON = '#8b5e3c'
 
 function Svg({ children, className = '', size = 64 }) {
   return (

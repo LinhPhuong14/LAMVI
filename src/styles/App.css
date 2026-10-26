@@ -198,7 +198,7 @@
 }
 
 .btn-ghost:hover {
-  background: rgba(191, 138, 58, 0.12);
+  background: rgba(200, 154, 99, 0.12);
   border-color: var(--sepia);
 }
 
@@ -361,7 +361,7 @@
   font-style: italic;
   font-weight: 600;
   color: var(--son);
-  background: linear-gradient(transparent 70%, rgba(191, 138, 58, 0.42) 70% 92%, transparent 92%);
+  background: linear-gradient(transparent 70%, rgba(200, 154, 99, 0.42) 70% 92%, transparent 92%);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
@@ -697,8 +697,8 @@
 
 .marquee {
   overflow: hidden;
-  border-top: 3px double rgba(191, 138, 58, 0.55);
-  border-bottom: 3px double rgba(191, 138, 58, 0.55);
+  border-top: 3px double rgba(200, 154, 99, 0.55);
+  border-bottom: 3px double rgba(200, 154, 99, 0.55);
   background: var(--than-2);
   padding: 13px 0;
   position: relative;
@@ -794,7 +794,7 @@
 }
 
 .story-stats > div + div {
-  border-left: 1px dashed rgba(226, 198, 143, 0.35);
+  border-left: 1px dashed rgba(234, 214, 183, 0.35);
 }
 
 .story-stats strong {
@@ -1137,8 +1137,8 @@
   background: var(--cham-deep);
   background-image:
     var(--tex-grain),
-    radial-gradient(circle at 20% 30%, rgba(191, 138, 58, 0.16), transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(163, 50, 31, 0.2), transparent 45%);
+    radial-gradient(circle at 20% 30%, rgba(200, 154, 99, 0.16), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(139, 94, 60, 0.2), transparent 45%);
   color: var(--diep);
 }
 
@@ -1316,7 +1316,7 @@
   left: 6%;
   right: 6%;
   height: 3px;
-  border-top: 3px dotted rgba(163, 50, 31, 0.3);
+  border-top: 3px dotted rgba(139, 94, 60, 0.3);
 }
 
 .timeline-beam {
@@ -1341,7 +1341,7 @@
   height: 14px;
   border-radius: 50%;
   background: radial-gradient(circle, #fff4cf 0 25%, var(--hoe) 50%, transparent 72%);
-  box-shadow: 0 0 14px 6px rgba(191, 138, 58, 0.45);
+  box-shadow: 0 0 14px 6px rgba(200, 154, 99, 0.45);
 }
 
 .timeline-label {
@@ -1516,8 +1516,8 @@
   /* Trăng rằm sau điện thoại: quầng sáng mềm, không viền */
   background: radial-gradient(circle at 42% 38%, #f6dca0, var(--hoe) 62%, #c98a2a);
   box-shadow:
-    0 0 0 14px rgba(191, 138, 58, 0.1),
-    0 0 0 30px rgba(191, 138, 58, 0.05);
+    0 0 0 14px rgba(200, 154, 99, 0.1),
+    0 0 0 30px rgba(200, 154, 99, 0.05);
 }
 
 .phone-frame {
@@ -1558,7 +1558,7 @@
   width: 100%;
   aspect-ratio: 9 / 12;
   background:
-    radial-gradient(circle at 50% 45%, rgba(191, 138, 58, 0.55), transparent 60%),
+    radial-gradient(circle at 50% 45%, rgba(200, 154, 99, 0.55), transparent 60%),
     var(--cham);
   border-radius: 18px;
   display: flex;
@@ -2115,7 +2115,7 @@
   }
   .story-stats > div + div {
     border-left: 0;
-    border-top: 1px dashed rgba(226, 198, 143, 0.35);
+    border-top: 1px dashed rgba(234, 214, 183, 0.35);
   }
   .timeline li:nth-child(2n) {
     border-left: 0;
@@ -2202,7 +2202,7 @@
   background: conic-gradient(
     from var(--thread-angle),
     transparent 0 62%,
-    rgba(226, 198, 143, 0.2) 70%,
+    rgba(234, 214, 183, 0.2) 70%,
     #ffe7a6 80%,
     var(--hoe) 84%,
     transparent 92%
@@ -2426,7 +2426,7 @@
   overflow-x: auto;
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
-  scrollbar-color: rgba(226, 198, 143, 0.35) transparent;
+  scrollbar-color: rgba(234, 214, 183, 0.35) transparent;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
   mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
 }
@@ -2732,9 +2732,9 @@
 /* Đăng nhập/đăng ký: nền trơn có vài quầng màu mờ (hoè, son nhạt, chàm) cho thẻ kính có cái để làm mờ */
 .scene-auth {
   background:
-    radial-gradient(60% 50% at 12% 18%, rgba(191, 138, 58, 0.22), transparent 70%),
-    radial-gradient(50% 45% at 88% 24%, rgba(163, 50, 31, 0.13), transparent 70%),
-    radial-gradient(70% 55% at 70% 92%, rgba(38, 55, 74, 0.2), transparent 70%),
+    radial-gradient(60% 50% at 12% 18%, rgba(200, 154, 99, 0.22), transparent 70%),
+    radial-gradient(50% 45% at 88% 24%, rgba(139, 94, 60, 0.13), transparent 70%),
+    radial-gradient(70% 55% at 70% 92%, rgba(63, 32, 11, 0.2), transparent 70%),
     linear-gradient(180deg, var(--diep-light), var(--diep));
 }
 
@@ -2783,8 +2783,8 @@
   inset: 0;
   z-index: -2;
   background:
-    linear-gradient(90deg, rgba(14, 22, 32, 0.86) 0%, rgba(14, 22, 32, 0.55) 48%, rgba(14, 22, 32, 0.25) 100%),
-    linear-gradient(to bottom, rgba(14, 22, 32, 0.45), transparent 30%, rgba(14, 22, 32, 0.6));
+    linear-gradient(90deg, rgba(30, 15, 5, 0.86) 0%, rgba(30, 15, 5, 0.55) 48%, rgba(30, 15, 5, 0.25) 100%),
+    linear-gradient(to bottom, rgba(30, 15, 5, 0.45), transparent 30%, rgba(30, 15, 5, 0.6));
 }
 
 /* Quầng sáng bokeh trôi chậm — chỉ trang trí, tắt khi giảm chuyển động */
@@ -2793,7 +2793,7 @@
   z-index: -1;
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(circle, rgba(226, 198, 143, 0.5), rgba(226, 198, 143, 0) 68%);
+  background: radial-gradient(circle, rgba(234, 214, 183, 0.5), rgba(234, 214, 183, 0) 68%);
   animation: auth-drift 16s ease-in-out infinite alternate;
 }
 
@@ -2875,7 +2875,7 @@
   margin: 24px 0 0;
   font-size: 1.05rem;
   line-height: 1.7;
-  color: rgba(251, 247, 239, 0.8);
+  color: rgba(250, 243, 225, 0.8);
 }
 
 .auth-aside-seal {
@@ -2906,7 +2906,7 @@
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .auth-panel {
-    background: rgba(251, 247, 239, 0.96);
+    background: rgba(250, 243, 225, 0.96);
   }
 }
 
@@ -2918,7 +2918,7 @@
   padding: 4px;
   margin-bottom: 26px;
   border-radius: 999px;
-  background: rgba(122, 93, 60, 0.12);
+  background: rgba(122, 82, 51, 0.12);
 }
 
 .auth-tabs a {
@@ -2962,7 +2962,7 @@
 
 .auth-panel .field input,
 .auth-panel .field select {
-  border-color: rgba(122, 93, 60, 0.3);
+  border-color: rgba(122, 82, 51, 0.3);
   border-radius: var(--r-sm);
   background: rgba(255, 255, 255, 0.7);
   transition:
@@ -2976,7 +2976,7 @@
   outline: none;
   border-color: var(--son);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(163, 50, 31, 0.16);
+  box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.16);
 }
 
 .auth-panel .form .btn-primary {
@@ -3012,7 +3012,7 @@
 }
 
 .field-pw-toggle:hover {
-  background: rgba(163, 50, 31, 0.08);
+  background: rgba(139, 94, 60, 0.08);
 }
 
 .field-pw-toggle:focus-visible {
@@ -3025,7 +3025,7 @@
   gap: 12px;
   color: var(--than);
   background: #fff;
-  border-color: rgba(122, 93, 60, 0.3);
+  border-color: rgba(122, 82, 51, 0.3);
   border-radius: var(--r-sm);
 }
 
@@ -3190,7 +3190,7 @@
 /* ---------- Header kính mờ (T-46, D-80) ----------
    Phá quy tắc cũ "phần tử dính không blur" theo yêu cầu PO; chỉ thanh điều hướng, blur vừa phải. */
 .nav {
-  background: rgba(244, 237, 224, 0.62);
+  background: rgba(244, 232, 207, 0.62);
   border-bottom: 1px solid var(--g-border);
   -webkit-backdrop-filter: var(--g-blur);
   backdrop-filter: var(--g-blur);
@@ -3321,7 +3321,7 @@
 }
 
 .cart-bubble-close:hover {
-  background: rgba(122, 93, 60, 0.12);
+  background: rgba(122, 82, 51, 0.12);
 }
 
 .cart-bubble-body {
@@ -3338,7 +3338,7 @@
   width: 56px;
   height: 56px;
   border-radius: var(--r-sm);
-  background: radial-gradient(circle at 50% 40%, rgba(226, 198, 143, 0.5), rgba(233, 223, 203, 0.7));
+  background: radial-gradient(circle at 50% 40%, rgba(234, 214, 183, 0.5), rgba(234, 214, 183, 0.7));
   overflow: hidden;
 }
 
@@ -3440,7 +3440,7 @@
 
 .page-auth .nav-auth,
 .page-auth .auth-foot {
-  background: rgba(244, 237, 224, 0.5);
+  background: rgba(244, 232, 207, 0.5);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   backdrop-filter: blur(18px) saturate(140%);
 }
@@ -3456,7 +3456,7 @@
 }
 
 .page-auth .auth-foot {
-  background: rgba(244, 237, 224, 0.5);
+  background: rgba(244, 232, 207, 0.5);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   backdrop-filter: blur(18px) saturate(140%);
 }
@@ -3484,7 +3484,7 @@
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .page-auth .nav-auth,
   .page-auth .auth-foot {
-    background: rgba(244, 237, 224, 0.92);
+    background: rgba(244, 232, 207, 0.92);
   }
 }
 
@@ -3592,4 +3592,95 @@
 .product-cutout {
   filter: drop-shadow(0 0 14px rgba(255, 200, 110, 0.6)) drop-shadow(0 8px 8px rgba(0, 0, 0, 0.3));
   animation: none;
+}
+
+/* Video giới thiệu toàn khung hình ở đầu trang chủ (khách quét QR thấy ngay) */
+.intro-film {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  background: var(--cham-deep);
+  color: var(--diep-light);
+}
+
+.intro-film-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.intro-film-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(43, 22, 7, 0.35) 0%, rgba(43, 22, 7, 0) 30%, rgba(43, 22, 7, 0.78) 100%);
+}
+
+.intro-film-copy {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+  padding: 0 clamp(20px, 6vw, 72px) clamp(56px, 10svh, 96px);
+  max-width: 880px;
+}
+
+.intro-film-brand {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  letter-spacing: 0.42em;
+  color: var(--hoe-light);
+}
+
+.intro-film-slogan {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.intro-film-slogan em {
+  display: block;
+  font-style: normal;
+  color: var(--hoe-light);
+}
+
+.intro-film-controls {
+  position: absolute;
+  right: clamp(16px, 4vw, 40px);
+  bottom: clamp(16px, 4vw, 40px);
+  display: flex;
+  gap: 10px;
+}
+
+.intro-film-controls button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(234, 214, 183, 0.6);
+  background: rgba(43, 22, 7, 0.55);
+  color: var(--diep-light);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.intro-film-controls button:hover {
+  background: rgba(43, 22, 7, 0.8);
+}
+
+@media (max-width: 640px) {
+  /* Chừa chỗ cho thanh tab đáy cố định (~72px) */
+  .intro-film-copy {
+    padding-bottom: 112px;
+  }
+
+  .intro-film-controls {
+    top: 16px;
+    bottom: auto;
+  }
 }

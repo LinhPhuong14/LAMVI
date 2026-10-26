@@ -161,6 +161,16 @@ export default {
       { label: 'Packing & thank-you card', note: 'The lantern and a thank-you card with a QR code are boxed' },
     ],
   },
+  intro: {
+    slogan1: 'Every Vietnamese stroke,',
+    slogan2: 'its own signature',
+    label: 'LAMVI introduction film: the dó paper village',
+    soundOn: 'Sound on',
+    soundOff: 'Sound off',
+    play: 'Play video',
+    pause: 'Pause video',
+    cta: 'View the collection',
+  },
   films: {
     eyebrow: 'See the craft',
     title: 'The dó paper that becomes the lantern',
