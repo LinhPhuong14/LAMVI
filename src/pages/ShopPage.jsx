@@ -5,6 +5,7 @@ import CollectionCard from '../components/CollectionCard'
 import ProductCards from '../components/ProductCards'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
+import PageArt from '../components/PageArt.jsx'
 import Seo from '../seo/Seo.jsx'
 import { breadcrumbJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
@@ -43,6 +44,7 @@ export default function ShopPage() {
 
   return (
     <section className="page-section shop">
+      <PageArt kind="lamps" />
       <Seo
         title={t('meta.shopTitle')}
         description={t('meta.shopDescription')}

@@ -134,7 +134,7 @@ export default function MayConfigPage() {
                   <span className="i18n-lang">{l.toUpperCase()}</span>
                   <textarea
                     rows={2}
-                    aria-label={`${S.may.groups[g]} — ${S.common.langs[l]}`}
+                    aria-label={`${S.may.groups[g]}: ${S.common.langs[l]}`}
                     value={form.lines[g][l]}
                     onChange={(e) => set({ lines: { ...form.lines, [g]: { ...form.lines[g], [l]: e.target.value } } })}
                   />

@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-26 (phiên 3) — Carousel, hero video, bỏ dấu gạch, thiết kế lại dashboard (nhánh `feat/motion-carousel`, D-123)
+
+PO: hình minh hoạ, hero ngắn và sống động, carousel, motion tự động, bỏ dấu gạch dài, video hero bị phóng to, tư duy lại dashboard khách và admin. Đã làm: toàn bộ trừ triển khai dashboard (mới có đề xuất ở `dashboard-ux.md`, cần PO duyệt thứ tự và 3 điểm cần BA). Thanh toán/đơn hàng/tài khoản: bước đánh số, tóm tắt đơn nền nâu đậm, dashboard sáng bỏ ảnh trời/đèn bay. Chưa làm: trang đơn cảm ơn mới chỉ chỉnh CSS (chưa kiểm ảnh), ảnh og:image.
+
+---
+
 ## 2026-10-26 (phiên 2) — Đợt chống AI slop (nhánh `feat/calm-ui`, D-122)
 
 PO: gỡ bớt hoạ tiết, căn section chuẩn hơn; hỏi có cần quyền crawl Behance/Pinterest → không (đăng nhập + cấm bot), dùng web công khai. Lần 1 gỡ quá tay → PO: "các trang bị đơn điệu quá, chỉnh cho thẩm mĩ hơn chứ không phải tối giản". Đọc kỹ các bài về nguyên nhân AI slop (xem T-93) rồi làm lại theo hướng biên tập có chủ đích: tiêu đề mục lớn đánh số, vòm cửa sổ, thẻ so le, chữ số lớn, nền xen kẽ, trang con đồng bộ, 404. Sửa lỗi hero mờ do cuộn tính từ đầu trang. Chưa làm: tài khoản, đơn hàng, checkout, admin; og:image.

@@ -184,3 +184,13 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 |---|---|---|---|
 | Gỡ hoạ tiết trang chủ, nền phẳng, nhịp section (T-93) | ✅ code | `HomePage.jsx`, `Scene.jsx`, cuối `pages.css`; test `ssr.*.extra`, `Folk.extra` đã cập nhật | trang con (shop, giỏ, đơn, tài khoản) |
 
+
+
+| Đợt v0.69 (D-123) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Carousel tự chạy | ✅ code | `Carousel.jsx`, `ProductCards.jsx`, `HomePage.jsx` | test riêng cho Carousel |
+| Hero video đúng tỉ lệ + chữ bên dưới ở mobile | ✅ code | `IntroFilm`, cuối `pages.css`; `craftFilms.independent.test.js` | bản video nhẹ cho mobile |
+| Hình minh hoạ trang con | ✅ code | `PageArt.jsx` | trang giỏ, đơn |
+| Bỏ dấu gạch dài khỏi nội dung | ✅ code | i18n, seed, mail, Mây | |
+| Thiết kế lại dashboard | 📝 đề xuất | `docs/knowledge/dashboard-ux.md` | PO duyệt, rồi triển khai |
+

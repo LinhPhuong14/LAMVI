@@ -2,10 +2,10 @@
 export default {
   routeLoad: { error: '页面暂时无法加载。请刷新后重试。', reload: '重新加载' },
   meta: {
-    shopTitle: '商店 — LAMVI · 手工宣纸灯笼',
+    shopTitle: '商店 · LAMVI · 手工宣纸灯笼',
     shopDescription: 'LAMVI 全部手工宣纸灯笼：按类型筛选，附带二维码祝福感谢卡和制作视频。',
-    productTitle: '{name} — LAMVI · 手工纸灯',
-    title: 'LAMVI — 手工纸灯',
+    productTitle: '{name} · LAMVI · 手工纸灯',
+    title: 'LAMVI · 手工纸灯',
     description: '手工纸灯礼物，附带二维码祝福和制灯过程视频。',
   },
   nav: {
@@ -33,7 +33,7 @@ export default {
     eyebrow: '手工纸 · 百年手艺村',
     title1: '每一盏灯，',
     title2: '都点亮一个故事',
-    sub: '送给亲人的手工纸灯——附带灯的制作历程和您的专属祝福，扫码即可开启。',
+    sub: '送给亲人的手工纸灯，附带灯的制作历程和您的专属祝福，扫码即可开启。',
     explore: '探索系列',
     story: '聆听手艺村的故事',
     scroll: '向下滚动',
@@ -42,17 +42,17 @@ export default {
   story: {
     eyebrow: '传承',
     title: '来自百年纸艺村',
-    text: '这种纸曾用于记录历史、印制东湖年画，承载了几代人的记忆。我们让这种材料以灯的形式重现——让您家庭的故事，由这份坚韧的材料点亮。',
+    text: '这种纸曾用于记录历史、印制东湖年画，承载了几代人的记忆。我们让这种材料以灯的形式重现，让您家庭的故事，由这份坚韧的材料点亮。',
     coverAlt: 'LAMVI 灯置于木桌上，身后是在阳光下晾晒的 dó 纸',
     statLamps: '盏灯，来自首个系列',
-    statStages: '段旅程：杨坞—风溪 → 东湖 → LAMVI',
+    statStages: '段旅程：杨坞，风溪 → 东湖 → LAMVI',
     statStory: '份专属祝福，伴随每份礼物',
   },
   // Phòng tranh: ảnh tư liệu public domain/CC0 (src/data/folkArt.js). Chú thích do dev soạn — chờ Marketing duyệt
   gallery: {
     label: '民间画廊',
     source: '图片来源',
-    note: '东湖民间年画及 18 世纪末 dó 纸绘画（越南国家美术博物馆）。资料图片来自维基共享资源，属公有领域或 CC0——并非 LAMVI 的产品照片。',
+    note: '东湖民间年画及 18 世纪末 dó 纸绘画（越南国家美术博物馆）。资料图片来自维基共享资源，属公有领域或 CC0，并非 LAMVI 的产品照片。',
     items: {
       'chuot-ruoc-den': {
         name: '老鼠提灯游行',
@@ -96,17 +96,17 @@ export default {
       },
       'giang-hoc-do': {
         name: '讲学图',
-        meta: 'dó 纸绘画，乂安省独雷祠，18 世纪末——越南国家美术博物馆',
+        meta: 'dó 纸绘画，乂安省独雷祠，18 世纪末，越南国家美术博物馆',
         alt: '18 世纪 dó 纸立轴：先生为学生讲学',
       },
       'vinh-quy': {
         name: '荣归图',
-        meta: 'dó 纸绘画，乂安省独雷祠，18 世纪末——越南国家美术博物馆',
+        meta: 'dó 纸绘画，乂安省独雷祠，18 世纪末，越南国家美术博物馆',
         alt: '18 世纪 dó 纸立轴：文官荣归故里，随从相伴',
       },
       'van-tu-giay-do-1904': {
         name: 'dó 纸文书',
-        meta: '1904 年行政文书，贴有印花税票——公有领域',
+        meta: '1904 年行政文书，贴有印花税票，公有领域',
         alt: '1904 年 dó 纸手写汉字文书，盖有印章并贴有印花税票',
       },
     },
@@ -114,18 +114,18 @@ export default {
   artisan: {
     eyebrow: '手艺的守护者',
     title: '创造光的双手',
-    quote: '取自杨坞—风溪的 dó 纸被送往东湖，由优秀匠人阮有果亲自完成涂贝壳粉（điệp）与适合每盏 LAMVI 灯的东湖图案。',
+    quote: '取自杨坞，风溪的 dó 纸被送往东湖，由优秀匠人阮有果亲自完成涂贝壳粉（điệp）与适合每盏 LAMVI 灯的东湖图案。',
     name: '优秀匠人 阮有果',
     place: '东湖版画村',
     videoTitle: '视频：东湖村的版画制作',
-    videoCaption: '东湖版画村——为 LAMVI 灯涂贝壳粉并印制图案的地方。',
+    videoCaption: '东湖版画村，为 LAMVI 灯涂贝壳粉并印制图案的地方。',
   },
   products: {
     viewAll: '查看更多',
     eyebrow: '系列',
     title: '选择您想点亮的那盏灯',
     collectionCopy:
-      '每盏灯既可自用，也可送给心上人——在结账时选择“送礼”或“自用”。',
+      '每盏灯既可自用，也可送给心上人，在结账时选择“送礼”或“自用”。',
     viewDetail: '查看详情',
     loading: '正在加载产品…',
     error: '无法加载产品，请稍后再试。',
@@ -147,7 +147,7 @@ export default {
     eyebrow: '手工历程',
     title: '跟随您的订单走过每道工序',
     steps: [
-      { label: '杨坞—风溪手工纸', note: '手工 dó 纸直接取自造纸作坊' },
+      { label: '杨坞，风溪手工纸', note: '手工 dó 纸直接取自造纸作坊' },
       { label: '涂贝壳粉与东湖图案', note: '纸被送到东湖，涂贝壳粉并完成图案' },
       { label: '组装与试亮', note: '灯身、木底座与暖黄 LED 经组装、校准与试亮' },
       { label: '包装与感谢卡', note: '灯与带二维码的感谢卡一同装盒' },
@@ -163,12 +163,13 @@ export default {
     pause: '暂停视频',
     cta: '查看系列',
   },
+  carousel: { prev: '上一张', next: '下一张' },
   films: {
     eyebrow: '亲眼看手艺',
     title: '化作灯身的 dó 纸',
-    intro: '每盏 LAMVI 灯都始于杨坞—风溪手艺村的手工 dó 纸。',
+    intro: '每盏 LAMVI 灯都始于杨坞，风溪手艺村的手工 dó 纸。',
     paperTitle: 'dó 纸手艺村',
-    paperNote: '手工 dó 纸——LAMVI 灯身的材料。',
+    paperNote: '手工 dó 纸，LAMVI 灯身的材料。',
   },
   qr: {
     eyebrow: '拆礼时刻',
@@ -254,7 +255,7 @@ export default {
     moit: "已通知越南工贸部",
     follow: "关注 LAMVI",
     newsUnavailable: '邮件订阅暂未开放。您可以通过官方渠道关注 LAMVI。',
-    tagline: '手工纸灯——守护记忆之火，点亮爱意。',
+    tagline: '手工纸灯，守护记忆之火，点亮爱意。',
     products: '产品',
     support: '支持',
     faq: '常见问题',
@@ -265,7 +266,7 @@ export default {
     newsText: '手艺村故事和新优惠，每月一封。',
     newsPlaceholder: '您的邮箱',
     newsSubmit: '订阅',
-    copyright: '© 2026 LAMVI — 手工纸灯。',
+    copyright: '© 2026 LAMVI · 手工纸灯。',
   },
   gift: {
     eyebrow: '给你的祝福',
@@ -291,7 +292,7 @@ export default {
     countdownToday: '语音和视频将于今天删除。如需保留，请点击“下载”。',
     mediaExpired: '此祝福的语音/视频已超过保存期限并已删除，文字内容仍然保留。',
     emptyTitle: '感谢您收下这份礼物',
-    emptyText: '寄件人没有写专属祝福——欢迎观看这批灯笼的制作历程。',
+    emptyText: '寄件人没有写专属祝福，欢迎观看这批灯笼的制作历程。',
     watchBatch: '观看灯笼批次视频',
     private: '此页面为私密页面，只有持有贺卡二维码的人才能打开。',
     toHome: '探索 LAMVI',
@@ -350,7 +351,7 @@ export default {
     cartTotal: "小计",
     heroLine1: '点亮一盏灯',
     heroLine2: '寄托你想说的话',
-    heroLead: '手工宣纸灯笼，附上专属祝福——从工坊到收礼人，每道工序都可追踪。',
+    heroLead: '手工宣纸灯笼，附上专属祝福，从工坊到收礼人，每道工序都可追踪。',
     show: '显示',
     hide: '隐藏',
     tabsLabel: '选择登录或创建账户',
@@ -469,7 +470,7 @@ export default {
     mayHint: '点击屏幕角落的 Mây，询问灯、祝福或配送相关问题。',
   },
   errors: {
-    PRODUCT_HAS_ORDERS: '该商品已有订单，无法删除——请改为“已隐藏”。',
+    PRODUCT_HAS_ORDERS: '该商品已有订单，无法删除，请改为“已隐藏”。',
     SLUG_LOCKED: '商品在售时无法修改 slug（会使已分享的链接失效）。如确需修改，请先隐藏商品。',
     MESSAGE_TOO_SHORT: "请至少输入 10 个字符。",
     CONTACT_UNAVAILABLE: "暂时无法发送，请通过热线或 Zalo 联系。",
@@ -538,7 +539,7 @@ export default {
     IMAGE_NOT_UPLOADED: '图片上传失败，请重试。',
     CART_EMPTY: '购物车是空的。',
     CART_HAS_UNAVAILABLE: '购物车中有已停售的商品，请先移除。',
-    OUT_OF_STOCK: '库存不足，可能刚被他人订走——请检查购物车。',
+    OUT_OF_STOCK: '库存不足，可能刚被他人订走，请检查购物车。',
     PRICE_CHANGED: '价格已变动，请查看新的金额后再确认。',
     COD_NOT_ALLOWED_FOR_GIFT: '寄给他人的订单不支持货到付款。',
     PAYMENT_UNAVAILABLE: '在线支付暂时不可用，请选择货到付款。',
@@ -557,7 +558,7 @@ export default {
     COUPON_USER_LIMIT: '您已用完该优惠码的使用次数。',
     COUPON_MIN_ORDER: '订单金额未达到该优惠码的最低要求。',
     COUPON_NOT_APPLICABLE: '该优惠码不适用于购物车中的商品。',
-    COUPON_IN_USE: '该优惠码已被使用——请停用而不是删除。',
+    COUPON_IN_USE: '该优惠码已被使用，请停用而不是删除。',
     INVALID_CODE: '优惠码仅限大写字母和数字，3 至 32 个字符。',
     INVALID_PERCENT: '折扣百分比须在 1 到 100 之间。',
     INVALID_AMOUNT: '折扣金额须大于 0。',
@@ -618,7 +619,7 @@ export default {
     totalNote: '含增值税。',
     submit: '提交订单',
     submitting: '正在创建订单…',
-    priceChanged: '价格刚刚变动。下方金额已更新——请再次点击“提交订单”确认。',
+    priceChanged: '价格刚刚变动。下方金额已更新，请再次点击“提交订单”确认。',
   },
   orders: {
     title: '我的订单',
@@ -642,7 +643,7 @@ export default {
     payExpired: '支付链接已过期，订单已取消。',
     thanksTitle: '谢谢您！',
     thanksText: '我们已收到订单 {code}，您可以在此跟踪进度。',
-    thanksMessage: '该订单含祝福——在灯具打包前，您可随时在“订单”中撰写。',
+    thanksMessage: '该订单含祝福，在灯具打包前，您可随时在“订单”中撰写。',
     awaitingPayment: '正在等待支付确认。',
     statuses: {
       pending_payment: '待支付',
@@ -672,7 +673,7 @@ export default {
   shop: {
     eyebrow: '商店',
     title: '手工宣纸灯笼',
-    lead: '选择您想点亮的灯笼——自用或送给心上人。在结账时选择“送礼”或“自用”。',
+    lead: '选择您想点亮的灯笼，自用或送给心上人。在结账时选择“送礼”或“自用”。',
     perks: ['印有二维码的感谢卡，可打开您的祝福', '扫描卡片上的二维码，观看这批灯的制作历程', '价格已含增值税，仅限越南境内配送'],
     filterLabel: '按类型筛选',
     filters: {
@@ -699,7 +700,7 @@ export default {
     summary: '订单摘要',
     shipping: '运费',
     shippingAtCheckout: '见下方运费说明',
-    emptyCopy: '云云建议您去逛逛系列——每盏灯都是一个等待点亮的故事。',
+    emptyCopy: '云云建议您去逛逛系列，每盏灯都是一个等待点亮的故事。',
     mayTitle: '云云小提醒：每份礼物都附带',
     perks: ['印有二维码的感谢卡，可打开您的祝福', '扫描卡片上的二维码，观看这批灯的制作历程', '价格已含增值税，仅限越南境内配送'],
     unavailableName: '已下架的商品',
@@ -725,7 +726,7 @@ export default {
     hasUnavailable: '购物车中有已下架商品，不计入金额且无法下单。',
     soldOut: '暂时缺货',
     lowStock: '仅剩 {n} 件',
-    shortage: '仅剩 {n} 件——请减少数量',
+    shortage: '仅剩 {n} 件，请减少数量',
     hasShortage: '部分商品库存不足，请先减少数量或移除后再结算。',
     maxNote: '每种商品最多 {max} 件。',
     subtotal: '小计',
@@ -743,7 +744,7 @@ export default {
     close: '关闭',
     title: 'Mây',
     subtitle: 'LAMVI 的 AI 助手',
-    aiNotice: 'Mây 是 AI 助手，只根据 LAMVI 的信息回答。您的消息由境外 AI 服务商（OpenAI）处理——请勿发送敏感个人信息。Mây 不能替您下单或修改账户。',
+    aiNotice: 'Mây 是 AI 助手，只根据 LAMVI 的信息回答。您的消息由境外 AI 服务商（OpenAI）处理，请勿发送敏感个人信息。Mây 不能替您下单或修改账户。',
     suggestTitle: '推荐问题',
     suggestions: ['灯笼是用什么材料做的？', '感谢卡上的二维码有什么用？', '下单后还能写祝福吗？', '配送需要多久？'],
     greeting: '你好，我是 Mây！想了解纸灯、祝福还是二维码呢？',
@@ -926,7 +927,7 @@ export default {
           '收到的商品与订单不符。',
           '我们不接受因改变主意而退换，尤其是附有个性化祝福的灯笼。'
         ] },
-        { h: '开箱视频——必须提供', items: [
+        { h: '开箱视频，必须提供', items: [
           '申请必须附带一段从开箱开始、连续拍摄到展示灯笼状态的视频。没有视频，我们无法处理申请。',
           '若灯笼是礼物，请收礼人在拆箱时拍摄。该提示也在礼物二维码页面和感谢卡上。'
         ] },
@@ -949,7 +950,7 @@ export default {
     wholeSet: '整套',
     view: '查看系列',
     notFound: '未找到该系列',
-    metaTitle: '{name}系列 — LAMVI',
+    metaTitle: '{name}系列, LAMVI',
     setNote: '购买整套即可拥有本系列的全部灯笼。',
     addSet: '购买整套',
     pickSingle: '或单独挑选（共 {n} 盏）',

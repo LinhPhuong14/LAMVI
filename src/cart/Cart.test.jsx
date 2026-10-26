@@ -108,7 +108,7 @@ describe('Giỏ tài khoản (D-41, D-59, D-61)', () => {
       'GET /cart': () => ({ body: present([{ slug: 'den-nguyet', quantity: 1 }, { slug: 'den-sum-vay', quantity: 1 }], ['den-sum-vay']) }),
     })
     renderAt('/cart')
-    expect(await screen.findByText('Sản phẩm này hiện không còn bán — vui lòng xoá khỏi giỏ.')).toBeInTheDocument()
+    expect(await screen.findByText('Sản phẩm này hiện không còn bán, vui lòng xoá khỏi giỏ.')).toBeInTheDocument()
     expect(screen.getByText(/Giỏ có sản phẩm không còn bán/)).toBeInTheDocument()
     const hiddenLine = screen.getByText('Đèn Sum Vầy', { selector: 'strong' }).closest('li')
     expect(within(hiddenLine).getByRole('button', { name: 'Tăng số lượng' })).toBeDisabled()

@@ -128,7 +128,7 @@ async function policies(repo, { payosEnabled = false, returnsEnabled = false, co
       scope: 'Giao toàn quốc Việt Nam',
       flatFeeVnd: fee,
       freeShippingFromVnd: freeFrom,
-      note: 'Phí vận chuyển đồng giá toàn quốc; miễn phí khi tổng tiền hàng tạm tính từ mức freeShippingFromVnd (bằng 0 nghĩa là không có mức miễn phí). LAMVI chưa cam kết thời gian giao cụ thể — không hứa ngày giao.',
+      note: 'Phí vận chuyển đồng giá toàn quốc; miễn phí khi tổng tiền hàng tạm tính từ mức freeShippingFromVnd (bằng 0 nghĩa là không có mức miễn phí). LAMVI chưa cam kết thời gian giao cụ thể, không hứa ngày giao.',
     },
     payment: {
       methods: payosEnabled ? ['Thanh toán khi nhận hàng (COD)', 'Chuyển khoản / quét mã (payOS)'] : ['Thanh toán khi nhận hàng (COD)'],

@@ -117,7 +117,7 @@ function Related({ slug }) {
           {t('pdp.viewAll')} <span aria-hidden="true">→</span>
         </Link>
       </div>
-      <ProductCards items={items} />
+      <ProductCards items={items} carousel label={t('products.title')} />
     </section>
   )
 }

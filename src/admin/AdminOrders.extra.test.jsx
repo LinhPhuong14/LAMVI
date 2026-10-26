@@ -268,7 +268,7 @@ describe('Admin — coupon (§14, D-71)', () => {
     })
     renderAt('/admin/coupons')
     fireEvent.click(await screen.findByRole('button', { name: 'Xoá' }))
-    expect(await screen.findByText('Mã đã được dùng — hãy tắt thay vì xoá.')).toBeInTheDocument()
+    expect(await screen.findByText('Mã đã được dùng, hãy tắt thay vì xoá.')).toBeInTheDocument()
     confirm.mockRestore()
   })
 })

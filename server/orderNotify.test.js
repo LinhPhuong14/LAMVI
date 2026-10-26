@@ -76,7 +76,7 @@ describe('Đơn được xác nhận (§20)', () => {
     expect(mailer.outbox).toHaveLength(1)
     const m = mailer.outbox[0]
     expect(m.to).toBe('khach@lamvi.test')
-    expect(m.subject).toBe(`LAMVI — Đã xác nhận đơn ${code}`)
+    expect(m.subject).toBe(`LAMVI · Đã xác nhận đơn ${code}`)
     expect(m.text).toContain('Đèn Nguyệt × 1')
     expect(m.text).toContain('920.000')
     expect(m.text).toContain(`${SITE}/don-hang/${code}`)
@@ -91,7 +91,7 @@ describe('Đơn được xác nhận (§20)', () => {
     const data = { orderCode: o.payosOrderCode, amount: o.total, code: '00' }
     const hook = () => request(app).post('/api/payments/payos/webhook').send({ code: '00', desc: 'ok', data, signature: signData(data, CHECKSUM) })
     expect((await hook()).status).toBe(200)
-    expect(subjects()).toEqual([`LAMVI — Đã xác nhận đơn ${code}`])
+    expect(subjects()).toEqual([`LAMVI · Đã xác nhận đơn ${code}`])
     await hook()
     await hook()
     expect(mailer.outbox).toHaveLength(1)
@@ -124,9 +124,9 @@ describe('Đơn được xác nhận (§20)', () => {
 
 describe('Ngôn ngữ thông báo = ngôn ngữ ưa thích của tài khoản (D-41)', () => {
   it.each([
-    ['en', 'LAMVI — Order', 'View order', '/en/don-hang/'],
-    ['zh', 'LAMVI — 订单', '查看订单', '/zh/don-hang/'],
-    ['vi', 'LAMVI — Đã xác nhận đơn', 'Xem đơn hàng', '/don-hang/'],
+    ['en', 'LAMVI · Order', 'View order', '/en/don-hang/'],
+    ['zh', 'LAMVI · 订单', '查看订单', '/zh/don-hang/'],
+    ['vi', 'LAMVI · Đã xác nhận đơn', 'Xem đơn hàng', '/don-hang/'],
   ])('%s', async (lang, subj, cta, path) => {
     const who = await login(`${lang}@lamvi.test`, 'customer', { preferredLocale: lang })
     const code = await place({}, who)
@@ -143,7 +143,7 @@ describe('Ngôn ngữ thông báo = ngôn ngữ ưa thích của tài khoản (D
   })
 
   it('ngôn ngữ lạ → tiếng Việt', () => {
-    expect(orderMail({ kind: 'shipped', lang: 'fr', order: { code: 'LV1', items: [], total: 0 }, siteUrl: SITE }).subject).toBe('LAMVI — Đơn LV1 đã được gửi đi')
+    expect(orderMail({ kind: 'shipped', lang: 'fr', order: { code: 'LV1', items: [], total: 0 }, siteUrl: SITE }).subject).toBe('LAMVI · Đơn LV1 đã được gửi đi')
   })
 })
 
@@ -155,7 +155,7 @@ describe('Đơn đã gửi, huỷ, hoàn tiền, hết hạn thanh toán (§20)'
     await adminMove(code, 'packed')
     expect(mailer.outbox).toHaveLength(0)
     await adminMove(code, 'shipped', { trackingCode: 'VN123456789' })
-    expect(subjects()).toEqual([`LAMVI — Đơn ${code} đã được gửi đi`])
+    expect(subjects()).toEqual([`LAMVI · Đơn ${code} đã được gửi đi`])
     expect(mailer.outbox[0].text).toContain('Mã vận đơn: VN123456789')
     await adminMove(code, 'delivered')
     expect(mailer.outbox).toHaveLength(1)
@@ -184,7 +184,7 @@ describe('Đơn đã gửi, huỷ, hoàn tiền, hết hạn thanh toán (§20)'
     mailer.outbox.length = 0
     await request(app).post(`/api/orders/${code}/cancel`).set('Authorization', customer.token).send({})
     await request(app).post(`/api/orders/${code}/cancel`).set('Authorization', customer.token).send({})
-    expect(subjects()).toEqual([`LAMVI — Đơn ${code} đã được huỷ`])
+    expect(subjects()).toEqual([`LAMVI · Đơn ${code} đã được huỷ`])
     expect(mailer.outbox[0].text).not.toMatch(/hoàn tiền/)
   })
 
@@ -197,14 +197,14 @@ describe('Đơn đã gửi, huỷ, hoàn tiền, hết hạn thanh toán (§20)'
     await request(app).post(`/api/orders/${code}/cancel`).set('Authorization', customer.token).send({})
     expect(mailer.outbox[0].text).toContain('hoàn tiền')
     await request(app).post(`/api/admin/orders/${code}/refund`).set('Authorization', admin.token).send({ note: 'ck' })
-    expect(subjects()).toEqual([`LAMVI — Đơn ${code} đã được huỷ`, `LAMVI — Đã hoàn tiền đơn ${code}`])
+    expect(subjects()).toEqual([`LAMVI · Đơn ${code} đã được huỷ`, `LAMVI · Đã hoàn tiền đơn ${code}`])
   })
 
   it('admin huỷ đơn → báo huỷ', async () => {
     const code = await place()
     mailer.outbox.length = 0
     await adminMove(code, 'cancelled')
-    expect(subjects()).toEqual([`LAMVI — Đơn ${code} đã được huỷ`])
+    expect(subjects()).toEqual([`LAMVI · Đơn ${code} đã được huỷ`])
   })
 
   it('đơn payOS quá hạn: báo đúng một lần dù cron và khách mở đơn cùng lúc', async () => {
@@ -212,7 +212,7 @@ describe('Đơn đã gửi, huỷ, hoàn tiền, hết hạn thanh toán (§20)'
     clock = new Date(clock.getTime() + PAYMENT_WINDOW_MS + 1000)
     const cron = () => request(app).get('/api/internal/expire-orders').set('Authorization', 'Bearer bimat-cron')
     await Promise.all([cron(), cron(), request(app).get(`/api/orders/${code}`).set('Authorization', customer.token)])
-    expect(subjects()).toEqual([`LAMVI — Đơn ${code} đã hết hạn thanh toán`])
+    expect(subjects()).toEqual([`LAMVI · Đơn ${code} đã hết hạn thanh toán`])
   })
 })
 

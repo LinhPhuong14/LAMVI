@@ -3,10 +3,10 @@
 export default {
   routeLoad: { error: 'Chưa tải được trang. Vui lòng tải lại để tiếp tục.', reload: 'Tải lại trang' },
   meta: {
-    shopTitle: 'Cửa hàng — LAMVI · đèn giấy dó thủ công',
+    shopTitle: 'Cửa hàng · LAMVI · đèn giấy dó thủ công',
     shopDescription: 'Toàn bộ đèn giấy dó thủ công LAMVI: lọc theo loại, kèm thiệp lời chúc gắn mã QR và video hành trình làm đèn.',
-    productTitle: '{name} — LAMVI · đèn giấy dó thủ công',
-    title: 'LAMVI — Đèn Giấy Dó Thủ Công',
+    productTitle: '{name} · LAMVI · đèn giấy dó thủ công',
+    title: 'LAMVI · Đèn Giấy Dó Thủ Công',
     description:
       'Đèn giấy dó thủ công làm quà tặng, kèm lời chúc gắn mã QR và video hành trình làm đèn.',
   },
@@ -35,7 +35,7 @@ export default {
     eyebrow: 'Giấy dó thủ công · Làng nghề trăm năm',
     title1: 'Mỗi chiếc đèn,',
     title2: 'một câu chuyện được thắp lên',
-    sub: 'Đèn giấy dó thủ công dành tặng người thân — kèm theo hành trình đèn được làm ra và lời chúc của riêng bạn, mở ra chỉ bằng một lần quét mã.',
+    sub: 'Đèn giấy dó thủ công dành tặng người thân, kèm theo hành trình đèn được làm ra và lời chúc của riêng bạn, mở ra chỉ bằng một lần quét mã.',
     explore: 'Khám phá bộ sưu tập',
     story: 'Nghe câu chuyện làng nghề',
     scroll: 'Cuộn xuống',
@@ -52,10 +52,10 @@ export default {
     eyebrow: 'Di sản',
     title: 'Từ làng nghề giấy dó trăm năm',
     // §31.3 (mới phát hiện): bỏ ý "được lưu giữ theo cách bền bỉ" (D-26)
-    text: 'Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ, lưu giữ ký ức của bao thế hệ. Chúng tôi mang chất liệu ấy trở lại trong hình hài một chiếc đèn — để câu chuyện của gia đình bạn được thắp lên từ chính chất liệu bền bỉ ấy.',
+    text: 'Giấy dó từng dùng để chép sử, vẽ tranh Đông Hồ, lưu giữ ký ức của bao thế hệ. Chúng tôi mang chất liệu ấy trở lại trong hình hài một chiếc đèn, để câu chuyện của gia đình bạn được thắp lên từ chính chất liệu bền bỉ ấy.',
     coverAlt: 'Đèn LAMVI đặt trên bàn gỗ, phía sau là những tờ giấy dó phơi nắng bên hiên nhà',
     statLamps: 'chiếc đèn trong bộ sưu tập đầu tiên',
-    statStages: 'chặng hành trình: Dương Ổ – Phong Khê → Đông Hồ → LAMVI',
+    statStages: 'chặng hành trình: Dương Ổ, Phong Khê → Đông Hồ → LAMVI',
     // §31.3: thay "câu chuyện riêng mỗi đèn" (D-01, D-45)
     statStory: 'lời chúc riêng cho mỗi món quà',
   },
@@ -63,7 +63,7 @@ export default {
   gallery: {
     label: 'Phòng tranh dân gian',
     source: 'Nguồn ảnh',
-    note: 'Tranh dân gian Đông Hồ và tranh vẽ trên giấy dó cuối thế kỷ 18 (Bảo tàng Mỹ thuật Việt Nam). Ảnh tư liệu từ Wikimedia Commons, thuộc phạm vi công cộng hoặc CC0 — không phải ảnh sản phẩm của LAMVI.',
+    note: 'Tranh dân gian Đông Hồ và tranh vẽ trên giấy dó cuối thế kỷ 18 (Bảo tàng Mỹ thuật Việt Nam). Ảnh tư liệu từ Wikimedia Commons, thuộc phạm vi công cộng hoặc CC0, không phải ảnh sản phẩm của LAMVI.',
     items: {
       'chuot-ruoc-den': {
         name: 'Chuột rước đèn',
@@ -76,7 +76,7 @@ export default {
         alt: 'Tranh Đông Hồ: đàn chuột rước dâu bằng kiệu, mang lễ vật biếu mèo',
       },
       'ong-to-ba-nguyet': {
-        name: 'Ông Tơ – Bà Nguyệt',
+        name: 'Ông Tơ và Bà Nguyệt',
         meta: 'Tranh Đông Hồ',
         alt: 'Tranh đôi Đông Hồ: Ông Tơ và Bà Nguyệt, hai vị thần se duyên, ngự trên linh vật giữa mây, hai bên có người hầu',
       },
@@ -107,17 +107,17 @@ export default {
       },
       'giang-hoc-do': {
         name: 'Giảng học đồ',
-        meta: 'Tranh trên giấy dó, đền Độc Lôi (Nghệ An), cuối thế kỷ 18 — Bảo tàng Mỹ thuật Việt Nam',
+        meta: 'Tranh trên giấy dó, đền Độc Lôi (Nghệ An), cuối thế kỷ 18, Bảo tàng Mỹ thuật Việt Nam',
         alt: 'Tranh cuộn trên giấy dó thế kỷ 18: thầy đồ giảng học cho học trò',
       },
       'vinh-quy': {
         name: 'Vinh quy',
-        meta: 'Tranh trên giấy dó, đền Độc Lôi (Nghệ An), cuối thế kỷ 18 — Bảo tàng Mỹ thuật Việt Nam',
+        meta: 'Tranh trên giấy dó, đền Độc Lôi (Nghệ An), cuối thế kỷ 18, Bảo tàng Mỹ thuật Việt Nam',
         alt: 'Tranh cuộn trên giấy dó thế kỷ 18: quan văn vinh quy về làng cùng đoàn tuỳ tùng',
       },
       'van-tu-giay-do-1904': {
         name: 'Văn tự trên giấy dó',
-        meta: 'Giấy tờ hành chính năm 1904, có tem thuế — phạm vi công cộng',
+        meta: 'Giấy tờ hành chính năm 1904, có tem thuế, phạm vi công cộng',
         alt: 'Văn tự chữ Hán viết tay trên giấy dó năm 1904, có đóng dấu và dán tem',
       },
     },
@@ -126,18 +126,18 @@ export default {
     eyebrow: 'Người giữ lửa nghề',
     title: 'Bàn tay tạo nên ánh sáng',
     quote:
-      'Giấy dó lấy từ Dương Ổ – Phong Khê được đưa tới Đông Hồ, nơi Nghệ nhân Ưu tú Nguyễn Hữu Quả trực tiếp thực hiện công đoạn phủ điệp và phần nghệ thuật Đông Hồ phù hợp với từng chiếc đèn LAMVI.',
+      'Giấy dó lấy từ Dương Ổ, Phong Khê được đưa tới Đông Hồ, nơi Nghệ nhân Ưu tú Nguyễn Hữu Quả trực tiếp thực hiện công đoạn phủ điệp và phần nghệ thuật Đông Hồ phù hợp với từng chiếc đèn LAMVI.',
     name: 'Nghệ nhân Ưu tú Nguyễn Hữu Quả',
     place: 'Làng tranh Đông Hồ',
     videoTitle: 'Video: làm tranh ở làng Đông Hồ',
-    videoCaption: 'Làng tranh Đông Hồ — nơi phủ điệp và in phần nghệ thuật cho đèn LAMVI.',
+    videoCaption: 'Làng tranh Đông Hồ, nơi phủ điệp và in phần nghệ thuật cho đèn LAMVI.',
   },
   products: {
     viewAll: 'Xem thêm',
     eyebrow: 'Bộ sưu tập',
     title: 'Chọn chiếc đèn bạn muốn thắp',
     collectionCopy:
-      'Mỗi chiếc đèn có thể thắp cho chính bạn hoặc gửi tặng người thương — bạn chọn “mua tặng” hay “mua cho mình” ở bước thanh toán.',
+      'Mỗi chiếc đèn có thể thắp cho chính bạn hoặc gửi tặng người thương, bạn chọn “mua tặng” hay “mua cho mình” ở bước thanh toán.',
     viewDetail: 'Xem chi tiết',
     loading: 'Đang tải sản phẩm…',
     error: 'Không tải được sản phẩm. Vui lòng thử lại sau.',
@@ -161,7 +161,7 @@ export default {
     // §31.3: thay "Theo dõi đèn của bạn từng bước" (D-01)
     title: 'Theo dõi đơn của bạn qua từng công đoạn',
     steps: [
-      { label: 'Giấy dó Dương Ổ – Phong Khê', note: 'Giấy dó thủ công lấy trực tiếp từ cơ sở làm giấy' },
+      { label: 'Giấy dó Dương Ổ, Phong Khê', note: 'Giấy dó thủ công lấy trực tiếp từ cơ sở làm giấy' },
       { label: 'Phủ điệp & artwork Đông Hồ', note: 'Giấy được đưa tới Đông Hồ để phủ điệp và thực hiện phần nghệ thuật' },
       { label: 'Lắp đèn & kiểm tra sáng', note: 'Thân đèn, đế gỗ và LED vàng ấm được lắp, căn chỉnh và thử sáng' },
       // D-104: QR nằm trên thiệp cảm ơn, không khắc trên đèn
@@ -178,12 +178,13 @@ export default {
     pause: 'Dừng video',
     cta: 'Xem bộ sưu tập',
   },
+  carousel: { prev: 'Slide trước', next: 'Slide sau' },
   films: {
     eyebrow: 'Xem tận mắt nghề',
     title: 'Từ tờ giấy dó làm nên thân đèn',
-    intro: 'Mỗi chiếc đèn LAMVI bắt đầu từ giấy dó thủ công của làng nghề Dương Ổ – Phong Khê.',
+    intro: 'Mỗi chiếc đèn LAMVI bắt đầu từ giấy dó thủ công của làng nghề Dương Ổ, Phong Khê.',
     paperTitle: 'Làng nghề giấy dó',
-    paperNote: 'Giấy dó thủ công — chất liệu làm thân đèn LAMVI.',
+    paperNote: 'Giấy dó thủ công, chất liệu làm thân đèn LAMVI.',
   },
   qr: {
     eyebrow: 'Khoảnh khắc mở quà',
@@ -278,7 +279,7 @@ export default {
     moit: "Đã thông báo Bộ Công Thương",
     follow: "Theo dõi LAMVI",
     newsUnavailable: 'Đăng ký nhận tin hiện chưa mở. Bạn có thể theo dõi LAMVI qua các kênh chính thức.',
-    tagline: 'Đèn giấy dó thủ công — giữ lửa ký ức, thắp sáng yêu thương.',
+    tagline: 'Đèn giấy dó thủ công, giữ lửa ký ức, thắp sáng yêu thương.',
     products: 'Sản phẩm',
     support: 'Hỗ trợ',
     faq: 'Câu hỏi thường gặp',
@@ -289,7 +290,7 @@ export default {
     newsText: 'Câu chuyện làng nghề và ưu đãi mới, gửi mỗi tháng một lần.',
     newsPlaceholder: 'Email của bạn',
     newsSubmit: 'Đăng ký',
-    copyright: '© 2026 LAMVI — Đèn giấy dó thủ công.',
+    copyright: '© 2026 LAMVI · Đèn giấy dó thủ công.',
   },
   gift: {
     eyebrow: 'Lời chúc dành cho bạn',
@@ -315,7 +316,7 @@ export default {
     countdownToday: 'Giọng nói và video sẽ bị xoá trong hôm nay. Bấm "Tải về" nếu bạn muốn giữ lại.',
     mediaExpired: 'Giọng nói/video của lời chúc đã hết thời hạn lưu và đã được xoá. Phần chữ vẫn được giữ lại.',
     emptyTitle: 'Cảm ơn bạn đã đón nhận món quà',
-    emptyText: 'Người gửi chưa viết lời chúc riêng — mời bạn xem hành trình làm ra mẻ đèn của mình.',
+    emptyText: 'Người gửi chưa viết lời chúc riêng, mời bạn xem hành trình làm ra mẻ đèn của mình.',
     watchBatch: 'Xem video mẻ đèn',
     private: 'Trang này riêng tư, chỉ người có mã QR trên thiệp mới mở được.',
     toHome: 'Khám phá LAMVI',
@@ -347,7 +348,7 @@ export default {
     notAllowed: 'Đơn này không có lời chúc.',
     states: {
       EMPTY: 'Chưa soạn',
-      DRAFT: 'Bản nháp — sửa được',
+      DRAFT: 'Bản nháp, sửa được',
       TEXT_LOCKED: 'Đã khoá phần chữ',
       LOCKED: 'Đã khoá',
       ACTIVE: 'Người nhận đã mở',
@@ -368,13 +369,13 @@ export default {
   },
   auth: {
     checkoutNote: "Đăng nhập để lưu lời chúc và theo dõi đơn hàng của bạn.",
-    checkoutNoteSub: "Giỏ hàng của bạn vẫn được giữ nguyên. Tạo tài khoản chỉ mất vài giây — hoặc tiếp tục nhanh bằng Google.",
+    checkoutNoteSub: "Giỏ hàng của bạn vẫn được giữ nguyên. Tạo tài khoản chỉ mất vài giây, hoặc tiếp tục nhanh bằng Google.",
     cartSummary: "Giỏ hàng của bạn",
     cartItems: "{n} sản phẩm",
     cartTotal: "Tạm tính",
     heroLine1: 'Thắp một ngọn đèn',
     heroLine2: 'cho điều bạn muốn gửi',
-    heroLead: 'Đèn giấy dó làm tay, kèm lời chúc riêng — theo dõi từng công đoạn từ xưởng tới tay người nhận.',
+    heroLead: 'Đèn giấy dó làm tay, kèm lời chúc riêng, theo dõi từng công đoạn từ xưởng tới tay người nhận.',
     show: 'Hiện',
     hide: 'Ẩn',
     tabsLabel: 'Chọn đăng nhập hoặc tạo tài khoản',
@@ -495,7 +496,7 @@ export default {
     mayHint: 'Bấm vào Mây ở góc màn hình để hỏi về đèn, lời chúc hay giao hàng.',
   },
   errors: {
-    PRODUCT_HAS_ORDERS: 'Sản phẩm đã có đơn hàng nên không xoá được — hãy chuyển sang “Đã ẩn”.',
+    PRODUCT_HAS_ORDERS: 'Sản phẩm đã có đơn hàng nên không xoá được, hãy chuyển sang “Đã ẩn”.',
     SLUG_LOCKED: 'Không đổi được slug khi sản phẩm đang bán (để giữ link đã chia sẻ). Hãy ẩn sản phẩm trước nếu thật sự cần đổi.',
     MESSAGE_TOO_SHORT: "Vui lòng nhập ít nhất 10 ký tự.",
     CONTACT_UNAVAILABLE: "Chưa gửi được lúc này. Vui lòng liên hệ qua hotline hoặc Zalo.",
@@ -549,8 +550,8 @@ export default {
     INVALID_STOCK: 'Tồn kho phải là số nguyên không âm, hoặc để trống.',
     INVALID_BATCH_CODE: 'Mã lô chỉ gồm chữ in hoa, số và gạch nối.',
     BATCH_CODE_TAKEN: 'Mã lô đã tồn tại.',
-    BATCH_CODE_LOCKED: 'Lô đã xuất bản — không đổi được mã lô.',
-    BATCH_PUBLISHED: 'Lô đã xuất bản — không xoá được.',
+    BATCH_CODE_LOCKED: 'Lô đã xuất bản, không đổi được mã lô.',
+    BATCH_PUBLISHED: 'Lô đã xuất bản, không xoá được.',
     VIDEO_REQUIRED: 'Lô chưa có video.',
     INVALID_VIDEO_TYPE: 'Chỉ nhận video MP4, WebM hoặc MOV.',
     VIDEO_TOO_LARGE: 'Video vượt quá dung lượng cho phép.',
@@ -564,7 +565,7 @@ export default {
     IMAGE_NOT_UPLOADED: 'Chưa tải được ảnh lên. Vui lòng thử lại.',
     CART_EMPTY: 'Giỏ hàng đang trống.',
     CART_HAS_UNAVAILABLE: 'Giỏ có sản phẩm không còn bán. Vui lòng xoá trước khi đặt.',
-    OUT_OF_STOCK: 'Sản phẩm không đủ hàng. Có thể vừa có người đặt trước — hãy kiểm tra lại giỏ.',
+    OUT_OF_STOCK: 'Sản phẩm không đủ hàng. Có thể vừa có người đặt trước, hãy kiểm tra lại giỏ.',
     PRICE_CHANGED: 'Giá đã thay đổi. Vui lòng xem lại bảng giá mới rồi xác nhận.',
     COD_NOT_ALLOWED_FOR_GIFT: 'Đơn giao cho người khác không thanh toán khi nhận hàng được.',
     PAYMENT_UNAVAILABLE: 'Thanh toán trực tuyến đang tạm ngưng. Vui lòng chọn thanh toán khi nhận hàng.',
@@ -583,7 +584,7 @@ export default {
     COUPON_USER_LIMIT: 'Bạn đã dùng hết số lần cho mã này.',
     COUPON_MIN_ORDER: 'Đơn hàng chưa đạt giá trị tối thiểu của mã giảm giá.',
     COUPON_NOT_APPLICABLE: 'Mã giảm giá không áp dụng cho sản phẩm trong giỏ.',
-    COUPON_IN_USE: 'Mã đã được dùng — hãy tắt thay vì xoá.',
+    COUPON_IN_USE: 'Mã đã được dùng, hãy tắt thay vì xoá.',
     INVALID_CODE: 'Mã chỉ gồm chữ in hoa và số, từ 3 đến 32 ký tự.',
     INVALID_PERCENT: 'Phần trăm giảm phải từ 1 đến 100.',
     INVALID_AMOUNT: 'Số tiền giảm phải lớn hơn 0.',
@@ -644,7 +645,7 @@ export default {
     totalNote: 'Đã gồm VAT.',
     submit: 'Đặt hàng',
     submitting: 'Đang tạo đơn…',
-    priceChanged: 'Giá vừa thay đổi. Bảng giá bên dưới đã được cập nhật — vui lòng bấm Đặt hàng lại để xác nhận.',
+    priceChanged: 'Giá vừa thay đổi. Bảng giá bên dưới đã được cập nhật, vui lòng bấm Đặt hàng lại để xác nhận.',
   },
   orders: {
     title: 'Đơn hàng của tôi',
@@ -668,7 +669,7 @@ export default {
     payExpired: 'Liên kết thanh toán đã hết hạn nên đơn đã được huỷ.',
     thanksTitle: 'Cảm ơn bạn!',
     thanksText: 'Chúng tôi đã nhận đơn {code}. Bạn có thể theo dõi tiến độ tại đây.',
-    thanksMessage: 'Đơn này có lời chúc — bạn soạn lời chúc trong mục Đơn hàng bất cứ lúc nào trước khi đèn được đóng gói.',
+    thanksMessage: 'Đơn này có lời chúc, bạn soạn lời chúc trong mục Đơn hàng bất cứ lúc nào trước khi đèn được đóng gói.',
     awaitingPayment: 'Đang chờ xác nhận thanh toán.',
     statuses: {
       pending_payment: 'Chờ thanh toán',
@@ -698,7 +699,7 @@ export default {
   shop: {
     eyebrow: 'Cửa hàng',
     title: 'Đèn giấy dó thủ công',
-    lead: 'Chọn chiếc đèn bạn muốn thắp — cho chính mình hoặc gửi tặng người thương. Bạn chọn mua tặng hay mua cho mình ở bước thanh toán.',
+    lead: 'Chọn chiếc đèn bạn muốn thắp, cho chính mình hoặc gửi tặng người thương. Bạn chọn mua tặng hay mua cho mình ở bước thanh toán.',
     perks: ['Thiệp cảm ơn có mã QR mở lời chúc', 'Quét QR trên thiệp để xem video hành trình mẻ đèn', 'Giá đã gồm VAT, giao trong nước'],
     filterLabel: 'Lọc theo loại',
     filters: {
@@ -718,14 +719,14 @@ export default {
     helpLink: 'Hỏi đáp',
   },
   cart: {
-    syncFailed: 'Không đồng bộ được giỏ hàng. Món bạn chọn khi chưa đăng nhập vẫn được giữ trên thiết bị này — vui lòng tải lại trang để thử lại.',
+    syncFailed: 'Không đồng bộ được giỏ hàng. Món bạn chọn khi chưa đăng nhập vẫn được giữ trên thiết bị này, vui lòng tải lại trang để thử lại.',
     eyebrow: 'Giỏ quà của bạn',
     stepsLabel: 'Các bước đặt hàng',
     steps: ['Giỏ hàng', 'Thanh toán', 'Hoàn tất'],
     summary: 'Tóm tắt đơn',
     shipping: 'Vận chuyển',
     shippingAtCheckout: 'Xem mức phí bên dưới',
-    emptyCopy: 'Mây gợi ý bạn ghé bộ sưu tập — mỗi chiếc đèn là một câu chuyện để thắp lên.',
+    emptyCopy: 'Mây gợi ý bạn ghé bộ sưu tập, mỗi chiếc đèn là một câu chuyện để thắp lên.',
     mayTitle: 'Mây nhắc nhỏ: mỗi món quà đi kèm',
     perks: ['Thiệp cảm ơn có mã QR mở lời chúc của bạn', 'Quét QR trên thiệp để xem video hành trình mẻ đèn được làm ra', 'Giá đã gồm VAT, giao trong nước'],
     unavailableName: 'Sản phẩm không còn bán',
@@ -747,11 +748,11 @@ export default {
     empty: 'Giỏ hàng đang trống.',
     continue: 'Tiếp tục xem đèn',
     loading: 'Đang tải giỏ hàng…',
-    unavailable: 'Sản phẩm này hiện không còn bán — vui lòng xoá khỏi giỏ.',
+    unavailable: 'Sản phẩm này hiện không còn bán, vui lòng xoá khỏi giỏ.',
     hasUnavailable: 'Giỏ có sản phẩm không còn bán; sản phẩm đó không được tính và không thể đặt.',
     soldOut: 'Tạm hết hàng',
     lowStock: 'Chỉ còn {n}',
-    shortage: 'Chỉ còn {n} — hãy giảm số lượng',
+    shortage: 'Chỉ còn {n}, hãy giảm số lượng',
     hasShortage: 'Có sản phẩm không đủ hàng. Hãy giảm số lượng hoặc xoá trước khi thanh toán.',
     maxNote: 'Tối đa {max} sản phẩm mỗi loại.',
     subtotal: 'Tạm tính',
@@ -769,7 +770,7 @@ export default {
     close: 'Đóng',
     title: 'Mây',
     subtitle: 'Trợ lý AI của LAMVI',
-    aiNotice: 'Mây là trợ lý AI, chỉ trả lời dựa trên thông tin của LAMVI. Nội dung bạn nhắn được xử lý bởi nhà cung cấp AI ở nước ngoài (OpenAI) — đừng gửi thông tin cá nhân nhạy cảm. Mây không đặt hàng hay sửa tài khoản giúp bạn được.',
+    aiNotice: 'Mây là trợ lý AI, chỉ trả lời dựa trên thông tin của LAMVI. Nội dung bạn nhắn được xử lý bởi nhà cung cấp AI ở nước ngoài (OpenAI), đừng gửi thông tin cá nhân nhạy cảm. Mây không đặt hàng hay sửa tài khoản giúp bạn được.',
     suggestTitle: 'Gợi ý câu hỏi',
     suggestions: ['Đèn làm từ chất liệu gì?', 'Mã QR trên thiệp dùng để làm gì?', 'Tôi có thể viết lời chúc sau khi đặt không?', 'Giao hàng mất bao lâu?'],
     greeting: 'Chào bạn, Mây đây! Bạn muốn hỏi về đèn, lời chúc hay mã QR nè?',
@@ -780,7 +781,7 @@ export default {
     faqTitle: 'Câu hỏi thường gặp',
     startTour: 'Dẫn tour',
     historyNote: 'Cuộc trò chuyện được lưu trong tài khoản của bạn.',
-    guestNote: 'Bạn chưa đăng nhập — cuộc trò chuyện không được lưu.',
+    guestNote: 'Bạn chưa đăng nhập, cuộc trò chuyện không được lưu.',
     tour: {
       label: 'Tour cùng Mây',
       next: 'Tiếp',
@@ -952,7 +953,7 @@ export default {
           'Giao sai sản phẩm so với đơn hàng.',
           'Chúng tôi không nhận đổi trả vì đổi ý, đặc biệt với đèn kèm lời chúc cá nhân hoá.'
         ] },
-        { h: 'Video khui hàng — bắt buộc', items: [
+        { h: 'Video khui hàng, bắt buộc', items: [
           'Yêu cầu đổi trả phải kèm video quay liên tục từ lúc khui hàng đến lúc thấy tình trạng đèn. Không có video, chúng tôi không thể xử lý yêu cầu.',
           'Nếu đèn là quà tặng, người nhận hãy quay video khi mở hộp. Hướng dẫn này cũng có trên trang QR lời chúc và thiệp cảm ơn.'
         ] },
@@ -975,7 +976,7 @@ export default {
     wholeSet: 'Trọn bộ',
     view: 'Xem bộ sưu tập',
     notFound: 'Không tìm thấy bộ sưu tập',
-    metaTitle: 'Bộ sưu tập {name} — LAMVI',
+    metaTitle: 'Bộ sưu tập {name}, LAMVI',
     setNote: 'Mua trọn bộ để có đủ các đèn của bộ sưu tập này.',
     addSet: 'Mua cả bộ',
     pickSingle: 'Hoặc chọn từng đèn ({n} đèn)',
@@ -991,7 +992,7 @@ export default {
   contact: {
     title: "Liên hệ LAMVI",
     description: "Hotline, Zalo, email hỗ trợ, giờ làm việc và biểu mẫu liên hệ của LAMVI.",
-    lead: "Bạn cần hỗ trợ về đơn hàng, đổi trả hay muốn hỏi thêm về đèn? Chọn kênh thuận tiện nhất — chúng tôi trả lời trong giờ làm việc.",
+    lead: "Bạn cần hỗ trợ về đơn hàng, đổi trả hay muốn hỏi thêm về đèn? Chọn kênh thuận tiện nhất, chúng tôi trả lời trong giờ làm việc.",
     hotline: "Hotline",
     zalo: "Zalo",
     zaloOpen: "Nhắn Zalo",

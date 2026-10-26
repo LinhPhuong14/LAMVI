@@ -34,6 +34,7 @@ import Seo from '../seo/Seo.jsx'
 import { organizationJsonLd, webSiteJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
 import ProductCards from '../components/ProductCards'
+import Carousel from '../components/Carousel.jsx'
 import MayAvatar from '../may/MayAvatar.jsx'
 
 const TONES = ['amber', 'dusk', 'dawn', 'moss', 'dusk']
@@ -256,6 +257,12 @@ function Hero() {
           {/* Đèn thật (mẫu Tứ Linh) đã tách nền từ ảnh fanpage (D-107, public/images/lamps/CREDITS.md) */}
           <img className="lamp-cutout hero-lamp" src="/images/lamps/tu-linh-cutout.webp" alt={t('lookbook.items')[1]} width={172} height={402} fetchPriority="high" decoding="async" />
         </m.div>
+        <figure className="hero-polaroid hp-a" aria-hidden="true">
+          <img src="/images/folk/chuot-ruoc-den-480.webp" alt="" width={150} height={170} loading="lazy" decoding="async" />
+        </figure>
+        <figure className="hero-polaroid hp-b" aria-hidden="true">
+          <img src="/images/lamps/thu-hoach.jpg" alt="" width={130} height={160} loading="lazy" decoding="async" />
+        </figure>
       </div>
 
     </section>
@@ -277,7 +284,7 @@ function ProductGrid() {
 
   return (
     <>
-      <ProductCards items={res.data.items} />
+      <ProductCards items={res.data.items} carousel label={t('products.title')} />
       {/* D-86: đi tới trang Cửa hàng để xem toàn bộ đèn */}
       <div className="products-more">
         <Link to={path('/shop')} className="btn btn-ghost">
@@ -377,7 +384,8 @@ export default function HomePage() {
         <SkyLanterns />
         <div className="lookbook-inner">
           <LampHead eyebrow={t('lookbook.eyebrow')} title={t('lookbook.title')} />
-          <Reveal className="lookbook-grid" tabIndex={0} role="region" aria-label={t('lookbook.title')} variants={group} margin="-10% 0px -10% 0px">
+          <Carousel label={t('lookbook.title')}>
+          <Reveal className="lookbook-grid" variants={group} margin="-10% 0px -10% 0px">
             {t('lookbook.items').map((label, i) => (
               <m.div
                 className={`lookbook-card size-${SIZES[i]} tone-${TONES[i]}`}
@@ -396,6 +404,7 @@ export default function HomePage() {
               </m.div>
             ))}
           </Reveal>
+          </Carousel>
         </div>
       </section>
 

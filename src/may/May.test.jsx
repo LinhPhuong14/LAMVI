@@ -163,7 +163,7 @@ describe('Admin — cấu hình Mây (FR-AI-007)', () => {
     expect(await screen.findByText('Đã dùng trên 80% ngân sách tháng.')).toBeInTheDocument()
     fireEvent.click(screen.getByLabelText('Bật trả lời bằng OpenAI'))
     fireEvent.change(screen.getByLabelText('Ngân sách tháng (USD)'), { target: { value: '30' } })
-    fireEvent.change(screen.getByLabelText('Hết lượt ("mệt") — Tiếng Việt'), { target: { value: 'Mây mệt\n\nMây buồn ngủ' } })
+    fireEvent.change(screen.getByLabelText('Hết lượt ("mệt"): Tiếng Việt'), { target: { value: 'Mây mệt\n\nMây buồn ngủ' } })
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }))
     await waitFor(() => expect(puts).toHaveLength(1))
     expect(puts[0]).toMatchObject({ openaiEnabled: true, monthlyBudgetUsd: 30 })

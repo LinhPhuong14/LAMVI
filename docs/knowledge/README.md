@@ -8,6 +8,7 @@ Bộ tài liệu này giữ cho mọi phiên code (người hoặc AI) làm vi�
 | [`decisions.md`](decisions.md) | Quyết định **kỹ thuật** `T-xx` (stack, kiến trúc, quy ước) | Khi chọn/đổi công nghệ hoặc cách làm |
 | [`architecture.md`](architecture.md) | Cấu trúc thư mục, luồng dữ liệu, adapter, schema, API | Khi thêm module/bảng/endpoint |
 | [`design-rules.md`](design-rules.md) | Design rules: màu, chữ, nét/khung, hoạ tiết, ảnh (nguồn, giấy phép), motion, hiệu năng | Khi đổi token, thêm component giao diện hoặc ảnh |
+| [`dashboard-ux.md`](dashboard-ux.md) | Đề xuất thiết kế lại dashboard khách và admin (từng tab: nội dung, bố cục, nút) | Khi triển khai hoặc đổi luồng dashboard |
 | [`conventions.md`](conventions.md) | Quy ước code, i18n, API, test, commit | Khi thống nhất quy ước mới |
 | [`deploy-vercel.md`](deploy-vercel.md) | Cách chạy trên Vercel, biến môi trường, quy tắc deploy (T-33) | Khi đổi cấu hình deploy |
 | [`glossary.md`](glossary.md) | Thuật ngữ nghiệp vụ ↔ tên trong code | Khi xuất hiện khái niệm mới |

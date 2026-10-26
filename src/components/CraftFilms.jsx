@@ -126,39 +126,46 @@ export function IntroFilm({ ctaHref }) {
 
   return (
     <section className="intro-film" aria-label={t('intro.label')}>
-      <video
-        ref={ref}
-        className="intro-film-video"
-        autoPlay
-        muted
-        suppressHydrationWarning
-        onPlay={() => setPaused(false)}
-        onPause={() => setPaused(true)}
-        loop
-        playsInline
-        preload="metadata"
-        poster={film.poster}
-        aria-label={t('intro.label')}
-      >
-        <source src={film.src} type="video/mp4" />
-      </video>
-      <div className="intro-film-shade" aria-hidden="true" />
+      <div className="intro-film-stage">
+        <video
+          ref={ref}
+          className="intro-film-video"
+          autoPlay
+          muted
+          suppressHydrationWarning
+          onPlay={() => setPaused(false)}
+          onPause={() => setPaused(true)}
+          loop
+          playsInline
+          preload="metadata"
+          poster={film.poster}
+          aria-label={t('intro.label')}
+        >
+          <source src={film.src} type="video/mp4" />
+        </video>
+        <div className="intro-film-shade" aria-hidden="true" />
+        <div className="intro-film-controls">
+          <button type="button" onClick={togglePlay} aria-label={paused ? t('intro.play') : t('intro.pause')}>
+            {paused ? '▶' : '❚❚'}
+          </button>
+          <button type="button" onClick={toggleSound} aria-label={muted ? t('intro.soundOn') : t('intro.soundOff')}>
+            {muted ? '🔇' : '🔊'}
+          </button>
+        </div>
+      </div>
       <div className="intro-film-copy">
         <p className="intro-film-brand">LAMVI</p>
         <p className="intro-film-slogan">
           {t('intro.slogan1')} <em>{t('intro.slogan2')}</em>
         </p>
-        <a className="btn btn-primary" href={ctaHref}>
-          {t('intro.cta')} <span aria-hidden="true">↓</span>
-        </a>
-      </div>
-      <div className="intro-film-controls">
-        <button type="button" onClick={togglePlay} aria-label={paused ? t('intro.play') : t('intro.pause')}>
-          {paused ? '▶' : '❚❚'}
-        </button>
-        <button type="button" onClick={toggleSound} aria-label={muted ? t('intro.soundOn') : t('intro.soundOff')}>
-          {muted ? '🔇' : '🔊'}
-        </button>
+        <div className="intro-film-actions">
+          <a className="btn btn-primary" href={ctaHref}>
+            {t('intro.cta')} <span aria-hidden="true">↓</span>
+          </a>
+          <a className="btn btn-ghost" href="#story">
+            {t('hero.story')}
+          </a>
+        </div>
       </div>
     </section>
   )

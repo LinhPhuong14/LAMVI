@@ -71,6 +71,6 @@ describe('CartPage v2', () => {
     mockApi({ ...base, 'GET /cart': () => ({ body: cartOf(true) }) })
     renderAt('/cart')
     expect(await screen.findByText(/Giỏ có sản phẩm không còn bán/)).toBeInTheDocument()
-    expect(screen.getByText('Sản phẩm này hiện không còn bán — vui lòng xoá khỏi giỏ.')).toBeInTheDocument()
+    expect(screen.getByText('Sản phẩm này hiện không còn bán, vui lòng xoá khỏi giỏ.')).toBeInTheDocument()
   })
 })

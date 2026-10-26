@@ -203,13 +203,13 @@ describe('CSS trang nội bộ theo design-rules §12', () => {
 })
 
 describe('Số liệu dashboard IT', () => {
-  it('dải số liệu ngăn bằng nét dọc, số dùng Fraunces kiểu cổ (§12)', async () => {
+  it('dải số liệu ngăn bằng nét dọc, số dùng Cormorant, chữ số cùng chiều cao (§12)', async () => {
     itApi()
     renderAt('/it')
     await screen.findByRole('heading', { name: 'Dashboard IT', level: 1 })
     await waitFor(() => expect(document.querySelectorAll('.it-kpis div').length).toBe(4))
     expect(ADMIN_CSS).toMatch(/\.it-kpis div \+ div \{\s*border-left: 1px solid var\(--dash-line\)/)
-    expect(ADMIN_CSS).toMatch(/\.it-kpis strong \{[^}]*font-variant-numeric: oldstyle-nums/s)
+    expect(ADMIN_CSS).toMatch(/\.it-kpis strong \{[^}]*font-variant-numeric: lining-nums/s)
   })
 
   it('hàng có lỗi 5xx đánh dấu bằng vạch son, không tô mảng đỏ đậm', () => {

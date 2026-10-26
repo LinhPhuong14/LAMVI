@@ -37,7 +37,7 @@ describe('Giỏ hàng', () => {
     mockApi({ 'GET /products': () => ({ body: { items } }), 'GET /cart': () => ({ body: cartBody() }), 'GET /me': () => ({ body: { profile: { id: 'u1', email: 'an@example.com', fullName: 'An', preferredLocale: 'vi', role: 'customer' } } }), 'GET /may/history': () => ({ body: { items: [] } }) })
     renderAt('/cart')
     expect(await screen.findByText(/Có sản phẩm không đủ hàng/)).toBeTruthy()
-    expect(screen.getByText('Chỉ còn 2 — hãy giảm số lượng')).toBeTruthy()
+    expect(screen.getByText('Chỉ còn 2, hãy giảm số lượng')).toBeTruthy()
     expect(screen.getByRole('button', { name: /Thanh toán|Đặt hàng|checkout/i })).toBeDisabled()
   })
 })

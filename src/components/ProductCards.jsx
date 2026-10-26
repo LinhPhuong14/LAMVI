@@ -7,12 +7,13 @@ import { Reveal } from './Reveal'
 import { group, stamp } from '../lib/motion.js'
 import { useI18n } from '../i18n/index.js'
 import AddToCart from '../cart/AddToCart.jsx'
+import Carousel from './Carousel.jsx'
 
 // Lưới thẻ sản phẩm dùng chung cho bộ sưu tập ở trang chủ và trang Cửa hàng (D-86).
 // FR-CART-001; "Mua tặng/Mua cho mình" chọn ở bước thanh toán (FR-CHK-002, D-83).
-export default function ProductCards({ items, className = '' }) {
+export default function ProductCards({ items, className = '', carousel = false, label }) {
   const { t, path } = useI18n()
-  return (
+  const grid = (
     <Reveal className={`product-grid ${className}`.trim()} variants={group} margin="-8% 0px -8% 0px">
       {items.map((p, i) => (
         <TiltCard className={`product-card tone-${p.tone}`} key={p.slug} variants={stamp} custom={i}>
@@ -39,4 +40,5 @@ export default function ProductCards({ items, className = '' }) {
       ))}
     </Reveal>
   )
+  return carousel ? <Carousel label={label}>{grid}</Carousel> : grid
 }
