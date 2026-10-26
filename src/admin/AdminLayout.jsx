@@ -30,10 +30,34 @@ const NAV = [
   ['groupInsight', [['/admin/analytics', 'analytics', AnalyticsIcon]]],
 ]
 
+// Chỉ dựng sau khi đã xác nhận vai trò: huy hiệu gọi API admin nên không được gọi với tài khoản thường
+function AdminNav() {
+  const counts = useAdminCounts()
+  return (
+    <nav aria-label={S.title}>
+          {NAV.map(([group, items]) => (
+            <div key={group ?? 'top'} className="admin-nav-group">
+              {group && <span className="admin-nav-title">{S.nav[group]}</span>}
+              {items.map(([to, key, Icon, badge, end]) => (
+                <NavLink key={to} to={to} end={end}>
+                  <Icon />
+                  {S.nav[key]}
+                  {badge && counts[badge] > 0 && (
+                    <span className="admin-badge" aria-label={`${counts[badge]}`}>
+                      {counts[badge]}
+                    </span>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          ))}
+    </nav>
+  )
+}
+
 // BR-SEO-001: admin noindex
 function Gate() {
   const { user, authedApi } = useAuth()
-  const counts = useAdminCounts()
   const [state, setState] = useState({ status: 'loading' })
 
   useEffect(() => {
@@ -79,24 +103,7 @@ function Gate() {
           <Seal>LAMVI</Seal>
           <strong>{S.title}</strong>
         </div>
-        <nav aria-label={S.title}>
-          {NAV.map(([group, items]) => (
-            <div key={group ?? 'top'} className="admin-nav-group">
-              {group && <span className="admin-nav-title">{S.nav[group]}</span>}
-              {items.map(([to, key, Icon, badge, end]) => (
-                <NavLink key={to} to={to} end={end}>
-                  <Icon />
-                  {S.nav[key]}
-                  {badge && counts[badge] > 0 && (
-                    <span className="admin-badge" aria-label={`${counts[badge]}`}>
-                      {counts[badge]}
-                    </span>
-                  )}
-                </NavLink>
-              ))}
-            </div>
-          ))}
-        </nav>
+        <AdminNav />
         <div className="admin-side-foot">
           {/* D-51: chỉ IT mới vào được /it */}
           {state.role === 'it' && (

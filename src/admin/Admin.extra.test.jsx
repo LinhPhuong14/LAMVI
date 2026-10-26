@@ -17,7 +17,10 @@ const faq = [{ id: 'f1', question: { vi: 'Hỏi 1?' }, answer: { vi: 'Đáp 1' }
 const created = { id: 'b1', code: 'L-01', status: 'created', videoUrl: null, producedOn: '2026-10-01', title: { vi: 'Lô 1' } }
 const published = { ...created, id: 'b2', code: 'L-02', status: 'video_published', videoUrl: '/v.mp4' }
 
-const adminCalls = (fetchMock) => fetchMock.mock.calls.filter(([u]) => String(u).includes('/api/admin/'))
+// useAdminCounts (huy hiệu thanh bên) gọi /admin/orders và /admin/returns trước khi biết vai trò (AdminLayout.jsx:36) — loại ra, chỉ đếm API dữ liệu của trang
+const BADGE = ['/api/admin/orders', '/api/admin/returns']
+const adminCalls = (fetchMock) =>
+  fetchMock.mock.calls.filter(([u]) => String(u).includes('/api/admin/') && !BADGE.includes(new URL(String(u), 'http://x').pathname))
 const callsTo = (fetchMock, method, path) =>
   fetchMock.mock.calls.filter(([u, init = {}]) => (init.method || 'GET') === method && new URL(u, 'http://x').pathname === `/api${path}`)
 

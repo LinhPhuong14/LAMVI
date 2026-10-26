@@ -543,7 +543,7 @@ describe('CSS dashboard', () => {
   it('mọi var(--x) trong pages.css được định nghĩa', () => {
     const defined = new Set([...(INDEX + PAGES).matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]))
     const used = [...new Set([...PAGES.matchAll(/var\(\s*(--[\w-]+)/g)].map((m) => m[1]))]
-    expect(used.filter((v) => !defined.has(v))).toEqual([])
+    expect(used.filter((v) => !defined.has(v) && v !== '--dur')).toEqual([]) // --dur: FolkGallery đặt inline (style) cho thanh tiến độ
   })
 
   it('@keyframes dash-in tồn tại; reduced-motion tắt animation của .dash-panel và .dash-stat', () => {

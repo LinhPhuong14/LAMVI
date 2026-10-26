@@ -45,7 +45,7 @@ beforeEach(() => {
 })
 
 describe('Thanh bên trang nội bộ', () => {
-  it('admin: ấn triện + nhãn khu vực + 10 mục có biểu tượng, mục đang mở được đánh dấu', async () => {
+  it('admin: ấn triện + nhãn khu vực + 11 mục nhóm theo công việc có biểu tượng, mục đang mở được đánh dấu', async () => {
     mockApi({ 'GET /me': me('admin'), 'GET /admin/products': () => ({ body: { items: [] } }) })
     const { container } = renderAt('/admin/products')
     await screen.findByRole('heading', { name: 'Sản phẩm', level: 1 })
@@ -53,17 +53,19 @@ describe('Thanh bên trang nội bộ', () => {
     const nav = container.querySelector('.admin-nav nav')
     const links = [...nav.querySelectorAll('a')]
     expect(links.map((a) => a.textContent)).toEqual([
+      'Hôm nay',
       'Đơn hàng',
       'Đổi trả',
-      'Người dùng',
+      'Mã giảm giá',
       'Sản phẩm',
       'Bộ sưu tập',
-      'Hỏi đáp',
       'Lô đèn',
-      'Mã giảm giá',
-      'Truy cập (GA)',
+      'Hỏi đáp',
       'Mây (AI)',
+      'Người dùng',
+      'Truy cập (GA)',
     ])
+    expect([...nav.querySelectorAll('.admin-nav-title')].map((e) => e.textContent)).toEqual(['Bán hàng', 'Sản phẩm', 'Nội dung', 'Khách hàng', 'Phân tích'])
     // Biểu tượng là trang trí; nhãn chữ mới là nội dung cho trình đọc màn hình
     for (const a of links) {
       const icon = a.querySelector('svg.admin-nav-icon')

@@ -26,13 +26,17 @@ describe('Admin — phân quyền (D-38, D-48)', () => {
     const fetchMock = mockApi({ 'GET /me': me('customer') })
     renderAt('/admin/products')
     expect(await screen.findByRole('heading', { name: 'Không có quyền truy cập' })).toBeInTheDocument()
-    expect(fetchMock.mock.calls.some(([u]) => String(u).includes('/api/admin/'))).toBe(false)
+    // Không gọi API dữ liệu của trang (sản phẩm). Hai lệnh đếm huy hiệu ở thanh bên (useAdminCounts) vẫn chạy trước khi biết vai trò;
+    // server từ chối ở mọi /admin (D-38) — xem báo cáo (AdminLayout.jsx:36)
+    const paths = fetchMock.mock.calls.map(([u]) => new URL(String(u), 'http://x').pathname)
+    expect(paths).not.toContain('/api/admin/products')
   })
 
-  it('/admin → chuyển tới Đơn hàng; trang noindex', async () => {
+  it('/admin → trang "Hôm nay" (không còn chuyển sang Đơn hàng); trang noindex', async () => {
     mockApi({ 'GET /me': me('admin'), 'GET /admin/orders': () => ({ body: { items: [] } }) })
     renderAt('/admin')
-    expect(await screen.findByRole('heading', { name: 'Đơn hàng' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Hôm nay', level: 1 })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Đơn hàng', level: 1 })).toBeNull()
     expect(document.head.querySelector('meta[name="robots"]')?.content).toBe('noindex')
   })
 })

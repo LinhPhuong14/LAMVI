@@ -26,14 +26,18 @@ describe.each(['vi', 'en', 'zh'])('SSR %s — phòng tranh và hoạ tiết', (l
     const d = await doc(PREFIX[lang])
     const gallery = d.querySelector('#story .folk-gallery')
     expect(gallery).not.toBeNull()
-    const imgs = gallery.querySelectorAll('img')
-    expect(imgs).toHaveLength(FOLK_ART.length)
+    // D-124: một tranh lớn (đầu tiên) + hàng thumbnail; thumbnail lazy, nút có aria-label = tên tranh
+    const big = gallery.querySelector('.folk-feature img')
+    expect(big.getAttribute('alt')).toBe(MESSAGES[lang].gallery.items[FOLK_ART[0].id].alt)
+    expect(big.getAttribute('width')).toBe(String(FOLK_ART[0].width))
+    const thumbs = gallery.querySelectorAll('button.folk-thumb')
+    expect(thumbs).toHaveLength(FOLK_ART.length)
     FOLK_ART.forEach((art, i) => {
-      const img = imgs[i]
+      const img = thumbs[i].querySelector('img')
+      expect(thumbs[i].getAttribute('aria-label')).toBe(MESSAGES[lang].gallery.items[art.id].name)
       expect(img.getAttribute('loading')).toBe('lazy')
       expect(img.getAttribute('width')).toBe(String(art.width))
       expect(img.getAttribute('height')).toBe(String(art.height))
-      expect(img.getAttribute('alt')).toBe(MESSAGES[lang].gallery.items[art.id].alt)
     })
     expect(gallery.querySelector('.folk-gallery-note').textContent).toBe(MESSAGES[lang].gallery.note)
     // Ghi chú: tranh trong Reveal có opacity:0 trong HTML SSR tới khi JS chạy — khoảng trống đã biết G-34 (decisions T-22), không kiểm ở đây

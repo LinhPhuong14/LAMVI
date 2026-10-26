@@ -269,7 +269,7 @@ describe('CSS giao diện tối', () => {
   it('mọi var(--x) dùng trong pages.css đều được khai báo (hoặc có giá trị dự phòng)', () => {
     const defined = new Set([...allCss.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]))
     const missing = []
-    for (const m of pages.matchAll(/var\(\s*(--[\w-]+)\s*(,)?/g)) if (!m[2] && !defined.has(m[1])) missing.push(m[1])
+    for (const m of pages.matchAll(/var\(\s*(--[\w-]+)\s*(,)?/g)) if (!m[2] && !defined.has(m[1]) && m[1] !== '--dur') missing.push(m[1]) // --dur: FolkGallery đặt inline (style)
     expect([...new Set(missing)]).toEqual([])
   })
 

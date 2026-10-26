@@ -53,13 +53,15 @@ describe('CSS — bỏ phong cách viền đen dày + bóng đổ cứng', () =>
     expect(read('src/components/Motifs.jsx')).not.toMatch(/Postmark/)
   })
 
+  // Biến CSS do JSX đặt inline (style={{ '--dur': … }} ở FolkGallery) nên không có khai báo trong CSS
+  const INLINE_VARS = ['--dur']
   it('mọi var(--x) trong App.css/pages.css đều được định nghĩa (index.css hoặc chính file)', () => {
     const missing = {}
     for (const f of ['src/styles/App.css', 'src/styles/pages.css']) {
       const s = FILES[f]
       const defined = new Set([...(INDEX + s).matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]))
       const used = new Set([...s.matchAll(/var\(\s*(--[\w-]+)/g)].map((m) => m[1]))
-      const miss = [...used].filter((v) => !defined.has(v))
+      const miss = [...used].filter((v) => !defined.has(v) && !INLINE_VARS.includes(v))
       if (miss.length) missing[f] = miss
     }
     expect(missing).toEqual({})
