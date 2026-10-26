@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { m } from 'framer-motion'
 import { useAutoplayInView } from '../lib/useAutoplayInView.js'
+import { useHydratedReducedMotion } from '../lib/hydration.js'
 import { useI18n } from '../i18n/index.js'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import { rise, group } from '../lib/motion.js'
@@ -91,5 +92,77 @@ export default function CraftFilms() {
         </figcaption>
       </m.figure>
     </Reveal>
+  )
+}
+
+// Màn hình đầu trang chủ: video giới thiệu toàn khung hình (khách quét QR vào thấy ngay).
+// Tự phát không tiếng, lặp; poster hiện ngay từ HTML server. Giảm chuyển động → không tự phát (WCAG 2.2.2), có nút phát/dừng và bật/tắt tiếng.
+export function IntroFilm({ ctaHref }) {
+  const { t } = useI18n()
+  const ref = useRef(null)
+  const reduce = useHydratedReducedMotion()
+  const [paused, setPaused] = useState(false)
+  const [muted, setMuted] = useState(true)
+  const film = CRAFT_FILMS.paper
+
+  useEffect(() => {
+    const video = ref.current
+    if (!video) return
+    video.muted = true // React không phản ánh thuộc tính muted khi SSR → đặt lại để trình duyệt cho tự phát
+    if (reduce) video.pause()
+    else video.play()?.catch(() => setPaused(true))
+  }, [reduce])
+
+  const togglePlay = () => {
+    const video = ref.current
+    if (!video) return
+    if (video.paused) video.play()?.catch(() => {})
+    else video.pause()
+  }
+  const toggleSound = () => {
+    const video = ref.current
+    if (!video) return
+    video.muted = !video.muted
+    setMuted(video.muted)
+    if (!video.muted && video.paused) togglePlay()
+  }
+
+  return (
+    <section className="intro-film" aria-label={t('intro.label')}>
+      <video
+        ref={ref}
+        className="intro-film-video"
+        autoPlay
+        muted
+        suppressHydrationWarning
+        onPlay={() => setPaused(false)}
+        onPause={() => setPaused(true)}
+        loop
+        playsInline
+        preload="metadata"
+        poster={film.poster}
+        aria-label={t('intro.label')}
+      >
+        <source src={film.src} type="video/mp4" />
+      </video>
+      <div className="intro-film-shade" aria-hidden="true" />
+      <div className="intro-film-copy">
+        <p className="intro-film-brand">LAMVI</p>
+        <p className="intro-film-slogan">
+          {t('intro.slogan1')} <em>{t('intro.slogan2')}</em>
+        </p>
+        <a className="btn btn-primary" href={ctaHref}>
+          {t('intro.cta')} <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+      <div className="intro-film-controls">
+        <button type="button" onClick={togglePlay} aria-label={paused ? t('intro.play') : t('intro.pause')}>
+          {paused ? '▶' : '❚❚'}
+        </button>
+        <button type="button" onClick={toggleSound} aria-label={muted ? t('intro.soundOn') : t('intro.soundOff')}>
+          {muted ? '🔇' : '🔊'}
+        </button>
+      </div>
+    </section>
   )
 }

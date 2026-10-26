@@ -168,6 +168,16 @@ export default {
       { label: 'Đóng gói & thiệp cảm ơn', note: 'Đèn và thiệp cảm ơn có mã QR được đóng hộp' },
     ],
   },
+  intro: {
+    slogan1: 'Mỗi nét Việt,',
+    slogan2: 'một nét riêng',
+    label: 'Video giới thiệu LAMVI: làng nghề giấy dó',
+    soundOn: 'Bật tiếng',
+    soundOff: 'Tắt tiếng',
+    play: 'Phát video',
+    pause: 'Dừng video',
+    cta: 'Xem bộ sưu tập',
+  },
   films: {
     eyebrow: 'Xem tận mắt nghề',
     title: 'Từ tờ giấy dó làm nên thân đèn',

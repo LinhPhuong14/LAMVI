@@ -153,6 +153,16 @@ export default {
       { label: '包装与感谢卡', note: '灯与带二维码的感谢卡一同装盒' },
     ],
   },
+  intro: {
+    slogan1: '每一笔越南韵味，',
+    slogan2: '自有独特印记',
+    label: 'LAMVI 介绍视频：dó 纸手艺村',
+    soundOn: '开启声音',
+    soundOff: '关闭声音',
+    play: '播放视频',
+    pause: '暂停视频',
+    cta: '查看系列',
+  },
   films: {
     eyebrow: '亲眼看手艺',
     title: '化作灯身的 dó 纸',

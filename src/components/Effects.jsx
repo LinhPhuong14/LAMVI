@@ -148,8 +148,8 @@ export function BrandHover({ text }) {
       <defs>
         <m.radialGradient id={gradId} gradientUnits="userSpaceOnUse" cx={cxp} cy={cyp} r={rp}>
           <stop offset="0%" stopColor="#e6a623" />
-          <stop offset="45%" stopColor="#a83a2a" />
-          <stop offset="100%" stopColor="#a83a2a" stopOpacity="0" />
+          <stop offset="45%" stopColor="#8b5e3c" />
+          <stop offset="100%" stopColor="#8b5e3c" stopOpacity="0" />
         </m.radialGradient>
       </defs>
       <m.text

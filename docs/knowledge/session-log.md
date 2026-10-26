@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-26 — Màu theo guideline + video giới thiệu đầu trang (nhánh `feat/brand-colors-intro-video`, D-121)
+
+PO gửi brand guideline (5 màu, Cormorant Garamond + Be Vietnam Pro) và báo client chê UI "AI slop"; yêu cầu đưa video giới thiệu lên đầu trang cho người quét QR. PO chọn video làng giấy dó, thay hero ở trang chủ `/`. Đã làm: đổi toàn bộ token màu (T-92), font tiêu đề, `IntroFilm`, cập nhật test (Palette, AccountTheme, SSR craftFilms). Tham khảo thiết kế bằng WebSearch (Behance/Pinterest không crawl được — cần đăng nhập, cấm bot): hero video im lặng + poster, bản dọc 3:4 cho điện thoại, ít trang trí hơn. **Chưa làm**: gỡ bớt hoạ tiết/kính mờ/vân giấy (nguồn gốc cảm giác "AI slop"), dựng lại og:image, bản video nhẹ cho mobile (G-119).
+
+---
+
 ## 2026-10-23 (phiên 3) — Mây trả lời "chưa biết" quá nhiều (nhánh `fix/may-knowledge`, G-118)
 
 PO: "chưa bật OpenAI cho Mây hay sao, hỏi gì cũng không biết, trả lời liên hệ email". Gọi thử `POST /api/may/chat` trên production: OpenAI **đang bật** (câu về giá, mẫu đèn, "giấy dó là gì" trả lời được); câu "ship bao lâu", "đặt hàng thế nào", "Tứ Linh gồm linh vật nào" trả về câu "chưa biết". Nguyên nhân trong code: Mây không có nguồn về chính sách; bộ chặn BR-AI-003/005 trả ngay "chưa biết" khi câu đầu vướng. Sửa: `get_policies`, thử lại một lần có nhắc luật, prompt. Không có khoá OpenAI trong phiên nên kiểm bằng OpenAI giả; **sau deploy cần gọi lại 5 câu trên production để xác nhận**. PO thêm: "đừng strict quá, để Mây thú vị" → D-118: prompt có tính cách, cho phép kiến thức văn hoá chung, câu mẫu thân thiện, nhiệt độ 0,7; giữ nguyên BR-AI-003/005/006.

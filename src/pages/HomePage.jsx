@@ -14,7 +14,7 @@ import Marquee from '../components/Marquee'
 import Particles from '../components/Particles'
 import Faq from '../components/Faq'
 import FolkGallery from '../components/FolkGallery'
-import CraftFilms, { CraftVideo, PhoneVideo } from '../components/CraftFilms'
+import CraftFilms, { CraftVideo, IntroFilm, PhoneVideo } from '../components/CraftFilms'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import Scene from '../components/Scene'
 import { CountUp, Reveal } from '../components/Reveal'
@@ -231,7 +231,7 @@ function Hero() {
   const cueOpacity = useTransform(scrollY, [0, 140], [1, 0])
 
   return (
-    <section className="hero aged has-motifs">
+    <section id="hero" className="hero aged has-motifs">
       <Scene name="hero" />
       <PointerGlow />
       <Particles />
@@ -367,6 +367,8 @@ export default function HomePage() {
         ]}
       />
       <ScrollProgress />
+
+      <IntroFilm ctaHref="#hero" />
 
       <Hero />
 

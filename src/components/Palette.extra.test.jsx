@@ -53,14 +53,14 @@ describe('T-26 — token màu trong :root', () => {
 describe('T-26 — tương phản WCAG (tự tính từ hex, ngưỡng AA 4,5:1 chữ thường)', () => {
   // [chữ, nền, tỉ lệ ghi ở design-rules §2.3]
   const PAIRS = [
-    ['than', 'diep', 13.5],
-    ['than-soft', 'diep', 7.2],
-    ['than-soft', 'diep-deep', 6.3],
-    ['son', 'diep', 6.0],
-    ['diep-light', 'son', 6.5],
-    ['hoe-light', 'cham', 7.4],
-    ['diep', 'cham', 10.4],
-    ['sepia', 'diep', 5.2],
+    ['than', 'diep', 12.2],
+    ['than-soft', 'diep', 7.0],
+    ['than-soft', 'diep-deep', 6.0],
+    ['son', 'diep', 4.6],
+    ['diep-light', 'son', 5.0],
+    ['hoe-light', 'cham', 10.4],
+    ['diep', 'cham', 12.2],
+    ['sepia', 'diep', 5.6],
     // eyebrow trên nền tối
     ['hoe-light', 'cham-deep', null],
   ]
@@ -70,8 +70,8 @@ describe('T-26 — tương phản WCAG (tự tính từ hex, ngưỡng AA 4,5:1 
     if (doc) expect(Math.abs(r - doc), `${fg}/${bg} = ${r.toFixed(2)} (ghi ${doc})`).toBeLessThan(0.1)
   })
 
-  it('--hoe trên --cham < 4,5 (đúng như design-rules nói, không được dùng cho chữ)', () => {
-    expect(ratio(TOKENS.hoe, TOKENS.cham)).toBeLessThan(4.5)
+  it('--hoe (Caramel) trên --diep < 4,5 (đúng như design-rules nói, không được dùng cho chữ trên nền sáng)', () => {
+    expect(ratio(TOKENS.hoe, TOKENS.diep)).toBeLessThan(4.5)
   })
 
   it('.story .eyebrow và .lookbook .eyebrow dùng --hoe-light (không dùng --hoe/--son trên nền tối)', () => {

@@ -45,7 +45,7 @@ describe('Banner', () => {
   })
 
   it('có màu nền chàm quanh banner để khi khách chặn ảnh vẫn thấy khung và chữ alt', () => {
-    expect(recoveryMail({ lang: 'vi', url: LINK, siteUrl: SITE }).html).toMatch(/bgcolor="#1a2735"/)
+    expect(recoveryMail({ lang: 'vi', url: LINK, siteUrl: SITE }).html).toMatch(/bgcolor="#2b1607"/)
   })
 })
 
@@ -75,7 +75,7 @@ describe('Bố cục', () => {
 
   it('nút bấm là bảng có nền (Outlook), link là địa chỉ đầy đủ; thêm dòng sao chép liên kết', () => {
     const html = recoveryMail({ lang: 'vi', url: LINK, siteUrl: SITE }).html
-    expect(html).toMatch(/<td[^>]*bgcolor="#a3321f"[^>]*><a href="https:\/\/lamvi\.test\/reset-password#t=abc123"/)
+    expect(html).toMatch(/<td[^>]*bgcolor="#8b5e3c"[^>]*><a href="https:\/\/lamvi\.test\/reset-password#t=abc123"/)
     expect(html).toContain('Nếu nút không bấm được')
     expect(html.split('reset-password#t=abc123').length - 1).toBe(2) // nút + dòng sao chép
   })
@@ -108,8 +108,8 @@ describe('Bố cục', () => {
   it('có nhãn phân loại (eyebrow), vạch son dưới banner và hộp lưu ý', () => {
     const html = recoveryMail({ lang: 'vi', url: LINK, siteUrl: SITE }).html
     expect(html).toContain('Bảo mật tài khoản')
-    expect(html).toMatch(/<td height="4" bgcolor="#a3321f"/)
-    expect(html).toMatch(/<td width="4" bgcolor="#a3321f"[^>]*><\/td><td[^>]*>Nếu không phải bạn/) // lưu ý nằm trong hộp có vạch
+    expect(html).toMatch(/<td height="4" bgcolor="#8b5e3c"/)
+    expect(html).toMatch(/<td width="4" bgcolor="#8b5e3c"[^>]*><\/td><td[^>]*>Nếu không phải bạn/) // lưu ý nằm trong hộp có vạch
     expect(orderMail({ kind: 'shipped', lang: 'en', order, siteUrl: SITE }).html).toContain('Your order')
   })
 
@@ -117,7 +117,7 @@ describe('Bố cục', () => {
     const html = orderMail({ kind: 'confirmed', lang: 'vi', order, siteUrl: SITE }).html
     expect(html).toContain('Mã đơn')
     expect(html).toContain('LV2610-AAAAAAA')
-    expect(html).toMatch(/color:#a3321f">920\.000/)
+    expect(html).toMatch(/color:#8b5e3c">920\.000/)
   })
 
   it('khối tóm tắt đơn chỉ ở thư xác nhận và đã gửi; có tổng tiền', () => {

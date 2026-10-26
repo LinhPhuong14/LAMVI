@@ -15,23 +15,25 @@ Quy tắc thiết kế cho giao diện công khai của LAMVI. Token nằm ở `
 
 ## 2. Màu
 
+Bảng màu theo brand guideline (T-93): Cream Ivory `#F4E8CF`, Light Beige `#EAD6B7`, Caramel `#C89A63`, Warm Brown `#8B5E3C`, Deep Brown `#3F200B`. Tên token giữ nguyên (`--son` nay là Warm Brown, `--cham` là Deep Brown). Không còn đỏ son và xanh chàm; tranh tư liệu và đèn minh hoạ giữ màu gốc.
+
 ### 2.1 Token
 
 | Token | Hex | Tên | Dùng cho |
 |---|---|---|---|
-| `--diep` | `#f4ede0` | Giấy điệp | Nền trang |
-| `--diep-deep` | `#e9dfcb` | Giấy điệp đậm | Nền phần nhấn (lời khách hàng), nhãn |
-| `--diep-light` | `#fbf7ef` | Giấy điệp sáng | Mặt thẻ, chữ trên nền tối |
-| `--than` | `#2a211b` | Mực than tre | Chữ chính, footer |
-| `--than-2` | `#3a2c22` | Mực than nhạt | Dải hoành phi (marquee) |
-| `--than-soft` | `#5a4b3e` | Mực loãng | Chữ phụ |
-| `--son` | `#a3321f` | Đỏ son | Nút chính, ấn triện, eyebrow, số liệu then chốt |
-| `--son-deep` | `#7c2617` | Son đậm | Hover nút, link |
-| `--hoe` | `#bf8a3a` | Vàng hoè ngả đồng | Ánh đèn, trống đồng, nét trên nền tối |
-| `--hoe-light` | `#e2c68f` | Hoè nhạt | Số liệu/chú thích trên nền chàm |
-| `--cham` | `#26374a` | Xanh chàm | Mảng nền tối (Di sản) |
-| `--cham-deep` | `#1a2735` | Chàm đêm | Lookbook |
-| `--sepia` | `#7a5d3c` | Sepia | Nét, nhãn phụ nhỏ |
+| `--diep` | `#f4e8cf` | Cream Ivory | Nền trang |
+| `--diep-deep` | `#ead6b7` | Light Beige | Nền phần nhấn (lời khách hàng), nhãn |
+| `--diep-light` | `#faf3e1` | Ivory sáng (dẫn xuất) | Mặt thẻ, chữ trên nền tối |
+| `--than` | `#3f200b` | Deep Brown | Chữ chính, footer |
+| `--than-2` | `#55331a` | Deep Brown nhạt (dẫn xuất) | Dải hoành phi (marquee) |
+| `--than-soft` | `#6b4426` | Nâu loãng (dẫn xuất) | Chữ phụ |
+| `--son` | `#8b5e3c` | Warm Brown | Nút chính, ấn triện, eyebrow, số liệu then chốt |
+| `--son-deep` | `#5f3e22` | Warm Brown đậm (dẫn xuất) | Hover nút, link |
+| `--hoe` | `#c89a63` | Caramel | Ánh đèn, trống đồng, nét trên nền tối |
+| `--hoe-light` | `#ead6b7` | Light Beige (chữ trên nền tối) | Số liệu/chú thích trên nền chàm |
+| `--cham` | `#3f200b` | Deep Brown (mảng tối) | Mảng nền tối (Di sản) |
+| `--cham-deep` | `#2b1607` | Nâu đêm (dẫn xuất) | Lookbook |
+| `--sepia` | `#7a5233` | Sepia | Nét, nhãn phụ nhỏ |
 | `--la`, `--hong` | `#5b6b4c`, `#c97f66` | Lá, hồng điệp | **Chỉ** trong minh hoạ (đèn, nền tranh) và chỉ số bước |
 | `--hair`, `--hair-soft` | sepia 42% / 20% | Nét mảnh | Viền, đường kẻ |
 
@@ -39,22 +41,22 @@ Tên cũ (`--ink`, `--paper`, `--brown`…) là bí danh cho code cũ; code mớ
 
 ### 2.2 Tỉ lệ
 
-~70% giấy · ~20% mực (than, chàm) · ~7% son · ~3% hoè. Mỗi màn hình **chỉ một** điểm nhấn son nổi bật (thường là nút chính). Lá và hồng không dùng cho chữ hay nút.
+~70% ivory/beige · ~20% Deep Brown · ~7% Warm Brown · ~3% Caramel. Mỗi màn hình **chỉ một** điểm nhấn son nổi bật (thường là nút chính). Lá và hồng không dùng cho chữ hay nút.
 
 ### 2.3 Độ tương phản (đã đo, WCAG)
 
 | Cặp | Tỉ lệ | Mức |
 |---|---|---|
-| `--than` / `--diep` | 13,5 | AAA |
-| `--than-soft` / `--diep` | 7,2 | AAA |
-| `--than-soft` / `--diep-deep` | 6,3 | AA |
-| `--son` / `--diep` (eyebrow chữ nhỏ) | 6,0 | AA |
-| `--diep-light` / `--son` (chữ trên nút) | 6,5 | AA |
-| `--hoe-light` / `--cham` | 7,4 | AAA |
-| `--diep` / `--cham` | 10,4 | AAA |
-| `--sepia` / `--diep` | 5,2 | AA |
+| `--than` / `--diep` | 12,2 | AAA |
+| `--than-soft` / `--diep` | 7,0 | AAA |
+| `--than-soft` / `--diep-deep` | 6,0 | AA |
+| `--son` / `--diep` (eyebrow chữ nhỏ) | 4,6 | AA |
+| `--diep-light` / `--son` (chữ trên nút) | 5,0 | AA |
+| `--hoe-light` / `--cham` | 10,4 | AAA |
+| `--diep` / `--cham` | 12,2 | AAA |
+| `--sepia` / `--diep` | 5,6 | AA |
 
-Không dùng `--hoe` cho chữ: trên nền sáng và trên `--cham` đều dưới 4,5:1 (4,0 trên chàm). Chữ nhỏ trên nền tối dùng `--hoe-light`.
+Không dùng `--hoe` (Caramel) cho chữ trên nền sáng: `--hoe` / `--diep` chỉ 2,1:1. Trên `--cham` đạt 5,8:1 nhưng chữ nhỏ vẫn ưu tiên `--hoe-light`.
 
 ## 3. Chữ
 

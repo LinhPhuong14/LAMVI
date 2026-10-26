@@ -47,13 +47,13 @@ export function errorPage({ lang = 'vi', brand } = {}) {
     <meta name="robots" content="noindex" />
     <title>${esc(t.title)}</title>
     <style>
-      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f7f0e4; color: #3a2c22;
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f4e8cf; color: #55331a;
         font: 17px/1.6 'Be Vietnam Pro', system-ui, sans-serif; text-align: center; padding: 24px; }
       main { max-width: 480px; }
       h1 { font-family: Georgia, serif; font-weight: 500; font-size: 2rem; margin: 0 0 12px; }
-      .mark { letter-spacing: 0.08em; color: #6b4226; font-family: Georgia, serif; font-size: 1.4rem; margin: 0 0 8px; }
-      .btn { display: inline-block; margin: 16px 0 24px; padding: 12px 28px; border-radius: 8px; background: #9c2f20; color: #fff; text-decoration: none; font-weight: 600; }
-      .contact { font-size: 0.95rem; color: #6b4226; }
+      .mark { letter-spacing: 0.08em; color: #6b4426; font-family: Georgia, serif; font-size: 1.4rem; margin: 0 0 8px; }
+      .btn { display: inline-block; margin: 16px 0 24px; padding: 12px 28px; border-radius: 8px; background: #8b5e3c; color: #fff; text-decoration: none; font-weight: 600; }
+      .contact { font-size: 0.95rem; color: #6b4426; }
       .contact a { color: inherit; }
     </style>
   </head>

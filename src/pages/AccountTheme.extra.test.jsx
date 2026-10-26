@@ -297,7 +297,7 @@ describe('CSS giao diện tối', () => {
     const btn = block(pages, "\\.dash\\[data-theme='dark'\\] \\.btn-primary")
     const bg = btn.match(/background:\s*(#[0-9a-f]{3,6})/i)[1]
     const fgc = btn.match(/[^-]color:\s*(#[0-9a-f]{3,6})/i)[1]
-    expect(fgc.toLowerCase()).toBe('#fbf7ef')
+    expect(fgc.toLowerCase()).toBe('#faf3e1')
     const rb = contrast(fgc, bg)
     if (rb < 4.5) low.push(`btn-primary ${fgc} on ${bg}: ${rb.toFixed(2)}`)
     expect(low).toEqual([])

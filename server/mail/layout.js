@@ -6,7 +6,7 @@ import { LOCALES } from '../i18n.js'
 
 export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
-const C = { diep: '#f4ede0', diepLight: '#fbf7ef', diepDeep: '#e9dfcb', than: '#2a211b', thanSoft: '#5a4b3e', son: '#a3321f', hoe: '#bf8a3a', hoeLight: '#e2c68f', chamDeep: '#1a2735' }
+const C = { diep: '#f4e8cf', diepLight: '#faf3e1', diepDeep: '#ead6b7', than: '#3f200b', thanSoft: '#6b4426', son: '#8b5e3c', hoe: '#c89a63', hoeLight: '#ead6b7', chamDeep: '#2b1607' }
 const SERIF = "Georgia,'Times New Roman',serif"
 const SANS = "-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif"
 export const MAIL_BANNER_PATH = '/images/mail/banner.jpg'

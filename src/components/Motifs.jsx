@@ -47,12 +47,12 @@ export function Cloud({ className = '' }) {
       <path
         d="M10 58 H150 C150 44 138 36 126 40 C124 22 104 14 92 26 C86 10 62 8 54 26 C44 18 28 24 30 38 C18 36 10 46 10 58 Z"
         fill="currentColor"
-        stroke="#8b6a45"
+        stroke="#8b5e3c"
         strokeOpacity="0.7"
         strokeWidth="1.4"
         strokeLinejoin="round"
       />
-      <g fill="none" stroke="#8b6a45" strokeOpacity="0.7" strokeWidth="1.3" strokeLinecap="round">
+      <g fill="none" stroke="#8b5e3c" strokeOpacity="0.7" strokeWidth="1.3" strokeLinecap="round">
         <path d="M62 44 C62 34 76 32 78 42 C79 48 70 49 70 44" />
         <path d="M100 46 C100 38 112 37 113 45" />
         <path d="M36 50 C36 44 45 43 46 49" />
@@ -111,9 +111,9 @@ export function OldPhoto({ children, className = '' }) {
   const edge = zigzagRect(232, 280)
   return (
     <svg viewBox="-8 -8 248 296" className={`old-photo ${className}`} aria-hidden="true">
-      <polygon points={edge} fill="#f6ecd4" stroke="#2b2119" strokeOpacity="0.25" />
+      <polygon points={edge} fill="#f4e8cf" stroke="#3f200b" strokeOpacity="0.25" />
       <g transform="translate(16 16)">{children}</g>
-      <g fill="#2b2119" opacity="0.82">
+      <g fill="#3f200b" opacity="0.82">
         <path d="M-8 -8 H34 L-8 34 Z" />
         <path d="M240 -8 H198 L240 34 Z" />
         <path d="M-8 288 H34 L-8 246 Z" />

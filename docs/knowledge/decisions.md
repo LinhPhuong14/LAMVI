@@ -427,3 +427,10 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - D-120: `public/videos/hanh-trinh-me-den.mp4` (0,9 MB, 480×640, 15,2 s, không tiếng) ghép bằng ffmpeg từ hai tệp gốc làng nghề: 7 đoạn 2,6 s (giấy dó t=36,5/49/68; Đông Hồ t=20/36/60/68), `crop=900:1200:(iw-900)/2:0` (bỏ dải phụ đề ở đáy), `xfade` 0,5 s, CRF 30, `+faststart`. Poster t=4 s.
 - `src/lib/useAutoplayInView.js`: tách logic tự phát khi thấy (T-90) để `CraftVideo` và `PhoneVideo` dùng chung. `PhoneVideo` không có `controls` (khung 212 px) → nút phát/dừng riêng. **Không dùng prop `muted`** trên `<video>`: React render thuộc tính này khác nhau giữa SSR và client → lỗi lệch hydrate; đặt `video.muted = true` trong effect.
 - Nhịp motion ở `src/lib/motion.js` (hằng `OUT` = 0,6 s cho pha rời đi) và các biến thể riêng của trang chủ (`phone`, `sun`, `lampHalo`, `lampBody`).
+
+### T-92 — Bảng màu theo brand guideline, font Cormorant Garamond, video giới thiệu đầu trang (2026-10-26)
+
+- D-121. Giữ nguyên **tên** token (`--diep`, `--than`, `--son`, `--hoe`, `--cham`…), chỉ đổi giá trị ở `src/index.css` để không phải sửa component; hex viết cứng và `rgba()` cùng tông trong `App.css`, `pages.css`, `gallery.css`, mail (`server/mail/layout.js`), trang lỗi, `theme-color` được thay theo. Giao diện tối của dashboard dùng nâu đêm (#2a1608…). Tương phản đo lại ở `design-rules.md` §2.3; test `Palette.extra.test.jsx` tự đối chiếu bảng đó.
+- Font: `@fontsource/cormorant-garamond` (500/600/700 + 500 nghiêng, có tập con vietnamese) thay Fraunces Variable; `--serif` đổi theo. Gói `@fontsource-variable/fraunces` còn trong `package.json`, chưa gỡ.
+- `IntroFilm` (`src/components/CraftFilms.jsx`) là khối đầu trang chủ: `<video autoplay muted loop playsinline preload="metadata" poster>`; `suppressHydrationWarning` vì React không khớp thuộc tính `muted` giữa SSR và client; `muted` đặt lại bằng ref rồi gọi `play()`. Không dùng `useAutoplayInView` (khối này luôn nằm trong màn hình đầu). Hero chữ đổi thành `id="hero"` làm đích của nút "Xem bộ sưu tập"; `h1` vẫn nằm ở hero (khối video chỉ dùng `<p>`).
+
