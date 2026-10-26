@@ -450,3 +450,10 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - Số: `font-variant-numeric: lining-nums` (Cormorant mặc định kiểu cổ).
 - `PageArt` (ảnh đèn tách nền, tranh Đông Hồ có sẵn trong `public/images`) cạnh tiêu đề trang con; ẩn dưới 1000 px.
 
+### T-95 — Admin "Hôm nay", danh sách đơn tách đôi, phòng tranh tự chuyển, khung xem trước (2026-10-26)
+
+- D-124. `AdminLayout` dùng `NAV` nhóm và `useAdminCounts` (GET `/admin/orders` + `/admin/returns?status=requested`, tải lại khi đổi đường dẫn) cho huy hiệu. `OverviewPage` tính mọi số liệu ở client từ `/admin/orders`, `/admin/returns`, `/admin/batches` (chưa có endpoint tổng hợp: khi số đơn lớn nên thêm `GET /admin/summary` để khỏi tải cả danh sách).
+- `OrdersPage` tải danh sách MỘT lần và lọc ở client (chip, tìm kiếm); `OrderDetail` nhận `onChanged` để làm mới danh sách sau khi đổi trạng thái. Mở `/admin/orders/:code` thì hiện `aside.orders-detail` (dính, cuộn riêng); dưới 1100 px chi tiết xuống dưới danh sách. Lọc nhanh từ trang Hôm nay qua `?loc=confirmed|cod|flag`.
+- `HoverPreview.jsx` (`usePreview`): khung phóng to bằng portal + vị trí fixed, để không bị cắt bởi vùng cuộn của carousel; chỉ bật khi `(hover: hover)`. Dùng ở `LookbookCard`.
+- `FolkGallery`: bỏ dải cuộn ngang; tự chuyển bằng `setInterval` 4,5 giây, dừng khi hover/focus/giảm chuyển động, thanh tiến trình CSS trên ảnh nhỏ đang chọn.
+

@@ -7,24 +7,33 @@ import AdminAtmosphere from './AdminAtmosphere.jsx'
 import Seo from '../seo/Seo.jsx'
 import { AnalyticsIcon, BatchesIcon, CouponsIcon, FaqIcon, ItIcon, MayIcon, OrdersIcon, ProductsIcon, SiteIcon, UsersIcon } from './NavIcons.jsx'
 import { S } from './strings.js'
+import { useAdminCounts } from './useAdminCounts.js'
 
-// Thứ tự theo tần suất dùng hằng ngày: đơn hàng trước, cấu hình sau
+// Nhóm theo công việc, không theo bảng dữ liệu (docs/knowledge/dashboard-ux.md). [đường dẫn, khoá, biểu tượng, huy hiệu?]
 const NAV = [
-  ['/admin/orders', 'orders', OrdersIcon],
-  ['/admin/returns', 'returns', OrdersIcon],
-  ['/admin/users', 'users', UsersIcon],
-  ['/admin/products', 'products', ProductsIcon],
-  ['/admin/collections', 'collections', ProductsIcon],
-  ['/admin/faq', 'faq', FaqIcon],
-  ['/admin/batches', 'batches', BatchesIcon],
-  ['/admin/coupons', 'coupons', CouponsIcon],
-  ['/admin/analytics', 'analytics', AnalyticsIcon],
-  ['/admin/may', 'may', MayIcon],
+  [null, [['/admin', 'overview', OrdersIcon, null, true]]],
+  ['groupSales', [
+    ['/admin/orders', 'orders', OrdersIcon, 'orders'],
+    ['/admin/returns', 'returns', OrdersIcon, 'returns'],
+    ['/admin/coupons', 'coupons', CouponsIcon],
+  ]],
+  ['groupCatalog', [
+    ['/admin/products', 'products', ProductsIcon],
+    ['/admin/collections', 'collections', ProductsIcon],
+    ['/admin/batches', 'batches', BatchesIcon],
+  ]],
+  ['groupContent', [
+    ['/admin/faq', 'faq', FaqIcon],
+    ['/admin/may', 'may', MayIcon],
+  ]],
+  ['groupPeople', [['/admin/users', 'users', UsersIcon]]],
+  ['groupInsight', [['/admin/analytics', 'analytics', AnalyticsIcon]]],
 ]
 
 // BR-SEO-001: admin noindex
 function Gate() {
   const { user, authedApi } = useAuth()
+  const counts = useAdminCounts()
   const [state, setState] = useState({ status: 'loading' })
 
   useEffect(() => {
@@ -71,11 +80,21 @@ function Gate() {
           <strong>{S.title}</strong>
         </div>
         <nav aria-label={S.title}>
-          {NAV.map(([to, key, Icon]) => (
-            <NavLink key={to} to={to}>
-              <Icon />
-              {S.nav[key]}
-            </NavLink>
+          {NAV.map(([group, items]) => (
+            <div key={group ?? 'top'} className="admin-nav-group">
+              {group && <span className="admin-nav-title">{S.nav[group]}</span>}
+              {items.map(([to, key, Icon, badge, end]) => (
+                <NavLink key={to} to={to} end={end}>
+                  <Icon />
+                  {S.nav[key]}
+                  {badge && counts[badge] > 0 && (
+                    <span className="admin-badge" aria-label={`${counts[badge]}`}>
+                      {counts[badge]}
+                    </span>
+                  )}
+                </NavLink>
+              ))}
+            </div>
           ))}
         </nav>
         <div className="admin-side-foot">

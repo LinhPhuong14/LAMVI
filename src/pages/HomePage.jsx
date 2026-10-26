@@ -35,6 +35,7 @@ import { organizationJsonLd, webSiteJsonLd } from '../seo/head.js'
 import { useSiteUrl } from '../seo/context.js'
 import ProductCards from '../components/ProductCards'
 import Carousel from '../components/Carousel.jsx'
+import { usePreview } from '../components/HoverPreview.jsx'
 import MayAvatar from '../may/MayAvatar.jsx'
 
 const TONES = ['amber', 'dusk', 'dawn', 'moss', 'dusk']
@@ -269,6 +270,26 @@ function Hero() {
   )
 }
 
+// Thẻ đèn ở lookbook: rê chuột/focus hiện khung phóng to ảnh thật của đèn (D-124)
+function LookbookCard({ label, i }) {
+  const slug = LOOKBOOK_PHOTOS[i]
+  const { bind, node } = usePreview({ src: slug ? `/images/lamps/${slug}.jpg` : '', title: label, subtitle: 'LAMVI' })
+  return (
+    <m.div className={`lookbook-card size-${SIZES[i]} tone-${TONES[i]}`} variants={rise} tabIndex={0} {...(slug ? bind : {})}>
+      <m.span className="lookbook-halo" aria-hidden="true" variants={lampHalo} />
+      <m.div className="lookbook-lamp" variants={lampBody}>
+        {slug ? (
+          <img className="lamp-cutout lookbook-lamp-img" src={`/images/lamps/${slug}-cutout.webp`} alt="" width={74} height={170} loading="lazy" decoding="async" />
+        ) : (
+          <Lantern size={SIZES[i] === 'tall' ? 140 : 104} tone={TONES[i]} swing />
+        )}
+      </m.div>
+      <span className="lookbook-caption">{label}</span>
+      {slug && node}
+    </m.div>
+  )
+}
+
 function ProductGrid() {
   const { t, lang, path } = useI18n()
   const res = useApi('/products', lang)
@@ -387,21 +408,7 @@ export default function HomePage() {
           <Carousel label={t('lookbook.title')}>
           <Reveal className="lookbook-grid" variants={group} margin="-10% 0px -10% 0px">
             {t('lookbook.items').map((label, i) => (
-              <m.div
-                className={`lookbook-card size-${SIZES[i]} tone-${TONES[i]}`}
-                key={`${TONES[i]}-${i}`}
-                variants={rise}
-              >
-                <m.span className="lookbook-halo" aria-hidden="true" variants={lampHalo} />
-                <m.div className="lookbook-lamp" variants={lampBody}>
-                  {LOOKBOOK_PHOTOS[i] ? (
-                    <img className="lamp-cutout lookbook-lamp-img" src={`/images/lamps/${LOOKBOOK_PHOTOS[i]}-cutout.webp`} alt="" width={74} height={170} loading="lazy" decoding="async" />
-                  ) : (
-                    <Lantern size={SIZES[i] === 'tall' ? 140 : 104} tone={TONES[i]} swing />
-                  )}
-                </m.div>
-                <span className="lookbook-caption">{label}</span>
-              </m.div>
+              <LookbookCard key={`${TONES[i]}-${i}`} label={label} i={i} />
             ))}
           </Reveal>
           </Carousel>

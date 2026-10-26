@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-26 (phiên 4) — Admin Hôm nay + phòng tranh tương tác (nhánh `feat/admin-today`, D-124)
+
+PO duyệt làm admin trước. Đã làm B1 (Hôm nay), B2 (Đơn hàng: chip, tìm kiếm, nút bước kế, chi tiết bên phải), điều hướng nhóm có huy hiệu. Thêm: phòng tranh tự chuyển (không cuộn ngang) và khung xem trước đèn ở lookbook. Chưa làm: B3 đến B10 (đổi trả có trình phát, sản phẩm dạng lưới, v.v.), dashboard khách (A1 đến A5), điểm cần BA (CSV, in phiếu, quyền nhân viên), endpoint tổng hợp cho trang Hôm nay.
+
+---
+
 ## 2026-10-26 (phiên 3) — Carousel, hero video, bỏ dấu gạch, thiết kế lại dashboard (nhánh `feat/motion-carousel`, D-123)
 
 PO: hình minh hoạ, hero ngắn và sống động, carousel, motion tự động, bỏ dấu gạch dài, video hero bị phóng to, tư duy lại dashboard khách và admin. Đã làm: toàn bộ trừ triển khai dashboard (mới có đề xuất ở `dashboard-ux.md`, cần PO duyệt thứ tự và 3 điểm cần BA). Thanh toán/đơn hàng/tài khoản: bước đánh số, tóm tắt đơn nền nâu đậm, dashboard sáng bỏ ảnh trời/đèn bay. Chưa làm: trang đơn cảm ơn mới chỉ chỉnh CSS (chưa kiểm ảnh), ảnh og:image.
