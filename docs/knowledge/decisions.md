@@ -457,3 +457,10 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - `HoverPreview.jsx` (`usePreview`): khung phóng to bằng portal + vị trí fixed, để không bị cắt bởi vùng cuộn của carousel; chỉ bật khi `(hover: hover)`. Dùng ở `LookbookCard`.
 - `FolkGallery`: bỏ dải cuộn ngang; tự chuyển bằng `setInterval` 4,5 giây, dừng khi hover/focus/giảm chuyển động, thanh tiến trình CSS trên ảnh nhỏ đang chọn.
 
+### T-96 — Responsive điện thoại đợt 4 (2026-10-26)
+
+- D-125. Quy trình kiểm: script Playwright mở 16 trang (công khai, khách đã đăng nhập, admin) ở 320/360/390/430 px, đo `scrollWidth` so với `clientWidth`, liệt kê phần tử vượt mép phải không nằm trong vùng cuộn, và đếm nút/link nhỏ hơn 40 px. Kết quả cuối: 0 trang tràn; còn lại chỉ vùng chạm đã nâng lên 44 px bằng khối cuối `pages.css` ("Responsive điện thoại").
+- Admin ≤ 960 px: `.admin-nav` thành hàng ngang dính (`position: sticky`), ẩn tiêu đề nhóm và biểu tượng; `.orders-split.has-detail` ẩn danh sách khi mở chi tiết; ≤ 700 px bảng đơn (`.orders-table`) thành lưới thẻ 2 cột bằng CSS (không đổi markup, nên test không đổi).
+- Tài khoản: `.dash-tabs` có 5 tab nhưng lưới đáy khai báo 4 cột (tab "Hồ sơ" bị xuống hàng thứ hai): đổi thành 5 cột.
+- Lỗi do chính các đợt trước: khối `.order-head` bị tô nâu đậm với chữ tối nên mất chữ ở trang đơn hàng; đã bỏ khối đó.
+

@@ -6404,20 +6404,6 @@ h1 {
   color: var(--diep-light);
 }
 
-/* Trang cảm ơn sau đặt hàng: tấm nâu đậm làm điểm nhấn */
-.order-page > .account-card:first-of-type,
-.order-head {
-  background: var(--cham);
-  color: var(--diep);
-  border: 0;
-}
-
-.order-page > .account-card:first-of-type h1,
-.order-page > .account-card:first-of-type .page-title {
-  color: var(--diep-light);
-  border: 0;
-  padding: 0;
-}
 
 /* Video giới thiệu: full chiều rộng, khung 16:9 đúng tỉ lệ nguồn (không phóng to → không vỡ hình); cắt dải phụ đề cứng ở đáy video */
 .intro-film {
@@ -7031,4 +7017,304 @@ h1 {
 @keyframes hp-in {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* ===== Responsive điện thoại (D-125): kiểm ở 320, 360, 390, 430 px ===== */
+@media (max-width: 960px) {
+  /* Admin: thanh bên thành một hàng ngang dính đầu trang thay vì khối cao chiếm màn hình */
+  .admin-nav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--dash-line);
+  }
+
+  .admin-brand strong,
+  .admin-nav-title {
+    display: none;
+  }
+
+  .admin-brand {
+    flex: none;
+  }
+
+  .admin-nav nav {
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .admin-nav-group {
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .admin-nav-group + .admin-nav-group {
+    margin-top: 0;
+    padding-left: 8px;
+    border-left: 1px solid var(--dash-line);
+  }
+
+  .admin-nav nav a,
+  .admin-back {
+    flex: none;
+    min-height: 44px;
+    padding: 8px 12px;
+    white-space: nowrap;
+  }
+
+  .admin-nav .admin-nav-icon {
+    display: none;
+  }
+
+  .admin-side-foot {
+    flex: none;
+    flex-direction: row;
+    margin: 0 0 0 auto;
+  }
+
+  .admin-main {
+    padding: 24px 16px 72px;
+  }
+
+  /* Danh sách đơn: mở chi tiết thì chỉ hiện chi tiết (có nút quay lại) */
+  .orders-split.has-detail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .orders-split.has-detail .orders-list {
+    display: none;
+  }
+
+  .orders-list,
+  .orders-detail {
+    min-width: 0;
+  }
+
+  .orders-detail {
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .admin-search {
+    max-width: none;
+  }
+
+  /* Bảng đơn thành thẻ: mã + trạng thái, người nhận + tổng, nút */
+  .orders-table,
+  .orders-table tbody,
+  .orders-table tr,
+  .orders-table td {
+    display: block;
+  }
+
+  .orders-table thead {
+    display: none;
+  }
+
+  .orders-table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 14px 4px;
+    border-top: 1px solid var(--dash-line);
+  }
+
+  .orders-table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .orders-table td:nth-child(1) { grid-column: 1; }
+  .orders-table td:nth-child(5) { grid-column: 2; grid-row: 1; justify-self: end; }
+  .orders-table td:nth-child(3) { grid-column: 1; }
+  .orders-table td:nth-child(4) { grid-column: 2; justify-self: end; font-weight: 600; }
+  .orders-table td:nth-child(2),
+  .orders-table td:nth-child(6) { display: none; }
+  .orders-table td:nth-child(7) { grid-column: 1 / -1; margin-top: 8px; justify-content: flex-start; }
+
+  .orders-table .admin-row-actions .btn {
+    min-height: 44px;
+  }
+
+  .admin-table {
+    min-width: 560px;
+  }
+
+  .orders-table {
+    min-width: 0;
+  }
+
+  .admin-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-actions .btn {
+    flex: 1 1 calc(50% - 8px);
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Tài khoản: 5 tab ở thanh đáy trên một hàng */
+  .dash-tabs,
+  .dash[data-theme='dark'] .dash-tabs {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .dash-tab {
+    font-size: 0.62rem;
+    letter-spacing: 0;
+  }
+
+  /* Cửa hàng: các ý nhỏ xuống dòng thay vì bị cắt ở mép phải */
+  .shop-perks {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  /* Vùng chạm tối thiểu 44 px */
+  .cart-remove,
+  .cart-continue,
+  .dash-theme,
+  .dash-side-link,
+  .back-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dash-theme {
+    min-width: 44px;
+  }
+
+  .checkout textarea {
+    min-height: 88px;
+  }
+
+  .checkout .btn-small,
+  .order-summary .btn-small {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero h1 {
+    font-size: 2.3rem;
+  }
+
+  .intro-film-slogan {
+    font-size: 2rem;
+  }
+
+  .section-head h2,
+  .page-title {
+    font-size: 2.1rem;
+  }
+
+  .todo strong {
+    font-size: 2.8rem;
+  }
+
+  .chip {
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .btn-small,
+  .chip,
+  .dash-logout,
+  .cart-remove {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .qty button {
+    min-width: 44px;
+  }
+
+  .qty input {
+    min-width: 44px;
+  }
+
+  .dash .lang-switch a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 44px;
+  }
+}
+
+/* Điện thoại hẹp: tổng tiền xuống dòng thay vì bị cắt; chip dài tự xuống dòng; tiến độ đơn 5 mốc trên một hàng */
+@media (max-width: 480px) {
+  .sum-total {
+    flex-wrap: wrap;
+    gap: 2px 12px;
+  }
+
+  .sum-total > span:last-child {
+    font-size: 1.35rem;
+  }
+
+  .chip,
+  .shop-perks li,
+  .perk,
+  .pdp-perks li {
+    white-space: normal;
+    text-align: left;
+  }
+
+  .order-flow {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .order-flow li {
+    min-width: 0;
+    font-size: 0.68rem;
+    line-height: 1.25;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 960px) {
+  .admin-nav {
+    flex-wrap: nowrap;
+  }
+
+  .admin-nav nav {
+    flex: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .shop-perks {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .shop-perks li {
+    flex: 0 1 auto;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-head-link {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

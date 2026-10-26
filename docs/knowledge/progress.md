@@ -199,3 +199,7 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Admin: điều hướng nhóm + trang Hôm nay + đơn hàng tách đôi | ✅ code | `AdminLayout.jsx`, `OverviewPage.jsx`, `OrdersPage.jsx`, `useAdminCounts.js` | B3 đến B10 (dashboard-ux.md), endpoint tổng hợp |
 | Phòng tranh tự chuyển + khung xem trước đèn | ✅ code | `FolkGallery.jsx`, `HoverPreview.jsx`, `HomePage.jsx` | |
 
+| Đợt v0.71 (D-125) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Responsive điện thoại 320 đến 430 px | ✅ code | cuối `pages.css`; script đo tràn và vùng chạm (16 trang x 4 cỡ) | iOS Safari thật, nằm ngang, tablet |
+
