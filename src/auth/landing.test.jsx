@@ -12,6 +12,8 @@ const base = (role, extra = {}) => ({
   'POST /auth/login': () => ({ body: session }),
   'GET /me': profile(role),
   'GET /admin/orders': () => ({ body: { items: [] } }),
+  'GET /admin/returns': () => ({ body: { items: [] } }),
+  'GET /admin/batches': () => ({ body: { items: [] } }),
   'GET /admin/analytics/realtime': () => ({ body: { configured: false } }),
   'GET /orders': () => ({ body: { items: [] } }),
   'GET /may/history': () => ({ body: { items: [] } }),
@@ -34,7 +36,7 @@ describe('Trang đích sau khi đăng nhập', () => {
     mockApi(base(role))
     renderAt('/login')
     await signIn()
-    expect(await screen.findByRole('heading', { name: 'Đơn hàng', level: 1 })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Hôm nay', level: 1 })).toBeInTheDocument()
     expect(screen.queryByText(/Tài khoản của tôi/)).toBeNull()
   })
 
@@ -43,7 +45,7 @@ describe('Trang đích sau khi đăng nhập', () => {
     renderAt('/login')
     await signIn()
     await waitFor(() => expect(fetchMock.mock.calls.some(([u]) => String(u).includes('/orders'))).toBe(true))
-    expect(screen.queryByRole('heading', { name: 'Đơn hàng', level: 1 })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Hôm nay', level: 1 })).toBeNull()
   })
 
   it('admin có ?next (vd đang đi tới giỏ hàng) → tôn trọng next, không ép /admin', async () => {
@@ -51,7 +53,7 @@ describe('Trang đích sau khi đăng nhập', () => {
     renderAt('/login?next=%2Fcart')
     await signIn()
     await waitFor(() => expect(fetchMock.mock.calls.some(([u]) => String(u).startsWith('/api/cart'))).toBe(true))
-    expect(screen.queryByRole('heading', { name: 'Đơn hàng', level: 1 })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Hôm nay', level: 1 })).toBeNull()
   })
 
   it('trang đăng nhập bản en: admin vẫn vào /admin (admin không có tiền tố ngôn ngữ — D-48)', async () => {
@@ -60,7 +62,7 @@ describe('Trang đích sau khi đăng nhập', () => {
     fireEvent.change(await screen.findByLabelText('Email'), { target: { value: 'a@lamvi.test' } })
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'Gio-Hoa#Sen2026' } })
     fireEvent.click(screen.getAllByRole('button', { name: 'Sign in' }).find((b) => b.type === 'submit'))
-    expect(await screen.findByRole('heading', { name: 'Đơn hàng', level: 1 })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Hôm nay', level: 1 })).toBeInTheDocument()
   })
 
   it('/me lỗi (mạng, 500) → không chặn đăng nhập, về /account', async () => {
@@ -90,19 +92,19 @@ describe('Google callback', () => {
 
   it('admin vào thẳng /admin', async () => {
     callback('admin')
-    expect(await screen.findByRole('heading', { name: 'Đơn hàng', level: 1 })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Hôm nay', level: 1 })).toBeInTheDocument()
   })
 
   it('khách hàng → /account (không vào admin)', async () => {
     const fetchMock = callback('customer')
     await waitFor(() => expect(fetchMock.mock.calls.some(([u]) => String(u).includes('/orders'))).toBe(true))
-    expect(screen.queryByRole('heading', { name: 'Đơn hàng', level: 1 })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Hôm nay', level: 1 })).toBeNull()
   })
 
   it('admin có ?next → theo next', async () => {
     const fetchMock = callback('admin', '?next=%2Fcart', { 'GET /cart': () => ({ body: { items: [], total: 0 } }) })
     await waitFor(() => expect(fetchMock.mock.calls.some(([u]) => String(u).startsWith('/api/cart'))).toBe(true))
-    expect(screen.queryByRole('heading', { name: 'Đơn hàng', level: 1 })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Hôm nay', level: 1 })).toBeNull()
   })
 
   it('next ngoài site (open redirect) bị bỏ → dùng trang mặc định an toàn của vai trò', async () => {

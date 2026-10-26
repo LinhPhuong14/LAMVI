@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Field from '../components/Field'
 import { formatVnd } from '../lib/money.js'
 import { useAuth } from '../auth/context.js'
@@ -85,7 +85,7 @@ function GiftCard({ order }) {
 }
 
 // FR-ORD-002: chi tiết một đơn + đổi trạng thái theo đúng luồng §16
-function OrderDetail({ code }) {
+function OrderDetail({ code, onChanged }) {
   const { authedApi } = useAuth()
   const { t } = useI18n()
   const label = useStatusLabel()
@@ -123,6 +123,7 @@ function OrderDetail({ code }) {
         body: { status: next, trackingCode: tracking || null },
       })
       await load()
+      onChanged?.()
     } catch (err) {
       setError(err.code)
     } finally {
@@ -141,6 +142,7 @@ function OrderDetail({ code }) {
         body: { status: to, trackingCode: tracking || null },
       })
       await load()
+      onChanged?.()
     } catch (err) {
       setError(err.code)
     } finally {
@@ -156,6 +158,7 @@ function OrderDetail({ code }) {
     try {
       await authedApi(`/admin/orders/${encodeURIComponent(code)}/cod-collected`, { method: 'POST', body: {} })
       await load()
+      onChanged?.()
     } catch (err) {
       setError(err.code)
     } finally {
@@ -170,6 +173,7 @@ function OrderDetail({ code }) {
     try {
       await authedApi(`/admin/orders/${encodeURIComponent(code)}/refund`, { method: 'POST', body: {} })
       await load()
+      onChanged?.()
     } catch (err) {
       setError(err.code)
     } finally {
@@ -348,87 +352,135 @@ function OrderDetail({ code }) {
   )
 }
 
-// FR-ORD-002: danh sách đơn, lọc theo trạng thái
+// FR-ORD-002: danh sách đơn. Chip trạng thái kèm số lượng, tìm kiếm, một nút chuyển bước kế tiếp trên mỗi hàng;
+// mở một đơn thì chi tiết hiện bên phải, danh sách vẫn ở bên trái (docs/knowledge/dashboard-ux.md, B2)
+const STATUSES = ['pending_payment', 'confirmed', 'in_production', 'packed', 'shipped', 'delivered', 'delivery_failed', 'cancelled']
+const isCodOpen = (o) => o.paymentMethod === 'cod' && o.paymentStatus === 'pending' && ['shipped', 'delivered'].includes(o.status)
+const normalize = (v) => String(v ?? '').toLowerCase()
+
 export default function OrdersPage() {
   const { code } = useParams()
   const { t } = useI18n()
+  const { authedApi } = useAuth()
+  const navigate = useNavigate()
+  const [params] = useSearchParams()
   const label = useStatusLabel()
-  const [status, setStatus] = useState('')
-  const list = useAdminList(status ? `/admin/orders?status=${status}` : '/admin/orders')
+  const [chip, setChip] = useState(params.get('loc') ?? 'all')
+  const [q, setQ] = useState('')
+  const [moveError, setMoveError] = useState(null)
+  const list = useAdminList('/admin/orders')
 
-  if (code) return <OrderDetail code={code} />
+  const items = list.status === 'ok' ? list.items : []
+  const count = (c) =>
+    c === 'all' ? items.length : c === 'cod' ? items.filter(isCodOpen).length : c === 'flag' ? items.filter((o) => o.paymentFlag).length : items.filter((o) => o.status === c).length
+  const needle = normalize(q).trim()
+  const shown = items.filter((o) => {
+    const inChip = chip === 'all' || (chip === 'cod' ? isCodOpen(o) : chip === 'flag' ? Boolean(o.paymentFlag) : o.status === chip)
+    return inChip && (!needle || [o.code, o.recipientName, o.recipientPhone].some((v) => normalize(v).includes(needle)))
+  })
+  const chips = [['all', S.orders.chipAll], ...STATUSES.map((s) => [s, label.status(s)]), ['cod', S.orders.chipCod], ['flag', S.orders.chipFlag]]
 
-  const STATUSES = [
-    'pending_payment',
-    'confirmed',
-    'in_production',
-    'packed',
-    'shipped',
-    'delivered',
-    'delivery_failed',
-    'cancelled',
-  ]
+  // Một nút chuyển sang bước kế tiếp thuận chiều (không phải huỷ / giao thất bại); bước khác mở chi tiết
+  const forward = (o) => o.nextStatuses.find((s) => !['cancelled', 'delivery_failed'].includes(s))
+  async function move(o) {
+    const to = forward(o)
+    if (!to || !window.confirm(fmt(S.orders.statusConfirm, { code: o.code, status: label.status(to) }))) return
+    setMoveError(null)
+    try {
+      await authedApi(`/admin/orders/${encodeURIComponent(o.code)}/status`, { method: 'POST', body: { status: to, trackingCode: null } })
+      list.reload()
+    } catch (err) {
+      setMoveError(err.code)
+    }
+  }
 
   return (
-    <section>
-      <PageHead title={S.orders.title}>
-        <Field as="select" label={S.orders.colStatus} value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="">{S.orders.all}</option>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {label.status(s)}
-            </option>
+    <section className={`orders-split${code ? ' has-detail' : ''}`}>
+      <div className="orders-list">
+        <PageHead title={S.orders.title} />
+        <input
+          type="search"
+          className="admin-search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={S.orders.search}
+          aria-label={S.orders.search}
+        />
+        <div className="chip-row" role="group" aria-label={S.orders.colStatus}>
+          {chips.filter(([key]) => key === 'all' || key === chip || count(key) > 0).map(([key, text]) => (
+            <button key={key} type="button" className={`chip${chip === key ? ' is-on' : ''}`} aria-pressed={chip === key} onClick={() => setChip(key)}>
+              {text}
+              <b>{count(key)}</b>
+            </button>
           ))}
-        </Field>
-      </PageHead>
-      {list.status === 'loading' && <p>{S.common.loading}</p>}
-      {list.status === 'error' && (
-        <p className="notice error" role="alert">
-          {t(`errors.${list.error.code}`)}
-        </p>
-      )}
-      {list.status === 'ok' &&
-        (list.items.length === 0 ? (
-          <p>{S.orders.empty}</p>
-        ) : (
-          <div className="admin-panel">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>{S.orders.colCode}</th>
-                  <th>{S.orders.colDate}</th>
-                  <th>{S.orders.colRecipient}</th>
-                  <th>{S.orders.colTotal}</th>
-                  <th>{S.orders.colStatus}</th>
-                  <th>{S.orders.colPayment}</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {list.items.map((o) => (
-                  <tr key={o.code}>
-                    <td>
-                      <code>{o.code}</code>
-                      {o.paymentFlag && <span className="status status-draft"> ⚑</span>}
-                    </td>
-                    <td>{date(o.createdAt)}</td>
-                    <td>{o.recipientName}</td>
-                    <td>{formatVnd(o.total)}</td>
-                    <td>
-                      <span className={`order-status order-status-${o.status}`}>{label.status(o.status)}</span>
-                    </td>
-                    <td>{label.payment(o.paymentStatus)}</td>
-                    <td className="admin-row-actions">
-                      <Link to={`/admin/orders/${o.code}`} className="btn btn-small">
-                        {S.orders.detail}
-                      </Link>
-                    </td>
+        </div>
+        {moveError && (
+          <p className="notice error" role="alert">
+            {t(`errors.${moveError}`)}
+          </p>
+        )}
+        {list.status === 'loading' && <p>{S.common.loading}</p>}
+        {list.status === 'error' && (
+          <p className="notice error" role="alert">
+            {t(`errors.${list.error.code}`)}
+          </p>
+        )}
+        {list.status === 'ok' &&
+          (shown.length === 0 ? (
+            <p>{S.orders.empty}</p>
+          ) : (
+            <div className="admin-panel">
+              <table className="admin-table orders-table">
+                <thead>
+                  <tr>
+                    <th>{S.orders.colCode}</th>
+                    <th>{S.orders.colDate}</th>
+                    <th>{S.orders.colRecipient}</th>
+                    <th>{S.orders.colTotal}</th>
+                    <th>{S.orders.colStatus}</th>
+                    <th>{S.orders.colPayment}</th>
+                    <th />
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
+                </thead>
+                <tbody>
+                  {shown.map((o) => {
+                    const to = forward(o)
+                    return (
+                      <tr key={o.code} className={`${o.code === code ? 'is-open' : ''}${o.status === 'confirmed' ? ' is-new' : ''}`.trim()} onClick={() => navigate(`/admin/orders/${o.code}`)}>
+                        <td>
+                          <code>{o.code}</code>
+                          {o.paymentFlag && <span className="status status-draft"> ⚑</span>}
+                        </td>
+                        <td>{date(o.createdAt)}</td>
+                        <td>{o.recipientName}</td>
+                        <td>{formatVnd(o.total)}</td>
+                        <td>
+                          <span className={`order-status order-status-${o.status}`}>{label.status(o.status)}</span>
+                        </td>
+                        <td>{label.payment(o.paymentStatus)}</td>
+                        <td className="admin-row-actions" onClick={(e) => e.stopPropagation()}>
+                          {to && (
+                            <button type="button" className="btn btn-small btn-primary" onClick={() => move(o)}>
+                              {fmt(S.orders.quickBtn, { status: label.status(to) })}
+                            </button>
+                          )}
+                          <Link to={`/admin/orders/${o.code}`} className="btn btn-small">
+                            {S.orders.detail}
+                          </Link>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ))}
+      </div>
+      {code && (
+        <aside className="orders-detail" aria-label={code}>
+          <OrderDetail code={code} key={code} onChanged={list.reload} />
+        </aside>
+      )}
     </section>
   )
 }

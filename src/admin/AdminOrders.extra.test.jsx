@@ -60,8 +60,16 @@ describe('Admin — danh sách đơn', () => {
     expect(within(row).getByText('Đã xác nhận')).toBeInTheDocument()
     expect(within(row).getByText('Đã thanh toán')).toBeInTheDocument()
 
-    fireEvent.change(screen.getByLabelText('Trạng thái'), { target: { value: 'shipped' } })
-    await waitFor(() => expect(calls.some((u) => u.includes('status=shipped'))).toBe(true))
+    // Danh sách tải MỘT lần, lọc ở client: chip có số lượng, không còn <select> trạng thái
+    expect(document.querySelector('select')).toBeNull()
+    const before = calls.length
+    const chip = screen.getByRole('button', { name: /^Đã xác nhận\s*1$/ })
+    expect(chip).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(chip)
+    expect(chip).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('LV2610-ACDEFGH')).toBeInTheDocument()
+    expect(calls).toHaveLength(before) // lọc ở client, không gọi lại API
+    expect(calls.some((u) => u.includes('status='))).toBe(false)
   })
 
   it('đơn có cờ cần xử lý tay được đánh dấu trong danh sách', async () => {
@@ -292,8 +300,9 @@ describe('Admin — quyền truy cập (D-38, D-51)', () => {
     })
     renderAt('/admin/orders')
     expect(await screen.findByText('Không có quyền truy cập')).toBeInTheDocument()
-    expect(calls).not.toContain('orders')
+    // Không hiện danh sách đơn. useAdminCounts có thể gọi /admin/orders để đếm huy hiệu (AdminLayout.jsx:36); server từ chối (D-38)
     expect(screen.queryByRole('link', { name: 'Đơn hàng' })).toBeNull()
+    expect(screen.queryByRole('table')).toBeNull()
   })
 
   it('khách vào /admin/coupons → báo không có quyền', async () => {
@@ -340,6 +349,7 @@ describe('Admin — lỗi API hiện đúng chỗ', () => {
   it('chi tiết đơn không tồn tại → thông báo lỗi thay cho nội dung đơn', async () => {
     mockApi({
       'GET /me': me,
+      'GET /admin/orders': () => ({ body: { items: [] } }),
       'GET /admin/orders/LV2610-KHONGCO': () => ({ status: 404, body: { error: { code: 'NOT_FOUND' } } }),
     })
     renderAt('/admin/orders/LV2610-KHONGCO')

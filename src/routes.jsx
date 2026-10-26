@@ -2,7 +2,7 @@ import { lazy } from 'react'
 import RouteLoader from './components/RouteLoader.jsx'
 import { GuestRoute, ProtectedRoute } from './auth/ProtectedRoute.jsx'
 const ReturnsPage = lazy(() => import('./admin/ReturnsPage'))
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import LocaleLayout from './components/LocaleLayout'
 import HomePage from './pages/HomePage'
 import ProductPage from './pages/ProductPage'
@@ -24,6 +24,7 @@ const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'))
 const AdminLayout = lazy(() => import('./admin/AdminLayout'))
 const AdminOrdersPage = lazy(() => import('./admin/OrdersPage'))
+const AdminOverviewPage = lazy(() => import('./admin/OverviewPage'))
 const CouponsPage = lazy(() => import('./admin/CouponsPage'))
 const UsersPage = lazy(() => import('./admin/UsersPage'))
 const CollectionsPage = lazy(() => import('./admin/CollectionsPage'))
@@ -72,7 +73,7 @@ export default function AppRoutes() {
       <Route path="/it" element={<ProtectedRoute><RouteLoader><ItDashboard /></RouteLoader></ProtectedRoute>} />
       {/* D-48: admin chỉ tiếng Việt */}
       <Route path="/admin" element={<ProtectedRoute><RouteLoader><AdminLayout /></RouteLoader></ProtectedRoute>}>
-        <Route index element={<Navigate to="orders" replace />} />
+        <Route index element={<RouteLoader><AdminOverviewPage /></RouteLoader>} />
         <Route path="orders" element={<RouteLoader><AdminOrdersPage /></RouteLoader>} />
         <Route path="orders/:code" element={<RouteLoader><AdminOrdersPage /></RouteLoader>} />
         <Route path="users" element={<RouteLoader><UsersPage /></RouteLoader>} />

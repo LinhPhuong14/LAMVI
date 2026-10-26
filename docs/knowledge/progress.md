@@ -194,3 +194,8 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Bỏ dấu gạch dài khỏi nội dung | ✅ code | i18n, seed, mail, Mây | |
 | Thiết kế lại dashboard | 📝 đề xuất | `docs/knowledge/dashboard-ux.md` | PO duyệt, rồi triển khai |
 
+| Đợt v0.70 (D-124) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Admin: điều hướng nhóm + trang Hôm nay + đơn hàng tách đôi | ✅ code | `AdminLayout.jsx`, `OverviewPage.jsx`, `OrdersPage.jsx`, `useAdminCounts.js` | B3 đến B10 (dashboard-ux.md), endpoint tổng hợp |
+| Phòng tranh tự chuyển + khung xem trước đèn | ✅ code | `FolkGallery.jsx`, `HoverPreview.jsx`, `HomePage.jsx` | |
+
