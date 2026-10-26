@@ -130,7 +130,7 @@ describe('D-62: trang chủ (client) /, /en, /zh', () => {
     vi.unstubAllGlobals()
   })
 
-  it.each(['vi', 'en', 'zh'])('%s: logo header, ấn triện dọc, footer, tiêu đề document đều là LAMVI', async (lang) => {
+  it.each(['vi', 'en', 'zh'])('%s: logo header, không còn ấn triện dọc, footer, tiêu đề document đều là LAMVI', async (lang) => {
     mockApi(handlers)
     const { container } = renderAt(PREFIX[lang])
 
@@ -141,9 +141,9 @@ describe('D-62: trang chủ (client) /, /en, /zh', () => {
     // 21/10: header dùng logotype vector chuẩn (logotype.svg); logo tròn còn ở chân trang
     expect(logo.querySelector('img.brand-wordmark')).toHaveAttribute('src', '/images/brand/logotype.svg')
 
-    // Ấn triện dọc
-    const vseal = container.querySelector('.hero-seal .vseal')
-    expect([...vseal.children].map((c) => c.textContent)).toEqual(['L', 'A', 'M', 'V', 'I'])
+    // D-122: ấn triện dọc đã gỡ khỏi trang chủ
+    expect(container.querySelector('.hero-seal')).toBeNull()
+    expect(container.querySelector('.vseal')).toBeNull()
 
     // Footer: Seal LAMVI + chữ lớn BrandHover
     const footer = container.querySelector('footer.footer')

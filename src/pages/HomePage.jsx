@@ -10,16 +10,12 @@ import {
 } from 'framer-motion'
 import Lantern from '../components/Lantern'
 import ScrollProgress from '../components/ScrollProgress'
-import Marquee from '../components/Marquee'
-import Particles from '../components/Particles'
 import Faq from '../components/Faq'
 import FolkGallery from '../components/FolkGallery'
 import CraftFilms, { CraftVideo, IntroFilm, PhoneVideo } from '../components/CraftFilms'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import Scene from '../components/Scene'
 import { CountUp, Reveal } from '../components/Reveal'
-import { PointerGlow } from '../components/Effects'
-import { Cloud, DrumSun, Lotus, VerticalSeal } from '../components/Motifs'
 import {
   EASE_IN,
   EASE_OUT,
@@ -88,9 +84,7 @@ function useScrollToHash() {
 function Eyebrow({ children, variants = rise }) {
   return (
     <m.span className="eyebrow" variants={variants}>
-      <Lotus />
       {children}
-      <Lotus />
     </m.span>
   )
 }
@@ -227,23 +221,13 @@ function Hero() {
   const copyY = useTransform(scrollY, [0, 520], [0, reduce ? 0 : -70])
   const lanternY = useTransform(scrollY, [0, 700], [0, reduce ? 0 : -180])
   const lanternOpacity = useTransform(scrollY, [250, 700], [1, 0])
-  const drumY = useTransform(scrollY, [0, 700], [0, reduce ? 0 : 140])
-  const cueOpacity = useTransform(scrollY, [0, 140], [1, 0])
 
   return (
-    <section id="hero" className="hero aged has-motifs">
-      <Scene name="hero" />
-      <PointerGlow />
-      <Particles />
-      <Cloud className="hero-cloud cloud-a" />
-      <Cloud className="hero-cloud cloud-b" />
-
+    <section id="hero" className="hero">
       <m.div className="hero-copy" style={{ opacity: copyOpacity, y: copyY }}>
         <div>
           <span className="eyebrow intro" style={introDelay(0)}>
-            <Lotus />
             {t('hero.eyebrow')}
-            <Lotus />
           </span>
           <h1>
             <Words text={t('hero.title1')} />
@@ -267,59 +251,12 @@ function Hero() {
       </m.div>
 
       <div className="hero-art">
-        <m.div className="hero-drum" style={{ y: drumY }}>
-          <m.div
-            initial={{ opacity: 0, scale: 0.7, rotate: -40 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 1.6, ease: EASE_OUT }}
-          >
-            <DrumSun />
-          </m.div>
-        </m.div>
-        <div className="hero-glow" />
         <m.div className="hero-lantern" style={{ y: lanternY, opacity: lanternOpacity }}>
-          <m.div
-            initial={{ y: -140, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 55, damping: 11, delay: 0.3 }}
-          >
-            {/* Đèn thật (mẫu Tứ Linh) đã tách nền từ ảnh fanpage — giữ quầng sáng/hào quang của hero (D-107, public/images/lamps/CREDITS.md) */}
-            <img className="lamp-cutout hero-lamp" src="/images/lamps/tu-linh-cutout.webp" alt={t('lookbook.items')[1]} width={172} height={402} fetchPriority="high" decoding="async" />
-          </m.div>
-        </m.div>
-        <m.div
-          className="hero-art-satellite satellite-a"
-          initial={{ y: -80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 60, damping: 12, delay: 0.6 }}
-        >
-          <Lantern size={78} tone="amber" swing />
-        </m.div>
-        <m.div
-          className="hero-art-satellite satellite-b"
-          initial={{ y: -80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 60, damping: 12, delay: 0.8 }}
-        >
-          <Lantern size={58} tone="moss" swing />
-        </m.div>
-        {/* Ấn triện dọc đóng lên sau cùng, như lạc khoản bên mép tranh */}
-        <m.div
-          className="hero-seal"
-          initial={{ opacity: 0, scale: 1.6, rotate: -18 }}
-          animate={{ opacity: 1, scale: 1, rotate: -3 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 16, delay: 1.3 }}
-        >
-          <VerticalSeal label="LAMVI" />
+          {/* Đèn thật (mẫu Tứ Linh) đã tách nền từ ảnh fanpage (D-107, public/images/lamps/CREDITS.md) */}
+          <img className="lamp-cutout hero-lamp" src="/images/lamps/tu-linh-cutout.webp" alt={t('lookbook.items')[1]} width={172} height={402} fetchPriority="high" decoding="async" />
         </m.div>
       </div>
 
-      <m.a href="#story" className="scroll-cue" style={{ opacity: cueOpacity }}>
-        <span>{t('hero.scroll')}</span>
-        <svg width="14" height="20" viewBox="0 0 14 20" fill="none" aria-hidden="true">
-          <path d="M1 1L7 19L13 1" stroke="currentColor" strokeWidth="1.6" />
-        </svg>
-      </m.a>
     </section>
   )
 }
@@ -371,8 +308,6 @@ export default function HomePage() {
       <IntroFilm ctaHref="#hero" />
 
       <Hero />
-
-      <Marquee />
 
       <Reveal as="section" id="story" className="story has-motifs" variants={group}>
         <Scene name="story" />

@@ -39,7 +39,11 @@ const RISE = [
   { left: '94%', size: 16, delay: 2.4, dur: 9.6 },
 ]
 
+const CALM_KEEP = new Set(['auth', 'notFound'])
+
 export default function Scene({ name, className = '' }) {
+  // Đợt chống "AI slop" (D-122): nền ảnh/khói/đèn trời chỉ giữ ở trang đăng nhập và 404; còn lại nền phẳng
+  if (!CALM_KEEP.has(name)) return null
   const s = SCENES[name]
   if (!s) return null
   return (

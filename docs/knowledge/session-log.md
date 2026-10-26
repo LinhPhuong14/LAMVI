@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-26 (phiên 2) — Đợt chống AI slop (nhánh `feat/calm-ui`, D-122)
+
+PO: gỡ bớt hoạ tiết, căn section chuẩn hơn; hỏi có cần quyền crawl Behance/Pinterest → không (đăng nhập + cấm bot), dùng web công khai. Đã làm: gỡ trang trí ở hero và mọi section, `Scene` chỉ còn auth/404, nền phẳng, thẻ đèn một màu, khung 1200 px + nhịp 8 px, cập nhật test theo hành vi mới. Chưa làm: trang con (shop, giỏ, đơn, tài khoản) còn kính/khung riêng; ảnh đèn tách nền vẫn có quầng ở lookbook (cố ý, là ánh đèn).
+
+---
+
 ## 2026-10-26 — Màu theo guideline + video giới thiệu đầu trang (nhánh `feat/brand-colors-intro-video`, D-121)
 
 PO gửi brand guideline (5 màu, Cormorant Garamond + Be Vietnam Pro) và báo client chê UI "AI slop"; yêu cầu đưa video giới thiệu lên đầu trang cho người quét QR. PO chọn video làng giấy dó, thay hero ở trang chủ `/`. Đã làm: đổi toàn bộ token màu (T-92), font tiêu đề, `IntroFilm`, cập nhật test (Palette, AccountTheme, SSR craftFilms). Tham khảo thiết kế bằng WebSearch (Behance/Pinterest không crawl được — cần đăng nhập, cấm bot): hero video im lặng + poster, bản dọc 3:4 cho điện thoại, ít trang trí hơn. **Chưa làm**: gỡ bớt hoạ tiết/kính mờ/vân giấy (nguồn gốc cảm giác "AI slop"), dựng lại og:image, bản video nhẹ cho mobile (G-119).

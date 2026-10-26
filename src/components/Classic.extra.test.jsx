@@ -194,13 +194,12 @@ describe('VerticalSeal', () => {
 })
 
 describe('Trang chủ sau đổi giao diện', () => {
-  it.each(['vi', 'en', 'zh'])('%s: .hero-seal chứa VerticalSeal LAMVI, không còn .story-cloud / postmark', async (lang) => {
+  it.each(['vi', 'en', 'zh'])('%s: .hero-seal đã gỡ (D-122), không còn .story-cloud / postmark', async (lang) => {
     mockApi(handlers)
     const { container } = renderAt(PREFIX[lang])
-    const seal = container.querySelector('.hero-seal .vseal')
-    expect(seal).not.toBeNull()
-    expect(seal).toHaveAttribute('aria-hidden', 'true')
-    expect([...seal.children].map((c) => c.textContent)).toEqual(['L', 'A', 'M', 'V', 'I'])
+    // D-122: đã gỡ ấn triện dọc khỏi hero (VerticalSeal vẫn còn là component)
+    expect(container.querySelector('.hero-seal')).toBeNull()
+    expect(container.querySelector('.vseal')).toBeNull()
     expect(container.querySelector('.story-cloud')).toBeNull()
     expect(container.querySelector('#story .folk-cloud')).toBeNull()
     expect(container.querySelector('[class*="postmark"]')).toBeNull()

@@ -39,18 +39,10 @@ describe.each(['vi', 'en', 'zh'])('SSR %s — phòng tranh và hoạ tiết', (l
     // Ghi chú: tranh trong Reveal có opacity:0 trong HTML SSR tới khi JS chạy — khoảng trống đã biết G-34 (decisions T-22), không kiểm ở đây
   })
 
-  it('8 lớp cảnh .scene (ảnh thật) aria-hidden, không phần tử focus được, mỗi lớp nằm trong phần has-motifs', async () => {
+  it('D-122: trang chủ không còn lớp cảnh .scene / .motif-layer (nền phẳng); phần has-motifs không có cảnh con', async () => {
     const d = await doc(PREFIX[lang])
-    const layers = [...d.querySelectorAll('.scene')]
-    expect(layers).toHaveLength(8)
-    for (const layer of layers) {
-      expect(layer.getAttribute('aria-hidden')).toBe('true')
-      expect(layer.querySelectorAll('a, button, input, select, textarea, [tabindex], [href], svg')).toHaveLength(0)
-      expect(layer.parentElement.classList.contains('has-motifs')).toBe(true)
-      expect(layer.parentElement.tagName).toBe('SECTION')
-      for (const img of layer.querySelectorAll('img')) expect(img.getAttribute('alt')).toBe('')
-    }
+    expect(d.querySelectorAll('.scene')).toHaveLength(0)
     expect(d.querySelectorAll('.motif-layer')).toHaveLength(0)
-    for (const s of d.querySelectorAll('.has-motifs')) expect(s.querySelector(':scope > .scene')).not.toBeNull()
+    for (const s of d.querySelectorAll('.has-motifs')) expect(s.querySelector(':scope > .scene')).toBeNull()
   })
 })

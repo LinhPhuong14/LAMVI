@@ -12,15 +12,14 @@ const template = readFileSync(`${root}index.html`, 'utf8')
 const page = (url) => renderPage({ repo: createMemoryRepo(), config, template, render, url, pathname: url })
 
 describe('SSR trang chủ — ấn triện dọc', () => {
-  it.each(['/', '/en', '/zh'])('%s: có .hero-seal > .vseal (L/A/M/V/I, aria-hidden), không có postmark / story-cloud', async (url) => {
+  it.each(['/', '/en', '/zh'])('%s: không còn .hero-seal / .vseal (D-122), không có postmark / story-cloud', async (url) => {
     const r = await page(url)
     expect(r.status).toBe(200)
     expect(r.html).not.toMatch(/postmark/i)
     expect(r.html).not.toContain('story-cloud')
     const doc = new JSDOM(r.html).window.document
-    const seal = doc.querySelector('.hero-seal .vseal')
-    expect(seal).not.toBeNull()
-    expect(seal.getAttribute('aria-hidden')).toBe('true')
-    expect([...seal.children].map((c) => c.textContent)).toEqual(['L', 'A', 'M', 'V', 'I'])
+    // D-122: đã gỡ ấn triện dọc khỏi trang chủ
+    expect(doc.querySelector('.hero-seal')).toBeNull()
+    expect(doc.querySelector('.vseal')).toBeNull()
   })
 })

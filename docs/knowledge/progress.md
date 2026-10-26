@@ -180,3 +180,7 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Font Cormorant Garamond | ✅ code | `src/main.jsx`, `index.html` | gỡ gói Fraunces |
 | Video giới thiệu đầu trang chủ | ✅ code | `IntroFilm` ở `CraftFilms.jsx`, `HomePage.jsx`; `server/craftFilms.independent.test.js` | bản mobile nhẹ, video không phụ đề (G-119) |
 
+| Đợt v0.68 (D-122) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Gỡ hoạ tiết trang chủ, nền phẳng, nhịp section (T-93) | ✅ code | `HomePage.jsx`, `Scene.jsx`, cuối `pages.css`; test `ssr.*.extra`, `Folk.extra` đã cập nhật | trang con (shop, giỏ, đơn, tài khoản) |
+
