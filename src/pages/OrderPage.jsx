@@ -220,7 +220,7 @@ export default function OrderPage() {
 
         <h2>{t('orders.payment')}</h2>
         <p>
-          {t(`orders.methods.${order.paymentMethod}`)} — {t(`orders.paymentStatuses.${order.paymentStatus}`)}
+          {t(`orders.methods.${order.paymentMethod}`)}, {t(`orders.paymentStatuses.${order.paymentStatus}`)}
         </p>
         {order.trackingCode && (
           <p>

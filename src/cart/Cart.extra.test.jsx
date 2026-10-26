@@ -236,7 +236,7 @@ describe('Thanh toán (D-61, US-001 AC-003)', () => {
     mockApi(srv.handlers)
     renderAt('/cart')
     expect(await screen.findByRole('button', { name: 'Thanh toán' })).toBeDisabled()
-    expect(screen.getAllByText('Sản phẩm này hiện không còn bán — vui lòng xoá khỏi giỏ.')).toHaveLength(2)
+    expect(screen.getAllByText('Sản phẩm này hiện không còn bán, vui lòng xoá khỏi giỏ.')).toHaveLength(2)
   })
 
   it('đã đăng nhập: bấm Thanh toán → sang trang checkout (FR-CHK-001)', async () => {

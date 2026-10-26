@@ -86,7 +86,7 @@ describe('D-67: OpenAI mặc định bật; admin tắt (D-55) hoặc thiếu kh
   it('đã bật nhưng không có khoá (openai=null) → vẫn offline', async () => {
     await enable()
     const res = await chat({ message: 'giá đèn?', lang: 'en' })
-    expect(res.body.reply).toMatchObject({ kind: 'resting', text: 'Mây is taking a rest — here are some frequently asked questions' })
+    expect(res.body.reply).toMatchObject({ kind: 'resting', text: 'Mây is taking a rest, here are some frequently asked questions' })
   })
 })
 

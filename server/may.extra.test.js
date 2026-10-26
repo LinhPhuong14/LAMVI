@@ -568,7 +568,7 @@ describe('Cấu hình (FR-AI-007)', () => {
     await enable({ supportChannel: { vi: '', en: '', zh: '' } })
     const r = await chat({ message: 'x', lang: 'en' })
     expect(r.body.reply.text).not.toContain('{channel}')
-    expect(r.body.reply.text).toBe('Mây doesn’t know this yet — you could check the FAQ on our site')
+    expect(r.body.reply.text).toBe('Mây doesn’t know this yet, you could check the FAQ on our site')
   })
 
   it('câu thông báo admin sửa được dùng ngay; lang lạ → vi', async () => {

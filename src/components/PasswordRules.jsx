@@ -24,7 +24,7 @@ export default function PasswordRules({ password, confirm }) {
               {r.ok ? '✓' : '○'}
             </span>
             {t(`auth.pwRules.${r.id}`)}
-            <span className="sr-only"> — {r.ok ? t('auth.pwRules.ok') : t('auth.pwRules.todo')}</span>
+            <span className="sr-only">: {r.ok ? t('auth.pwRules.ok') : t('auth.pwRules.todo')}</span>
           </li>
         ))}
       </ul>

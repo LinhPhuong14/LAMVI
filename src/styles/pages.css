@@ -1010,7 +1010,7 @@
   font-size: 2.1rem;
   font-weight: 300;
   line-height: 1.1;
-  font-variant-numeric: oldstyle-nums;
+  font-variant-numeric: lining-nums;
 }
 
 .it-table-wrap {
@@ -1827,7 +1827,7 @@
   font-weight: 300;
   font-size: 3rem;
   line-height: 1.05;
-  font-variant-numeric: oldstyle-nums;
+  font-variant-numeric: lining-nums;
   color: var(--than);
 }
 
@@ -4390,7 +4390,7 @@
   font-family: var(--serif);
   font-size: 1.5rem;
   font-weight: 600;
-  font-variant-numeric: oldstyle-nums;
+  font-variant-numeric: lining-nums;
   white-space: nowrap;
 }
 
@@ -4561,7 +4561,7 @@
 .order-row-total {
   font-family: var(--serif);
   font-size: 1.05rem;
-  font-variant-numeric: oldstyle-nums;
+  font-variant-numeric: lining-nums;
 }
 
 @media (max-width: 960px) {
@@ -6029,5 +6029,509 @@ h1 {
 
   .hero-art {
     min-height: 420px;
+  }
+}
+
+/* ===== Tài khoản, đơn hàng, thanh toán (D-122): cùng ngôn ngữ biên tập ===== */
+:root {
+  font-variant-numeric: lining-nums; /* Cormorant mặc định số kiểu cổ: "0" giống chữ O, "1" giống chữ I */
+}
+
+/* Thẻ: một lớp, không khung lồng nhau */
+.account-card::before {
+  display: none;
+}
+
+.account-card {
+  box-shadow: none;
+  border: 1px solid var(--hair-soft);
+  border-radius: var(--r-sm);
+}
+
+/* Thanh toán: các bước là mục đánh số, không hộp bọc hộp */
+.checkout .checkout-main .account-card {
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--hair);
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.checkout fieldset {
+  padding: 28px 0 36px;
+}
+
+.checkout legend {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 20px;
+  font-family: var(--serif);
+  font-size: 1.7rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--than);
+}
+
+.step-no {
+  display: inline;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  color: var(--hoe);
+}
+
+.step-no::before {
+  content: '0';
+}
+
+.checkout legend svg,
+.checkout legend img {
+  display: none;
+}
+
+.checkout .page-title {
+  margin-bottom: 40px;
+}
+
+/* Tóm tắt đơn: tấm nâu đậm làm điểm nhấn của trang (giỏ hàng, thanh toán, đơn hàng) */
+.order-summary {
+  --than: var(--diep);
+  --than-soft: rgba(244, 232, 207, 0.82);
+  --sepia: var(--hoe);
+  --hair: rgba(234, 214, 183, 0.28);
+  --hair-soft: rgba(234, 214, 183, 0.16);
+  --diep-light: color-mix(in srgb, var(--cham) 78%, var(--diep));
+  --son: var(--hoe);
+  --son-deep: var(--hoe-light);
+  background: var(--cham);
+  color: var(--diep);
+  border-radius: var(--r-md);
+  box-shadow: none;
+}
+
+.order-summary::before {
+  display: none;
+}
+
+.order-summary h2,
+.order-summary h3 {
+  color: var(--diep-light);
+}
+
+.order-summary .btn-primary {
+  background: var(--hoe);
+  color: var(--cham);
+}
+
+.order-summary .btn-primary:hover {
+  background: var(--hoe-light);
+}
+
+.order-summary input {
+  color: var(--than);
+  border-color: var(--hair);
+}
+
+.order-summary .btn-ghost,
+.order-summary .btn-small {
+  color: var(--diep);
+  border-color: var(--hair);
+}
+
+/* Dashboard tài khoản (giao diện sáng): nền phẳng, thẻ đặc; ảnh trời và đèn bay chỉ giữ ở giao diện tối */
+.dash:not([data-theme='dark']) .dash-sky,
+.dash:not([data-theme='dark']) .dash-photo,
+.dash:not([data-theme='dark']) .dash-smoke,
+.dash:not([data-theme='dark']) .dash-rise {
+  display: none;
+}
+
+.dash:not([data-theme='dark']) {
+  --glass: var(--diep-light);
+  --glass-strong: var(--diep-light);
+  --glass-soft: var(--diep-deep);
+  --glass-edge: var(--hair-soft);
+  --glass-shadow: none;
+  --glass-blur: none;
+}
+
+/* Số liệu tổng quan: chữ số lớn */
+.dash-stat strong,
+.dash-stat .dash-stat-value {
+  font-weight: 500;
+  font-size: clamp(2.6rem, 4vw, 3.6rem);
+  line-height: 1;
+  color: var(--than);
+}
+
+/* ===== Băng chuyền, hero ngắn + sống động, chuyển động nền, hình minh hoạ trang con (D-123) ===== */
+@keyframes lv-bob {
+  from { transform: translateY(0) rotate(-0.6deg); }
+  to { transform: translateY(-12px) rotate(0.8deg); }
+}
+
+@keyframes lv-float {
+  from { transform: translateY(0) rotate(var(--r, -4deg)); }
+  to { transform: translateY(-14px) rotate(calc(var(--r, -4deg) + 2deg)); }
+}
+
+@keyframes lv-breathe {
+  from { opacity: 0.55; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes lv-drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(14px, -10px); }
+}
+
+/* Băng chuyền: lưới thẻ hoá dải cuộn có snap; nút, chấm, tự chạy ở components/Carousel.jsx */
+.carousel {
+  position: relative;
+}
+
+.is-carousel {
+  display: flex !important;
+  grid-template-columns: none !important;
+  gap: 24px !important;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 4px 2px 8px;
+  margin-inline: 0 !important;
+}
+
+.is-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.is-carousel > * {
+  flex: 0 0 calc((100% - 48px) / 3);
+  margin-top: 0 !important;
+  scroll-snap-align: start;
+}
+
+.lookbook-grid.is-carousel > * {
+  flex-basis: calc((100% - 96px) / 5);
+}
+
+@media (max-width: 1000px) {
+  .is-carousel > * { flex-basis: calc((100% - 24px) / 2); }
+  .lookbook-grid.is-carousel > * { flex-basis: calc((100% - 48px) / 3); }
+}
+
+@media (max-width: 640px) {
+  .is-carousel { gap: 14px !important; }
+  .is-carousel > * { flex-basis: 80%; }
+  .lookbook-grid.is-carousel > * { flex-basis: 62%; }
+}
+
+.carousel-ui {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.carousel-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--hair);
+  background: none;
+  color: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.carousel-btn:hover {
+  background: var(--son);
+  border-color: var(--son);
+  color: var(--diep-light);
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.carousel-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--hair);
+  transition: width 0.35s var(--ease-out), background 0.35s ease;
+}
+
+.carousel-dots span.is-on {
+  width: 28px;
+  background: var(--son);
+}
+
+.lookbook .carousel-btn { border-color: rgba(234, 214, 183, 0.4); color: var(--diep-light); }
+.lookbook .carousel-dots span { background: rgba(234, 214, 183, 0.3); }
+.lookbook .carousel-dots span.is-on { background: var(--hoe); }
+
+/* Hero: thấp hơn, có ảnh minh hoạ chồng lớp, mọi thứ trôi nhẹ */
+.hero {
+  padding-block: clamp(32px, 4.5vw, 56px);
+  align-items: center;
+}
+
+.hero h1 {
+  font-size: clamp(2.6rem, 5vw, 4.4rem);
+}
+
+.hero-sub {
+  margin: 18px 0 26px;
+}
+
+.hero-art {
+  min-height: clamp(340px, 34vw, 420px);
+}
+
+.hero-lantern {
+  margin: 0 0 24px;
+}
+
+.hero-lamp {
+  max-height: min(340px, 30vw);
+  width: auto;
+  animation: lv-bob 5.5s ease-in-out infinite alternate;
+}
+
+.hero-art::before {
+  animation: lv-breathe 5s ease-in-out infinite alternate;
+}
+
+.hero-art::after {
+  animation: lv-drift 9s ease-in-out infinite alternate;
+}
+
+.hero-polaroid {
+  position: absolute;
+  margin: 0;
+  padding: 6px 6px 18px;
+  background: var(--diep-light);
+  border-radius: 2px;
+  box-shadow: var(--print-lg);
+  animation: lv-float 7s ease-in-out infinite alternate;
+}
+
+.hero-polaroid img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hp-a { --r: -7deg; left: -2%; top: 4%; width: 118px; height: 150px; }
+.hp-b { --r: 6deg; right: -4%; bottom: 14%; width: 108px; height: 138px; animation-delay: -3s; }
+
+@media (max-width: 860px) {
+  .hero { padding-block: 32px 40px; }
+  .hero-art { min-height: 340px; }
+  .hero-lamp { max-height: 270px; }
+  .hp-a { left: 2%; width: 92px; height: 118px; }
+  .hp-b { right: 0; width: 86px; height: 112px; }
+}
+
+/* Chuyển động nền cho các hình khác */
+.lookbook-lamp-img { animation: lv-bob 6s ease-in-out infinite alternate; }
+.lookbook-card:nth-child(even) .lookbook-lamp-img { animation-delay: -2.5s; }
+.product-art img { animation: lv-bob 7s ease-in-out infinite alternate; }
+.product-card:nth-child(even) .product-art img { animation-delay: -3s; }
+.phone-sun { animation: lv-breathe 6s ease-in-out infinite alternate; }
+
+/* Hình minh hoạ cạnh tiêu đề trang con */
+.page-section { position: relative; }
+
+.page-art {
+  position: absolute;
+  top: clamp(24px, 4vw, 48px);
+  right: var(--sec-x);
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.page-art-lamp {
+  height: clamp(120px, 14vw, 190px);
+  width: auto;
+  animation: lv-bob 5.5s ease-in-out infinite alternate;
+}
+
+.page-art-lamp.l1 { height: clamp(150px, 17vw, 230px); animation-delay: -1.8s; }
+.page-art-lamp.l2 { animation-delay: -3.4s; }
+
+.page-art-print {
+  --r: 5deg;
+  margin: 0;
+  padding: 8px 8px 22px;
+  width: clamp(120px, 14vw, 180px);
+  background: var(--diep-light);
+  box-shadow: var(--print-lg);
+  border-radius: 2px;
+  animation: lv-float 8s ease-in-out infinite alternate;
+}
+
+.page-art-print img { display: block; width: 100%; height: auto; }
+
+.medium .page-art { right: -40px; }
+
+@media (max-width: 1000px) {
+  .page-art { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-lamp, .hero-art::before, .hero-art::after, .hero-polaroid, .lookbook-lamp-img, .product-art img,
+  .phone-sun, .page-art-lamp, .page-art-print { animation: none; }
+}
+
+/* Tóm tắt đơn: tiêu đề trên nền nâu đậm */
+.order-summary h2,
+.order-summary h3,
+.checkout .order-summary h2 {
+  color: var(--diep-light);
+}
+
+/* Trang cảm ơn sau đặt hàng: tấm nâu đậm làm điểm nhấn */
+.order-page > .account-card:first-of-type,
+.order-head {
+  background: var(--cham);
+  color: var(--diep);
+  border: 0;
+}
+
+.order-page > .account-card:first-of-type h1,
+.order-page > .account-card:first-of-type .page-title {
+  color: var(--diep-light);
+  border: 0;
+  padding: 0;
+}
+
+/* Video giới thiệu: full chiều rộng, khung 16:9 đúng tỉ lệ nguồn (không phóng to → không vỡ hình); cắt dải phụ đề cứng ở đáy video */
+.intro-film {
+  position: relative;
+  min-height: 0;
+  display: block;
+  background: var(--cham-deep);
+}
+
+.intro-film-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 92svh;
+  min-height: 360px;
+  overflow: hidden;
+}
+
+.intro-film-video {
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: 118%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.intro-film-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(43, 22, 7, 0.7) 0%, rgba(43, 22, 7, 0.22) 46%, transparent 72%),
+    linear-gradient(0deg, rgba(43, 22, 7, 0.5) 0%, transparent 38%);
+}
+
+.intro-film-copy {
+  position: absolute;
+  left: max(var(--sec-x), calc((100% - var(--wrap)) / 2));
+  bottom: clamp(32px, 7vw, 88px);
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  max-width: min(640px, 56%);
+  padding: 0;
+}
+
+.intro-film-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.95rem;
+  letter-spacing: 0.5em;
+}
+
+.intro-film-brand::before {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--hoe);
+}
+
+.intro-film-slogan {
+  font-size: clamp(2.2rem, 4.8vw, 4.2rem);
+  font-weight: 500;
+  line-height: 1.04;
+  text-transform: none;
+}
+
+.intro-film-slogan em {
+  display: block;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--hoe-light);
+}
+
+.intro-film-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.intro-film-actions .btn-ghost {
+  color: var(--diep-light);
+  border-color: rgba(234, 214, 183, 0.55);
+}
+
+.intro-film-controls {
+  right: clamp(14px, 3vw, 32px);
+  bottom: clamp(14px, 3vw, 32px);
+}
+
+@media (max-width: 760px) {
+  /* Điện thoại: video giữ đúng 16:9 trên cùng, chữ nằm dưới trên nền nâu đậm (không đè, không cắt hình) */
+  .intro-film-stage {
+    max-height: none;
+    min-height: 0;
+  }
+
+  .intro-film-shade {
+    background: linear-gradient(0deg, rgba(43, 22, 7, 0.35) 0%, transparent 30%);
+  }
+
+  .intro-film-copy {
+    position: static;
+    max-width: none;
+    padding: 28px var(--sec-x) 36px;
+    background: var(--cham);
+    color: var(--diep-light);
+  }
+
+  .intro-film-controls {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
   }
 }

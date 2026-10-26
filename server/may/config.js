@@ -9,17 +9,17 @@ export const MESSAGE_GROUPS = ['sick', 'tired', 'resting', 'unknown', 'unknownNo
 const DEFAULT_MESSAGES = {
   sick: {
     vi: ['Mây bị ốm rùi, chờ Mây khỏe lại xíu nha', 'Mây đang hơi mệt trong người, bạn thử lại sau ít phút nha'],
-    en: ['Mây is feeling a little sick — please wait a bit while Mây gets better', 'Mây is under the weather, please try again in a few minutes'],
+    en: ['Mây is feeling a little sick, please wait a bit while Mây gets better', 'Mây is under the weather, please try again in a few minutes'],
     zh: ['Mây 生病了，请等 Mây 恢复一下哦', 'Mây 有点不舒服，请过几分钟再试'],
   },
   tired: {
     vi: ['Hôm nay Mây nói nhiều quá, mai mình trò chuyện tiếp nha'],
-    en: ['Mây has talked a lot today — let’s chat again tomorrow'],
+    en: ['Mây has talked a lot today, let’s chat again tomorrow'],
     zh: ['今天 Mây 说了太多话啦，明天再聊吧'],
   },
   resting: {
     vi: ['Mây đang nghỉ ngơi, bạn xem thử mấy câu hỏi thường gặp nè'],
-    en: ['Mây is taking a rest — here are some frequently asked questions'],
+    en: ['Mây is taking a rest, here are some frequently asked questions'],
     zh: ['Mây 正在休息，先看看这些常见问题吧'],
   },
   unknown: {
@@ -29,7 +29,7 @@ const DEFAULT_MESSAGES = {
   },
   unknownNoChannel: {
     vi: ['Hì, câu này Mây chưa biết chắc rồi. Bạn xem thử phần hỏi đáp trên web nha, hoặc hỏi Mây chuyện khác cũng được', 'Mây gãi đầu một cái… câu này Mây chưa có thông tin. Bạn xem phần hỏi đáp trên web giúp Mây nha'],
-    en: ['Mây doesn’t know this yet — you could check the FAQ on our site'],
+    en: ['Mây doesn’t know this yet, you could check the FAQ on our site'],
     zh: ['这个 Mây 还不知道，可以看看网站上的常见问题'],
   },
 }

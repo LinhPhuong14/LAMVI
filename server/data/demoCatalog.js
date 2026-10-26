@@ -206,8 +206,8 @@ export const faqEntries = [
       zh: '视频和祝福会保存多久？',
     },
     answer: {
-      vi: 'Lời chúc dạng chữ được lưu vĩnh viễn. Lời chúc bằng giọng nói hoặc video được lưu 30 ngày kể từ khi người nhận bấm "Tôi đã nhận được quà" — hãy bấm "Tải về" để giữ lại. Video quá trình làm đèn (quét mã QR trên đèn) được lưu vĩnh viễn.',
-      en: 'Text messages are kept forever. Voice and video messages are kept for 30 days after the recipient taps "I have received my gift" — tap "Download" to keep a copy. The lantern-making video (scan the QR code on the lantern) is kept forever.',
+      vi: 'Lời chúc dạng chữ được lưu vĩnh viễn. Lời chúc bằng giọng nói hoặc video được lưu 30 ngày kể từ khi người nhận bấm "Tôi đã nhận được quà", hãy bấm "Tải về" để giữ lại. Video quá trình làm đèn (quét mã QR trên đèn) được lưu vĩnh viễn.',
+      en: 'Text messages are kept forever. Voice and video messages are kept for 30 days after the recipient taps "I have received my gift", tap "Download" to keep a copy. The lantern-making video (scan the QR code on the lantern) is kept forever.',
       zh: '文字祝福永久保存。语音或视频祝福在收礼人点击“我已收到礼物”后保存 30 天——请点击“下载”保留副本。灯的制作视频（扫描灯上的二维码）永久保存。',
     },
   },

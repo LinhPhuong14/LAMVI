@@ -115,7 +115,7 @@ describe('Xoá có hỏi xác nhận', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true)
     renderAt('/admin/batches')
     fireEvent.click(within((await screen.findByText('L-01')).closest('tr')).getByRole('button', { name: 'Xoá' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Lô đã xuất bản — không xoá được.')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Lô đã xuất bản, không xoá được.')
   })
 
   it('huỷ confirm xuất bản → không gọi publish', async () => {

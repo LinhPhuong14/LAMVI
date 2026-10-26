@@ -21,7 +21,7 @@ export default function I18nInput({ label, value, onChange, error, multiline = f
           <span className="i18n-lang">{l.toUpperCase()}</span>
           <Tag
             id={`${id}-${l}`}
-            aria-label={`${label} — ${S.common.langs[l]}`}
+            aria-label={`${label}: ${S.common.langs[l]}`}
             value={v[l] ?? ''}
             rows={multiline ? rows : undefined}
             onChange={(e) => onChange({ ...v, [l]: e.target.value })}

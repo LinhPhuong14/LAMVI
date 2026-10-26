@@ -441,3 +441,12 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - `Scene.jsx` chỉ còn `auth` (`CALM_KEEP`); 404 dùng chữ số 404 bằng CSS thay ảnh trời đêm. Dữ liệu `SCENES` và ảnh giữ nguyên. `Marquee`, `Particles`, `PointerGlow`, `Motifs` còn trong `src/components/` nhưng trang chủ không dùng.
 - Hero: chuyển động cuộn tính theo chính khối hero (`useScroll({ target })`), không theo đầu trang — trước đó chữ hero bị mờ hết vì phía trên có video giới thiệu.
 - Còn lại: trang tài khoản, đơn hàng, checkout, admin chưa qua đợt này.
+
+### T-94 — Carousel, hero video đúng tỉ lệ, bỏ dấu gạch dài (2026-10-26)
+
+- D-123. `src/components/Carousel.jsx`: bọc quanh một "đường chạy" (lưới thẻ); khi hydrate thêm lớp `is-carousel` (CSS `pages.css` biến lưới thành dải cuộn snap), nút trước/sau, chấm, tự chạy (`setInterval`, chỉ khi trong màn hình, dừng khi rê chuột/focus/chạm/tab ẩn/giảm chuyển động). Không JS vẫn là lưới thường. Dùng ở `ProductCards carousel` (trang chủ, sản phẩm liên quan) và lookbook. Nhãn nút nút `carousel.prev/next` khác "Next" của tour Mây để không trùng tên truy cập.
+- `IntroFilm`: khung `aspect-ratio: 16/9` (nguồn 1280×720) thay `min-height: 100svh` + `cover` vốn phóng to và cắt video ở màn dọc; video cao 118% neo trên để cắt dải phụ đề cứng; ≤760 px chữ nằm dưới video.
+- Bỏ dấu gạch dài ở nội dung (i18n, seed, `demoCatalog`, email, Mây): `seed.sql` sinh lại bằng `npm run db:seed-sql`. Ghi chú trong mã và tài liệu kỹ thuật không đổi.
+- Số: `font-variant-numeric: lining-nums` (Cormorant mặc định kiểu cổ).
+- `PageArt` (ảnh đèn tách nền, tranh Đông Hồ có sẵn trong `public/images`) cạnh tiêu đề trang con; ẩn dưới 1000 px.
+

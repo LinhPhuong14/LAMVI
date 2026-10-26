@@ -54,7 +54,7 @@ describe('Khung soạn lời chúc', () => {
     expect(await screen.findByText('Đã lưu lời chúc.')).toBeInTheDocument()
     const put = fetchMock.mock.calls.find(([u, i]) => String(u) === `/api/orders/${CODE}/message` && i?.method === 'PUT')
     expect(JSON.parse(put[1].body)).toEqual({ text: 'Chúc mừng', textLang: 'vi' })
-    expect(screen.getByText('Bản nháp — sửa được')).toBeInTheDocument()
+    expect(screen.getByText('Bản nháp, sửa được')).toBeInTheDocument()
   })
 
   it('đơn không có lời chúc → không có khung (D-14)', async () => {

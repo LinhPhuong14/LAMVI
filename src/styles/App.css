@@ -799,7 +799,7 @@
 
 .story-stats strong {
   font-family: var(--serif);
-  font-variant-numeric: oldstyle-nums;
+  font-variant-numeric: lining-nums;
   font-weight: 600;
   font-size: 3.2rem;
   line-height: 1.1;

@@ -4,6 +4,7 @@ import { useApi } from '../api/useApi.js'
 import { useSubmit } from '../auth/useForm.js'
 import Field from '../components/Field'
 import { useI18n } from '../i18n/index.js'
+import PageArt from '../components/PageArt.jsx'
 import Seo from '../seo/Seo.jsx'
 
 const telHref = (phone) => `tel:${phone.replace(/[^0-9+]/g, '')}`
@@ -50,6 +51,7 @@ export default function ContactPage() {
 
   return (
     <section className="page-section medium contact-page">
+      <PageArt kind="folk" folk="ong" />
       <Seo title={t('contact.title')} description={t('contact.description')} path="/contact" />
       <h1 className="page-title">{t('contact.title')}</h1>
       <p className="policy-intro">{t('contact.lead')}</p>
