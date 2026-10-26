@@ -434,10 +434,10 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - Font: `@fontsource/cormorant-garamond` (500/600/700 + 500 nghiêng, có tập con vietnamese) thay Fraunces Variable; `--serif` đổi theo. Gói `@fontsource-variable/fraunces` còn trong `package.json`, chưa gỡ.
 - `IntroFilm` (`src/components/CraftFilms.jsx`) là khối đầu trang chủ: `<video autoplay muted loop playsinline preload="metadata" poster>`; `suppressHydrationWarning` vì React không khớp thuộc tính `muted` giữa SSR và client; `muted` đặt lại bằng ref rồi gọi `play()`. Không dùng `useAutoplayInView` (khối này luôn nằm trong màn hình đầu). Hero chữ đổi thành `id="hero"` làm đích của nút "Xem bộ sưu tập"; `h1` vẫn nằm ở hero (khối video chỉ dùng `<p>`).
 
-### T-93 — Đợt chống "AI slop": nền phẳng, một hệ nâng khối, nhịp section (2026-10-26)
+### T-93 — Đợt chống "AI slop": thiết kế biên tập có chủ đích (2026-10-26)
 
-- D-122. Tham khảo từ web công khai (không crawl Behance/Pinterest): bỏ gradient trang trí, kính mờ, bóng đổ mặc định lặp mọi thẻ; chọn **một** hệ nâng khối (`--print`, `--print-lg`); thang khoảng cách 8 px.
-- Cách làm: khối cuối `src/styles/pages.css` ("Đợt chống AI slop") đặt token `--tex-*`, `--corner-*`, `--pat-cloud`, `--g-blur` = `none`, thêm `--sec-y`, `--sec-x`, `--wrap`; mọi section dùng `padding-inline: max(var(--sec-x), calc((100% - var(--wrap)) / 2))` để nền full-bleed vẫn tràn mép mà nội dung thẳng một cột 1200 px.
-- `Scene.jsx` chỉ render `auth` và `notFound` (`CALM_KEEP`); dữ liệu `SCENES` và ảnh trong `public/images/scene/` giữ nguyên để khôi phục nếu cần. `Marquee`, `Particles`, `PointerGlow`, `Motifs` vẫn còn trong `src/components/` nhưng trang chủ không dùng.
-- Còn lại đường chạy khác chưa dọn: trang con (cửa hàng, giỏ, đơn) còn khung/kính ở CSS riêng.
-
+- D-122. Nguyên nhân "AI slop" theo các bài tổng hợp (superdesign.dev, saasui.design, dev.to/alanwest, impeccable): **thiếu quyết định thiết kế** — Inter + gradient tím, mọi thứ căn giữa, lưới thẻ giống hệt, khoảng cách đều, thẻ bo tròn + bóng mặc định, không có điểm nhấn. Chữa bằng hướng thiết kế rõ ràng, bố cục bất đối xứng, nhịp thay đổi, ảnh/nội dung thật — **không phải** bỏ hết trang trí (lần đầu gỡ quá tay khiến trang đơn điệu).
+- Cách làm: hai khối cuối `src/styles/pages.css` ("Đợt chống AI slop" và "Lớp thiết kế biên tập"). Token `--tex-*`, `--corner-*`, `--pat-cloud`, `--g-blur` = `none`; `--sec-y`, `--sec-x`, `--wrap` cho nhịp section; tiêu đề mục đánh số bằng CSS counter `sec` (`.section-head .eyebrow::before`); vòm cửa sổ `border-radius: 999px 999px 0 0` ở `.hero-art` và `.product-art`; thẻ đèn so le `:nth-child(3n + 2)`.
+- `Scene.jsx` chỉ còn `auth` (`CALM_KEEP`); 404 dùng chữ số 404 bằng CSS thay ảnh trời đêm. Dữ liệu `SCENES` và ảnh giữ nguyên. `Marquee`, `Particles`, `PointerGlow`, `Motifs` còn trong `src/components/` nhưng trang chủ không dùng.
+- Hero: chuyển động cuộn tính theo chính khối hero (`useScroll({ target })`), không theo đầu trang — trước đó chữ hero bị mờ hết vì phía trên có video giới thiệu.
+- Còn lại: trang tài khoản, đơn hàng, checkout, admin chưa qua đợt này.

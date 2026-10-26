@@ -215,15 +215,16 @@ function ProcessTimeline({ steps }) {
 function Hero() {
   const { t, path } = useI18n()
   const reduce = useHydratedReducedMotion()
-  const { scrollY } = useScroll()
-  // Rời màn hình đầu: chữ mờ dần và lui lên; đèn bay lên như thả đèn trời; trống đồng chìm xuống
-  const copyOpacity = useTransform(scrollY, [0, 520], [1, 0])
-  const copyY = useTransform(scrollY, [0, 520], [0, reduce ? 0 : -70])
-  const lanternY = useTransform(scrollY, [0, 700], [0, reduce ? 0 : -180])
-  const lanternOpacity = useTransform(scrollY, [250, 700], [1, 0])
+  const ref = useRef(null)
+  // Tính theo chính khối hero (không theo đầu trang: phía trên nó có video giới thiệu)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
+  const copyOpacity = useTransform(scrollYProgress, [0.3, 1], [1, 0])
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -50])
+  const lanternY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -90])
+  const lanternOpacity = useTransform(scrollYProgress, [0.4, 1], [1, 0])
 
   return (
-    <section id="hero" className="hero">
+    <section id="hero" className="hero" ref={ref}>
       <m.div className="hero-copy" style={{ opacity: copyOpacity, y: copyY }}>
         <div>
           <span className="eyebrow intro" style={introDelay(0)}>
