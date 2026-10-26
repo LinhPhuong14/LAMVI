@@ -144,6 +144,12 @@ describe('D-66 — cảnh nền ảnh thật (thay hoạ tiết SVG)', () => {
     for (const name of NAMES) {
       const { container, unmount } = render(<Scene name={name} />)
       const layer = container.querySelector('.scene')
+      if (!['auth', 'notFound'].includes(name)) {
+        // D-122: các cảnh khác không render (nền phẳng)
+        expect(layer, name).toBeNull()
+        unmount()
+        continue
+      }
       expect(layer, name).toHaveAttribute('aria-hidden', 'true')
       expect(layer.querySelectorAll('a, button, input, select, textarea, [tabindex], [href], svg')).toHaveLength(0)
       for (const img of layer.querySelectorAll('img')) {
@@ -165,16 +171,12 @@ describe('D-66 — cảnh nền ảnh thật (thay hoạ tiết SVG)', () => {
     expect(container.innerHTML).toBe('')
   })
 
-  it('HomePage: 8 phần gắn Scene khác nhau, mỗi phần có class has-motifs; không còn FloatingMotifs', () => {
+  it('HomePage: D-122 không còn <Scene> nào (nền phẳng); không còn FloatingMotifs', () => {
     const src = read('src/pages/HomePage.jsx')
     expect(src).not.toMatch(/FloatingMotifs/)
-    const uses = [...src.matchAll(/<Scene name="([\w-]+)" \/>/g)]
-    expect(uses).toHaveLength(8)
-    for (const u of uses) {
-      const prevLine = src.slice(0, u.index).trimEnd().split('\n').at(-1)
-      expect(prevLine, u[1]).toMatch(/<(section|Reveal as="section")[^>]*className="[^"]*\bhas-motifs\b/)
-    }
-    expect(new Set(uses.map((u) => u[1])).size).toBe(8)
+    expect([...src.matchAll(/<Scene name="([\w-]+)" \/>/g)].every((u) => !['hero', 'auth', 'notFound'].includes(u[1]))).toBe(true)
+    for (const name of ['story', 'artisan', 'products', 'lookbook', 'process', 'qr', 'faq'])
+      expect(render(<Scene name={name} />).container.innerHTML).toBe('')
   })
 
   it('CSS: .has-motifs tạo stacking context; .scene nằm dưới nội dung; giảm chuyển động tắt khói và đèn bay', () => {

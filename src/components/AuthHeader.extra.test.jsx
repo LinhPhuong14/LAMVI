@@ -132,10 +132,12 @@ describe('Scene', () => {
     await waitFor(() => expect(document.querySelector('.scene-auth')).toBeTruthy())
     expect(document.querySelector('img.scene-photo')).toBeNull()
   })
-  it('/cart vẫn render ảnh', async () => {
+  it('/cart không còn cảnh nền (D-122: chỉ auth/notFound giữ .scene)', async () => {
     mockApi(base)
     renderAt('/cart')
-    await waitFor(() => expect(document.querySelector('.scene-cart img.scene-photo')).toBeTruthy())
+    await waitFor(() => expect(document.title).toContain('Giỏ hàng'))
+    expect(document.querySelector('.scene')).toBeNull()
+    expect(document.querySelector('img.scene-photo')).toBeNull()
   })
 })
 

@@ -5562,3 +5562,132 @@
     min-height: 48px;
   }
 }
+
+/* ===== Đợt chống "AI slop" (D-122): nền phẳng, một hệ nâng khối, nhịp section theo thang 8 px ===== */
+:root {
+  --tex-fiber: none;
+  --tex-grain: none;
+  --tex-foxing: none;
+  --tex-worn: none;
+  --corner-tl: none;
+  --corner-tr: none;
+  --corner-bl: none;
+  --corner-br: none;
+  --pat-cloud: none;
+  --g-blur: none;
+  --g-bg: var(--diep-light);
+  --g-bg-strong: var(--diep-light);
+  --g-border: var(--hair-soft);
+  --g-shadow: none;
+  /* Một hệ nâng khối duy nhất: nét mảnh + bóng rất nhẹ */
+  --print: 0 1px 2px rgba(63, 32, 11, 0.06);
+  --print-lg: 0 1px 2px rgba(63, 32, 11, 0.06), 0 8px 24px -16px rgba(63, 32, 11, 0.25);
+  --shadow-glow: none;
+  /* Nhịp section */
+  --sec-y: clamp(72px, 9vw, 128px);
+  --sec-x: clamp(20px, 5vw, 56px);
+  --wrap: 1200px;
+}
+
+body {
+  background-image: none;
+}
+
+/* Ấn triện, quầng sáng, khói, đèn trời, mây: chỉ là trang trí */
+.hero-glow,
+.hero-cloud,
+.sky-lanterns,
+.sky-lantern,
+.scene-smoke,
+.scene-rise,
+.scroll-cue,
+.has-motifs > .cloud,
+.story::before,
+.lookbook::before,
+.footer::before,
+.testimonial-card::after,
+.testimonial-card::before {
+  display: none;
+}
+
+.eyebrow svg {
+  display: none;
+}
+
+/* Mọi section: cùng container 1200 px, cùng nhịp dọc; nền full-bleed vẫn tràn mép */
+.story,
+.artisan,
+.products,
+.lookbook,
+.process,
+.films,
+.qr-experience,
+.testimonials,
+.faq {
+  max-width: none;
+  margin: 0;
+  padding-block: var(--sec-y);
+  padding-inline: max(var(--sec-x), calc((100% - var(--wrap)) / 2));
+}
+
+.faq {
+  padding-inline: max(var(--sec-x), calc((100% - 800px) / 2));
+}
+
+.hero {
+  max-width: none;
+  margin: 0;
+  padding-block: clamp(56px, 8vw, 104px);
+  padding-inline: max(var(--sec-x), calc((100% - var(--wrap)) / 2));
+  min-height: 0;
+}
+
+.section-head {
+  margin: 0 auto 48px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 860px) {
+  .hero,
+  .artisan,
+  .qr-experience {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+/* Thẻ sản phẩm: một nền be thống nhất (không còn mỗi đèn một màu), bỏ khuyết góc và quầng sáng */
+.tone-amber,
+.tone-dusk,
+.tone-dawn,
+.tone-moss {
+  --tone: var(--diep-deep);
+}
+
+.product-art {
+  background: var(--diep-deep);
+}
+
+.product-art::after {
+  display: none;
+}
+
+.product-card:hover {
+  translate: 0 -2px;
+  box-shadow: var(--print-lg);
+}
+
+.lookbook-card {
+  border-width: 1px;
+  background: rgba(43, 22, 7, 0.5);
+}
+
+.lookbook-halo {
+  --tone: var(--hoe);
+  opacity: 0.35;
+}

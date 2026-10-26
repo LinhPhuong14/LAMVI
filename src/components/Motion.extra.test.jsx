@@ -174,16 +174,12 @@ describe('FAQ — mở/đóng có animation', () => {
 })
 
 describe('Marquee', () => {
-  it('bản sao thứ hai aria-hidden, bản đầu đọc được; không còn ký tự ✦', async () => {
+  it('D-122: trang chủ không còn .marquee', async () => {
     mockApi(handlers)
     const { container } = renderAt('/')
-    const lines = container.querySelectorAll('.marquee-line')
-    expect(lines).toHaveLength(2)
-    expect(lines[0]).not.toHaveAttribute('aria-hidden')
-    expect(lines[1]).toHaveAttribute('aria-hidden', 'true')
-    expect(container.querySelector('.marquee').textContent).not.toContain('✦')
-    for (const item of viMsg.marquee) expect(lines[0].textContent).toContain(item)
-    lines[0].querySelectorAll('svg').forEach((s) => expect(s).toHaveAttribute('aria-hidden', 'true'))
+    await screen.findByRole('heading', { level: 1 })
+    expect(container.querySelector('.marquee')).toBeNull()
+    expect(container.querySelector('.marquee-line')).toBeNull()
   })
 })
 
