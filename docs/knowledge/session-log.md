@@ -2,7 +2,7 @@
 
 ## 2026-10-26 (phiên 2) — Đợt chống AI slop (nhánh `feat/calm-ui`, D-122)
 
-PO: gỡ bớt hoạ tiết, căn section chuẩn hơn; hỏi có cần quyền crawl Behance/Pinterest → không (đăng nhập + cấm bot), dùng web công khai. Đã làm: gỡ trang trí ở hero và mọi section, `Scene` chỉ còn auth/404, nền phẳng, thẻ đèn một màu, khung 1200 px + nhịp 8 px, cập nhật test theo hành vi mới. Chưa làm: trang con (shop, giỏ, đơn, tài khoản) còn kính/khung riêng; ảnh đèn tách nền vẫn có quầng ở lookbook (cố ý, là ánh đèn).
+PO: gỡ bớt hoạ tiết, căn section chuẩn hơn; hỏi có cần quyền crawl Behance/Pinterest → không (đăng nhập + cấm bot), dùng web công khai. Lần 1 gỡ quá tay → PO: "các trang bị đơn điệu quá, chỉnh cho thẩm mĩ hơn chứ không phải tối giản". Đọc kỹ các bài về nguyên nhân AI slop (xem T-93) rồi làm lại theo hướng biên tập có chủ đích: tiêu đề mục lớn đánh số, vòm cửa sổ, thẻ so le, chữ số lớn, nền xen kẽ, trang con đồng bộ, 404. Sửa lỗi hero mờ do cuộn tính từ đầu trang. Chưa làm: tài khoản, đơn hàng, checkout, admin; og:image.
 
 ---
 

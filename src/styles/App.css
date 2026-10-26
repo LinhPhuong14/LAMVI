@@ -230,7 +230,7 @@
   top: 0;
   z-index: 20;
   background: var(--diep);
-  border-bottom: 3px double var(--hair);
+  border-bottom: 1px solid var(--hair);
   transition:
     transform 0.45s var(--ease-out),
     box-shadow 0.3s ease;
@@ -697,8 +697,8 @@
 
 .marquee {
   overflow: hidden;
-  border-top: 3px double rgba(200, 154, 99, 0.55);
-  border-bottom: 3px double rgba(200, 154, 99, 0.55);
+  border-top: 1px solid rgba(200, 154, 99, 0.55);
+  border-bottom: 1px solid rgba(200, 154, 99, 0.55);
   background: var(--than-2);
   padding: 13px 0;
   position: relative;
@@ -1690,8 +1690,8 @@
 .testimonials {
   padding: 110px 56px;
   background: var(--diep-deep);
-  border-top: 3px double var(--hair);
-  border-bottom: 3px double var(--hair);
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
 }
 
 .testimonial-grid {
@@ -1818,8 +1818,8 @@
 .faq-list {
   display: flex;
   flex-direction: column;
-  border-top: 3px double var(--hair);
-  border-bottom: 3px double var(--hair);
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
 }
 
 /* Danh sách ngăn bằng nét mảnh — không đóng hộp từng câu */
@@ -3050,7 +3050,7 @@
 .auth-or::after {
   content: '';
   flex: 1;
-  border-top: 3px double var(--hair);
+  border-top: 1px solid var(--hair);
 }
 
 .auth-footer {

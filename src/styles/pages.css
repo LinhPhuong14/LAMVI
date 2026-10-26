@@ -4110,7 +4110,7 @@
 .pdp-desc {
   margin: 16px 0 0;
   padding-top: 16px;
-  border-top: 3px double var(--hair);
+  border-top: 1px solid var(--hair);
   color: var(--than-soft);
   font-size: 1.02rem;
   line-height: 1.7;
@@ -4374,7 +4374,7 @@
   align-items: baseline;
   margin-top: 6px;
   padding-top: 14px;
-  border-top: 3px double var(--hair);
+  border-top: 1px solid var(--hair);
   color: var(--son-deep);
 }
 
@@ -5690,4 +5690,344 @@ body {
 .lookbook-halo {
   --tone: var(--hoe);
   opacity: 0.35;
+}
+
+/* Trang con: cùng khung và nhịp với trang chủ */
+.page-section {
+  max-width: var(--wrap);
+  padding: clamp(40px, 6vw, 64px) var(--sec-x) var(--sec-y);
+}
+
+.page-section.cart,
+.page-section.shop,
+.page-section.pdp {
+  max-width: var(--wrap);
+}
+
+/* 404: khung nâu đậm phẳng, không ảnh trời đêm */
+.notfound-night {
+  box-shadow: none;
+  border-radius: var(--r-lg);
+}
+
+/* ===== Lớp thiết kế biên tập (D-122): có chủ đích, không phải tối giản =====
+   Ý tưởng: tạp chí thủ công — tiêu đề cỡ lớn căn trái, đánh số mục, vòm cửa sổ đèn lồng làm hình khối nhận diện,
+   nền xen kẽ ivory / beige / nâu đậm tạo nhịp, chữ số lớn thay biểu tượng trang trí. */
+body {
+  counter-reset: sec;
+}
+
+.eyebrow {
+  gap: 14px;
+  color: var(--sepia);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 36px;
+  height: 1px;
+  background: var(--hoe);
+}
+
+.section-head .eyebrow::before {
+  counter-increment: sec;
+  content: counter(sec, decimal-leading-zero);
+  width: auto;
+  height: auto;
+  background: none;
+  padding-right: 14px;
+  border-right: 1px solid var(--hoe);
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  color: var(--hoe);
+}
+
+/* Tiêu đề mục: căn trái, cỡ lớn, hai cột (tiêu đề | dẫn nhập) */
+.section-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  column-gap: clamp(32px, 6vw, 96px);
+  align-items: end;
+  max-width: none;
+  margin: 0 0 clamp(40px, 5vw, 64px);
+  text-align: left;
+}
+
+.section-head > .eyebrow {
+  grid-column: 1 / -1;
+}
+
+.section-head h2 {
+  font-size: clamp(2.5rem, 5.4vw, 4.6rem);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.section-head > p {
+  margin: 0;
+  max-width: 44ch;
+  padding-bottom: 6px;
+  color: var(--than-soft);
+}
+
+@media (max-width: 860px) {
+  .section-head {
+    grid-template-columns: 1fr;
+    row-gap: 16px;
+  }
+}
+
+h1 {
+  font-weight: 500;
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 6.4vw, 5.6rem);
+  line-height: 1;
+}
+
+.h1-accent {
+  color: var(--son);
+  background: none;
+}
+
+/* Hero: đèn đứng trong vòm cửa sổ — hình khối nhận diện của LAMVI */
+.hero {
+  grid-template-columns: 1.15fr 0.85fr;
+}
+
+.hero-art {
+  min-height: clamp(420px, 44vw, 560px);
+  align-items: flex-end;
+  isolation: isolate;
+}
+
+.hero-art::before,
+.hero-art::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(86%, 380px);
+  height: 100%;
+  translate: -50% 0;
+  border-radius: 999px 999px 0 0;
+  z-index: -1;
+}
+
+.hero-art::before {
+  background: var(--diep-deep);
+}
+
+.hero-art::after {
+  translate: calc(-50% + 18px) -14px;
+  border: 1px solid var(--hoe);
+  background: none;
+  z-index: -2;
+}
+
+.hero-lantern {
+  margin: 0 0 48px;
+}
+
+/* Nhịp nền xen kẽ */
+.products,
+.qr-experience {
+  background: var(--diep-deep);
+}
+
+.films {
+  background: var(--cham);
+  color: var(--diep-light);
+}
+
+.films .section-head h2 {
+  color: var(--diep-light);
+}
+
+.films .section-head > p,
+.films .intent-copy {
+  color: rgba(244, 232, 207, 0.78);
+}
+
+.films .eyebrow,
+.films .section-head .eyebrow::before {
+  color: var(--hoe-light);
+}
+
+/* Thẻ đèn: không hộp, ảnh trong vòm cửa sổ, so le như tranh treo */
+.product-card {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+  text-align: left;
+}
+
+.product-card::before {
+  display: none;
+}
+
+.product-art {
+  border-radius: 999px 999px var(--r-xs) var(--r-xs);
+  background: var(--diep-light);
+  padding: 56px 0 28px;
+}
+
+.products .product-art {
+  background: var(--diep-light);
+}
+
+.product-body {
+  padding: 20px 4px 0;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.product-body h3 {
+  font-size: 1.75rem;
+  font-weight: 500;
+}
+
+@media (min-width: 861px) {
+  .product-grid > .product-card:nth-child(3n + 2) {
+    margin-top: 48px;
+  }
+}
+
+/* Quy trình: chữ số lớn thay vòng tròn */
+.timeline-index {
+  width: auto;
+  height: auto;
+  place-items: start;
+  border: 0;
+  background: none;
+  font-weight: 500;
+  font-size: clamp(3rem, 5vw, 4.2rem);
+  line-height: 1;
+  color: var(--hoe);
+}
+
+.timeline-label {
+  font-weight: 600;
+  font-size: 1.35rem;
+}
+
+/* Số liệu phần Di sản: lớn hơn, căn trái */
+.story-stats strong {
+  font-size: clamp(3.6rem, 7vw, 5.6rem);
+  font-weight: 500;
+  color: var(--hoe);
+}
+
+/* Trang con: tiêu đề lớn, vạch dưới, mục chính sách đánh số */
+.page-title {
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  font-weight: 500;
+  line-height: 1.02;
+  margin: 8px 0 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.policy-page {
+  counter-reset: pol;
+}
+
+.policy-page h2 {
+  counter-increment: pol;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-top: 40px;
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+
+.policy-page h2::before {
+  content: counter(pol, decimal-leading-zero);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: var(--hoe);
+}
+
+.contact-channels > div {
+  padding: 18px 0;
+  border-top: 1px solid var(--hair-soft);
+  grid-template-columns: minmax(120px, 200px) 1fr;
+  font-size: 1.1rem;
+}
+
+.contact-channels dt {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  color: var(--sepia);
+}
+
+.timeline li .timeline-index,
+.timeline li.is-lit .timeline-index,
+.timeline li.is-lit:nth-child(n) .timeline-index {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--hoe);
+}
+
+.timeline li.is-lit .timeline-index {
+  color: var(--son);
+}
+
+.timeline-track {
+  display: none;
+}
+
+.timeline li {
+  border-left: 1px solid var(--hair);
+  padding-left: 20px;
+}
+
+.notfound-night {
+  position: relative;
+  padding-block: clamp(72px, 12vw, 140px);
+}
+
+.notfound-night::before {
+  content: '404';
+  display: block;
+  margin-bottom: -0.15em;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(7rem, 22vw, 15rem);
+  line-height: 0.9;
+  color: var(--hoe);
+  opacity: 0.9;
+}
+
+.notfound-night .page-title {
+  border: 0;
+  padding: 0;
+}
+
+.auth-panel .page-title,
+.account-card .page-title {
+  border: 0;
+  padding-bottom: 0;
+}
+
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.6rem, 11vw, 3.6rem);
+  }
+
+  .hero-art {
+    min-height: 420px;
+  }
 }
