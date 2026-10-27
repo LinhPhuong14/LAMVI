@@ -6,6 +6,7 @@ import { useSubmit } from '../auth/useForm.js'
 import { useI18n } from '../i18n/index.js'
 import { useAdminList } from './useAdminList.js'
 import PageHead from './PageHead.jsx'
+import Split from './Split.jsx'
 import { S } from './strings.js'
 
 const EMPTY = {
@@ -198,6 +199,18 @@ export default function CouponsPage() {
   const { t } = useI18n()
   const [editing, setEditing] = useState(null)
   const [actionError, setActionError] = useState(null)
+  const [filter, setFilter] = useState('all')
+
+  // Bật/tắt ngay trên hàng (PATCH một phần, có nhật ký thay đổi ở server)
+  async function toggle(c) {
+    setActionError(null)
+    try {
+      await authedApi(`/admin/coupons/${c.id}`, { method: 'PATCH', body: { status: c.status === 'active' ? 'disabled' : 'active' } })
+      list.reload()
+    } catch (err) {
+      setActionError(err.code)
+    }
+  }
 
   async function remove(c) {
     if (!window.confirm(S.common.confirmDelete)) return
@@ -220,17 +233,22 @@ export default function CouponsPage() {
         )}
       </PageHead>
       <p className="field-hint">{S.coupons.note}</p>
-      {editing && (
-        <CouponForm
-          key={editing.id ?? 'new'}
-          initial={editing}
-          onCancel={() => setEditing(null)}
-          onDone={() => {
-            setEditing(null)
-            list.reload()
-          }}
-        />
-      )}
+      <Split
+        label={S.coupons.title}
+        aside={
+          editing && (
+            <CouponForm
+              key={editing.id ?? 'new'}
+              initial={editing}
+              onCancel={() => setEditing(null)}
+              onDone={() => {
+                setEditing(null)
+                list.reload()
+              }}
+            />
+          )
+        }
+      >
       {actionError && (
         <p className="notice error" role="alert">
           {t(`errors.${actionError}`)}
@@ -242,6 +260,14 @@ export default function CouponsPage() {
           {t(`errors.${list.error.code}`)}
         </p>
       )}
+      <div className="chip-row" role="group" aria-label={S.coupons.colStatus}>
+        {[['all', S.orders.chipAll], ['active', S.coupons.statuses.active], ['disabled', S.coupons.statuses.disabled]].map(([k, l]) => (
+          <button key={k} type="button" className={`chip${filter === k ? ' is-on' : ''}`} aria-pressed={filter === k} onClick={() => setFilter(k)}>
+            {l}
+            <b>{k === 'all' ? (list.items?.length ?? 0) : (list.items ?? []).filter((c) => c.status === k).length}</b>
+          </button>
+        ))}
+      </div>
       {list.status === 'ok' &&
         (list.items.length === 0 ? (
           <p>{S.coupons.empty}</p>
@@ -251,31 +277,33 @@ export default function CouponsPage() {
               <thead>
                 <tr>
                   <th>{S.coupons.colCode}</th>
-                  <th>{S.coupons.colType}</th>
+                  <th className="col-secondary">{S.coupons.colType}</th>
                   <th>{S.coupons.colValue}</th>
-                  <th>{S.coupons.colUsed}</th>
-                  <th>{S.coupons.colPeriod}</th>
+                  <th className="col-secondary">{S.coupons.colUsed}</th>
+                  <th className="col-secondary">{S.coupons.colPeriod}</th>
                   <th>{S.coupons.colStatus}</th>
                   <th />
                 </tr>
               </thead>
               <tbody>
-                {list.items.map((c) => (
+                {list.items.filter((c) => filter === 'all' || c.status === filter).map((c) => (
                   <tr key={c.id}>
                     <td>
                       <code>{c.code}</code>
                     </td>
-                    <td>{S.coupons.types[c.type]}</td>
+                    <td className="col-secondary">{S.coupons.types[c.type]}</td>
                     <td>{valueLabel(c)}</td>
-                    <td>
+                    <td className="col-secondary">
                       {c.usedCount}
                       {c.usageLimit ? ` / ${c.usageLimit}` : ` / ${S.coupons.unlimited}`}
                     </td>
-                    <td>{period(c)}</td>
+                    <td className="col-secondary">{period(c)}</td>
                     <td>
-                      <span className={`status status-${c.status === 'active' ? 'published' : 'hidden'}`}>
+                      <label className="switch">
+                        <input type="checkbox" role="switch" checked={c.status === 'active'} onChange={() => toggle(c)} aria-label={`${c.code}: ${S.coupons.statuses[c.status]}`} />
+                        <span className="switch-track" aria-hidden="true" />
                         {S.coupons.statuses[c.status]}
-                      </span>
+                      </label>
                     </td>
                     <td className="admin-row-actions">
                       <button type="button" className="btn btn-small" onClick={() => setEditing(c)}>
@@ -291,6 +319,7 @@ export default function CouponsPage() {
             </table>
           </div>
         ))}
+      </Split>
     </section>
   )
 }

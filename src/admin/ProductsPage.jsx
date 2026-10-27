@@ -7,6 +7,7 @@ import { useI18n } from '../i18n/index.js'
 import I18nInput from './I18nInput.jsx'
 import { useAdminList } from './useAdminList.js'
 import PageHead from './PageHead.jsx'
+import Split from './Split.jsx'
 import { S, fmt } from './strings.js'
 import { uploadFile } from './uploadFile.js'
 
@@ -211,6 +212,8 @@ export default function ProductsPage() {
   const { t } = useI18n()
   const [editing, setEditing] = useState(null) // null | {} (mới) | product
   const [actionError, setActionError] = useState(null)
+  const [filter, setFilter] = useState('all')
+  const [q, setQ] = useState('')
 
   async function remove(p) {
     if (!window.confirm(S.common.confirmDelete)) return
@@ -223,6 +226,11 @@ export default function ProductsPage() {
     }
   }
 
+  const items = list.status === 'ok' ? list.items : []
+  const needle = q.trim().toLowerCase()
+  const shown = items.filter((p) => (filter === 'all' || p.status === filter) && (!needle || `${p.name?.vi ?? ''} ${p.slug}`.toLowerCase().includes(needle)))
+  const stockText = (p) => (p.stock === null || p.stock === undefined ? S.products.stockUntracked : p.stock === 0 ? S.products.stockOut : String(p.stock))
+
   return (
     <section>
       <PageHead title={S.products.title}>
@@ -232,73 +240,83 @@ export default function ProductsPage() {
           </button>
         )}
       </PageHead>
-      {editing && (
-        <ProductForm
-          key={editing.id ?? 'new'}
-          initial={editing}
-          onCancel={() => setEditing(null)}
-          onDone={() => {
-            setEditing(null)
-            list.reload()
-          }}
-          onImageChange={(item) => {
-            setEditing(item)
-            list.reload()
-          }}
-        />
-      )}
-      {actionError && (
-        <p className="notice error" role="alert">
-          {t(`errors.${actionError}`)}
-        </p>
-      )}
-      {list.status === 'loading' && <p>{S.common.loading}</p>}
-      {list.status === 'error' && (
-        <p className="notice error" role="alert">
-          {t(`errors.${list.error.code}`)}
-        </p>
-      )}
-      {list.status === 'ok' && (
-        <div className="admin-panel">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>{S.products.colName}</th>
-                <th>{S.products.slug}</th>
-                <th>{S.products.colPrice}</th>
-                <th>{S.products.colStock}</th>
-                <th>{S.products.colStatus}</th>
-                <th>{S.products.colImage}</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {list.items.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.name?.vi}</td>
-                  <td>
-                    <code>{p.slug}</code>
-                  </td>
-                  <td>{formatVnd(p.price)}</td>
-                  <td>{p.stock === null || p.stock === undefined ? S.products.stockUntracked : p.stock === 0 ? S.products.stockOut : p.stock}</td>
-                  <td>
-                    <span className={`status status-${p.status}`}>{S.products.statuses[p.status]}</span>
-                  </td>
-                  <td>{p.imageUrl ? S.products.hasImage : '—'}</td>
-                  <td className="admin-row-actions">
-                    <button type="button" className="btn btn-small" onClick={() => setEditing(p)}>
-                      {S.common.edit}
-                    </button>
-                    <button type="button" className="btn btn-small btn-danger" onClick={() => remove(p)}>
-                      {S.common.delete}
-                    </button>
-                  </td>
-                </tr>
+      <Split
+        label={S.products.title}
+        aside={
+          editing && (
+            <ProductForm
+              key={editing.id ?? 'new'}
+              initial={editing}
+              onCancel={() => setEditing(null)}
+              onDone={() => {
+                setEditing(null)
+                list.reload()
+              }}
+              onImageChange={(item) => {
+                setEditing(item)
+                list.reload()
+              }}
+            />
+          )
+        }
+      >
+        {actionError && (
+          <p className="notice error" role="alert">
+            {t(`errors.${actionError}`)}
+          </p>
+        )}
+        {list.status === 'loading' && <p>{S.common.loading}</p>}
+        {list.status === 'error' && (
+          <p className="notice error" role="alert">
+            {t(`errors.${list.error.code}`)}
+          </p>
+        )}
+        {list.status === 'ok' && (
+          <>
+            <input type="search" className="admin-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={S.products.search} aria-label={S.products.search} />
+            <div className="chip-row" role="group" aria-label={S.products.colStatus}>
+              {[['all', S.orders.chipAll], ...Object.entries(S.products.statuses)].map(([k, l]) => (
+                <button key={k} type="button" className={`chip${filter === k ? ' is-on' : ''}`} aria-pressed={filter === k} onClick={() => setFilter(k)}>
+                  {l}
+                  <b>{k === 'all' ? items.length : items.filter((p) => p.status === k).length}</b>
+                </button>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </div>
+            <ul className="admin-cards">
+              {shown.map((p) => (
+                <li key={p.id}>
+                  <article className={`admin-card${editing?.id === p.id ? ' is-open' : ''}`}>
+                    <div className="admin-card-img">
+                      <span>{S.products.colImage}</span>
+                      {/* Ảnh admin tải lên; chưa có thì dùng ảnh đèn chụp sẵn theo slug (nếu có), lỗi thì lộ chữ "Ảnh" */}
+                      <img src={p.imageUrl ?? `/images/lamps/${p.slug.replace(/^den-(ga-)?/, '')}-cutout.webp`} alt="" loading="lazy" onError={(e) => (e.currentTarget.hidden = true)} />
+                    </div>
+                    <div className="admin-card-body">
+                      <h3>{p.name?.vi}</h3>
+                      <small>
+                        <code>{p.slug}</code>
+                      </small>
+                      <strong>{formatVnd(p.price)}</strong>
+                      <small>
+                        {S.products.colStock}: {stockText(p)}
+                      </small>
+                      <span className={`status status-${p.status}`}>{S.products.statuses[p.status]}</span>
+                    </div>
+                    <div className="admin-card-foot">
+                      <button type="button" className="btn btn-small btn-primary" onClick={() => setEditing(p)}>
+                        {S.common.edit}
+                      </button>
+                      <button type="button" className="btn btn-small btn-danger" onClick={() => remove(p)}>
+                        {S.common.delete}
+                      </button>
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </Split>
     </section>
   )
 }

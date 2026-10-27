@@ -481,3 +481,10 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 
 - (2026-10-27) Carousel tự chạy mỗi **2 giây** (`Carousel.jsx`, PO yêu cầu); phòng tranh Đông Hồ giữ 4,5 giây. Sửa lỗi layout thẻ sản phẩm: `.product-body` căn `stretch` (kiểu editorial trước đó để `flex-start` làm đường kẻ và chân thẻ co theo nội dung), chân thẻ (giá + nút) luôn ở đáy và dàn hết chiều rộng.
 
+### T-99 — Bố cục `Split` cho các trang admin (2026-10-27)
+
+- D-128. `src/admin/Split.jsx`: `.admin-split` (một cột; khi có `aside` thành hai cột, ngăn phải dính và cuộn riêng). Cột phụ đánh `className="col-secondary"` để tự ẩn khi ngăn mở. ≤ 1100 px ngăn xuống dưới danh sách; ≤ 960 px danh sách ẩn hẳn khi ngăn mở. `OrdersPage` và `ReturnsPage` có bố cục hai cột riêng viết trước (`orders-split`, `returns-split`), có thể gộp về `Split` sau.
+- Công tắc `.switch` là `input[type=checkbox][role=switch]` với vùng chạm 44 px; bật/tắt mã giảm giá gửi `PATCH /admin/coupons/:id {status}` (server hỗ trợ cập nhật một phần).
+- Thẻ sản phẩm admin: ảnh lấy `imageUrl`, chưa có thì `public/images/lamps/<slug bỏ "den-" và "ga-">-cutout.webp`, lỗi tải thì lộ chữ "Ảnh". Đây là ánh xạ theo tên, không phải dữ liệu; cần ảnh thật từ admin khi thêm đèn mới.
+- Còn lại chưa làm: B8 (Hỏi đáp, Mây) và B10 (Analytics) của `dashboard-ux.md`.
+

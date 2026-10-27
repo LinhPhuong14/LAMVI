@@ -7,6 +7,7 @@ import I18nInput from './I18nInput.jsx'
 import { useAdminList } from './useAdminList.js'
 import { uploadFile } from './uploadFile.js'
 import PageHead from './PageHead.jsx'
+import Split from './Split.jsx'
 import { S, fmt } from './strings.js'
 
 const isPublished = (b) => b.status === 'video_published'
@@ -173,62 +174,79 @@ export default function BatchesPage() {
           </button>
         )}
       </PageHead>
-      {editing && (
-        <>
-          <BatchForm key={`${editing.id ?? 'new'}-${editing.status}`} initial={editing} onSaved={update} onCancel={() => setEditing(null)} />
-          {editing.id && <VideoPanel key={editing.id} batch={editing} onChange={update} />}
-        </>
-      )}
-      {actionError && (
-        <p className="notice error" role="alert">
-          {t(`errors.${actionError}`)}
-        </p>
-      )}
-      {list.status === 'loading' && <p>{S.common.loading}</p>}
-      {list.status === 'error' && (
-        <p className="notice error" role="alert">
-          {t(`errors.${list.error.code}`)}
-        </p>
-      )}
-      {list.status === 'ok' && (
-        <div className="admin-panel">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>{S.batches.colCode}</th>
-                <th>{S.batches.colDate}</th>
-                <th>{S.batches.colVideo}</th>
-                <th>{S.batches.colStatus}</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {list.items.map((b) => (
-                <tr key={b.id}>
-                  <td>
-                    <code>{b.code}</code>
-                  </td>
-                  <td>{b.producedOn ?? '—'}</td>
-                  <td>{b.videoUrl ? S.batches.hasVideo : '—'}</td>
-                  <td>
-                    <span className={`status status-${b.status}`}>{S.batches.statuses[b.status]}</span>
-                  </td>
-                  <td className="admin-row-actions">
-                    <button type="button" className="btn btn-small" onClick={() => setEditing(b)}>
-                      {S.common.edit}
-                    </button>
-                    {!isPublished(b) && (
-                      <button type="button" className="btn btn-small btn-danger" onClick={() => remove(b)}>
-                        {S.common.delete}
-                      </button>
-                    )}
-                  </td>
+      <Split
+        label={S.batches.title}
+        aside={
+          editing && (
+            <>
+              <BatchForm key={`${editing.id ?? 'new'}-${editing.status}`} initial={editing} onSaved={update} onCancel={() => setEditing(null)} />
+              {editing.id && <VideoPanel key={editing.id} batch={editing} onChange={update} />}
+            </>
+          )
+        }
+      >
+        {actionError && (
+          <p className="notice error" role="alert">
+            {t(`errors.${actionError}`)}
+          </p>
+        )}
+        {list.status === 'loading' && <p>{S.common.loading}</p>}
+        {list.status === 'error' && (
+          <p className="notice error" role="alert">
+            {t(`errors.${list.error.code}`)}
+          </p>
+        )}
+        {list.status === 'ok' && (
+          <div className="admin-panel">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>{S.batches.colCode}</th>
+                  <th className="col-secondary">{S.batches.colDate}</th>
+                  <th>{S.batches.colStatus}</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {list.items.map((b) => (
+                  <tr key={b.id} className={editing?.id === b.id ? 'is-open' : undefined}>
+                    <td>
+                      <code>{b.code}</code>
+                    </td>
+                    <td className="col-secondary">{b.producedOn ?? '—'}</td>
+                    <td>
+                      <ol className="steps" aria-label={S.batches.statuses[b.status]}>
+                        <li className="is-done">
+                          <i aria-hidden="true" />
+                          {S.batches.stepCreate}
+                        </li>
+                        <li className={b.videoUrl ? 'is-done' : ''}>
+                          <i aria-hidden="true" />
+                          {S.batches.stepVideo}
+                        </li>
+                        <li className={isPublished(b) ? 'is-done' : ''}>
+                          <i aria-hidden="true" />
+                          {S.batches.stepPublish}
+                        </li>
+                      </ol>
+                    </td>
+                    <td className="admin-row-actions">
+                      <button type="button" className={`btn btn-small ${!isPublished(b) ? 'btn-primary' : ''}`} onClick={() => setEditing(b)}>
+                        {!isPublished(b) ? (b.videoUrl ? S.batches.nextPublish : S.batches.nextVideo) : S.common.edit}
+                      </button>
+                      {!isPublished(b) && (
+                        <button type="button" className="btn btn-small btn-danger" onClick={() => remove(b)}>
+                          {S.common.delete}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Split>
     </section>
   )
 }
