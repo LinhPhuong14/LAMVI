@@ -43,21 +43,32 @@ describe('Trang chủ', () => {
 })
 
 describe('Hero trang chủ', () => {
-  it('dùng ảnh cover có srcSet 800/1280/1672, alt từ i18n; không còn đèn hay ảnh minh hoạ cũ', async () => {
+  it('hero có đèn Tứ Linh và hai polaroid; không còn hero-cover; ảnh cover nằm ở IntroCover trước hero', async () => {
     mockApi(handlers)
     const { container } = renderAt('/')
     await screen.findAllByText('Đèn Nguyệt')
-    const fig = container.querySelector('figure.hero-cover')
-    expect(fig).toBeInTheDocument()
-    const img = fig.querySelector('img')
-    expect(img).toHaveAttribute('src', '/images/brand/cover-1280.webp')
-    expect(img.getAttribute('srcset')).toMatch(/cover-800\.webp 800w.*cover-1280\.webp 1280w.*cover-1672\.webp 1672w/)
-    expect(img).toHaveAttribute('alt', viMsg.hero.coverAlt)
-    expect(img).toHaveAttribute('width', '1672')
-    expect(img).toHaveAttribute('height', '800')
-    expect(img.getAttribute('fetchpriority') ?? img.getAttribute('fetchPriority')).toBe('high')
-    expect(container.querySelector('.hero-polaroid')).toBeNull()
-    expect(container.querySelector('.hero-lamp')).toBeNull()
+    const hero = container.querySelector('#hero')
+    expect(hero.querySelector('.hero-cover')).toBeNull()
+    expect(container.querySelector('.hero-cover')).toBeNull()
+    const lamp = hero.querySelector('.hero-art .hero-lantern > img.hero-lamp')
+    expect(lamp).toBeInTheDocument()
+    expect(lamp.getAttribute('src')).toMatch(/tu-linh-cutout\.webp$/)
+    expect(hero.querySelectorAll('figure.hero-polaroid')).toHaveLength(2)
+    expect(hero.querySelector('.hero-polaroid.hp-a')).toBeInTheDocument()
+    expect(hero.querySelector('.hero-polaroid.hp-b')).toBeInTheDocument()
+    // Ảnh cover đã chuyển sang khối đầu trang
+    const cover = container.querySelector('section.intro-cover img')
+    expect(cover).toHaveAttribute('alt', viMsg.hero.coverAlt)
+    expect(cover.compareDocumentPosition(hero) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('phần Di sản (#story) không còn ảnh bìa story-cover', async () => {
+    mockApi(handlers)
+    const { container } = renderAt('/')
+    await screen.findAllByText('Đèn Nguyệt')
+    expect(container.querySelector('#story')).toBeInTheDocument()
+    expect(container.querySelector('.story-cover')).toBeNull()
+    expect(container.querySelector('#story img[src*="cover-1672"]')).toBeNull()
   })
 })
 

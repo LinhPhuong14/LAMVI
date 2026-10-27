@@ -6,6 +6,9 @@ import { describe, expect, it } from 'vitest'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
 import { faqVi, productsVi } from '../test/fixtures.js'
+import vi_ from '../i18n/messages/vi.js'
+
+const A = vi_.account
 
 const base = {
   'GET /products': () => ({ body: productsVi }),
@@ -157,17 +160,24 @@ describe('Tab — chuột, URL, ARIA', () => {
     expect(panel().textContent).not.toMatch(/₫/)
   })
 
-  it('?tab=orders: có đơn → mã đơn, sản phẩm, trạng thái, tổng tiền', async () => {
+  it('?tab=orders: có đơn → hàng đơn (mã, sản phẩm, trạng thái, tổng tiền) + chi tiết bên phải', async () => {
     login()
     api({ orders: [sampleOrder] })
     renderAt('/account?tab=orders')
-    const row = await within(panel()).findByText('LV2610-ACDEFGH')
-    const li = row.closest('.order-row')
-    expect(within(li).getByText('Đang làm')).toBeInTheDocument()
-    expect(within(li).getByText('Đèn Nguyệt × 1', { exact: false })).toBeInTheDocument()
-    expect(li.textContent).toContain('920.000')
-    // Mã đơn dẫn tới trang chi tiết
-    expect(row.closest('a')).toHaveAttribute('href', '/don-hang/LV2610-ACDEFGH')
+    const row = await waitFor(() => {
+      const el = panel().querySelector('.order-row')
+      expect(el).not.toBeNull()
+      return el
+    })
+    expect(row).toHaveTextContent('LV2610-ACDEFGH')
+    expect(row).toHaveTextContent('Đèn Nguyệt × 1')
+    expect(row).toHaveTextContent(vi_.orders.statuses.in_production)
+    expect(row.textContent).toContain('920.000')
+    expect(row).toHaveAttribute('aria-pressed', 'true') // đơn đầu tiên được chọn sẵn
+    // Chi tiết + liên kết tới trang đơn
+    const detail = panel().querySelector('article.dash-order-detail')
+    expect(detail).not.toBeNull()
+    expect(within(detail).getByRole('link', { name: A.ordersView.open })).toHaveAttribute('href', '/don-hang/LV2610-ACDEFGH')
   })
 })
 
@@ -185,8 +195,8 @@ describe('Tab — bàn phím (WAI-ARIA)', () => {
     expect(document.activeElement).toBe(tab('Đơn hàng'))
 
     key('ArrowRight')
-    expect(tab('Gallery')).toHaveAttribute('aria-selected', 'true')
-    expect(document.activeElement).toBe(tab('Gallery'))
+    expect(tab(A.tabs.gallery)).toHaveAttribute('aria-selected', 'true')
+    expect(document.activeElement).toBe(tab(A.tabs.gallery))
 
     key('ArrowDown')
     expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')
@@ -253,55 +263,63 @@ describe('Badge', () => {
   })
 })
 
-describe('Tổng quan — số liệu', () => {
-  const stats = () => [...document.querySelectorAll('.dash-stat')]
-
-  it('giỏ có hàng: số lượng + tạm tính kèm "đã gồm VAT" (BR-PRC-003, D-68); chỉ đếm tin khách', async () => {
+describe('Tổng quan', () => {
+  it('không còn ô số liệu và thẻ thông tin cá nhân', async () => {
     login()
     api({ cart: fullCart })
     renderAt('/account')
-    await waitFor(() => expect(stats()[0].querySelector('.dash-stat-value').textContent).toBe('2'))
-    expect(stats()[0].textContent).toMatch(/1\.780\.000/)
-    expect(within(stats()[0]).getByText('đã gồm VAT')).toBeInTheDocument()
-    // Ô đơn hàng: số đơn thật (FR-ACC-002), không còn chỗ chờ "Sắp ra mắt"
-    expect(stats()[1].querySelector('.dash-stat-value').textContent).toBe('0')
-    expect(stats()[1].textContent).toContain('Bạn chưa có đơn hàng nào.')
-    await waitFor(() => expect(stats()[2].querySelector('.dash-stat-value').textContent).toBe('2'))
-    // Link giỏ ở thanh bên hiển thị số lượng
-    expect(screen.getByRole('link', { name: 'Giỏ hàng (2)' })).toBeInTheDocument()
-    // Mọi giá hiển thị trên trang đều có chú thích VAT
-    for (const p of document.querySelectorAll('.dash-stat-price')) expect(p.parentElement.querySelector('.price-note')).not.toBeNull()
+    await screen.findByRole('tablist')
+    await waitFor(() => expect(panel().querySelector('.dash-todo-list')).not.toBeNull())
+    expect(document.querySelector('.dash-stats')).toBeNull()
+    expect(document.querySelector('.dash-stat')).toBeNull()
+    expect(document.querySelector('.dash-facts')).toBeNull()
   })
 
-  it('giỏ trống → "Giỏ hàng đang trống", không có giá', async () => {
+  it('giỏ có hàng: thẻ "Cần làm" nêu số món, nút tới /cart; thanh bên hiển thị số lượng', async () => {
+    login()
+    api({ cart: fullCart })
+    renderAt('/account')
+    const li = await waitFor(() => {
+      const el = panel().querySelector('.dash-todo-list li')
+      expect(el).not.toBeNull()
+      return el
+    })
+    expect(li).toHaveTextContent(vi_.account.todo.cart.replace('{n}', '2'))
+    expect(within(li).getByRole('link', { name: vi_.cart.view })).toHaveAttribute('href', '/cart')
+    expect(screen.getByRole('link', { name: 'Giỏ hàng (2)' })).toBeInTheDocument()
+  })
+
+  it('giỏ trống, chưa có đơn → trạng thái rỗng với nút xem đèn; thanh bên "Giỏ hàng"', async () => {
     login()
     api()
     renderAt('/account')
-    await waitFor(() => expect(stats()[0].querySelector('.dash-stat-value').textContent).toBe('0'))
-    expect(stats()[0].textContent).toContain('Giỏ hàng đang trống')
-    expect(stats()[0].textContent).not.toMatch(/₫/)
+    const empty = await waitFor(() => {
+      const el = panel().querySelector('.dash-todo-empty')
+      expect(el).not.toBeNull()
+      return el
+    })
+    expect(empty).toHaveTextContent(A.todo.none)
+    expect(within(empty).getByRole('link', { name: A.todo.browse })).toHaveAttribute('href', '/shop')
+    expect(panel().querySelector('.dash-todo-list')).toBeNull()
+    expect(panel().textContent).not.toMatch(/₫/)
     expect(screen.getByRole('link', { name: 'Giỏ hàng' })).toBeInTheDocument()
   })
 
-  it('nút trong ô số liệu chuyển tab', async () => {
+  it('nút "Trò chuyện" ở đầu trang chuyển tab', async () => {
     login()
     api()
     renderAt('/account')
     await screen.findByRole('tablist')
-    fireEvent.click(within(stats()[1]).getByRole('button'))
-    expect(tab('Đơn hàng')).toHaveAttribute('aria-selected', 'true')
-    fireEvent.click(tab('Tổng quan'))
-    fireEvent.click(within(stats()[2]).getByRole('button'))
+    fireEvent.click(within(document.querySelector('.dash-actions')).getByRole('button', { name: A.tabs.may }))
     expect(tab('Trò chuyện')).toHaveAttribute('aria-selected', 'true')
   })
 
-  it('lịch sử Mây lỗi → trạng thái trống, không có alert; số câu = 0', async () => {
+  it('lịch sử Mây lỗi → trạng thái trống, không có alert', async () => {
     login()
     api({ historyFails: true })
     renderAt('/account')
     expect(await screen.findByText('Bạn chưa trò chuyện với Mây.')).toBeInTheDocument()
     expect(screen.queryAllByRole('alert')).toHaveLength(0)
-    expect(stats()[2].querySelector('.dash-stat-value').textContent).toBe('0')
     expect(screen.queryByRole('button', { name: 'Xem tất cả' })).toBeNull()
     fireEvent.click(tab('Trò chuyện'))
     expect(screen.getByText('Bạn chưa trò chuyện với Mây.')).toBeInTheDocument()
@@ -321,28 +339,12 @@ describe('Tổng quan — số liệu', () => {
     expect(screen.getByText('Đèn nào hợp tặng mẹ?')).toBeInTheDocument()
   })
 
-  it('tóm tắt hồ sơ: tên, email, SĐT "Chưa có", ngôn ngữ; "Sửa" → tab hồ sơ', async () => {
-    login()
-    api()
-    renderAt('/account')
-    const dl = await waitFor(() => {
-      const el = document.querySelector('.dash-facts')
-      expect(el).not.toBeNull()
-      return el
-    })
-    const dd = [...dl.querySelectorAll('dd')].map((d) => d.textContent)
-    expect(dd).toEqual(['Nguyễn An', 'an@example.com', 'Chưa có', 'Tiếng Việt'])
-    fireEvent.click(screen.getByRole('button', { name: 'Sửa' }))
-    expect(tab('Hồ sơ')).toHaveAttribute('aria-selected', 'true')
-    expect(await screen.findByDisplayValue('Nguyễn An')).toBeInTheDocument()
-  })
-
-  it('có SĐT → hiển thị SĐT', async () => {
+  it('tab Hồ sơ: tên, email; có SĐT → hiển thị trong ô nhập', async () => {
     login()
     api({ me: { body: { profile: { ...profile, phone: '0901234567', preferredLocale: 'en' } } } })
-    renderAt('/account')
-    await screen.findByText('0901234567')
-    expect(screen.getByText('English')).toBeInTheDocument()
+    renderAt('/account?tab=profile')
+    expect(await screen.findByDisplayValue('Nguyễn An')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('0901234567')).toBeInTheDocument()
   })
 })
 

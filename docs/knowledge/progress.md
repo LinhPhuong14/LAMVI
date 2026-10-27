@@ -209,3 +209,8 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Hero dùng ảnh cover fanpage | ✅ code | `HomePage.jsx`, `public/images/brand/cover-*.webp` | |
 | Trang `/welcome` (QR dán đèn), xoay ngang | ✅ code | `WelcomePage.jsx`, cuối `pages.css`; i18n `welcome.*` | PO/BA chốt G-120, đo lượt quét |
 
+| Đợt v0.73 (D-127) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Ảnh cover thay video đầu trang; hero đèn khôi phục | ✅ code | `IntroCover.jsx`, `HomePage.jsx` | |
+| Dashboard khách A1 đến A3, A5 | ✅ code | `AccountPage.jsx`, cuối `pages.css` | sổ địa chỉ, video mẻ đèn theo đơn |
+

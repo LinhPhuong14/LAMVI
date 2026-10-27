@@ -112,9 +112,9 @@ function SceneView({ scene, t, path, paused, muted, leaving, onProgress, onNext,
     >
       {scene.type === 'intro' && (
       <>
-        <img className="welcome-bg blur" src="/images/brand/cover-800.webp" alt="" />
+        <img className="welcome-bg blur" src="/images/lamps/tu-linh.jpg" alt="" />
         <div className="welcome-frame is-cover">
-          <img className="kenburns" src="/images/brand/cover-1672.webp" alt="" />
+          <img className="kenburns" src="/images/lamps/tu-linh.jpg" alt="" />
         </div>
         <div className="welcome-copy">
           <p className="welcome-kicker">{t('welcome.introKicker')}</p>
@@ -177,9 +177,9 @@ function SceneView({ scene, t, path, paused, muted, leaving, onProgress, onNext,
 
     {scene.type === 'end' && (
       <>
-        <img className="welcome-bg blur" src="/images/brand/cover-800.webp" alt="" />
+        <img className="welcome-bg blur" src="/images/lamps/tu-linh.jpg" alt="" />
         <div className="welcome-frame is-cover">
-          <img className="kenburns" src="/images/brand/cover-1672.webp" alt="" />
+          <img className="kenburns" src="/images/lamps/tu-linh.jpg" alt="" />
         </div>
         <div className="welcome-copy">
           <h2>{t('welcome.endTitle')}</h2>

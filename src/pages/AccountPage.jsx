@@ -2,9 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../components/Field'
 import Lantern from '../components/Lantern'
-import { GiftArt, HeroScene, LetterArt } from '../components/DashArt'
+import { HeroScene, LetterArt } from '../components/DashArt'
 import DashSky from '../components/DashSky'
-import Price from '../components/Price'
 import { Lotus } from '../components/Motifs'
 import Logo from '../components/Logo.jsx'
 import { LanguageSwitcher } from '../components/SiteHeader'
@@ -17,7 +16,7 @@ import { useSubmit } from '../auth/useForm.js'
 import { useMyOrders } from '../orders/useOrders.js'
 import GalleryPanel from '../gallery/GalleryPanel.jsx'
 import { useGallery } from '../gallery/useGallery.js'
-import { StatusBadge } from '../orders/OrderStatus.jsx'
+import OrderProgress, { StatusBadge } from '../orders/OrderStatus.jsx'
 import { formatVnd } from '../lib/money.js'
 
 // Ngày giờ theo giờ Việt Nam (như tháng ngân sách Mây) — [ASSUMPTION] ghi ở spec §5.2
@@ -240,8 +239,65 @@ function Card({ title, id, tag, action, className = '', children }) {
 }
 
 // FR-ACC-002: đơn hàng của tôi. Dữ liệu do trang cha nạp một lần (dùng chung với ô số liệu).
+// Nhóm lọc: gom trạng thái đơn theo việc khách quan tâm
+const ORDER_GROUPS = {
+  active: ['pending_payment', 'confirmed', 'in_production', 'packed'],
+  shipping: ['shipped', 'delivery_failed'],
+  done: ['delivered'],
+  cancelled: ['cancelled'],
+}
+const lampEditable = (o) => o.hasMessage && ['pending_payment', 'confirmed', 'in_production', 'packed'].includes(o.status)
+
+function OrderDetail({ order }) {
+  const { t, lang, path } = useI18n()
+  return (
+    <article className="dash-order-detail" aria-label={order.code}>
+      <header>
+        <h3>{order.code}</h3>
+        <StatusBadge status={order.status} />
+      </header>
+      <p className="dash-muted">{new Date(order.createdAt).toLocaleDateString(lang === 'zh' ? 'zh-Hans' : lang)}</p>
+      <OrderProgress status={order.status} />
+      <ul className="dash-order-items">
+        {order.items.map((i) => (
+          <li key={i.slug}>
+            <span>
+              {i.name} <small>× {i.quantity}</small>
+            </span>
+            <span>{formatVnd(i.lineTotal)}</span>
+          </li>
+        ))}
+        <li className="is-total">
+          <span>{t('orders.total')}</span>
+          <strong>{formatVnd(order.total)}</strong>
+        </li>
+      </ul>
+      <p className="dash-muted">
+        {order.recipientName} · {[order.addressLine, order.ward, order.province].filter(Boolean).join(', ')}
+      </p>
+      <div className="dash-order-actions">
+        {lampEditable(order) && (
+          <Link to={path(`/don-hang/${order.code}`)} className="btn btn-primary">
+            {t('account.todo.composeBtn')}
+          </Link>
+        )}
+        <Link to={path(`/don-hang/${order.code}`)} className={lampEditable(order) ? 'btn btn-ghost' : 'btn btn-primary'}>
+          {t('account.ordersView.open')}
+        </Link>
+      </div>
+    </article>
+  )
+}
+
 function OrdersPanel({ status, items, error }) {
   const { t, lang, path } = useI18n()
+  const [group, setGroup] = useState('active')
+  const [picked, setPicked] = useState(null)
+  const list = items ?? []
+  const shown = group === 'all' ? list : list.filter((o) => ORDER_GROUPS[group]?.includes(o.status))
+  const count = (g) => (g === 'all' ? list.length : list.filter((o) => ORDER_GROUPS[g].includes(o.status)).length)
+  const current = shown.find((o) => o.code === picked) ?? shown[0] ?? null
+  const groups = ['active', 'shipping', 'done', 'cancelled', 'all']
 
   return (
     <Card title={t('account.orders')} id="dash-orders-title" className="dash-wide">
@@ -265,23 +321,39 @@ function OrdersPanel({ status, items, error }) {
         </div>
       )}
       {status === 'ok' && items.length > 0 && (
-        <ul className="order-list">
-          {items.map((o) => (
-            <li key={o.code} className="order-row">
-              <div>
-                <Link to={path(`/don-hang/${o.code}`)} className="product-link">
-                  <strong>{o.code}</strong>
-                </Link>
-                <span className="field-hint">
-                  {new Date(o.createdAt).toLocaleDateString(lang === 'zh' ? 'zh-Hans' : lang)} ·{' '}
-                  {o.items.map((i) => `${i.name} × ${i.quantity}`).join(', ')}
-                </span>
-              </div>
-              <StatusBadge status={o.status} />
-              <span className="order-row-total">{formatVnd(o.total)}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <div className="chip-row" role="group" aria-label={t('account.orders')}>
+            {groups.map((g) => (
+              <button key={g} type="button" className={`chip${group === g ? ' is-on' : ''}`} aria-pressed={group === g} onClick={() => setGroup(g)}>
+                {t(`account.ordersView.${g}`)}
+                <b>{count(g)}</b>
+              </button>
+            ))}
+          </div>
+          {shown.length === 0 ? (
+            <p className="dash-muted">{t('account.ordersView.none')}</p>
+          ) : (
+            <div className="dash-orders-split">
+              <ul className="order-list">
+                {shown.map((o) => (
+                  <li key={o.code}>
+                    <button type="button" className={`order-row${current?.code === o.code ? ' is-open' : ''}`} aria-pressed={current?.code === o.code} onClick={() => setPicked(o.code)}>
+                      <span className="order-row-main">
+                        <strong>{o.code}</strong>
+                        <span className="field-hint">
+                          {new Date(o.createdAt).toLocaleDateString(lang === 'zh' ? 'zh-Hans' : lang)} · {o.items.map((i) => `${i.name} × ${i.quantity}`).join(', ')}
+                        </span>
+                      </span>
+                      <StatusBadge status={o.status} />
+                      <span className="order-row-total">{formatVnd(o.total)}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {current && <OrderDetail order={current} />}
+            </div>
+          )}
+        </>
       )}
     </Card>
   )
@@ -324,114 +396,173 @@ function ProfilePanel({ state, setState }) {
   )
 }
 
-function Overview({ cart, mayItems, profile, orders, go }) {
+// Việc cần làm trước (docs/knowledge/dashboard-ux.md, A1): mỗi thẻ có đúng một nút
+function todoList({ cart, orders, t, path }) {
+  const list = []
+  for (const o of orders ?? []) {
+    if (list.length >= 3) break
+    if (o.status === 'pending_payment') list.push({ key: `pay-${o.code}`, text: t('account.todo.pay', { code: o.code }), to: path(`/don-hang/${o.code}`), btn: t('account.todo.payBtn'), primary: true })
+    else if (lampEditable(o)) list.push({ key: `msg-${o.code}`, text: t('account.todo.compose', { code: o.code }), to: path(`/don-hang/${o.code}`), btn: t('account.todo.composeBtn'), primary: true })
+  }
+  const active = (orders ?? []).find((o) => ['confirmed', 'in_production', 'packed', 'shipped'].includes(o.status))
+  if (active && list.length < 3) list.push({ key: `track-${active.code}`, text: t('account.todo.track', { code: active.code, status: t(`orders.statuses.${active.status}`) }), to: path(`/don-hang/${active.code}`), btn: t('account.todo.trackBtn') })
+  if (cart?.itemCount && list.length < 3) list.push({ key: 'cart', text: t('account.todo.cart', { n: cart.itemCount }), to: path('/cart'), btn: t('cart.view') })
+  return list
+}
+
+function Overview({ cart, mayItems, orders, go }) {
   const { t, path } = useI18n()
-  const asked = mayItems?.filter((m) => m.role === 'user').length
-  const count = cart?.itemCount
+  const todo = todoList({ cart, orders, t, path })
+  const latest = (orders ?? []).find((o) => ['confirmed', 'in_production', 'packed', 'shipped', 'delivered'].includes(o.status))
   const recent = mayItems?.slice(-2) ?? []
 
   return (
     <>
-      <ul className="dash-stats" aria-label={t('account.overview')}>
-        <li className="dash-stat" data-tone="amber" style={{ '--i': 0 }}>
-          <span className="dash-stat-art" aria-hidden="true">
-            <Lantern size={46} tone="amber" swing />
-          </span>
-          <span className="dash-stat-label">{t('account.statCart')}</span>
-          <strong className="dash-stat-value">{count ?? '–'}</strong>
-          <span className="dash-stat-sub">
-            {count ? <Price amount={cart.subtotal} className="dash-stat-price" /> : t('account.cartEmpty')}
-          </span>
-          <Link to={path('/cart')} className="dash-stat-link">
-            {t('cart.view')} <span aria-hidden="true">→</span>
-          </Link>
-        </li>
-        <li className="dash-stat" data-tone="son" style={{ '--i': 1 }}>
-          <span className="dash-stat-art" aria-hidden="true">
-            <GiftArt size={52} />
-          </span>
-          <span className="dash-stat-label">{t('account.orders')}</span>
-          <strong className="dash-stat-value">{orders?.length ?? '–'}</strong>
-          <span className="dash-stat-sub">
-            {orders?.length ? t(`orders.statuses.${orders[0].status}`) : t('orders.empty')}
-          </span>
-          <button type="button" className="dash-stat-link" onClick={() => go('orders')} aria-label={`${t('account.viewMore')}: ${t('account.orders')}`}>
-            {t('account.viewMore')} <span aria-hidden="true">→</span>
-          </button>
-        </li>
-        <li className="dash-stat" data-tone="cham" style={{ '--i': 2 }}>
-          <span className="dash-stat-art" aria-hidden="true">
-            <MayAvatar size={52} />
-          </span>
-          <span className="dash-stat-label">{t('account.statMay')}</span>
-          <strong className="dash-stat-value">{asked ?? '–'}</strong>
-          <span className="dash-stat-sub">{t('account.statMaySub')}</span>
-          <button type="button" className="dash-stat-link" onClick={() => go('may')} aria-label={`${t('account.viewMore')}: ${t('account.tabs.may')}`}>
-            {t('account.viewMore')} <span aria-hidden="true">→</span>
-          </button>
-        </li>
-      </ul>
+      <section className="dash-todo" aria-labelledby="dash-todo-title">
+        <h2 id="dash-todo-title" className="dash-section-label">
+          {t('account.todo.title')}
+        </h2>
+        {orders === null || orders === undefined ? (
+          <p className="dash-muted">{t('account.loading')}</p>
+        ) : todo.length === 0 ? (
+          <div className="dash-todo-empty">
+            <Lantern size={64} tone="amber" swing />
+            <div>
+              <p>{t('account.todo.none')}</p>
+              <Link to={path('/shop')} className="btn btn-primary">
+                {t('account.todo.browse')}
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <ul className="dash-todo-list">
+            {todo.map((x) => (
+              <li key={x.key} className={x.primary ? 'is-primary' : ''}>
+                <span>{x.text}</span>
+                <Link to={x.to} className={`btn ${x.primary ? 'btn-primary' : 'btn-ghost'} btn-compact`}>
+                  {x.btn}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
-      <div className="dash-duo">
-        <Card
-          title={t('account.recentChat')}
-          id="dash-recent-title"
-          action={
-            recent.length > 0 && (
-              <button type="button" className="dash-head-link" onClick={() => go('may')}>
-                {t('account.viewAll')}
-              </button>
-            )
-          }
-        >
-          {mayItems === null && <p className="dash-muted">{t('account.loading')}</p>}
-          {mayItems?.length === 0 && <MayEmpty />}
-          {recent.length > 0 && (
-            <ol className="may-list may-history dash-recent">
-              {recent.map((m, i) => (
-                <li key={i} className={`may-msg may-${m.role} may-kind-${m.kind}`}>
-                  {m.role === 'user' && <span className="sr-only">{t('accountMay.you')}: </span>}
-                  {m.content}
-                </li>
-              ))}
-            </ol>
-          )}
+      {latest && (
+        <Card title={t('account.latestOrder')} id="dash-latest-title" action={<button type="button" className="dash-head-link" onClick={() => go('orders')}>{t('account.viewAll')}</button>}>
+          <div className="dash-latest">
+            <div>
+              <strong>{latest.code}</strong> <StatusBadge status={latest.status} />
+              <p className="dash-muted">{latest.items.map((i) => `${i.name} × ${i.quantity}`).join(', ')}</p>
+            </div>
+            <OrderProgress status={latest.status} />
+          </div>
         </Card>
+      )}
 
-        <Card
-          title={t('account.profile')}
-          id="dash-summary-title"
-          
-          action={
-            <button type="button" className="dash-head-link" onClick={() => go('profile')}>
-              {t('account.edit')}
+      <Card
+        title={t('account.recentChat')}
+        id="dash-recent-title"
+        action={
+          recent.length > 0 && (
+            <button type="button" className="dash-head-link" onClick={() => go('may')}>
+              {t('account.viewAll')}
             </button>
-          }
-        >
-          {!profile && <p className="dash-muted">{t('account.loading')}</p>}
-          {profile && (
-            <dl className="dash-facts">
-              <div>
-                <dt>{t('auth.fullName')}</dt>
-                <dd>{profile.fullName || '—'}</dd>
-              </div>
-              <div>
-                <dt>{t('auth.email')}</dt>
-                <dd>{profile.email}</dd>
-              </div>
-              <div>
-                <dt>{t('account.phone')}</dt>
-                <dd>{profile.phone || t('account.notSet')}</dd>
-              </div>
-              <div>
-                <dt>{t('auth.preferredLocale')}</dt>
-                <dd>{t(`locales.${profile.preferredLocale}`)}</dd>
-              </div>
-            </dl>
-          )}
-        </Card>
-      </div>
+          )
+        }
+      >
+        {mayItems === null && <p className="dash-muted">{t('account.loading')}</p>}
+        {mayItems?.length === 0 && <MayEmpty />}
+        {recent.length > 0 && (
+          <ol className="may-list may-history dash-recent">
+            {recent.map((m, i) => (
+              <li key={i} className={`may-msg may-${m.role} may-kind-${m.kind}`}>
+                {m.role === 'user' && <span className="sr-only">{t('accountMay.you')}: </span>}
+                {m.content}
+              </li>
+            ))}
+          </ol>
+        )}
+      </Card>
     </>
+  )
+}
+
+
+// A3: các đơn có lời chúc, đi thẳng tới trang đơn để soạn/sửa
+function MessagesCard({ orders }) {
+  const { t, path } = useI18n()
+  const withMsg = (orders ?? []).filter((o) => o.hasMessage)
+  return (
+    <Card title={t('account.messages.title')} id="dash-messages-title" className="dash-wide">
+      {orders === null || orders === undefined ? (
+        <p className="dash-muted">{t('account.loading')}</p>
+      ) : withMsg.length === 0 ? (
+        <p className="dash-muted">{t('account.messages.none')}</p>
+      ) : (
+        <ul className="dash-messages">
+          {withMsg.map((o) => (
+            <li key={o.code}>
+              <span>
+                <strong>{o.code}</strong> <StatusBadge status={o.status} />
+              </span>
+              <Link to={path(`/don-hang/${o.code}`)} className={`btn btn-compact ${lampEditable(o) ? 'btn-primary' : 'btn-ghost'}`}>
+                {lampEditable(o) ? t('account.messages.edit') : t('account.messages.view')}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  )
+}
+
+// A5: đổi mật khẩu. Server thu hồi mọi phiên sau khi đổi → đăng xuất và về trang đăng nhập.
+function SecurityCard() {
+  const { t, path } = useI18n()
+  const { authedApi, logout } = useAuth()
+  const navigate = useNavigate()
+  const [f, setF] = useState({ currentPassword: '', password: '', confirmPassword: '' })
+  const [done, setDone] = useState(false)
+  const { pending, error, fields, run } = useSubmit()
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
+  async function onSubmit(e) {
+    e.preventDefault()
+    if (f.password !== f.confirmPassword) return
+    const ok = await run(async () => {
+      await authedApi('/auth/change-password', { method: 'POST', body: f })
+      return true
+    })
+    if (ok) {
+      setDone(true)
+      setTimeout(async () => {
+        await logout()
+        navigate(path('/login'))
+      }, 1800)
+    }
+  }
+  const mismatch = f.confirmPassword && f.password !== f.confirmPassword
+  return (
+    <Card title={t('account.security.title')} id="dash-security-title" className="dash-profile">
+      <form className="form" onSubmit={onSubmit} noValidate>
+        <Field label={t('account.security.current')} type="password" autoComplete="current-password" value={f.currentPassword} onChange={set('currentPassword')} error={fields.currentPassword} />
+        <Field label={t('auth.newPassword')} type="password" autoComplete="new-password" value={f.password} onChange={set('password')} error={fields.password} />
+        <Field label={t('auth.confirmPassword')} type="password" autoComplete="new-password" value={f.confirmPassword} onChange={set('confirmPassword')} error={mismatch ? 'PASSWORD_MISMATCH' : fields.confirmPassword} />
+        {error && !Object.keys(fields).length && (
+          <p className="notice error" role="alert">
+            {t(`errors.${error}`)}
+          </p>
+        )}
+        {done && (
+          <p className="notice success" role="status">
+            {t('account.security.done')}
+          </p>
+        )}
+        <button className="btn btn-primary" type="submit" disabled={pending || done}>
+          {pending ? t('auth.submitting') : t('account.security.save')}
+        </button>
+      </form>
+    </Card>
   )
 }
 
@@ -602,7 +733,8 @@ export default function AccountPage() {
               </div>
             )}
           </div>
-          <HeroScene />
+          {/* Hình minh hoạ lớn chỉ khi khách chưa có đơn: người đã có đơn cần thấy việc của mình trước (D-127) */}
+          {tab === 'overview' && !orders?.length && <HeroScene />}
         </header>
 
         {state.status === 'error' && (
@@ -612,11 +744,21 @@ export default function AccountPage() {
         )}
 
         <div className="dash-panel" key={tab}>
-          {tab === 'overview' && <Overview cart={cart} mayItems={mayItems} profile={profile} orders={orders} go={go} />}
+          {tab === 'overview' && <Overview cart={cart} mayItems={mayItems} orders={orders} go={go} />}
           {tab === 'orders' && <OrdersPanel status={myOrders.status} items={myOrders.items} error={myOrders.error} />}
-          {tab === 'gallery' && <GalleryPanel state={gallery} />}
+          {tab === 'gallery' && (
+            <>
+              <MessagesCard orders={orders} />
+              <GalleryPanel state={gallery} />
+            </>
+          )}
           {tab === 'may' && <MayPanel items={mayItems} />}
-          {tab === 'profile' && <ProfilePanel state={state} setState={setState} />}
+          {tab === 'profile' && (
+            <>
+              <ProfilePanel state={state} setState={setState} />
+              <SecurityCard />
+            </>
+          )}
         </div>
       </section>
     </div>
