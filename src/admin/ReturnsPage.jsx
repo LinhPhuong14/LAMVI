@@ -1,5 +1,5 @@
 import '../returns/returns.css'
-import { S } from './strings.js'
+import { S, fmt } from './strings.js'
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/context.js'
@@ -21,6 +21,7 @@ function daysLeft(r, now) {
 function Detail({ r, labels, busy, onSave, now }) {
   const { authedApi } = useAuth()
   const [video, setVideo] = useState({ status: r.videoPurged ? 'purged' : 'loading' })
+  const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
     if (r.videoPurged) return undefined
@@ -31,7 +32,7 @@ function Detail({ r, labels, busy, onSave, now }) {
     return () => {
       alive = false
     }
-  }, [authedApi, r.id, r.videoPurged])
+  }, [authedApi, r.id, r.videoPurged, attempt])
 
   const approved = r.status === 'approved'
   const left = daysLeft(r, now)
@@ -52,13 +53,16 @@ function Detail({ r, labels, busy, onSave, now }) {
         {video.status === 'error' && (
           <div role="alert">
             <p>{S.returns.videoError}</p>
-            <button type="button" className="btn btn-small" onClick={() => setVideo({ status: 'loading' })}>
+            <button type="button" className="btn btn-small" onClick={() => {
+                setVideo({ status: 'loading' })
+                setAttempt((n) => n + 1)
+              }}>
               {S.returns.retry}
             </button>
           </div>
         )}
         {video.status === 'ok' && <video aria-label={S.returns.video} controls preload="metadata" src={video.url} />}
-        {left !== null && video.status !== 'purged' && <p className="field-hint">{`${S.returns.purgeIn} ${left} ngày`}</p>}
+        {left !== null && video.status !== 'purged' && <p className="field-hint">{fmt(S.returns.purgeIn, { n: left })}</p>}
       </div>
 
       {r.description && <p className="returns-desc">{r.description}</p>}

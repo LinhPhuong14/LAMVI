@@ -2,7 +2,7 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
-import { S } from './strings.js'
+import { S, fmt } from './strings.js'
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'admin', email: 'a@lamvi.test' } }
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals(); localStorage.clear() })
 const ago = (d) => new Date(Date.now() - d * 86400000).toISOString()
@@ -25,16 +25,16 @@ it('purged video shows the retention note, no player and no fetch', async () => 
 it('resolved request shows a 90-day countdown (90 - days since resolvedAt)', async () => {
   setup([row('kept')], 'resolved')
   fireEvent.click(await screen.findByRole('button', { name: 'Đã xử lý' }))
-  expect(await screen.findByText(new RegExp(`${S.returns.purgeIn} 80\\b`))).toBeInTheDocument()
+  expect(await screen.findByText(fmt(S.returns.purgeIn, { n: 80 }))).toBeInTheDocument()
   await waitFor(() => expect(document.querySelector('video')).not.toBeNull())
 })
 it('rejected request counts down from decidedAt and floors at 0', async () => {
   setup([row('kept', { status: 'rejected', resolvedAt: undefined, decidedAt: ago(120) })], 'rejected')
   fireEvent.click(await screen.findByRole('button', { name: 'Từ chối' }))
-  expect(await screen.findByText(new RegExp(`${S.returns.purgeIn} 0\\b`))).toBeInTheDocument()
+  expect(await screen.findByText(fmt(S.returns.purgeIn, { n: 0 }))).toBeInTheDocument()
 })
 it('pending request has no countdown', async () => {
   setup([row('kept', { status: 'requested', resolvedAt: undefined })], 'requested')
   await screen.findByRole('link', { name: 'LV-kept' })
-  expect(screen.queryByText(new RegExp(S.returns.purgeIn))).toBeNull()
+  expect(screen.queryByText(/Video tự xoá sau/)).toBeNull()
 })
