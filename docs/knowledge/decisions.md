@@ -488,3 +488,5 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - Thẻ sản phẩm admin: ảnh lấy `imageUrl`, chưa có thì `public/images/lamps/<slug bỏ "den-" và "ga-">-cutout.webp`, lỗi tải thì lộ chữ "Ảnh". Đây là ánh xạ theo tên, không phải dữ liệu; cần ảnh thật từ admin khi thêm đèn mới.
 - Còn lại chưa làm: B8 (Hỏi đáp, Mây) và B10 (Analytics) của `dashboard-ux.md`.
 
+- (D-129) `FaqPage`: đổi thứ tự bằng hai `PATCH {sortOrder}` theo vị trí mới của cặp liền kề (không kéo thả); nút bị khoá khi đang lọc vì vị trí khi đó không còn là vị trí thật. `MayConfigPage`: tab chỉ render một biểu mẫu tại một thời điểm (state giữ ở trang nên đổi tab không mất chỉnh sửa); `dirty` so `JSON.stringify` của trạng thái hiện tại với ảnh chụp lúc tải hoặc lúc lưu thành công. `src/admin/strings.js` đã bỏ dấu gạch dài.
+
