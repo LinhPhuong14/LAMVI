@@ -77,8 +77,8 @@ export function createGaRealtime({ propertyId, clientEmail, privateKey, fetchImp
     return token.value
   }
 
-  async function report(body) {
-    const res = await call(`${API}/properties/${propertyId}:runRealtimeReport`, {
+  async function report(body, endpoint = 'runRealtimeReport') {
+    const res = await call(`${API}/properties/${propertyId}:${endpoint}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${await accessToken()}` },
       body: JSON.stringify(body),
@@ -138,7 +138,47 @@ export function createGaRealtime({ propertyId, clientEmail, privateKey, fetchImp
     }
   }
 
+  // Báo cáo theo kỳ (GA4 `runReport`): phễu mua hàng từ các sự kiện GA §23.3, người dùng theo ngày, kênh vào.
+  // Chỉ số gộp, không có dữ liệu cá nhân. Cache 60 giây theo số ngày để nhiều admin không nhân hạn mức.
+  const FUNNEL = ['view_item', 'add_to_cart', 'begin_checkout', 'purchase']
+  const periodCache = new Map()
+  async function loadPeriod(days) {
+    const dateRanges = [{ startDate: `${days}daysAgo`, endDate: 'today' }]
+    const run = (body) => report({ dateRanges, ...body }, 'runReport')
+    const [totals, byEvent, byDay, channels] = await Promise.all([
+      run({ metrics: [{ name: 'activeUsers' }, { name: 'screenPageViews' }, { name: 'sessions' }] }),
+      run({
+        dimensions: [{ name: 'eventName' }],
+        metrics: [{ name: 'totalUsers' }, { name: 'eventCount' }],
+        dimensionFilter: { filter: { fieldName: 'eventName', inListFilter: { values: FUNNEL } } },
+      }),
+      run({ dimensions: [{ name: 'date' }], metrics: [{ name: 'activeUsers' }], orderBys: [{ dimension: { dimensionName: 'date' } }], limit: 120 }),
+      run({ dimensions: [{ name: 'sessionDefaultChannelGroup' }], metrics: [{ name: 'sessions' }], limit: 20 }),
+    ])
+    const t = totals.rows?.[0]?.metricValues ?? []
+    const ev = new Map((byEvent.rows ?? []).map((r) => [r.dimensionValues?.[0]?.value, { users: toNum(r.metricValues?.[0]?.value), events: toNum(r.metricValues?.[1]?.value) }]))
+    return {
+      configured: true,
+      days,
+      fetchedAt: new Date(now()).toISOString(),
+      users: toNum(t[0]?.value),
+      pageViews: toNum(t[1]?.value),
+      sessions: toNum(t[2]?.value),
+      funnel: FUNNEL.map((name) => ({ name, users: ev.get(name)?.users ?? 0, events: ev.get(name)?.events ?? 0 })),
+      daily: rows(byDay, ['date']).map((r) => ({ date: r.date, users: r.value })),
+      channels: top(rows(channels, ['name'])),
+    }
+  }
+
   return {
+    async period(days) {
+      const key = [7, 28, 90].includes(days) ? days : 7
+      const hit = periodCache.get(key)
+      if (hit && hit.at + 60_000 > now()) return hit.data
+      const data = await loadPeriod(key)
+      periodCache.set(key, { at: now(), data })
+      return data
+    },
     async snapshot() {
       if (cached && cached.at + CACHE_MS > now()) return cached.data
       // Gọi đồng thời dùng chung một lần tải; lỗi không được cache

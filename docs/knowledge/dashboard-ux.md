@@ -115,3 +115,7 @@ Huy hiệu số cạnh Đơn hàng (đơn cần xử lý) và Đổi trả (yêu
 4. Phần còn lại.
 
 Điểm cần BA/PO xác nhận trước khi làm (không tự quyết): có thêm sổ địa chỉ cho khách (A5) không; có tạo chức năng xuất CSV và in phiếu giao (B2) không, vì đây là yêu cầu vận hành mới ngoài phạm vi D-34; vai trò nhân viên có tách quyền (chỉ xem đơn, không đụng giá) không.
+
+## D. Trạng thái triển khai (2026-10-27)
+
+Đã làm: A1 đến A3, A5 (khách); B1 đến B10 (admin). Chưa làm: sổ địa chỉ khách (A5), xuất CSV và in phiếu giao (B2), tách quyền nhân viên: cần BA/PO quyết. Chưa kiểm B10 với dữ liệu GA thật.

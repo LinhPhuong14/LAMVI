@@ -22,7 +22,7 @@ describe('Admin — GA realtime', () => {
   it('hiện số người online và các bảng xếp hạng; có mục trên thanh điều hướng', async () => {
     mockApi({ 'GET /me': me, 'GET /admin/analytics/realtime': () => ({ body: snapshot }) })
     renderAt('/admin/analytics')
-    expect(await screen.findByRole('heading', { name: 'Truy cập thời gian thực' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Truy cập' })).toBeInTheDocument()
     const kpi = (await screen.findByText('Đang online (30 phút qua)')).parentElement
     expect(within(kpi).getByText('12')).toBeInTheDocument()
     expect(screen.getByText('Trang chủ')).toBeInTheDocument()

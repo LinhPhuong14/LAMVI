@@ -35,6 +35,23 @@ export default function CollectionsPage() {
   const list = useAdminList('/admin/collections')
   const { authedApi } = useAuth()
   const [editing, setEditing] = useState(null), [error, setError] = useState(null)
+  const sorted = list.status === 'ok' ? [...list.items].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)) : []
+  // Đổi chỗ hai bộ liền kề: gán lại thứ tự theo vị trí mới của cả hai (nút ↑ ↓, dùng được bằng bàn phím)
+  async function move(index, dir) {
+    const a = sorted[index]
+    const b = sorted[index + dir]
+    if (!a || !b) return
+    setError(null)
+    try {
+      await Promise.all([
+        authedApi(`/admin/collections/${a.id}`, { method: 'PATCH', body: { sortOrder: index + dir } }),
+        authedApi(`/admin/collections/${b.id}`, { method: 'PATCH', body: { sortOrder: index } }),
+      ])
+      list.reload()
+    } catch (e) {
+      setError(e.code)
+    }
+  }
   async function remove(c) {
     if (!window.confirm(S.collections.confirmDelete)) return
     setError(null)
@@ -59,10 +76,14 @@ export default function CollectionsPage() {
         {list.status === 'ok' && (!list.items.length ? <p>{S.collections.empty}</p> : (
           <div className="admin-panel">
             <table className="admin-table">
-              <thead><tr><th>{S.products.colName}</th><th className="col-secondary">Slug</th><th>{S.products.status}</th><th>{S.collections.actions}</th></tr></thead>
+              <thead><tr><th>{S.collections.colOrder}</th><th>{S.products.colName}</th><th className="col-secondary">Slug</th><th>{S.products.status}</th><th>{S.collections.actions}</th></tr></thead>
               <tbody>
-                {list.items.map((c) => (
+                {sorted.map((c, i) => (
                   <tr key={c.id}>
+                    <td className="faq-admin-order">
+                      <button type="button" className="btn btn-small" onClick={() => move(i, -1)} disabled={i === 0} aria-label={`${S.faq.moveUp}: ${c.name.vi}`}>↑</button>
+                      <button type="button" className="btn btn-small" onClick={() => move(i, 1)} disabled={i === sorted.length - 1} aria-label={`${S.faq.moveDown}: ${c.name.vi}`}>↓</button>
+                    </td>
                     <td>{c.name.vi}</td>
                     <td className="col-secondary"><code>{c.slug}</code></td>
                     <td><span className={`status status-${c.status}`}>{S.products.statuses[c.status]}</span></td>
