@@ -54,21 +54,23 @@ describe('D-118 — tệp video trong public/', () => {
 })
 
 describe('D-118 — SSR trang chủ', () => {
-  it('vi: video giới thiệu là khối đầu trang (tự phát không tiếng, lặp, có poster), phát lần đầu trước hero', async () => {
+  it('vi: đầu trang là ảnh bìa .intro-cover đứng trước #hero; không có video nào trước #artisan', async () => {
     const doc = await ssrHome('/')
-    const intro = doc.querySelector('.intro-film')
-    expect(intro).toBeTruthy()
-    expect(intro.compareDocumentPosition(doc.querySelector('#hero')) & 4).toBeTruthy() // #hero đứng sau
-    const v = intro.querySelector('video')
-    expect(v.querySelector('source').getAttribute('src')).toBe(CRAFT_FILMS.paper.src)
-    for (const a of ['autoplay', 'muted', 'loop', 'playsinline']) expect(v.hasAttribute(a), a).toBe(true)
-    expect(v.getAttribute('poster')).toBe(CRAFT_FILMS.paper.poster)
-    expect(doc.querySelector('main, #root').querySelector('video')).toBe(v) // video đầu tiên trong trang
+    const cover = doc.querySelector('.intro-cover')
+    expect(cover).toBeTruthy()
+    expect(doc.querySelector('.intro-film')).toBeNull()
+    expect(cover.compareDocumentPosition(doc.querySelector('#hero')) & 4).toBeTruthy() // #hero đứng sau
+    const artisan = doc.querySelector('#artisan')
+    for (const v of doc.querySelectorAll('video')) {
+      expect(artisan.compareDocumentPosition(v) & 4 || artisan.contains(v), 'video phải ở #artisan hoặc sau đó').toBeTruthy()
+    }
+    expect(doc.querySelector('main, #root').querySelector('video').closest('#artisan')).toBe(artisan)
   })
 
   it('vi: ba video còn lại (2 làng nghề + clip điện thoại), preload="none", có poster/aria-label, không iframe', async () => {
     const doc = await ssrHome('/')
-    const videos = [...doc.querySelectorAll('video')].filter((v) => !v.closest('.intro-film'))
+    const videos = [...doc.querySelectorAll('video')]
+    expect(videos).toHaveLength(3)
     const srcs = videos.map((v) => v.querySelector('source')?.getAttribute('src'))
     expect(srcs).toEqual(expect.arrayContaining([CRAFT_FILMS.dongho.src, CRAFT_FILMS.paper.src, CRAFT_FILMS.journey.src]))
     for (const v of videos) {
