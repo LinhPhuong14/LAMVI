@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-27 — Đổi trả admin, hero cover, trang /welcome (nhánh `feat/welcome-returns`, D-126)
+
+PO: làm tab Đổi trả admin (B3), đổi ảnh hero sang ảnh cover fanpage, thêm trang thông điệp tự chạy để in QR dán lên đèn cho đơn không có lời chúc, thêm xoay ngang, tinh tế và liền mạch hơn. Đã làm tất cả; tìm thêm và bỏ nốt dấu gạch trong `returns/strings.js`, `CartPage`, `seo/head.js`, email. Cần PO/BA: D-126 thay D-104 một phần (QR trên đèn), G-120 (vật lý tem, một QR chung, đo lượt quét, video nặng khi 4G). Chưa làm: B4 đến B10 admin, dashboard khách, bản video nhẹ cho mobile.
+
+---
+
 ## 2026-10-26 (phiên 5) — Responsive điện thoại (nhánh `fix/mobile-responsive-2`, D-125)
 
 PO: làm lại một lượt responsive ở nhiều cỡ điện thoại. Đã làm: kiểm tự động 16 trang x 4 cỡ, sửa tràn ngang ở chi tiết đơn admin, thanh bên admin, bảng đơn admin, tab tài khoản, tổng tiền, chip, vùng chạm. Chưa làm: kiểm trên thiết bị thật (iOS Safari, thanh địa chỉ co giãn, bàn phím ảo che ô nhập), điện thoại nằm ngang, máy tính bảng 768 đến 1024 px; poster video giới thiệu ở khung nhỏ trông mờ (do ảnh nguồn 16:9 thấp).

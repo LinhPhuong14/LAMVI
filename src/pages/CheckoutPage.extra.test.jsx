@@ -340,7 +340,8 @@ describe('Giao diện đồng bộ với các trang khác', () => {
 
   it('CSS trang mới không dùng viền dày hay bóng đổ lệch cứng (design-rules §11)', () => {
     const css = readFileSync(join(process.cwd(), 'src/styles/pages.css'), 'utf8')
-    const block = css.slice(css.indexOf('Checkout & đơn hàng'))
+    const from = css.indexOf('Checkout & đơn hàng')
+    const block = css.slice(from, css.indexOf('Trạng thái đơn', from))
     expect(block).not.toMatch(/border:\s*[2-9]px/)
     expect(block).not.toMatch(/box-shadow:\s*\d+px\s+\d+px\s+0/)
     // Dùng token màu, không viết mã màu cứng

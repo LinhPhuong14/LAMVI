@@ -1,195 +1,259 @@
 import '../returns/returns.css'
-import { S } from './strings.js'
+import { S, fmt } from './strings.js'
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/context.js'
 import { returnStrings } from '../returns/strings.js'
+import PageHead from './PageHead.jsx'
+
+const STATUSES = ['requested', 'approved', 'resolved', 'rejected']
+const DAY = 86400000
+const when = (iso) => (iso ? new Date(iso).toLocaleString('vi-VN') : '')
+
+// Số ngày còn lại trước khi video bị xoá (D-109: 90 ngày sau khi xử lý xong). Yêu cầu chưa xử lý xong thì chưa tính.
+function daysLeft(r, now) {
+  const end = r.status === 'resolved' ? r.resolvedAt : r.status === 'rejected' ? r.decidedAt : null
+  if (!end) return null
+  return Math.max(0, 90 - Math.floor((now - new Date(end).getTime()) / DAY))
+}
+
+// Chi tiết một yêu cầu: video khui hàng phát ngay, quyết định bằng hai nút rõ ràng (docs/knowledge/dashboard-ux.md, B3)
+function Detail({ r, labels, busy, onSave, now }) {
+  const { authedApi } = useAuth()
+  const [video, setVideo] = useState({ status: r.videoPurged ? 'purged' : 'loading' })
+  const [attempt, setAttempt] = useState(0)
+
+  useEffect(() => {
+    if (r.videoPurged) return undefined
+    let alive = true
+    authedApi(`/admin/returns/${r.id}/video`)
+      .then((v) => alive && setVideo({ status: 'ok', url: v.url }))
+      .catch(() => alive && setVideo({ status: 'error' }))
+    return () => {
+      alive = false
+    }
+  }, [authedApi, r.id, r.videoPurged, attempt])
+
+  const approved = r.status === 'approved'
+  const left = daysLeft(r, now)
+
+  return (
+    <article className="returns-detail" aria-label={labels[r.reason]}>
+      <header>
+        <h2>{labels[r.reason]}</h2>
+        <span className={`order-status returns-status-${r.status}`}>{labels[r.status]}</span>
+      </header>
+      <p className="returns-meta">
+        {r.orderCode && <Link to={`/admin/orders/${encodeURIComponent(r.orderCode)}`}>{r.orderCode}</Link>} · {when(r.submittedAt)}
+      </p>
+
+      <div className="returns-video">
+        {video.status === 'purged' && <p className="field-hint">{S.returns.videoPurged}</p>}
+        {video.status === 'loading' && <p role="status">{S.common.loading}</p>}
+        {video.status === 'error' && (
+          <div role="alert">
+            <p>{S.returns.videoError}</p>
+            <button type="button" className="btn btn-small" onClick={() => {
+                setVideo({ status: 'loading' })
+                setAttempt((n) => n + 1)
+              }}>
+              {S.returns.retry}
+            </button>
+          </div>
+        )}
+        {video.status === 'ok' && <video aria-label={S.returns.video} controls preload="metadata" src={video.url} />}
+        {left !== null && video.status !== 'purged' && <p className="field-hint">{fmt(S.returns.purgeIn, { n: left })}</p>}
+      </div>
+
+      {r.description && <p className="returns-desc">{r.description}</p>}
+      <ul className="returns-items">
+        {r.items.map((i) => (
+          <li key={i.slug}>
+            {i.slug} × {i.quantity}
+          </li>
+        ))}
+      </ul>
+
+      {r.decisionNote && (
+        <p className="returns-note">
+          <strong>{S.returns.decision}:</strong> {r.decisionNote} · {when(r.decidedAt)}
+        </p>
+      )}
+      {r.resolutionNote && (
+        <p className="returns-note">
+          <strong>{S.returns.outcomes[r.resolution]}:</strong> {r.resolutionNote} · {when(r.resolvedAt)}
+        </p>
+      )}
+
+      {['requested', 'approved'].includes(r.status) && (
+        <form onSubmit={(e) => onSave(e, r)} className="returns-form">
+          <fieldset disabled={busy}>
+            <label>
+              {S.returns.reason}
+              <textarea name="note" required minLength={3} maxLength={2000} />
+            </label>
+            <div className="returns-actions">
+              {(approved ? ['replacement', 'refund'] : ['approved', 'rejected']).map((x, i) => (
+                <button
+                  key={x}
+                  type="submit"
+                  name={approved ? 'resolution' : 'status'}
+                  value={x}
+                  className={`btn ${i === 0 ? 'btn-primary' : 'btn-ghost'}`}
+                >
+                  {busy ? S.common.saving : approved ? S.returns.outcomes[x] : x === 'approved' ? S.returns.approve : S.returns.reject}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        </form>
+      )}
+    </article>
+  )
+}
+
 export default function ReturnsPage() {
-  const [preview, setPreview] = useState(null)
-  const { authedApi } = useAuth(),
-    labels = returnStrings('vi')
-  const [data, setData] = useState({ items: [], nextCursor: null }),
-    [error, setError] = useState(false)
-  const [busy, setBusy] = useState(false),
-    [loading, setLoading] = useState(true)
-  const [status, setStatus] = useState('requested'),
-    [cursors, setCursors] = useState([null]),
-    [page, setPage] = useState(0)
-  const cursor = cursors[page]
-  const load = useCallback(async () => {
-    const params = new URLSearchParams({ status })
-    if (cursor) params.set('cursor', cursor)
-    return authedApi(`/admin/returns?${params}`)
-  }, [authedApi, status, cursor])
+  const { authedApi } = useAuth()
+  const labels = returnStrings('vi')
+  const [status, setStatus] = useState('requested')
+  const [items, setItems] = useState([])
+  const [next, setNext] = useState(null)
+  const [selected, setSelected] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [now] = useState(() => Date.now())
+
+  const fetchPage = useCallback((cursor) => authedApi(`/admin/returns?${new URLSearchParams({ status, ...(cursor ? { cursor } : {}) })}`), [authedApi, status])
+
+  const reload = useCallback(async () => {
+    const r = await fetchPage(null)
+    setItems(r.items)
+    setNext(r.nextCursor ?? null)
+    setSelected((cur) => (r.items.some((x) => x.id === cur) ? cur : (r.items[0]?.id ?? null)))
+  }, [fetchPage])
+
   useEffect(() => {
     let alive = true
-    load()
-      .then((r) => alive && setData(r))
+    fetchPage(null)
+      .then((r) => {
+        if (!alive) return
+        setItems(r.items)
+        setNext(r.nextCursor ?? null)
+        setSelected(r.items[0]?.id ?? null)
+      })
       .catch(() => alive && setError(true))
       .finally(() => alive && setLoading(false))
     return () => {
       alive = false
     }
-  }, [load])
-  async function retry() {
+  }, [fetchPage])
+
+  async function more() {
     setLoading(true)
-    setError(false)
     try {
-      setData(await load())
+      const r = await fetchPage(next)
+      setItems((cur) => [...cur, ...r.items])
+      setNext(r.nextCursor ?? null)
     } catch {
       setError(true)
     } finally {
       setLoading(false)
     }
   }
-  async function video(id) {
+
+  async function retry() {
+    setLoading(true)
+    setError(false)
     try {
-      const r = await authedApi(`/admin/returns/${id}/video`)
-      setPreview({ id, url: r.url })
+      await reload()
     } catch {
       setError(true)
+    } finally {
+      setLoading(false)
     }
   }
+
   async function save(e, r) {
     e.preventDefault()
+    const f = new FormData(e.currentTarget)
+    const choice = e.nativeEvent.submitter?.value
+    const resolution = r.status === 'approved'
     setBusy(true)
     setError(false)
-    const f = new FormData(e.currentTarget)
     try {
-      const resolution = r.status === 'approved'
       await authedApi(`/admin/returns/${r.id}${resolution ? '/resolve' : ''}`, {
         method: resolution ? 'POST' : 'PATCH',
-        body: resolution
-          ? { resolution: f.get('resolution'), note: f.get('note') }
-          : { status: f.get('status'), note: f.get('note') },
+        body: resolution ? { resolution: choice, note: f.get('note') } : { status: choice, note: f.get('note') },
       })
-      setData(await load())
+      await reload()
     } catch {
       setError(true)
     } finally {
       setBusy(false)
     }
   }
+
+  const current = items.find((x) => x.id === selected)
+
   return (
-    <section className="returns-panel">
-      <h1>{S.returns.title}</h1>
-      <p>{S.returns.note}</p>
-      <label>
-        {S.returns.filter}
-        <select
-          value={status}
-          onChange={(e) => {
-            setLoading(true)
-            setError(false)
-            setStatus(e.target.value)
-            setPage(0)
-            setCursors([null])
-          }}
-        >
-          {['requested', 'approved', 'resolved', 'rejected'].map((x) => (
-            <option key={x} value={x}>
+    <section className={`returns-panel returns-split${current ? ' has-detail' : ''}`}>
+      <div className="returns-list">
+        <PageHead title={S.returns.title} />
+        <p className="field-hint">{S.returns.note}</p>
+        <div className="chip-row" role="group" aria-label={S.returns.filter}>
+          {STATUSES.map((x) => (
+            <button
+              key={x}
+              type="button"
+              className={`chip${status === x ? ' is-on' : ''}`}
+              aria-pressed={status === x}
+              onClick={() => {
+                if (x === status) return
+                setLoading(true)
+                setError(false)
+                setItems([])
+                setSelected(null)
+                setStatus(x)
+              }}
+            >
               {labels[x]}
-            </option>
+            </button>
           ))}
-        </select>
-      </label>
-      {loading && <p role="status">{S.common.loading}</p>}
-      {error && (
-        <div role="alert">
-          <p>{S.returns.error}</p>
-          <button type="button" onClick={retry}>
-            {S.returns.retry}
-          </button>
         </div>
-      )}
-      {!loading && !error && !data.items.length && <p>{S.returns.empty}</p>}
-      {!loading &&
-        data.items.map((r) => (
-          <article className="account-card" key={r.id}>
-            <h2>{labels[r.reason]}</h2>
-            {r.orderCode && <Link to={`/admin/orders/${encodeURIComponent(r.orderCode)}`}>{r.orderCode}</Link>}
-            <p>{r.description}</p>
-            <p>
-              {labels[r.status]} · {r.submittedAt && new Date(r.submittedAt).toLocaleString('vi-VN')}
-            </p>
-            <ul>
-              {r.items.map((i) => (
-                <li key={i.slug}>
-                  {i.slug} × {i.quantity}
-                </li>
-              ))}
-            </ul>
-            {r.videoPurged ? (
-              <p className="field-hint">{S.returns.videoPurged}</p>
-            ) : (
-              <button type="button" className="btn btn-secondary" onClick={() => video(r.id)}>
-                {S.returns.video}
+        {error && (
+          <div role="alert">
+            <p>{S.returns.error}</p>
+            <button type="button" className="btn btn-small" onClick={retry}>
+              {S.returns.retry}
+            </button>
+          </div>
+        )}
+        {loading && <p role="status">{S.common.loading}</p>}
+        {!loading && !error && !items.length && <p>{S.returns.empty}</p>}
+        <ul className="returns-cards">
+          {items.map((r) => (
+            <li key={r.id}>
+              <button type="button" className={`returns-card${r.id === selected ? ' is-open' : ''}`} aria-pressed={r.id === selected} onClick={() => setSelected(r.id)}>
+                <strong>{labels[r.reason]}</strong>
+                <span>{r.orderCode}</span>
+                <small>{when(r.submittedAt)}</small>
+                {r.videoPurged ? <em>{S.returns.videoGone}</em> : <em>{S.returns.hasVideo}</em>}
               </button>
-            )}
-            {preview?.id === r.id && (
-              <video aria-label={S.returns.video} controls preload="metadata" src={preview.url} />
-            )}
-            {r.decisionNote && (
-              <p>
-                {r.decisionNote} · {r.decidedAt && new Date(r.decidedAt).toLocaleString('vi-VN')}
-              </p>
-            )}
-            {r.resolutionNote && (
-              <p>
-                {S.returns.outcomes[r.resolution]} · {r.resolutionNote} ·{' '}
-                {r.resolvedAt && new Date(r.resolvedAt).toLocaleString('vi-VN')}
-              </p>
-            )}
-            {['requested', 'approved'].includes(r.status) && (
-              <form onSubmit={(e) => save(e, r)}>
-                <fieldset disabled={busy}>
-                  <label>
-                    {r.status === 'approved' ? S.returns.outcome : S.returns.decision}
-                    <select name={r.status === 'approved' ? 'resolution' : 'status'}>
-                      {(r.status === 'approved' ? ['replacement', 'refund'] : ['approved', 'rejected']).map((x) => (
-                        <option key={x} value={x}>
-                          {r.status === 'approved' ? S.returns.outcomes[x] : labels[x]}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    {S.returns.reason}
-                    <textarea name="note" required minLength={3} maxLength={2000} />
-                  </label>
-                  <button className="btn btn-primary" type="submit">
-                    {busy ? S.common.saving : S.returns.save}
-                  </button>
-                </fieldset>
-              </form>
-            )}
-          </article>
-        ))}
-      <nav aria-label={S.returns.pages}>
-        <button
-          type="button"
-          disabled={loading || page === 0}
-          onClick={() => {
-            setLoading(true)
-            setError(false)
-            setPage((p) => p - 1)
-          }}
-        >
-          {S.returns.previous}
-        </button>
-        <button
-          type="button"
-          disabled={loading || !data.nextCursor}
-          onClick={() => {
-            setLoading(true)
-            setError(false)
-            setCursors((c) => [...c.slice(0, page + 1), data.nextCursor])
-            setPage((p) => p + 1)
-          }}
-        >
-          {S.returns.next}
-        </button>
-      </nav>
+            </li>
+          ))}
+        </ul>
+        {next && (
+          <button type="button" className="btn btn-ghost" disabled={loading} onClick={more}>
+            {S.returns.more}
+          </button>
+        )}
+      </div>
+      {current && (
+        <aside className="returns-aside">
+          <Detail key={current.id + current.status} r={current} labels={labels} busy={busy} onSave={save} now={now} />
+        </aside>
+      )}
     </section>
   )
 }

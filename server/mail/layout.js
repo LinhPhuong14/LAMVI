@@ -10,14 +10,14 @@ const C = { diep: '#f4e8cf', diepLight: '#faf3e1', diepDeep: '#ead6b7', than: '#
 const SERIF = "Georgia,'Times New Roman',serif"
 const SANS = "-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif"
 export const MAIL_BANNER_PATH = '/images/mail/banner.jpg'
-const BANNER_ALT = { vi: 'LAMVI — đèn giấy dó thủ công', en: 'LAMVI — handmade giấy dó lanterns', zh: 'LAMVI — 手工绵纸灯笼' }
+const BANNER_ALT = { vi: 'LAMVI, đèn giấy dó thủ công', en: 'LAMVI, handmade giấy dó lanterns', zh: 'LAMVI, 手工绵纸灯笼' }
 const htmlLang = (l) => (l === 'zh' ? 'zh-Hans' : l)
 const lang3 = (l) => (LOCALES.includes(l) ? l : 'vi')
 const cut = (str, n) => (str.length > n ? `${str.slice(0, n - 1)}…` : str)
 
 const FOOT = {
   vi: {
-    tagline: 'Đèn giấy dó thủ công — giữ lửa ký ức, thắp sáng yêu thương.',
+    tagline: 'Đèn giấy dó thủ công, giữ lửa ký ức, thắp sáng yêu thương.',
     help: 'Cần hỗ trợ?',
     email: 'Email',
     phone: 'Hotline',
@@ -26,12 +26,12 @@ const FOOT = {
     follow: 'Theo dõi LAMVI',
     reason: 'Bạn nhận được thư này vì có tài khoản hoặc đơn hàng tại LAMVI.',
     transactional: 'Đây là thư giao dịch liên quan đến tài khoản hoặc đơn hàng của bạn, không phải thư quảng cáo nên không có mục huỷ đăng ký.',
-    noreply: 'Thư được gửi tự động — vui lòng không trả lời trực tiếp thư này.',
+    noreply: 'Thư được gửi tự động, vui lòng không trả lời trực tiếp thư này.',
     noreplyHelp: 'Thư được gửi tự động; nếu cần hỗ trợ, hãy liên hệ theo thông tin phía trên.',
     rights: 'Bảo lưu mọi quyền.',
   },
   en: {
-    tagline: 'Handmade giấy dó lanterns — keeping memories alight, lighting up love.',
+    tagline: 'Handmade giấy dó lanterns, keeping memories alight, lighting up love.',
     help: 'Need help?',
     email: 'Email',
     phone: 'Hotline',
@@ -40,7 +40,7 @@ const FOOT = {
     follow: 'Follow LAMVI',
     reason: 'You are receiving this email because you have an account or an order at LAMVI.',
     transactional: 'This is a transactional email about your account or order, not marketing, so it has no unsubscribe option.',
-    noreply: 'This email was sent automatically — please do not reply to it directly.',
+    noreply: 'This email was sent automatically, please do not reply to it directly.',
     noreplyHelp: 'This email was sent automatically; if you need help, please use the contact details above.',
     rights: 'All rights reserved.',
   },
@@ -114,7 +114,7 @@ export function footerText({ lang, brand, siteUrl, year = new Date().getFullYear
   if (contact.length) lines.push('', `${f.help}`, ...contact)
   if (b.address) lines.push('', `${f.address}: ${b.address}`)
   if (siteUrl) lines.push('', siteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, ''))
-  lines.push('', f.reason, f.transactional, `© ${year} ${b.name}${b.legalName ? ` — ${b.legalName}` : ''}. ${f.rights}`)
+  lines.push('', f.reason, f.transactional, `© ${year} ${b.name}${b.legalName ? `, ${b.legalName}` : ''}. ${f.rights}`)
   return lines.join('\n')
 }
 
@@ -147,7 +147,7 @@ function footerHtml({ l, brand, siteUrl, allowLinks, year }) {
       <p style="margin:4px 0 16px;font:13px/1.5 ${SERIF};font-style:italic;color:${C.thanSoft}">${esc(f.tagline)}</p>
       ${contactBlock}${addressBlock}${socialBlock}${hostBlock}
       <p style="margin:18px 0 0;padding-top:14px;border-top:1px dashed ${C.hoeLight};${small}">${esc(f.reason)}<br>${esc(f.transactional)}<br>${esc(brand.supportEmail || brand.phone ? f.noreplyHelp : f.noreply)}</p>
-      <p style="margin:10px 0 0;font:11px/1.6 ${SANS};color:${C.thanSoft}">© ${year} ${esc(brand.name)}${brand.legalName ? ` — ${esc(brand.legalName)}` : ''}. ${esc(f.rights)}</p>
+      <p style="margin:10px 0 0;font:11px/1.6 ${SANS};color:${C.thanSoft}">© ${year} ${esc(brand.name)}${brand.legalName ? `, ${esc(brand.legalName)}` : ''}. ${esc(f.rights)}</p>
     </td></tr>`
 }
 

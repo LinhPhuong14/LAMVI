@@ -15,7 +15,7 @@ import ConsentBanner from './ConsentBanner'
 import CartProvider from '../cart/CartProvider.jsx'
 
 // Trang dạng ứng dụng (dashboard tài khoản) tự có thanh bên, không dùng header/footer của trang giới thiệu
-const APP_PAGES = new Set(['/account'])
+const APP_PAGES = new Set(['/account', '/welcome'])
 
 // Cảnh nền ảnh thật ở đầu các trang công khai (D-66); trang chủ có cảnh riêng từng phần, 404 tự vẽ khung đêm
 const AUTH_PAGES = new Set(['/login', '/register', '/forgot-password', '/reset-password', '/auth/callback'])

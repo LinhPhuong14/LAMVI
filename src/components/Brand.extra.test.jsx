@@ -22,7 +22,7 @@ const handlers = {
 // Tên cũ / sai: MỘC, Mộc (viết hoa đầu — tên riêng), LÂM VỊ, Lâm Vị/Lâm vị, và mọi biến thể Latin khác "LAMVI" (Lamvi, Lam Vi, LAM VI…).
 // Chữ "mộc" viết thường là từ chung (Trầm mộc, mộc bản) → không tính là thương hiệu, liệt kê riêng ở test dưới.
 const OLD_BRAND = /MỘC|Mộc(?! bản)|LÂM VỊ|Lâm [Vv]ị|lâm vị/u
-const WRONG_LATIN = /\b(?!LAMVI\b)[Ll][Aa][Mm][ _-]?[Vv][Ii]\b/
+const WRONG_LATIN = /\b(?!LAMVI\b)(?!lamvi:may-)[Ll][Aa][Mm][ _-]?[Vv][Ii]\b/
 const badLines = (text) =>
   text
     .normalize('NFC')

@@ -464,3 +464,12 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - Tài khoản: `.dash-tabs` có 5 tab nhưng lưới đáy khai báo 4 cột (tab "Hồ sơ" bị xuống hàng thứ hai): đổi thành 5 cột.
 - Lỗi do chính các đợt trước: khối `.order-head` bị tô nâu đậm với chữ tối nên mất chữ ở trang đơn hàng; đã bỏ khối đó.
 
+### T-97 — Đổi trả admin hai cột, hero cover, trang /welcome dạng story (2026-10-27)
+
+- D-126. `ReturnsPage`: giữ nguyên API; chip trạng thái thay `<select>`; chi tiết tự gọi `GET /admin/returns/:id/video` (URL ký 5 phút) khi chọn; hai nút submit đặt `name`/`value` (`status` hoặc `resolution`) và đọc qua `e.nativeEvent.submitter.value`; đếm ngược 90 ngày tính ở client từ `resolvedAt`/`decidedAt`.
+- Hero: `public/images/brand/cover-{800,1280,1672}.webp` sinh từ `cover-1672x800.jpg` bằng Pillow (không thêm dependency). `.hero-cover` giữ nguyên khung 2,09:1.
+- `WelcomePage`: dựng bằng `createPortal` vào `document.body` vì tổ tiên có `transform` (PageTransition) làm `position: fixed` sai; chỉ render sau khi mount. Cảnh cố định thời lượng dùng `setTimeout` có tính phần còn lại khi tạm dừng; thanh tiến độ là CSS `animation` cùng thời lượng (`animation-play-state` theo trạng thái tạm dừng); cảnh video đẩy tiến độ bằng `timeupdate`. Chuyển cảnh: cảnh cũ giữ ~0,9 giây (`is-leaving`) mờ dần trong khi cảnh mới hiện; video của cảnh kế tiếp được nạp trước bằng một `<video preload="auto">` ẩn.
+- Xoay ngang: `matchMedia('(orientation: portrait) and (max-width: 700px) and (pointer: coarse)')` cho lời nhắc; nút toàn màn hình gọi `requestFullscreen()` rồi `screen.orientation.lock('landscape')` (Android Chrome; iOS Safari không hỗ trợ khoá hướng nên chỉ nhắc). CSS `@media (orientation: landscape) and (max-height: 520px)` bố trí hai cột.
+- `/welcome` thuộc `APP_PAGES` (không header, footer, tab bar); Mây mở bằng sự kiện `lamvi:may-open`.
+- Video `lang-giay-do-720.mp4` và `tranh-dong-ho-720.mp4` có dải đen ở đầu khung và phụ đề cứng ở đáy: `<video>` cao 120% đặt `top: -8%` trong khung `overflow: hidden` để cắt cả hai (áp cho cả video hero).
+

@@ -13,3 +13,27 @@
 .returns-panel [role='alert'] { border-left: 3px solid var(--ember); padding-left: .8rem; }
 
 .returns-panel video { width: 100%; max-height: 30rem; border-radius: var(--r-sm); background: var(--ink); }
+
+/* Admin: danh sách bên trái, chi tiết bên phải (docs/knowledge/dashboard-ux.md, B3) */
+.returns-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; max-width: none; }
+.returns-split.has-detail { grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); align-items: start; }
+.returns-cards { display: grid; gap: .6rem; margin: 0; padding: 0; list-style: none; }
+.returns-card { display: grid; gap: .15rem; width: 100%; padding: .9rem 1rem; text-align: left; border: 1px solid var(--dash-line); border-radius: var(--r-sm); background: var(--diep-light); color: inherit; font: inherit; cursor: pointer; }
+.returns-card:hover, .returns-card.is-open { border-color: var(--son); }
+.returns-card.is-open { box-shadow: inset 3px 0 0 var(--son); }
+.returns-card small, .returns-card em { font-size: .8rem; font-style: normal; color: var(--than-soft); }
+.returns-aside { position: sticky; top: 24px; }
+.returns-detail { display: grid; gap: 1rem; padding-left: 2rem; border-left: 1px solid var(--dash-line); }
+.returns-detail header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+.returns-detail h2 { margin: 0; font-size: 1.8rem; }
+.returns-meta, .returns-desc, .returns-note { margin: 0; }
+.returns-video video { width: 100%; max-height: 28rem; background: var(--cham-deep); }
+.returns-items { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.returns-items li { padding: .25rem .7rem; border: 1px solid var(--hair); border-radius: 999px; font-size: .86rem; }
+.returns-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.returns-actions .btn { flex: 1 1 10rem; }
+@media (max-width: 960px) {
+  .returns-split.has-detail { grid-template-columns: minmax(0, 1fr); }
+  .returns-aside { position: static; }
+  .returns-detail { padding-left: 0; border-left: 0; border-top: 1px solid var(--dash-line); padding-top: 1.5rem; }
+}

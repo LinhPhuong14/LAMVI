@@ -20,7 +20,7 @@ const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
 // Feedback 08/10, mục 18: mọi tiêu đề trang đều có tên thương hiệu ("… — LAMVI")
-const withBrand = (title) => (title && !title.toUpperCase().includes('LAMVI') ? `${title} — LAMVI` : title)
+const withBrand = (title) => (title && !title.toUpperCase().includes('LAMVI') ? `${title} · LAMVI` : title)
 
 /**
  * @param {object} p

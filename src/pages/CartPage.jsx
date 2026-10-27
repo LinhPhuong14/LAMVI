@@ -121,7 +121,7 @@ export default function CartPage() {
                 <QuantityInput
                   value={i.quantity}
                   disabled={!i.available || Boolean(pendingLines[i.slug])}
-                  label={`${t('cart.quantity')} — ${i.product.name ?? t('cart.unavailableName')}`}
+                  label={`${t('cart.quantity')}: ${i.product.name ?? t('cart.unavailableName')}`}
                   onChange={(q) => q !== i.quantity && setQuantity(i.slug, q)}
                 />
                 <div className="cart-line-total">
