@@ -18,7 +18,7 @@ describe('B: bộ sưu tập trang chủ không có tab quà tặng/tự dùng',
 })
 
 describe('E: dashboard tổng quan', () => {
-  it('.dash-actions có 2 điều khiển; 3 stat có data-tone amber/son/cham', async () => {
+  it('.dash-actions có 2 điều khiển; không còn ô số liệu .dash-stat', async () => {
     localStorage.setItem('moc.session', JSON.stringify(session))
     mockApi({
       ...base,
@@ -31,6 +31,7 @@ describe('E: dashboard tổng quan', () => {
     await waitFor(() => expect(document.querySelector('.dash-actions')).not.toBeNull())
     const actions = document.querySelector('.dash-actions')
     expect(actions.querySelectorAll('a, button')).toHaveLength(2)
-    expect([...document.querySelectorAll('.dash-stat')].map((n) => n.dataset.tone)).toEqual(['amber', 'son', 'cham'])
+    expect(document.querySelectorAll('.dash-stat')).toHaveLength(0)
+    expect(document.querySelector('.dash-todo')).not.toBeNull()
   })
 })
