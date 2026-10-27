@@ -225,7 +225,7 @@ describe('payOS enabled / health', () => {
 describe('head withBrand', () => {
   const title = (t) => buildHeadTags({ lang: 'vi', siteUrl: 'https://x.test', path: '/', title: t }).find((x) => x.tag === 'title')?.text
   it('thêm hậu tố một lần; không nhân đôi; không thêm khi rỗng; chống lẫn HTML', () => {
-    expect(title('Cửa hàng')).toBe('Cửa hàng — LAMVI')
+    expect(title('Cửa hàng')).toBe('Cửa hàng · LAMVI')
     expect(title('LAMVI — Đèn')).toBe('LAMVI — Đèn')
     expect(title('Đèn lamvi')).toBe('Đèn lamvi')
     expect(title('')).toBeUndefined()

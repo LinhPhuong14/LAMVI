@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { screen, within } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
+import viMsg from '../i18n/messages/vi.js'
 import { faqVi, productsVi } from '../test/fixtures.js'
 
 const handlers = {
@@ -38,6 +39,25 @@ describe('Trang chủ', () => {
     mockApi({ 'GET /products': () => ({ status: 500, body: { error: { code: 'INTERNAL_ERROR' } } }) })
     renderAt('/')
     expect(await screen.findByText('Không tải được sản phẩm. Vui lòng thử lại sau.')).toBeInTheDocument()
+  })
+})
+
+describe('Hero trang chủ', () => {
+  it('dùng ảnh cover có srcSet 800/1280/1672, alt từ i18n; không còn đèn hay ảnh minh hoạ cũ', async () => {
+    mockApi(handlers)
+    const { container } = renderAt('/')
+    await screen.findAllByText('Đèn Nguyệt')
+    const fig = container.querySelector('figure.hero-cover')
+    expect(fig).toBeInTheDocument()
+    const img = fig.querySelector('img')
+    expect(img).toHaveAttribute('src', '/images/brand/cover-1280.webp')
+    expect(img.getAttribute('srcset')).toMatch(/cover-800\.webp 800w.*cover-1280\.webp 1280w.*cover-1672\.webp 1672w/)
+    expect(img).toHaveAttribute('alt', viMsg.hero.coverAlt)
+    expect(img).toHaveAttribute('width', '1672')
+    expect(img).toHaveAttribute('height', '800')
+    expect(img.getAttribute('fetchpriority') ?? img.getAttribute('fetchPriority')).toBe('high')
+    expect(container.querySelector('.hero-polaroid')).toBeNull()
+    expect(container.querySelector('.hero-lamp')).toBeNull()
   })
 })
 

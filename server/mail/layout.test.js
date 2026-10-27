@@ -28,14 +28,14 @@ describe('Banner', () => {
 
   it.each(all())('%s: banner ở địa chỉ tuyệt đối https của site, có alt, bề rộng 600, không vượt khung', (_, m) => {
     expect(m.html).toContain(`<img src="${SITE}${MAIL_BANNER_PATH}"`)
-    expect(m.html).toMatch(/<img [^>]*alt="LAMVI — đèn giấy dó thủ công"/)
+    expect(m.html).toMatch(/<img [^>]*alt="LAMVI, đèn giấy dó thủ công"/)
     expect(m.html).toMatch(/<img [^>]*width="600"/)
     expect(m.html).toContain('max-width:600px')
   })
 
   it('alt theo ngôn ngữ', () => {
-    expect(recoveryMail({ lang: 'en', url: LINK, siteUrl: SITE }).html).toContain('alt="LAMVI — handmade giấy dó lanterns"')
-    expect(recoveryMail({ lang: 'zh', url: LINK, siteUrl: SITE }).html).toContain('alt="LAMVI — 手工绵纸灯笼"')
+    expect(recoveryMail({ lang: 'en', url: LINK, siteUrl: SITE }).html).toContain('alt="LAMVI, handmade giấy dó lanterns"')
+    expect(recoveryMail({ lang: 'zh', url: LINK, siteUrl: SITE }).html).toContain('alt="LAMVI, 手工绵纸灯笼"')
   })
 
   it('không có siteUrl → banner chữ, không có thẻ img hỏng', () => {
@@ -93,7 +93,7 @@ describe('Bố cục', () => {
   it('chân thư luôn có thương hiệu, khẩu hiệu, lý do nhận thư, ghi chú thư giao dịch, bản quyền', () => {
     const html = recoveryMail({ lang: 'vi', url: LINK, siteUrl: SITE }).html
     expect(html).toContain('lamvi.test')
-    expect(html).toContain('Đèn giấy dó thủ công — giữ lửa ký ức')
+    expect(html).toContain('Đèn giấy dó thủ công, giữ lửa ký ức')
     expect(html).toContain('Bạn nhận được thư này vì có tài khoản hoặc đơn hàng tại LAMVI')
     expect(html).toContain('không phải thư quảng cáo')
     expect(html).toContain(`© ${new Date().getFullYear()} LAMVI`)

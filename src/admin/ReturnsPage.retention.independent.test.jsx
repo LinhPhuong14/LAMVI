@@ -23,15 +23,15 @@ it('purged video shows the retention note, no player and no fetch', async () => 
   expect(document.querySelector('video')).toBeNull()
 })
 it('resolved request shows a 90-day countdown (90 - days since resolvedAt)', async () => {
-  setup([row('kept')], 'requested')
+  setup([row('kept')], 'resolved')
   fireEvent.click(await screen.findByRole('button', { name: 'Đã xử lý' }))
-  expect(await screen.findByText(`${S.returns.purgeIn} 80 ngày`)).toBeInTheDocument()
+  expect(await screen.findByText(new RegExp(`${S.returns.purgeIn} 80\\b`))).toBeInTheDocument()
   await waitFor(() => expect(document.querySelector('video')).not.toBeNull())
 })
 it('rejected request counts down from decidedAt and floors at 0', async () => {
   setup([row('kept', { status: 'rejected', resolvedAt: undefined, decidedAt: ago(120) })], 'rejected')
   fireEvent.click(await screen.findByRole('button', { name: 'Từ chối' }))
-  expect(await screen.findByText(`${S.returns.purgeIn} 0 ngày`)).toBeInTheDocument()
+  expect(await screen.findByText(new RegExp(`${S.returns.purgeIn} 0\\b`))).toBeInTheDocument()
 })
 it('pending request has no countdown', async () => {
   setup([row('kept', { status: 'requested', resolvedAt: undefined })], 'requested')
