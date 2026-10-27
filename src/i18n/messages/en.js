@@ -204,6 +204,7 @@ export default {
     endContact: 'Contact LAMVI',
     progress: 'Scene {n} of {total}',
   },
+  folk: { colophon: 'Dó paper · Đông Hồ · Dương Ổ' },
   films: {
     eyebrow: 'See the craft',
     title: 'The dó paper that becomes the lantern',

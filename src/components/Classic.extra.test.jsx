@@ -153,7 +153,7 @@ describe('CSS hợp lệ cơ bản', () => {
     // Nếu dùng biến (vd --roof-mask) thì mọi định nghĩa biến đó phải là data-URI SVG 1440 hoặc tương đương
     const v = wk[1].match(/var\((--[\w-]+)\)/)
     if (v) {
-      const defs = [...APP.matchAll(new RegExp(`${v[1]}\\s*:\\s*url\\("data:image/svg\\+xml,([^"]*)"\\)`, 'g'))]
+      const defs = [...(INDEX + APP).matchAll(new RegExp(`${v[1]}\\s*:\\s*url\\("data:image/svg\\+xml,([^"]*)"\\)`, 'g'))]
       expect(defs.length).toBeGreaterThan(0)
       for (const d of defs) {
         const doc = new DOMParser().parseFromString(decodeURIComponent(d[1]), 'image/svg+xml')

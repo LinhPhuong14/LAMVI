@@ -495,3 +495,9 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - D-130. `createGaRealtime` (server/adapters/gaRealtime.js) thêm `period(days)`: bốn lần `runReport` song song (tổng, phễu theo `eventName` lọc `inListFilter` bốn sự kiện, theo `date`, theo `sessionDefaultChannelGroup`), `days` chỉ nhận 7/28/90 (giá trị lạ quy về 7), cache 60 giây theo kỳ để nhiều admin không nhân hạn mức GA; lỗi không cache. Route `GET /admin/analytics/report?days=`. Cần GA ghi nhận đủ `view_item`, `add_to_cart`, `begin_checkout`, `purchase` (đã có ở `src/analytics/ga.js`); số `users` của phễu là `totalUsers` theo từng sự kiện, nên một người có thể nằm ở nhiều bước (đúng với phễu), nhưng không đảm bảo thứ tự thời gian.
 - Không cần biến môi trường mới. Property GA cần bật Data API (đã dùng cho realtime).
 
+### T-101 — Lớp họa tiết dân gian Việt cho trang chủ (2026-10-27)
+
+- D-131. `src/components/Folk.jsx`: `Diem` (đường diềm: tam giác xen chấm tròn, data-URI SVG hai màu trong `pages.css`), `RoofEdge` (mái đình, dùng `--roof-mask` nay nằm ở `index.css`), `DrumWatermark` (tái dùng `DrumSun`, xoay 140 giây), `LanternString` (sáu đèn `Lantern` đung đưa lệch pha, rộng theo `%`, thu còn nửa số đèn dưới 900 px), `Colophon` (chữ dọc `writing-mode: vertical-rl` + ấn vuông, ẩn dưới 900 px). Tất cả `aria-hidden`, chuyển động bằng CSS và tắt khi giảm chuyển động.
+- Quy tắc để không thành "AI slop" trở lại: mỗi họa tiết có nguồn gốc văn hoá rõ (trống đồng Đông Sơn, diềm tranh Đông Hồ, mái đình, lạc khoản và ấn trên tranh), dùng đúng chỗ (nền khối tối, ranh giới giữa các mục, dấu mốc) và chỉ bằng màu thương hiệu; không dùng quầng sáng, kính mờ, gradient trang trí. Đèn lồng giữ màu minh hoạ gốc.
+- Hoành phi (`Marquee`) quay lại giữa hero và `#story`; hai mép là diềm. Ảnh nền phong cảnh/khói/đèn trời (`Scene`) vẫn tắt (T-93).
+

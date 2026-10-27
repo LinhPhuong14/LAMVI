@@ -174,12 +174,17 @@ describe('FAQ — mở/đóng có animation', () => {
 })
 
 describe('Marquee', () => {
-  it('D-122: trang chủ không còn .marquee', async () => {
+  it('D-131: trang chủ có dải hoành phi .marquee giữa hero và #story; bản sao thứ hai aria-hidden', async () => {
     mockApi(handlers)
     const { container } = renderAt('/')
     await screen.findByRole('heading', { level: 1 })
-    expect(container.querySelector('.marquee')).toBeNull()
-    expect(container.querySelector('.marquee-line')).toBeNull()
+    const marquee = container.querySelector('.marquee')
+    expect(marquee).not.toBeNull()
+    expect(container.querySelector('#hero').compareDocumentPosition(marquee) & 4).toBeTruthy()
+    expect(marquee.compareDocumentPosition(container.querySelector('#story')) & 4).toBeTruthy()
+    const lines = marquee.querySelectorAll('.marquee-line')
+    expect(lines).toHaveLength(2)
+    expect(lines[1].getAttribute('aria-hidden')).toBe('true')
   })
 })
 

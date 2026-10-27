@@ -14,6 +14,9 @@ import Faq from '../components/Faq'
 import FolkGallery from '../components/FolkGallery'
 import CraftFilms, { CraftVideo, PhoneVideo } from '../components/CraftFilms'
 import IntroCover from '../components/IntroCover.jsx'
+import Marquee from '../components/Marquee'
+import { Cloud } from '../components/Motifs'
+import { Colophon, Diem, DrumWatermark, LanternString, RoofEdge } from '../components/Folk.jsx'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import Scene from '../components/Scene'
 import { CountUp, Reveal } from '../components/Reveal'
@@ -228,6 +231,7 @@ function Hero() {
 
   return (
     <section id="hero" className="hero" ref={ref}>
+      <DrumWatermark side="right" className="drum-hero" />
       <m.div className="hero-copy" style={{ opacity: copyOpacity, y: copyY }}>
         <div>
           <span className="eyebrow intro" style={introDelay(0)}>
@@ -338,7 +342,11 @@ export default function HomePage() {
 
       <Hero />
 
+      <Marquee />
+
       <Reveal as="section" id="story" className="story has-motifs" variants={group}>
+        <DrumWatermark side="right" />
+        <Colophon>{t('folk.colophon')}</Colophon>
         <Scene name="story" />
         <SectionHead eyebrow={t('story.eyebrow')} title={t('story.title')} />
         <m.p className="story-text drop-cap" variants={rise}>
@@ -384,6 +392,7 @@ export default function HomePage() {
       </Reveal>
 
       <section id="products" className="products has-motifs">
+        <LanternString />
         <Scene name="products" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('products.eyebrow')} title={t('products.title')}>
@@ -397,6 +406,8 @@ export default function HomePage() {
       </section>
 
       <section id="lookbook" className="lookbook has-motifs">
+        <RoofEdge from="deep" />
+        <DrumWatermark side="left" />
         <Scene name="lookbook" />
         <SkyLanterns />
         <div className="lookbook-inner">
@@ -412,6 +423,7 @@ export default function HomePage() {
       </section>
 
       <section id="process" className="process has-motifs">
+        <Diem tone="light" />
         <Scene name="process" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('process.eyebrow')} title={t('process.title')} />
@@ -421,10 +433,13 @@ export default function HomePage() {
 
       {/* D-118: video làng giấy dó (cách làm đèn) — src/data/craftFilms.js */}
       <section id="films" className="films">
+        <RoofEdge />
+        <DrumWatermark side="right" />
         <CraftFilms />
       </section>
 
       <section id="qr" className="qr-experience has-motifs">
+        <Diem tone="light" />
         <Scene name="qr" />
         <Reveal className="qr-copy" variants={group}>
           <Eyebrow>{t('qr.eyebrow')}</Eyebrow>
@@ -464,6 +479,8 @@ export default function HomePage() {
       {/* Feedback 08/10 mục 14: gỡ đánh giá khi chưa có khách thật; sẽ lấy từ đơn đã giao ('Đã mua hàng') */}
 
       <section id="faq" className="faq has-motifs">
+        <Cloud className="faq-cloud cloud-l" />
+        <Cloud className="faq-cloud cloud-r" />
         <Scene name="faq" />
         <Reveal variants={group}>
           <SectionHead eyebrow={t('faq.eyebrow')} title={t('faq.title')} />

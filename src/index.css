@@ -173,3 +173,16 @@ button {
     scroll-behavior: auto;
   }
 }
+
+/* Mái đình: đường chuyển từ nền giấy sang mảng màu — nóc phẳng, mặt nguyệt trên nóc, hai đầu đao vút cong ở mép.
+   Phần giấy phía trên được vẽ bằng mask nên mảng màu bên dưới hiện đúng hình mái. */
+:root {
+  --roof-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 64' preserveAspectRatio='none'%3E%3Cpath d='M0 0 H1440 V30 Q1416 24 1402 6 Q1394 24 1360 34 C1330 40 1290 42 1240 42 L744 42 A24 24 0 0 0 696 42 L200 42 C150 42 110 40 80 34 Q46 24 38 6 Q24 24 0 30 Z'/%3E%3C/svg%3E");
+}
+
+/* Màn hẹp: đường mái vẽ theo tỉ lệ riêng để mặt nguyệt không bị kéo méo */
+@media (max-width: 640px) {
+  :root {
+    --roof-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 64' preserveAspectRatio='none'%3E%3Cpath d='M0 0 H400 V30 Q390 26 382 8 Q374 26 350 35 C330 41 300 42 270 42 L222 42 A22 22 0 0 0 178 42 L130 42 C100 42 70 41 50 35 Q26 26 18 8 Q10 26 0 30 Z'/%3E%3C/svg%3E");
+  }
+}
