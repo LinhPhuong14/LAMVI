@@ -4,6 +4,7 @@ import { join, resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
+import { S } from './strings.js'
 import vi_ from '../i18n/messages/vi.js'
 import en from '../i18n/messages/en.js'
 import zh from '../i18n/messages/zh.js'
@@ -94,7 +95,7 @@ describe('Xoá có hỏi xác nhận', () => {
     const fetchMock = mockApi({ 'GET /me': me('admin'), [listKey]: () => ({ body: listBody }), [`${method} ${delPath}`]: () => ({ status: 204 }) })
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
     renderAt(path)
-    fireEvent.click(within((await screen.findByText(text)).closest('tr')).getByRole('button', { name: 'Xoá' }))
+    fireEvent.click(within((await screen.findByText(text)).closest('tr, article')).getByRole('button', { name: 'Xoá' }))
     expect(confirm).toHaveBeenCalledWith('Xoá mục này? Không thể hoàn tác.')
     expect(callsTo(fetchMock, method, delPath)).toHaveLength(0)
   })
@@ -103,7 +104,7 @@ describe('Xoá có hỏi xác nhận', () => {
     const fetchMock = mockApi({ 'GET /me': me('admin'), [listKey]: () => ({ body: listBody }), [`${method} ${delPath}`]: () => ({ status: 204 }) })
     vi.spyOn(window, 'confirm').mockReturnValue(true)
     renderAt(path)
-    fireEvent.click(within((await screen.findByText(text)).closest('tr')).getByRole('button', { name: 'Xoá' }))
+    fireEvent.click(within((await screen.findByText(text)).closest('tr, article')).getByRole('button', { name: 'Xoá' }))
     await waitFor(() => expect(callsTo(fetchMock, method, delPath)).toHaveLength(1))
     const [, listPath] = listKey.split(' ')
     await waitFor(() => expect(callsTo(fetchMock, 'GET', listPath).length).toBeGreaterThanOrEqual(2))
@@ -126,8 +127,9 @@ describe('Xoá có hỏi xác nhận', () => {
     const fetchMock = mockApi({ 'GET /me': me('admin'), 'GET /admin/batches': () => ({ body: { items: [withVideo] } }) })
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
     renderAt('/admin/batches')
-    fireEvent.click(within((await screen.findByText('L-01')).closest('tr')).getByRole('button', { name: 'Sửa' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Xuất bản' }))
+    // Lô chưa xuất bản có video: nút hành động ở hàng là "Xuất bản" (mở ngăn bên), rồi bấm "Xuất bản" trong ngăn
+    fireEvent.click(within((await screen.findByText('L-01')).closest('tr')).getByRole('button', { name: S.batches.nextPublish }))
+    fireEvent.click(within(document.querySelector('aside.split-aside')).getByRole('button', { name: S.batches.publish }))
     expect(confirm).toHaveBeenCalled()
     expect(callsTo(fetchMock, 'POST', '/admin/batches/b1/publish')).toHaveLength(0)
   })
@@ -159,7 +161,7 @@ describe('Tải video (D-46)', () => {
     })
     failingXhr(mode)
     renderAt('/admin/batches')
-    fireEvent.click(within((await screen.findByText('L-01')).closest('tr')).getByRole('button', { name: 'Sửa' }))
+    fireEvent.click(within((await screen.findByText('L-01')).closest('tr')).getByRole('button', { name: S.batches.nextVideo }))
     fireEvent.change(document.querySelector('input[type="file"]'), { target: { files: [new File(['abc'], 'a.mp4', { type: 'video/mp4' })] } })
     expect(await screen.findByText('Tải video lên thất bại. Vui lòng thử lại.')).toBeInTheDocument()
     expect(callsTo(fetchMock, 'POST', '/admin/batches/b1/video')).toHaveLength(0)
@@ -188,7 +190,7 @@ describe('Tải video (D-46)', () => {
       }),
     })
     renderAt('/admin/batches')
-    fireEvent.click(within((await screen.findByText('L-01')).closest('tr')).getByRole('button', { name: 'Sửa' }))
+    fireEvent.click(within((await screen.findByText('L-01')).closest('tr')).getByRole('button', { name: S.batches.nextVideo }))
     fireEvent.change(document.querySelector('input[type="file"]'), { target: { files: [new File(['abc'], 'a.mkv', { type: 'video/x-matroska' })] } })
     expect(await screen.findByText('Video vượt quá dung lượng cho phép.')).toBeInTheDocument()
     expect(put).not.toHaveBeenCalled()
@@ -261,7 +263,7 @@ describe('Lỗi theo trường hiện đúng chỗ', () => {
       ),
     })
     renderAt('/admin/products')
-    fireEvent.click(within((await screen.findByText('Đèn Nguyệt')).closest('tr')).getByRole('button', { name: 'Sửa' }))
+    fireEvent.click(within((await screen.findByText('Đèn Nguyệt')).closest('article')).getByRole('button', { name: 'Sửa' }))
     fireEvent.change(screen.getByLabelText('Giá bán đã gồm VAT (VND)'), { target: { value: '-5' } })
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }))
     await waitFor(() => expect(screen.getByLabelText('Giá bán đã gồm VAT (VND)')).toHaveAccessibleDescription('Giá phải là số nguyên VND, không âm.'))

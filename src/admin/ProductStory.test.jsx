@@ -14,7 +14,7 @@ describe('Admin — câu chuyện mẫu đèn', () => {
   it('form sửa hiện sẵn câu chuyện hiện có ở 3 ô ngôn ngữ, có chú thích hướng dẫn', async () => {
     mockApi({ 'GET /me': me, 'GET /admin/products': () => ({ body: { items: [lamp] } }), 'GET /admin/collections': () => ({ body: { items: [] } }) })
     renderAt('/admin/products')
-    fireEvent.click(within((await screen.findByText('Đèn Thu Hoạch')).closest('tr')).getByRole('button', { name: 'Sửa' }))
+    fireEvent.click(within((await screen.findByText('Đèn Thu Hoạch')).closest('article')).getByRole('button', { name: 'Sửa' }))
     expect(screen.getByLabelText('Câu chuyện của mẫu đèn: Tiếng Việt').value).toBe('Truyện cũ.\n\nĐoạn hai.')
     expect(screen.getByLabelText('Câu chuyện của mẫu đèn: English').value).toBe('Old story.')
     expect(screen.getByLabelText('Câu chuyện của mẫu đèn: 简体中文').value).toBe('')
@@ -35,7 +35,7 @@ describe('Admin — câu chuyện mẫu đèn', () => {
       },
     })
     renderAt('/admin/products')
-    fireEvent.click(within((await screen.findByText('Đèn Thu Hoạch')).closest('tr')).getByRole('button', { name: 'Sửa' }))
+    fireEvent.click(within((await screen.findByText('Đèn Thu Hoạch')).closest('article')).getByRole('button', { name: 'Sửa' }))
     fireEvent.change(screen.getByLabelText('Câu chuyện của mẫu đèn: 简体中文'), { target: { value: '新故事' } })
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }))
     await waitFor(() => expect(patches).toHaveLength(1))
