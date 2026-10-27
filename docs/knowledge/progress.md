@@ -227,3 +227,7 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 |---|---|---|---|
 | Admin Analytics theo kỳ + phễu; đổi thứ tự bộ sưu tập | ✅ code | `AnalyticsPage.jsx`, `gaRealtime.js`, `admin.js`; `gaPeriod.test.js`, `AnalyticsPeriod.test.jsx` | kiểm với GA thật (cần khoá service account) |
 
+| Đợt v0.77 (D-131) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Landing: lớp họa tiết dân gian Việt | ✅ code | `Folk.jsx`, cuối `pages.css`; `Folk.test.jsx` | Marketing duyệt chữ lạc khoản; ảnh Đông Hồ thêm ở các mục khác |
+

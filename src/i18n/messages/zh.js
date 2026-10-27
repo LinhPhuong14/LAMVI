@@ -196,6 +196,7 @@ export default {
     endContact: '联系 LAMVI',
     progress: '第 {n} 幕，共 {total} 幕',
   },
+  folk: { colophon: '绵纸 · 东湖 · 杨坞' },
   films: {
     eyebrow: '亲眼看手艺',
     title: '化作灯身的 dó 纸',

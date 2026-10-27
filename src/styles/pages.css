@@ -8340,3 +8340,254 @@ h1 {
 .funnel-bar { height: 14px; border-radius: 999px; background: var(--dash-soft); overflow: hidden; }
 .funnel-bar span { display: block; height: 100%; border-radius: 999px; background: var(--hoe); transition: width 0.6s var(--ease-out); }
 .funnel li:last-child .funnel-bar span { background: var(--son); }
+
+/* ===== Lớp họa tiết dân gian Việt cho trang chủ (D-131) ===== */
+.story,
+.lookbook,
+.films,
+.products,
+.process,
+.qr-experience {
+  position: relative;
+}
+
+.story,
+.lookbook,
+.films {
+  overflow: hidden;
+}
+
+.story > *:not(.drum-watermark):not(.colophon):not(.roof-edge):not(.diem):not(.lantern-string):not(.scene),
+.lookbook > *:not(.drum-watermark):not(.roof-edge):not(.scene),
+.films > *:not(.drum-watermark):not(.roof-edge) {
+  position: relative;
+  z-index: 2;
+}
+
+/* Đường diềm: dải tam giác xen chấm tròn (diềm tranh Đông Hồ, hoa văn trống đồng) */
+.diem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  background-repeat: repeat-x;
+  background-position: center;
+  background-size: 32px 22px;
+  opacity: 0.85;
+}
+
+.diem-light {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='22'%3E%3Cg fill='none' stroke='%238b5e3c' stroke-width='1.2' stroke-linejoin='round'%3E%3Cpath d='M0 20 L8 5 L16 20 L24 5 L32 20'/%3E%3Ccircle cx='8' cy='14' r='1.8' fill='%238b5e3c' stroke='none'/%3E%3Ccircle cx='24' cy='14' r='1.8' fill='%238b5e3c' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.diem-dark {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='22'%3E%3Cg fill='none' stroke='%23c89a63' stroke-width='1.2' stroke-linejoin='round'%3E%3Cpath d='M0 20 L8 5 L16 20 L24 5 L32 20'/%3E%3Ccircle cx='8' cy='14' r='1.8' fill='%23c89a63' stroke='none'/%3E%3Ccircle cx='24' cy='14' r='1.8' fill='%23c89a63' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Hoành phi: hai mép là đường diềm */
+.marquee {
+  border: 0;
+  padding: 24px 0;
+  background-color: var(--cham);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='22'%3E%3Cg fill='none' stroke='%23c89a63' stroke-width='1.2' stroke-linejoin='round'%3E%3Cpath d='M0 20 L8 5 L16 20 L24 5 L32 20'/%3E%3Ccircle cx='8' cy='14' r='1.8' fill='%23c89a63' stroke='none'/%3E%3Ccircle cx='24' cy='14' r='1.8' fill='%23c89a63' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='22'%3E%3Cg fill='none' stroke='%23c89a63' stroke-width='1.2' stroke-linejoin='round'%3E%3Cpath d='M0 2 L8 17 L16 2 L24 17 L32 2'/%3E%3Ccircle cx='8' cy='8' r='1.8' fill='%23c89a63' stroke='none'/%3E%3Ccircle cx='24' cy='8' r='1.8' fill='%23c89a63' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat-x, repeat-x;
+  background-position: left top, left bottom;
+  background-size: 32px 22px, 32px 22px;
+}
+
+.marquee-line {
+  font-size: 1.25rem;
+  letter-spacing: 0.3em;
+  color: var(--diep);
+}
+
+.marquee-line .lotus {
+  color: var(--hoe);
+  width: 26px;
+  height: 17px;
+}
+
+/* Mái đình: mép chuyển từ giấy sang khối nâu đậm */
+.roof-edge {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  height: 46px;
+  background: var(--diep);
+  -webkit-mask: var(--roof-mask) 0 0 / 100% 100% no-repeat;
+  mask: var(--roof-mask) 0 0 / 100% 100% no-repeat;
+}
+
+.roof-edge.roof-from-deep {
+  background: var(--diep-deep);
+}
+
+/* Mặt trống đồng lớn, xoay rất chậm phía sau tiêu đề */
+.drum-watermark {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: clamp(380px, 52vw, 700px);
+  aspect-ratio: 1;
+  color: var(--hoe);
+  opacity: 0.1;
+  pointer-events: none;
+  translate: 0 -50%;
+}
+
+.drum-watermark.drum-right { right: -14%; }
+.drum-watermark.drum-left { left: -14%; }
+
+.drum-watermark svg {
+  width: 100%;
+  height: 100%;
+  animation: drum-turn 140s linear infinite;
+}
+
+@keyframes drum-turn {
+  to { transform: rotate(360deg); }
+}
+
+/* Dây đèn lồng */
+.lantern-string {
+  position: absolute;
+  top: 0;
+  left: 4%;
+  right: 4%;
+  height: 150px;
+  z-index: 1;
+  color: var(--hoe);
+  pointer-events: none;
+}
+
+.lantern-string svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 56%;
+}
+
+.lantern-string-item {
+  position: absolute;
+  translate: -50% 0;
+  animation: lv-bob 4.6s ease-in-out infinite alternate;
+}
+
+.products {
+  padding-top: calc(var(--sec-y) + 56px);
+}
+
+/* Lạc khoản: dòng chữ dọc kèm ấn vuông ở mép khối tối */
+.colophon {
+  position: absolute;
+  top: 132px;
+  left: clamp(10px, 2.4vw, 36px);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  color: var(--hoe-light);
+  opacity: 0.85;
+}
+
+.colophon-text {
+  writing-mode: vertical-rl;
+  font-family: var(--serif);
+  font-size: 1rem;
+  letter-spacing: 0.34em;
+}
+
+.colophon-seal {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid var(--hoe);
+  border-radius: 3px;
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  color: var(--hoe);
+  rotate: -4deg;
+}
+
+/* Số công đoạn: ấn vuông đóng dấu */
+.timeline li .timeline-index,
+.timeline li.is-lit:nth-child(n) .timeline-index {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 8px;
+  border: 1.5px solid var(--hoe);
+  border-radius: 4px;
+  background: none;
+  font-size: 1.7rem;
+  color: var(--hoe);
+  rotate: -3deg;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+.timeline li:nth-child(even) .timeline-index { rotate: 2deg; }
+
+.timeline li.is-lit:nth-child(n) .timeline-index,
+.timeline li:hover .timeline-index {
+  background: var(--son);
+  border: 1.5px solid var(--son);
+  color: var(--diep-light);
+}
+
+/* Khung tranh: đường diềm dưới ảnh/ video tư liệu */
+.film-card,
+.artisan-film {
+  position: relative;
+}
+
+.film-card::after,
+.artisan-film::after {
+  content: '';
+  display: block;
+  height: 22px;
+  margin: 10px 4px 0;
+  background-repeat: repeat-x;
+  background-size: 32px 22px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='22'%3E%3Cg fill='none' stroke='%238b5e3c' stroke-width='1.2' stroke-linejoin='round'%3E%3Cpath d='M0 20 L8 5 L16 20 L24 5 L32 20'/%3E%3Ccircle cx='8' cy='14' r='1.8' fill='%238b5e3c' stroke='none'/%3E%3Ccircle cx='24' cy='14' r='1.8' fill='%238b5e3c' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.7;
+}
+
+@media (max-width: 900px) {
+  .colophon { display: none; }
+  .lantern-string { height: 110px; }
+  .lantern-string-item:nth-child(odd) { display: none; }
+  .products { padding-top: calc(var(--sec-y) + 36px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drum-watermark svg, .lantern-string-item { animation: none; }
+}
+
+.lantern-string-item .lantern-svg { display: block; width: 100%; height: auto; }
+
+.hero { position: relative; overflow: hidden; }
+.hero > *:not(.drum-watermark) { position: relative; z-index: 2; }
+.drum-hero { width: clamp(420px, 56vw, 760px); right: -10%; opacity: 0.12; }
+
+.faq { position: relative; }
+.faq-cloud {
+  position: absolute;
+  width: clamp(140px, 18vw, 260px);
+  color: var(--hoe);
+  opacity: 0.35;
+  pointer-events: none;
+  animation: lv-drift 14s ease-in-out infinite alternate;
+}
+.faq-cloud.cloud-l { top: 6%; left: -2%; }
+.faq-cloud.cloud-r { bottom: 8%; right: -2%; animation-delay: -6s; transform: scaleX(-1); }
+@media (max-width: 900px) { .faq-cloud { display: none; } }
+@media (prefers-reduced-motion: reduce) { .faq-cloud { animation: none; } }

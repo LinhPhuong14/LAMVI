@@ -211,6 +211,7 @@ export default {
     endContact: 'Liên hệ LAMVI',
     progress: 'Cảnh {n} trên {total}',
   },
+  folk: { colophon: 'Giấy dó · Đông Hồ · Dương Ổ' },
   films: {
     eyebrow: 'Xem tận mắt nghề',
     title: 'Từ tờ giấy dó làm nên thân đèn',
