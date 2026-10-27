@@ -5,7 +5,7 @@ import { useI18n } from '../i18n/index.js'
 // Băng chuyền cho dải thẻ cuộn ngang (D-123). Bọc quanh MỘT phần tử "đường chạy" (lưới thẻ); khi hydrate, đường chạy
 // được thêm lớp `is-carousel` (CSS biến lưới thành dải cuộn có snap). Không có JS → vẫn là lưới thường.
 // Tự chạy mỗi `interval` ms khi đang trong màn hình; dừng khi rê chuột, focus, chạm, tab ẩn hoặc bật giảm chuyển động.
-export default function Carousel({ children, label, interval = 5200 }) {
+export default function Carousel({ children, label, interval = 2000 }) {
   const { t } = useI18n()
   const wrap = useRef(null)
   const reduce = useHydratedReducedMotion()
