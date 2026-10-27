@@ -8284,3 +8284,51 @@ h1 {
 
 .admin-card-img { position: relative; }
 .admin-card-img img { position: absolute; inset: 0; padding: 8px; }
+
+/* Hỏi đáp: danh sách có nút đổi thứ tự và công tắc hiển thị */
+.faq-admin-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.faq-admin-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--dash-line);
+  border-radius: var(--r-sm);
+  background: var(--diep-light);
+}
+.faq-admin-list li.is-open { border-color: var(--son); box-shadow: inset 3px 0 0 var(--son); }
+.faq-admin-order { display: grid; gap: 4px; }
+.faq-admin-text { min-width: 0; }
+.faq-admin-text p { margin: 4px 0 0; font-size: 0.88rem; color: var(--than-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.admin-split.has-aside .faq-admin-list li { grid-template-columns: auto minmax(0, 1fr) auto; }
+.admin-split.has-aside .faq-admin-list .admin-row-actions { grid-column: 2 / -1; }
+@media (max-width: 640px) {
+  .faq-admin-list li { grid-template-columns: auto minmax(0, 1fr); }
+  .faq-admin-list .switch, .faq-admin-list .admin-row-actions { grid-column: 2; }
+}
+
+/* Mây: chi phí và thanh lưu dính đáy */
+.may-usage { display: grid; gap: 16px; max-width: 760px; margin-bottom: 24px; }
+.may-usage h2 { margin: 0; font-size: 1.5rem; }
+.may-usage-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.may-usage-kpis strong { display: block; font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 500; line-height: 1.1; }
+.may-usage-kpis span { font-size: 0.82rem; color: var(--than-soft); }
+.may-meter { height: 10px; border-radius: 999px; background: var(--dash-soft); overflow: hidden; }
+.may-meter span { display: block; height: 100%; border-radius: 999px; background: var(--hoe); transition: width 0.6s var(--ease-out); }
+.may-meter.is-warn span { background: var(--son); }
+.may-meter.is-out span { background: var(--son-deep); }
+.save-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 14px 0;
+  background: linear-gradient(0deg, var(--diep) 70%, transparent);
+}
+.save-bar span { font-size: 0.88rem; color: var(--sepia); }
+.save-bar.is-dirty .btn-primary { box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.25); }

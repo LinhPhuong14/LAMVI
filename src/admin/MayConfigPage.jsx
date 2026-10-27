@@ -16,11 +16,28 @@ const toLines = (arr) => (arr ?? []).join('\n')
 const fromLines = (s) => s.split('\n').map((x) => x.trim()).filter(Boolean)
 
 function Usage({ usage }) {
-  const pct = usage.budgetPct == null ? '—' : Math.round(usage.budgetPct * 100)
+  const pct = usage.budgetPct == null ? null : Math.round(usage.budgetPct * 100)
+  const tone = usage.alert === 'exhausted' ? 'is-out' : usage.alert === 'warning' ? 'is-warn' : ''
   return (
-    <div className="account-card">
+    <div className="may-usage">
       <h2>{S.may.usageTitle}</h2>
-      <p>{fmt(S.may.usage, { cost: usage.costUsd.toFixed(2), budget: usage.budgetUsd, pct, requests: usage.requests })}</p>
+      <div className="may-usage-kpis">
+        <div>
+          <strong>{`${usage.costUsd.toFixed(2)} / ${usage.budgetUsd} USD`}</strong>
+          <span>{S.may.costLabel}</span>
+        </div>
+        <div>
+          <strong>{pct == null ? '-' : `${pct}%`}</strong>
+          <span>{S.may.budgetUsed}</span>
+        </div>
+        <div>
+          <strong>{usage.requests}</strong>
+          <span>{S.may.requestsLabel}</span>
+        </div>
+      </div>
+      <div className={`may-meter ${tone}`} role="img" aria-label={fmt(S.may.usage, { cost: usage.costUsd.toFixed(2), budget: usage.budgetUsd, pct: pct ?? '-', requests: usage.requests })}>
+        <span style={{ width: `${Math.min(100, pct ?? 0)}%` }} />
+      </div>
       {!usage.openaiConfigured && <p className="notice">{S.may.notConfigured}</p>}
       {usage.alert === 'warning' && <p className="notice error">{S.may.alertWarning}</p>}
       {usage.alert === 'exhausted' && <p className="notice error">{S.may.alertExhausted}</p>}
@@ -36,6 +53,8 @@ export default function MayConfigPage() {
   const [usage, setUsage] = useState(null)
   const [loadError, setLoadError] = useState(null)
   const [saved, setSaved] = useState(false)
+  const [tab, setTab] = useState('config')
+  const [baseline, setBaseline] = useState(null)
   const { pending, error, fields, run } = useSubmit()
 
   useEffect(() => {
@@ -51,6 +70,7 @@ export default function MayConfigPage() {
           lines: Object.fromEntries(GROUPS.map((g) => [g, Object.fromEntries(LANGS.map((l) => [l, toLines(cfg.messages[g][l])]))])),
         })
         setUsage(u)
+        setBaseline(JSON.stringify({ openaiEnabled: cfg.openaiEnabled, monthlyBudgetUsd: String(cfg.monthlyBudgetUsd), supportChannel: cfg.supportChannel, limits: Object.fromEntries(LIMITS.map((k) => [k, String(cfg.limits[k])])), lines: Object.fromEntries(GROUPS.map((g) => [g, Object.fromEntries(LANGS.map((l) => [l, toLines(cfg.messages[g][l])]))])) }))
       })
       .catch((err) => alive && setLoadError(err.code))
     return () => {
@@ -67,6 +87,9 @@ export default function MayConfigPage() {
   }
   if (!form) return <p>{S.common.loading}</p>
 
+  const snapshot = (f) => JSON.stringify({ openaiEnabled: f.openaiEnabled, monthlyBudgetUsd: f.monthlyBudgetUsd, supportChannel: f.supportChannel, limits: f.limits, lines: f.lines })
+  const dirty = baseline !== null && snapshot(form) !== baseline
+
   const set = (patch) => {
     setSaved(false)
     setForm({ ...form, ...patch })
@@ -82,13 +105,33 @@ export default function MayConfigPage() {
       messages: Object.fromEntries(GROUPS.map((g) => [g, Object.fromEntries(LANGS.map((l) => [l, fromLines(form.lines[g][l])]))])),
     }
     const res = await run(() => authedApi('/admin/may/config', { method: 'PUT', body }))
-    if (res) setSaved(true)
+    if (res) {
+      setSaved(true)
+      setBaseline(snapshot(form))
+    }
   }
 
   return (
     <section>
       <PageHead title={S.may.title} />
-      {usage && <Usage usage={usage} />}
+      <div className="chip-row" role="group" aria-label={S.may.title}>
+        {[['config', S.may.tabConfig], ['usage', S.may.tabUsage]].map(([k, l]) => (
+          <button key={k} type="button" className={`chip${tab === k ? ' is-on' : ''}`} aria-pressed={tab === k} onClick={() => setTab(k)}>
+            {l}
+            {k === 'usage' && usage && usage.alert && <b>!</b>}
+          </button>
+        ))}
+      </div>
+      {tab === 'config' && usage && ['warning', 'exhausted'].includes(usage.alert) && (
+        <p className="notice error" role="status">
+          {usage.alert === 'warning' ? S.may.alertWarning : S.may.alertExhausted}{' '}
+          <button type="button" className="btn btn-small" onClick={() => setTab('usage')}>
+            {S.may.tabUsage}
+          </button>
+        </p>
+      )}
+      {tab === 'usage' && usage && <Usage usage={usage} />}
+      {tab === 'config' && (
       <form className="form admin-form" onSubmit={onSubmit} noValidate>
         <label className="checkbox">
           <input type="checkbox" checked={form.openaiEnabled} onChange={(e) => set({ openaiEnabled: e.target.checked })} />
@@ -154,12 +197,14 @@ export default function MayConfigPage() {
             {S.common.saved}
           </p>
         )}
-        <div className="admin-actions">
+        <div className={`save-bar${dirty ? ' is-dirty' : ''}`}>
+          {dirty && <span>{S.may.dirty}</span>}
           <button className="btn btn-primary" type="submit" disabled={pending}>
             {pending ? S.common.saving : S.common.save}
           </button>
         </div>
       </form>
+      )}
     </section>
   )
 }

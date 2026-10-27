@@ -219,3 +219,7 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Admin B4, B5, B6, B7, B9 theo bố cục `Split` | ✅ code | `Split.jsx`, `Coupons/Products/Collections/Batches/UsersPage.jsx` | test đang cập nhật |
 | Admin B8 (Hỏi đáp, Mây), B10 (Analytics) | ⏳ chưa | | làm ở đợt sau |
 
+| Đợt v0.75 (D-129) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Admin Hỏi đáp (thứ tự, công tắc, chip) và Mây (tab, thanh lưu) | ✅ code | `FaqPage.jsx`, `MayConfigPage.jsx`; `FaqMay.test.jsx` | Analytics (B10), kéo thả bộ sưu tập |
+
