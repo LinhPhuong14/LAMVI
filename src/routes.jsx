@@ -14,6 +14,7 @@ import PolicyPage from './pages/PolicyPage'
 import ContactPage from './pages/ContactPage'
 import CollectionPage from './pages/CollectionPage'
 import ShopPage from './pages/ShopPage'
+const WelcomePage = lazy(() => import('./pages/WelcomePage'))
 const CartPage = lazy(() => import('./pages/CartPage'))
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
 const OrderPage = lazy(() => import('./pages/OrderPage'))
@@ -44,6 +45,7 @@ function localeChildren() {
       <Route path="lo/:code" element={<BatchPage />} />
       <Route path="qr/:token" element={<RouteLoader><GiftPage /></RouteLoader>} />
       <Route path="shop" element={<ShopPage />} />
+      <Route path="welcome" element={<RouteLoader><WelcomePage /></RouteLoader>} />
       <Route path="privacy" element={<PolicyPage kind="privacy" />} />
       <Route path="returns" element={<PolicyPage kind="returns" />} />
       <Route path="terms" element={<PolicyPage kind="terms" />} />

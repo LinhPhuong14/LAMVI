@@ -6424,9 +6424,10 @@ h1 {
 
 .intro-film-video {
   position: absolute;
-  inset: 0 0 auto 0;
+  top: -7%;
+  left: 0;
   width: 100%;
-  height: 118%;
+  height: 120%;
   object-fit: cover;
   object-position: top center;
 }
@@ -7317,4 +7318,650 @@ h1 {
     min-height: 44px;
     min-width: 44px;
   }
+}
+
+/* Hero: ảnh cover fanpage thay cho vòm + đèn + ảnh minh hoạ; hero thấp, ảnh nguyên khung (2,09:1) */
+.hero {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+}
+
+.hero-cover {
+  position: relative;
+  margin: 0;
+  isolation: isolate;
+}
+
+.hero-cover::before {
+  content: '';
+  position: absolute;
+  inset: 14px -14px -14px 14px;
+  border: 1px solid var(--hoe);
+  border-radius: var(--r-md);
+  z-index: -1;
+  animation: lv-drift 9s ease-in-out infinite alternate;
+}
+
+.hero-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1672 / 800;
+  object-fit: cover;
+  border-radius: var(--r-md);
+  box-shadow: var(--print-lg);
+  animation: cover-in 1.2s var(--ease-out) both;
+}
+
+@keyframes cover-in {
+  from { opacity: 0; transform: scale(1.04); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .hero-cover::before {
+    inset: 10px -6px -10px 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cover::before, .hero-cover img { animation: none; }
+}
+
+/* ===== Trang thông điệp /welcome: trải nghiệm tự chạy kiểu story (D-126) ===== */
+.welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  background: var(--cham-deep);
+  color: var(--diep-light);
+}
+
+.welcome-bars {
+  position: absolute;
+  top: calc(10px + env(safe-area-inset-top));
+  left: 12px;
+  right: 12px;
+  z-index: 6;
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.welcome-bars li {
+  flex: 1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(244, 232, 207, 0.28);
+}
+
+.welcome-bars li span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--diep-light);
+}
+
+.welcome-bars li.is-done span {
+  width: 100%;
+}
+
+.welcome-bars li.is-now span {
+  animation: welcome-fill linear forwards;
+}
+
+@keyframes welcome-fill {
+  to { width: 100%; }
+}
+
+.welcome-top {
+  position: absolute;
+  top: calc(24px + env(safe-area-inset-top));
+  left: 12px;
+  right: 12px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.welcome-close {
+  padding: 8px 14px;
+  border: 1px solid rgba(244, 232, 207, 0.5);
+  border-radius: 999px;
+  background: rgba(43, 22, 7, 0.45);
+  color: var(--diep-light);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.welcome-tools {
+  display: flex;
+  gap: 8px;
+}
+
+.welcome-tools button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(244, 232, 207, 0.5);
+  background: rgba(43, 22, 7, 0.45);
+  color: var(--diep-light);
+  cursor: pointer;
+}
+
+.welcome-stage {
+  position: absolute;
+  inset: 0;
+  touch-action: manipulation;
+}
+
+.welcome-scene {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: welcome-in 0.7s var(--ease-out) both;
+}
+
+@keyframes welcome-in {
+  from { opacity: 0; transform: scale(1.015); }
+  to { opacity: 1; transform: none; }
+}
+
+.welcome-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.welcome-bg.kenburns {
+  animation: welcome-kb 14s ease-out forwards;
+}
+
+.welcome-bg.blur {
+  filter: blur(26px) brightness(0.45) saturate(1.1);
+  transform: scale(1.15);
+}
+
+@keyframes welcome-kb {
+  from { transform: scale(1); }
+  to { transform: scale(1.14); }
+}
+
+.welcome-copy {
+  position: relative;
+  z-index: 4;
+  align-self: end;
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  max-width: 680px;
+  padding: 0 clamp(20px, 6vw, 72px) calc(clamp(40px, 9vh, 96px) + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+.welcome-copy > * {
+  animation: welcome-up 0.8s var(--ease-out) both;
+}
+
+.welcome-copy > :nth-child(2) { animation-delay: 0.15s; }
+.welcome-copy > :nth-child(3) { animation-delay: 0.3s; }
+.welcome-copy > :nth-child(4) { animation-delay: 0.45s; }
+.welcome-copy > :nth-child(5) { animation-delay: 0.6s; }
+
+@keyframes welcome-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+.welcome-kicker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--hoe-light);
+}
+
+.welcome-kicker::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--hoe);
+}
+
+.welcome h1,
+.welcome h2 {
+  margin: 0;
+  color: var(--diep-light);
+  font-size: clamp(2.4rem, 7vw, 4.6rem);
+  font-weight: 500;
+  line-height: 1.02;
+}
+
+.welcome-text {
+  max-width: 52ch;
+  font-size: clamp(1rem, 2.4vw, 1.15rem);
+  line-height: 1.7;
+  color: rgba(244, 232, 207, 0.86);
+}
+
+.welcome .btn,
+.welcome-actions {
+  position: relative;
+  z-index: 7;
+  pointer-events: auto;
+}
+
+.welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.welcome .btn-ghost {
+  color: var(--diep-light);
+  border-color: rgba(244, 232, 207, 0.55);
+}
+
+/* Cảnh video: tiêu đề trên, khung 16:9 ở giữa (không cắt, không phóng to), chú thích dưới */
+.scene-video {
+  grid-template-rows: auto 1fr auto;
+  align-content: stretch;
+  padding-top: 84px;
+}
+
+.scene-video .welcome-copy {
+  align-self: start;
+  padding-bottom: 0;
+}
+
+.scene-video h2 {
+  font-size: clamp(1.8rem, 5vw, 3.2rem);
+}
+
+.welcome-frame {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  justify-self: center;
+  width: min(calc(100% - 32px), 980px, calc((100dvh - 330px) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--r-md);
+  background: var(--cham-deep);
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.7);
+  animation: welcome-up 0.9s var(--ease-out) 0.2s both;
+}
+
+.welcome-video {
+  position: absolute;
+  top: -8%;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.welcome-caption {
+  position: relative;
+  z-index: 4;
+  margin: 0;
+  padding: 0 clamp(20px, 6vw, 72px) calc(32px + env(safe-area-inset-bottom));
+  text-align: center;
+  color: rgba(244, 232, 207, 0.86);
+  pointer-events: none;
+}
+
+/* Cảnh đèn: ảnh đèn tách nền nổi giữa, trôi nhẹ, quầng sáng thở */
+.scene-lamp {
+  grid-template-rows: 1fr auto;
+}
+
+.welcome-lamp {
+  position: relative;
+  z-index: 2;
+  align-self: end;
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  height: min(52dvh, 460px);
+  margin-top: 90px;
+}
+
+.welcome-lamp::before {
+  content: '';
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 154, 99, 0.55), transparent 68%);
+  animation: lv-breathe 3.5s ease-in-out infinite alternate;
+}
+
+.welcome-lamp img {
+  position: relative;
+  height: min(52dvh, 460px);
+  width: auto;
+  max-width: 80vw;
+  object-fit: contain;
+  animation: lv-bob 4.5s ease-in-out infinite alternate, welcome-up 0.9s var(--ease-out) both;
+}
+
+.scene-lamp .welcome-copy {
+  align-self: start;
+  padding-top: 18px;
+}
+
+/* Cảnh Mây */
+.scene-may {
+  grid-template-rows: auto 1fr;
+  background: radial-gradient(circle at 50% 24%, rgba(200, 154, 99, 0.3), transparent 60%), var(--cham-deep);
+}
+
+.welcome-may {
+  align-self: end;
+  justify-self: center;
+  margin-top: 96px;
+  animation: lv-bob 3.2s ease-in-out infinite alternate;
+}
+
+.welcome-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.welcome-chips li {
+  padding: 8px 14px;
+  border: 1px solid rgba(244, 232, 207, 0.4);
+  border-radius: 999px;
+  font-size: 0.92rem;
+  animation: welcome-up 0.7s var(--ease-out) both;
+}
+
+/* Vùng chạm lùi/tiến */
+.welcome-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.zone-prev { left: 0; width: 32%; }
+.zone-next { right: 0; width: 68%; }
+
+.welcome-zone:disabled {
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .scene-lamp,
+  .scene-may {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+  }
+
+  .welcome-lamp,
+  .welcome-may {
+    margin-top: 0;
+    align-self: center;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .scene-lamp .welcome-copy,
+  .scene-may .welcome-copy {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    padding-top: 0;
+  }
+
+  .welcome-lamp img {
+    height: min(66dvh, 560px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-scene, .welcome-copy > *, .welcome-frame, .welcome-lamp img, .welcome-lamp::before, .welcome-may, .welcome-chips li,
+  .welcome-bg.kenburns { animation: none; }
+}
+
+/* Cảnh mở đầu và kết: ảnh cover nguyên khung (2,09:1) ở giữa, chữ bên dưới */
+.scene-intro,
+.scene-end {
+  grid-template-rows: 1fr auto;
+  padding-top: 84px;
+}
+
+.welcome-frame.is-cover {
+  width: min(calc(100% - 32px), 980px, calc((100dvh - 360px) * 2.09));
+  aspect-ratio: 1672 / 800;
+}
+
+.welcome-frame.is-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scene-intro .welcome-copy,
+.scene-end .welcome-copy {
+  align-self: start;
+  padding-top: 20px;
+}
+
+/* Lời nhắc xoay ngang (điện thoại dựng đứng) và bố cục khi nằm ngang */
+.welcome-rotate {
+  position: absolute;
+  left: 50%;
+  top: calc(84px + env(safe-area-inset-top));
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  padding: 10px 18px 10px 12px;
+  translate: -50% 0;
+  border: 1px solid rgba(244, 232, 207, 0.5);
+  border-radius: 999px;
+  background: rgba(43, 22, 7, 0.78);
+  color: var(--diep-light);
+  font: inherit;
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+  animation: welcome-up 0.6s var(--ease-out) 0.8s both;
+}
+
+.welcome-rotate-icon {
+  flex: none;
+  width: 18px;
+  height: 30px;
+  border: 2px solid var(--hoe-light);
+  border-radius: 4px;
+  animation: welcome-turn 2.6s ease-in-out infinite;
+}
+
+@keyframes welcome-turn {
+  0%, 20% { transform: rotate(0); }
+  50%, 80% { transform: rotate(-90deg); }
+  100% { transform: rotate(0); }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .welcome-top { top: calc(18px + env(safe-area-inset-top)); }
+
+  .scene-intro,
+  .scene-end,
+  .scene-video,
+  .scene-lamp,
+  .scene-may {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    grid-template-rows: 1fr;
+    align-items: center;
+    padding-top: 40px;
+    column-gap: 16px;
+  }
+
+  .scene-video { grid-template-rows: 1fr auto; }
+
+  .scene-intro .welcome-copy,
+  .scene-end .welcome-copy,
+  .scene-video .welcome-copy,
+  .scene-lamp .welcome-copy,
+  .scene-may .welcome-copy {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    padding: 0 0 0 clamp(20px, 5vw, 56px);
+  }
+
+  .scene-video .welcome-copy { grid-row: 1; }
+
+  .welcome h1,
+  .welcome h2 { font-size: clamp(1.6rem, 5.4vh, 2.6rem); }
+
+  .welcome-text { font-size: 0.92rem; line-height: 1.55; }
+
+  .welcome-frame,
+  .welcome-frame.is-cover {
+    grid-column: 2;
+    grid-row: 1;
+    width: min(100%, calc((100dvh - 110px) * 16 / 9));
+    margin-right: 16px;
+  }
+
+  .welcome-frame.is-cover { width: min(100%, calc((100dvh - 110px) * 2.09)); }
+
+  .welcome-caption {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 0 16px 10px;
+    font-size: 0.82rem;
+  }
+
+  .welcome-lamp,
+  .welcome-may {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    margin: 0;
+  }
+
+  .welcome-lamp img { height: min(72dvh, 320px); }
+
+  .welcome-chips li { padding: 5px 10px; font-size: 0.8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-rotate, .welcome-rotate-icon { animation: none; }
+}
+
+/* Tinh chỉnh trải nghiệm liền mạch (D-126): chuyển cảnh mờ chồng, điều khiển nhẹ hơn */
+.welcome-scene.is-leaving {
+  z-index: 0;
+  pointer-events: none;
+  animation: welcome-out 0.8s ease both;
+}
+
+.welcome-scene:not(.is-leaving) {
+  z-index: 1;
+  animation-duration: 0.9s;
+}
+
+@keyframes welcome-out {
+  to { opacity: 0; transform: scale(1.03); }
+}
+
+.welcome-preload {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.welcome-bars {
+  gap: 3px;
+}
+
+.welcome-bars li {
+  height: 2px;
+  background: rgba(244, 232, 207, 0.22);
+}
+
+.welcome-close {
+  padding: 8px 12px;
+  border-color: transparent;
+  background: rgba(43, 22, 7, 0.35);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.welcome-tools button {
+  width: 40px;
+  height: 40px;
+  border-color: transparent;
+  background: rgba(43, 22, 7, 0.35);
+  font-size: 0.8rem;
+  transition: background 0.2s ease;
+}
+
+.welcome-close:hover,
+.welcome-tools button:hover {
+  background: rgba(43, 22, 7, 0.6);
+}
+
+.welcome-kicker {
+  letter-spacing: 0.24em;
+  font-size: 0.72rem;
+}
+
+.welcome h1,
+.welcome h2 {
+  letter-spacing: -0.01em;
+}
+
+.welcome-frame {
+  box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(244, 232, 207, 0.12);
+}
+
+.welcome-rotate {
+  border-color: transparent;
+  background: rgba(43, 22, 7, 0.55);
+  font-size: 0.82rem;
+}
+
+.welcome-bg.blur {
+  transition: filter 0.6s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-scene.is-leaving { animation: none; opacity: 0; }
 }

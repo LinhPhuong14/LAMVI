@@ -222,8 +222,6 @@ function Hero() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const copyOpacity = useTransform(scrollYProgress, [0.3, 1], [1, 0])
   const copyY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -50])
-  const lanternY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -90])
-  const lanternOpacity = useTransform(scrollYProgress, [0.4, 1], [1, 0])
 
   return (
     <section id="hero" className="hero" ref={ref}>
@@ -253,19 +251,19 @@ function Hero() {
         </div>
       </m.div>
 
-      <div className="hero-art">
-        <m.div className="hero-lantern" style={{ y: lanternY, opacity: lanternOpacity }}>
-          {/* Đèn thật (mẫu Tứ Linh) đã tách nền từ ảnh fanpage (D-107, public/images/lamps/CREDITS.md) */}
-          <img className="lamp-cutout hero-lamp" src="/images/lamps/tu-linh-cutout.webp" alt={t('lookbook.items')[1]} width={172} height={402} fetchPriority="high" decoding="async" />
-        </m.div>
-        <figure className="hero-polaroid hp-a" aria-hidden="true">
-          <img src="/images/folk/chuot-ruoc-den-480.webp" alt="" width={150} height={170} loading="lazy" decoding="async" />
-        </figure>
-        <figure className="hero-polaroid hp-b" aria-hidden="true">
-          <img src="/images/lamps/thu-hoach.jpg" alt="" width={130} height={160} loading="lazy" decoding="async" />
-        </figure>
-      </div>
-
+      <figure className="hero-cover">
+        {/* Ảnh cover fanpage chính thức của LAMVI (public/images/brand/CREDITS.md), thay ảnh đèn + ảnh minh hoạ cũ */}
+        <img
+          src="/images/brand/cover-1280.webp"
+          srcSet="/images/brand/cover-800.webp 800w, /images/brand/cover-1280.webp 1280w, /images/brand/cover-1672.webp 1672w"
+          sizes="(max-width: 860px) 100vw, 640px"
+          alt={t('hero.coverAlt')}
+          width={1672}
+          height={800}
+          fetchPriority="high"
+          decoding="async"
+        />
+      </figure>
     </section>
   )
 }

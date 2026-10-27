@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useCallback, useState } from 'react'
+import { Component, lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useI18n } from '../i18n/index.js'
 import { splitLocale } from '../i18n/core.js'
@@ -30,11 +30,17 @@ function MayInner() {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [touring, setTouring] = useState(false)
+  // Trang /welcome (QR dán trên đèn) mở Mây bằng sự kiện này
+  useEffect(() => {
+    const openFromPage = () => setOpen(true)
+    window.addEventListener('lamvi:may-open', openFromPage)
+    return () => window.removeEventListener('lamvi:may-open', openFromPage)
+  }, [])
   const rest = splitLocale(location.pathname).rest
   const isHome = rest === '/'
   // Feedback 08/10, 7.5/16: nút Mây nổi đè lên form giỏ hàng/thanh toán trên mobile → ẩn ở hai trang này
   // Mobile UX: nút nổi cũng đè lên nút chính của form đăng nhập/đăng ký → ẩn ở các trang auth
-  const hideFab = rest === '/cart' || rest === '/checkout' || ['/login', '/register', '/forgot-password', '/reset-password', '/auth/callback'].includes(rest.replace(/\/+$/, ''))
+  const hideFab = rest === '/cart' || rest === '/checkout' || ['/login', '/register', '/forgot-password', '/reset-password', '/auth/callback', '/welcome'].includes(rest.replace(/\/+$/, ''))
 
   // Feedback 08/10 mục 10: không tự bật tour (che hero/CTA, tự cuộn trang). Tour là lựa chọn trong Mây (“Dẫn tour”).
 

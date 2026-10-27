@@ -203,3 +203,9 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 |---|---|---|---|
 | Responsive điện thoại 320 đến 430 px | ✅ code | cuối `pages.css`; script đo tràn và vùng chạm (16 trang x 4 cỡ) | iOS Safari thật, nằm ngang, tablet |
 
+| Đợt v0.72 (D-126) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Admin Đổi trả (B3) hai cột, video tự phát, hai nút quyết định | ✅ code | `ReturnsPage.jsx`, `returns.css` | test đang cập nhật |
+| Hero dùng ảnh cover fanpage | ✅ code | `HomePage.jsx`, `public/images/brand/cover-*.webp` | |
+| Trang `/welcome` (QR dán đèn), xoay ngang | ✅ code | `WelcomePage.jsx`, cuối `pages.css`; i18n `welcome.*` | PO/BA chốt G-120, đo lượt quét |
+
