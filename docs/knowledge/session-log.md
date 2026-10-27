@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-27 (phiên 2) — Dashboard khách + sửa hiểu lầm ảnh cover (nhánh `feat/customer-dashboard`, D-127)
+
+PO làm rõ: ảnh cover thay cho VIDEO đầu trang (không thay ảnh đèn của hero); cover đã ở hero thì bỏ ở nơi khác. Đã sửa: IntroCover thay IntroFilm, khôi phục hero đèn, bỏ cover ở Di sản và /welcome. Dashboard khách: Cần làm, Đơn hàng hai cột, Lời chúc & video, Bảo mật. Bài học: câu "ảnh hero" mơ hồ, nên hỏi lại khi có hai cách hiểu. Chưa làm: sổ địa chỉ, video mẻ đèn theo đơn, các tab admin B4 đến B10.
+
+---
+
 ## 2026-10-27 — Đổi trả admin, hero cover, trang /welcome (nhánh `feat/welcome-returns`, D-126)
 
 PO: làm tab Đổi trả admin (B3), đổi ảnh hero sang ảnh cover fanpage, thêm trang thông điệp tự chạy để in QR dán lên đèn cho đơn không có lời chúc, thêm xoay ngang, tinh tế và liền mạch hơn. Đã làm tất cả; tìm thêm và bỏ nốt dấu gạch trong `returns/strings.js`, `CartPage`, `seo/head.js`, email. Cần PO/BA: D-126 thay D-104 một phần (QR trên đèn), G-120 (vật lý tem, một QR chung, đo lượt quét, video nặng khi 4G). Chưa làm: B4 đến B10 admin, dashboard khách, bản video nhẹ cho mobile.

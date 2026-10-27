@@ -473,3 +473,9 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - `/welcome` thuộc `APP_PAGES` (không header, footer, tab bar); Mây mở bằng sự kiện `lamvi:may-open`.
 - Video `lang-giay-do-720.mp4` và `tranh-dong-ho-720.mp4` có dải đen ở đầu khung và phụ đề cứng ở đáy: `<video>` cao 120% đặt `top: -8%` trong khung `overflow: hidden` để cắt cả hai (áp cho cả video hero).
 
+### T-98 — Cover thay video đầu trang, dashboard khách theo việc cần làm (2026-10-27)
+
+- D-127. `IntroCover.jsx` thay `IntroFilm` (đã xoá cùng CSS `.intro-film*`, `.hero-cover*`); hero khôi phục từ lịch sử git (`hero-art`, `hero-polaroid`) và cuộn tính theo chính khối hero. `public/images/brand/cover-*.webp` chỉ còn dùng ở `IntroCover`; `cover-1672x800.jpg` còn dùng cho `scripts/gen_og_from_cover.py` (ảnh chia sẻ).
+- `AccountPage`: `todoList()` suy ra việc cần làm từ danh sách đơn (`hasMessage` + trạng thái còn sửa được, `pending_payment`, đơn đang làm/giao) và giỏ hàng; `OrdersPanel` lọc client theo nhóm trạng thái (`ORDER_GROUPS`), chi tiết lấy từ chính danh sách (API `/orders` đã trả đủ mặt hàng, người nhận, tổng), nên không gọi thêm. `SecurityCard` gọi `POST /auth/change-password` (server thu hồi mọi phiên, nên gọi `logout()` rồi về `/login`). `MessagesCard` chỉ dùng cờ `hasMessage`; trạng thái soạn/đã mở từng lời chúc chưa có trong danh sách đơn (cần mở rộng API nếu muốn hiện ở đây).
+- Tab `gallery` giữ khoá URL `?tab=gallery` (liên kết cũ vẫn dùng được), chỉ đổi nhãn.
+
