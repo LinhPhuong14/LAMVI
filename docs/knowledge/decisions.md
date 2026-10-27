@@ -490,3 +490,8 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 
 - (D-129) `FaqPage`: đổi thứ tự bằng hai `PATCH {sortOrder}` theo vị trí mới của cặp liền kề (không kéo thả); nút bị khoá khi đang lọc vì vị trí khi đó không còn là vị trí thật. `MayConfigPage`: tab chỉ render một biểu mẫu tại một thời điểm (state giữ ở trang nên đổi tab không mất chỉnh sửa); `dirty` so `JSON.stringify` của trạng thái hiện tại với ảnh chụp lúc tải hoặc lúc lưu thành công. `src/admin/strings.js` đã bỏ dấu gạch dài.
 
+### T-100 — GA báo cáo theo kỳ (2026-10-27)
+
+- D-130. `createGaRealtime` (server/adapters/gaRealtime.js) thêm `period(days)`: bốn lần `runReport` song song (tổng, phễu theo `eventName` lọc `inListFilter` bốn sự kiện, theo `date`, theo `sessionDefaultChannelGroup`), `days` chỉ nhận 7/28/90 (giá trị lạ quy về 7), cache 60 giây theo kỳ để nhiều admin không nhân hạn mức GA; lỗi không cache. Route `GET /admin/analytics/report?days=`. Cần GA ghi nhận đủ `view_item`, `add_to_cart`, `begin_checkout`, `purchase` (đã có ở `src/analytics/ga.js`); số `users` của phễu là `totalUsers` theo từng sự kiện, nên một người có thể nằm ở nhiều bước (đúng với phễu), nhưng không đảm bảo thứ tự thời gian.
+- Không cần biến môi trường mới. Property GA cần bật Data API (đã dùng cho realtime).
+

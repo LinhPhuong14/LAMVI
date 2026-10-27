@@ -74,6 +74,17 @@ export function adminRouter({ repo, auth, storage, config, orders = null, gaReal
     }
   })
 
+  // Báo cáo theo kỳ (7, 28, 90 ngày): phễu, người dùng theo ngày, kênh vào
+  r.get('/admin/analytics/report', async (req, res) => {
+    if (!gaRealtime) return res.json({ configured: false })
+    try {
+      res.json(await gaRealtime.period(Number(req.query.days)))
+    } catch (err) {
+      if (!(err instanceof GaError)) throw err
+      throw new HttpError(502, `GA_${err.code}`, `GA_${err.code}`)
+    }
+  })
+
   // --- Sản phẩm
   r.get('/admin/products', async (req, res) => {
     res.json({ items: await repo.listProducts() })

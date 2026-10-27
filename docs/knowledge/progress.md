@@ -223,3 +223,7 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 |---|---|---|---|
 | Admin Hỏi đáp (thứ tự, công tắc, chip) và Mây (tab, thanh lưu) | ✅ code | `FaqPage.jsx`, `MayConfigPage.jsx`; `FaqMay.test.jsx` | Analytics (B10), kéo thả bộ sưu tập |
 
+| Đợt v0.76 (D-130) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Admin Analytics theo kỳ + phễu; đổi thứ tự bộ sưu tập | ✅ code | `AnalyticsPage.jsx`, `gaRealtime.js`, `admin.js`; `gaPeriod.test.js`, `AnalyticsPeriod.test.jsx` | kiểm với GA thật (cần khoá service account) |
+

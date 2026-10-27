@@ -21,6 +21,7 @@ export const S = {
     viRequiredHint: 'Tiếng Việt bắt buộc; thiếu bản en/zh thì web hiện tiếng Việt.',
   },
   collections: {
+    colOrder: 'Thứ tự',
     "title": "Bộ sưu tập",
     "note": "Chỉ phát hành nội dung đã được tác giả/Marketing duyệt. Bộ chỉ hiển thị khi có ít nhất một sản phẩm đang bán; cốt truyện chỉ mở khi khách sở hữu đủ bộ.",
     "slug": "Slug bộ sưu tập",
@@ -345,7 +346,19 @@ export const S = {
 }
 
 export const ANALYTICS = {
-  title: 'Truy cập thời gian thực',
+  title: 'Truy cập',
+  tabRealtime: 'Thời gian thực',
+  tabPeriod: 'Theo kỳ',
+  periods: { 7: '7 ngày', 28: '28 ngày', 90: '90 ngày' },
+  users: 'Người dùng',
+  sessions: 'Lượt truy cập',
+  funnelTitle: 'Phễu mua hàng',
+  funnelHint: 'Số người dùng ở mỗi bước (sự kiện GA). Tỉ lệ so với bước trước; đây là nơi mất khách nhiều nhất.',
+  funnelSteps: { view_item: 'Xem sản phẩm', add_to_cart: 'Thêm vào giỏ', begin_checkout: 'Bắt đầu thanh toán', purchase: 'Đặt hàng thành công' },
+  dailyTitle: 'Người dùng theo ngày',
+  channels: 'Kênh vào',
+  vsPrev: 'so với bước trước',
+  noEvents: 'Chưa có sự kiện nào trong kỳ này.',
   autoRefresh: 'Tự làm mới mỗi 30 giây · số liệu của Google Analytics, trễ vài giây',
   refresh: 'Làm mới',
   updated: 'Cập nhật lúc {time}',
