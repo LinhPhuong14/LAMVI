@@ -1,5 +1,11 @@
 # Nhật ký phiên
 
+## 2026-10-27 (phiên 3) — Admin còn lại + sửa layout thẻ sản phẩm (nhánh `ccr-f7654e08-wqcdp4`, D-128)
+
+PO báo lỗi layout thẻ sản phẩm trong carousel (chân thẻ co lại) và yêu cầu carousel 2 giây: đã sửa và merge. Admin: B4 (mã giảm giá), B5 (sản phẩm), B6 (bộ sưu tập, chưa kéo thả), B7 (lô đèn), B9 (người dùng) theo bố cục `Split`. Chưa làm: B8 (Hỏi đáp, Mây), B10 (Analytics), kéo thả bộ sưu tập, xuất CSV và in phiếu. Lưu ý: lần merge sửa layout chỉ chạy test component, chưa chạy cả bộ.
+
+---
+
 ## 2026-10-27 (phiên 2) — Dashboard khách + sửa hiểu lầm ảnh cover (nhánh `feat/customer-dashboard`, D-127)
 
 PO làm rõ: ảnh cover thay cho VIDEO đầu trang (không thay ảnh đèn của hero); cover đã ở hero thì bỏ ở nơi khác. Đã sửa: IntroCover thay IntroFilm, khôi phục hero đèn, bỏ cover ở Di sản và /welcome. Dashboard khách: Cần làm, Đơn hàng hai cột, Lời chúc & video, Bảo mật. Bài học: câu "ảnh hero" mơ hồ, nên hỏi lại khi có hai cách hiểu. Chưa làm: sổ địa chỉ, video mẻ đèn theo đơn, các tab admin B4 đến B10.

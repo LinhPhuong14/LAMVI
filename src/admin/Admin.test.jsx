@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
+import { S } from './strings.js'
 
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'admin@moc.test' } }
 const me = (role) => () => ({ body: { profile: { id: 'u1', email: 'admin@moc.test', role, preferredLocale: 'vi', fullName: 'A' } } })
@@ -45,7 +46,7 @@ describe('Admin — sản phẩm (FR-CAT-004)', () => {
   it('liệt kê mọi trạng thái, gồm sản phẩm đã ẩn', async () => {
     mockApi({ 'GET /me': me('admin'), 'GET /admin/products': () => ({ body: { items: products } }) })
     renderAt('/admin/products')
-    const row = (await screen.findByText('Đèn Ẩn')).closest('tr')
+    const row = (await screen.findByText('Đèn Ẩn')).closest('article')
     expect(within(row).getByText('Đã ẩn')).toBeInTheDocument()
     expect(within(row).getByText(/500\.000/)).toBeInTheDocument()
   })
@@ -132,8 +133,8 @@ describe('Admin — lô & video (FR-QR-007, D-46, D-47)', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true)
 
     renderAt('/admin/batches')
-    fireEvent.click(within((await screen.findByText('L-01')).closest('tr')).getByRole('button', { name: 'Sửa' }))
-    expect(screen.getByRole('button', { name: 'Xuất bản' })).toBeDisabled()
+    fireEvent.click(within((await screen.findByText('L-01')).closest('tr')).getByRole('button', { name: S.batches.nextVideo }))
+    expect(within(document.querySelector('aside.split-aside')).getByRole('button', { name: S.batches.publish })).toBeDisabled()
 
     const file = new File(['abc'], 'lo.mp4', { type: 'video/mp4' })
     fireEvent.change(document.querySelector('input[type="file"]'), { target: { files: [file] } })
@@ -142,7 +143,7 @@ describe('Admin — lô & video (FR-QR-007, D-46, D-47)', () => {
     expect(sent[0]).toMatchObject({ method: 'PUT', url: 'https://storage.test/up?token=t' })
     expect(calls[1]).toEqual(['attach', { path: 'b1/x.mp4' }])
 
-    fireEvent.click(screen.getByRole('button', { name: 'Xuất bản' }))
+    fireEvent.click(within(document.querySelector('aside.split-aside')).getByRole('button', { name: S.batches.publish }))
     expect(await screen.findByText(/Lô đã xuất bản/)).toBeInTheDocument()
     expect(calls.at(-1)).toEqual(['publish'])
   })

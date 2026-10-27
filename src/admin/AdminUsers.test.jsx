@@ -63,6 +63,7 @@ describe('Danh sách người dùng', () => {
 
 describe('Chi tiết người dùng', () => {
   const detail = (item, extra = {}) => ({
+    'GET /admin/users': () => ({ body: { items: [item], total: 1, page: 1, pageSize: 20 } }),
     'GET /admin/users/u-an': () => ({ body: { item, orders: [{ code: 'LV2610-AAAAAAA', status: 'confirmed', total: 920000, createdAt: '2026-10-02T03:00:00.000Z' }], audit: [] } }),
     ...extra,
   })

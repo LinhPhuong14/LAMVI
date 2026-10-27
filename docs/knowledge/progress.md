@@ -214,3 +214,8 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | Ảnh cover thay video đầu trang; hero đèn khôi phục | ✅ code | `IntroCover.jsx`, `HomePage.jsx` | |
 | Dashboard khách A1 đến A3, A5 | ✅ code | `AccountPage.jsx`, cuối `pages.css` | sổ địa chỉ, video mẻ đèn theo đơn |
 
+| Đợt v0.74 (D-128) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Admin B4, B5, B6, B7, B9 theo bố cục `Split` | ✅ code | `Split.jsx`, `Coupons/Products/Collections/Batches/UsersPage.jsx` | test đang cập nhật |
+| Admin B8 (Hỏi đáp, Mây), B10 (Analytics) | ⏳ chưa | | làm ở đợt sau |
+

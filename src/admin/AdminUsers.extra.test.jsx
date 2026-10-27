@@ -13,6 +13,7 @@ const user = (over = {}) => ({
 })
 const list = (items, extra = {}) => ({ body: { items, total: items.length, page: 1, pageSize: 20, ...extra } })
 const detail = (item, extra = {}) => ({
+  'GET /admin/users': () => ({ body: { items: [item], total: 1, page: 1, pageSize: 20 } }),
   'GET /admin/users/u-an': () => ({ body: { item, orders: [], audit: [] } }),
   ...extra,
 })

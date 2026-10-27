@@ -8066,3 +8066,221 @@ h1 {
 .is-carousel {
   align-items: stretch;
 }
+
+/* ===== Admin: bố cục danh sách + ngăn biểu mẫu (D-128) ===== */
+.admin-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+}
+
+.admin-split.has-aside {
+  grid-template-columns: minmax(0, 1fr) minmax(400px, 520px);
+  align-items: start;
+}
+
+.split-main {
+  min-width: 0;
+}
+
+.split-aside {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  padding-left: 28px;
+  border-left: 1px solid var(--dash-line);
+}
+
+.admin-split.has-aside .col-secondary {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .admin-split.has-aside {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .split-aside {
+    position: static;
+    max-height: none;
+    padding: 24px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--dash-line);
+  }
+}
+
+@media (max-width: 960px) {
+  .admin-split.has-aside .split-main {
+    display: none;
+  }
+
+  .split-aside {
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+/* Công tắc bật/tắt ngay trên hàng */
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.switch-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--hair);
+  transition: background 0.2s ease;
+}
+
+.switch-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--diep-light);
+  transition: transform 0.2s var(--ease-out);
+}
+
+.switch input:checked + .switch-track {
+  background: var(--son);
+}
+
+.switch input:checked + .switch-track::after {
+  transform: translateX(18px);
+}
+
+.switch input:focus-visible + .switch-track {
+  outline: 2px solid var(--son);
+  outline-offset: 2px;
+}
+
+/* Thẻ sản phẩm trong admin */
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  border: 1px solid var(--dash-line);
+  border-radius: var(--r-md);
+  background: var(--diep-light);
+  overflow: hidden;
+}
+
+.admin-card.is-open {
+  border-color: var(--son);
+  box-shadow: inset 0 0 0 1px var(--son);
+}
+
+.admin-card-img {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  background: var(--diep-deep);
+}
+
+.admin-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.admin-card-img span {
+  font-size: 0.8rem;
+  color: var(--than-soft);
+}
+
+.admin-card-body {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px 8px;
+}
+
+.admin-card-body h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.admin-card-body small {
+  color: var(--than-soft);
+}
+
+.admin-card-foot {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 14px;
+}
+
+/* Thanh tiến trình 3 bước của lô đèn */
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.78rem;
+  color: var(--than-soft);
+}
+
+.steps li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.steps li + li::before {
+  content: '';
+  width: 16px;
+  height: 1px;
+  background: var(--hair);
+}
+
+.steps i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--hair);
+}
+
+.steps li.is-done i {
+  background: var(--son);
+  border-color: var(--son);
+}
+
+.steps li.is-done {
+  color: var(--than);
+}
+
+.admin-table tbody tr.is-open { background: var(--dash-soft); }
+.admin-table tbody tr.is-open td:first-child { box-shadow: inset 3px 0 0 var(--son); }
+
+.admin-card-img { position: relative; }
+.admin-card-img img { position: absolute; inset: 0; padding: 8px; }

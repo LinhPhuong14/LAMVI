@@ -5,6 +5,7 @@ import { useSubmit } from '../auth/useForm.js'
 import I18nInput from './I18nInput.jsx'
 import { useAdminList } from './useAdminList.js'
 import PageHead from './PageHead.jsx'
+import Split from './Split.jsx'
 import { S, fmt } from './strings.js'
 
 function CollectionForm({ initial, onDone, onCancel }) {
@@ -39,11 +40,43 @@ export default function CollectionsPage() {
     setError(null)
     try { await authedApi(`/admin/collections/${c.id}`, { method: 'DELETE' }); list.reload() } catch (e) { setError(e.code) }
   }
-  return <section><PageHead title={S.collections.title}>{!editing && <button className="btn btn-primary" type="button" onClick={() => setEditing({})}>{S.common.create}</button>}</PageHead>
-    {editing && <CollectionForm key={editing.id ?? 'new'} initial={editing} onCancel={() => setEditing(null)} onDone={() => { setEditing(null); list.reload() }} />}
-    {error && <p className="notice error" role="alert">{error === 'COLLECTION_IN_USE' ? S.collections.inUse : fmt(S.collections.deleteError, { error })}</p>}
-    {list.status === 'loading' && <p>{S.common.loading}</p>}
-    {list.status === 'error' && <p className="notice error" role="alert">{S.collections.loadError} <button type="button" onClick={list.reload}>{S.collections.retry}</button></p>}
-    {list.status === 'ok' && (!list.items.length ? <p>{S.collections.empty}</p> : <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>{S.products.colName}</th><th>Slug</th><th>{S.products.status}</th><th>{S.collections.actions}</th></tr></thead><tbody>{list.items.map((c) => <tr key={c.id}><td>{c.name.vi}</td><td>{c.slug}</td><td>{S.products.statuses[c.status]}</td><td><button type="button" className="btn btn-small" onClick={() => setEditing(c)}>{S.common.edit}</button> <button type="button" className="btn btn-small btn-danger" onClick={() => remove(c)}>{S.common.delete}</button></td></tr>)}</tbody></table></div>)}
-  </section>
+  return (
+    <section>
+      <PageHead title={S.collections.title}>
+        {!editing && (
+          <button className="btn btn-primary" type="button" onClick={() => setEditing({})}>
+            {S.common.create}
+          </button>
+        )}
+      </PageHead>
+      <Split
+        label={S.collections.title}
+        aside={editing && <CollectionForm key={editing.id ?? 'new'} initial={editing} onCancel={() => setEditing(null)} onDone={() => { setEditing(null); list.reload() }} />}
+      >
+        {error && <p className="notice error" role="alert">{error === 'COLLECTION_IN_USE' ? S.collections.inUse : fmt(S.collections.deleteError, { error })}</p>}
+        {list.status === 'loading' && <p>{S.common.loading}</p>}
+        {list.status === 'error' && <p className="notice error" role="alert">{S.collections.loadError} <button type="button" onClick={list.reload}>{S.collections.retry}</button></p>}
+        {list.status === 'ok' && (!list.items.length ? <p>{S.collections.empty}</p> : (
+          <div className="admin-panel">
+            <table className="admin-table">
+              <thead><tr><th>{S.products.colName}</th><th className="col-secondary">Slug</th><th>{S.products.status}</th><th>{S.collections.actions}</th></tr></thead>
+              <tbody>
+                {list.items.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.name.vi}</td>
+                    <td className="col-secondary"><code>{c.slug}</code></td>
+                    <td><span className={`status status-${c.status}`}>{S.products.statuses[c.status]}</span></td>
+                    <td className="admin-row-actions">
+                      <button type="button" className="btn btn-small btn-primary" onClick={() => setEditing(c)}>{S.common.edit}</button>
+                      <button type="button" className="btn btn-small btn-danger" onClick={() => remove(c)}>{S.common.delete}</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </Split>
+    </section>
+  )
 }

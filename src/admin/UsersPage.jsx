@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import Field from '../components/Field'
 import { formatVnd } from '../lib/money.js'
 import { useAuth } from '../auth/context.js'
 import { useI18n } from '../i18n/index.js'
 import PageHead from './PageHead.jsx'
+import Split from './Split.jsx'
 import { S, fmt } from './strings.js'
 
 const ROLES = ['customer', 'admin', 'it']
@@ -237,6 +238,7 @@ export default function UsersPage() {
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
   const [state, setState] = useState({ status: 'loading' })
+  const navigate = useNavigate()
 
   const query = new URLSearchParams()
   if (applied) query.set('q', applied)
@@ -246,7 +248,6 @@ export default function UsersPage() {
   const qs = query.toString()
 
   useEffect(() => {
-    if (id) return
     let alive = true
     authedApi(`/admin/users${qs ? `?${qs}` : ''}`)
       .then((r) => alive && setState({ status: 'ok', ...r }))
@@ -254,9 +255,7 @@ export default function UsersPage() {
     return () => {
       alive = false
     }
-  }, [authedApi, qs, id])
-
-  if (id) return <UserDetail id={id} />
+  }, [authedApi, qs])
 
   const pages = state.status === 'ok' ? Math.max(1, Math.ceil(state.total / state.pageSize)) : 1
   const submit = (e) => {
@@ -268,6 +267,7 @@ export default function UsersPage() {
   return (
     <section>
       <PageHead title={S.users.title} />
+      <Split label={S.users.title} aside={id && <UserDetail key={id} id={id} />}>
       <form className="admin-grid" onSubmit={submit} role="search">
         <Field label={S.users.search} value={q} onChange={(e) => setQ(e.target.value)} maxLength={100} />
         <Field
@@ -321,28 +321,28 @@ export default function UsersPage() {
                 <thead>
                   <tr>
                     <th>{S.users.colName}</th>
-                    <th>{S.users.colEmail}</th>
-                    <th>{S.users.colPhone}</th>
+                    <th className="col-secondary">{S.users.colEmail}</th>
+                    <th className="col-secondary">{S.users.colPhone}</th>
                     <th>{S.users.colRole}</th>
-                    <th>{S.users.colOrders}</th>
+                    <th className="col-secondary">{S.users.colOrders}</th>
                     <th>{S.users.colStatus}</th>
-                    <th>{S.users.colCreated}</th>
+                    <th className="col-secondary">{S.users.colCreated}</th>
                     <th />
                   </tr>
                 </thead>
                 <tbody>
                   {state.items.map((u) => (
-                    <tr key={u.id}>
+                    <tr key={u.id} className={u.id === id ? 'is-open' : undefined} onClick={() => navigate(`/admin/users/${u.id}`)} style={{ cursor: 'pointer' }}>
                       <td>{u.fullName ?? '—'}</td>
-                      <td>{u.email ?? '—'}</td>
-                      <td>{u.phone ?? '—'}</td>
+                      <td className="col-secondary">{u.email ?? '—'}</td>
+                      <td className="col-secondary">{u.phone ?? '—'}</td>
                       <td>{S.users.roles[u.role]}</td>
-                      <td>{u.orderCount}</td>
+                      <td className="col-secondary">{u.orderCount}</td>
                       <td>
                         <StatusPill locked={u.locked} />
                       </td>
-                      <td>{date(u.createdAt)}</td>
-                      <td className="admin-row-actions">
+                      <td className="col-secondary">{date(u.createdAt)}</td>
+                      <td className="admin-row-actions" onClick={(e) => e.stopPropagation()}>
                         <Link to={`/admin/users/${u.id}`} className="btn btn-small">
                           {S.users.detail}
                         </Link>
@@ -365,6 +365,7 @@ export default function UsersPage() {
             )}
           </>
         ))}
+      </Split>
     </section>
   )
 }
