@@ -479,3 +479,5 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - `AccountPage`: `todoList()` suy ra việc cần làm từ danh sách đơn (`hasMessage` + trạng thái còn sửa được, `pending_payment`, đơn đang làm/giao) và giỏ hàng; `OrdersPanel` lọc client theo nhóm trạng thái (`ORDER_GROUPS`), chi tiết lấy từ chính danh sách (API `/orders` đã trả đủ mặt hàng, người nhận, tổng), nên không gọi thêm. `SecurityCard` gọi `POST /auth/change-password` (server thu hồi mọi phiên, nên gọi `logout()` rồi về `/login`). `MessagesCard` chỉ dùng cờ `hasMessage`; trạng thái soạn/đã mở từng lời chúc chưa có trong danh sách đơn (cần mở rộng API nếu muốn hiện ở đây).
 - Tab `gallery` giữ khoá URL `?tab=gallery` (liên kết cũ vẫn dùng được), chỉ đổi nhãn.
 
+- (2026-10-27) Carousel tự chạy mỗi **2 giây** (`Carousel.jsx`, PO yêu cầu); phòng tranh Đông Hồ giữ 4,5 giây. Sửa lỗi layout thẻ sản phẩm: `.product-body` căn `stretch` (kiểu editorial trước đó để `flex-start` làm đường kẻ và chân thẻ co theo nội dung), chân thẻ (giá + nút) luôn ở đáy và dàn hết chiều rộng.
+

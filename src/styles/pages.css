@@ -8032,3 +8032,37 @@ h1 {
     border-top: 1px solid var(--dash-line);
   }
 }
+
+/* Sửa lỗi layout thẻ sản phẩm trong carousel: thân thẻ dàn hết chiều rộng, chân thẻ (giá + nút) luôn nằm đáy và thẳng hàng */
+.product-card {
+  height: 100%;
+}
+
+.product-body {
+  align-items: stretch;
+  flex: 1;
+}
+
+.product-body h3,
+.product-body .product-desc {
+  text-align: left;
+}
+
+.product-foot {
+  width: 100%;
+  margin-top: auto;
+  gap: 12px;
+}
+
+.product-foot .price-block,
+.product-foot > :first-child {
+  min-width: 0;
+}
+
+.is-carousel > .product-card {
+  align-self: stretch;
+}
+
+.is-carousel {
+  align-items: stretch;
+}
