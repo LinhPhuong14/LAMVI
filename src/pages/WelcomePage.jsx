@@ -7,6 +7,8 @@ import { useHydratedReducedMotion } from '../lib/hydration.js'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import Seo from '../seo/Seo.jsx'
 import MayAvatar from '../may/MayAvatar.jsx'
+import { Diem, DrumWatermark } from '../components/Folk.jsx'
+import { FOLK_ART, folkSrc } from '../data/folkArt.js'
 
 // Trang thông điệp để in QR dán lên đèn cho các đơn không kèm lời chúc (D-126).
 // Trải nghiệm kiểu "story": các cảnh tự chạy nối nhau (giới thiệu, hai video làng nghề, năm đèn, Mây, kết),
@@ -16,6 +18,15 @@ const SLIDE_MS = 5500
 const INTRO_MS = 7000
 const MAY_MS = 9000
 const VIDEO_MAX_MS = 20000
+const TALE_MS = 9500
+// Bốn đoạn kể xen giữa các video: mỗi đoạn một tranh dân gian (tư liệu công cộng) và ba câu kể hiện lần lượt (D-132).
+const TALES = [
+  { art: 'van-tu-giay-do-1904', chapter: 1, tilt: -1.5 },
+  { art: 'vinh-hoa', chapter: 2, tilt: 1.5 },
+  { art: 'ca-chep', chapter: 2, tilt: -1 },
+  { art: 'ong-to-ba-nguyet', chapter: 3, tilt: 1 },
+]
+const tale = (i) => ({ type: 'tale', ...TALES[i], n: i, ms: TALE_MS })
 
 function useScenes(t, products) {
   return useMemo(() => {
@@ -26,14 +37,19 @@ function useScenes(t, products) {
       name: products[i]?.name ?? names[i],
       text: products[i]?.description ?? '',
       ms: SLIDE_MS,
+      chapter: 3,
     }))
     return [
-      { type: 'intro', ms: INTRO_MS },
-      { type: 'video', film: CRAFT_FILMS.paper, kicker: t('welcome.paperKicker'), title: t('films.paperTitle'), text: t('films.paperNote') },
-      { type: 'video', film: CRAFT_FILMS.dongho, kicker: t('welcome.dongKicker'), title: t('artisan.videoTitle'), text: t('artisan.videoCaption') },
+      { type: 'intro', ms: INTRO_MS, chapter: 0 },
+      tale(0),
+      { type: 'video', film: CRAFT_FILMS.paper, chapter: 1, kicker: t('welcome.paperKicker'), title: t('films.paperTitle'), text: t('films.paperNote') },
+      tale(1),
+      { type: 'video', film: CRAFT_FILMS.dongho, chapter: 2, kicker: t('welcome.dongKicker'), title: t('artisan.videoTitle'), text: t('artisan.videoCaption') },
+      tale(2),
+      tale(3),
       ...lamps,
-      { type: 'may', ms: MAY_MS },
-      { type: 'end', ms: 0 },
+      { type: 'may', ms: MAY_MS, chapter: 4 },
+      { type: 'end', ms: 0, chapter: 5 },
     ]
   }, [t, products])
 }
@@ -102,6 +118,45 @@ function useLandscape() {
 }
 
 
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI']
+
+// Đầu mỗi chương: ấn vuông đóng xuống (số La Mã) cạnh tên chương, như dấu ấn trên tranh dân gian.
+function Chapter({ n, t, extra }) {
+  return (
+    <p className="welcome-chapter">
+      <span className="welcome-seal" aria-hidden="true">{ROMAN[n]}</span>
+      <span className="welcome-chapter-name">{t('welcome.chapters')[n]}</span>
+      {extra && <span className="welcome-chapter-extra">{extra}</span>}
+    </p>
+  )
+}
+
+// Tranh dân gian đóng khung: viền diềm, ghi nguồn bên dưới (ảnh tư liệu phạm vi công cộng).
+function Print({ id, t, tilt = 0, drift = false }) {
+  const w = FOLK_ART.find((a) => a.id === id).widths
+  const big = w[w.length - 1]
+  const small = w[0]
+  return (
+    <figure className={`welcome-print${drift ? ' is-drift' : ''}`} style={{ '--tilt': `${tilt}deg` }}>
+      <div className="welcome-print-mat">
+        <img src={folkSrc(id, big)} srcSet={small === big ? undefined : `${folkSrc(id, small)} ${small}w, ${folkSrc(id, big)} ${big}w`} sizes="(max-width: 700px) 80vw, 480px" alt={t(`gallery.items.${id}.alt`)} />
+      </div>
+      <figcaption>{t(`gallery.items.${id}.name`)}</figcaption>
+    </figure>
+  )
+}
+
+// Lớp nền dân gian chung của mọi cảnh: trống đồng xoay chậm phía sau, hai đường diềm trên và dưới.
+function FolkBackdrop({ side }) {
+  return (
+    <>
+      <DrumWatermark side={side} className="welcome-drum" />
+      <Diem tone="dark" className="welcome-diem" />
+      <Diem tone="dark" className="welcome-diem is-bottom" />
+    </>
+  )
+}
+
 // Một cảnh. Cảnh vừa rời được giữ thêm ~0,8 giây ở lớp dưới và mờ dần trong khi cảnh mới hiện lên (chuyển cảnh liền mạch).
 function SceneView({ scene, t, path, paused, muted, leaving, onProgress, onNext, onReplay, onMay }) {
   return (
@@ -112,14 +167,29 @@ function SceneView({ scene, t, path, paused, muted, leaving, onProgress, onNext,
     >
       {scene.type === 'intro' && (
       <>
-        <img className="welcome-bg blur" src="/images/lamps/tu-linh.jpg" alt="" />
-        <div className="welcome-frame is-cover">
-          <img className="kenburns" src="/images/lamps/tu-linh.jpg" alt="" />
-        </div>
+        <FolkBackdrop side="right" />
+        <Print id="chuot-ruoc-den" t={t} tilt={-1.5} />
         <div className="welcome-copy">
-          <p className="welcome-kicker">{t('welcome.introKicker')}</p>
+          <Chapter n={scene.chapter} t={t} extra={t('welcome.introKicker')} />
           <h1>{t('welcome.introTitle')}</h1>
           <p className="welcome-text">{t('welcome.introText')}</p>
+        </div>
+      </>
+    )}
+
+    {scene.type === 'tale' && (
+      <>
+        <FolkBackdrop side={scene.n % 2 ? 'left' : 'right'} />
+        <Print id={scene.art} t={t} tilt={scene.tilt} drift />
+        <div className="welcome-copy">
+          <Chapter n={scene.chapter} t={t} extra={t('welcome.tales')[scene.n].title} />
+          <ol className="welcome-lines">
+            {t('welcome.tales')[scene.n].lines.map((line, i) => (
+              <li key={line} style={{ animationDelay: `${0.7 + i * 2.2}s` }}>
+                {line}
+              </li>
+            ))}
+          </ol>
         </div>
       </>
     )}
@@ -127,8 +197,9 @@ function SceneView({ scene, t, path, paused, muted, leaving, onProgress, onNext,
     {scene.type === 'video' && (
       <>
         <img className="welcome-bg blur" src={scene.film.poster} alt="" />
+        <FolkBackdrop side={scene.chapter === 1 ? 'left' : 'right'} />
         <div className="welcome-copy">
-          <p className="welcome-kicker">{scene.kicker}</p>
+          <Chapter n={scene.chapter} t={t} extra={scene.kicker} />
           <h2>{scene.title}</h2>
         </div>
         <div className="welcome-frame">
@@ -141,11 +212,13 @@ function SceneView({ scene, t, path, paused, muted, leaving, onProgress, onNext,
     {scene.type === 'lamp' && (
       <>
         <img className="welcome-bg blur" src={`/images/lamps/${scene.slug}.jpg`} alt="" />
+        <FolkBackdrop side={LAMPS.indexOf(scene.slug) % 2 ? 'left' : 'right'} />
         <div className="welcome-lamp">
+          <span className="welcome-hang" aria-hidden="true" />
           <img src={`/images/lamps/${scene.slug}-cutout.webp`} alt={scene.name} />
         </div>
         <div className="welcome-copy">
-          <p className="welcome-kicker">{`${LAMPS.indexOf(scene.slug) + 1} / ${LAMPS.length} · ${t('welcome.lampsKicker')}`}</p>
+          <Chapter n={scene.chapter} t={t} extra={`${LAMPS.indexOf(scene.slug) + 1} / ${LAMPS.length}`} />
           <h2>{scene.name}</h2>
           {scene.text && <p className="welcome-text">{scene.text}</p>}
         </div>
@@ -154,11 +227,12 @@ function SceneView({ scene, t, path, paused, muted, leaving, onProgress, onNext,
 
     {scene.type === 'may' && (
       <>
+        <FolkBackdrop side="right" />
         <div className="welcome-may" aria-hidden="true">
           <MayAvatar pose="welcome" size={150} />
         </div>
         <div className="welcome-copy">
-          <p className="welcome-kicker">{t('welcome.mayKicker')}</p>
+          <Chapter n={scene.chapter} t={t} extra={t('welcome.mayKicker')} />
           <h2>{t('welcome.mayTitle')}</h2>
           <p className="welcome-text">{t('welcome.mayText')}</p>
           <ul className="welcome-chips">
@@ -177,11 +251,10 @@ function SceneView({ scene, t, path, paused, muted, leaving, onProgress, onNext,
 
     {scene.type === 'end' && (
       <>
-        <img className="welcome-bg blur" src="/images/lamps/tu-linh.jpg" alt="" />
-        <div className="welcome-frame is-cover">
-          <img className="kenburns" src="/images/lamps/tu-linh.jpg" alt="" />
-        </div>
+        <FolkBackdrop side="left" />
+        <Print id="dam-cuoi-chuot" t={t} tilt={1.5} />
         <div className="welcome-copy">
+          <Chapter n={scene.chapter} t={t} />
           <h2>{t('welcome.endTitle')}</h2>
           <p className="welcome-text">{t('welcome.endText')}</p>
           <div className="welcome-actions" onPointerDown={(e) => e.stopPropagation()}>

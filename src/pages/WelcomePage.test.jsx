@@ -57,13 +57,13 @@ afterEach(() => {
 })
 
 describe('WelcomePage', () => {
-  it('dựng ở <body> với vùng carousel có nhãn, noindex, 10 thanh tiến độ và cảnh giới thiệu', async () => {
+  it('dựng ở <body> với vùng carousel có nhãn, noindex, 14 thanh tiến độ và cảnh giới thiệu', async () => {
     await open()
     const region = screen.getByRole('region', { name: W.label })
     expect(region.parentElement).toBe(document.body)
     expect(kind()).toBe('scene-intro')
     expect(screen.getByRole('heading', { level: 1, name: W.introTitle })).toBeInTheDocument()
-    expect(document.querySelectorAll('.welcome-bars li')).toHaveLength(10)
+    expect(document.querySelectorAll('.welcome-bars li')).toHaveLength(14)
     expect(document.querySelector('.welcome-bars li.is-now')).toBe(document.querySelectorAll('.welcome-bars li')[0])
     expect(document.querySelector('meta[name=robots][content*=noindex]')).not.toBeNull()
   })
@@ -81,7 +81,7 @@ describe('WelcomePage', () => {
     await advance(6900)
     expect(kind()).toBe('scene-intro')
     await advance(200)
-    expect(kind()).toBe('scene-video')
+    expect(kind()).toBe('scene-tale')
     const old = document.querySelector('.welcome-scene.is-leaving')
     expect(old).toHaveClass('scene-intro')
     expect(old).toHaveAttribute('aria-hidden', 'true')
@@ -92,7 +92,7 @@ describe('WelcomePage', () => {
 
   it('cảnh video không tự chuyển bằng đồng hồ: chỉ khi video kết thúc; rồi tới video thứ hai', async () => {
     await open()
-    await goTo(1)
+    await goTo(2)
     expect(kind()).toBe('scene-video')
     const v1 = scene().querySelector('video.welcome-video')
     expect(v1).toHaveAttribute('aria-label', viMsg.films.paperTitle)
@@ -101,29 +101,32 @@ describe('WelcomePage', () => {
     expect(scene().querySelector('video.welcome-video')).toBe(v1)
     fireEvent.ended(v1)
     await settle(5)
+    expect(kind()).toBe('scene-tale')
+    await goTo(1)
     const v2 = scene().querySelector('video.welcome-video')
     expect(v2).not.toBe(v1)
     expect(v2).toHaveAttribute('aria-label', viMsg.artisan.videoTitle)
     fireEvent.ended(v2)
     await settle(5)
+    expect(kind()).toBe('scene-tale')
+    await goTo(2)
     expect(kind()).toBe('scene-lamp')
   })
 
   it('video chạy quá 20 giây thì tự sang cảnh kế', async () => {
     await open()
-    await goTo(1)
+    await goTo(2)
     const v = scene().querySelector('video.welcome-video')
     Object.defineProperty(v, 'duration', { value: 60, configurable: true })
     Object.defineProperty(v, 'currentTime', { value: 20.5, configurable: true })
     fireEvent.timeUpdate(v)
     await settle(5)
-    expect(scene().querySelector('video.welcome-video')).not.toBe(v)
-    expect(scene().querySelector('video.welcome-video')).toHaveAttribute('aria-label', viMsg.artisan.videoTitle)
+    expect(kind()).toBe('scene-tale')
   })
 
   it('năm đèn theo pieceOrder, 5,5 giây mỗi đèn, dùng tên và mô tả từ /products', async () => {
     await open()
-    await goTo(3)
+    await goTo(7)
     for (let i = 0; i < 5; i++) {
       expect(kind()).toBe('scene-lamp')
       expect(scene().querySelector('h2')).toHaveTextContent(names[i])
@@ -146,7 +149,7 @@ describe('WelcomePage', () => {
     await advance(3900)
     expect(kind()).toBe('scene-intro')
     await advance(600)
-    expect(kind()).toBe('scene-video')
+    expect(kind()).toBe('scene-tale')
   })
 
   it('nút tạm dừng đổi nhãn và chặn tự chuyển', async () => {
@@ -160,14 +163,14 @@ describe('WelcomePage', () => {
     fireEvent.click(btn)
     expect(btn).toHaveAttribute('aria-label', W.pause)
     await advance(7100)
-    expect(kind()).toBe('scene-video')
+    expect(kind()).toBe('scene-tale')
   })
 
   it('phím mũi tên phải/trái chuyển cảnh, Space tạm dừng', async () => {
     await open()
     fireEvent.keyDown(window, { key: 'ArrowRight' })
     await settle(5)
-    expect(kind()).toBe('scene-video')
+    expect(kind()).toBe('scene-tale')
     fireEvent.keyDown(window, { key: 'ArrowLeft' })
     await settle(5)
     expect(kind()).toBe('scene-intro')
@@ -181,7 +184,7 @@ describe('WelcomePage', () => {
     await open()
     fireEvent.click(zone('next'))
     await settle(5)
-    expect(kind()).toBe('scene-video')
+    expect(kind()).toBe('scene-tale')
     expect(document.querySelectorAll('.welcome-bars li')[1]).toHaveClass('is-now')
     expect(zone('prev')).toBeEnabled()
     fireEvent.click(zone('prev'))
@@ -193,21 +196,21 @@ describe('WelcomePage', () => {
     await open()
     const soundOn = () => tools().querySelector(`button[aria-label="${W.soundOn}"]`)
     expect(soundOn()).toBeNull()
-    await goTo(1)
+    await goTo(2)
     expect(soundOn()).not.toBeNull()
     fireEvent.click(soundOn())
     expect(tools().querySelector(`button[aria-label="${W.soundOff}"]`)).not.toBeNull()
-    await goTo(1)
+    await goTo(2)
     expect(kind()).toBe('scene-video')
     expect(tools().querySelector(`button[aria-label="${W.soundOff}"]`)).not.toBeNull()
     await goTo(1)
-    expect(kind()).toBe('scene-lamp')
+    expect(kind()).toBe('scene-tale')
     expect(tools().querySelector(`button[aria-label="${W.soundOff}"]`)).toBeNull()
   })
 
   it('cảnh Mây (9 giây): bấm nút gửi sự kiện lamvi:may-open', async () => {
     await open()
-    await goTo(8)
+    await goTo(12)
     expect(kind()).toBe('scene-may')
     const onOpen = vi.fn()
     window.addEventListener('lamvi:may-open', onOpen)
@@ -220,7 +223,7 @@ describe('WelcomePage', () => {
 
   it('cảnh cuối không tự chuyển; có Xem bộ sưu tập, Liên hệ; Xem lại về cảnh đầu', async () => {
     await open()
-    await goTo(9)
+    await goTo(13)
     expect(kind()).toBe('scene-end')
     await advance(120000)
     expect(kind()).toBe('scene-end')
@@ -269,7 +272,7 @@ describe('WelcomePage', () => {
   it('/en/welcome dùng chuỗi tiếng Anh và link /en/shop', async () => {
     await open('/en/welcome')
     expect(screen.getByRole('region', { name: enMsg.welcome.label })).toBeInTheDocument()
-    await goTo(9)
+    await goTo(13)
     expect(screen.getByRole('link', { name: enMsg.welcome.endShop })).toHaveAttribute('href', '/en/shop')
   })
 })
@@ -294,9 +297,64 @@ describe('route /welcome', () => {
 
   it('May.jsx mở khung chat khi nhận sự kiện lamvi:may-open', async () => {
     await open()
-    await goTo(8)
+    await goTo(12)
     fireEvent.click(screen.getByRole('button', { name: W.mayAsk }))
     await settle()
     expect(document.querySelector('.may-panel, .may-chat, [role=dialog]')).not.toBeNull()
+  })
+
+  describe('hướng dân gian (D-132)', () => {
+    const chapter = () => scene().querySelector('.welcome-chapter')
+
+    it('mỗi cảnh có ấn số La Mã + tên chương theo đúng mạch truyện', async () => {
+      await open()
+      const seals = ['I', 'II', 'II', 'III', 'III', 'III', 'IV', 'IV', 'IV', 'IV', 'IV', 'IV', 'V', 'VI']
+      for (let n = 0; n < seals.length; n++) {
+        expect(chapter().querySelector('.welcome-seal').textContent).toBe(seals[n])
+        if (n < seals.length - 1) await goTo(1)
+      }
+    })
+
+    it('bốn đoạn kể có tranh dân gian, ba câu kể hiện lần lượt, caption và alt đúng nguồn', async () => {
+      await open()
+      const order = []
+      for (let n = 0; n < 14; n++) {
+        if (kind() === 'scene-tale') {
+          expect(scene().querySelectorAll('.welcome-lines li')).toHaveLength(3)
+          const delays = [...scene().querySelectorAll('.welcome-lines li')].map((li) => parseFloat(li.style.animationDelay))
+          expect(delays[0]).toBeLessThan(delays[1])
+          expect(delays[1]).toBeLessThan(delays[2])
+          order.push(scene().querySelector('figure.welcome-print img').getAttribute('src').split('/').pop().replace(/-\d+\.webp$/, ''))
+        }
+        if (n < 13) await goTo(1)
+      }
+      expect(order).toEqual(['van-tu-giay-do-1904', 'vinh-hoa', 'ca-chep', 'ong-to-ba-nguyet'])
+    })
+
+    it('cảnh mở đầu và kết dùng tranh Đông Hồ đóng khung có chú thích, không dùng ảnh cover', async () => {
+      await open()
+      const fig = scene().querySelector('figure.welcome-print')
+      expect(fig.querySelector('img').getAttribute('src')).toContain('/images/folk/chuot-ruoc-den-')
+      expect(fig.querySelector('figcaption').textContent).toBe(viMsg.gallery.items['chuot-ruoc-den'].name)
+      expect(scene().innerHTML).not.toContain('brand/cover')
+      await goTo(13)
+      expect(kind()).toBe('scene-end')
+      expect(scene().querySelector('figure.welcome-print img').getAttribute('src')).toContain('dam-cuoi-chuot')
+    })
+
+    it('mọi cảnh có trống đồng và hai đường diềm, đều aria-hidden', async () => {
+      await open()
+      for (let n = 0; n < 14; n++) {
+        const drum = scene().querySelector('.drum-watermark')
+        expect(drum.getAttribute('aria-hidden')).toBe('true')
+        expect(scene().querySelectorAll('.welcome-diem[aria-hidden="true"]')).toHaveLength(2)
+        await goTo(1)
+      }
+    })
+
+    it('ba ngôn ngữ đều có đủ 6 tên chương', () => {
+      expect(viMsg.welcome.chapters).toHaveLength(6)
+      expect(enMsg.welcome.chapters).toHaveLength(6)
+    })
   })
 })

@@ -826,3 +826,10 @@ Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE
 - Trả lời Q-35. Trước go-live: G-17, G-18, G-20.
 
 **Tạm tắt payOS (fix)** — function crash trên Vercel; payOS giờ tắt mặc định, bật bằng `PAYOS_ENABLED=1`. Cập nhật `.env.example`, `deploy-vercel.md`. lint/test/build xanh.
+
+## 2026-11-02 — /welcome dạng truyện kể dân gian (D-132)
+
+**Đã làm**: làm lại `/welcome` theo hướng dân gian (chương + ấn đóng, tranh Đông Hồ đóng khung, trống đồng xoay, hai đường diềm) rồi thêm bốn đoạn kể (giấy dó, ván khắc và màu, lời chúc trong tranh, thắp đèn) xen giữa các video; 14 cảnh. Tra cứu nguồn công khai về giấy điệp, ván gỗ thị, màu tự nhiên. i18n vi/en/zh (`welcome.chapters`, `welcome.tales`). Test: `WelcomePage.test.jsx` cập nhật, `WelcomePage.folk.test.jsx` (subagent kiểm thử độc lập).
+
+**Còn lại / cần người dùng**: Marketing/BA duyệt lời kể ba ngôn ngữ; tư liệu kiểm chứng cho làng giấy dó; G-120 (QR, tem, đo lượt quét); bản video mobile nhẹ.
+

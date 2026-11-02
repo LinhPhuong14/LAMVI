@@ -8591,3 +8591,286 @@ h1 {
 .faq-cloud.cloud-r { bottom: 8%; right: -2%; animation-delay: -6s; transform: scaleX(-1); }
 @media (max-width: 900px) { .faq-cloud { display: none; } }
 @media (prefers-reduced-motion: reduce) { .faq-cloud { animation: none; } }
+
+/* ===== /welcome theo hướng dân gian (D-132): chương, ấn đóng, tranh đóng khung, trống đồng ===== */
+.welcome-drum {
+  z-index: 1;
+  opacity: 0.14;
+}
+
+.welcome-diem {
+  z-index: 3;
+  opacity: 0.55;
+}
+
+.welcome-diem.is-bottom {
+  top: auto;
+  bottom: 0;
+  transform: scaleY(-1);
+}
+
+.welcome-chapter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0;
+  color: var(--hoe-light);
+}
+
+.welcome-seal {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 6px;
+  border: 1.5px solid var(--hoe);
+  border-radius: 3px;
+  background: var(--son);
+  color: var(--diep-light);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  transform-origin: 50% 60%;
+  animation: welcome-stamp 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) 0.25s both;
+}
+
+@keyframes welcome-stamp {
+  0% { opacity: 0; transform: scale(1.9) rotate(-9deg); }
+  60% { opacity: 1; transform: scale(0.94) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-2deg); }
+}
+
+.welcome-chapter-name {
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.welcome-chapter-extra {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 232, 207, 0.62);
+}
+
+.welcome-chapter-extra::before {
+  content: '·';
+  margin-right: 14px;
+}
+
+/* Tranh đóng khung giấy dó, viền nâu và lề kẹp */
+.welcome-print {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  justify-self: center;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  width: min(calc(100% - 48px), 520px, calc((100dvh - 360px) * 1.38));
+  --tilt: 0deg;
+  rotate: var(--tilt);
+  animation: welcome-up 0.9s var(--ease-out) 0.2s both;
+}
+
+.welcome-print-mat {
+  padding: 12px;
+  border: 2px solid var(--hoe);
+  background: var(--diep);
+  box-shadow: 0 0 0 5px var(--cham-deep), 0 0 0 6px var(--hoe), 0 28px 50px -24px rgba(0, 0, 0, 0.75);
+}
+
+.welcome-print img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.welcome-print figcaption {
+  text-align: center;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 232, 207, 0.6);
+}
+
+/* Đèn treo: sợi dây rủ từ mép trên xuống đỉnh đèn */
+.welcome-hang {
+  position: absolute;
+  top: -90px;
+  left: 50%;
+  width: 1px;
+  height: 96px;
+  background: var(--hoe);
+  opacity: 0.8;
+}
+
+/* Màn rộng: cảnh mở đầu và kết chia hai cột (chữ trái, tranh phải) để không bị cắt chữ */
+@media (min-width: 900px) and (min-aspect-ratio: 4/3) and (min-height: 521px) {
+  .scene-intro,
+  .scene-end {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-rows: 1fr;
+    align-items: center;
+    padding-top: 0;
+  }
+
+  .scene-intro .welcome-copy,
+  .scene-end .welcome-copy {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    padding: 0 0 0 clamp(40px, 7vw, 110px);
+  }
+
+  .scene-intro .welcome-print,
+  .scene-end .welcome-print {
+    grid-column: 2;
+    grid-row: 1;
+    width: min(88%, 520px, calc((100dvh - 200px) * 1.38));
+  }
+}
+
+/* Điện thoại dựng đứng: chừa chỗ cho lời nhắc xoay ngang ở trên tranh */
+@media (orientation: portrait) and (max-width: 700px) and (pointer: coarse) {
+  .scene-intro,
+  .scene-end { padding-top: 160px; }
+  .welcome-print { width: min(calc(100% - 48px), calc((100dvh - 560px) * 1.38)); }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .welcome-print { width: min(88%, calc((100dvh - 130px) * 1.38)); margin-top: 24px; }
+  .welcome-diem { opacity: 0.4; }
+  .welcome-seal { min-width: 26px; height: 26px; font-size: 0.8rem; }
+  .welcome-chapter-extra { display: none; }
+  .scene-may .welcome-copy { gap: 8px; }
+  .scene-may .welcome-chips { gap: 6px; }
+  .scene-may .welcome-chips li { padding: 5px 12px; font-size: 0.8rem; }
+  .scene-may .welcome-text { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-seal, .welcome-print { animation: none; }
+}
+
+/* Đoạn kể: tranh trôi chậm (Ken Burns) trong khung, ba câu kể hiện lần lượt như đọc truyện */
+.welcome-print.is-drift .welcome-print-mat {
+  overflow: hidden;
+}
+
+.welcome-print.is-drift img {
+  animation: welcome-drift 12s ease-out both;
+}
+
+@keyframes welcome-drift {
+  from { transform: scale(1); }
+  to { transform: scale(1.12) translate(-1.5%, -1%); }
+}
+
+.welcome-lines {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 34ch;
+}
+
+.welcome-lines li {
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 3.2vh, 1.75rem);
+  line-height: 1.4;
+  color: var(--diep-light);
+  opacity: 0;
+  animation: welcome-line 1.1s var(--ease-out) forwards;
+}
+
+.welcome-lines li:last-child {
+  color: var(--hoe-light);
+}
+
+@keyframes welcome-line {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+.scene-tale {
+  grid-template-rows: 1fr auto;
+  padding-top: 84px;
+}
+
+.scene-tale .welcome-copy {
+  align-self: start;
+  padding-top: 20px;
+}
+
+@media (min-width: 900px) and (min-aspect-ratio: 4/3) and (min-height: 521px) {
+  .scene-tale {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-rows: 1fr;
+    align-items: center;
+    padding-top: 0;
+  }
+
+  .scene-tale .welcome-copy {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    padding: 0 0 0 clamp(40px, 7vw, 110px);
+  }
+
+  .scene-tale .welcome-print {
+    grid-column: 2;
+    grid-row: 1;
+    width: min(70%, 420px, calc((100dvh - 200px) * 1.1));
+  }
+
+}
+
+@media (orientation: portrait) and (max-width: 700px) and (pointer: coarse) {
+  .scene-tale { padding-top: 160px; }
+  .scene-tale .welcome-print { width: min(calc(100% - 96px), calc((100dvh - 600px) * 1.1)); }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .scene-tale {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-rows: 1fr;
+    align-items: center;
+    padding-top: 40px;
+  }
+  .scene-tale .welcome-copy { grid-column: 1; grid-row: 1; align-self: center; padding: 0 0 0 clamp(20px, 5vw, 56px); }
+  .scene-tale .welcome-print { grid-column: 2; grid-row: 1; width: min(60%, calc((100dvh - 130px) * 1.0)); }
+  .welcome-lines { gap: 8px; }
+  .welcome-lines li { font-size: 1.05rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-lines li { opacity: 1; animation: none; }
+  .welcome-print.is-drift img { animation: none; }
+}
+
+/* Cảnh kể: ảnh tranh đứng giới hạn theo chiều cao màn hình để câu kể không bị đẩy ra ngoài */
+.scene-tale .welcome-print {
+  width: fit-content;
+  max-width: calc(100% - 48px);
+}
+
+.scene-tale .welcome-print img {
+  width: auto;
+  max-width: 100%;
+  max-height: calc(100dvh - 230px);
+  margin: 0 auto;
+}
+
+@media (orientation: portrait) and (max-width: 700px) {
+  .scene-tale { padding-top: 150px; }
+  .scene-tale .welcome-print img { max-height: 27dvh; }
+  .welcome-lines { gap: 8px; }
+  .welcome-lines li { font-size: 1.15rem; line-height: 1.3; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .scene-tale .welcome-print { width: fit-content; max-width: 90%; }
+  .scene-tale .welcome-print img { max-height: calc(100dvh - 130px); }
+}
