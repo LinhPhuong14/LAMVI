@@ -501,3 +501,9 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - Quy tắc để không thành "AI slop" trở lại: mỗi họa tiết có nguồn gốc văn hoá rõ (trống đồng Đông Sơn, diềm tranh Đông Hồ, mái đình, lạc khoản và ấn trên tranh), dùng đúng chỗ (nền khối tối, ranh giới giữa các mục, dấu mốc) và chỉ bằng màu thương hiệu; không dùng quầng sáng, kính mờ, gradient trang trí. Đèn lồng giữ màu minh hoạ gốc.
 - Hoành phi (`Marquee`) quay lại giữa hero và `#story`; hai mép là diềm. Ảnh nền phong cảnh/khói/đèn trời (`Scene`) vẫn tắt (T-93).
 
+### T-102 — /welcome dạng truyện kể dân gian (2026-11-02)
+
+- D-132. `WelcomePage.jsx`: `Chapter` (ấn La Mã + tên chương, ấn đóng bằng CSS `welcome-stamp`), `Print` (tranh trong `FOLK_ART`, khung giấy dó viền caramel, chọn bản rộng nhất có sẵn), `FolkBackdrop` (`DrumWatermark` + hai `Diem`). Cảnh `tale` mới: `TALES` (4 đoạn, mỗi đoạn tranh + chương) và `welcome.tales` ở i18n (ba câu, hiện lần lượt bằng `animation-delay` 0,7s + 2,2s mỗi câu). 14 cảnh, mỗi đoạn kể 9,5 giây.
+- Bố cục: màn rộng chia hai cột (chữ trái, tranh phải); điện thoại dọc chừa chỗ cho lời nhắc xoay ngang; xoay ngang thu gọn (ẩn dòng phụ chương, giảm cỡ chữ). Chiều cao ảnh tranh đứng giới hạn theo `dvh` để câu kể không bị đẩy ra ngoài.
+- Giảm chuyển động tắt ấn đóng, tranh trôi và hiệu ứng hiện câu (câu hiện sẵn). Màu chỉ dùng token thương hiệu; `--tilt` khai báo mặc định trong CSS (test kiểm biến CSS).
+

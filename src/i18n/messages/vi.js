@@ -184,6 +184,13 @@ export default {
     rotate: 'Xoay ngang điện thoại để xem trọn vẹn',
     landscape: 'Toàn màn hình ngang',
     exitFull: 'Thoát toàn màn hình',
+    tales: [
+      { title: 'Một tờ giấy từ vỏ cây', lines: ['Mọi chuyện bắt đầu từ vỏ một cây dó.', 'Người thợ bóc vỏ, ngâm, giã, rồi vớt từng tờ mỏng trong bể bột.', 'Tờ giấy nhẹ như hơi thở, nhưng giữ được màu thời gian.'] },
+      { title: 'Ván khắc và sắc màu', lines: ['Ở làng Đông Hồ, mỗi bức tranh được in từ những tấm ván gỗ khắc tay.', 'Mỗi màu một ván, in lên giấy điệp óng ánh bột vỏ sò.', 'Đen từ than tre, vàng từ hoa hòe, đỏ từ sỏi son, xanh từ lá chàm.'] },
+      { title: 'Lời chúc trong tranh', lines: ['Con cá chép chúc thi đỗ, đàn lợn chúc con cháu đầy đàn.', 'Mỗi nét vẽ là một lời cầu mong bình an và no ấm.', 'Người xưa không gửi thiệp, họ treo một bức tranh.'] },
+      { title: 'Rồi người ta thắp đèn', lines: ['LAMVI đưa những lời chúc ấy lên thân đèn giấy dó.', 'Khi ánh sáng bật lên, bức tranh như tỉnh dậy.', 'Đây là năm chiếc đèn của bộ sưu tập đầu tiên.'] },
+    ],
+    chapters: ['Khai đèn', 'Giấy dó', 'Tranh Đông Hồ', 'Năm chiếc đèn', 'Hỏi Mây', 'Lời cảm ơn'],
     label: 'Thông điệp từ LAMVI',
     close: 'Về trang chủ',
     pause: 'Tạm dừng',

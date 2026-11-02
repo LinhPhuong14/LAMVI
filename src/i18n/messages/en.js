@@ -177,6 +177,13 @@ export default {
     rotate: 'Rotate your phone sideways for the full view',
     landscape: 'Landscape fullscreen',
     exitFull: 'Exit fullscreen',
+    tales: [
+      { title: 'A sheet from tree bark', lines: ['It all begins with the bark of a dó tree.', 'The maker strips, soaks and pounds it, then lifts each thin sheet from the vat.', 'The paper is light as breath, yet it keeps the colour of time.'] },
+      { title: 'Woodblocks and colour', lines: ['In Đông Hồ village, every print is made from hand-carved wooden blocks.', 'One block per colour, pressed onto paper dusted with ground seashell.', 'Black from bamboo charcoal, yellow from sophora flowers, red from ochre, blue from indigo leaves.'] },
+      { title: 'Wishes in the picture', lines: ['The carp wishes for exam success, the pigs for a house full of children.', 'Every line is a hope for peace and plenty.', 'People of old did not send cards. They hung a picture.'] },
+      { title: 'Then the lamp is lit', lines: ['LAMVI carries those wishes onto a dó paper lamp.', 'When the light comes on, the picture seems to wake.', 'These are the five lamps of our first collection.'] },
+    ],
+    chapters: ['Lighting up', 'Dó paper', 'Đông Hồ prints', 'Five lanterns', 'Ask Mây', 'Thank you'],
     label: 'A message from LAMVI',
     close: 'Back to home',
     pause: 'Pause',
