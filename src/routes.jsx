@@ -10,6 +10,7 @@ import NotFoundPage from './pages/NotFoundPage'
 const AccountPage = lazy(() => import('./pages/AccountPage'))
 import BatchPage from './pages/BatchPage'
 const GiftPage = lazy(() => import('./pages/GiftPage'))
+const WishRoomPage = lazy(() => import('./wishroom/WishRoomPage'))
 import PolicyPage from './pages/PolicyPage'
 import ContactPage from './pages/ContactPage'
 import CollectionPage from './pages/CollectionPage'
@@ -44,6 +45,8 @@ function localeChildren() {
       <Route path="products/:slug" element={<ProductPage />} />
       <Route path="lo/:code" element={<BatchPage />} />
       <Route path="qr/:token" element={<RouteLoader><GiftPage /></RouteLoader>} />
+      {/* Prototype "Phòng thư LAMVI" (xem docs/ba-spec.md §21.9) — dữ liệu mẫu cục bộ, chưa nối API QR thật */}
+      <Route path="phong-thu" element={<RouteLoader><WishRoomPage /></RouteLoader>} />
       <Route path="shop" element={<ShopPage />} />
       <Route path="welcome" element={<RouteLoader><WelcomePage /></RouteLoader>} />
       <Route path="privacy" element={<PolicyPage kind="privacy" />} />
