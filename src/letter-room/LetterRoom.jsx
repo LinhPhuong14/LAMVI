@@ -1,337 +1,237 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import "@fontsource/instrument-sans/400.css";
-import "@fontsource/instrument-sans/500.css";
-import "@fontsource/spectral/vietnamese-400.css";
-import "@fontsource/spectral/vietnamese-400-italic.css";
-import "@fontsource/caveat/400.css";
+import "@fontsource/itim/vietnamese-400.css";
+import "@fontsource/itim/latin-400.css";
 import {
   demos,
   occasions,
   initialState,
   roomReducer,
   validateLetter,
+  PHASE_TIMINGS,
+  shotForPhase,
 } from "./data";
+import OrientationGate from "./OrientationGate";
+import LetterReader from "./LetterReader";
 import "./room.css";
-
-function Dedication() {
+// The embedding API intentionally re-exports the shared validator.
+// oxlint-disable-next-line react/only-export-components
+export { validateLetter };
+export function Handwritten({ text, delay = 0 }) {
+  let index = 0;
   return (
-    <div className="lr-dedication">
-      <svg viewBox="0 0 310 85" role="img" aria-label="Gửi bạn,">
-        <g
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path
-            pathLength="1"
-            d="M53 28C75 3 14 8 18 48S65 69 62 40L39 43M82 34L75 55Q76 70 90 52L99 34L92 62Q96 67 104 54M83 21Q91 11 97 20Q102 26 94 27M116 34L107 63M118 23L119 24"
-          />
-          <path
-            pathLength="1"
-            d="M152 14L138 60Q157 30 169 39Q177 54 158 63Q144 69 143 56M179 47Q195 30 201 39L193 60Q195 67 204 57M196 40Q174 35 174 57Q176 68 190 57M185 75L187 76M216 41L208 64Q231 31 236 41L228 60Q230 67 240 56M255 60Q258 67 249 74"
-          />
-        </g>
-      </svg>
-    </div>
+    <span className="lr-ink">
+      <span className="lr-sr-only">{text}</span>
+      <span aria-hidden="true">
+        {Array.from(
+          new Intl.Segmenter("vi", { granularity: "grapheme" }).segment(text),
+          ({ segment }) => (
+            <span
+              className="lr-glyph"
+              key={index}
+              style={{ "--ink-delay": `${delay + index++ * 0.022}s` }}
+            >
+              {segment}
+            </span>
+          ),
+        )}
+      </span>
+    </span>
   );
 }
-function Surprise({ letter, onReveal }) {
-  const [open, setOpen] = useState(false),
-    [done, setDone] = useState(false),
-    [photo, setPhoto] = useState(0);
-  const d = letter.occasionData,
-    type = letter.occasion;
-  const labels = {
-    birthday: "Mở chiếc thiệp nhỏ",
-    anniversary: "Kéo kỷ niệm ra ánh sáng",
-    thankYou: "Lật góc thư",
-    milestone: "Đóng dấu cột mốc",
-    encouragement: "Mở khi cần",
-    longDistance: "Mở hai ô cửa",
-    justBecause: "Chạm vào vầng trăng",
-  };
-  const hasData = Boolean(
-    d.message || d.date || d.label || d.places || d.photos?.length,
+export default function LetterRoom({
+  letter: suppliedLetter,
+  onExit,
+  preview = false,
+  afterLetter,
+} = {}) {
+  const [params, setParams] = useSearchParams(),
+    key = Object.hasOwn(occasions, params.get("occasion"))
+      ? params.get("occasion")
+      : "birthday";
+  const letter = validateLetter(
+    suppliedLetter || {
+      ...demos[key],
+      ...(params.get("kind") === "video" ? { kind: "video" } : {}),
+      ...(params.get("empty") === "1"
+        ? { occasionData: {}, postscript: undefined }
+        : {}),
+    },
   );
-  if (!hasData && !letter.postscript) return null;
+  return (
+    <OrientationGate>
+      {(active) => (
+        <Room
+          key={`${key}-${letter.recipientName}-${letter.kind}-${params.get("fallback")}`}
+          active={active}
+          letter={letter}
+          fallback={params.get("fallback") === "1"}
+          onSelect={(occasion) => setParams({ occasion })}
+          onExit={onExit}
+          preview={preview || Boolean(suppliedLetter)}
+          afterLetter={afterLetter}
+          legacyAssets={params.get("assets") === "legacy"}
+        />
+      )}
+    </OrientationGate>
+  );
+}
+function Cue({
+  point,
+  label,
+  hint,
+  idle,
+  onClick,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  onPointerCancel,
+  onKeyDown,
+  icon = "·",
+  width,
+  height,
+  disabled,
+}) {
+  const x = Math.max(25, Math.min(width - 25, point.x)),
+    y = Math.max(25, Math.min(height - 25, point.y));
+  return (
+    <button
+      className={`lr-object-cue ${idle ? "show-label" : ""} ${x > width * 0.6 ? "label-left" : ""}`}
+      aria-label={label}
+      style={{ left: x, top: y }}
+      onClick={onClick}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
+      onLostPointerCapture={onPointerCancel}
+      onKeyDown={onKeyDown}
+      disabled={disabled}
+    >
+      <span className="lr-cue-dot" aria-hidden="true">
+        {icon}
+      </span>
+      <span className="lr-cue-label" aria-hidden="true">
+        {hint || label}
+      </span>
+    </button>
+  );
+}
+function FinalNote({ letter, point, width, height }) {
+  const d = letter.occasionData,
+    [photo, setPhoto] = useState(0);
   return (
     <section
-      className={`lr-surprise ${open ? "is-open" : ""}`}
-      aria-label="Bất ngờ dành cho bạn"
+      className="lr-final-note"
+      role="status"
+      style={{
+        left: Math.max(16, Math.min(width - 286, point.x - 135)),
+        top: Math.max(20, Math.min(height - 115, point.y + 35)),
+      }}
     >
-      {!open ? (
-        <button
-          className="lr-surprise-trigger"
-          onClick={() => {
-            setOpen(true);
-            onReveal();
-          }}
-        >
-          <span>{type === "justBecause" ? "☾" : "✧"}</span>
-          {hasData ? labels[type] : "Một lời tái bút"}
-          <span>↗</span>
-        </button>
-      ) : (
-        <div className={`lr-gift lr-${type}`}>
-          {type === "birthday" && hasData ? (
+      {letter.occasion === "anniversary" && (
+        <>
+          {d.photos?.length ? (
             <>
-              <p className="lr-hand">Ước một điều đi.</p>
-              <div className={`lr-cake ${done ? "blown" : ""}`}>
-                <button
-                  aria-label="Tắt nến"
-                  onClick={() => setDone(true)}
-                  disabled={done}
-                >
-                  <span className="lr-flame">♨</span>
-                  <span className="lr-candle" />
+              <img
+                src={d.photos[photo % d.photos.length]}
+                alt={`Kỷ niệm ${photo + 1}`}
+              />
+              {d.photos.length > 1 && (
+                <button onClick={() => setPhoto((p) => p + 1)}>
+                  Ảnh tiếp theo →
                 </button>
-                <div className="lr-cake-tier" />
-                <div className="lr-cake-base" />
-                {done && <span className="lr-smoke">〰</span>}
-              </div>
-              {!done ? (
-                <button className="lr-link" onClick={() => setDone(true)}>
-                  Chạm để tắt nến
-                </button>
-              ) : (
-                <p className="lr-ribbon">{d.message || letter.postscript}</p>
               )}
             </>
-          ) : type === "anniversary" && hasData ? (
-            <div
-              className="lr-polaroid"
-              onTouchStart={(e) => {
-                e.currentTarget.dataset.x = e.touches[0].clientX;
-              }}
-              onTouchEnd={(e) => {
-                if (
-                  Math.abs(
-                    e.changedTouches[0].clientX -
-                      Number(e.currentTarget.dataset.x),
-                  ) > 35
-                )
-                  setPhoto((p) => (p ? 0 : 1));
-              }}
-            >
-              {d.photos?.length ? (
-                <>
-                  <img
-                    src={d.photos[photo % d.photos.length]}
-                    alt={`Kỷ niệm ${photo + 1}`}
-                    onError={(e) => {
-                      e.currentTarget.hidden = true;
-                    }}
-                  />
-                  {d.photos.length > 1 && (
-                    <button onClick={() => setPhoto((p) => (p ? 0 : 1))}>
-                      Ảnh tiếp theo →
-                    </button>
-                  )}
-                </>
-              ) : (
-                <span className="lr-paper-flower">✳</span>
-              )}
-              <p className="lr-hand">{d.date}</p>
-              <p>{d.message}</p>
-            </div>
-          ) : type === "longDistance" && hasData ? (
-            <>
-              <div className="lr-windows">
-                {(d.places || ["Nơi bạn", "Nơi mình"])
-                  .slice(0, 2)
-                  .map((p, i) => (
-                    <div key={i}>
-                      <span>☾</span>
-                      <p>{p}</p>
-                    </div>
-                  ))}
-              </div>
-              <p>{d.message}</p>
-            </>
-          ) : (
-            <>
-              <div className="lr-surprise-symbol">
-                {type === "milestone"
-                  ? d.label
-                  : type === "justBecause"
-                    ? d.icon || "☾"
-                    : type === "thankYou"
-                      ? "↶"
-                      : "✧"}
-              </div>
-              {type === "thankYou" && (
-                <p className="lr-hand">Có một chuyện mình vẫn nhớ.</p>
-              )}
-              <p>{d.message || letter.postscript}</p>
-            </>
-          )}
-        </div>
+          ) : null}
+          <strong>{d.date}</strong>
+        </>
       )}
+      {letter.occasion === "milestone" && <strong>{d.label}</strong>}
+      {letter.occasion === "longDistance" && (
+        <strong>{d.places?.join(" • ")}</strong>
+      )}
+      <p>
+        {d.message ||
+          letter.postscript ||
+          "Một chút thương, dành riêng cho bạn."}
+      </p>
     </section>
   );
 }
-function Reader({ letter, onReveal, getPaperRect }) {
-  const [written, setWritten] = useState(false),
-    [playing, setPlaying] = useState(false),
-    [error, setError] = useState(false),
-    [ended, setEnded] = useState(false);
-  const ref = useRef(null);
-  useEffect(() => {
-    ref.current?.focus({ preventScroll: true });
-    if (
-      !matchMedia("(prefers-reduced-motion: reduce)").matches &&
-      ref.current?.animate
-    ) {
-      const origin = getPaperRect?.();
-      const bounds = ref.current.getBoundingClientRect();
-      if (origin)
-        ref.current.animate(
-          [
-            {
-              transform: `translate(${origin.left - bounds.left}px, ${origin.top - bounds.top}px) scale(${origin.width / bounds.width}, ${origin.height / bounds.height})`,
-              opacity: 0.7,
-            },
-            { transform: "translate(0, 0) scale(1, 1)", opacity: 1 },
-          ],
-          {
-            duration: 420,
-            easing: "cubic-bezier(.2,.7,.2,1)",
-            fill: "backwards",
-          },
-        );
-    }
-    const timer = setTimeout(
-      () => setWritten(true),
-      matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1350,
-    );
-    return () => clearTimeout(timer);
-  }, [getPaperRect]);
-  return (
-    <article
-      ref={ref}
-      tabIndex={-1}
-      className="lr-reader"
-      aria-label={`Lời chúc gửi ${letter.recipientName}`}
-    >
-      <div className="lr-letter-meta">
-        MỘT LÁ THƯ DÀNH RIÊNG CHO BẠN <span>✧</span>
-      </div>
-      <Dedication />
-      <p className="lr-recipient">{letter.recipientName} thân mến,</p>
-      <div
-        className={`lr-letter-content ${written ? "visible" : ""}`}
-        aria-hidden={!written}
-        inert={!written}
-      >
-        {letter.kind === "text" ? (
-          (Array.isArray(letter.message)
-            ? letter.message
-            : letter.message.split("\n\n")
-          ).map((p, i) => <p key={i}>{p}</p>)
-        ) : (
-          <div className="lr-video">
-            {!playing ? (
-              <button
-                className="lr-video-poster"
-                onClick={() => setPlaying(true)}
-                style={
-                  letter.posterUrl
-                    ? { backgroundImage: `url(${letter.posterUrl})` }
-                    : undefined
-                }
-              >
-                <span>▷</span>Xem lời nhắn
-              </button>
-            ) : (
-              <video
-                src={letter.videoUrl}
-                poster={letter.posterUrl}
-                controls
-                autoPlay
-                playsInline
-                preload="metadata"
-                onEnded={() => setEnded(true)}
-                onError={() => setError(true)}
-              >
-                {letter.captionsUrl && (
-                  <track
-                    kind="captions"
-                    src={letter.captionsUrl}
-                    srcLang="vi"
-                    label="Tiếng Việt"
-                    default
-                  />
-                )}
-              </video>
-            )}
-            {error && (
-              <p role="status">
-                Video chưa tải được. Bạn vẫn có thể mở món quà nhỏ bên dưới.{" "}
-                <button
-                  onClick={() => {
-                    setPlaying(false);
-                    setError(false);
-                  }}
-                >
-                  Thử lại
-                </button>
-              </p>
-            )}
-          </div>
-        )}
-        <div className="lr-signature">
-          <span>Thương mến,</span>
-          <strong>{letter.senderName}</strong>
-        </div>
-        <div className={ended ? "lr-ended" : ""}>
-          <Surprise letter={letter} onReveal={onReveal} />
-        </div>
-      </div>
-      <div className="lr-letter-bottom">
-        GẤP LẠI MỘT CHÚT THƯƠNG. GIỮ LẠI MỘT CHÚT SÁNG.
-      </div>
-    </article>
-  );
-}
-export default function LetterRoom() {
-  const [params, setParams] = useSearchParams();
-  const key = Object.hasOwn(occasions, params.get("occasion"))
-    ? params.get("occasion")
-    : "justBecause";
-  return (
-    <Room
-      key={`${key}-${params.get("kind")}-${params.get("fallback")}`}
-      letter={validateLetter({
-        ...demos[key],
-        ...(params.get("kind") === "video" ? { kind: "video" } : {}),
-        ...(params.get("empty") === "1"
-          ? { occasionData: {}, postscript: undefined }
-          : {}),
-      })}
-      fallback={params.get("fallback") === "1"}
-      onSelect={(occasion) => setParams({ occasion })}
-    />
-  );
-}
-function Room({ letter, fallback, onSelect }) {
+function Room({
+  letter,
+  fallback,
+  onSelect,
+  onExit,
+  preview,
+  afterLetter,
+  active,
+  legacyAssets,
+}) {
   const [state, dispatch] = useReducer(roomReducer, initialState),
     [failed, setFailed] = useState(fallback),
-    [surprise, setSurprise] = useState(false);
+    [sceneReady, setSceneReady] = useState(fallback),
+    [view, setView] = useState({ stable: true, anchors: {} }),
+    [size, setSize] = useState({ width: 960, height: 540 }),
+    [idlePhase, setIdlePhase] = useState(null),
+    [sound, setSound] = useState(false);
   const host = useRef(null),
     scene = useRef(null),
-    drag = useRef(null),
     stateRef = useRef(state),
-    actionRef = useRef(null);
+    reduced = useRef(false),
+    transition = useRef({ phase: null, remaining: 0 }),
+    drag = useRef(null),
+    pointerHandler = useRef(null),
+    audio = useRef(null),
+    soundRef = useRef(false);
   useEffect(() => {
     stateRef.current = state;
-  }, [state]);
-  const reduced = useRef(false);
+    soundRef.current = sound;
+  }, [state, sound]);
+  const clickSound = useCallback(() => {
+    if (!soundRef.current || !audio.current) return;
+    try {
+      const c = audio.current,
+        o = c.createOscillator(),
+        g = c.createGain();
+      o.type = "square";
+      o.frequency.setValueAtTime(1300, c.currentTime);
+      o.frequency.exponentialRampToValueAtTime(180, c.currentTime + 0.04);
+      g.gain.setValueAtTime(0.025, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.045);
+      o.connect(g);
+      g.connect(c.destination);
+      o.start();
+      o.stop(c.currentTime + 0.05);
+    } catch {}
+  }, []);
+  const perform = useCallback(
+    (type) => {
+      if (
+        ["LIGHT", "APPROACH", "OPEN", "BLOW", "REVEAL"].includes(type) &&
+        scene.current?.canInteract === false
+      )
+        return;
+      if (type === "LIGHT") clickSound();
+      dispatch({ type });
+    },
+    [clickSound],
+  );
+  useEffect(() => {
+    const resize = () => {
+      const r = host.current?.getBoundingClientRect();
+      if (r?.width) setSize({ width: r.width, height: r.height });
+    };
+    resize();
+    const ro =
+      typeof ResizeObserver === "function" ? new ResizeObserver(resize) : null;
+    if (host.current) ro?.observe(host.current);
+    return () => ro?.disconnect();
+  }, []);
   useEffect(() => {
     reduced.current = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (fallback) return;
+    if (fallback || !active || scene.current) return;
     let cancelled = false;
     import("./scene")
       .then(({ createRoom }) => {
@@ -339,245 +239,310 @@ function Room({ letter, fallback, onSelect }) {
         try {
           scene.current = createRoom(host.current, {
             recipientName: letter.recipientName,
+            occasion: letter.occasion,
+            legacyAssets,
             reduced: reduced.current,
-            onAction: (type) => dispatch({ type }),
-            onError: () => setFailed(true),
+            onAction: perform,
+            onReady: () => setSceneReady(true),
+            onError: () => {
+              setFailed(true);
+              setSceneReady(true);
+            },
+            onFrame: setView,
+            onPaperPointer: (type, event) =>
+              pointerHandler.current?.(type, event),
           });
           scene.current.setState(stateRef.current);
         } catch {
           setFailed(true);
+          setSceneReady(true);
         }
       })
       .catch(() => {
-        if (!cancelled) setFailed(true);
+        if (!cancelled) {
+          setFailed(true);
+          setSceneReady(true);
+        }
       });
     return () => {
       cancelled = true;
+    };
+  }, [
+    active,
+    fallback,
+    letter.recipientName,
+    letter.occasion,
+    perform,
+    legacyAssets,
+  ]);
+  useEffect(
+    () => () => {
       scene.current?.dispose();
       scene.current = null;
-    };
-  }, [fallback, letter.recipientName]);
-  useEffect(() => {
-    scene.current?.setState({ ...state, surprise });
-    const next = {
-      lighting: ["LIT", 1000],
-      approaching: ["READY", 900],
-      extracting: ["READ", 420],
-      returning: ["RETURNED", 380],
-    }[state.phase];
-    if (!next) return;
-    const timer = setTimeout(
-      () => dispatch({ type: next[0] }),
-      reduced.current ? 25 : next[1],
-    );
-    return () => clearTimeout(timer);
-  }, [state, surprise]);
-  useEffect(() => {
-    if (["lit", "ready"].includes(state.phase))
-      actionRef.current?.focus({ preventScroll: true });
-  }, [state.phase]);
-  const getPaperRect = useCallback(
-    () => (failed ? null : scene.current?.paperRect()),
-    [failed],
+      audio.current?.close();
+    },
+    [],
   );
-  const ready = state.phase === "ready",
-    reading = state.phase === "reading",
-    dark = state.phase === "dark";
+  useEffect(() => {
+    scene.current?.setState({ ...state, paused: !active });
+  }, [state, active]);
+  useEffect(() => {
+    const next = PHASE_TIMINGS[state.phase];
+    if (!next) {
+      transition.current = { phase: state.phase, remaining: 0 };
+      return;
+    }
+    if (transition.current.phase !== state.phase)
+      transition.current = {
+        phase: state.phase,
+        remaining: reduced.current ? 25 : next[1],
+      };
+    if (!active) return;
+    const remaining = transition.current.remaining,
+      start = performance.now();
+    const timer = setTimeout(() => dispatch({ type: next[0] }), remaining);
+    return () => {
+      clearTimeout(timer);
+      transition.current.remaining = Math.max(
+        0,
+        remaining - (performance.now() - start),
+      );
+    };
+  }, [state.phase, active]);
+  useEffect(() => {
+    if (!active) return;
+    const timer = setTimeout(() => setIdlePhase(state.phase), 3200);
+    return () => clearTimeout(timer);
+  }, [state.phase, active]);
   function start(e) {
-    if (!ready || drag.current || e.button !== 0) return;
+    if (state.phase !== "ready" || drag.current || (e.button ?? 0) !== 0)
+      return;
     e.currentTarget.setPointerCapture(e.pointerId);
     drag.current = {
       id: e.pointerId,
       x: e.clientX,
       y: e.clientY,
       point: scene.current?.project(e.clientX, e.clientY),
-      value: 0,
       moved: false,
     };
   }
   function move(e) {
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
-    const point = scene.current?.project(e.clientX, e.clientY);
-    const amount =
-      point && d.point ? (d.point.z - point.z) / 1.35 : (d.y - e.clientY) / 160;
     d.moved ||= Math.hypot(e.clientX - d.x, e.clientY - d.y) > 7;
-    d.value = Math.max(0, Math.min(1, amount));
-    dispatch({ type: "DRAG", value: d.value });
+    const p = scene.current?.project(e.clientX, e.clientY);
+    dispatch({
+      type: "DRAG",
+      value: p && d.point ? (d.point.z - p.z) / 1.35 : (d.y - e.clientY) / 120,
+    });
   }
   function finish(e, cancel = false) {
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     drag.current = null;
-    if (e.currentTarget.hasPointerCapture(e.pointerId))
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId))
       e.currentTarget.releasePointerCapture(e.pointerId);
-    if (!d.moved && !cancel) dispatch({ type: "OPEN" });
-    else dispatch({ type: "RELEASE", cancel });
+    dispatch({ type: !d.moved && !cancel ? "OPEN" : "RELEASE", cancel });
   }
-  const action = dark
-    ? "Chạm để bật đèn"
-    : state.phase === "lit"
-      ? "Chạm vào phong bì để mở thư"
-      : ready
-        ? "Kéo mép giấy lên"
-        : null;
+  useEffect(() => {
+    pointerHandler.current = (type, e) =>
+      type === "start"
+        ? start(e)
+        : type === "move"
+          ? move(e)
+          : finish(e, type === "cancel");
+  });
+  const getPaperRect = useCallback(
+    () => (failed ? null : scene.current?.paperRect()),
+    [failed],
+  );
+  const point = (name) =>
+    view.anchors[name] || {
+      x:
+        size.width *
+        {
+          switch: 0.35,
+          envelope: 0.66,
+          paper: 0.57,
+          card: 0.58,
+          candle: 0.55,
+          lamp: 0.4,
+        }[name],
+      y:
+        size.height *
+        {
+          switch: 0.66,
+          envelope: 0.56,
+          paper: 0.4,
+          card: 0.56,
+          candle: 0.46,
+          lamp: 0.42,
+        }[name],
+    };
+  const idle = active && idlePhase === state.phase;
+  const cueProps = {
+    width: size.width,
+    height: size.height,
+    disabled: !failed && !view.stable,
+    idle,
+  };
+  const cue =
+    state.phase === "dark"
+      ? { name: "switch", label: "Chạm để bật đèn", type: "LIGHT", icon: "⏻" }
+      : state.phase === "envelope"
+        ? {
+            name: "envelope",
+            label: "Chạm vào phong bì để mở thư",
+            type: "APPROACH",
+            icon: "↗",
+          }
+        : state.phase === "ready"
+          ? {
+              name: "paper",
+              label: "Kéo mép giấy lên",
+              type: "OPEN",
+              icon: "↑",
+            }
+          : state.phase === "surprise"
+            ? {
+                name:
+                  letter.occasion === "justBecause"
+                    ? "lamp"
+                    : letter.occasion === "birthday"
+                      ? "candle"
+                      : "card",
+                label:
+                  letter.occasion === "birthday"
+                    ? "Chạm để tắt nến"
+                    : letter.occasion === "justBecause"
+                      ? "Chạm vào hình trên đèn"
+                      : "Mở điều nhỏ dành cho bạn",
+                type: letter.occasion === "birthday" ? "BLOW" : "REVEAL",
+                icon: letter.occasion === "birthday" ? "·" : "✧",
+              }
+            : null;
+  function toggleSound() {
+    if (!sound) {
+      try {
+        const A = window.AudioContext || window.webkitAudioContext;
+        if (A) {
+          audio.current ||= new A();
+          audio.current.resume();
+        }
+      } catch {}
+    }
+    setSound((x) => !x);
+  }
   return (
     <main
-      className={`lr-page ${dark ? "lr-dark" : "lr-lit"} ${reading ? "lr-reading" : ""}`}
+      className={`lr-page lr-pov lr-game ${sceneReady ? "lr-scene-ready" : ""} ${state.phase === "dark" ? "lr-dark" : "lr-lit"} ${state.phase === "reading" ? "lr-reading" : ""} lr-phase-${state.phase}`}
+      data-phase={state.phase}
+      data-camera={shotForPhase(state.phase, letter.occasion)}
     >
-      <header className="lr-header">
-        <a href="/" className="lr-brand" aria-label="LAMVI trang chủ">
-          LAMVI<span>®</span>
-        </a>
-        <span className="lr-header-caption">ÁNH SÁNG GIỮ LỜI THƯƠNG</span>
-        <button
-          className="lr-reset"
-          onClick={() => window.location.reload()}
-          aria-label="Bắt đầu lại"
-        >
-          ↻ <span>Bắt đầu lại</span>
-        </button>
-      </header>
-      <section className="lr-intro">
-        <div className="lr-eyebrow">
-          <span /> MỘT MÓN QUÀ, MỘT LỜI NHẮN
-        </div>
-        <h1>
-          Phòng thư <em>LAMVI</em>
-          <span className="lr-title-star">✳</span>
-        </h1>
-        <p>
-          Một góc sáng nhỏ.
-          <br className="lr-mobile-break" /> Một lời thương dành riêng cho{" "}
-          {letter.recipientName}.
-        </p>
-      </section>
+      <h1 className="lr-sr-only">Phòng thư LAMVI</h1>
       <div className="lr-stage-wrap">
-        <div className="lr-side-note">
-          GIẤY DÓ · ÁNH SÁNG · NHỮNG ĐIỀU THƯƠNG
-        </div>
         <div
           className="lr-stage"
           ref={host}
-          aria-label="Góc phòng có đèn giấy dó và phong bì"
+          aria-label="Căn phòng LAMVI với đèn giấy dó và phong thư"
         />
+        <div className="lr-atmosphere" aria-hidden="true" />
+        <div className="lr-game-controls">
+          <span className="lr-game-brand">LAMVI</span>
+          <div>
+            <button
+              aria-label={sound ? "Tắt âm thanh" : "Bật âm thanh"}
+              aria-pressed={sound}
+              onClick={toggleSound}
+            >
+              {sound ? "♪" : "♩"}
+            </button>
+            <button
+              aria-label={onExit ? "Đóng xem trước" : "Bắt đầu lại"}
+              onClick={() => (onExit ? onExit() : window.location.reload())}
+            >
+              ↻
+            </button>
+          </div>
+        </div>
         {failed && (
-          <div className={`lr-fallback ${dark ? "" : "is-lit"}`}>
+          <div
+            className={`lr-fallback ${state.phase === "dark" ? "" : "is-lit"} ${!["dark", "lighting", "lit", "envelope"].includes(state.phase) ? "lr-fallback-letter" : ""}`}
+            aria-label="Cảnh 2D dự phòng"
+          >
             <div className="lr-wall" />
             <div className="lr-desk">
               <div className="lr-lamp" />
-              <button
-                className="lr-switch"
-                aria-label="Bật đèn"
-                disabled={!dark}
-                onClick={() => dispatch({ type: "LIGHT" })}
-              />
-              <button
-                className="lr-envelope"
-                aria-label="Mở phong bì"
-                disabled={state.phase !== "lit"}
-                onClick={() => dispatch({ type: "APPROACH" })}
-              >
+              <div className="lr-envelope">
                 <span>Gửi {letter.recipientName}</span>
                 <i />
-              </button>
+                <div className="lr-fallback-sheet" />
+              </div>
             </div>
           </div>
         )}
-        {!reading && (
-          <div
-            className={`lr-action lr-action-${state.phase}`}
-            aria-live="polite"
-          >
-            {action ? (
-              <button
-                ref={actionRef}
-                className="lr-action-button"
-                onClick={(e) => {
-                  if (dark) dispatch({ type: "LIGHT" });
-                  else if (state.phase === "lit")
-                    dispatch({ type: "APPROACH" });
-                  else if (ready && e.detail === 0) dispatch({ type: "OPEN" });
-                }}
-                onKeyDown={(e) => {
-                  if (ready && (e.key === "Enter" || e.key === " ")) {
-                    e.preventDefault();
-                    dispatch({ type: "OPEN" });
-                  }
-                }}
-                onPointerDown={start}
-                onPointerMove={move}
-                onPointerUp={(e) => finish(e)}
-                onPointerCancel={(e) => finish(e, true)}
-                onLostPointerCapture={(e) => finish(e, true)}
-              >
-                <span className="lr-action-icon">
-                  {dark ? "⏻" : ready ? "↑" : "↗"}
-                </span>
-                {action}
-                {ready && <small>hoặc chạm để mở</small>}
-              </button>
-            ) : (
-              <span>
-                {state.phase === "lighting"
-                  ? "Một chút sáng, một chút ấm…"
-                  : state.phase === "approaching"
-                    ? "Có một lá thư dành cho bạn…"
-                    : "Lời thương đang mở…"}
-              </span>
-            )}
-          </div>
-        )}
-        {reading && (
-          <Reader
-            letter={letter}
-            onReveal={() => setSurprise(true)}
-            getPaperRect={getPaperRect}
+        {cue && (
+          <Cue
+            {...cueProps}
+            point={point(cue.name)}
+            label={cue.label}
+            hint={state.phase === "surprise" && letter.occasion === "birthday" ? "Ước một điều đi." : undefined}
+            idle={idle || state.phase === "surprise"}
+            icon={cue.icon}
+            onClick={(e) => {
+              if (state.phase !== "ready" || e.detail === 0) perform(cue.type);
+            }}
+            onPointerDown={state.phase === "ready" ? start : undefined}
+            onPointerMove={state.phase === "ready" ? move : undefined}
+            onPointerUp={state.phase === "ready" ? (e) => finish(e) : undefined}
+            onPointerCancel={
+              state.phase === "ready" ? (e) => finish(e, true) : undefined
+            }
+            onKeyDown={(e) => {
+              if (
+                state.phase === "ready" &&
+                (e.key === "Enter" || e.key === " ")
+              ) {
+                e.preventDefault();
+                perform("OPEN");
+              }
+            }}
           />
         )}
-        <div className="lr-room-tag">
-          <span className={dark ? "" : "on"} />
-          {dark ? "GÓC NHỎ ĐANG NGỦ" : "ĐÈN ĐÃ SÁNG · THƯƠNG ĐÃ ĐẾN"}
-        </div>
+        {state.phase === "reading" && (
+          <LetterReader
+            letter={letter}
+            getPaperRect={getPaperRect}
+            active={active}
+            afterLetter={afterLetter}
+            onSurprise={() => dispatch({ type: "SURPRISE" })}
+          />
+        )}
+        {["celebrating", "celebrated"].includes(state.phase) && (
+          <FinalNote
+            letter={letter}
+            point={point("card")}
+            width={size.width}
+            height={size.height}
+          />
+        )}
+        {!preview && (
+          <details className="lr-demo">
+            <summary>Lời chúc mẫu</summary>
+            <div>
+              {Object.entries(occasions).map(([k, v]) => (
+                <button
+                  key={k}
+                  aria-pressed={letter.occasion === k}
+                  onClick={() => onSelect(k)}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          </details>
+        )}
       </div>
-      <footer className="lr-footer">
-        <div className="lr-progress" aria-label="Tiến trình mở thư">
-          {["Thắp sáng", "Mở thư", "Giữ điều thương"].map((s, i) => (
-            <span
-              key={s}
-              className={
-                i === 0 ||
-                (i === 1 && !["dark", "lighting"].includes(state.phase)) ||
-                (i === 2 && reading)
-                  ? "active"
-                  : ""
-              }
-            >
-              <b>0{i + 1}</b>
-              {s}
-            </span>
-          ))}
-        </div>
-        <p>Được gói bằng giấy. Được gửi bằng lòng.</p>
-        <span className="lr-footer-flower">✳</span>
-      </footer>
-      <details className="lr-demo">
-        <summary>
-          Khám phá lời chúc mẫu <span>＋</span>
-        </summary>
-        <div>
-          {Object.entries(occasions).map(([k, v]) => (
-            <button
-              key={k}
-              aria-pressed={letter.occasion === k}
-              onClick={() => onSelect(k)}
-            >
-              {v}
-              {k === "longDistance" ? " · video" : ""}
-            </button>
-          ))}
-        </div>
-      </details>
     </main>
   );
 }

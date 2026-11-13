@@ -102,45 +102,71 @@ export function validateLetter(value) {
   return { ...value, occasionData: value.occasionData || {} };
 }
 export const initialState = { phase: "dark", progress: 0 };
+export const PHASE_TIMINGS = {
+  lighting: ["LIT", 1800],
+  lit: ["FOCUS_ENVELOPE", 900],
+  approaching: ["READY", 1200],
+  returning: ["RETURNED", 380],
+  extracting: ["EXTRACTED", 420],
+  lifting: ["READ", 1100],
+  surpriseEntering: ["SURPRISE_READY", 1100],
+  celebrating: ["CELEBRATED", 1100],
+};
 export function roomReducer(state, action) {
+  const go = (phase, progress = state.progress) => ({
+    ...state,
+    phase,
+    progress,
+  });
   switch (action.type) {
     case "LIGHT":
-      return state.phase === "dark" ? { ...state, phase: "lighting" } : state;
+      return state.phase === "dark" ? go("lighting") : state;
     case "LIT":
-      return state.phase === "lighting" ? { ...state, phase: "lit" } : state;
+      return state.phase === "lighting" ? go("lit") : state;
+    case "FOCUS_ENVELOPE":
+      return state.phase === "lit" ? go("envelope") : state;
     case "APPROACH":
-      return state.phase === "lit" ? { ...state, phase: "approaching" } : state;
+      return state.phase === "envelope" ? go("approaching") : state;
     case "READY":
-      return state.phase === "approaching"
-        ? { ...state, phase: "ready" }
-        : state;
+      return state.phase === "approaching" ? go("ready") : state;
     case "DRAG":
       return state.phase === "ready" && Number.isFinite(action.value)
-        ? { ...state, progress: Math.max(0, Math.min(1, action.value)) }
+        ? go("ready", Math.max(0, Math.min(1, action.value)))
         : state;
     case "RELEASE":
       return state.phase === "ready"
-        ? {
-            phase:
-              action.cancel || state.progress < 0.4
-                ? "returning"
-                : "extracting",
-            progress: action.cancel || state.progress < 0.4 ? 0 : 1,
-          }
+        ? go(
+            action.cancel || state.progress < 0.4 ? "returning" : "extracting",
+            action.cancel || state.progress < 0.4 ? 0 : 1,
+          )
         : state;
     case "RETURNED":
-      return state.phase === "returning"
-        ? { phase: "ready", progress: 0 }
-        : state;
+      return state.phase === "returning" ? go("ready", 0) : state;
     case "OPEN":
-      return state.phase === "ready"
-        ? { phase: "extracting", progress: 1 }
-        : state;
+      return state.phase === "ready" ? go("extracting", 1) : state;
+    case "EXTRACTED":
+      return state.phase === "extracting" ? go("lifting", 1) : state;
     case "READ":
-      return state.phase === "extracting"
-        ? { ...state, phase: "reading" }
-        : state;
+      return state.phase === "lifting" ? go("reading", 1) : state;
+    case "SURPRISE":
+      return state.phase === "reading" ? go("surpriseEntering") : state;
+    case "SURPRISE_READY":
+      return state.phase === "surpriseEntering" ? go("surprise") : state;
+    case "BLOW":
+    case "REVEAL":
+      return state.phase === "surprise" ? go("celebrating") : state;
+    case "CELEBRATED":
+      return state.phase === "celebrating" ? go("celebrated") : state;
     default:
       return state;
   }
+}
+export function shotForPhase(phase, occasion = "birthday") {
+  if (phase === "dark") return "room";
+  if (["lighting", "lit"].includes(phase)) return "switch";
+  if (phase === "envelope") return "envelope";
+  if (["approaching", "ready", "returning", "extracting"].includes(phase))
+    return "slot";
+  if (["lifting", "reading"].includes(phase)) return "letter";
+  return occasion === "justBecause" ? "lamp" : "reverse";
 }

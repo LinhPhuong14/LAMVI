@@ -847,3 +847,13 @@ Prototype riêng `/phong-thu`, giữ stack React/Vite/Express. Three.js tải đ
 Full suite đầu: 4007 đạt, 1 lỗi, 2 bỏ qua; lỗi `MobileBars.test.jsx` bắn callback trước khi passive effect gắn observer. Sửa riêng mock lưu target và chờ observer đúng nút mua; test sản phẩm + 49 test phòng thư chạy lại đạt 52/52, không sửa mã sản phẩm. Remote master đã có triển khai `wishroom` riêng của session khác (`e58872e`), nên giữ nguyên nhánh/worktree này để tránh ghi đè route và tài liệu.
 
 Xác nhận cuối: full suite 262 tệp đạt; 4008 ca đạt, 2 bỏ qua (239,98 giây). Lint và build client/SSR đạt. Ảnh mobile/desktop và giấy phép phụ thuộc lưu kèm. Nhánh riêng không merge tự động do master có prototype khác cùng route.
+
+## 2026-11-13 — Phòng thư POV và đồ họa liền khối (D-136, T-105)
+
+Theo feedback, thay luồng isometric/kéo bằng POV game tự mở thư sau một lần bật đèn; fade/pulse, ánh vàng dịu theo palette D-121. Itim Vietnamese + fade/clip grapheme thay SVG, giấy caro, bì vintage có tem/seam. Khối rounded/lathe, cốc/rèm liên tục, tiếp xúc bàn, PMREM, soft occlusion, shadow theo nhu cầu. Đã xem docs/source các link yêu cầu, tải PBR giấy/gỗ CC0 sau mở proxy, resize 512 WebP và ghi nguồn. Pinterest vẫn bị proxy chặn; không giả nhận đã xem pin. 52 test độc lập đạt, full 262 tệp/4011 ca đạt + 2 skipped; lint/build đạt. Bản nhánh `feat/phong-thu`, chưa ghi đè triển khai `wishroom` trên master. Handoff: `docs/phong-thu.md`.
+
+D-137 trong cùng phiên: cố định 16:9 ngang; portrait overlay đen 80% chữ trắng; chưa tạo scene trước khi ngang. Quay lại dọc pause phase/rAF và giữ reader/scroll, video pause. Dựng gate bằng useSyncExternalStore; không xin quyền khóa hướng hay fullscreen. Nghiệm thu đổi sang portrait gate + 800×360 landscape.
+
+
+### Phòng thư — cập nhật D-136 (2026-11-13)
+Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác chủ động. Tách CameraRig/LetterReader/PaperSurprise; reducer khóa bước chuyển và kéo 40%. Bì vẫn trên bàn, giấy mới nâng lên; reader mở rộng. Dùng camera-controls MIT và bàn KayKit CC0 qua GLTFLoader, giữ stack/brand/ánh sáng. Không tích hợp bộ surfaceMaterials bị từ chối. Chi tiết triển khai/nguồn/QA: `docs/phong-thu.md`, `docs/art/model-sources.md`, `docs/qa/phong-thu/README.md`. Ghi chú này thay mô tả tự mở thư trước đó, không thay API QR/backend.

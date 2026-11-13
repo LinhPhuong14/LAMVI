@@ -513,3 +513,13 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - `CRAFT_FILMS.*.srcLite`; `src/lib/filmSrc.js` (`pickFilmSrc`): bản nhẹ khi `max-width: 800px`, `navigator.connection.saveData` hoặc `effectiveType` ≤ 3g; clip `journey` đã nhẹ (0,9 MB) nên không có `srcLite`.
 - `/welcome` chỉ dựng ở client nên chọn nguồn ngay lần render đầu (video đang phát và video tải trước dùng cùng bản). `CraftVideo` được SSR nên giữ bản 720p lúc hydrate rồi đổi sau khi mount và gọi `load()` (preload="none", chưa tải byte nào).
 
+
+## T-105 — Phòng thư POV, khối mềm và vật liệu PBR (2026-11-13)
+
+Theo D-136, prototype `feat/phong-thu` dùng PerspectiveCamera ở tầm mắt thay orthographic. Một thao tác bật đèn khởi động các phase tự động; group envelope nội suy vị trí và quaternion trong scene, giấy uốn nhẹ rồi chuyển DOM. Dùng RoundedBoxGeometry và profile LatheGeometry cho mép khối liên tục; PMREM RoomEnvironment cho phản sáng, PCF + occlusion cục bộ thay nhiều pass blur. Texture giấy/gỗ CC0 resize 512 WebP, giữ fallback procedural, render và shadow theo nhu cầu. HUD/headline dùng font brand; thư riêng dùng Itim Vietnamese, Intl.Segmenter + CSS fade/clip từng grapheme, có bản chữ đầy đủ cho screen reader. Không dùng skinning book hay tải model của repo tham khảo. Không thay `src/wishroom` trên master/QR thật.
+
+Bổ sung D-137: game frame 16:9 letterbox, OrientationGate dùng viewport resize/orientationchange + useSyncExternalStore, SSR snapshot portrait. Three chỉ import khi active landscape; quay dọc giữ component/thư, inert UI, pause rAF và phase timer với thời gian còn lại; video pause. Chuyển ngang reveal fade/blur từ đen, không cần fullscreen/orientation-lock permission.
+
+
+### Phòng thư — cập nhật D-136 (2026-11-13)
+Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác chủ động. Tách CameraRig/LetterReader/PaperSurprise; reducer khóa bước chuyển và kéo 40%. Bì vẫn trên bàn, giấy mới nâng lên; reader mở rộng. Dùng camera-controls MIT và bàn KayKit CC0 qua GLTFLoader, giữ stack/brand/ánh sáng. Không tích hợp bộ surfaceMaterials bị từ chối. Chi tiết triển khai/nguồn/QA: `docs/phong-thu.md`, `docs/art/model-sources.md`, `docs/qa/phong-thu/README.md`. Ghi chú này thay mô tả tự mở thư trước đó, không thay API QR/backend.

@@ -237,3 +237,11 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 | `/phong-thu`: phòng Three.js, thư chữ/video, bảy dịp, fallback 2D | ✅ prototype cục bộ | `src/letter-room/`; 49 test độc lập đạt; hướng dẫn `docs/phong-thu.md` | đối chiếu đèn thật, tích hợp QR sau, nghiệm thu iOS/GPU thật; quà giấy dùng DOM/CSS |
 
 Phòng thư `feat/phong-thu`: xác nhận toàn repo 262 tệp / 4008 ca đạt, 2 bỏ qua; lint + build đạt. Chờ chọn cách phối hợp với bản `wishroom` trên master trước tích hợp.
+
+| Phòng thư POV D-136 / T-105 | ✅ prototype nhánh riêng | Fade phòng → pulse đèn → tự nâng/mở bì vintage → giấy caro → chữ Itim; rounded geometry, PBR 512px, PMREM và soft contact shadow | Full 4011 đạt, 2 bỏ qua; cần Pinterest proxy và GPU thiết bị thật; chờ phối hợp master |
+
+| D-137: game landscape 16:9 | ✅ code | OrientationGate, portrait overlay 80%, lazy WebGL, pause/resume phase/render, video pause | QA portrait → landscape → portrait → resume, test độc lập orientation |
+
+
+### Phòng thư — cập nhật D-136 (2026-11-13)
+Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác chủ động. Tách CameraRig/LetterReader/PaperSurprise; reducer khóa bước chuyển và kéo 40%. Bì vẫn trên bàn, giấy mới nâng lên; reader mở rộng. Dùng camera-controls MIT và bàn KayKit CC0 qua GLTFLoader, giữ stack/brand/ánh sáng. Không tích hợp bộ surfaceMaterials bị từ chối. Chi tiết triển khai/nguồn/QA: `docs/phong-thu.md`, `docs/art/model-sources.md`, `docs/qa/phong-thu/README.md`. Ghi chú này thay mô tả tự mở thư trước đó, không thay API QR/backend.
