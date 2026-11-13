@@ -4,6 +4,8 @@
 
 const film = (slug) => ({
   src: `/videos/${slug}-720.mp4`,
+  // Bản 360p cho điện thoại và mạng chậm (lib/filmSrc.js, T-103)
+  srcLite: `/videos/${slug}-360.mp4`,
   poster: `/videos/${slug}-poster.webp`,
 })
 

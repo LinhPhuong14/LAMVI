@@ -5,6 +5,7 @@ import { act, cleanup, fireEvent, screen } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
 import viMsg from '../i18n/messages/vi.js'
 import enMsg from '../i18n/messages/en.js'
+import { CRAFT_FILMS } from '../data/craftFilms.js'
 
 const W = viMsg.welcome
 const names = ['Đèn Thu Hoạch', 'Đèn Tứ Linh', 'Đèn Phúc Lộc', 'Đèn Tam Dương', 'Đèn Lộn Dần']
@@ -111,6 +112,21 @@ describe('WelcomePage', () => {
     expect(kind()).toBe('scene-tale')
     await goTo(2)
     expect(kind()).toBe('scene-lamp')
+  })
+
+  it('màn hẹp dùng bản video 360p cho cả video đang phát lẫn video tải trước', async () => {
+    stubMedia(['(max-width: 800px)'])
+    await open()
+    await goTo(1)
+    expect(document.querySelector('video.welcome-preload').getAttribute('src')).toBe(CRAFT_FILMS.paper.srcLite)
+    await goTo(1)
+    expect(scene().querySelector('video.welcome-video').getAttribute('src')).toBe(CRAFT_FILMS.paper.srcLite)
+  })
+
+  it('màn rộng dùng bản 720p', async () => {
+    await open()
+    await goTo(2)
+    expect(scene().querySelector('video.welcome-video').getAttribute('src')).toBe(CRAFT_FILMS.paper.src)
   })
 
   it('video chạy quá 20 giây thì tự sang cảnh kế', async () => {

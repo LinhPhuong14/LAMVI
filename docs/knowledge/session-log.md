@@ -833,3 +833,9 @@ Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE
 
 **Còn lại / cần người dùng**: Marketing/BA duyệt lời kể ba ngôn ngữ; tư liệu kiểm chứng cho làng giấy dó; G-120 (QR, tem, đo lượt quét); bản video mobile nhẹ.
 
+## 2026-11-13 — Video làng nghề bản nhẹ cho điện thoại (T-103)
+
+**Đã làm**: nén hai video làng nghề thành bản 360p (5,8 MB và 4,3 MB, giảm khoảng 70%), `srcLite` + `lib/filmSrc.js` chọn bản nhẹ trên màn hẹp, tiết kiệm dữ liệu, mạng ≤ 3G; áp dụng cho `/welcome` (cả video tải trước) và `CraftVideo` ở trang chủ. Test: `lib/filmSrc.test.jsx`, `WelcomePage.test.jsx`.
+
+**Còn lại / cần người dùng**: đo tải thật bằng 4G; G-120 (QR, tem, đo lượt quét).
+

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { m } from 'framer-motion'
 import { useAutoplayInView } from '../lib/useAutoplayInView.js'
+import { pickFilmSrc } from '../lib/filmSrc.js'
 import { useI18n } from '../i18n/index.js'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import { rise, group } from '../lib/motion.js'
@@ -9,12 +10,24 @@ import { Reveal } from './Reveal'
 // Video tự host, `preload="none"`: lúc vào trang chỉ tải poster; tự phát khi cuộn tới (useAutoplayInView)
 export function CraftVideo({ film, title, className = '' }) {
   const ref = useRef(null)
+  const [src, setSrc] = useState(film.src)
+  const applied = useRef(film.src)
   useAutoplayInView(ref)
+  // Sau khi hydrate mới đổi sang bản nhẹ (preload="none" nên chưa tải gì); load() để trình duyệt nhận nguồn mới.
+  // Phim đổi prop thì luôn cập nhật nguồn, kể cả khi bản chọn là bản đầy đủ.
+  useEffect(() => {
+    const next = pickFilmSrc(film)
+    if (next === applied.current) return
+    applied.current = next
+    // oxlint-disable-next-line react/set-state-in-effect
+    setSrc(next)
+    ref.current?.load()
+  }, [film])
 
   return (
     <div className={`film-frame ${className}`.trim()}>
       <video ref={ref} controls preload="none" playsInline loop poster={film.poster} aria-label={title}>
-        <source src={film.src} type="video/mp4" />
+        <source src={src} type="video/mp4" />
       </video>
     </div>
   )

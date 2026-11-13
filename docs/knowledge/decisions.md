@@ -507,3 +507,9 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - Bố cục: màn rộng chia hai cột (chữ trái, tranh phải); điện thoại dọc chừa chỗ cho lời nhắc xoay ngang; xoay ngang thu gọn (ẩn dòng phụ chương, giảm cỡ chữ). Chiều cao ảnh tranh đứng giới hạn theo `dvh` để câu kể không bị đẩy ra ngoài.
 - Giảm chuyển động tắt ấn đóng, tranh trôi và hiệu ứng hiện câu (câu hiện sẵn). Màu chỉ dùng token thương hiệu; `--tilt` khai báo mặc định trong CSS (test kiểm biến CSS).
 
+### T-103 — Video làng nghề bản nhẹ cho điện thoại (2026-11-13)
+
+- Hai video 720p (19,8 MB và 15,3 MB) có thêm bản 360p: `lang-giay-do-360.mp4` (5,8 MB) và `tranh-dong-ho-360.mp4` (4,3 MB). Lệnh nén: `ffmpeg -i X-720.mp4 -vf "scale=640:360:flags=lanczos,fps=24" -c:v libx264 -preset slow -crf 29 -maxrate 420k -bufsize 840k -profile:v main -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 48k -ac 1 X-360.mp4`. Tệp nằm trong `public/videos/` như bản gốc (cùng `excludeFiles` và cache dài ở `vercel.json`).
+- `CRAFT_FILMS.*.srcLite`; `src/lib/filmSrc.js` (`pickFilmSrc`): bản nhẹ khi `max-width: 800px`, `navigator.connection.saveData` hoặc `effectiveType` ≤ 3g; clip `journey` đã nhẹ (0,9 MB) nên không có `srcLite`.
+- `/welcome` chỉ dựng ở client nên chọn nguồn ngay lần render đầu (video đang phát và video tải trước dùng cùng bản). `CraftVideo` được SSR nên giữ bản 720p lúc hydrate rồi đổi sau khi mount và gọi `load()` (preload="none", chưa tải byte nào).
+

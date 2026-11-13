@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/index.js'
 import { useApi } from '../api/useApi.js'
+import { pickFilmSrc } from '../lib/filmSrc.js'
 import { useHydratedReducedMotion } from '../lib/hydration.js'
 import { CRAFT_FILMS } from '../data/craftFilms.js'
 import Seo from '../seo/Seo.jsx'
@@ -67,7 +68,7 @@ function Video({ scene, paused, muted, onProgress, onEnd }) {
     <video
       ref={ref}
       className="welcome-video"
-      src={scene.film.src}
+      src={pickFilmSrc(scene.film)}
       poster={scene.film.poster}
       muted
       playsInline
@@ -318,7 +319,7 @@ export default function WelcomePage() {
   }, [leaving])
 
   // Nạp trước video của cảnh kế tiếp để chuyển cảnh không bị khựng
-  const upcoming = scenes[idx + 1]?.type === 'video' ? scenes[idx + 1].film.src : null
+  const upcoming = scenes[idx + 1]?.type === 'video' ? pickFilmSrc(scenes[idx + 1].film) : null
 
   // Cảnh có thời lượng cố định tự chuyển sau `ms`; thanh tiến độ CSS dùng cùng thời lượng nên khớp.
   const timer = useRef(null)
