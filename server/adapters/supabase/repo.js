@@ -143,6 +143,22 @@ const toProfile = (r) => ({
   createdAt: r.created_at,
 })
 
+// D-134: phong thư admin soạn cho từng đơn
+const toOrderLetter = (r) => ({
+  id: r.id,
+  orderId: r.order_id,
+  status: r.status,
+  content: r.content ?? null,
+  slug: r.slug,
+  token: r.token,
+  publishedAt: r.published_at,
+  openedAt: r.opened_at,
+  updatedBy: r.updated_by,
+  createdAt: r.created_at,
+  updatedAt: r.updated_at,
+})
+const LETTER_COLS = { status: 'status', content: 'content', slug: 'slug', token: 'token', publishedAt: 'published_at', updatedBy: 'updated_by' }
+
 const toGiftMessage = (r) => ({
   id: r.id,
   orderId: r.order_id,
@@ -183,7 +199,7 @@ function toRow(obj, cols) {
 }
 
 // 23505 = unique_violation của Postgres
-const UNIQUE_FIELD = { collections_slug_key: 'slug', products_slug_key: 'slug', batches_code_key: 'code', coupons_code_key: 'code', orders_code_key: 'code' }
+const UNIQUE_FIELD = { collections_slug_key: 'slug', products_slug_key: 'slug', batches_code_key: 'code', coupons_code_key: 'code', orders_code_key: 'code', order_letters_slug_key: 'slug' }
 
 function unwrap({ data, error }) {
   if (error) {
@@ -655,6 +671,32 @@ export function createSupabaseRepo(client) {
         message: toGiftMessage(r.message),
         order: { id: r.order.id, status: r.order.status, deliveredAt: r.order.delivered_at },
       }))
+    },
+
+    // --- Phong thư riêng của đơn (D-134, D-135)
+    async getOrderLetter(orderId) {
+      const row = unwrap(await client.from('order_letters').select('*').eq('order_id', orderId).maybeSingle())
+      return row ? toOrderLetter(row) : null
+    },
+    async getLetterBySlug(slug) {
+      const row = unwrap(await client.from('order_letters').select('*').eq('slug', slug).maybeSingle())
+      return row ? toOrderLetter(row) : null
+    },
+    async saveOrderLetter(orderId, patch) {
+      const row = { order_id: orderId, ...toRow(patch, LETTER_COLS) }
+      return toOrderLetter(unwrap(await client.from('order_letters').upsert(row, { onConflict: 'order_id' }).select('*').single()))
+    },
+    // Thư viện QR: mọi thư đã từng có QR (slug), mới nhất trước, kèm mã đơn
+    async listOrderLetters({ limit = 500 } = {}) {
+      const rows = unwrap(
+        await client.from('order_letters').select('*, orders(code, status)').not('slug', 'is', null).order('published_at', { ascending: false, nullsFirst: false }).order('updated_at', { ascending: false }).limit(limit),
+      )
+      return rows.map((r) => ({ ...toOrderLetter(r), orderCode: r.orders?.code ?? null, orderStatus: r.orders?.status ?? null }))
+    },
+    // Lần mở đầu tiên của người nhận — chỉ ghi một lần
+    async markLetterOpened(id, at) {
+      unwrap(await client.from('order_letters').update({ opened_at: at }).eq('id', id).is('opened_at', null))
+      return one('order_letters', id, toOrderLetter)
     },
   }
 }

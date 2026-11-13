@@ -16,6 +16,7 @@ const NAV = [
     ['/admin/orders', 'orders', OrdersIcon, 'orders'],
     ['/admin/returns', 'returns', OrdersIcon, 'returns'],
     ['/admin/coupons', 'coupons', CouponsIcon],
+    ['/admin/letters', 'letters', CouponsIcon],
   ]],
   ['groupCatalog', [
     ['/admin/products', 'products', ProductsIcon],

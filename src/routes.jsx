@@ -4,6 +4,7 @@ import { GuestRoute, ProtectedRoute } from './auth/ProtectedRoute.jsx'
 const ReturnsPage = lazy(() => import('./admin/ReturnsPage'))
 import { Route, Routes } from 'react-router-dom'
 import LocaleLayout from './components/LocaleLayout'
+import LocaleProvider from './i18n/LocaleProvider.jsx'
 import HomePage from './pages/HomePage'
 import ProductPage from './pages/ProductPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -33,6 +34,9 @@ const CollectionsPage = lazy(() => import('./admin/CollectionsPage'))
 const ProductsPage = lazy(() => import('./admin/ProductsPage'))
 const FaqPage = lazy(() => import('./admin/FaqPage'))
 const BatchesPage = lazy(() => import('./admin/BatchesPage'))
+const LetterEditorPage = lazy(() => import('./admin/LetterEditorPage'))
+const LettersGalleryPage = lazy(() => import('./admin/LettersGalleryPage'))
+const LetterPage = lazy(() => import('./pages/LetterPage'))
 const ItDashboard = lazy(() => import('./it/ItDashboard'))
 const AnalyticsPage = lazy(() => import('./admin/AnalyticsPage'))
 const MayConfigPage = lazy(() => import('./admin/MayConfigPage'))
@@ -74,6 +78,8 @@ function localeChildren() {
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* D-135: phong thư người nhận (subdomain riêng → /thu/<slug>), không tiền tố ngôn ngữ */}
+      <Route path="/thu/:slug" element={<LocaleProvider lang="vi"><RouteLoader><LetterPage /></RouteLoader></LocaleProvider>} />
       {/* D-51: dashboard IT */}
       <Route path="/it" element={<ProtectedRoute><RouteLoader><ItDashboard /></RouteLoader></ProtectedRoute>} />
       {/* D-48: admin chỉ tiếng Việt */}
@@ -81,6 +87,8 @@ export default function AppRoutes() {
         <Route index element={<RouteLoader><AdminOverviewPage /></RouteLoader>} />
         <Route path="orders" element={<RouteLoader><AdminOrdersPage /></RouteLoader>} />
         <Route path="orders/:code" element={<RouteLoader><AdminOrdersPage /></RouteLoader>} />
+        <Route path="orders/:code/letter" element={<RouteLoader><LetterEditorPage /></RouteLoader>} />
+        <Route path="letters" element={<RouteLoader><LettersGalleryPage /></RouteLoader>} />
         <Route path="users" element={<RouteLoader><UsersPage /></RouteLoader>} />
         <Route path="users/:id" element={<RouteLoader><UsersPage /></RouteLoader>} />
         <Route path="coupons" element={<RouteLoader><CouponsPage /></RouteLoader>} />
