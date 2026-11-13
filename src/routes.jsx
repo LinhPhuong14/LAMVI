@@ -78,7 +78,7 @@ function localeChildren() {
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* D-135: phong thư người nhận (subdomain riêng → /thu/<slug>), không tiền tố ngôn ngữ */}
+      {/* D-138: phong thư người nhận (/thu/<slug>), không tiền tố ngôn ngữ */}
       <Route path="/thu/:slug" element={<LocaleProvider lang="vi"><RouteLoader><LetterPage /></RouteLoader></LocaleProvider>} />
       {/* D-51: dashboard IT */}
       <Route path="/it" element={<ProtectedRoute><RouteLoader><ItDashboard /></RouteLoader></ProtectedRoute>} />

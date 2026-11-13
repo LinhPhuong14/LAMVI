@@ -673,7 +673,7 @@ export function createSupabaseRepo(client) {
       }))
     },
 
-    // --- Phong thư riêng của đơn (D-134, D-135)
+    // --- Phong thư riêng của đơn (D-134, D-138)
     async getOrderLetter(orderId) {
       const row = unwrap(await client.from('order_letters').select('*').eq('order_id', orderId).maybeSingle())
       return row ? toOrderLetter(row) : null

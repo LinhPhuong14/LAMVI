@@ -66,21 +66,66 @@ describe('Thư viện QR', () => {
 })
 
 describe('Trang người nhận /thu/:slug', () => {
-  it('gửi slug + token (từ #) trong body; mở phong bì thấy thư', async () => {
-    let sent
+  const openApi = () => {
+    const sent = []
     mockApi({
       'POST /letters/open': (_u, init) => {
-        sent = JSON.parse(init.body)
+        sent.push(JSON.parse(init.body))
         return { body: { item: content } }
       },
     })
     window.location.hash = '#' + 'A'.repeat(43)
+    return sent
+  }
+  const video = () => document.querySelector('video.lt-intro-video')
+
+  it('D-138: xem hết 2 video → phòng tối → bật đèn → phong bì → thư → nút xem lại', async () => {
+    const sent = openApi()
     renderAt('/thu/abcdefghij')
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở thư gửi Linh' }))
+    expect(await screen.findByText('Tranh Đông Hồ trên đèn giấy dó')).toBeTruthy()
+    expect(sent).toEqual([{ slug: 'abcdefghij', token: 'A'.repeat(43) }])
+    // Lần đầu: không có nút bỏ qua, chưa thấy đèn
+    expect(screen.queryByRole('button', { name: 'Bỏ qua, vào phòng' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Bật đèn' })).toBeNull()
+    fireEvent.ended(video())
+    expect(await screen.findByText('Từ làng giấy dó đến chiếc đèn')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Bật đèn' })).toBeNull()
+    fireEvent.ended(video())
+    fireEvent.click(await screen.findByRole('button', { name: 'Bật đèn' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Mở thư gửi Linh' }, { timeout: 2000 }))
     expect(screen.getByText('Đoạn một.')).toBeTruthy()
-    expect(sent).toEqual({ slug: 'abcdefghij', token: 'A'.repeat(43) })
     fireEvent.click(screen.getByRole('button', { name: 'Thổi nến' }))
     expect(screen.getByText('Tuổi mới')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Xem lại cách làm đèn' }))
+    expect(screen.getByRole('dialog', { name: 'Từ làng giấy dó đến chiếc đèn' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Đóng video' }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Lịch sử văn hoá' }))
+    expect(screen.getByRole('dialog', { name: 'Tranh Đông Hồ trên đèn giấy dó' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: /truyện kể/ }).getAttribute('href')).toBe('/welcome')
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    // Đã xem hết → lần sau được bỏ qua
+    expect(localStorage.getItem('lv.letter.intro.abcdefghij')).toBe('1')
+  })
+
+  it('đã xem hết ở lần trước → có nút "Bỏ qua, vào phòng"', async () => {
+    localStorage.setItem('lv.letter.intro.abcdefghij', '1')
+    openApi()
+    renderAt('/thu/abcdefghij')
+    fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua, vào phòng' }))
+    expect(await screen.findByRole('button', { name: 'Bật đèn' })).toBeTruthy()
+    localStorage.removeItem('lv.letter.intro.abcdefghij')
+  })
+
+  it('video lỗi → hiện "Tiếp tục" để không kẹt ngoài lá thư', async () => {
+    openApi()
+    renderAt('/thu/abcdefghij')
+    await screen.findByText('Tranh Đông Hồ trên đèn giấy dó')
+    fireEvent.error(video())
+    fireEvent.click(await screen.findByRole('button', { name: 'Tiếp tục' }))
+    expect(await screen.findByText('Từ làng giấy dó đến chiếc đèn')).toBeTruthy()
   })
 
   it('không có token → "không tìm thấy", không gọi API', async () => {

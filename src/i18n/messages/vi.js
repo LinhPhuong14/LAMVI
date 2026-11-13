@@ -332,7 +332,7 @@ export default {
     newsSubmit: 'Đăng ký',
     copyright: '© 2026 LAMVI · Đèn giấy dó thủ công.',
   },
-  // D-135: trang phong thư người nhận
+  // D-138: trang phong thư người nhận
   letter: {
     title: 'Phong thư · LAMVI',
     loading: 'Đang mở phong thư…',

@@ -15,7 +15,6 @@ import { renderPage } from './ssr.js'
 import { render } from '../src/entry-server.jsx'
 
 const base = { publicSiteUrl: 'https://lamvi.test', rateLimit: { enabled: false } }
-const BASE_DOMAIN = 'thu.lamvi.test'
 let app, repo, auth, customer, admin, it_
 
 async function login(email, role = 'customer') {
@@ -460,9 +459,8 @@ describe('validateLetterContent — biên và dữ liệu xấu', () => {
 })
 
 describe('letterUrl', () => {
-  it('LETTER_PROTOCOL=http dùng http; localhost không cổng thì không thêm ":"', () => {
-    expect(letterUrl({ publicSiteUrl: 'https://x.test', letterBaseDomain: 'thu.x.test', letterProtocol: 'http' }, 'abcdefghij', 'T')).toBe('http://abcdefghij.thu.x.test/#T')
-    expect(letterUrl({ publicSiteUrl: 'http://localhost', letterBaseDomain: 'localhost' }, 'abcdefghij', 'T')).toBe('http://abcdefghij.localhost/#T')
+  it('D-138: không subdomain — bỏ qua letterBaseDomain/letterProtocol', () => {
+    expect(letterUrl({ publicSiteUrl: 'https://x.test', letterBaseDomain: 'thu.x.test', letterProtocol: 'http' }, 'abcdefghij', 'T')).toBe('https://x.test/thu/abcdefghij#T')
   })
 })
 
@@ -478,117 +476,6 @@ describe('Giới hạn tần suất mở thư', () => {
   })
 })
 
-describe('Subdomain phong thư — giả mạo Host / đường dẫn', () => {
-  const host = (slug) => `${slug}.${BASE_DOMAIN}`
-  let L
-  beforeEach(async () => {
-    app = build({ ...base, letterBaseDomain: BASE_DOMAIN })
-    L = await publishedOrder()
-    webHits.length = 0
-  })
-
-  it('Host có cổng hoặc viết hoa vẫn nhận đúng slug', async () => {
-    for (const h of [`${host(L.slug)}:443`, host(L.slug).toUpperCase(), `${L.slug.toUpperCase()}.Thu.LAMVI.test:8080`]) {
-      const r = await request(app).get('/').set('Host', h)
-      expect(r.status, h).toBe(302)
-      expect(r.headers.location).toBe(`/thu/${L.slug}`)
-      expect((await request(app).get('/api/admin/letters').set('Host', h).set('Authorization', admin.token)).status, h).toBe(404)
-    }
-  })
-
-  it('subdomain lồng nhau / sai định dạng → 404, không lọt tới site chính', async () => {
-    for (const h of [`a.${host(L.slug)}`, `x.y.${BASE_DOMAIN}`, `-abcdefghi.${BASE_DOMAIN}`, `1bcdefghij.${BASE_DOMAIN}`, `abcdefghijk.${BASE_DOMAIN}`, `.${BASE_DOMAIN}`]) {
-      const page = await request(app).get('/login').set('Host', h)
-      expect(page.status, h).toBe(404)
-      const api = await request(app).get('/api/admin/letters').set('Host', h).set('Authorization', admin.token)
-      expect(api.status, h).toBe(404)
-    }
-    expect(webHits).toEqual([])
-  })
-
-  it('FQDN có dấu chấm cuối (abc….thu.domain.) không được chạy site chính/admin', async () => {
-    const h = `${host(L.slug)}.`
-    const api = await request(app).get('/api/admin/letters').set('Host', h).set('Authorization', admin.token)
-    expect(api.status).toBe(404)
-    const page = await request(app).get('/login').set('Host', h)
-    expect(page.status).not.toBe(200)
-  })
-
-  it('/thu/<slug khác>, dấu / cuối, hoa/thường, đường dẫn mã hoá → về đúng /thu/<slug của mình>', async () => {
-    const other = await publishedOrder()
-    for (const p of [
-      `/thu/${other.slug}`,
-      `/thu/${L.slug}/`,
-      `/THU/${L.slug}`,
-      `/thu/${L.slug.toUpperCase()}`,
-      `/thu/${L.slug}/extra`,
-      `/thu/%${L.slug.charCodeAt(0).toString(16)}${L.slug.slice(1)}`,
-      '/thu',
-      '/admin/letters',
-      '/vi/login',
-      '/sitemap.xml',
-      '/lo/ABC',
-    ]) {
-      const r = await request(app).get(p).set('Host', host(L.slug))
-      expect(r.status, p).toBe(302)
-      expect(r.headers.location, p).toBe(`/thu/${L.slug}`)
-      expect(r.headers['cache-control'], p).toBe('no-store')
-    }
-    expect(webHits).toEqual([])
-  })
-
-  it('trang /thu/<slug của mình> và tệp tĩnh lọt tới web kèm X-Robots-Tag noindex', async () => {
-    const r = await request(app).get(`/thu/${L.slug}`).set('Host', host(L.slug))
-    expect(r.status).toBe(200)
-    expect(r.headers['x-robots-tag']).toMatch(/noindex/)
-    const a = await request(app).get('/assets/index-abc.js').set('Host', host(L.slug))
-    expect(a.headers['x-robots-tag']).toMatch(/noindex/)
-    expect(webHits.map((h) => h.path)).toEqual([`/thu/${L.slug}`, '/assets/index-abc.js'])
-  })
-
-  it('API: /API/…, /api/Letters/open, dấu / cuối, mã hoá → không tới router admin', async () => {
-    for (const [m, p] of [
-      ['get', '/API/admin/letters'],
-      ['get', '/Api/admin/letters'],
-      ['get', '/api/%61dmin/letters'],
-      ['get', '/api//admin/letters'],
-      ['get', '/api/letters/open/../../admin/letters'],
-      ['get', '/api/health/../admin/letters'],
-      ['post', '/api/letters/open/'],
-      ['post', '/API/letters/open'],
-      ['get', '/api/me'],
-      ['get', '/api/products'],
-    ]) {
-      const r = await request(app)[m](p).set('Host', host(L.slug)).set('Authorization', admin.token).send({})
-      expect(r.status === 200 && Array.isArray(r.body?.items), `${m} ${p}`).toBe(false)
-      expect([302, 404], `${m} ${p} → ${r.status}`).toContain(r.status)
-    }
-  })
-
-  it('API được phép vẫn chạy: health, site, mở thư; robots chặn toàn bộ', async () => {
-    expect((await request(app).get('/api/health').set('Host', host(L.slug))).status).toBe(200)
-    expect((await request(app).get('/api/site').set('Host', host(L.slug))).status).toBe(200)
-    expect((await open(L, host(L.slug))).status).toBe(200)
-    const robots = await request(app).get('/robots.txt').set('Host', host(L.slug))
-    expect(robots.text).toBe('User-agent: *\nDisallow: /\n')
-  })
-
-  it('subdomain không tồn tại nhưng đúng định dạng: chỉ ra trang thư, mở thư 404', async () => {
-    const r = await request(app).get('/').set('Host', host('zzzzzzzzzz'))
-    expect(r.headers.location).toBe('/thu/zzzzzzzzzz')
-    expect((await open({ slug: 'zzzzzzzzzz', token: L.token }, host('zzzzzzzzzz'))).status).toBe(404)
-  })
-
-  it('X-Forwarded-Host không đổi được subdomain khi không bật trust proxy', async () => {
-    const r = await request(app).get('/api/admin/letters').set('Host', 'lamvi.test').set('X-Forwarded-Host', host(L.slug)).set('Authorization', admin.token)
-    expect(r.status).toBe(200)
-  })
-
-  it('domain chính vẫn phục vụ /thu/<slug> (dự phòng) và trang thường', async () => {
-    expect((await request(app).get('/login').set('Host', 'lamvi.test')).text).toBe('WEB /login')
-    expect((await request(app).get(`/thu/${L.slug}`).set('Host', 'lamvi.test')).status).toBe(200)
-  })
-})
 
 describe('SSR /thu/<slug>: riêng tư, noindex, không GA', () => {
   const template = readFileSync(new URL('../index.html', import.meta.url), 'utf8')

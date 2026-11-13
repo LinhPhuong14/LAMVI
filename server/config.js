@@ -8,12 +8,6 @@ import { parseServiceAccount } from './adapters/gaRealtime.js'
  */
 export const DEFAULT_HASH_SALT = 'dev-hash-salt'
 
-// Chỉ nhận tên miền thuần (không giao thức, không cổng/đường dẫn)
-function normalizeLetterDomain(v) {
-  const d = String(v ?? '').trim().toLowerCase().replace(/\.$/, '')
-  return /^(?=.{3,200}$)([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9-]{2,}$/.test(d) || d === 'localhost' ? d : null
-}
-
 export function loadConfig(env = process.env) {
   const supabase = {
     url: env.SUPABASE_URL,
@@ -26,10 +20,6 @@ export function loadConfig(env = process.env) {
     port: Number(env.PORT) || 5173,
     // Cắt "/" ở cuối: canonical/hreflang/sitemap nối trực tiếp đường dẫn nên sẽ sinh "//" nếu để
     publicSiteUrl: normalizeSiteUrl(env.PUBLIC_SITE_URL || 'http://localhost:5173'),
-    // D-135: domain gốc của subdomain phong thư (vd thu.<domain> → https://<slug>.thu.<domain>).
-    // Không đặt → QR dùng {PUBLIC_SITE_URL}/thu/<slug>. Cần wildcard domain trên Vercel (deploy-vercel.md).
-    letterBaseDomain: normalizeLetterDomain(env.LETTER_BASE_DOMAIN),
-    letterProtocol: env.LETTER_PROTOCOL === 'http' ? 'http' : 'https',
     // Giới hạn dung lượng video lô [ASSUMPTION]; phải ≤ giới hạn file của bucket Supabase
     maxVideoMb: Number(env.MAX_VIDEO_MB) || 500,
     // FR-RET-001: 0 keeps submission disabled until PO approves video limits and retention.

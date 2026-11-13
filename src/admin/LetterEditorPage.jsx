@@ -75,7 +75,7 @@ function previewOf(f) {
   return { ...c, message: paragraphsOf(c.message), occasionData: Object.keys(od).length ? od : null, postscript: c.postscript || null }
 }
 
-/** D-134: admin soạn toàn bộ phong thư của một đơn, xem trước, xuất bản ra QR (D-135). */
+/** D-134: admin soạn toàn bộ phong thư của một đơn, xem trước, xuất bản ra QR (D-138). */
 export default function LetterEditorPage() {
   const { code } = useParams()
   const { authedApi } = useAuth()

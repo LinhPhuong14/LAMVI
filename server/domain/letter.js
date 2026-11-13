@@ -1,6 +1,6 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 
-// D-134, D-135: phong thư riêng của từng đơn — admin soạn toàn bộ, xuất QR dẫn tới subdomain riêng.
+// D-134, D-138: phong thư riêng của từng đơn — admin soạn toàn bộ, xuất QR dẫn tới trang riêng trên domain chính.
 
 /** Bảy dịp của Phòng thư (khớp `occasions` ở src/letter-room/data.js). */
 export const OCCASIONS = ['birthday', 'anniversary', 'thankYou', 'milestone', 'encouragement', 'longDistance', 'justBecause']
@@ -10,8 +10,8 @@ export const LETTER_STATUSES = ['draft', 'published']
 // Giới hạn độ dài [ASSUMPTION] — đủ cho một lá thư tay, chặn dữ liệu rác làm nặng trang
 export const LIMITS = { name: 60, paragraph: 1200, paragraphs: 12, message: 6000, postscript: 400, short: 300, label: 60, places: 4, photos: 2 }
 
-// Subdomain ngẫu nhiên: 10 ký tự a-z0-9 bắt đầu bằng chữ (~51 bit) — không lộ mã đơn qua DNS/SNI.
-// Không phải bí mật: quyền xem nằm ở token (D-135).
+// Mã thư ngẫu nhiên trên đường dẫn /thu/<slug>: 10 ký tự a-z0-9 bắt đầu bằng chữ — không lộ mã đơn.
+// Không phải bí mật: quyền xem nằm ở token (D-138).
 export const SLUG_RE = /^[a-z][a-z0-9]{9}$/
 const SLUG_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789'
 export function generateSlug() {
@@ -33,21 +33,8 @@ export function tokenMatches(given, expected) {
   return timingSafeEqual(a, b)
 }
 
-/**
- * URL in lên QR. Có LETTER_BASE_DOMAIN → https://<slug>.<domain>/#<token> (D-135); không có (dev,
- * Preview) → {PUBLIC_SITE_URL}/thu/<slug>#<token>.
- */
+/** URL in lên QR (D-138): {PUBLIC_SITE_URL}/thu/<slug>#<token> — không dùng subdomain. */
 export function letterUrl(config, slug, token) {
-  const base = config.letterBaseDomain
-  if (base) {
-    // Dev: <slug>.localhost dùng cổng của PUBLIC_SITE_URL (trình duyệt tự trỏ *.localhost về máy)
-    if (base === 'localhost') {
-      const site = new URL(config.publicSiteUrl)
-      return `${site.protocol}//${slug}.localhost${site.port ? `:${site.port}` : ''}/#${token}`
-    }
-    const proto = config.letterProtocol ?? 'https'
-    return `${proto}://${slug}.${base}/#${token}`
-  }
   return `${config.publicSiteUrl}/thu/${slug}#${token}`
 }
 

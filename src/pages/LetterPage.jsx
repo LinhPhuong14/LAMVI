@@ -3,9 +3,12 @@ import { useParams } from 'react-router-dom'
 import { api, ApiError } from '../api/client.js'
 import Seo from '../seo/Seo.jsx'
 import LetterPaper from '../letters/LetterPaper.jsx'
+import IntroFilms from '../letters/IntroFilms.jsx'
+import LetterExtras from '../letters/LetterExtras.jsx'
+import { introSeen, markIntroSeen } from '../letters/films.js'
 import { useI18n } from '../i18n/index.js'
 
-// D-135: trang phong thư của người nhận (subdomain riêng → /thu/<slug>). Token nằm sau dấu # (không
+// D-138: trang phong thư của người nhận (/thu/<slug> trên domain chính). Token nằm sau dấu # (không
 // vào log server/Referer) và chỉ gửi trong body POST. Sai/không có token → cùng một màn "không tìm thấy".
 export default function LetterPage() {
   const { slug } = useParams()
@@ -22,7 +25,8 @@ export default function LetterPage() {
         if (!/^[A-Za-z0-9_-]{43}$/.test(token)) throw new ApiError(404, 'NOT_FOUND')
         const r = await api('/letters/open', { method: 'POST', body: { slug, token } })
         if (!r?.item || typeof r.item !== 'object') throw new ApiError(0, 'INTERNAL_ERROR')
-        if (alive) setState({ status: 'ok', letter: r.item })
+        // D-138: hai video LAMVI trước, xem hết mới vào phòng bật đèn
+        if (alive) setState({ status: 'ok', letter: r.item, intro: true, canSkip: introSeen(slug) })
       } catch (err) {
         if (alive) setState({ status: 'error', code: err instanceof ApiError ? err.status : 0 })
       }
@@ -37,7 +41,17 @@ export default function LetterPage() {
       <Seo title={t('letter.title')} noindex />
       {state.status === 'ok' ? (
         <main>
-          <LetterPaper letter={state.letter} />
+          {state.intro ? (
+            <IntroFilms
+              canSkip={state.canSkip}
+              onDone={(watchedAll) => {
+                if (watchedAll) markIntroSeen(slug)
+                setState((s) => ({ ...s, intro: false }))
+              }}
+            />
+          ) : (
+            <LetterPaper letter={state.letter} afterLetter={<LetterExtras />} />
+          )}
         </main>
       ) : (
         <main className="lt-status" role={state.status === 'loading' ? 'status' : undefined} aria-busy={state.status === 'loading'}>

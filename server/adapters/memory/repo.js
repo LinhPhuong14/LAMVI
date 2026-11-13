@@ -601,7 +601,7 @@ export function createMemoryRepo(data = {}) {
         .slice(0, Math.max(1, Math.min(limit, 100)))
     },
 
-    // --- Phong thư riêng của đơn (D-134, D-135)
+    // --- Phong thư riêng của đơn (D-134, D-138)
     async getOrderLetter(orderId) {
       const l = state.orderLetters.find((x) => x.orderId === orderId)
       return l ? clone(l) : null
