@@ -207,7 +207,7 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 |---|---|---|---|
 | Admin Đổi trả (B3) hai cột, video tự phát, hai nút quyết định | ✅ code | `ReturnsPage.jsx`, `returns.css` | test đang cập nhật |
 | Hero dùng ảnh cover fanpage | ✅ code | `HomePage.jsx`, `public/images/brand/cover-*.webp` | |
-| Trang `/welcome` (QR dán đèn), xoay ngang, dạng truyện kể dân gian (D-132, T-102) | ✅ code | `WelcomePage.jsx`, cuối `pages.css`; i18n `welcome.*` | PO/BA chốt G-120, đo lượt quét |
+| Trang `/welcome` (QR dán đèn), xoay ngang, dạng truyện kể dân gian (D-132, T-102) | ✅ code | `WelcomePage.jsx`, cuối `pages.css`; i18n `welcome.*`; video bản nhẹ 360p (T-103, `lib/filmSrc.js`) | PO/BA chốt G-120, đo lượt quét |
 
 | Đợt v0.73 (D-127) | Trạng thái | Code / kiểm tra | Còn lại |
 |---|---|---|---|
