@@ -1,5 +1,17 @@
 # Tiến độ tính năng
 
+## 2026-11-13 — Prototype "Phòng thư LAMVI" (feat/phong-thu-lamvi, D-133, T-104)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Phòng isometric 3D, bật đèn, camera áp sát phong bì, kéo thư, nét mực, đọc chữ/video, tái bút | ✅ prototype, dữ liệu mẫu | `src/wishroom/*`, route `/phong-thu` (`routes.jsx`, `IMMERSIVE_PAGES` ở `LocaleLayout.jsx`) | Nối vào `/qr/:token` thật (G-121, Q-44); texture ảnh thật (giấy/gỗ/giấy dó) |
+| Lối 2D khi không có WebGL (cùng máy trạng thái) | ✅ | `src/wishroom/Fallback2D.jsx` | — |
+| Cảnh E — bất ngờ theo dịp: sinh nhật, kỷ niệm, tặng bất chợt (hình bóng qua giấy đèn) | ✅ 3/7 dịp (đợt 1 theo PO) | `src/wishroom/OccasionSurprise.jsx`, bake silhouette ở `sceneEngine.js` | 4 dịp còn lại (thankYou, milestone, encouragement, longDistance) |
+| Test: máy trạng thái, toán kéo/easing, luồng 2D đầy đủ (bật đèn→đọc→P.S./Cảnh E), mẫu video | ✅ 28 test mới | `src/wishroom/*.test.{js,jsx}` | — |
+| Kiểm thử độc lập (T-11) | ✅ | agent fork tự chạy `npm test`/`npm run lint`, không có finding ảnh hưởng tới nghiệp vụ hiện có | — |
+
+Toàn bộ 264 file / 3988 test (+1 skip) xanh; `npm run lint` sạch; `npm run build` xanh. Không đổi hành vi trang `/qr/:token` thật hay dữ liệu lời chúc trong DB.
+
 ## 2026-10-23 — Video khung điện thoại + motion chậm (feat/qr-video-slow-motion, D-120)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |

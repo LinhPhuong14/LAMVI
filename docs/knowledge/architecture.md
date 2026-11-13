@@ -312,6 +312,20 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 - `AuthProvider`: access token + user trong `localStorage` (`moc.session`, không có refresh token — T-49), `authedApi` tự gọi `/auth/refresh` (cookie) một lần khi gặp 401.
 
 
+## Phòng thư LAMVI — prototype trải nghiệm nhận lời chúc 3D (T-104, D-133)
+
+Prototype trang `/phong-thu` (noindex, không SSR — `IMMERSIVE_PAGES` trong `LocaleLayout.jsx` bỏ
+hết header/footer/tabbar/May/banner cookie, khác `/qr/:token` thật). Dữ liệu mẫu cục bộ (`src/wishroom/data.js`),
+**không gọi API thật** — xem §21.9 `ba-spec.md` trước khi nối vào luồng QR thật ở `GiftPage.jsx`.
+
+- `dragProgress.js`: toán học thuần (easing, chiếu trục kéo lên màn hình, tiến độ kéo, ngưỡng thả tay 40%, `tween` rAF) — test được không cần DOM/WebGL.
+- `useWishRoomMachine.js`: máy trạng thái 6 trạng thái (`roomDark→roomLit→envelopeFocus→letterReady→letterOpen→postscriptOpen`) bằng `useReducer`; `request()` có cổng đồng bộ (busy/cạnh hợp lệ) cho thao tác trực tiếp từ sự kiện, `advance()` bỏ qua cổng đó cho bước nối tiếp gọi từ callback đã lưu (`onDone` của tween) — tránh bug closure cũ (state đọc được trong callback có thể lệch so với state thật, xem decisions.md T-104).
+- `sceneEngine.js`: engine Three.js thuần (không R3F) dựng phòng/đèn/phong bì/lá thư/tái bút, camera `OrthographicCamera` với hai "khung hình" (rộng/áp sát phong bì) nội suy vị trí+điểm nhìn+zoom, raycast hit-test, bóng tiếp xúc giả (sprite gradient, không shadow map), bóng hình Cảnh E qua `emissiveMap`. Chỉ import động (code-splitting) sau khi `WishRoomPage.jsx` xác nhận WebGL khởi tạo được — không import trong test chạy jsdom.
+- `WishRoomScene.jsx`: bọc canvas, Pointer Events + `setPointerCapture`, phân biệt chạm/kéo bằng ngưỡng px, gọi `dragProgress.js` để quy đổi delta con trỏ → tiến độ.
+- `InkGreeting.jsx` / `LetterReader.jsx` / `OccasionSurprise.jsx`: lớp HTML thay lá thư 3D (Cảnh D), căn theo `getLetterScreenRect()`; `OccasionSurprise` là Cảnh E (bất ngờ theo dịp) — chỉ 3 dịp có giao diện (`IMPLEMENTED_OCCASIONS`), dịp khác rơi về P.S. thường.
+- `Fallback2D.jsx`: lối không WebGL, dùng lại `useWishRoomMachine` + `LetterReader`, không có canvas.
+- Font riêng trang này (nạp trong `WishRoomPage.jsx`, không ảnh hưởng LCP các trang khác): Spectral (thân thư), Itim (chữ viết tay — có bộ `vietnamese`, thay cho Caveat/Instrument Sans không có, xem T-104); Be Vietnam Pro (hướng dẫn/UI) dùng lại font đã nạp sẵn ở `main.jsx`.
+
 ## Checkout transaction (T-59)
 
 `orders/service.js` tính quote và payload; `repo.createOrder` commit qua RPC `create_checkout_order`. Postgres giữ kho/coupon, order_items snapshots, redemption và consumption của cart trong một transaction. Memory adapter mô phỏng khi `fromCart:true`; việc chèn snapshot fixture không có cart dùng cho test lịch sử.

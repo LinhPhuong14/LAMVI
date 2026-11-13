@@ -1,5 +1,19 @@
 # Nhật ký phiên
 
+## 2026-11-13 — Prototype "Phòng thư LAMVI" (nhánh `feat/phong-thu-lamvi`, D-133, T-104)
+
+Người dùng đưa đặc tả chi tiết (không phải từ ba-spec.md có sẵn — tự dán trực tiếp vào hội thoại) cho một microsite 3D isometric ở trang nhận lời chúc: bật đèn → chạm phong bì → kéo thư → nét mực → đọc chữ/video → P.S., sau đó mở rộng thêm "Cảnh E" (bất ngờ theo dịp tặng quà, 7 dịp, PO chọn dựng trước 3 dịp: sinh nhật, kỷ niệm, tặng bất chợt). Vì chưa có trong `ba-spec.md`, đã ghi nhận là D-133 (§21.9) thay vì tự quyết định phạm vi nghiệp vụ — giữ đúng scope người dùng nói rõ là **prototype + dữ liệu mẫu cục bộ**, không nối API thật.
+
+Đã dựng: `src/wishroom/*` (engine Three.js thuần, máy trạng thái 6 bước, lớp đọc HTML, lối 2D dự phòng), route `/phong-thu` toàn màn hình (`IMMERSIVE_PAGES` mới ở `LocaleLayout.jsx`, bỏ hết header/footer/May/banner cookie — khác hẳn các route khác của site). 5 dữ liệu mẫu (`?mau=chu|video|sinhnhat|kyniem|batchot`).
+
+**Bài học/bug đáng nhớ** (chi tiết ở `decisions.md` T-104): (1) trộn hai trục local sau khi xoay phong bì nằm phẳng (Y=trục kéo thư, Z=trục chồng lớp) làm vỡ hình học hoàn toàn — soát lại bằng tay từng phép quay; (2) đơn vị `zoom` của `OrthographicCamera` không phải pixel, đặt nhầm làm khung nhìn còn 0,004 đơn vị (đen toàn bộ); (3) `request()` của máy trạng thái đọc `state` qua closure — an toàn khi gọi trực tiếp từ sự kiện nhưng SAI khi gọi nối tiếp trong một callback đã lưu lại (onDone của tween bất đồng bộ), phải tách riêng `advance()` không qua cổng closure cho đúng trường hợp đó; (4) `aria-hidden="true"` đặt nhầm lên cả khối chứa một nút bấm thật (nến sinh nhật) làm nút biến mất khỏi cây hỗ trợ tiếp cận lẫn test — bài học: `aria-hidden` chỉ đặt trên phần tử THUẦN trang trí, không bọc lên bất cứ gì có thể focus; (5) thử `ACESFilmicToneMapping` + `HemisphereLight` + `Fog` để "đẹp hơn, giống game" theo yêu cầu người dùng nhưng làm phẳng/nhạt đúng tương phản ấm/lạnh mà bảng màu đặc tả cố tình giữ — bỏ, chỉ giữ lại rim light tĩnh + hình học rèm có nếp gấp thật (không tốn thêm chi phí render).
+
+Quy trình: chạy Playwright thật (desktop + 390/420px) để tự chụp và soát từng cảnh thay vì chỉ tin test — phát hiện mọi bug hình học/ánh sáng ở trên qua ảnh chụp, không phải qua đọc code. Subagent kiểm thử độc lập (T-11) chạy sau khi code xong, trước khi commit — xem báo cáo ở cuối phiên này trong code review hoặc hỏi lại nếu cần.
+
+Toàn bộ 264 file / 3988 test xanh, lint sạch, build (client + SSR) qua. Không đổi hành vi `/qr/:token` thật. Còn mở (G-121, Q-44): có đưa trải nghiệm này vào luồng QR thật không, và theo cách nào; texture ảnh thật (giấy/gỗ/giấy dó) — nguồn CC0 đã ghi chú ngay trong `sceneEngine.js`.
+
+---
+
 ## 2026-10-27 (phiên 3) — Admin còn lại + sửa layout thẻ sản phẩm (nhánh `ccr-f7654e08-wqcdp4`, D-128)
 
 PO báo lỗi layout thẻ sản phẩm trong carousel (chân thẻ co lại) và yêu cầu carousel 2 giây: đã sửa và merge. Admin: B4 (mã giảm giá), B5 (sản phẩm), B6 (bộ sưu tập, chưa kéo thả), B7 (lô đèn), B9 (người dùng) theo bố cục `Split`. Chưa làm: B8 (Hỏi đáp, Mây), B10 (Analytics), kéo thả bộ sưu tập, xuất CSV và in phiếu. Lưu ý: lần merge sửa layout chỉ chạy test component, chưa chạy cả bộ.

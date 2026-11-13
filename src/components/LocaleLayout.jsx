@@ -17,6 +17,11 @@ import CartProvider from '../cart/CartProvider.jsx'
 // Trang dạng ứng dụng (dashboard tài khoản) tự có thanh bên, không dùng header/footer của trang giới thiệu
 const APP_PAGES = new Set(['/account', '/welcome'])
 
+// Trải nghiệm toàn màn hình, không có chrome nào của site (không header/footer/tabbar/May/banner
+// cookie) — "Phòng thư LAMVI" là microsite riêng người nhận mở từ QR, phải chiếm trọn màn hình
+// ngay từ frame đầu (yêu cầu §1: "bố cục phải giữ được cả hai [đèn, phong bì] trong vùng nhìn chính")
+const IMMERSIVE_PAGES = new Set(['/phong-thu'])
+
 // Cảnh nền ảnh thật ở đầu các trang công khai (D-66); trang chủ có cảnh riêng từng phần, 404 tự vẽ khung đêm
 const AUTH_PAGES = new Set(['/login', '/register', '/forgot-password', '/reset-password', '/auth/callback'])
 function pageScene(rest) {
@@ -35,10 +40,14 @@ export default function LocaleLayout({ lang }) {
   const outlet = useOutlet()
   const { rest } = splitLocale(pathname)
   const clean = rest.replace(/\/+$/, '') || '/'
+  const immersive = IMMERSIVE_PAGES.has(clean)
   const app = APP_PAGES.has(clean)
   const auth = AUTH_PAGES.has(clean)
   const scene = app ? null : pageScene(clean)
   const tabs = !app && !auth && showsTabBar(clean)
+
+  if (immersive) return <LocaleProvider lang={lang}>{outlet}</LocaleProvider>
+
   return (
     <LocaleProvider lang={lang}>
       {/* NFR-A11Y-001: tắt hiệu ứng framer-motion khi người dùng bật giảm chuyển động */}
