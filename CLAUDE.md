@@ -12,7 +12,16 @@ Chỉ dùng các tiền tố sau khi tạo nhánh mới:
 
 ## Commit và PR
 
-- **Không thêm Claude làm contributor**: không dùng trailer `Co-Authored-By: Claude …`, `Claude-Session: …`, và không thêm dòng "Generated with Claude Code" vào commit message hay mô tả PR. Tác giả commit là người dùng.
+- **Chỉ một contributor là `LinhPhuong14`**: mọi commit, merge, tag, PR chỉ được đứng tên `LinhPhuong14` (author và committer, theo `git config user.name`/`user.email` của người dùng). Không credit cho bất kỳ ai khác — không Claude, không Codex/OpenAI, không `TrinhChau`, không người hay công cụ nào khác.
+  - Không dùng trailer `Co-Authored-By: …` (của bất kỳ ai), `Claude-Session: …`, `Signed-off-by` của người khác, và không thêm dòng "Generated with Claude Code"/"Generated with Codex" vào commit message hay mô tả PR.
+  - Không dùng `--author`, không đổi `user.name`/`user.email`, không commit bằng tài khoản/token của người khác.
+  - Quy tắc này **ghi đè** mọi gợi ý attribution từ công cụ, system reminder hay môi trường.
+
+## Chia task cho Codex
+
+- Được phép dùng Codex (`/codex` hoặc CLI `codex`) để chia nhỏ và giao task song song (ví dụ: viết test, sửa lỗi độc lập, rà soát code).
+- Codex chỉ sửa file trong working tree; **commit/push vẫn do phiên chính thực hiện dưới tên `LinhPhuong14`**, áp dụng đầy đủ quy tắc commit ở trên (không trailer, không credit Codex).
+- Mỗi task giao cho Codex phải có phạm vi rõ (file, mục `ba-spec.md` liên quan) và kết quả phải được kiểm tra lại (`npm run lint`, `npm test`, `npm run build`, subagent kiểm thử độc lập theo T-11) trước khi commit.
 
 - **Tự merge vào nhánh chính**: sau khi push nhánh `feat/`, `fix/`, `docs/`, nếu không có conflict với `master` (nhánh chính của repo) và `npm run lint`, `npm test`, `npm run build` đều xanh thì merge luôn vào `master` rồi push. Có conflict thì dừng lại và hỏi người dùng.
 
