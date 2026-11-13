@@ -199,3 +199,268 @@
     transition: none;
   }
 }
+
+/* D-138: video mở đầu, căn phòng bật đèn, nút xem lại cuối thư */
+.lt-intro {
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  background: #1e140c;
+  color: #f6ead2;
+  text-align: center;
+  box-sizing: border-box;
+}
+.lt-intro-step {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d9b07a;
+}
+.lt-intro-title {
+  margin: 0;
+  font-family: var(--serif, Georgia, serif);
+  font-weight: 500;
+  font-size: clamp(1.4rem, 5vw, 2rem);
+}
+.lt-intro-video {
+  width: min(960px, 100%);
+  max-height: 70svh;
+  border-radius: 10px;
+  background: #000;
+}
+.lt-intro-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+.lt-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.lt-btn {
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1px solid #d9b07a;
+  border-radius: 999px;
+  background: #d9b07a;
+  color: #2b1a0e;
+  font: inherit;
+  cursor: pointer;
+}
+.lt-btn-ghost {
+  background: transparent;
+  color: inherit;
+}
+.lt-btn:focus-visible,
+.lt-lamp:focus-visible,
+.lt-overlay-close:focus-visible {
+  outline: 3px solid #f6ead2;
+  outline-offset: 3px;
+}
+
+.lt-room {
+  position: relative;
+  width: min(420px, 100%);
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+  padding: 40px 16px;
+}
+.lt-stage:has(.lt-room) {
+  background: radial-gradient(90% 70% at 50% 40%, #2a1d12 0%, #120c07 100%);
+  transition: background 0.9s ease;
+}
+.lt-stage:has(.lt-room.is-lit) {
+  background: radial-gradient(90% 70% at 50% 40%, #fff1d2 0%, #e8cf9f 55%, #b98a52 100%);
+}
+.lt-lamp {
+  position: relative;
+  width: 140px;
+  height: 220px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 12px;
+}
+.lt-lamp:disabled {
+  cursor: default;
+}
+.lt-lamp-shade {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 10px;
+  height: 150px;
+  border-radius: 46% 46% 40% 40% / 30% 30% 22% 22%;
+  background: #5b4330;
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 6%);
+  transition: background 0.9s ease, box-shadow 0.9s ease;
+}
+.lt-lamp-base {
+  position: absolute;
+  left: 50px;
+  right: 50px;
+  bottom: 18px;
+  height: 46px;
+  border-radius: 6px 6px 10px 10px;
+  background: #3b2617;
+}
+.lt-lamp-glow {
+  position: absolute;
+  inset: -60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 214 140 / 70%) 0%, rgb(255 214 140 / 0%) 65%);
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.is-lit .lt-lamp-shade {
+  background: radial-gradient(circle at 50% 45%, #fff6dc 0%, #f4cf8a 60%, #d99a4d 100%);
+  box-shadow: 0 0 60px rgb(255 200 120 / 70%);
+}
+.is-lit .lt-lamp-glow {
+  opacity: 1;
+}
+.lt-room-hint {
+  margin: 0;
+  color: #f6ead2;
+  text-align: center;
+  transition: color 0.9s ease;
+}
+.is-lit .lt-room-hint {
+  color: #4a2f1a;
+}
+
+.lt-after {
+  margin: 28px 0 0;
+  padding-top: 18px;
+  border-top: 1px dashed rgb(168 116 63 / 40%);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.lt-after .lt-btn {
+  background: transparent;
+  color: #6b4426;
+  border-color: #a8743f;
+}
+
+.lt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(18 12 7 / 88%);
+}
+.lt-overlay-box {
+  position: relative;
+  width: min(960px, 100%);
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  color: #f6ead2;
+  text-align: center;
+}
+.lt-overlay-box a {
+  color: #d9b07a;
+}
+.lt-overlay-close {
+  justify-self: end;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 12%);
+  color: #f6ead2;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lt-stage,
+  .lt-lamp-shade,
+  .lt-lamp-glow,
+  .lt-room-hint {
+    transition: none;
+  }
+}
+
+/* Tiêu đề viết tay: nét mực chạy theo đường viền chữ + vệt ngòi bút trái → phải, rồi mực đổ đầy */
+.lt-hw-wrap {
+  margin: 0 0 12px;
+  line-height: 1;
+}
+.lt-hw {
+  display: block;
+  height: clamp(2.6rem, 10vw, 3.6rem);
+  width: auto;
+  max-width: 100%;
+  overflow: visible;
+}
+.lt-hw-text {
+  font: 400 48px 'Itim', cursive;
+  fill: #4a2f1a;
+  fill-opacity: 0;
+  stroke: #4a2f1a;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation:
+    lt-hw-stroke var(--hw-dur, 2s) cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards,
+    lt-hw-fill 0.6s ease-out calc(var(--hw-dur, 2s) * 0.8) forwards;
+}
+.lt-hw-sweep {
+  transform: scaleX(0);
+  animation: lt-hw-sweep var(--hw-dur, 2s) cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+}
+@keyframes lt-hw-stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes lt-hw-fill {
+  to {
+    fill-opacity: 1;
+    stroke-width: 0.3;
+  }
+}
+@keyframes lt-hw-sweep {
+  to {
+    transform: scaleX(1.12);
+  }
+}
+.lt-hw.is-instant .lt-hw-text {
+  animation: none;
+  fill-opacity: 1;
+  stroke-width: 0.3;
+  stroke-dashoffset: 0;
+}
+
+/* Nội dung chính: fade in sau khi tiêu đề viết xong */
+.lt-content {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+.lt-content.is-shown {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lt-content {
+    transition: none;
+  }
+}

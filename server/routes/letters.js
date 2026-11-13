@@ -19,7 +19,7 @@ const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArra
 
 /**
  * D-134: admin soạn phong thư cho từng đơn và xuất bản ra QR.
- * D-135: người nhận mở bằng subdomain ngẫu nhiên + token trong QR; ai có link là xem được.
+ * D-138: người nhận mở /thu/<slug>#<token> trên domain chính; ai có link là xem được.
  */
 export function lettersRouter({ repo, auth, config }) {
   const r = Router()
@@ -38,8 +38,6 @@ export function lettersRouter({ repo, auth, config }) {
   r.post('/letters/open', limit('letter-open', 60, 600), async (req, res) => {
     const { slug, token } = body(req)
     if (typeof slug !== 'string' || !SLUG_RE.test(slug)) throw notFound()
-    // Dưới subdomain của thư: chỉ mở đúng thư của subdomain đó
-    if (req.letterSlug && req.letterSlug !== slug) throw notFound()
     const letter = await repo.getLetterBySlug(slug)
     const ok = letter && letter.status === 'published' && letter.content && tokenMatches(token, letter.token)
     if (!ok) throw notFound()
@@ -122,7 +120,7 @@ export function lettersRouter({ repo, auth, config }) {
     res.json({ item: presentLetterForAdmin(saved, config) })
   })
 
-  // Tạo QR mới (lộ link, in hỏng…): đổi cả subdomain và token, QR cũ hết hiệu lực ngay
+  // Tạo QR mới (lộ link, in hỏng…): đổi cả mã thư (slug) và token, QR cũ hết hiệu lực ngay
   r.post('/admin/orders/:code/letter/rotate', async (req, res) => {
     const o = await orderOf(req)
     const letter = await repo.getOrderLetter(o.id)

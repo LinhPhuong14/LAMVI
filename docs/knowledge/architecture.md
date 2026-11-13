@@ -314,7 +314,7 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 - Công khai: `/shop` (bộ sưu tập + đèn lẻ), `/collections/:slug`, `/privacy`, `/returns`; tài khoản: `/account?tab=gallery` (gallery + chăn Đông Hồ).
 - Admin: `/admin/{orders,users,products,faq,batches,coupons,analytics,may}` — chỉ tiếng Việt, ngoài `LocaleLayout` (D-48).
 - IT: `/it` — chỉ tiếng Việt (D-51).
-- Trang con: `/` · `/products/:slug` · `/lo/:code` · `/qr/:token` (riêng tư, noindex) · `/thu/:slug` (phong thư, riêng tư, không tiền tố ngôn ngữ; dưới subdomain `<slug>.<LETTER_BASE_DOMAIN>` — middleware `letterHost`) · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
+- Trang con: `/` · `/products/:slug` · `/lo/:code` · `/qr/:token` (riêng tư, noindex) · `/thu/:slug` (phong thư, riêng tư, không tiền tố ngôn ngữ; QR `{PUBLIC_SITE_URL}/thu/<slug>#<token>` — D-138; video mở đầu → phòng bật đèn → thư) · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
 - `AuthProvider`: access token + user trong `localStorage` (`moc.session`, không có refresh token — T-49), `authedApi` tự gọi `/auth/refresh` (cookie) một lần khi gặp 401.
 
 

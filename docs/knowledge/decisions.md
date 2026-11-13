@@ -49,7 +49,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-52 | 2026-10-02 | Trang Cửa hàng `/shop` + `ProductCards` dùng chung; navbar luôn ghim, thu nhỏ 20% khi cuộn (`transform`, không đổi layout) | Hiệu lực |
 | T-53 | 2026-10-02 | Trang chi tiết sản phẩm `ProductPage` v2 (lưới `pdp-*`), khối `Related` dùng lại `ProductCards` | Hiệu lực |
 | T-104 | 2026-11-13 | Prototype "Phòng thư LAMVI" (`/phong-thu`, D-133): Three.js thuần (không R3F), máy trạng thái 6 bước, font Itim thay Caveat/Instrument Sans (thiếu bộ `vietnamese`) | Hiệu lực |
-| T-106 | 2026-11-13 | Phong thư riêng từng đơn + QR subdomain (D-134, D-135): bảng `order_letters`, middleware `letterHost` chặn site chính dưới subdomain, token sau `#` gửi qua POST, biến `LETTER_BASE_DOMAIN` + wildcard domain Vercel | Hiệu lực |
+| T-106 | 2026-11-13 | Phong thư riêng từng đơn + QR (D-134, D-135, D-138): bảng `order_letters`, URL `/thu/<slug>#<token>` trên domain chính (D-138 bỏ subdomain, gỡ `letterHost`/`LETTER_BASE_DOMAIN`), token sau `#` gửi qua POST, video mở đầu + phòng bật đèn | Hiệu lực (sửa đổi) |
 
 ---
 
@@ -535,4 +535,7 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - **Token sau `#`**: không vào access log của Vercel/proxy và không đi theo Referer; redirect 302 không có fragment thì trình duyệt giữ nguyên `#token`. Client gửi token trong body POST. So khớp bằng hash SHA-256 + `timingSafeEqual`.
 - **Trang `/thu/<slug>`**: riêng tư (`classifyPath` → private, noindex, không SSR nội dung), không tiền tố ngôn ngữ, không nhúng GA (`isInternalPath`). Giao diện tạm `LetterPaper` 2D, nhận đúng hình dạng `letter` của `letter-room` để thay bằng cảnh 3D sau (G-124).
 - **Thay thế đã cân nhắc**: subdomain = mã đơn (lộ mã đơn qua DNS/SNI, bỏ); token trong path (vào log, bỏ); gắn thiết bị/PIN (người dùng chọn "ai có link là xem").
-- **Hệ quả**: Vercel cần wildcard domain `*.<LETTER_BASE_DOMAIN>` (nameserver trỏ Vercel) — xem `deploy-vercel.md`. Dev: `LETTER_BASE_DOMAIN=localhost` → `http://<slug>.localhost:5173/#token`.
+- **Hệ quả (bản đầu)**: Vercel cần wildcard domain `*.<LETTER_BASE_DOMAIN>`.
+- **Sửa đổi 2026-11-13 (D-138)**: người dùng bỏ subdomain — gỡ `server/middleware/letterHost.js`, `config.letterBaseDomain/letterProtocol`, biến `LETTER_BASE_DOMAIN`; `letterUrl` luôn trả `{PUBLIC_SITE_URL}/thu/<slug>#<token>`. Không cần cấu hình DNS/Vercel thêm. Slug vẫn ngẫu nhiên (không lộ mã đơn trên URL), token vẫn sau `#`.
+- **Luồng người nhận (D-138)**: `IntroFilms` phát `CRAFT_FILMS.dongho` rồi `CRAFT_FILMS.paper` (chọn 360p/720p qua `pickFilmSrc`, T-103), chuyển bước bằng sự kiện `ended`; lỗi video → nút "Tiếp tục"; xem hết thì nhớ `lv.letter.intro.<slug>` ở localStorage (bọc try/catch) để lần sau cho bỏ qua. Sau đó `LetterPaper` thêm bước phòng tối/bật đèn (CSS, không WebGL) trước phong bì; `LetterExtras` cuối thư mở `FilmOverlay`. Video tự host ở `public/videos` (CDN), không qua function.
+- **Tiêu đề viết tay**: `HandwrittenTitle` vẽ SVG `<text>` font Itim, `stroke-dasharray/dashoffset` cho nét chạy theo viền glyph + `mask` một dải quét `scaleX` trái → phải, sau đó tô `fill-opacity`; nghe `animationend` (tên `lt-hw-fill`) bằng listener DOM, có timeout dự phòng; xong thì `.lt-content` fade in. Không dùng thư viện ngoài, không vẽ sẵn path cho từng tên.

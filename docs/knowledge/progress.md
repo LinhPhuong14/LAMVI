@@ -1,5 +1,16 @@
 # Tiến độ tính năng
 
+## 2026-11-13 — Phong thư: video mở đầu, phòng bật đèn, bỏ subdomain (feat/phong-thu-intro, D-138)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Bỏ subdomain, QR `{PUBLIC_SITE_URL}/thu/<slug>#<token>` | ✅ | `server/domain/letter.js` (gỡ `letterHost`, `LETTER_BASE_DOMAIN`) | — |
+| Hai video LAMVI mở đầu, xem hết mới vào phòng | ✅ | `src/letters/IntroFilms.jsx`, `src/letters/films.js` | Marketing duyệt thứ tự/tiêu đề video |
+| Căn phòng tối → bật đèn → phong bì | ✅ 2D | `src/letters/LetterPaper.jsx` | Cảnh 3D `letter-room` (G-124) |
+| Nút cuối thư: xem lại cách làm đèn, lịch sử văn hoá | ✅ | `src/letters/LetterExtras.jsx` | — |
+| Tiêu đề thư viết tay (stroke write-on), nội dung fade in sau | ✅ | `src/letters/HandwrittenTitle.jsx`, `HandwrittenTitle.test.jsx` | Xem thử trên iOS thật |
+| Test | ✅ | `src/admin/Letters.test.jsx`, `src/letters/letters.independent.test.jsx`, `server/letters*.test.js` | — |
+
 ## 2026-11-13 — Phong thư riêng từng đơn + QR subdomain (feat/phong-thu-qr, D-134, D-135, T-106)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |

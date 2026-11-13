@@ -1,4 +1,4 @@
-// Phong thư riêng của đơn (D-134) + QR subdomain (D-135)
+// Phong thư riêng của đơn (D-134) + QR trên domain chính (D-138)
 import { beforeEach, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { createApp } from './app.js'
@@ -52,10 +52,6 @@ const CONTENT = {
   occasionData: { message: 'Tuổi mới rực rỡ', label: 'bỏ qua vì không phải cột mốc' },
 }
 const adminApi = (method, path) => request(app)[method](`/api${path}`).set('Authorization', admin.token)
-const split = (url) => {
-  const u = new URL(url)
-  return { slug: u.hostname.split('.')[0], token: u.hash.slice(1), u }
-}
 
 describe('validateLetterContent', () => {
   it('chuẩn hoá đoạn, bỏ trường lạ và trường bất ngờ không thuộc dịp', () => {
@@ -78,16 +74,11 @@ describe('validateLetterContent', () => {
   })
 })
 
-describe('letterUrl & cấu hình', () => {
-  it('có LETTER_BASE_DOMAIN → subdomain + token sau #; không có → /thu/<slug>', () => {
-    expect(letterUrl({ ...base, letterBaseDomain: 'thu.lamvi.com.vn' }, 'abcdefghij', 'T')).toBe('https://abcdefghij.thu.lamvi.com.vn/#T')
+describe('letterUrl (D-138: không subdomain)', () => {
+  it('luôn là {PUBLIC_SITE_URL}/thu/<slug>#<token>, kể cả khi còn đặt LETTER_BASE_DOMAIN cũ', () => {
     expect(letterUrl(base, 'abcdefghij', 'T')).toBe('https://lamvi.test/thu/abcdefghij#T')
-    expect(letterUrl({ publicSiteUrl: 'http://localhost:5173', letterBaseDomain: 'localhost' }, 'abcdefghij', 'T')).toBe('http://abcdefghij.localhost:5173/#T')
-  })
-  it('loadConfig chỉ nhận tên miền thuần', () => {
-    expect(loadConfig({ LETTER_BASE_DOMAIN: 'Thu.Lamvi.com.vn' }).letterBaseDomain).toBe('thu.lamvi.com.vn')
-    expect(loadConfig({ LETTER_BASE_DOMAIN: 'https://x.vn/a' }).letterBaseDomain).toBeNull()
-    expect(loadConfig({}).letterBaseDomain).toBeNull()
+    expect(letterUrl({ ...base, letterBaseDomain: 'thu.lamvi.com.vn' }, 'abcdefghij', 'T')).toBe('https://lamvi.test/thu/abcdefghij#T')
+    expect(loadConfig({ LETTER_BASE_DOMAIN: 'thu.lamvi.com.vn' })).not.toHaveProperty('letterBaseDomain')
   })
 })
 
@@ -183,58 +174,3 @@ describe('Admin soạn, xuất bản, thư viện QR', () => {
   })
 })
 
-describe('Subdomain phong thư (D-135)', () => {
-  const host = (slug) => `${slug}.thu.lamvi.test`
-  beforeEach(() => {
-    app = build({ ...base, letterBaseDomain: 'thu.lamvi.test' })
-  })
-
-  it('URL QR dùng subdomain; trang gốc redirect về /thu/<slug>; API mở thư chạy dưới subdomain', async () => {
-    const code = await makeOrder()
-    await adminApi('put', `/admin/orders/${code}/letter`).send({ content: CONTENT })
-    const { url } = (await adminApi('post', `/admin/orders/${code}/letter/publish`)).body.item
-    const { slug, token, u } = split(url)
-    expect(u.origin).toBe(`https://${host(slug)}`)
-    expect(u.pathname).toBe('/')
-
-    const root = await request(app).get('/').set('Host', host(slug))
-    expect(root.status).toBe(302)
-    expect(root.headers.location).toBe(`/thu/${slug}`)
-    // Đường dẫn khác của site chính cũng bị đưa về trang thư
-    expect((await request(app).get('/admin').set('Host', host(slug))).headers.location).toBe(`/thu/${slug}`)
-
-    const open = await request(app).post('/api/letters/open').set('Host', host(slug)).send({ slug, token })
-    expect(open.status).toBe(200)
-  })
-
-  it('API khác (admin, giỏ hàng, đăng nhập) bị chặn dưới subdomain', async () => {
-    const r = await request(app).get('/api/admin/letters').set('Host', host('abcdefghij')).set('Authorization', admin.token)
-    expect(r.status).toBe(404)
-    expect((await request(app).post('/api/auth/login').set('Host', host('abcdefghij')).send({})).status).toBe(404)
-  })
-
-  it('subdomain không đúng định dạng → 404; robots chặn index', async () => {
-    expect((await request(app).get('/').set('Host', 'www.thu.lamvi.test')).status).toBe(404)
-    const robots = await request(app).get('/robots.txt').set('Host', host('abcdefghij'))
-    expect(robots.text).toContain('Disallow: /')
-  })
-
-  it('domain gốc của thư và host có dấu chấm cuối không lọt site chính', async () => {
-    expect((await request(app).get('/login').set('Host', 'thu.lamvi.test')).status).toBe(404)
-    const r = await request(app).get('/api/admin/letters').set('Host', `${host('abcdefghij')}.`).set('Authorization', admin.token)
-    expect(r.status).toBe(404)
-  })
-
-  it('dưới subdomain chỉ mở đúng thư của subdomain đó', async () => {
-    const code = await makeOrder()
-    await adminApi('put', `/admin/orders/${code}/letter`).send({ content: CONTENT })
-    const { slug, token } = split((await adminApi('post', `/admin/orders/${code}/letter/publish`)).body.item.url)
-    const r = await request(app).post('/api/letters/open').set('Host', host('zzzzzzzzzz')).send({ slug, token })
-    expect(r.status).toBe(404)
-  })
-
-  it('domain chính không bị ảnh hưởng', async () => {
-    expect((await request(app).get('/api/health').set('Host', 'lamvi.test')).status).toBe(200)
-    expect((await request(app).get('/api/admin/letters').set('Host', 'lamvi.test').set('Authorization', admin.token)).status).toBe(200)
-  })
-})

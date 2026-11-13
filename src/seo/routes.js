@@ -20,7 +20,7 @@ const seg = (s) => {
  */
 export function classifyPath(pathname) {
   // D-48, D-51: admin và IT chỉ tiếng Việt, không có tiền tố ngôn ngữ
-  // D-135: trang phong thư người nhận (/thu/<slug>, chạy dưới subdomain riêng) — riêng tư, không tiền tố ngôn ngữ
+  // D-138: trang phong thư người nhận (/thu/<slug>) — riêng tư, không tiền tố ngôn ngữ
   if (/^\/thu\/[^/]+\/?$/i.test(pathname)) return { kind: 'private', lang: 'vi' }
   if (/^\/(admin|it)(\/|$)/i.test(pathname)) return { kind: 'private', lang: 'vi' }
   const { lang, rest } = splitLocale(pathname)

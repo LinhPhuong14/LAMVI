@@ -858,3 +858,10 @@ Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE
 **Đã làm**: admin soạn toàn bộ phong thư mỗi đơn (`/admin/orders/:code/letter`, xem trước), xuất bản sinh subdomain ngẫu nhiên + token 256 bit (`https://<slug>.<LETTER_BASE_DOMAIN>/#<token>`), gỡ xuất bản/xuất bản lại giữ nguyên QR, "Tạo QR mới" khi lộ link; thư viện QR `/admin/letters` để in lại đúng QR cũ; trang người nhận `/thu/:slug` (2D, noindex, không GA); middleware chặn site chính dưới subdomain; bảng `order_letters`. Phối hợp với Codex qua bảng tin (`AGENTS.md`): bản 3D chọn `letter-room`, T-105 thuộc Codex.
 
 **Còn lại / cần người dùng**: chọn domain + cấu hình wildcard trên Vercel rồi đặt `LETTER_BASE_DOMAIN` (G-122); chạy migration `…0025`; tải video/ảnh trong admin (G-123); ghép cảnh 3D khi `feat/phong-thu` merge (G-124).
+
+## 2026-11-13 — Phong thư: video mở đầu, phòng bật đèn, bỏ subdomain (D-138)
+
+**Đã làm**: bỏ subdomain (gỡ middleware `letterHost`, biến `LETTER_BASE_DOMAIN`) — QR là `{PUBLIC_SITE_URL}/thu/<slug>#<token>`; trang phong thư mở đầu bằng 2 video LAMVI (tranh Đông Hồ, làng giấy dó) phải xem hết, rồi căn phòng tối chạm bật đèn → phong bì → thư; cuối thư có nút "Xem lại cách làm đèn" và "Lịch sử văn hoá". Đã báo Codex qua bảng tin để giữ luồng này khi ghép `letter-room`.
+
+**Còn lại / cần người dùng**: duyệt thứ tự/tiêu đề hai video; ghép cảnh 3D (G-124); tải video/ảnh trong admin (G-123); chạy migration `…0025`.
+

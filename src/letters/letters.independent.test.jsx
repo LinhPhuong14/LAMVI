@@ -78,7 +78,7 @@ describe('Trang người nhận /thu/:slug — trạng thái lỗi', () => {
     const f = mockApi({ 'POST /letters/open': () => ({ body: { item: content } }) })
     window.location.hash = `#${TOKEN}`
     renderAt('/thu/abcdefghij')
-    await screen.findByRole('button', { name: 'Mở thư gửi Linh' })
+    await screen.findByText('Tranh Đông Hồ trên đèn giấy dó')
     const [url, init] = openCalls(f)[0]
     expect(String(url)).not.toContain(TOKEN)
     expect(init.method).toBe('POST')
@@ -128,10 +128,11 @@ describe('LetterPaper', () => {
     expect(screen.getByText('Vì em')).toBeTruthy()
   })
 
-  it('không phải preview: phong bì đóng tới khi chạm', () => {
+  it('không phải preview: phòng tối → bật đèn → phong bì đóng tới khi chạm', async () => {
     render(<LetterPaper letter={content} />)
     expect(screen.queryByText('Đoạn một.')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Mở thư gửi Linh' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Bật đèn' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Mở thư gửi Linh' }, { timeout: 2000 }))
     expect(screen.getByText('Đoạn một.')).toBeTruthy()
     expect(screen.getByText('— An')).toBeTruthy()
   })

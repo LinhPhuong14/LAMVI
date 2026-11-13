@@ -319,7 +319,7 @@ export default {
     newsSubmit: 'Subscribe',
     copyright: '© 2026 LAMVI · Handmade dó paper lanterns.',
   },
-  // D-135: trang phong thư người nhận
+  // D-138: trang phong thư người nhận
   letter: {
     title: 'Letter · LAMVI',
     loading: 'Opening your letter…',

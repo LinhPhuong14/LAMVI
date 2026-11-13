@@ -308,7 +308,7 @@ export default {
     newsSubmit: '订阅',
     copyright: '© 2026 LAMVI · 手工纸灯。',
   },
-  // D-135: trang phong thư người nhận
+  // D-138: trang phong thư người nhận
   letter: {
     title: '信 · LAMVI',
     loading: '正在打开信件…',
