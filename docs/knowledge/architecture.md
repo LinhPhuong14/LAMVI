@@ -40,7 +40,7 @@ server/
   security/pwned.js        kiểm mật khẩu đã lộ (HIBP k-anonymity, fail-open) (T-49)
   middleware/security.js   Security headers + CSP hash (T-37)
   middleware/rateLimit.js  Chống dò/spam, đếm trong DB (T-38, G-20)
-  routes/                  catalog.js, auth.js, admin.js, adminUsers.js, it.js, may.js, cart.js, orders.js, qr.js, seo.js (sitemap, robots)
+  routes/                  catalog.js, auth.js, admin.js, adminUsers.js, it.js, may.js, cart.js, orders.js, qr.js, letters.js, seo.js (sitemap, robots)
   adapters/openai.js       Chat Completions qua fetch (T-29)
   adapters/payos.js        Cổng thanh toán: ký/xác minh HMAC, tạo & huỷ link (NFR-SEC-002)
   domain/admin.js          Kiểm tra dữ liệu admin (sản phẩm, FAQ, lô, video)
@@ -106,6 +106,7 @@ Thêm phương thức → thêm ở **cả** `memory` và `supabase` + test.
 |---|---|
 | `getOrderByQrToken(token)` | Đơn theo token QR (64 hex) |
 | `getGiftMessage(orderId)`, `upsertGiftMessage(orderId, patch)` | Mỗi đơn tối đa một dòng `gift_messages` |
+| `getOrderLetter(orderId)`, `getLetterBySlug(slug)`, `saveOrderLetter(orderId, patch)`, `listOrderLetters()`, `markLetterOpened(id, at)` | Phong thư mỗi đơn (D-134) |
 | `confirmGiftMessage(orderId, at)` | Ghi `confirmed_at` đúng một lần (tạo dòng nếu chưa có) |
 | `listGiftMediaCandidates()` | Các dòng còn media chưa xoá, kèm đơn — để cron xoá quá hạn |
 | `listProfiles({ q, role, locked, limit, offset })`, `countOrdersByUsers(ids)` | Admin: danh sách người dùng |
@@ -186,6 +187,7 @@ Lỗi chung: `RATE_LIMITED`.
 | `coupon_redemptions` | `coupon_id`, `user_id`, `order_id` unique | Đếm lượt theo khách (C-5); xoá khi huỷ đơn (C-8) |
 | `audit_log` | `at`, `actor_id`, `actor_role`, `entity`, `entity_id`, `action`, `old_value`/`new_value` jsonb | NFR-AUD-001: đơn, coupon, hoàn tiền, người dùng (khoá, mở khoá, đổi vai trò) |
 | `gift_messages` | `order_id` unique, `text` (≤300 ký tự do server kiểm), `text_lang`, `voice_path/type`, `video_path/type`, `confirmed_at`, `media_deleted_at`, `translations` jsonb | FR-MSG-001, D-12, D-26, D-75; bucket riêng tư `gift-media` |
+| `order_letters` | `order_id` unique, `status` draft/published, `content` jsonb (server kiểm), `slug` unique `[a-z][a-z0-9]{9}`, `token` (43 ký tự), `published_at`, `opened_at`, `updated_by` | D-134, D-135, T-106; chỉ service role |
 | `orders` (thêm) | `qr_token` unique NOT NULL (256 bit hex), `delivered_at` | BR-QR-001, D-75 |
 | `profiles` (thêm) | `email`, `locked_at`, `locked_reason` | G-19, D-90 |
 
@@ -253,6 +255,10 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET | `/api/qr/:token` | – (token) | Trang người nhận: `preparing` \| `greeting` \| `active` (chữ, media signed URL, đếm ngược, `batch` lô công khai mới nhất, `lamps[]` câu chuyện các mẫu đèn trong đơn — D-104/D-105). Token sai/đơn huỷ → 404 chung |
 | POST | `/api/qr/:token/confirm` | – (token) | "Tôi đã nhận được quà": ghi `confirmed_at` lần đầu; 409 `GIFT_NOT_READY` nếu chưa SHIPPED |
 | POST | `/api/qr/:token/translate` | – (token) | `{ lang }` → `{ lang, text, cached }`; 503 `TRANSLATE_UNAVAILABLE` |
+| POST | `/api/letters/open` | – (slug + token trong body) | Phong thư người nhận (D-135): `{ slug, token }` → nội dung thư; sai/chưa xuất bản/đơn huỷ → 404 chung; ghi `opened_at` lần đầu |
+| GET/PUT | `/api/admin/orders/:code/letter` | admin | Đọc/lưu phong thư của đơn (D-134); `item.url` là link QR khi đã xuất bản |
+| POST | `/api/admin/orders/:code/letter/publish` · `/unpublish` · `/rotate` | admin | Xuất bản (lần đầu sinh slug+token, sau đó giữ nguyên) · gỡ · tạo QR mới (QR cũ hết hiệu lực) |
+| GET | `/api/admin/letters` | admin | Thư viện QR: mọi phong thư đã có QR, mới nhất trước |
 | GET | `/api/admin/users?q=&role=&status=&page=` | Admin, IT | Danh sách 20 người/trang kèm số đơn (D-90) |
 | GET | `/api/admin/users/:id` | Admin, IT | Hồ sơ + 20 đơn gần nhất + nhật ký |
 | POST | `/api/admin/users/:id/lock` · `/unlock` | Admin (khách), IT (mọi người) | `{ reason? }`; không tự khoá mình (409 `CANNOT_MANAGE_SELF`) |
@@ -308,7 +314,7 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 - Công khai: `/shop` (bộ sưu tập + đèn lẻ), `/collections/:slug`, `/privacy`, `/returns`; tài khoản: `/account?tab=gallery` (gallery + chăn Đông Hồ).
 - Admin: `/admin/{orders,users,products,faq,batches,coupons,analytics,may}` — chỉ tiếng Việt, ngoài `LocaleLayout` (D-48).
 - IT: `/it` — chỉ tiếng Việt (D-51).
-- Trang con: `/` · `/products/:slug` · `/lo/:code` · `/qr/:token` (riêng tư, noindex) · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
+- Trang con: `/` · `/products/:slug` · `/lo/:code` · `/qr/:token` (riêng tư, noindex) · `/thu/:slug` (phong thư, riêng tư, không tiền tố ngôn ngữ; dưới subdomain `<slug>.<LETTER_BASE_DOMAIN>` — middleware `letterHost`) · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
 - `AuthProvider`: access token + user trong `localStorage` (`moc.session`, không có refresh token — T-49), `authedApi` tự gọi `/auth/refresh` (cookie) một lần khi gặp 401.
 
 

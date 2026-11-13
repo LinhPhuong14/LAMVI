@@ -32,6 +32,7 @@ export function createMemoryRepo(data = {}) {
     couponRedemptions: [],
     auditLog: [],
     giftMessages: [], // lời chúc, mỗi đơn tối đa một dòng (FR-MSG-001)
+    orderLetters: [], // phong thư admin soạn, mỗi đơn tối đa một dòng (D-134)
   }
 
   const now = () => new Date().toISOString()
@@ -598,6 +599,41 @@ export function createMemoryRepo(data = {}) {
         .filter((r) => r && mediaExpired(r.order, r.message, new Date(before)))
         .sort((a, b) => a.message.id.localeCompare(b.message.id))
         .slice(0, Math.max(1, Math.min(limit, 100)))
+    },
+
+    // --- Phong thư riêng của đơn (D-134, D-135)
+    async getOrderLetter(orderId) {
+      const l = state.orderLetters.find((x) => x.orderId === orderId)
+      return l ? clone(l) : null
+    },
+    async getLetterBySlug(slug) {
+      const l = state.orderLetters.find((x) => x.slug === slug)
+      return l ? clone(l) : null
+    },
+    async saveOrderLetter(orderId, patch) {
+      if (patch.slug && state.orderLetters.some((x) => x.slug === patch.slug && x.orderId !== orderId)) throw new RepoError('CONFLICT', 'slug')
+      let l = state.orderLetters.find((x) => x.orderId === orderId)
+      if (!l) {
+        l = { id: randomUUID(), orderId, status: 'draft', content: null, slug: null, token: null, publishedAt: null, openedAt: null, updatedBy: null, createdAt: now() }
+        state.orderLetters.push(l)
+      }
+      Object.assign(l, clone(patch), { updatedAt: now() })
+      return clone(l)
+    },
+    // Thư viện QR: mọi thư đã từng có QR (slug), mới nhất trước, kèm mã đơn
+    async listOrderLetters({ limit = 500 } = {}) {
+      return state.orderLetters
+        .filter((l) => l.slug)
+        .map((l) => ({ ...clone(l), orderCode: byId(state.orders, l.orderId)?.code ?? null, orderStatus: byId(state.orders, l.orderId)?.status ?? null }))
+        // Cùng thứ tự với Supabase: published_at giảm dần (chưa xuất bản xếp cuối), rồi updated_at
+        .sort((a, b) => (a.publishedAt ? 0 : 1) - (b.publishedAt ? 0 : 1) || String(b.publishedAt ?? '').localeCompare(String(a.publishedAt ?? '')) || String(b.updatedAt).localeCompare(String(a.updatedAt)))
+        .slice(0, limit)
+    },
+    // Lần mở đầu tiên của người nhận — chỉ ghi một lần
+    async markLetterOpened(id, at) {
+      const l = state.orderLetters.find((x) => x.id === id)
+      if (l && !l.openedAt) l.openedAt = at
+      return l ? clone(l) : null
     },
   }
 }

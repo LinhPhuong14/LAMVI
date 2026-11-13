@@ -853,3 +853,8 @@ Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE
 
 **Còn lại / cần người dùng**: đo tải thật bằng 4G; G-120 (QR, tem, đo lượt quét).
 
+## 2026-11-13 — Phong thư riêng từng đơn + QR subdomain (D-134, D-135, T-106)
+
+**Đã làm**: admin soạn toàn bộ phong thư mỗi đơn (`/admin/orders/:code/letter`, xem trước), xuất bản sinh subdomain ngẫu nhiên + token 256 bit (`https://<slug>.<LETTER_BASE_DOMAIN>/#<token>`), gỡ xuất bản/xuất bản lại giữ nguyên QR, "Tạo QR mới" khi lộ link; thư viện QR `/admin/letters` để in lại đúng QR cũ; trang người nhận `/thu/:slug` (2D, noindex, không GA); middleware chặn site chính dưới subdomain; bảng `order_letters`. Phối hợp với Codex qua bảng tin (`AGENTS.md`): bản 3D chọn `letter-room`, T-105 thuộc Codex.
+
+**Còn lại / cần người dùng**: chọn domain + cấu hình wildcard trên Vercel rồi đặt `LETTER_BASE_DOMAIN` (G-122); chạy migration `…0025`; tải video/ảnh trong admin (G-123); ghép cảnh 3D khi `feat/phong-thu` merge (G-124).

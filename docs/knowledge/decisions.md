@@ -49,6 +49,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-52 | 2026-10-02 | Trang Cửa hàng `/shop` + `ProductCards` dùng chung; navbar luôn ghim, thu nhỏ 20% khi cuộn (`transform`, không đổi layout) | Hiệu lực |
 | T-53 | 2026-10-02 | Trang chi tiết sản phẩm `ProductPage` v2 (lưới `pdp-*`), khối `Related` dùng lại `ProductCards` | Hiệu lực |
 | T-104 | 2026-11-13 | Prototype "Phòng thư LAMVI" (`/phong-thu`, D-133): Three.js thuần (không R3F), máy trạng thái 6 bước, font Itim thay Caveat/Instrument Sans (thiếu bộ `vietnamese`) | Hiệu lực |
+| T-106 | 2026-11-13 | Phong thư riêng từng đơn + QR subdomain (D-134, D-135): bảng `order_letters`, middleware `letterHost` chặn site chính dưới subdomain, token sau `#` gửi qua POST, biến `LETTER_BASE_DOMAIN` + wildcard domain Vercel | Hiệu lực |
 
 ---
 
@@ -526,3 +527,12 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - **Thử và bỏ**: `ACESFilmicToneMapping` + `HemisphereLight` + `THREE.Fog` để "đẹp như game" làm phẳng/nhạt tương phản ấm (đèn)/lạnh (chàm đêm) mà bảng màu đặc tả cố tình giữ — quay lại `AmbientLight` phẳng đã tuned, chỉ thêm một `PointLight` lạnh tĩnh phía rèm (rim light) và hình học rèm có nếp gấp thật (`makeCurtainGeometry`, dịch đỉnh theo sin) thay vì nhiều mặt phẳng chồng lệch vị trí.
 - **Hệ quả**: `IMMERSIVE_PAGES` mới trong `LocaleLayout.jsx` (khác `APP_PAGES` — bỏ luôn `<May/>`/`ConsentBanner`, không chỉ header/footer) cho trang toàn màn hình không có chrome nào của site; thêm route mới phải tự quyết định dùng `APP_PAGES` hay `IMMERSIVE_PAGES` nếu cũng cần ẩn chrome. Baking bóng hình có thể nâng cấp sau thành tương tác camera quay lại khung đèn nếu muốn hiệu ứng rõ hơn lúc mở bất ngờ (hiện là chi tiết nền, luôn hiện khi đèn sáng).
 
+### T-106 — Phong thư riêng từng đơn + QR subdomain (2026-11-13)
+
+- **Bối cảnh**: D-134 (admin soạn toàn bộ phong thư mỗi đơn), D-135 (QR dẫn tới subdomain riêng, ai có link là xem). T-105 thuộc engine POV của nhánh `feat/phong-thu` (Codex).
+- **Dữ liệu**: bảng `order_letters` (migration `…0025`), mỗi đơn một dòng: `status` draft/published, `content` jsonb do server kiểm (`server/domain/letter.js`, chỉ giữ trường biết trước), `slug` unique, `token`, `published_at`, `opened_at`. RLS bật, revoke anon/authenticated (T-51). Token lưu thô như `orders.qr_token` để admin in lại đúng QR (thư viện QR); lộ thì "Tạo QR mới".
+- **Một function, nhiều host**: không tách app. `server/middleware/letterHost.js` nhận `<slug>.<LETTER_BASE_DOMAIN>`, chỉ cho `/thu/<slug>`, tệp tĩnh, `/api/letters/open|health|site`; còn lại redirect về trang thư hoặc 404. Không đặt biến → middleware không làm gì, QR dùng `/thu/<slug>` trên domain chính.
+- **Token sau `#`**: không vào access log của Vercel/proxy và không đi theo Referer; redirect 302 không có fragment thì trình duyệt giữ nguyên `#token`. Client gửi token trong body POST. So khớp bằng hash SHA-256 + `timingSafeEqual`.
+- **Trang `/thu/<slug>`**: riêng tư (`classifyPath` → private, noindex, không SSR nội dung), không tiền tố ngôn ngữ, không nhúng GA (`isInternalPath`). Giao diện tạm `LetterPaper` 2D, nhận đúng hình dạng `letter` của `letter-room` để thay bằng cảnh 3D sau (G-124).
+- **Thay thế đã cân nhắc**: subdomain = mã đơn (lộ mã đơn qua DNS/SNI, bỏ); token trong path (vào log, bỏ); gắn thiết bị/PIN (người dùng chọn "ai có link là xem").
+- **Hệ quả**: Vercel cần wildcard domain `*.<LETTER_BASE_DOMAIN>` (nameserver trỏ Vercel) — xem `deploy-vercel.md`. Dev: `LETTER_BASE_DOMAIN=localhost` → `http://<slug>.localhost:5173/#token`.

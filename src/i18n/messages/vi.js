@@ -332,6 +332,15 @@ export default {
     newsSubmit: 'Đăng ký',
     copyright: '© 2026 LAMVI · Đèn giấy dó thủ công.',
   },
+  // D-135: trang phong thư người nhận
+  letter: {
+    title: 'Phong thư · LAMVI',
+    loading: 'Đang mở phong thư…',
+    notFound: 'Không tìm thấy phong thư',
+    notFoundHint: 'Hãy quét lại mã QR trên thiệp đi kèm món quà.',
+    error: 'Chưa mở được phong thư',
+    errorHint: 'Kết nối đang chập chờn. Bạn thử tải lại trang nhé.',
+  },
   gift: {
     eyebrow: 'Lời chúc dành cho bạn',
     loading: 'Đang mở lời chúc…',

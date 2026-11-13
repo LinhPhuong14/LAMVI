@@ -8874,3 +8874,67 @@ h1 {
   .scene-tale .welcome-print { width: fit-content; max-width: 90%; }
   .scene-tale .welcome-print img { max-height: calc(100dvh - 130px); }
 }
+
+/* D-134: soạn phong thư + thư viện QR trong admin */
+.letter-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.letter-form,
+.letter-side {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.letter-surprise {
+  border: 1px solid var(--hair, rgb(0 0 0 / 12%));
+  border-radius: 10px;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+.letter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.letter-preview-title {
+  font-size: 1rem;
+  margin: 0 0 8px;
+}
+.letter-qr {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.letter-qr img {
+  background: var(--white);
+  border-radius: 6px;
+}
+.letter-gallery {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.letter-card {
+  display: grid;
+  gap: 10px;
+}
+.letter-card-info {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 860px) {
+  .letter-editor-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

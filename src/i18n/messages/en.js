@@ -319,6 +319,15 @@ export default {
     newsSubmit: 'Subscribe',
     copyright: '© 2026 LAMVI · Handmade dó paper lanterns.',
   },
+  // D-135: trang phong thư người nhận
+  letter: {
+    title: 'Letter · LAMVI',
+    loading: 'Opening your letter…',
+    notFound: 'Letter not found',
+    notFoundHint: 'Please scan the QR code on the card that came with your gift again.',
+    error: "Couldn't open the letter",
+    errorHint: 'The connection seems unstable. Please reload the page.',
+  },
   gift: {
     eyebrow: 'A message for you',
     loading: 'Opening your message…',

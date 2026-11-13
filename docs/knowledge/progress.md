@@ -1,5 +1,16 @@
 # Tiến độ tính năng
 
+## 2026-11-13 — Phong thư riêng từng đơn + QR subdomain (feat/phong-thu-qr, D-134, D-135, T-106)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Admin soạn phong thư (nháp/xuất bản/gỡ/tạo QR mới), xem trước | ✅ | `src/admin/LetterEditorPage.jsx`, `server/routes/letters.js`, `server/domain/letter.js` | Tải video/ảnh lên (G-123) |
+| QR subdomain ngẫu nhiên + token sau `#`, chặn site chính dưới subdomain | ✅ code | `server/middleware/letterHost.js`, `config.letterBaseDomain` | Wildcard domain Vercel + `LETTER_BASE_DOMAIN` (G-122) |
+| Thư viện QR (in lại đúng QR cũ) | ✅ | `src/admin/LettersGalleryPage.jsx`, `GET /api/admin/letters` | — |
+| Trang người nhận `/thu/:slug` | ✅ 2D | `src/pages/LetterPage.jsx`, `src/letters/LetterPaper.jsx` | Thay bằng cảnh 3D `letter-room` (G-124) |
+| Bảng `order_letters` | ✅ migration | `supabase/migrations/20261113000025_order_letters.sql` | Chạy migration trên Supabase |
+| Test | ✅ | `server/letters.test.js`, `src/admin/Letters.test.jsx` + kiểm thử độc lập (T-11) | — |
+
 ## 2026-11-13 — Prototype "Phòng thư LAMVI" (feat/phong-thu-lamvi, D-133, T-104)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |

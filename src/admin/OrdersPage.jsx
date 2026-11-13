@@ -74,6 +74,11 @@ function GiftCard({ order }) {
       ) : (
         <p className="field-hint">{S.orders.giftNone}</p>
       )}
+      <p>
+        <Link className="btn btn-small" to={`/admin/orders/${encodeURIComponent(order.code)}/letter`}>
+          {S.letters.open}
+        </Link>
+      </p>
       <h3>{S.orders.qrImage}</h3>
       {png && <img src={png} alt={S.orders.qrImage} width="160" height="160" />}
       <Field label={S.orders.qrLink} value={url} readOnly onFocus={(e) => e.target.select()} hint={S.orders.qrPrivate} />

@@ -308,6 +308,15 @@ export default {
     newsSubmit: '订阅',
     copyright: '© 2026 LAMVI · 手工纸灯。',
   },
+  // D-135: trang phong thư người nhận
+  letter: {
+    title: '信 · LAMVI',
+    loading: '正在打开信件…',
+    notFound: '未找到信件',
+    notFoundHint: '请重新扫描礼物所附卡片上的二维码。',
+    error: '暂时无法打开信件',
+    errorHint: '网络不稳定，请刷新页面。',
+  },
   gift: {
     eyebrow: '给你的祝福',
     loading: '正在打开祝福…',

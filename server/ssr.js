@@ -55,7 +55,8 @@ function analyticsTags(measurementId) {
 }
 
 // Không phân biệt hoa/thường — xem classifyPath
-const isInternalPath = (pathname) => /^\/(admin|it)(\/|$)/i.test(pathname)
+// D-135: trang phong thư (/thu) cũng không nhúng GA — thư riêng tư của người nhận
+const isInternalPath = (pathname) => /^\/(admin|it|thu)(\/|$)/i.test(pathname)
 
 // Nội dung script nạp sẵn dữ liệu — tách ra để tính hash CSP trên đúng chuỗi được nhúng
 const initialDataScript = (data) => `window.__INITIAL_DATA__=${safeJson(data)}`
