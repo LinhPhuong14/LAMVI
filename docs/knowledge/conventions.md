@@ -5,6 +5,7 @@
 - JavaScript ES modules (`"type": "module"`), không TypeScript (T-01). Định dạng như code hiện có: 2 dấu cách, nháy đơn, không chấm phẩy.
 - Chú thích trong code viết tiếng Việt, ngắn; khi code hiện thực một quy tắc spec thì ghi mã (`// BR-PRC-003`, `// D-40`).
 - Nhánh: `feat/…`, `fix/…`, `docs/…`. Commit message tiếng Việt, câu mệnh lệnh ngắn ("Thêm API catalog…").
+- Commit/PR chỉ đứng tên `LinhPhuong14`; không trailer `Co-Authored-By`/`Claude-Session`, không credit Claude, Codex, `TrinhChau` hay ai khác (xem `CLAUDE.md`).
 - Không tự hiện thực điểm `[BA DECISION REQUIRED]`/`[LEGAL]`. Nếu buộc phải có chỗ trống trong code, để `// TODO(Q-xx)` và không đoán giá trị.
 
 ## Server (`server/`)
