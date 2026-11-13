@@ -86,6 +86,31 @@ describe('useWishRoomMachine', () => {
     expect(result.current.phase).toBe('postscriptOpen')
   })
 
+  it('advance() đi tiếp được dù không qua settle() trước (bước nối tiếp từ callback bất đồng bộ)', () => {
+    const { result } = renderHook(() => useWishRoomMachine())
+    act(() => {
+      result.current.request('roomLit')
+    })
+    expect(result.current.busy).toBe(true) // chưa settle
+    act(() => {
+      result.current.advance('envelopeFocus')
+    })
+    expect(result.current.phase).toBe('envelopeFocus')
+    expect(result.current.busy).toBe(false) // advance() luôn mở lại thao tác
+  })
+
+  it('advance() với cạnh không hợp lệ: không đổi trạng thái nhưng vẫn mở lại busy (không kẹt máy)', () => {
+    const { result } = renderHook(() => useWishRoomMachine())
+    act(() => {
+      result.current.request('roomLit')
+    })
+    act(() => {
+      result.current.advance('postscriptOpen') // nhảy cóc từ roomLit, không hợp lệ
+    })
+    expect(result.current.phase).toBe('roomLit')
+    expect(result.current.busy).toBe(false)
+  })
+
   it('reset() đưa về roomDark', () => {
     const { result } = renderHook(() => useWishRoomMachine())
     act(() => {
