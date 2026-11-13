@@ -264,6 +264,20 @@ export function createRoom(
     ctx.lineTo(x + rand() * 8 - 4, y + rand() * 18);
     ctx.stroke();
   }
+  function rooster(x, flip) {
+    ctx.save(); ctx.translate(x, 280); ctx.scale(flip, 1);
+    ctx.strokeStyle = "#693c24"; ctx.fillStyle = "#9a6037"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(0, 0, 27, 35, -.4, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#b88b4e"; ctx.beginPath(); ctx.ellipse(-3, -1, 15, 23, -.55, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(10,-19); ctx.bezierCurveTo(20,-45,5,-56,17,-65); ctx.bezierCurveTo(40,-70,43,-42,27,-24); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#9c4e32"; for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(17+i*6,-67,5,0,Math.PI*2);ctx.fill();}
+    ctx.fillStyle = "#3f200b"; ctx.beginPath();ctx.arc(28,-55,2,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.moveTo(36,-54);ctx.lineTo(47,-49);ctx.lineTo(35,-46);ctx.fill();
+    for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-20,4);ctx.bezierCurveTo(-72,-55+i*9,-70,37,-25,20);ctx.stroke();}
+    for(const a of [-10,11]){ctx.beginPath();ctx.moveTo(a,28);ctx.lineTo(a,48);ctx.lineTo(a+10,52);ctx.moveTo(a,48);ctx.lineTo(a-8,53);ctx.stroke();}
+    ctx.restore();
+  }
+  rooster(208, 1); rooster(302, -1);
   const texture = new T.CanvasTexture(canvas);
   texture.colorSpace = T.SRGBColorSpace;
   textures.push(texture);
@@ -283,6 +297,7 @@ export function createRoom(
     0,
     lamp,
   );
+  shade.rotation.y = Math.PI;
   const cord = new T.CatmullRomCurve3([
     new T.Vector3(-1, 1.746, 0.05),
     new T.Vector3(-1.45, 1.746, 0.5),
@@ -734,8 +749,8 @@ export function createRoom(
     }
   });
   const referenceCamera = new T.PerspectiveCamera(47, 16 / 9, 0.05, 80);
-  referenceCamera.position.set(0.55, 3.15, 5.1);
-  referenceCamera.lookAt(-0.2, 2.25, -0.5);
+  referenceCamera.position.set(0.4, 2.95, 3.65);
+  referenceCamera.lookAt(-0.15, 2.05, -0.15);
   referenceCamera.updateMatrixWorld();
   const paintProjection = new T.Matrix4().multiplyMatrices(
     referenceCamera.projectionMatrix,
@@ -760,7 +775,7 @@ export function createRoom(
   const backdropSize =
     host.clientWidth * Math.min(devicePixelRatio, 1.65) > 1100 ? 1600 : 960;
   const backdrop = loader.load(
-    `/letter-room/background/room-viet-v3-${backdropSize}.webp`,
+    `/letter-room/background/room-modern-v4-${backdropSize}.webp`,
     (loaded) => {
       if (disposed) {
         loaded.dispose();
@@ -769,6 +784,7 @@ export function createRoom(
       loaded.colorSpace = T.SRGBColorSpace;
       scene.background = loaded;
       roomPaint.uniforms.plate.value = loaded;
+      architecture.visible = false;
       architecture.traverse((object) => {
         if (object.isMesh) {
           object.material = roomPaint;
@@ -817,7 +833,7 @@ export function createRoom(
   function project(x, y) {
     coordinates(x, y);
     const p = new T.Vector3();
-    return raycaster.ray.intersectPlane(dragPlane, p) ? p : null;
+    return raycaster.ray.intersectPlane(dragPlane, p) ? envelope.worldToLocal(p) : null;
   }
   function hit(x, y, objects) {
     coordinates(x, y);
@@ -846,7 +862,7 @@ export function createRoom(
             : occasion === "justBecause"
               ? [shade]
               : paperSurprise.interactiveMeshes;
-    if (hit(e.clientX, e.clientY, objects))
+    if (state.phase === "envelope" || hit(e.clientX, e.clientY, objects))
       onAction(
         state.phase === "dark"
           ? "LIGHT"
@@ -956,6 +972,21 @@ export function createRoom(
       (phase === "lighting"
         ? 0.022 * Math.sin(clamp((elapsed - 650) / 450) * Math.PI)
         : 0);
+    // The camera stays seated; the envelope itself comes to the player.
+    const floatPhases = ["approaching", "ready", "returning", "extracting", "lifting", "reading"];
+    const floating = floatPhases.includes(phase);
+    const fly = phase === "approaching" ? ease(clamp(elapsed / (reduced ? 1 : 1000))) : floating ? 1 : 0;
+    const front = camera.localToWorld(new T.Vector3(0, -.04, -1.7));
+    const facing = camera.quaternion.clone().multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0), Math.PI/2));
+    if (floating) {
+      envelope.position.set(.8, 1.75, .35).lerp(front, fly);
+      envelope.quaternion.identity().slerp(facing, fly);
+    } else {
+      envelope.position.set(.8, 1.75, .35);
+      envelope.quaternion.identity();
+    }
+    envelope.updateMatrixWorld(true);
+    dragPlane.setFromNormalAndCoplanarPoint(new T.Vector3(0,1,0).applyQuaternion(envelope.quaternion), envelope.localToWorld(new T.Vector3(0,.034,0)));
     const opening = [
       "approaching",
       "ready",
@@ -970,7 +1001,7 @@ export function createRoom(
     ].includes(phase);
     const flapOpen =
       phase === "approaching"
-        ? ease(clamp(elapsed / (reduced ? 1 : 900)))
+        ? ease(clamp((elapsed - (reduced ? 0 : 650)) / (reduced ? 1 : 450)))
         : opening
           ? 1
           : 0;

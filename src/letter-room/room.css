@@ -1742,3 +1742,30 @@
     line-height: 29px !important;
   }
 }
+
+/* Body handwriting: isolated from title, scene controls and camera transitions. */
+.lr-reader .lr-body-ink-word { display: inline-block; white-space: nowrap; }
+.lr-reader .lr-body-ink-glyph {
+  display: inline-block;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+  animation: lr-body-ink-write .28s ease-out var(--body-ink-delay, 0s) both;
+}
+.lr-reader .lr-letter-content:not(.visible) .lr-body-ink-glyph { animation-play-state: paused !important; }
+.lr-reader .lr-body-ink.is-complete .lr-body-ink-glyph {
+  animation: none; opacity: 1; clip-path: none;
+}
+.lr-reader .lr-body-ink-skip {
+  min-height: 44px; margin: 0 0 12px; padding: 8px 12px;
+  color: inherit; background: transparent; border: 1px solid currentColor;
+  border-radius: 4px; font: inherit; font-size: 14px; cursor: pointer;
+}
+.lr-reader .lr-body-ink-skip:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+@keyframes lr-body-ink-write {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to { opacity: 1; clip-path: inset(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lr-reader .lr-body-ink-glyph { animation: none; opacity: 1; clip-path: none; }
+  .lr-reader .lr-body-ink-skip { display: none; }
+}

@@ -245,3 +245,6 @@ Phòng thư `feat/phong-thu`: xác nhận toàn repo 262 tệp / 4008 ca đạt,
 
 ### Phòng thư — cập nhật D-136 (2026-11-13)
 Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác chủ động. Tách CameraRig/LetterReader/PaperSurprise; reducer khóa bước chuyển và kéo 40%. Bì vẫn trên bàn, giấy mới nâng lên; reader mở rộng. Dùng camera-controls MIT và bàn KayKit CC0 qua GLTFLoader, giữ stack/brand/ánh sáng. Không tích hợp bộ surfaceMaterials bị từ chối. Chi tiết triển khai/nguồn/QA: `docs/phong-thu.md`, `docs/art/model-sources.md`, `docs/qa/phong-thu/README.md`. Ghi chú này thay mô tả tự mở thư trước đó, không thay API QR/backend.
+
+
+Cập nhật PO 2026-11-14 (điều chỉnh D-136): camera POV gần bàn hơn; cảnh bật đèn giữ nguyên camera, không cận công tắc. Sau đèn sáng, chạm vùng cảnh đưa bì từ bàn lên chính diện lơ lửng (vật thể di chuyển, camera đứng); kéo dùng mặt phẳng và trục local của bì. Nền gen modern-v4 thay bản rustic v3: cửa gỗ gọn, rèm sáng, tường kem, bàn sát góc phòng. Chụp đèn có đôi gà minh họa tự vẽ cảm hứng Đông Hồ; cần thay artwork thật. Nội dung thư reveal theo grapheme tiếng Việt, có hiện toàn bộ ngay và reduced motion; không tuyên bố thứ tự stroke của font là nét viết thật. Nguồn/prompt: docs/art/room-modern-v4.prompt.md.

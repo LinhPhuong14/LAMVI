@@ -43,7 +43,7 @@ describe('independent room reducer contracts', () => {
     expect(step(result, 'CELEBRATED')).toEqual({ phase: 'celebrated', progress: 1 })
   })
   it('locks camera shots to the six scene groups and branches for the lamp surprise', () => {
-    for (const [shot, phases] of Object.entries({ room: ['dark'], switch: ['lighting', 'lit'], envelope: ['envelope'], slot: ['approaching', 'ready', 'returning', 'extracting'], letter: ['lifting', 'reading'], reverse: ['surpriseEntering', 'surprise', 'celebrating', 'celebrated'] })) {
+    for (const [shot, phases] of Object.entries({ room: ['dark', 'lighting', 'lit', 'envelope', 'approaching', 'ready', 'returning', 'extracting'], letter: ['lifting', 'reading'], reverse: ['surpriseEntering', 'surprise', 'celebrating', 'celebrated'] })) {
       for (const phase of phases) expect(shotForPhase(phase, 'birthday')).toBe(shot)
     }
     for (const phase of ['surpriseEntering', 'surprise', 'celebrating', 'celebrated']) expect(shotForPhase(phase, 'justBecause')).toBe('lamp')

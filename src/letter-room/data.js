@@ -163,10 +163,10 @@ export function roomReducer(state, action) {
 }
 export function shotForPhase(phase, occasion = "birthday") {
   if (phase === "dark") return "room";
-  if (["lighting", "lit"].includes(phase)) return "switch";
-  if (phase === "envelope") return "envelope";
+  if (["lighting", "lit"].includes(phase)) return "room";
+  if (phase === "envelope") return "room";
   if (["approaching", "ready", "returning", "extracting"].includes(phase))
-    return "slot";
+    return "room";
   if (["lifting", "reading"].includes(phase)) return "letter";
   return occasion === "justBecause" ? "lamp" : "reverse";
 }

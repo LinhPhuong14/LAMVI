@@ -486,7 +486,7 @@ function Room({
             {...cueProps}
             point={point(cue.name)}
             label={cue.label}
-            hint={state.phase === "surprise" && letter.occasion === "birthday" ? "Ước một điều đi." : undefined}
+            hint={state.phase === "envelope" ? "Chạm để đưa thư lại gần" : state.phase === "surprise" && letter.occasion === "birthday" ? "Ước một điều đi." : undefined}
             idle={idle || state.phase === "surprise"}
             icon={cue.icon}
             onClick={(e) => {

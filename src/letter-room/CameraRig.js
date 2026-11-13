@@ -4,13 +4,13 @@ CameraControls.install({ THREE: T });
 
 export const CAMERA_SHOTS = Object.freeze({
   room: {
-    eye: [0.55, 3.15, 5.1],
-    target: [-0.2, 2.25, -0.5],
+    eye: [0.4, 2.95, 3.65],
+    target: [-0.15, 2.05, -0.15],
     up: [0, 1, 0],
     ortho: 0,
     height:
-      new T.Vector3(0.55, 3.15, 5.1).distanceTo(
-        new T.Vector3(-0.2, 2.25, -0.5),
+      new T.Vector3(0.4, 2.95, 3.65).distanceTo(
+        new T.Vector3(-0.15, 2.05, -0.15),
       ) * Math.tan(T.MathUtils.degToRad(47 / 2)),
     fov: 47,
   },

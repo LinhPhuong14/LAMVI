@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function LetterReader({
   letter,
@@ -9,7 +9,22 @@ export default function LetterReader({
 }) {
   const ref = useRef(null),
     video = useRef(null);
-  const [written, setWritten] = useState(false),
+  const reduced = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [revealAll, setRevealAll] = useState(reduced);
+  const paragraphs = useMemo(() => {
+    if (letter.kind !== "text") return [];
+    const segmenter = typeof Intl.Segmenter === "function" ? new Intl.Segmenter("vi", { granularity: "grapheme" }) : null;
+    let index = 0;
+    return (Array.isArray(letter.message) ? letter.message : letter.message.split("\n\n"))
+      .map(text => ({ text, words: text.split(/(\s+)/).map(word => ({
+        space: /^\s+$/.test(word), text: word,
+        glyphs: (segmenter ? Array.from(segmenter.segment(word), ({segment}) => segment) : Array.from(word.normalize("NFC"))).map(segment => ({text: segment, index: index++})),
+      })) }));
+  }, [letter.kind, letter.message]);
+  const glyphCount = paragraphs.reduce((sum, p) => sum + p.words.reduce((n, w) => n + w.glyphs.length, 0), 0);
+  // Even a long letter finishes in six seconds; controls never wait for the ink.
+  const inkStep = Math.min(.024, 5.7 / Math.max(1, glyphCount));
+  const [written, setWritten] = useState(reduced),
     [playing, setPlaying] = useState(false),
     [error, setError] = useState(false),
     [ended, setEnded] = useState(false);
@@ -60,6 +75,11 @@ export default function LetterReader({
       observer?.disconnect();
     };
   }, [getPaperRect]);
+  useEffect(() => {
+    if (reduced || !written || revealAll || !active) return;
+    const timer = setTimeout(() => setRevealAll(true), 6000);
+    return () => clearTimeout(timer);
+  }, [written, revealAll, active, reduced]);
   const surpriseText = {
     birthday: "Mở tấm thiệp nhỏ",
     anniversary: "Mở kỷ niệm của chúng mình",
@@ -94,10 +114,17 @@ export default function LetterReader({
         aria-hidden={!written}
       >
         {letter.kind === "text" ? (
-          (Array.isArray(letter.message)
-            ? letter.message
-            : letter.message.split("\n\n")
-          ).map((p, i) => <p key={i}>{p}</p>)
+          <>
+            {!revealAll && !reduced && <button className="lr-body-ink-skip" onClick={() => setRevealAll(true)}>Hiện toàn bộ lá thư</button>}
+            {paragraphs.map((paragraph, i) => <p key={i} className={`lr-body-ink ${revealAll || reduced ? "is-complete" : ""}`} style={{animationPlayState: active ? "running" : "paused"}}>
+              <span className="lr-sr-only">{paragraph.text}</span>
+              <span aria-hidden="true" className="lr-body-ink-visual">
+                {paragraph.words.map((word, w) => word.space ? word.text : <span className="lr-body-ink-word" key={w}>
+                  {word.glyphs.map(glyph => <span className="lr-body-ink-glyph" key={glyph.index} style={{"--body-ink-delay": `${glyph.index * inkStep}s`, animationPlayState: active ? "running" : "paused"}}>{glyph.text}</span>)}
+                </span>)}
+              </span>
+            </p>)}
+          </>
         ) : (
           <div className="lr-video">
             {!playing ? (

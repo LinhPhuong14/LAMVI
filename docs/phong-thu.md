@@ -85,3 +85,6 @@ API nhúng: `LetterRoom({ letter, onExit, preview, afterLetter })`. Các props c
 Kết quả cuối: lint/build đạt; 101 kiểm thử phòng thư độc lập đạt; hồi quy 4052 đạt + một ca routing chập chờn (cả tệp chạy lại 26/26 đạt), 2 skip. Xem QA README để phân biệt lượt chạy toàn bộ và lượt kiểm tra lại.
 
 Kiểm tra xác nhận sau chỉnh geometry cuối: `npm test -- src/letter-room src/components/Brand.extra.test.jsx src/pages/Routing.extra.test.jsx --maxWorkers=2` đạt **6 tệp / 136 ca** (gồm routing và brand).
+
+
+Cập nhật PO 2026-11-14 (điều chỉnh D-136): camera POV gần bàn hơn; cảnh bật đèn giữ nguyên camera, không cận công tắc. Sau đèn sáng, chạm vùng cảnh đưa bì từ bàn lên chính diện lơ lửng (vật thể di chuyển, camera đứng); kéo dùng mặt phẳng và trục local của bì. Nền gen modern-v4 thay bản rustic v3: cửa gỗ gọn, rèm sáng, tường kem, bàn sát góc phòng. Chụp đèn có đôi gà minh họa tự vẽ cảm hứng Đông Hồ; cần thay artwork thật. Nội dung thư reveal theo grapheme tiếng Việt, có hiện toàn bộ ngay và reduced motion; không tuyên bố thứ tự stroke của font là nét viết thật. Nguồn/prompt: docs/art/room-modern-v4.prompt.md.
