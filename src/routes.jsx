@@ -14,6 +14,7 @@ import PolicyPage from './pages/PolicyPage'
 import ContactPage from './pages/ContactPage'
 import CollectionPage from './pages/CollectionPage'
 import ShopPage from './pages/ShopPage'
+import LetterRoomRoute from './letter-room/LetterRoomRoute'
 const WelcomePage = lazy(() => import('./pages/WelcomePage'))
 const CartPage = lazy(() => import('./pages/CartPage'))
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
@@ -71,6 +72,7 @@ function localeChildren() {
 export default function AppRoutes() {
   return (
     <Routes>
+      <Route path="/phong-thu" element={<LetterRoomRoute />} />
       {/* D-51: dashboard IT */}
       <Route path="/it" element={<ProtectedRoute><RouteLoader><ItDashboard /></RouteLoader></ProtectedRoute>} />
       {/* D-48: admin chỉ tiếng Việt */}

@@ -839,3 +839,11 @@ Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE
 
 **Còn lại / cần người dùng**: đo tải thật bằng 4G; G-120 (QR, tem, đo lượt quét).
 
+
+## 2026-11-13 — Phòng thư lamvi (`feat/phong-thu`)
+
+Prototype riêng `/phong-thu`, giữ stack React/Vite/Express. Three.js tải động, orthographic camera chuyển phòng → mặt bàn, đèn giấy sợi procedural, bì/nắp/thư riêng, kéo ray-plane khóa trục; DOM reader/video và bảy bất ngờ. Fallback CSS 2D, keyboard và reduced motion; clip mẫu 6 giây tự tạo có audio Opus. Subagent kiểm thử độc lập 49 ca, phát hiện và sửa kiểm tra kiểu dữ liệu và NaN. Chrome headless kiểm tra mobile 360 px, desktop và giải mã audio thực. Chi tiết bàn giao/giới hạn tại `docs/phong-thu.md`. Không sửa luồng QR thật hoặc chính sách media.
+
+Full suite đầu: 4007 đạt, 1 lỗi, 2 bỏ qua; lỗi `MobileBars.test.jsx` bắn callback trước khi passive effect gắn observer. Sửa riêng mock lưu target và chờ observer đúng nút mua; test sản phẩm + 49 test phòng thư chạy lại đạt 52/52, không sửa mã sản phẩm. Remote master đã có triển khai `wishroom` riêng của session khác (`e58872e`), nên giữ nguyên nhánh/worktree này để tránh ghi đè route và tài liệu.
+
+Xác nhận cuối: full suite 262 tệp đạt; 4008 ca đạt, 2 bỏ qua (239,98 giây). Lint và build client/SSR đạt. Ảnh mobile/desktop và giấy phép phụ thuộc lưu kèm. Nhánh riêng không merge tự động do master có prototype khác cùng route.

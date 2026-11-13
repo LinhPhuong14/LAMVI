@@ -335,3 +335,7 @@ Chi tiết giới hạn, cutover và load profile: [runbook 1M](../production-re
 ## Khởi động chịu lỗi (T-73, 2026-10-08)
 
 `server/index.js` (điểm vào, `api/index.js` re-export từ đây) → `import('./main.js')` (toàn bộ khởi tạo: config, `assertRuntimeReady`, adapter, SSR). Lỗi khi nạp → `server/degraded.js` (503 + `server/errorPage.js`). Trang lỗi 5xx của SSR cũng dùng `errorPage`. Frontend mới: `ContactPage` (`/contact`), `PolicyPage` thêm kind `terms|shipping|payment`, ngăn kéo menu trong `SiteHeader` (portal), chú thích checkout ở `LoginPage`, nút `may-handoff` ở `MayChat`.
+
+### Prototype Phòng thư — nhánh `feat/phong-thu`
+
+`src/letter-room/LetterRoomRoute.jsx` chỉ tải trình nhận thư sau hydration; scene WebGL tải động tiếp, tránh chặn SSR và tải Three.js ở trang khác. `data.js` chứa schema kiểm tra dữ liệu, bảy mẫu và reducer trạng thái. `scene.js` quản lý phòng, đèn, camera, layer bì/thư, ray-plane projection và vòng render theo nhu cầu. `LetterRoom.jsx` nối reducer với pointer capture, đọc thư HTML, player và bất ngờ DOM/CSS; `room.css` bao gồm fallback 2D. Không endpoint/bảng mới, không kết nối dữ liệu QR thật. Đây là triển khai độc lập, không sửa `src/wishroom` được session khác merge vào master trong cùng phiên.

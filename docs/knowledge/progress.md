@@ -231,3 +231,9 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 |---|---|---|---|
 | Landing: lớp họa tiết dân gian Việt | ✅ code | `Folk.jsx`, cuối `pages.css`; `Folk.test.jsx` | Marketing duyệt chữ lạc khoản; ảnh Đông Hồ thêm ở các mục khác |
 
+
+| Prototype Phòng thư (2026-11-13) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| `/phong-thu`: phòng Three.js, thư chữ/video, bảy dịp, fallback 2D | ✅ prototype cục bộ | `src/letter-room/`; 49 test độc lập đạt; hướng dẫn `docs/phong-thu.md` | đối chiếu đèn thật, tích hợp QR sau, nghiệm thu iOS/GPU thật; quà giấy dùng DOM/CSS |
+
+Phòng thư `feat/phong-thu`: xác nhận toàn repo 262 tệp / 4008 ca đạt, 2 bỏ qua; lint + build đạt. Chờ chọn cách phối hợp với bản `wishroom` trên master trước tích hợp.
