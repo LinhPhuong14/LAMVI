@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 // Tiêu đề phong thư viết tay (stroke write-on), xong mới fade in nội dung chính
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import HandwrittenTitle from './HandwrittenTitle.jsx'
-import LetterPaper from './LetterPaper.jsx'
+import LetterReader from '../letter-room/LetterReader.jsx'
 
-const letter = { recipientName: 'Linh', senderName: 'An', occasion: 'thankYou', kind: 'text', message: ['Đoạn một.'], postscript: null, occasionData: null }
+const letter = { recipientName: 'Linh', senderName: 'An', occasion: 'thankYou', kind: 'text', message: ['Đoạn một.'], postscript: null, occasionData: {} }
 // jsdom không có AnimationEvent → tự dựng sự kiện kèm animationName
 const animEnd = (el, name) =>
   act(() => {
@@ -56,20 +56,31 @@ describe('HandwrittenTitle', () => {
   })
 })
 
-describe('LetterPaper — nội dung fade in sau tiêu đề', () => {
-  it('nội dung chính ẩn (chưa is-shown) tới khi tiêu đề viết xong', async () => {
-    render(<LetterPaper letter={letter} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Bật đèn' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở thư gửi Linh' }, { timeout: 2000 }))
-    const content = document.querySelector('.lt-content')
-    expect(content.classList.contains('is-shown')).toBe(false)
-    animEnd(document.querySelector('.lt-hw-text'), 'lt-hw-fill')
-    expect(content.classList.contains('is-shown')).toBe(true)
+describe('Phòng thư (LetterReader) — nội dung hiện sau tiêu đề viết tay', () => {
+  it('tiêu đề là h2 viết tay giữ nét gạch chân; nội dung ẩn (inert) tới khi tiêu đề viết xong', () => {
+    const { container } = render(<LetterReader letter={letter} />)
+    expect(screen.getByRole('heading', { level: 2, name: 'Gửi Linh,' })).toBeTruthy()
+    expect(container.querySelector('.lr-dedication .lt-hw')).toBeTruthy()
+    expect(container.querySelector('.lr-dedication > svg:not(.lt-hw) path')).toBeTruthy()
+    const content = container.querySelector('.lr-letter-content')
+    expect(content.classList.contains('visible')).toBe(false)
+    expect(content.getAttribute('aria-hidden')).toBe('true')
+    animEnd(container.querySelector('.lt-hw-text'), 'lt-hw-fill')
+    expect(content.classList.contains('visible')).toBe(true)
+    expect(content.getAttribute('aria-hidden')).toBe('false')
   })
 
-  it('xem trước admin: tiêu đề hiện ngay, nội dung hiện ngay', () => {
-    render(<LetterPaper letter={letter} preview />)
-    expect(document.querySelector('.lt-hw.is-instant')).toBeTruthy()
-    expect(document.querySelector('.lt-content.is-shown')).toBeTruthy()
+  it('animationend không bắn → nội dung vẫn hiện sau thời gian dự phòng', () => {
+    vi.useFakeTimers()
+    const { container } = render(<LetterReader letter={letter} />)
+    act(() => vi.advanceTimersByTime(2300))
+    expect(container.querySelector('.lr-letter-content.visible')).toBeTruthy()
+  })
+
+  it('giảm chuyển động: tiêu đề và nội dung hiện ngay', () => {
+    vi.stubGlobal('matchMedia', (q) => ({ matches: q.includes('reduce'), addEventListener() {}, removeEventListener() {} }))
+    const { container } = render(<LetterReader letter={letter} />)
+    expect(container.querySelector('.lt-hw.is-instant')).toBeTruthy()
+    expect(container.querySelector('.lr-letter-content.visible')).toBeTruthy()
   })
 })

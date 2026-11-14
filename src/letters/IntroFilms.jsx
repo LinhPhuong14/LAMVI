@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { pickFilmSrc } from '../lib/filmSrc.js'
 import { INTRO_FILMS } from './films.js'
 import './letters.css'
@@ -88,7 +89,10 @@ export default function IntroFilms({ onDone, canSkip = false }) {
   )
 }
 
-/** Xem lại một video (cuối thư): cách làm đèn / lịch sử văn hoá. */
+/**
+ * Xem lại một video (cuối thư): cách làm đèn / lịch sử văn hoá.
+ * Gắn vào <body> (portal): tờ thư trong Phòng thư có transform/filter nên `position: fixed` bên trong sẽ bị kẹt theo tờ giấy.
+ */
 export function FilmOverlay({ item, onClose, children }) {
   const src = useMemo(() => pickFilmSrc(item.film), [item])
   const closeRef = useRef(null)
@@ -98,7 +102,7 @@ export function FilmOverlay({ item, onClose, children }) {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [item, onClose])
-  return (
+  return createPortal(
     <div className="lt-overlay" role="dialog" aria-modal="true" aria-label={item.title}>
       <div className="lt-overlay-box">
         <button ref={closeRef} type="button" className="lt-overlay-close" onClick={onClose} aria-label="Đóng video">
@@ -109,6 +113,7 @@ export function FilmOverlay({ item, onClose, children }) {
         {src && <video className="lt-intro-video" src={src} poster={item.film.poster} controls playsInline autoPlay />}
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

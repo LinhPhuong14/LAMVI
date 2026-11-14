@@ -320,6 +320,8 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 
 ## Phòng thư LAMVI — prototype trải nghiệm nhận lời chúc 3D (T-104, D-133)
 
+> **Đã gỡ (D-139, 2026-11-14)**: `src/wishroom` không còn trong code; Phòng thư dùng `src/letter-room` (mục bên dưới). Phong thư thật: `src/pages/LetterPage.jsx` (`/thu/<slug>`) = `IntroFilms` → `LetterRoom` (lazy) với `afterLetter={<LetterExtras/>}`; admin xem thử qua `src/admin/LetterRoomPreview.jsx`.
+
 Prototype trang `/phong-thu` (noindex, không SSR — `IMMERSIVE_PAGES` trong `LocaleLayout.jsx` bỏ
 hết header/footer/tabbar/May/banner cookie, khác `/qr/:token` thật). Dữ liệu mẫu cục bộ (`src/wishroom/data.js`),
 **không gọi API thật** — xem §21.9 `ba-spec.md` trước khi nối vào luồng QR thật ở `GiftPage.jsx`.
@@ -355,3 +357,13 @@ Chi tiết giới hạn, cutover và load profile: [runbook 1M](../production-re
 ## Khởi động chịu lỗi (T-73, 2026-10-08)
 
 `server/index.js` (điểm vào, `api/index.js` re-export từ đây) → `import('./main.js')` (toàn bộ khởi tạo: config, `assertRuntimeReady`, adapter, SSR). Lỗi khi nạp → `server/degraded.js` (503 + `server/errorPage.js`). Trang lỗi 5xx của SSR cũng dùng `errorPage`. Frontend mới: `ContactPage` (`/contact`), `PolicyPage` thêm kind `terms|shipping|payment`, ngăn kéo menu trong `SiteHeader` (portal), chú thích checkout ở `LoginPage`, nút `may-handoff` ở `MayChat`.
+
+### Prototype Phòng thư — nhánh `feat/phong-thu`
+
+`src/letter-room/LetterRoomRoute.jsx` chỉ tải trình nhận thư sau hydration; scene WebGL tải động tiếp, tránh chặn SSR và tải Three.js ở trang khác. `data.js` chứa schema kiểm tra dữ liệu, bảy mẫu và reducer trạng thái. `scene.js` quản lý phòng, đèn, camera, layer bì/thư, ray-plane projection và vòng render theo nhu cầu. `LetterRoom.jsx` nối reducer với pointer capture, đọc thư HTML, player và bất ngờ DOM/CSS; `room.css` bao gồm fallback 2D. Không endpoint/bảng mới, không kết nối dữ liệu QR thật. Đây là triển khai độc lập, không sửa `src/wishroom` được session khác merge vào master trong cùng phiên.
+
+POV D-136/T-105 cập nhật prototype: camera Perspective; tự điều phối phase sau bật đèn, không còn UI kéo. Phòng/đèn dùng rounded/lathe và PBR local maps 512px, PMREM; giấy 3D uốn nhẹ khi trôi lên trước khi khớp sang reader DOM. Text dùng Itim + grapheme animation. Không thêm endpoint/schema/deploy config.
+
+
+### Phòng thư — cập nhật D-136 (2026-11-13)
+Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác chủ động. Tách CameraRig/LetterReader/PaperSurprise; reducer khóa bước chuyển và kéo 40%. Bì vẫn trên bàn, giấy mới nâng lên; reader mở rộng. Dùng camera-controls MIT và bàn KayKit CC0 qua GLTFLoader, giữ stack/brand/ánh sáng. Không tích hợp bộ surfaceMaterials bị từ chối. Chi tiết triển khai/nguồn/QA: `docs/phong-thu.md`, `docs/art/model-sources.md`, `docs/qa/phong-thu/README.md`. Ghi chú này thay mô tả tự mở thư trước đó, không thay API QR/backend.

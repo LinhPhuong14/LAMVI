@@ -6,7 +6,6 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
 import IntroFilms from './IntroFilms.jsx'
 import LetterExtras from './LetterExtras.jsx'
-import LetterPaper from './LetterPaper.jsx'
 import { INTRO_FILMS, filmByKey, introSeen, markIntroSeen } from './films.js'
 import { pickFilmSrc } from '../lib/filmSrc.js'
 
@@ -18,7 +17,7 @@ const T1 = 'Tranh Đông Hồ trên đèn giấy dó'
 const T2 = 'Từ làng giấy dó đến chiếc đèn'
 
 const video = () => document.querySelector('video.lt-intro-video')
-const lamp = () => screen.queryByRole('button', { name: 'Bật đèn' })
+const lamp = () => screen.queryByRole('button', { name: 'Chạm để bật đèn' })
 const openLetterApi = () => {
   const f = mockApi({ 'POST /letters/open': () => ({ body: { item: content } }) })
   window.location.hash = `#${TOKEN}`
@@ -136,7 +135,7 @@ describe('Nút "Bỏ qua" và cờ đã xem (localStorage)', () => {
     fireEvent.ended(video())
     await screen.findByText(T2)
     fireEvent.click(screen.getByRole('button', { name: 'Bỏ qua, vào phòng' }))
-    expect(await screen.findByRole('button', { name: 'Bật đèn' })).toBeTruthy()
+    expect(await screen.findByRole('button', { name: 'Chạm để bật đèn' })).toBeTruthy()
   })
 
   it('localStorage.getItem/setItem ném lỗi → vẫn xem video và vào được phòng, không có nút bỏ qua', async () => {
@@ -159,7 +158,7 @@ describe('Nút "Bỏ qua" và cờ đã xem (localStorage)', () => {
     fireEvent.ended(video())
     await screen.findByText(T2)
     fireEvent.ended(video())
-    expect(await screen.findByRole('button', { name: 'Bật đèn' })).toBeTruthy()
+    expect(await screen.findByRole('button', { name: 'Chạm để bật đèn' })).toBeTruthy()
   })
 
   it('bỏ qua bằng nút (đã có cờ) vẫn giữ cờ', async () => {
@@ -167,7 +166,7 @@ describe('Nút "Bỏ qua" và cờ đã xem (localStorage)', () => {
     openLetterApi()
     renderAt(`/thu/${SLUG}`)
     fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua, vào phòng' }))
-    await screen.findByRole('button', { name: 'Bật đèn' })
+    await screen.findByRole('button', { name: 'Chạm để bật đèn' })
     expect(localStorage.getItem(FLAG)).toBe('1')
   })
 })
@@ -186,7 +185,7 @@ describe('Video lỗi → "Tiếp tục"', () => {
     expect(lamp()).toBeNull()
     fireEvent.error(video())
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
-    expect(await screen.findByRole('button', { name: 'Bật đèn' })).toBeTruthy()
+    expect(await screen.findByRole('button', { name: 'Chạm để bật đèn' })).toBeTruthy()
   })
 
   it('video lỗi khi đã có cờ: ẩn "Bỏ qua", chỉ còn "Tiếp tục"', () => {
@@ -218,7 +217,7 @@ describe('Video lỗi → "Tiếp tục"', () => {
     await screen.findByText(T2)
     fireEvent.error(video())
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
-    await screen.findByRole('button', { name: 'Bật đèn' })
+    await screen.findByRole('button', { name: 'Chạm để bật đèn' })
     expect(localStorage.getItem(FLAG)).toBeNull()
   })
 })
@@ -245,54 +244,6 @@ describe('Chọn bản video nhẹ/đầy đủ (T-103)', () => {
     render(<LetterExtras />)
     fireEvent.click(screen.getByRole('button', { name: 'Xem lại cách làm đèn' }))
     expect(screen.getByRole('dialog').querySelector('video').getAttribute('src')).toBe('/videos/lang-giay-do-360.mp4')
-  })
-})
-
-describe('Căn phòng bật đèn (LetterPaper, không preview)', () => {
-  it('bật đèn → nút đèn bị vô hiệu; phong bì chỉ hiện sau ~900 ms', () => {
-    vi.useFakeTimers()
-    render(<LetterPaper letter={content} />)
-    expect(screen.getByText(/Căn phòng còn tối/)).toBeTruthy()
-    fireEvent.click(lamp())
-    expect(lamp().disabled).toBe(true)
-    expect(screen.getByText(/Đèn đã sáng/)).toBeTruthy()
-    fireEvent.click(lamp())
-    act(() => vi.advanceTimersByTime(800))
-    expect(screen.queryByRole('button', { name: 'Mở thư gửi Linh' })).toBeNull()
-    act(() => vi.advanceTimersByTime(150))
-    expect(screen.getByRole('button', { name: 'Mở thư gửi Linh' })).toBeTruthy()
-    expect(lamp()).toBeNull()
-  })
-
-  it('reduced-motion: vẫn tới được phong bì và thư (không kẹt ở phòng)', () => {
-    vi.useFakeTimers()
-    window.matchMedia = (q) => ({ matches: q.includes('reduce'), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} })
-    render(<LetterPaper letter={content} afterLetter={<LetterExtras />} />)
-    fireEvent.click(lamp())
-    act(() => vi.advanceTimersByTime(2000))
-    fireEvent.click(screen.getByRole('button', { name: 'Mở thư gửi Linh' }))
-    expect(screen.getByText('Đoạn một.')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Xem lại cách làm đèn' })).toBeTruthy()
-  })
-
-  it('tháo trang trước khi hết 900 ms không báo lỗi (hẹn giờ được huỷ)', () => {
-    vi.useFakeTimers()
-    const err = vi.spyOn(console, 'error').mockImplementation(() => {})
-    const { unmount } = render(<LetterPaper letter={content} />)
-    fireEvent.click(lamp())
-    unmount()
-    act(() => vi.advanceTimersByTime(2000))
-    expect(vi.getTimerCount()).toBe(0)
-    expect(err).not.toHaveBeenCalled()
-  })
-
-  it('nút xem lại chỉ có sau khi mở thư, không có ở phòng/phong bì', () => {
-    vi.useFakeTimers()
-    render(<LetterPaper letter={content} afterLetter={<LetterExtras />} />)
-    expect(screen.queryByRole('button', { name: 'Lịch sử văn hoá' })).toBeNull()
-    fireEvent.click(lamp())
-    act(() => vi.advanceTimersByTime(1000))
-    expect(screen.queryByRole('button', { name: 'Lịch sử văn hoá' })).toBeNull()
   })
 })
 
@@ -335,17 +286,5 @@ describe('Khung xem lại cuối thư (LetterExtras)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Xem lại cách làm đèn' }))
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(rm.mock.calls.some(([t]) => t === 'keydown')).toBe(true)
-  })
-})
-
-describe('Xem trước admin', () => {
-  it('LetterPaper preview: vào thẳng thư, không video mở đầu, không phòng, không nút xem lại', () => {
-    render(<LetterPaper letter={content} preview />)
-    expect(screen.getByText('Đoạn một.')).toBeTruthy()
-    expect(document.querySelector('video')).toBeNull()
-    expect(lamp()).toBeNull()
-    expect(screen.queryByRole('button', { name: /Mở thư gửi/ })).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Xem lại cách làm đèn' })).toBeNull()
-    expect(screen.queryByText(T1)).toBeNull()
   })
 })
