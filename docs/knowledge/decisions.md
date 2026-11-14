@@ -49,6 +49,7 @@ Quyết định nghiệp vụ nằm ở Phụ lục A của [`ba-spec.md`](../ba
 | T-52 | 2026-10-02 | Trang Cửa hàng `/shop` + `ProductCards` dùng chung; navbar luôn ghim, thu nhỏ 20% khi cuộn (`transform`, không đổi layout) | Hiệu lực |
 | T-53 | 2026-10-02 | Trang chi tiết sản phẩm `ProductPage` v2 (lưới `pdp-*`), khối `Related` dùng lại `ProductCards` | Hiệu lực |
 | T-104 | 2026-11-13 | Prototype "Phòng thư LAMVI" (`/phong-thu`, D-133): Three.js thuần (không R3F), máy trạng thái 6 bước, font Itim thay Caveat/Instrument Sans (thiếu bộ `vietnamese`) | Hiệu lực |
+| T-105 | 2026-11-14 | Đèn ở `/phong-thu` đổi từ hình trụ thủ tục sang mặt phẳng dùng ảnh thật chung với catalog (`public/images/lamps`), billboard quay quanh trục Y | Hiệu lực |
 
 ---
 
@@ -525,4 +526,15 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - **Bóng hình Cảnh E (mục 7, "hình giấu trong giấy dó")**: bake vào `emissiveMap` của chụp đèn (không chỉ `.map`) — ánh sáng hắt qua chủ yếu từ `emissiveIntensity`, đổi màu `.map` không đủ làm vùng tối rõ khi đèn sáng. Vị trí U trên `CylinderGeometry` phải khớp góc camera (azimuth 45° → u ≈ 45/360), đặt ở u=0,5 (mặt sau) sẽ bị khuất hoàn toàn — xem `drawSilhouette`/`makeLampBodyTexture`.
 - **Thử và bỏ**: `ACESFilmicToneMapping` + `HemisphereLight` + `THREE.Fog` để "đẹp như game" làm phẳng/nhạt tương phản ấm (đèn)/lạnh (chàm đêm) mà bảng màu đặc tả cố tình giữ — quay lại `AmbientLight` phẳng đã tuned, chỉ thêm một `PointLight` lạnh tĩnh phía rèm (rim light) và hình học rèm có nếp gấp thật (`makeCurtainGeometry`, dịch đỉnh theo sin) thay vì nhiều mặt phẳng chồng lệch vị trí.
 - **Hệ quả**: `IMMERSIVE_PAGES` mới trong `LocaleLayout.jsx` (khác `APP_PAGES` — bỏ luôn `<May/>`/`ConsentBanner`, không chỉ header/footer) cho trang toàn màn hình không có chrome nào của site; thêm route mới phải tự quyết định dùng `APP_PAGES` hay `IMMERSIVE_PAGES` nếu cũng cần ẩn chrome. Baking bóng hình có thể nâng cấp sau thành tương tác camera quay lại khung đèn nếu muốn hiệu ứng rõ hơn lúc mở bất ngờ (hiện là chi tiết nền, luôn hiện khi đèn sáng).
+
+### T-105 — Đèn dùng ảnh chụp thật thay hình trụ thủ tục
+
+- **Bối cảnh**: người dùng yêu cầu đổi ảnh đèn ở `/phong-thu` sang bản nét hơn, dùng chung ảnh đã có trong catalog (`public/images/lamps/*-cutout.webp`, đã tách nền, dùng cho thẻ sản phẩm ở `ProductImage.jsx`).
+- **Quyết định**: `sceneEngine.js` bỏ hẳn `base`/`body` (`CylinderGeometry`)/`rim` (`TorusGeometry`) + texture canvas thủ tục (`makeLampBodyTexture`), thay bằng **một `PlaneGeometry`** dùng ảnh `tu-linh-cutout.webp` làm texture (`makeLampPhotoTexture`, nạp bất đồng bộ qua `<img>`). Mặt phẳng chỉ billboard quanh trục Y (`Math.atan2`) để đèn vẫn "đứng thẳng", không ngả theo độ cao camera — camera không bao giờ xoay quanh đèn trong lúc đèn còn hiện nên không cần billboard đầy đủ 3 trục.
+- **Bật/tắt đèn**: ảnh chụp đã có sẵn ánh sáng ấm bên trong (chụp lúc đèn đang bật), không "tắt" được qua `emissiveIntensity` như texture thủ tục cũ → giả lập bằng cách tint `MeshBasicMaterial.color` từ một màu tối (`LAMP_DARK`) sang trắng (`LAMP_LIT`, giữ nguyên màu gốc ảnh) theo cùng nhịp `lampT` của `animateLightUp`. `LAMP_DARK` phải đủ sáng để còn thấy dáng đèn khi phòng tối (yêu cầu §Cảnh A "vẫn thấy dáng thân trụ") — quá tối (gần đen) thì gần như vô hình.
+- **Hai lỗi gặp khi chụp thử Playwright** (xem lịch sử sửa, đều ở `makeLampPhotoTexture`):
+  1. Tạo `CanvasTexture` từ canvas 1×1 rồi resize canvas lên kích thước ảnh thật (420×1000) khi `onload` → WebGL cố `texSubImage2D` (cập nhật từng phần) lên texture GPU cũ còn 1×1, lệch kích thước, báo `GL_INVALID_VALUE: glTexSubImage2DRobustANGLE` và cả mặt phẳng hiện một màu nhoè đặc (không còn chi tiết ảnh). **Sửa**: dựng canvas đúng kích thước cuối cùng (`LAMP_PHOTO_PX`, đo sẵn từ file) ngay từ đầu, không resize nữa.
+  2. Ảnh thật không phải hình vuông/luỹ thừa 2 → mặc định `generateMipmaps` có thể lọc sai trên một số driver; tắt hẳn (`generateMipmaps = false`, `minFilter`/`magFilter = LinearFilter`) cho chắc.
+  3. Bóng hình Cảnh E (cat silhouette) đặt giữa thân ảnh thật bị hoạ tiết rậm (tranh dân gian) nuốt mất, gần như không đọc được — dời lên dải lề kem phía trên hoạ tiết (gần mép trên của chụp đèn, `canvas.height*0.105`), nơi nền trơn hơn.
+- **Hệ quả**: `LAMP_PHOTO_URL`/`LAMP_PHOTO_PX` ở đầu `sceneEngine.js` là nơi duy nhất cần sửa để đổi mẫu đèn hiển thị; ảnh khác trong cùng bộ `public/images/lamps` có tỉ lệ khung hình gần giống (các bản `-cutout.webp` đều cao 1000px) nên thường chỉ cần đổi `LAMP_PHOTO_URL` + đo lại `LAMP_PHOTO_PX` đúng ảnh mới, không cần sửa `LAMP_CFG`.
 

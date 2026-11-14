@@ -1,5 +1,15 @@
 # Tiến độ tính năng
 
+## 2026-11-14 — Ảnh đèn thật cho Phòng thư LAMVI (feat/phong-thu-lamp-photo, D-134, T-105)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Đèn ở `/phong-thu` dùng ảnh chụp thật (Tứ Linh, cùng bộ catalog) thay hình trụ thủ tục | ✅ | `src/wishroom/sceneEngine.js` (`makeLampPhotoTexture`, `LAMP_PHOTO_URL`) | Gắn theo mẫu đèn thật của đơn khi nối API (G-121) |
+| Bật/tắt đèn qua tint màu (ảnh đã có sẵn ánh sáng) | ✅ | `LAMP_DARK`/`LAMP_LIT` trong `animateLightUp` | — |
+| Bóng hình Cảnh E dời lên dải lề kem (ảnh thật rậm hoạ tiết hơn nền trơn cũ) | ✅ | `makeLampPhotoTexture` | — |
+
+264 file / 4000+ test xanh (không thêm test mới — thay đổi chỉ ở `sceneEngine.js`, không import được trong test jsdom); lint/build xanh. Đã soát bằng Playwright thật (420px, 360px, trước/sau khi bật đèn, mẫu `batchot`) để phát hiện 2 lỗi WebGL (texture vỡ do resize canvas sau khi tạo, mipmap NPOT) — xem T-105.
+
 ## 2026-11-13 — Prototype "Phòng thư LAMVI" (feat/phong-thu-lamvi, D-133, T-104)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |

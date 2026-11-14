@@ -1,5 +1,17 @@
 # Nhật ký phiên
 
+## 2026-11-14 — Ảnh đèn thật cho Phòng thư LAMVI (nhánh `feat/phong-thu-lamp-photo`, D-134, T-105)
+
+Người dùng: "sửa ảnh đèn thành ảnh nét hơn đang dùng trong catalog". Đổi đèn ở `/phong-thu` từ hình trụ dựng bằng `CylinderGeometry` + texture canvas thủ tục sang một `PlaneGeometry` dùng ảnh chụp thật `tu-linh-cutout.webp` (cùng bộ `public/images/lamps` mà `ProductImage.jsx` dùng cho thẻ sản phẩm) — billboard chỉ quay quanh trục Y để đèn vẫn đứng thẳng tự nhiên.
+
+Hai lỗi WebGL gặp khi soát bằng Playwright thật (chi tiết T-105 ở `decisions.md`): (1) tạo canvas 1×1 rồi resize lên kích thước ảnh thật lúc tải xong làm `texSubImage2D` lệch kích thước với texture GPU cũ, vỡ hẳn kết cấu (cả mặt phẳng ra một màu nhoè) — sửa bằng cách dựng canvas đúng kích thước cuối cùng ngay từ đầu, không resize; (2) ảnh không phải kích thước luỹ thừa 2 nên tắt hẳn mipmap. Cũng chỉnh lại bóng hình Cảnh E (mèo giấu trong giấy) từ giữa thân đèn lên dải lề kem phía trên vì hoạ tiết tranh dân gian thật rậm hơn nền trơn cũ, nuốt mất silhouette.
+
+Bài học quy trình: lỗi WebGL loại này không throw lên console mặc định của trang (chỉ console.warn từ driver), phải chủ động gắn `page.on('console')`/`page.on('pageerror')` khi chụp thử mới thấy — ảnh chụp màn hình một mình không đủ để chẩn đoán nguyên nhân, chỉ thấy triệu chứng (mặt phẳng ra màu nhoè).
+
+Test hiện có (39 test, không import `sceneEngine.js` trong jsdom) không bị ảnh hưởng — không thêm test mới cho thay đổi này vì toàn bộ nằm trong phần chỉ chạy được với WebGL thật. Lint/build/264 file test khác đều xanh.
+
+---
+
 ## 2026-11-13 — Prototype "Phòng thư LAMVI" (nhánh `feat/phong-thu-lamvi`, D-133, T-104)
 
 Người dùng đưa đặc tả chi tiết (không phải từ ba-spec.md có sẵn — tự dán trực tiếp vào hội thoại) cho một microsite 3D isometric ở trang nhận lời chúc: bật đèn → chạm phong bì → kéo thư → nét mực → đọc chữ/video → P.S., sau đó mở rộng thêm "Cảnh E" (bất ngờ theo dịp tặng quà, 7 dịp, PO chọn dựng trước 3 dịp: sinh nhật, kỷ niệm, tặng bất chợt). Vì chưa có trong `ba-spec.md`, đã ghi nhận là D-133 (§21.9) thay vì tự quyết định phạm vi nghiệp vụ — giữ đúng scope người dùng nói rõ là **prototype + dữ liệu mẫu cục bộ**, không nối API thật.

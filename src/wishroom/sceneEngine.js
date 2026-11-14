@@ -1,15 +1,13 @@
 import * as THREE from 'three'
 import { easeInOutCubic, easeOutCubic, projectAxisToScreen, tween } from './dragProgress.js'
 
-// ĐIỂM THAY TEXTURE THẬT (hiện đang là canvas vẽ thủ tục — §4 yêu cầu bắt đầu bằng texture nhẹ,
-// chỉ đổi khi có asset thật). Ba nơi cụ thể và nguồn gợi ý đã kiểm (đều CC0/MIT):
+// ĐIỂM THAY TEXTURE THẬT (§4 yêu cầu bắt đầu bằng texture nhẹ, chỉ đổi khi có asset thật). Đèn đã
+// đổi sang ảnh chụp thật dùng chung với catalog (LAMP_PHOTO_URL, mục dưới) — còn hai nơi sau vẫn
+// là canvas vẽ thủ tục:
 //   - Giấy thư + nền phong bì: `makeNoiseTexture`/`makeEnvelopeFrontTexture` → thay bằng ambientCG
 //     "Paper001" (PBR, CC0, ambientcg.com/view?id=Paper001). Giữ alpha thấp khi chồng màu bảng §2.
 //   - Mặt bàn: `floorMat` ở dưới → thay bằng Poly Haven "Wood Table" (CC0, polyhaven.com/a/wood_table,
 //     bản 1K), hạ tương phản vân gỗ để mắt vẫn hướng về phong bì.
-//   - Chụp đèn: `makeLampBodyTexture` → PHẢI dùng ảnh cận giấy dó thật của LAMVI (không dùng
-//     texture ngoài) để lên ánh sáng đúng chất sản phẩm; bóng hình (Cảnh E mục 7) hiện bake tĩnh,
-//     có thể nâng dần tương phản mask lúc mở bất ngờ nếu camera quay lại khung đèn.
 // Màu theo bảng mỹ thuật của đặc tả (§2). Tập trung ở một nơi để đổi theo ảnh sản phẩm thật sau.
 export const PALETTE = {
   wall: 0xfaf4e7,
@@ -37,13 +35,18 @@ const PEEK = 0.035
 const LETTER_REST_Y = POCKET_TOP + PEEK - LETTER_L / 2
 const SLIDE_DISTANCE = 0.58
 
+// Ảnh đèn dùng chung với catalog (public/images/lamps — ProductImage.jsx dùng cùng bộ ảnh này cho
+// thẻ sản phẩm). Bản "-cutout" đã tách nền, nét hơn hẳn texture canvas vẽ thủ tục trước đây. Đổi
+// mẫu đèn hiển thị ở đây — mọi ảnh trong bộ cùng tỉ lệ khung hình nên không cần sửa LAMP_CFG.
+const LAMP_PHOTO_URL = '/images/lamps/tu-linh-cutout.webp'
+const LAMP_PHOTO_PX = { w: 420, h: 1000 } // kích thước thật của ảnh — xem lý do cần biết trước ở makeLampPhotoTexture
+const LAMP_PHOTO_ASPECT = LAMP_PHOTO_PX.w / LAMP_PHOTO_PX.h
+
 const LAMP_CFG = {
-  baseRadius: 0.26,
-  baseHeight: 0.1,
-  bodyRadius: 0.21,
-  bodyHeight: 0.86,
-  scale: 1, // đổi tỉ lệ đèn theo ảnh sản phẩm thật ở đây
+  height: 1.05, // chiều cao hiển thị trong cảnh (đơn vị thế giới) — đổi tỉ lệ đèn ở đây
+  scale: 1,
 }
+LAMP_CFG.width = LAMP_CFG.height * LAMP_PHOTO_ASPECT
 
 const ROOM = { width: 4.6, depth: 3.4, height: 2.6 }
 // Khoảng cách ngang đèn/phong bì phải vừa trong viewW của khung dọc hẹp nhất (điện thoại, §5 mục 1)
@@ -118,17 +121,32 @@ function drawSilhouette(ctx, shape, cx, cy, size) {
   ctx.restore()
 }
 
-function makeLampBodyTexture(occasionShape) {
-  const w = 512
-  const tex = makeNoiseTexture({ w, h: 512, base: '#faf4e7', fiber: '#e9ddc5', alpha: 0.18 })
-  if (occasionShape) {
-    // U của CylinderGeometry: 0 ứng với hướng local +Z, tăng theo chiều θ (ngược kim đồng hồ nhìn
-    // từ +Y). Camera mặc định (azimuth 45°) nhìn thẳng vào θ≈45° → đặt hình ở u=45/360 để nằm
-    // đúng mặt hướng ra camera, không phải mặt sau (bài học từ ảnh chụp thử: u=0.5 bị khuất).
-    const u = 45 / 360
-    drawSilhouette(tex.image.getContext('2d'), occasionShape, u * w, 280, 160)
+// Texture cho mặt phẳng hiển thị đèn: nạp ảnh chụp thật (bất đồng bộ — `<img>`/canvas, không chặn
+// khung hình đầu). Canvas dựng đúng LAMP_PHOTO_PX ngay từ đầu, KHÔNG resize sau khi ảnh tải xong —
+// đổi cỡ canvas sau khi texture đã tạo làm WebGL cố `texSubImage2D` lên texture cũ còn kích thước
+// ban đầu, lệch kích thước và vỡ hẳn kết cấu (đã gặp khi chụp thử: cả mặt phẳng ra một màu nhoè đặc).
+// Hình bóng Cảnh E mục 7 (nếu có) vẽ đè lên giữa ảnh khi đã tải xong — toàn bộ mặt trước chụp đèn
+// đều lọt vào khung hình (khác texture hình trụ cũ phải né mặt sau không thấy được).
+function makeLampPhotoTexture(occasionShape, onReady) {
+  const canvas = document.createElement('canvas')
+  canvas.width = LAMP_PHOTO_PX.w
+  canvas.height = LAMP_PHOTO_PX.h
+  const tex = new THREE.CanvasTexture(canvas)
+  tex.colorSpace = THREE.SRGBColorSpace
+  // Ảnh thật không vuông/luỹ thừa 2 — tắt mipmap, nếu không WebGL lọc ra kết cấu nhoè/sai màu.
+  tex.generateMipmaps = false
+  tex.minFilter = THREE.LinearFilter
+  tex.magFilter = THREE.LinearFilter
+  const img = new Image()
+  img.onload = () => {
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    // Đặt ở dải lề kem phía trên hoạ tiết (ảnh thật khá rậm hoạ tiết, đặt giữa thân sẽ chìm mất)
+    if (occasionShape) drawSilhouette(ctx, occasionShape, canvas.width * 0.5, canvas.height * 0.105, canvas.width * 0.55)
+    tex.needsUpdate = true
+    onReady?.()
   }
-  tex.needsUpdate = true
+  img.src = LAMP_PHOTO_URL
   return tex
 }
 
@@ -254,7 +272,6 @@ export function createWishRoomEngine(canvas, { recipientName, reducedMotion = fa
   scene.add(rimLight)
 
   const lampLight = new THREE.PointLight(PALETTE.lampLight, 0, 6, 2)
-  const paperTex = makeLampBodyTexture(occasionShape)
 
   // --- Phòng: sàn/bàn + hai vách + rèm + khay gốm (đạo cụ ít theo §2) ---
   const room = new THREE.Group()
@@ -291,7 +308,7 @@ export function createWishRoomEngine(canvas, { recipientName, reducedMotion = fa
   room.add(tray)
 
   const lampShadow = makeContactShadow(0.4)
-  lampShadow.scale.setScalar(LAMP_CFG.baseRadius * 2.6)
+  lampShadow.scale.setScalar(LAMP_CFG.width * 1.7)
   lampShadow.position.set(LAMP_POS.x, 0.002, LAMP_POS.z)
   room.add(lampShadow)
 
@@ -303,38 +320,31 @@ export function createWishRoomEngine(canvas, { recipientName, reducedMotion = fa
 
   scene.add(room)
 
-  // --- Đèn ngủ giấy dó ---
+  // --- Đèn ngủ giấy dó: một mặt phẳng dùng ảnh chụp thật (đã tách nền) thay vì dựng hình trụ thủ
+  // tục — ảnh cùng bộ với catalog nên nét hơn hẳn texture canvas trước đây. Chỉ xoay quanh trục Y
+  // (billboard theo phương ngang) để đèn vẫn "đứng thẳng" tự nhiên, không ngả theo góc nghiêng của
+  // camera — camera không bao giờ xoay quanh đèn trong lúc đèn còn hiện (chỉ thấy ở Cảnh A/B rộng).
   const lamp = new THREE.Group()
   lamp.position.copy(LAMP_POS)
   lamp.scale.setScalar(LAMP_CFG.scale)
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(LAMP_CFG.baseRadius, LAMP_CFG.baseRadius * 1.05, LAMP_CFG.baseHeight, 28), new THREE.MeshStandardMaterial({ color: PALETTE.wood, roughness: 0.7 }))
-  base.position.y = LAMP_CFG.baseHeight / 2
-  lamp.add(base)
-  // emissiveMap dùng chung texture giấy (đã bake bóng hình Cảnh E mục 7 nếu có) để chỗ tối của
-  // hình bóng cũng bớt phát sáng — chỉ đổi màu `.map` không đủ, ánh sáng hắt qua chủ yếu từ emissive.
-  const bodyMat = new THREE.MeshStandardMaterial({
-    color: PALETTE.wall,
-    map: paperTex,
-    emissiveMap: paperTex,
-    roughness: 1,
-    emissive: new THREE.Color(PALETTE.lampLight),
-    emissiveIntensity: 0,
-  })
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(LAMP_CFG.bodyRadius, LAMP_CFG.bodyRadius * 1.04, LAMP_CFG.bodyHeight, 32, 1, true), bodyMat)
-  body.position.y = LAMP_CFG.baseHeight + LAMP_CFG.bodyHeight / 2
-  lamp.add(body)
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(LAMP_CFG.bodyRadius * 1.02, 0.02, 10, 28), new THREE.MeshStandardMaterial({ color: PALETTE.wood, roughness: 0.7 }))
-  rim.rotation.x = Math.PI / 2
-  rim.position.y = LAMP_CFG.baseHeight + LAMP_CFG.bodyHeight
-  lamp.add(rim)
-  lampLight.position.set(0, LAMP_CFG.baseHeight + LAMP_CFG.bodyHeight * 0.55, 0)
+
+  const LAMP_DARK = new THREE.Color(0x3a4350) // đủ sáng để còn thấy dáng đèn khi phòng tối (yêu cầu §Cảnh A)
+  const LAMP_LIT = new THREE.Color(0xffffff)
+  const lampPlaneMat = new THREE.MeshBasicMaterial({ map: null, color: LAMP_DARK, transparent: true })
+  const lampPlane = new THREE.Mesh(new THREE.PlaneGeometry(LAMP_CFG.width, LAMP_CFG.height), lampPlaneMat)
+  lampPlane.position.y = LAMP_CFG.height / 2
+  const localCameraPos = SHOT_WIDE.position.clone().sub(LAMP_POS)
+  lampPlane.rotation.y = Math.atan2(localCameraPos.x, localCameraPos.z)
+  lampPlane.userData.hit = 'light'
+  lamp.add(lampPlane)
+  lampPlaneMat.map = makeLampPhotoTexture(occasionShape, () => render())
+
+  lampLight.position.set(0, LAMP_CFG.height * 0.52, 0)
   lamp.add(lampLight)
   const glow = makeGlowSprite()
   glow.position.copy(lampLight.position)
   lamp.add(glow)
   lamp.userData.hit = 'light'
-  body.userData.hit = 'light'
-  base.userData.hit = 'light'
   scene.add(lamp)
 
   // --- Phong bì (nằm phẳng trên bàn) ---
@@ -491,7 +501,7 @@ export function createWishRoomEngine(canvas, { recipientName, reducedMotion = fa
   // Điểm màn hình của đèn/phong bì ở khung hình hiện tại — dùng để đặt nút hướng dẫn HTML đúng vị
   // trí vật thể (yêu cầu §Cảnh A/B: nút nằm "gần công tắc" / theo đúng phong bì).
   function getLampScreenPoint() {
-    const mid = new THREE.Vector3(0, LAMP_CFG.baseHeight + LAMP_CFG.bodyHeight * 0.5, 0)
+    const mid = new THREE.Vector3(0, LAMP_CFG.height * 0.52, 0)
     return worldToScreen(lamp.localToWorld(mid))
   }
   function getEnvelopeScreenPoint() {
@@ -529,7 +539,7 @@ export function createWishRoomEngine(canvas, { recipientName, reducedMotion = fa
         const ambientT = Math.max(0, (t - 0.3) / 0.7)
         const easedAmbientT = easeInOutCubic(ambientT)
         lampLight.intensity = easeOutCubic(lampT) * 1.8
-        bodyMat.emissiveIntensity = easeOutCubic(lampT) * 1.1
+        lampPlaneMat.color.copy(LAMP_DARK).lerp(LAMP_LIT, easeOutCubic(lampT))
         glow.material.opacity = easeOutCubic(lampT) * 0.85
         ambient.color.copy(fromAmbient).lerp(toAmbient, easedAmbientT)
         ambient.intensity = fromIntensity + (0.85 - fromIntensity) * easedAmbientT
