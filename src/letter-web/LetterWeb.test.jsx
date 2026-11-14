@@ -218,11 +218,12 @@ describe('Hiệu ứng canvas-confetti', () => {
 })
 
 describe('Server: kiểu trải nghiệm + đèn (D-140)', () => {
-  it('template chỉ room/web (mặc định room), lamp chỉ 5 mẫu đèn', () => {
+  it('template chỉ web/room (D-141: mặc định web), lamp chỉ 5 mẫu đèn', () => {
     const ok = { recipientName: 'A', senderName: 'B', occasion: 'birthday', kind: 'text', message: 'x' }
-    expect(validateLetterContent(ok).value).toMatchObject({ template: 'room', lamp: null })
+    expect(validateLetterContent(ok).value).toMatchObject({ template: 'web', lamp: null })
+    expect(validateLetterContent({ ...ok, template: 'room' }).value).toMatchObject({ template: 'room' })
     expect(validateLetterContent({ ...ok, template: 'web', lamp: 'thu-hoach' }).value).toMatchObject({ template: 'web', lamp: 'thu-hoach' })
-    expect(validateLetterContent({ ...ok, template: '<x>', lamp: '../x' }).value).toMatchObject({ template: 'room', lamp: null })
+    expect(validateLetterContent({ ...ok, template: '<x>', lamp: '../x' }).value).toMatchObject({ template: 'web', lamp: null })
   })
 })
 
@@ -263,6 +264,9 @@ describe('Trang người nhận + admin chọn kiểu web 2D', () => {
     fireEvent.change(await screen.findByLabelText('Tên người nhận'), { target: { value: 'Ngọc' } })
     fireEvent.change(screen.getByLabelText('Tên người gửi'), { target: { value: 'Minh' } })
     fireEvent.change(screen.getByLabelText('Nội dung thư'), { target: { value: 'Thân.' } })
+    // D-141: web 2D là mặc định; chọn Phòng thư 3D thì ẩn ô chọn đèn
+    expect(screen.getByLabelText('Kiểu trải nghiệm').value).toBe('web')
+    fireEvent.change(screen.getByLabelText('Kiểu trải nghiệm'), { target: { value: 'room' } })
     expect(screen.queryByLabelText('Đèn trong phong thư')).toBeNull()
     fireEvent.change(screen.getByLabelText('Kiểu trải nghiệm'), { target: { value: 'web' } })
     fireEvent.change(screen.getByLabelText('Đèn trong phong thư'), { target: { value: 'lon-dan' } })

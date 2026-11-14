@@ -9,7 +9,7 @@ import { useI18n } from '../i18n/index.js'
 
 // Phòng thư 3D (letter-room, D-136/D-137) — chỉ tải three.js sau khi xem xong hai video mở đầu
 const LetterRoom = lazy(() => import('../letter-room/LetterRoom.jsx'))
-// Bản web 2D (D-140) — chọn theo `template` admin đặt cho từng thư; thư cũ không có trường này dùng Phòng thư 3D
+// Bản web 2D (D-140) là bản chính (D-141): mọi thư mở bằng LetterWeb trừ khi admin chọn rõ Phòng thư 3D (`template: 'room'`)
 const LetterWeb = lazy(() => import('../letter-web/LetterWeb.jsx'))
 
 // D-138: trang phong thư của người nhận (/thu/<slug> trên domain chính). Token nằm sau dấu # (không
@@ -62,10 +62,10 @@ export default function LetterPage() {
           }
         >
           {/* Căn phòng: bật đèn → phong bì → thư (tiêu đề viết tay) → hai nút xem lại cuối thư */}
-          {state.letter.template === 'web' ? (
-            <LetterWeb letter={state.letter} afterLetter={<LetterExtras />} />
-          ) : (
+          {state.letter.template === 'room' ? (
             <LetterRoom letter={state.letter} afterLetter={<LetterExtras />} />
+          ) : (
+            <LetterWeb letter={state.letter} afterLetter={<LetterExtras />} />
           )}
         </Suspense>
       ) : (

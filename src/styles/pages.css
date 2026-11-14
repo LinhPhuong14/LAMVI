@@ -8901,6 +8901,22 @@ h1 {
   gap: 8px;
   align-items: center;
 }
+.letter-lamp-pick {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 4px 12px;
+  align-items: end;
+}
+.letter-lamp-pick img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 40%, rgb(255 214 150 / 45%), transparent 70%), rgb(42 26 14);
+}
+.letter-lamp-pick a {
+  grid-column: 2;
+}
 .letter-preview-title {
   font-size: 1rem;
   margin: 0 0 8px;

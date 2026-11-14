@@ -65,6 +65,9 @@ export function lettersRouter({ repo, auth, config }) {
         recipientName: l.content?.recipientName ?? null,
         senderName: l.content?.senderName ?? null,
         occasion: l.content?.occasion ?? null,
+        // D-141: web 2D là bản chính — thư không ghi template coi là 'web'
+        template: l.content?.template === 'room' ? 'room' : 'web',
+        lamp: l.content?.lamp ?? null,
         slug: l.slug,
         publishedAt: l.publishedAt ?? null,
         openedAt: l.openedAt ?? null,

@@ -1,5 +1,14 @@
 # Tiến độ tính năng
 
+## 2026-11-14 — Web 2D là bản chính (feat/phong-thu-web-main, D-141, T-108)
+
+| Việc | Trạng thái | Ở đâu | Còn lại |
+| --- | --- | --- | --- |
+| Mặc định `template: 'web'`; `/phong-thu` = web 2D, 3D ở `/phong-thu/3d` | ✅ | `server/domain/letter.js`, `src/routes.jsx`, `LetterPage.jsx`, `LetterRoomPreview.jsx` | — |
+| Đốm sáng + sparkle khi đọc, handwriting reveal thân thư | ✅ | `src/letter-web/LetterWeb.jsx`, `web.css` | QA điện thoại thật |
+| Font viết tay có dấu tiếng Việt (Dancing Script, Patrick Hand) | ✅ | `@fontsource/*`, `web.css` | — |
+| Admin: mặc định web 2D, ảnh đèn + link xem mẫu, thư viện QR hiện kiểu/đèn | ✅ | `LetterEditorPage.jsx`, `LettersGalleryPage.jsx`, `server/routes/letters.js` | — |
+
 ## 2026-11-14 — Phong thư web 2D (feat/phong-thu-web, D-140, T-107)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |

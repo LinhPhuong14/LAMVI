@@ -7,7 +7,7 @@ import { mockApi, renderAt } from '../test/renderApp.jsx'
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'admin@lamvi.test' } }
 const me = () => ({ body: { profile: { id: 'u1', email: 'admin@lamvi.test', role: 'admin', preferredLocale: 'vi', fullName: 'A' } } })
 const URL_QR = 'https://lamvi.test/thu/abcdefghij#' + 'A'.repeat(43)
-const content = { recipientName: 'Linh', senderName: 'An', occasion: 'birthday', kind: 'text', message: ['Đoạn một.'], postscript: null, occasionData: { message: 'Tuổi mới' } }
+const content = { template: 'room', recipientName: 'Linh', senderName: 'An', occasion: 'birthday', kind: 'text', message: ['Đoạn một.'], postscript: null, occasionData: { message: 'Tuổi mới' } }
 
 beforeEach(() => localStorage.setItem('moc.session', JSON.stringify(session)))
 afterEach(() => {
@@ -49,6 +49,9 @@ describe('Soạn phong thư: mẫu Phòng thư + xem thử', () => {
     mockApi({ 'GET /me': me, 'GET /admin/orders/LV-AAA/letter': () => ({ body: { item: null } }) })
     renderAt('/admin/orders/LV-AAA/letter?fallback=1')
     fireEvent.change(await screen.findByLabelText('Tên người nhận'), { target: { value: 'Ngọc' } })
+    // D-141: mặc định web 2D; test này kiểm Phòng thư 3D nên chọn rõ
+    expect(screen.getByLabelText('Kiểu trải nghiệm').value).toBe('web')
+    fireEvent.change(screen.getByLabelText('Kiểu trải nghiệm'), { target: { value: 'room' } })
     // Chưa đủ dữ liệu → nút xem thử bị khoá
     expect(screen.getByRole('button', { name: 'Xem thử trong Phòng thư' }).disabled).toBe(true)
     fireEvent.change(screen.getByLabelText('Tên người gửi'), { target: { value: 'Minh' } })

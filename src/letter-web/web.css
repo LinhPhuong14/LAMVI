@@ -371,7 +371,7 @@
   transition: transform 1s cubic-bezier(0.2, 0.75, 0.2, 1) 0.1s;
 }
 .lw-env-sheet-title {
-  font: 1.15rem/1.2 'Itim', cursive;
+  font: 700 1.3rem/1.2 'Dancing Script', cursive;
 }
 .lw-env-sheet i {
   display: block;
@@ -418,7 +418,7 @@
   left: 9%;
   bottom: 13%;
   color: var(--lw-ink);
-  font: 1rem/1.2 'Itim', cursive;
+  font: 700 1.15rem/1.2 'Dancing Script', cursive;
   opacity: 0.85;
 }
 .lw-env-to b {
@@ -523,6 +523,7 @@
 }
 .lw-letter {
   position: relative;
+  z-index: 1;
   max-width: 640px;
   margin: 28px auto 0;
   padding: clamp(28px, 6vw, 56px) clamp(20px, 6vw, 56px) 40px;
@@ -563,12 +564,16 @@
 .lw-dedication {
   margin: 0 72px 18px 0;
   color: var(--lw-ink);
-  font: 2rem/1.3 'Itim', cursive;
+  font: 700 2.2rem/1.3 'Dancing Script', cursive;
 }
 .lw-dedication .lt-hw {
-  height: 1.4em;
+  height: 1.55em;
 }
+/* Handwriting reveal của tiêu đề: nét mực chạy theo viền chữ Dancing Script (có dấu tiếng Việt) */
 .lw-dedication .lt-hw-text {
+  font:
+    700 52px 'Dancing Script',
+    cursive;
   fill: currentColor;
   stroke: currentColor;
 }
@@ -581,24 +586,65 @@
 }
 .lw-para {
   margin: 0 0 18px;
-  font: 1.2rem/2rem 'Itim', cursive;
+  font: 1.35rem/2rem 'Patrick Hand', 'Itim', cursive;
 }
-/* "Text generate": từng chữ hiện từ mờ nhoè sang rõ */
+/* Handwriting reveal: mực chảy trái → phải trong từng chữ (mask gradient trượt), chữ sau nối chữ trước
+   như ngòi bút đang viết; mép mực hơi nhoè rồi rõ (giữ chút "text generate" của Aceternity UI). */
 .lw-word {
   display: inline-block;
   white-space: pre;
   opacity: 0;
-  filter: blur(10px);
-  transform: translateY(4px);
+  -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  -webkit-mask-size: 240% 100%;
+  mask-size: 240% 100%;
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  filter: blur(1.5px);
 }
 .lw-content.is-shown .lw-word {
-  animation: lw-word 0.55s ease forwards;
+  animation: lw-word 0.4s cubic-bezier(0.4, 0, 0.6, 1) forwards;
 }
 .lw-para.is-complete .lw-word {
   animation: none;
   opacity: 1;
+  -webkit-mask-image: none;
+  mask-image: none;
   filter: none;
-  transform: none;
+}
+/* Đốm sáng bay lên khi đọc thư */
+.lw-motes {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  animation: lw-fade 2s ease both;
+}
+.lw-motes i {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3d6 0%, rgb(255 210 140 / 85%) 40%, rgb(255 190 110 / 0%) 72%);
+  box-shadow: 0 0 10px 2px rgb(255 200 120 / 35%);
+  opacity: 0;
+  animation: lw-mote 12s linear infinite;
+}
+/* Sparkle bốn cánh lấp lánh quanh viền tờ thư */
+.lw-letter-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.lw-letter-sparkles i {
+  position: absolute;
+  background: radial-gradient(circle, #fffaf0 0 20%, #ffd98f 45%, #e8a94a 80%);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  filter: drop-shadow(0 0 4px rgb(255 214 150 / 90%));
+  transform: scale(0);
+  animation: lw-sparkle 2.6s ease-in-out infinite;
 }
 .lw-skip {
   display: block;
@@ -617,19 +663,18 @@
   justify-items: end;
   gap: 2px;
   margin: 26px 0 8px;
-  font-family: 'Itim', cursive;
+  font-family: 'Patrick Hand', 'Itim', cursive;
 }
 .lw-signature span {
   font-size: 0.95rem;
   opacity: 0.75;
 }
 .lw-signature strong {
-  font-weight: 400;
-  font-size: 1.6rem;
+  font: 700 2rem/1.2 'Dancing Script', cursive;
 }
 .lw-ps {
   margin: 14px 0 0;
-  font: italic 1.05rem/1.6 'Itim', cursive;
+  font: 1.2rem/1.6 'Patrick Hand', 'Itim', cursive;
   color: #6b4426;
   white-space: pre-line;
 }
@@ -720,7 +765,7 @@
   color: var(--lw-accent2);
 }
 .lw-surprise-big {
-  font: 1.6rem/1.2 'Itim', cursive;
+  font: 700 1.8rem/1.2 'Dancing Script', cursive;
 }
 .lw-badge {
   padding: 8px 18px;
@@ -736,7 +781,7 @@
 }
 .lw-places {
   margin: 0;
-  font: 1.35rem/1.4 'Itim', cursive;
+  font: 1.35rem/1.4 'Patrick Hand', 'Itim', cursive;
 }
 .lw-plane {
   display: inline-block;
@@ -769,7 +814,7 @@
 }
 .lw-surprise-text p {
   margin: 0;
-  font: 1.15rem/1.6 'Itim', cursive;
+  font: 1.3rem/1.6 'Patrick Hand', 'Itim', cursive;
 }
 /* Bánh sinh nhật giấy */
 .lw-cake {
@@ -847,8 +892,8 @@
     right: 16px;
   }
   .lw-para {
-    font-size: 1.1rem;
-    line-height: 1.85rem;
+    font-size: 1.22rem;
+    line-height: 1.9rem;
   }
 }
 
@@ -937,10 +982,48 @@
   }
 }
 @keyframes lw-word {
+  0% {
+    opacity: 1;
+  }
   to {
     opacity: 1;
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
     filter: none;
-    transform: none;
+  }
+}
+@keyframes lw-mote {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  12% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(var(--sway, 0), -55vh) scale(1);
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--sway, 0) * -0.6), -110vh) scale(0.8);
+  }
+}
+@keyframes lw-sparkle {
+  0%,
+  100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(1) rotate(45deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.4) rotate(90deg);
+    opacity: 0.6;
   }
 }
 @keyframes lw-fade {
@@ -990,8 +1073,13 @@
   }
   .lw-word {
     opacity: 1;
+    -webkit-mask-image: none;
+    mask-image: none;
     filter: none;
-    transform: none;
+  }
+  .lw-motes,
+  .lw-letter-sparkles {
+    display: none;
   }
 }
 

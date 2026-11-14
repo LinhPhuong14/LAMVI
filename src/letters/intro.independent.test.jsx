@@ -12,7 +12,7 @@ import { pickFilmSrc } from '../lib/filmSrc.js'
 const TOKEN = 'A'.repeat(43)
 const SLUG = 'abcdefghij'
 const FLAG = `lv.letter.intro.${SLUG}`
-const content = { recipientName: 'Linh', senderName: 'An', occasion: 'birthday', kind: 'text', message: ['Đoạn một.'], postscript: null, occasionData: null }
+const content = { template: 'room', recipientName: 'Linh', senderName: 'An', occasion: 'birthday', kind: 'text', message: ['Đoạn một.'], postscript: null, occasionData: null }
 const T1 = 'Tranh Đông Hồ trên đèn giấy dó'
 const T2 = 'Từ làng giấy dó đến chiếc đèn'
 

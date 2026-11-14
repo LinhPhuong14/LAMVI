@@ -6,7 +6,7 @@ import PageHead from './PageHead.jsx'
 import QrImage, { CopyLink } from './QrImage.jsx'
 import LetterRoomPreview from './LetterRoomPreview.jsx'
 import { demos, validateLetter } from '../letter-room/data.js'
-import { LAMPS } from '../letter-web/themes.js'
+import { LAMPS, DEFAULT_LAMP, lampSrc } from '../letter-web/themes.js'
 import { OCCASIONS, OCCASION_LABELS, paragraphsOf } from '../letters/occasions.js'
 import { S } from './strings.js'
 
@@ -15,7 +15,7 @@ const EMPTY = {
   recipientName: '',
   senderName: '',
   occasion: 'justBecause',
-  template: 'room',
+  template: 'web',
   lamp: '',
   kind: 'text',
   message: '',
@@ -36,7 +36,7 @@ function toForm(c) {
     recipientName: c.recipientName ?? '',
     senderName: c.senderName ?? '',
     occasion: c.occasion ?? 'justBecause',
-    template: c.template === 'web' ? 'web' : 'room',
+    template: c.template === 'room' ? 'room' : 'web',
     lamp: c.lamp ?? '',
     kind: c.kind ?? 'text',
     message: paragraphsOf(c.message).join('\n\n'),
@@ -226,18 +226,24 @@ export default function LetterEditorPage() {
               {published && ` · ${letter.openedAt ? L.opened : L.notOpened}`}
             </p>
             <Field label={L.experience} as="select" value={form.template} onChange={set('template')} hint={L.experienceHint}>
-              <option value="room">{L.experiences.room}</option>
               <option value="web">{L.experiences.web}</option>
+              <option value="room">{L.experiences.room}</option>
             </Field>
             {form.template === 'web' && (
-              <Field label={L.lamp} as="select" value={form.lamp} onChange={set('lamp')}>
-                <option value="">{L.lampDefault}</option>
-                {Object.entries(LAMPS).map(([slug, name]) => (
-                  <option key={slug} value={slug}>
-                    {name}
-                  </option>
-                ))}
-              </Field>
+              <div className="letter-lamp-pick">
+                <img src={lampSrc(form.lamp || DEFAULT_LAMP)} alt="" width="56" height="56" decoding="async" />
+                <Field label={L.lamp} as="select" value={form.lamp} onChange={set('lamp')}>
+                  <option value="">{L.lampDefault}</option>
+                  {Object.entries(LAMPS).map(([slug, name]) => (
+                    <option key={slug} value={slug}>
+                      {name}
+                    </option>
+                  ))}
+                </Field>
+                <a className="field-hint" href={`/phong-thu?occasion=${form.occasion}&lamp=${form.lamp || DEFAULT_LAMP}`} target="_blank" rel="noreferrer">
+                  {L.sampleDemo} ↗
+                </a>
+              </div>
             )}
             <Field label={L.template} as="select" value="" onChange={applyTemplate} hint={L.templateHint}>
               <option value="">{L.templatePick}</option>

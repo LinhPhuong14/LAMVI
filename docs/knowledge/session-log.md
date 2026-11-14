@@ -902,3 +902,11 @@ Kiểm thử độc lập (T-11): 30 test (`src/letters/room-integration.indepen
 **Còn lại / cần người dùng**: mở proxy cho ui.aceternity.com nếu muốn đối chiếu sát component gốc; QA trên điện thoại thật.
 
 **Cập nhật cùng ngày**: người dùng mở proxy → đối chiếu registry Aceternity UI (`lamp`, `spotlight-new`, `text-generate-effect`) và chuyển thể sang CSS ánh vàng (nhánh `fix/phong-thu-web-aceternity`); đọc giấy phép Aceternity (cho phép dùng/chỉnh sửa trong website). Demo trực tiếp: `https://www.lamvi.com.vn/phong-thu/web`, `https://www.lamvi.com.vn/phong-thu`.
+
+## 2026-11-14 — Web 2D là bản chính (D-141, T-108)
+
+**Đã làm**: `template` mặc định `web` (server, trang người nhận, xem thử admin — chỉ `room` mới mở 3D); `/phong-thu` = demo web 2D, 3D chuyển `/phong-thu/3d`. Pha đọc: đốm sáng bay + sparkle quanh tờ thư; thân thư handwriting reveal (mask gradient theo nhịp ký tự, ≤ 7 s). Font Dancing Script + Patrick Hand (có subset tiếng Việt; Playwrite VN bị loại vì Fontsource chỉ có Latin). Admin: mặc định Web 2D, ảnh đèn + link xem mẫu; thư viện QR hiện kiểu + đèn.
+
+Kiểm thử độc lập (T-11): `src/letter-web/main.independent.test.jsx` (46 test), phát hiện 2 lỗi đã sửa — chữ cuối thư dài nhất viết xong ở ~7,19 s (vượt ngân sách 7 s), thư viện QR sập khi `template` là khoá prototype. Full suite 277 tệp / 4285 đạt (Routing.extra chập chờn, chạy riêng đạt); lint + build xanh.
+
+**Còn lại / cần người dùng**: QA điện thoại thật; thư đã lưu rõ "Phòng thư 3D" trước v0.86 giữ 3D — đổi tay nếu muốn.

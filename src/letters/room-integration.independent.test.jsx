@@ -17,7 +17,7 @@ const realMatchMedia = window.matchMedia
 
 // Dữ liệu người nhận = đúng output của server (presentLetterForRecipient = content đã chuẩn hoá)
 const serverLetter = (input) => {
-  const { value, errors } = validateLetterContent(input)
+  const { value, errors } = validateLetterContent({ template: 'room', ...input }) // D-141: các test này kiểm Phòng thư 3D
   expect(errors).toEqual({})
   return value
 }
@@ -270,7 +270,7 @@ describe('Admin: mẫu lời chúc Phòng thư + xem thử', () => {
 
   it('Esc trong video cuối thư chỉ đóng video; Esc lần hai đóng xem thử, trả overflow body', async () => {
     document.body.style.overflow = 'scroll'
-    const content = { recipientName: 'Ngọc', senderName: 'Minh', occasion: 'birthday', kind: 'text', message: ['Thân.'], postscript: null, occasionData: null }
+    const content = { template: 'room', recipientName: 'Ngọc', senderName: 'Minh', occasion: 'birthday', kind: 'text', message: ['Thân.'], postscript: null, occasionData: null }
     await mount({ status: 'draft', content, url: null })
     const open = screen.getByRole('button', { name: 'Xem thử trong Phòng thư' })
     fireEvent.click(open)
@@ -286,7 +286,7 @@ describe('Admin: mẫu lời chúc Phòng thư + xem thử', () => {
     expect(document.body.style.overflow).toBe('scroll')
   })
 
-  const draft = { status: 'draft', content: { recipientName: 'Ngọc', senderName: 'Minh', occasion: 'birthday', kind: 'text', message: ['Thân.'], postscript: null, occasionData: null }, url: null }
+  const draft = { status: 'draft', content: { template: 'room', recipientName: 'Ngọc', senderName: 'Minh', occasion: 'birthday', kind: 'text', message: ['Thân.'], postscript: null, occasionData: null }, url: null }
   it('mở xem thử → focus chuyển vào trong dialog ngay', async () => {
     await mount(draft)
     const open = screen.getByRole('button', { name: 'Xem thử trong Phòng thư' })
@@ -310,7 +310,7 @@ describe('Admin: mẫu lời chúc Phòng thư + xem thử', () => {
   })
 
   it('xem thử thư video: poster/phụ đề rỗng → null, không sập', async () => {
-    const content = { recipientName: 'Ngọc', senderName: 'Minh', occasion: 'longDistance', kind: 'video', videoUrl: '/v.mp4', posterUrl: null, captionsUrl: null, message: [], postscript: null, occasionData: { places: ['A', 'B'] } }
+    const content = { template: 'room', recipientName: 'Ngọc', senderName: 'Minh', occasion: 'longDistance', kind: 'video', videoUrl: '/v.mp4', posterUrl: null, captionsUrl: null, message: [], postscript: null, occasionData: { places: ['A', 'B'] } }
     await mount({ status: 'draft', content, url: null })
     fireEvent.click(screen.getByRole('button', { name: 'Xem thử trong Phòng thư' }))
     const article = await walkToLetter()

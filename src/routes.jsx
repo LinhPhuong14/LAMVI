@@ -79,10 +79,11 @@ export default function AppRoutes() {
     <Routes>
       {/* D-138: phong thư người nhận (/thu/<slug>), không tiền tố ngôn ngữ */}
       <Route path="/thu/:slug" element={<LocaleProvider lang="vi"><RouteLoader><LetterPage /></RouteLoader></LocaleProvider>} />
-      {/* D-136: Phòng thư LAMVI (letter-room) — bản demo bảy lời chúc mẫu */}
-      <Route path="/phong-thu" element={<LetterRoomRoute />} />
-      {/* D-140: phong thư bản web 2D — demo bảy lời chúc mẫu */}
+      {/* D-141: bản chính là phong thư web 2D (D-140) — demo bảy lời chúc mẫu; /phong-thu/web giữ cho link cũ */}
+      <Route path="/phong-thu" element={<LetterWebRoute />} />
       <Route path="/phong-thu/web" element={<LetterWebRoute />} />
+      {/* D-136: Phòng thư 3D (letter-room) — bản phụ */}
+      <Route path="/phong-thu/3d" element={<LetterRoomRoute />} />
       {/* D-51: dashboard IT */}
       <Route path="/it" element={<ProtectedRoute><RouteLoader><ItDashboard /></RouteLoader></ProtectedRoute>} />
       {/* D-48: admin chỉ tiếng Việt */}

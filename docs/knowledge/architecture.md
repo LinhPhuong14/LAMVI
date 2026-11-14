@@ -371,3 +371,5 @@ Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác ch
 ## Phong thư web 2D (T-107, D-140)
 
 `src/letter-web/`: `LetterWeb.jsx` (phase `dark → lighting → rising → unfolding → reading`, hẹn giờ theo phase, giảm chuyển động = 0 ms), `Envelope.jsx` (phong bì CSS, trang trí `aria-hidden`), `Surprise.jsx` (dialog điều bất ngờ), `effects.js` (canvas-confetti theo dịp, `playOccasion()` trả `stop()`), `themes.js` (màu/tem theo dịp, 5 đèn). `/thu/<slug>` và xem thử admin chọn giữa `LetterRoom` (3D) và `LetterWeb` theo `content.template`. Demo `/phong-thu/web` (`LetterWebRoute.jsx`, private/noindex).
+
+D-141 (T-108): web 2D là bản chính — `template` mặc định `web`, chỉ `room` mới dựng `LetterRoom`; `/phong-thu` + `/phong-thu/web` → `LetterWebRoute`, `/phong-thu/3d` → `LetterRoomRoute`. Pha đọc có `.lw-motes` (fixed, sau tờ thư) và `.lw-letter-sparkles`; thân thư handwriting reveal bằng mask gradient theo nhịp ký tự; font Dancing Script + Patrick Hand (subset latin + vietnamese).

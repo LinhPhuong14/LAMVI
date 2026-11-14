@@ -135,7 +135,7 @@ describe('Timer và chuỗi pha', () => {
 })
 
 describe('Chữ hiện dần', () => {
-  it('12 đoạn dài: tổng độ trễ chữ ≤ 4,2 s; thư ngắn bước 0,07 s', () => {
+  it('12 đoạn dài: handwriting reveal viết xong ≤ 7 s; thư ngắn nhịp 0,055 s/ký tự', () => {
     vi.stubGlobal('matchMedia', media(true))
     const long = Array.from({ length: 12 }, (_, i) => `Đoạn ${i} ` + 'chữ '.repeat(190).trim())
     const { container, unmount } = render(<LetterWeb letter={{ ...base, message: long }} />)
@@ -143,14 +143,15 @@ describe('Chữ hiện dần', () => {
     return waitFor(() => expect(container.querySelector('.lw-word')).toBeTruthy()).then(() => {
       const delays = [...container.querySelectorAll('.lw-word')].map((w) => parseFloat(w.style.animationDelay))
       expect(delays.length).toBeGreaterThan(2000)
-      expect(Math.max(...delays)).toBeLessThanOrEqual(4.2)
+      expect(Math.max(...delays)).toBeLessThanOrEqual(7)
       expect(container.querySelectorAll('.lw-para')).toHaveLength(12)
       unmount()
       const short = render(<LetterWeb letter={{ ...base, message: ['một hai ba'] }} />)
       fireEvent.click(within(short.container).getByRole('button', { name: 'Bật đèn' }))
       return waitFor(() => expect(short.container.querySelectorAll('.lw-word')).toHaveLength(3)).then(() => {
         const d = [...short.container.querySelectorAll('.lw-word')].map((w) => parseFloat(w.style.animationDelay))
-        expect(d).toEqual([0, 0.07, 0.14])
+        // "một"(3) + cách, "hai"(3) + cách → 0, 4×0,055, 8×0,055
+        expect(d).toEqual([0, 0.22, 0.44])
       })
     })
   })
@@ -249,12 +250,17 @@ describe('Điều bất ngờ: hiệu ứng dừng', () => {
     expect(onClose).not.toHaveBeenCalled()
   })
 
-  it('admin xem thử: template khác "web" (thiếu/lạ) mở Phòng thư 3D, không phải bản web', async () => {
+  it('D-141 admin xem thử: chỉ template "room" mở Phòng thư 3D; thiếu/lạ mở bản web 2D (bản chính)', async () => {
     vi.stubGlobal('matchMedia', media(true))
-    const { unmount } = render(<LetterRoomPreview letter={{ ...base, template: 'WEB' }} onClose={() => {}} />)
+    const room = render(<LetterRoomPreview letter={{ ...base, template: 'room' }} onClose={() => {}} />)
     await new Promise((r) => setTimeout(r, 50))
     expect(document.querySelector('.lw-page')).toBeNull()
-    unmount()
+    room.unmount()
+    for (const template of ['WEB', undefined]) {
+      const web = render(<LetterRoomPreview letter={{ ...base, template }} onClose={() => {}} />)
+      await waitFor(() => expect(document.querySelector('.lw-page')).toBeTruthy())
+      web.unmount()
+    }
   })
 })
 
@@ -342,9 +348,9 @@ describe('Dữ liệu thư', () => {
 
 describe('Server validateLetterContent: template + lamp', () => {
   const ok = { recipientName: 'A', senderName: 'B', occasion: 'birthday', kind: 'text', message: 'x' }
-  it('thư cũ không có template → room; lamp không phải chuỗi → null; template viết hoa không được nhận', () => {
-    expect(validateLetterContent(ok).value).toMatchObject({ template: 'room', lamp: null })
-    expect(validateLetterContent({ ...ok, template: 'WEB', lamp: ['tu-linh'] }).value).toMatchObject({ template: 'room', lamp: null })
+  it('D-141: thiếu template → web; lamp không phải chuỗi → null; template viết hoa không được nhận (→ web)', () => {
+    expect(validateLetterContent(ok).value).toMatchObject({ template: 'web', lamp: null })
+    expect(validateLetterContent({ ...ok, template: 'ROOM', lamp: ['tu-linh'] }).value).toMatchObject({ template: 'web', lamp: null })
     expect(validateLetterContent({ ...ok, template: 'web', lamp: { toString: () => 'tu-linh' } }).value).toMatchObject({ template: 'web', lamp: null })
     expect(validateLetterContent({ ...ok, template: 'web', lamp: 'lon-dan' }).errors).toEqual({})
   })

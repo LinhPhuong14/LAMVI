@@ -33,10 +33,10 @@ export default function LetterRoomPreview({ letter, onClose }) {
         ×
       </button>
       <Suspense fallback={<p role="status">…</p>}>
-        {letter.template === 'web' ? (
-          <LetterWeb letter={letter} preview onExit={onClose} afterLetter={<LetterExtras />} />
-        ) : (
+        {letter.template === 'room' ? (
           <LetterRoom letter={letter} preview onExit={onClose} afterLetter={<LetterExtras />} />
+        ) : (
+          <LetterWeb letter={letter} preview onExit={onClose} afterLetter={<LetterExtras />} />
         )}
       </Suspense>
     </div>,
