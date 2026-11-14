@@ -108,6 +108,11 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
       style={{ '--lw-paper': theme.paper, '--lw-accent': theme.accent, '--lw-accent2': theme.accent2, '--lw-seal': theme.seal }}
     >
       <div className="lw-bg" aria-hidden="true" />
+      {/* Hai chùm spotlight chéo trôi chậm (theo "Spotlight" của Aceternity UI, đổi sang ánh vàng ấm) */}
+      <div className="lw-spotlight" aria-hidden="true">
+        <i />
+        <i />
+      </div>
       <header className="lw-top">
         <span className="lw-brand">LAMVI</span>
         <div className="lw-top-actions">
@@ -129,7 +134,11 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
 
       <section className="lw-stage" ref={stageRef} tabIndex={-1} aria-label="Đèn LAMVI và phong thư">
         <div className="lw-lamp-wrap">
-          <div className="lw-beam" aria-hidden="true" />
+          {/* Hiệu ứng "Lamp" (Aceternity UI): vạch sáng nở rộng, hai cánh ánh sáng hình nón đổ xuống, quầng mờ */}
+          <div className="lw-beam" aria-hidden="true">
+            <i className="lw-beam-l" />
+            <i className="lw-beam-r" />
+          </div>
           <div className="lw-halo" aria-hidden="true" />
           <div className="lw-sparks" aria-hidden="true">
             {SPARKS.map((s, i) => (
@@ -140,6 +149,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
           <button type="button" className="lw-lamp" onClick={light} tabIndex={-1} aria-hidden="true" disabled={lit}>
             <img src={lampSrc(lamp)} alt="" decoding="async" />
           </button>
+          <div className="lw-glow" aria-hidden="true" />
           <div className="lw-line" aria-hidden="true" />
         </div>
         <p className="lw-lamp-name">Đèn {LAMPS[lamp]}</p>
