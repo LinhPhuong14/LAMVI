@@ -4,6 +4,7 @@ import { useAuth } from '../auth/context.js'
 import PageHead from './PageHead.jsx'
 import QrImage, { CopyLink } from './QrImage.jsx'
 import { OCCASION_LABELS } from '../letters/occasions.js'
+import { LAMPS } from '../letter-web/themes.js'
 import { S } from './strings.js'
 
 const L = S.letters
@@ -53,6 +54,10 @@ export default function LettersGalleryPage() {
               <strong>{l.orderCode ?? '—'}</strong>
               <span>
                 {l.recipientName ?? '—'} · {OCCASION_LABELS[l.occasion] ?? ''}
+              </span>
+              <span>
+                {L.experienceShort[Object.hasOwn(L.experienceShort, l.template ?? '') ? l.template : 'web']}
+                {l.template !== 'room' && Object.hasOwn(LAMPS, l.lamp ?? "") ? ` · ${L.lampPrefix} ${LAMPS[l.lamp]}` : ''}
               </span>
               <span>
                 {L.statuses[l.status] ?? l.status} · {l.openedAt ? L.opened : L.notOpened}

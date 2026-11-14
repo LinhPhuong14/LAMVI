@@ -558,3 +558,11 @@ Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác ch
 - **Hiệu ứng dịp**: `canvas-confetti@1.9.4` (ISC, ~4 KB gzip, chunk riêng, `import()` chỉ khi mở điều bất ngờ); mỗi hiệu ứng trả `stop()` (huỷ rAF/interval + `confetti.reset()`) khi đóng khung/rời trang; `disableForReducedMotion` + kiểm `prefers-reduced-motion` trước khi tải.
 - **Phong bì**: CSS thuần (clip-path cho túi/nắp, `repeating-linear-gradient` + mask cho viền thư máy bay, noise SVG cho thớ giấy, nền chấm tròn cho răng cưa tem). Không dùng ảnh phong bì bên ngoài (không lo bản quyền, đổi màu theo dịp bằng biến CSS).
 - **Ảnh đèn**: dùng lại `public/images/lamps/*-cutout.webp` — cùng tệp đang phục vụ trên www.lamvi.com.vn (đã đối chiếu danh sách ảnh của trang chủ), không cần tải lại.
+
+### T-108 — Web 2D là bản chính, handwriting reveal, font viết tay tiếng Việt (2026-11-14, D-141)
+
+- **Mặc định**: `validateLetterContent` trả `template: 'web'` khi thiếu/lạ (`LETTER_TEMPLATES = ['web', 'room']`); `LetterPage`/`LetterRoomPreview` chỉ dựng `LetterRoom` khi `template === 'room'`. Không cần migration (`content` là jsonb). Thư đã lưu rõ `room` giữ nguyên.
+- **Route**: `/phong-thu` và `/phong-thu/web` → `LetterWebRoute`; `/phong-thu/3d` → `LetterRoomRoute` (không sửa `src/letter-room`, Codex sở hữu). Cả ba nằm trong `PRIVATE` (noindex).
+- **Font**: chọn qua metadata Fontsource — Playwrite VN chỉ có subset `latin` (thiếu ă/ơ/ư/ệ…) nên loại; Dancing Script (latin, latin-ext, vietnamese) và Patrick Hand (latin, latin-ext, vietnamese), OFL-1.1. Chỉ import `latin-*` + `vietnamese-*` (unicode-range của bộ vietnamese gồm ă, đ, ơ, ư, dấu tổ hợp và U+1EA0–1EF9), tải trong chunk `LetterWeb`.
+- **Handwriting reveal**: tiêu đề dùng `HandwrittenTitle` sẵn có (stroke-dashoffset theo viền glyph) với font Dancing Script qua CSS; thân thư dùng `mask-image` gradient trượt trong từng `.lw-word` (có tiền tố `-webkit-`), delay/duration tính theo số ký tự (`perChar = min(0.055, 7 / (ký tự + 6×số đoạn))`) → tổng ≤ 7 s. Không dùng thư viện vẽ nét (vivus…) vì tên/nội dung động, không có path SVG.
+- **Sparkle/đốm sáng**: CSS thuần (Aceternity "Sparkles" cần tsparticles ~40 KB — không đáng); vị trí tất định theo chỉ số (SSR/test ổn định), `aria-hidden`, không render khi giảm chuyển động. Đốm sáng `position: fixed` z-index 0 sau tờ thư (z-index 1) để không che chữ.

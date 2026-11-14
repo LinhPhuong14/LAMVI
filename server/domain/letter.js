@@ -7,7 +7,7 @@ export const OCCASIONS = ['birthday', 'anniversary', 'thankYou', 'milestone', 'e
 export const LETTER_KINDS = ['text', 'video']
 export const LETTER_STATUSES = ['draft', 'published']
 // D-140: hai kiểu trải nghiệm — Phòng thư 3D (`room`, mặc định) hoặc web 2D (`web`)
-export const LETTER_TEMPLATES = ['room', 'web']
+export const LETTER_TEMPLATES = ['web', 'room']
 // Ảnh đèn trong bản web 2D: 5 mẫu đèn LAMVI (public/images/lamps/<slug>-cutout.webp)
 export const LETTER_LAMPS = ['tu-linh', 'thu-hoach', 'phuc-loc-song-toan', 'tam-duong-khai-thai', 'lon-dan']
 
@@ -63,8 +63,8 @@ export function validateLetterContent(input) {
 
   value.occasion = OCCASIONS.includes(src.occasion) ? src.occasion : null
   if (!value.occasion) errors.occasion = 'INVALID'
-  // Thiếu/lạ → mặc định (thư soạn trước D-140 vẫn mở bằng Phòng thư 3D)
-  value.template = LETTER_TEMPLATES.includes(src.template) ? src.template : 'room'
+  // D-141: web 2D là bản chính — thiếu/lạ → 'web'; chỉ thư đã chọn rõ 'room' mới mở Phòng thư 3D
+  value.template = LETTER_TEMPLATES.includes(src.template) ? src.template : 'web'
   value.lamp = LETTER_LAMPS.includes(src.lamp) ? src.lamp : null
   value.kind = LETTER_KINDS.includes(src.kind) ? src.kind : null
   if (!value.kind) errors.kind = 'INVALID'

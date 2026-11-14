@@ -4,6 +4,11 @@ import Envelope from './Envelope.jsx'
 import Surprise from './Surprise.jsx'
 import { reducedMotion } from './effects.js'
 import { LAMPS, DEFAULT_LAMP, lampSrc, themeOf } from './themes.js'
+// Font viết tay có bộ dấu tiếng Việt (OFL-1.1): Dancing Script cho lời đề tặng/chữ ký, Patrick Hand cho thân thư
+import '@fontsource/dancing-script/latin-700.css'
+import '@fontsource/dancing-script/vietnamese-700.css'
+import '@fontsource/patrick-hand/latin-400.css'
+import '@fontsource/patrick-hand/vietnamese-400.css'
 import './web.css'
 
 // dark → (bấm bật đèn) lighting → rising (phong bì trồi lên, xi bung, nắp mở) → unfolding (thư trồi khỏi phong bì) → reading
@@ -23,6 +28,26 @@ const SPARKS = Array.from({ length: 22 }, (_, i) => ({
   delay: `${(i % 7) * 0.45}s`,
   size: `${2 + (i % 3)}px`,
 }))
+// Khi đọc thư: đốm sáng (bokeh) bay lên khắp trang + sparkle lấp lánh quanh tờ thư (theo "Sparkles" của Aceternity UI, CSS thuần)
+const MOTES = Array.from({ length: 26 }, (_, i) => ({
+  left: `${(i * 41 + 5) % 100}%`,
+  size: `${3 + ((i * 7) % 8)}px`,
+  dur: `${10 + ((i * 5) % 9)}s`,
+  delay: `${-((i * 1.7) % 14).toFixed(1)}s`,
+  sway: `${((i % 5) - 2) * 18}px`,
+}))
+const SPARKLES = Array.from({ length: 16 }, (_, i) => {
+  // Rải quanh viền tờ thư: lần lượt cạnh trên, phải, dưới, trái
+  const t = ((i * 29) % 100) / 100
+  const side = i % 4
+  const pos = [
+    { left: `${t * 100}%`, top: '-10px' },
+    { left: 'calc(100% + 4px)', top: `${t * 100}%` },
+    { left: `${t * 100}%`, top: 'calc(100% + 4px)' },
+    { left: '-14px', top: `${t * 100}%` },
+  ][side]
+  return { ...pos, size: `${10 + ((i * 5) % 11)}px`, delay: `${((i * 0.37) % 3).toFixed(2)}s`, dur: `${2.2 + ((i * 3) % 7) * 0.25}s` }
+})
 
 const hasValue = (v) => (Array.isArray(v) ? v.length > 0 : Boolean(v))
 
@@ -52,11 +77,27 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
     if (letter.kind !== 'text') return []
     const list = Array.isArray(letter.message) ? letter.message : String(letter.message ?? '').split(/\n\s*\n/)
     let i = 0
-    return list.filter(Boolean).map((text) => ({ text, words: text.split(/\s+/).filter(Boolean).map((w) => ({ w, i: i++ })) }))
+    return list.map((t) => String(t).trim()).filter(Boolean).map((text) => ({ text, words: text.split(/\s+/).filter(Boolean).map((w) => ({ w, i: i++ })) }))
   }, [letter.kind, letter.message])
-  const wordCount = paragraphs.reduce((n, p) => n + p.words.length, 0)
-  // Hiệu ứng "text generate": thư dài mấy cũng xong trong ~4,5 giây
-  const step = Math.min(0.07, 4.2 / Math.max(1, wordCount))
+  // Handwriting reveal: mực chảy trái → phải từng chữ, nhịp theo số ký tự (như đang viết);
+  // thư dài mấy cũng viết xong trong ~7 giây, có nút "Hiện toàn bộ" để bỏ qua
+  const { timing, total } = useMemo(() => {
+    // Ngân sách tính cả nhịp ngắt giữa các đoạn (6 ký tự mỗi đoạn)
+    const units = paragraphs.reduce((n, p) => n + 6 + p.words.reduce((m, { w }) => m + [...w].length + 1, 0), 0)
+    // Trừ 0,2 s cho nét cuối (thời lượng tối thiểu của một chữ) để chữ cuối viết xong trong 7 s
+    const perChar = Math.min(0.055, 6.8 / Math.max(1, units))
+    const timing = []
+    let at = 0
+    for (const p of paragraphs) {
+      for (const { w, i } of p.words) {
+        const len = [...w].length
+        timing[i] = { delay: at, dur: Math.min(0.9, Math.max(0.2, len * perChar * 1.6), Math.max(0.2, 7 - at)) }
+        at += (len + 1) * perChar
+      }
+      at += perChar * 6 // ngắt hơi giữa hai đoạn
+    }
+    return { timing, total: at }
+  }, [paragraphs])
 
   useEffect(() => {
     const next = NEXT[phase]
@@ -74,9 +115,9 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
   // Sau khi tiêu đề viết xong, thân thư chạy hết thì bỏ nút "Hiện toàn bộ"
   useEffect(() => {
     if (!titleDone || revealAll) return
-    const t = setTimeout(() => setRevealAll(true), (wordCount * step + 0.8) * 1000)
+    const t = setTimeout(() => setRevealAll(true), (total + 1) * 1000)
     return () => clearTimeout(t)
-  }, [titleDone, revealAll, wordCount, step])
+  }, [titleDone, revealAll, total])
 
   // Nút bị gỡ sau khi bấm → đưa focus tới chỗ hợp lý để người dùng bàn phím không bị rơi về <body>
   const light = () => {
@@ -175,8 +216,23 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         )}
       </section>
 
+      {phase === 'reading' && !reduced && (
+        <div className="lw-motes" aria-hidden="true">
+          {MOTES.map((m, i) => (
+            <i key={i} style={{ left: m.left, width: m.size, height: m.size, animationDuration: m.dur, animationDelay: m.delay, '--sway': m.sway }} />
+          ))}
+        </div>
+      )}
+
       {phase === 'reading' && (
         <article className="lw-letter" ref={readerRef} tabIndex={-1} aria-label={`Lời chúc gửi ${letter.recipientName}`}>
+          {!reduced && (
+            <div className="lw-letter-sparkles" aria-hidden="true">
+              {SPARKLES.map((s, i) => (
+                <i key={i} style={{ left: s.left, top: s.top, width: s.size, height: s.size, animationDelay: s.delay, animationDuration: s.dur }} />
+              ))}
+            </div>
+          )}
           <img className="lw-letter-stamp" src={theme.stamp} alt="" aria-hidden="true" />
           <HandwrittenTitle as="h2" className="lw-dedication" text={`Gửi ${letter.recipientName},`} instant={reduced} onDone={() => setTitleDone(true)} />
           <div className={`lw-content${titleDone ? ' is-shown' : ''}`} inert={!titleDone} aria-hidden={!titleDone}>
@@ -192,7 +248,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
                     <span className="lw-sr-only">{p.text}</span>
                     <span aria-hidden="true">
                       {p.words.map(({ w, i }) => (
-                        <span key={i} className="lw-word" style={{ animationDelay: `${i * step}s` }}>
+                        <span key={i} className="lw-word" style={{ animationDelay: `${timing[i].delay.toFixed(2)}s`, animationDuration: `${timing[i].dur.toFixed(2)}s` }}>
                           {w}{' '}
                         </span>
                       ))}

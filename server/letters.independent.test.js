@@ -333,7 +333,7 @@ describe('Thư viện QR', () => {
     expect(items[0]).toMatchObject({ recipientName: 'Minh', senderName: 'An', occasion: 'birthday', status: 'published', url: newer.url })
     expect(items[1].orderStatus).toBe('cancelled')
     for (const i of items) expect(Object.keys(i).sort()).toEqual(
-      ['occasion', 'openedAt', 'orderCode', 'orderStatus', 'publishedAt', 'recipientName', 'senderName', 'slug', 'status', 'updatedAt', 'url'].sort(),
+      ['lamp', 'occasion', 'openedAt', 'orderCode', 'orderStatus', 'publishedAt', 'recipientName', 'senderName', 'slug', 'status', 'template', 'updatedAt', 'url'].sort(),
     )
   })
 
