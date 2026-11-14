@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { api, ApiError } from '../api/client.js'
 import Seo from '../seo/Seo.jsx'
-import LetterPaper from '../letters/LetterPaper.jsx'
 import IntroFilms from '../letters/IntroFilms.jsx'
 import LetterExtras from '../letters/LetterExtras.jsx'
 import { introSeen, markIntroSeen } from '../letters/films.js'
 import { useI18n } from '../i18n/index.js'
+
+// Phòng thư 3D (letter-room, D-136/D-137) — chỉ tải three.js sau khi xem xong hai video mở đầu
+const LetterRoom = lazy(() => import('../letter-room/LetterRoom.jsx'))
 
 // D-138: trang phong thư của người nhận (/thu/<slug> trên domain chính). Token nằm sau dấu # (không
 // vào log server/Referer) và chỉ gửi trong body POST. Sai/không có token → cùng một màn "không tìm thấy".
@@ -39,20 +41,27 @@ export default function LetterPage() {
   return (
     <>
       <Seo title={t('letter.title')} noindex />
-      {state.status === 'ok' ? (
+      {state.status === 'ok' && state.intro ? (
         <main>
-          {state.intro ? (
-            <IntroFilms
-              canSkip={state.canSkip}
-              onDone={(watchedAll) => {
-                if (watchedAll) markIntroSeen(slug)
-                setState((s) => ({ ...s, intro: false }))
-              }}
-            />
-          ) : (
-            <LetterPaper letter={state.letter} afterLetter={<LetterExtras />} />
-          )}
+          <IntroFilms
+            canSkip={state.canSkip}
+            onDone={(watchedAll) => {
+              if (watchedAll) markIntroSeen(slug)
+              setState((s) => ({ ...s, intro: false }))
+            }}
+          />
         </main>
+      ) : state.status === 'ok' ? (
+        <Suspense
+          fallback={
+            <main className="lt-status" role="status" aria-busy="true">
+              <p>{t('letter.loading')}</p>
+            </main>
+          }
+        >
+          {/* Căn phòng: bật đèn → phong bì → thư (tiêu đề viết tay) → hai nút xem lại cuối thư */}
+          <LetterRoom letter={state.letter} afterLetter={<LetterExtras />} />
+        </Suspense>
       ) : (
         <main className="lt-status" role={state.status === 'loading' ? 'status' : undefined} aria-busy={state.status === 'loading'}>
           {state.status === 'loading' ? (

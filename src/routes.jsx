@@ -11,11 +11,11 @@ import NotFoundPage from './pages/NotFoundPage'
 const AccountPage = lazy(() => import('./pages/AccountPage'))
 import BatchPage from './pages/BatchPage'
 const GiftPage = lazy(() => import('./pages/GiftPage'))
-const WishRoomPage = lazy(() => import('./wishroom/WishRoomPage'))
 import PolicyPage from './pages/PolicyPage'
 import ContactPage from './pages/ContactPage'
 import CollectionPage from './pages/CollectionPage'
 import ShopPage from './pages/ShopPage'
+import LetterRoomRoute from './letter-room/LetterRoomRoute'
 const WelcomePage = lazy(() => import('./pages/WelcomePage'))
 const CartPage = lazy(() => import('./pages/CartPage'))
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
@@ -49,8 +49,6 @@ function localeChildren() {
       <Route path="products/:slug" element={<ProductPage />} />
       <Route path="lo/:code" element={<BatchPage />} />
       <Route path="qr/:token" element={<RouteLoader><GiftPage /></RouteLoader>} />
-      {/* Prototype "Phòng thư LAMVI" (xem docs/ba-spec.md §21.9) — dữ liệu mẫu cục bộ, chưa nối API QR thật */}
-      <Route path="phong-thu" element={<RouteLoader><WishRoomPage /></RouteLoader>} />
       <Route path="shop" element={<ShopPage />} />
       <Route path="welcome" element={<RouteLoader><WelcomePage /></RouteLoader>} />
       <Route path="privacy" element={<PolicyPage kind="privacy" />} />
@@ -80,6 +78,8 @@ export default function AppRoutes() {
     <Routes>
       {/* D-138: phong thư người nhận (/thu/<slug>), không tiền tố ngôn ngữ */}
       <Route path="/thu/:slug" element={<LocaleProvider lang="vi"><RouteLoader><LetterPage /></RouteLoader></LocaleProvider>} />
+      {/* D-136: Phòng thư LAMVI (letter-room) — bản demo bảy lời chúc mẫu */}
+      <Route path="/phong-thu" element={<LetterRoomRoute />} />
       {/* D-51: dashboard IT */}
       <Route path="/it" element={<ProtectedRoute><RouteLoader><ItDashboard /></RouteLoader></ProtectedRoute>} />
       {/* D-48: admin chỉ tiếng Việt */}

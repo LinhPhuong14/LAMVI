@@ -35,7 +35,7 @@ beforeEach(() => {
     'IntersectionObserver',
     class {
       constructor(cb) { this.cb = cb; observers.push(this) }
-      observe() {}
+      observe(target) { this.target = target }
       disconnect() {}
     },
   )
@@ -48,6 +48,8 @@ describe('Thanh mua cố định trang sản phẩm', () => {
     renderAt('/products/den-a')
     await screen.findByRole('heading', { level: 1, name: 'Đèn A' })
     expect(document.querySelector('.sticky-buy')).toBeNull()
+    // The heading can commit before StickyBuy's passive effect attaches its observer.
+    await waitFor(() => expect(observers.some((o) => o.target?.matches('.pdp-buy .product-buy'))).toBe(true))
     act(() => observers.forEach((o) => o.cb([{ isIntersecting: false, boundingClientRect: { top: 100 } }])))
     await waitFor(() => expect(document.querySelector('.sticky-buy')).not.toBeNull())
     expect(document.querySelector('.sticky-buy').textContent).toContain('Đèn A')

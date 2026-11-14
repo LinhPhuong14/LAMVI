@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import '@fontsource/itim/400.css'
+import './letters.css'
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 const reducedMotion = () => typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
@@ -15,8 +16,11 @@ const reducedMotion = () => typeof window !== 'undefined' && Boolean(window.matc
  * @param {string} p.text
  * @param {() => void} [p.onDone]
  * @param {boolean} [p.instant] hiện ngay (khung xem trước admin)
+ * @param {string} [p.as] thẻ tiêu đề (mặc định h1; trong Phòng thư là h2)
+ * @param {string} [p.className] lớp thêm cho thẻ tiêu đề
+ * @param {import('react').ReactNode} [p.children] phần trang trí sau chữ (vd. nét gạch chân)
  */
-export default function HandwrittenTitle({ text, onDone, instant: forceInstant = false }) {
+export default function HandwrittenTitle({ text, onDone, instant: forceInstant = false, as: Tag = 'h1', className = 'lt-greeting', children }) {
   const textRef = useRef(null)
   const [box, setBox] = useState(null)
   const [reduced] = useState(reducedMotion)
@@ -70,7 +74,7 @@ export default function HandwrittenTitle({ text, onDone, instant: forceInstant =
 
   const vb = box ?? { x: 0, y: -48, w: Math.max(200, [...text].length * 26), h: 64 }
   return (
-    <h1 className="lt-greeting lt-hw-wrap">
+    <Tag className={`${className} lt-hw-wrap`}>
       <svg
         className={`lt-hw${instant ? ' is-instant' : ''}`}
         viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
@@ -100,6 +104,7 @@ export default function HandwrittenTitle({ text, onDone, instant: forceInstant =
           {text}
         </text>
       </svg>
-    </h1>
+      {children}
+    </Tag>
   )
 }

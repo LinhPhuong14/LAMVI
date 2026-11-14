@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Field from '../components/Field'
 import { useAuth } from '../auth/context.js'
 import PageHead from './PageHead.jsx'
 import QrImage, { CopyLink } from './QrImage.jsx'
-import LetterPaper from '../letters/LetterPaper.jsx'
+import LetterRoomPreview from './LetterRoomPreview.jsx'
+import { demos, validateLetter } from '../letter-room/data.js'
 import { OCCASIONS, OCCASION_LABELS, paragraphsOf } from '../letters/occasions.js'
 import { S } from './strings.js'
 
@@ -107,6 +108,39 @@ export default function LetterEditorPage() {
   }, [load])
 
   const preview = useMemo(() => previewOf(form), [form])
+  // Thư chưa đủ để dựng Phòng thư (thiếu tên, nội dung…) → lý do hiện cạnh nút xem thử
+  const previewError = useMemo(() => {
+    try {
+      validateLetter(preview)
+      return preview.recipientName.trim() && preview.senderName.trim() ? null : L.previewNeedsNames
+    } catch (e) {
+      return e.message
+    }
+  }, [preview])
+  const [roomOpen, setRoomOpen] = useState(false)
+  const previewBtn = useRef(null)
+  // Đóng xem thử → trả focus về nút đã mở
+  const closeRoom = useCallback(() => {
+    setRoomOpen(false)
+    requestAnimationFrame(() => previewBtn.current?.focus())
+  }, [])
+
+  // Mẫu lời chúc của Phòng thư (letter-room): điền dịp, nội dung, điều bất ngờ; giữ tên đã gõ
+  function applyTemplate(e) {
+    const occasion = e.target.value
+    const demo = demos[occasion]
+    if (!demo) return
+    const hasContent = form.message.trim() || Object.values(form.od).some((v) => v.trim())
+    if (hasContent && !window.confirm(L.templateConfirm)) return
+    setForm((f) => ({
+      ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName }),
+      videoUrl: f.videoUrl,
+      posterUrl: f.posterUrl,
+      captionsUrl: f.captionsUrl,
+      postscript: f.postscript,
+    }))
+    setDirty(true)
+  }
   const set = (k) => (e) => {
     setForm((f) => ({ ...f, [k]: e.target.value }))
     setDirty(true)
@@ -184,6 +218,14 @@ export default function LetterEditorPage() {
               {L.status}: <strong>{L.statuses[letter?.status ?? 'none']}</strong>
               {published && ` · ${letter.openedAt ? L.opened : L.notOpened}`}
             </p>
+            <Field label={L.template} as="select" value="" onChange={applyTemplate} hint={L.templateHint}>
+              <option value="">{L.templatePick}</option>
+              {OCCASIONS.map((o) => (
+                <option key={o} value={o}>
+                  {OCCASION_LABELS[o]}
+                </option>
+              ))}
+            </Field>
             <Field label={L.recipientName} value={form.recipientName} onChange={set('recipientName')} maxLength={60} required />
             {err('recipientName') && <span className="field-error">{err('recipientName')}</span>}
             <Field label={L.senderName} value={form.senderName} onChange={set('senderName')} maxLength={60} required />
@@ -263,8 +305,13 @@ export default function LetterEditorPage() {
             )}
             <section aria-label={L.preview}>
               <h2 className="letter-preview-title">{L.preview}</h2>
-              {preview.recipientName ? <LetterPaper key={JSON.stringify(preview)} letter={preview} preview /> : <p className="field-hint">{L.recipientName}…</p>}
+              <p className="field-hint">{L.roomPreviewHint}</p>
+              <button ref={previewBtn} type="button" className="btn btn-primary btn-small" disabled={Boolean(previewError)} onClick={() => setRoomOpen(true)}>
+                {L.roomPreview}
+              </button>
+              {previewError && <p className="field-hint">{previewError}</p>}
             </section>
+            {roomOpen && !previewError && <LetterRoomPreview letter={preview} onClose={closeRoom} />}
           </div>
         </div>
       )}

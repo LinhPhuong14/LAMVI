@@ -2,9 +2,8 @@
 // Kiểm thử độc lập (T-11) phía giao diện cho phong thư (D-134, D-135): trang người nhận, lá thư,
 // trình soạn admin, thư viện QR. Bổ sung cho src/admin/Letters.test.jsx.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
-import LetterPaper from './LetterPaper.jsx'
 
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'admin@lamvi.test' } }
 const me = () => ({ body: { profile: { id: 'u1', email: 'admin@lamvi.test', role: 'admin', preferredLocale: 'vi', fullName: 'A' } } })
@@ -86,57 +85,6 @@ describe('Trang người nhận /thu/:slug — trạng thái lỗi', () => {
   })
 })
 
-describe('LetterPaper', () => {
-  it('thư video: có video + poster + phụ đề; không có nút bất ngờ khi occasionData rỗng', () => {
-    const { container } = render(
-      <LetterPaper preview letter={{ ...content, kind: 'video', videoUrl: '/videos/a.mp4', posterUrl: '/images/p.jpg', captionsUrl: '/videos/a.vtt' }} />,
-    )
-    const v = container.querySelector('video')
-    expect(v.getAttribute('src')).toBe('/videos/a.mp4')
-    expect(v.getAttribute('poster')).toBe('/images/p.jpg')
-    expect(container.querySelector('track').getAttribute('src')).toBe('/videos/a.vtt')
-    expect(screen.queryByRole('button', { name: 'Thổi nến' })).toBeNull()
-  })
-
-  it('thư chữ mang videoUrl lạ → không vẽ video', () => {
-    const { container } = render(<LetterPaper preview letter={{ ...content, videoUrl: '/videos/a.mp4' }} />)
-    expect(container.querySelector('video')).toBeNull()
-  })
-
-  it('nội dung có thẻ HTML được hiển thị như chữ thường (không chèn HTML)', () => {
-    const { container } = render(<LetterPaper preview letter={{ ...content, recipientName: '<img src=x onerror=alert(1)>', message: ['<b>đậm</b>'] }} />)
-    expect(container.querySelector('img')).toBeNull()
-    expect(container.querySelector('b')).toBeNull()
-    expect(screen.getByText('<b>đậm</b>')).toBeTruthy()
-  })
-
-  it('kỷ niệm: mở bất ngờ thấy ngày + ảnh; xa cách: thấy hai nơi; bất chợt: biểu tượng', () => {
-    const { unmount } = render(<LetterPaper preview letter={{ ...content, occasion: 'anniversary', occasionData: { date: '14/02/2020', photos: ['/images/a.jpg', '/images/b.jpg'] } }} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Mở kỷ niệm' }))
-    expect(screen.getByText('14/02/2020')).toBeTruthy()
-    expect(screen.getAllByAltText('Ảnh kỷ niệm')).toHaveLength(2)
-    unmount()
-
-    const r2 = render(<LetterPaper preview letter={{ ...content, occasion: 'longDistance', occasionData: { places: ['Hà Nội', 'Paris'] } }} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Nhìn qua ô cửa' }))
-    expect(screen.getByText('Hà Nội · Paris')).toBeTruthy()
-    r2.unmount()
-
-    render(<LetterPaper preview letter={{ ...content, occasion: 'justBecause', occasionData: { icon: '🌸', message: 'Vì em' } }} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Vì sao lại tặng?' }))
-    expect(screen.getByText('🌸')).toBeTruthy()
-    expect(screen.getByText('Vì em')).toBeTruthy()
-  })
-
-  it('không phải preview: phòng tối → bật đèn → phong bì đóng tới khi chạm', async () => {
-    render(<LetterPaper letter={content} />)
-    expect(screen.queryByText('Đoạn một.')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Bật đèn' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở thư gửi Linh' }, { timeout: 2000 }))
-    expect(screen.getByText('Đoạn một.')).toBeTruthy()
-    expect(screen.getByText('— An')).toBeTruthy()
-  })
-})
 
 describe('Trình soạn phong thư (admin)', () => {
   const letterPath = '/admin/orders/LV-AAA/letter'

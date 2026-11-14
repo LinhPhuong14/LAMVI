@@ -1,12 +1,21 @@
 # Tiến độ tính năng
 
+## 2026-11-14 — Phòng thư 3D vào web + mẫu/xem thử admin (feat/phong-thu-room, D-139)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Merge `letter-room` bản mới nhất (c5316e5), gỡ `wishroom` | ✅ | `src/letter-room/*`, `src/routes.jsx` | — |
+| `/thu/<slug>`: 2 video → Phòng thư 3D → tiêu đề viết tay → nút xem lại | ✅ | `src/pages/LetterPage.jsx`, `src/letter-room/LetterReader.jsx` | QA trên điện thoại thật (xoay ngang, WebGL) |
+| Admin: mẫu lời chúc theo dịp + xem thử trong Phòng thư | ✅ | `src/admin/LetterEditorPage.jsx`, `src/admin/LetterRoomPreview.jsx` | — |
+| Test | ✅ | `src/admin/Letters.test.jsx`, `src/letters/*.test.jsx`, `src/letter-room/*.test.*` + kiểm thử độc lập (T-11) | — |
+
 ## 2026-11-13 — Phong thư: video mở đầu, phòng bật đèn, bỏ subdomain (feat/phong-thu-intro, D-138)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |
 |---|---|---|---|
 | Bỏ subdomain, QR `{PUBLIC_SITE_URL}/thu/<slug>#<token>` | ✅ | `server/domain/letter.js` (gỡ `letterHost`, `LETTER_BASE_DOMAIN`) | — |
 | Hai video LAMVI mở đầu, xem hết mới vào phòng | ✅ | `src/letters/IntroFilms.jsx`, `src/letters/films.js` | Marketing duyệt thứ tự/tiêu đề video |
-| Căn phòng tối → bật đèn → phong bì | ✅ 2D | `src/letters/LetterPaper.jsx` | Cảnh 3D `letter-room` (G-124) |
+| Căn phòng tối → bật đèn → phong bì | ✅ 3D (D-139) | `src/letter-room/LetterRoom.jsx` | — |
 | Nút cuối thư: xem lại cách làm đèn, lịch sử văn hoá | ✅ | `src/letters/LetterExtras.jsx` | — |
 | Tiêu đề thư viết tay (stroke write-on), nội dung fade in sau | ✅ | `src/letters/HandwrittenTitle.jsx`, `HandwrittenTitle.test.jsx` | Xem thử trên iOS thật |
 | Test | ✅ | `src/admin/Letters.test.jsx`, `src/letters/letters.independent.test.jsx`, `server/letters*.test.js` | — |
@@ -18,7 +27,7 @@
 | Admin soạn phong thư (nháp/xuất bản/gỡ/tạo QR mới), xem trước | ✅ | `src/admin/LetterEditorPage.jsx`, `server/routes/letters.js`, `server/domain/letter.js` | Tải video/ảnh lên (G-123) |
 | QR subdomain ngẫu nhiên + token sau `#`, chặn site chính dưới subdomain | ✅ code | `server/middleware/letterHost.js`, `config.letterBaseDomain` | Wildcard domain Vercel + `LETTER_BASE_DOMAIN` (G-122) |
 | Thư viện QR (in lại đúng QR cũ) | ✅ | `src/admin/LettersGalleryPage.jsx`, `GET /api/admin/letters` | — |
-| Trang người nhận `/thu/:slug` | ✅ 2D | `src/pages/LetterPage.jsx`, `src/letters/LetterPaper.jsx` | Thay bằng cảnh 3D `letter-room` (G-124) |
+| Trang người nhận `/thu/:slug` | ✅ 3D (D-139) | `src/pages/LetterPage.jsx`, `src/letter-room/LetterRoom.jsx` | — |
 | Bảng `order_letters` | ✅ migration | `supabase/migrations/20261113000025_order_letters.sql` | Chạy migration trên Supabase |
 | Test | ✅ | `server/letters.test.js`, `src/admin/Letters.test.jsx` + kiểm thử độc lập (T-11) | — |
 
@@ -265,3 +274,20 @@ Cập nhật 2026-10-06 (v0.37). Cập nhật cuối mỗi tính năng. Trạng 
 |---|---|---|---|
 | Landing: lớp họa tiết dân gian Việt | ✅ code | `Folk.jsx`, cuối `pages.css`; `Folk.test.jsx` | Marketing duyệt chữ lạc khoản; ảnh Đông Hồ thêm ở các mục khác |
 
+
+| Prototype Phòng thư (2026-11-13) | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| `/phong-thu`: phòng Three.js, thư chữ/video, bảy dịp, fallback 2D | ✅ prototype cục bộ | `src/letter-room/`; 49 test độc lập đạt; hướng dẫn `docs/phong-thu.md` | đối chiếu đèn thật, tích hợp QR sau, nghiệm thu iOS/GPU thật; quà giấy dùng DOM/CSS |
+
+Phòng thư `feat/phong-thu`: xác nhận toàn repo 262 tệp / 4008 ca đạt, 2 bỏ qua; lint + build đạt. Chờ chọn cách phối hợp với bản `wishroom` trên master trước tích hợp.
+
+| Phòng thư POV D-136 / T-105 | ✅ prototype nhánh riêng | Fade phòng → pulse đèn → tự nâng/mở bì vintage → giấy caro → chữ Itim; rounded geometry, PBR 512px, PMREM và soft contact shadow | Full 4011 đạt, 2 bỏ qua; cần Pinterest proxy và GPU thiết bị thật; chờ phối hợp master |
+
+| D-137: game landscape 16:9 | ✅ code | OrientationGate, portrait overlay 80%, lazy WebGL, pause/resume phase/render, video pause | QA portrait → landscape → portrait → resume, test độc lập orientation |
+
+
+### Phòng thư — cập nhật D-136 (2026-11-13)
+Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác chủ động. Tách CameraRig/LetterReader/PaperSurprise; reducer khóa bước chuyển và kéo 40%. Bì vẫn trên bàn, giấy mới nâng lên; reader mở rộng. Dùng camera-controls MIT và bàn KayKit CC0 qua GLTFLoader, giữ stack/brand/ánh sáng. Không tích hợp bộ surfaceMaterials bị từ chối. Chi tiết triển khai/nguồn/QA: `docs/phong-thu.md`, `docs/art/model-sources.md`, `docs/qa/phong-thu/README.md`. Ghi chú này thay mô tả tự mở thư trước đó, không thay API QR/backend.
+
+
+Cập nhật PO 2026-11-14 (điều chỉnh D-136): camera POV gần bàn hơn; cảnh bật đèn giữ nguyên camera, không cận công tắc. Sau đèn sáng, chạm vùng cảnh đưa bì từ bàn lên chính diện lơ lửng (vật thể di chuyển, camera đứng); kéo dùng mặt phẳng và trục local của bì. Nền gen modern-v4 thay bản rustic v3: cửa gỗ gọn, rèm sáng, tường kem, bàn sát góc phòng. Chụp đèn có đôi gà minh họa tự vẽ cảm hứng Đông Hồ; cần thay artwork thật. Nội dung thư reveal theo grapheme tiếng Việt, có hiện toàn bộ ngay và reduced motion; không tuyên bố thứ tự stroke của font là nét viết thật. Nguồn/prompt: docs/art/room-modern-v4.prompt.md.
