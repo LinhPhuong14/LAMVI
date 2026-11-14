@@ -1,0 +1,7 @@
+# Overlay Đông Hồ v5
+
+Built-in imagegen, transparent_background=true. Generated source saved as `dong-ho-roosters-v5-source.png`; runtime `public/letter-room/textures/dong-ho-roosters-v5.webp`. New AI-created interpretation, not a scan or reproduction claimed as an authentic historical print. Replace with licensed product artwork for launch.
+
+Prompt: Generate an isolated transparent-background print artwork for a Vietnamese dó paper cylindrical lamp. Authentic visual language inspired by traditional Dong Ho Vietnamese woodblock folk prints: TWO magnificent roosters facing inward, elaborate sweeping layered fan tails, red combs, patterned feather scales, bold irregular charcoal-brown carved outlines, flat ochre, muted cinnabar and moss olive ink areas, visible hand stamped ink breaks. Small stylized rice sprigs at their feet. Sophisticated faithful woodcut craftsmanship, NOT cute cartoon ducks, NOT 3D, NOT modern vector icons. Symmetric balanced horizontal pair, generous clear transparent margins all around, no frame, NO paper background, no words, no watermark. Flat frontal print artwork, no lamp, no room, clean alpha silhouette, high resolution.
+
+Overlay is composited onto the existing paper CanvasTexture at (144,175), 224×150 on a 512² cylindrical UV. Color/emissive share that texture. Source remains transparent. Runtime alpha is composited onto paper fibers, not shown as a rectangular decal.

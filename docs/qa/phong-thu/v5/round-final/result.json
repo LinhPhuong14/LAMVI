@@ -1,0 +1,77 @@
+{
+  "round": "final",
+  "timeline": [
+    {
+      "name": "01-room",
+      "seconds": 12.651,
+      "phase": "dark"
+    },
+    {
+      "name": "02-lit",
+      "seconds": 15.37,
+      "phase": "lit"
+    },
+    {
+      "name": "03a-midflight",
+      "seconds": 18.717,
+      "phase": "approaching"
+    },
+    {
+      "name": "03-envelope",
+      "seconds": 20.118,
+      "phase": "ready"
+    },
+    {
+      "name": "03b-extract",
+      "seconds": 21.293,
+      "phase": "extracting"
+    },
+    {
+      "name": "03c-lifting",
+      "seconds": 22.581,
+      "phase": "lifting"
+    },
+    {
+      "name": "04-writing",
+      "seconds": 26.735,
+      "phase": "reading"
+    },
+    {
+      "name": "05-docked",
+      "seconds": 29.533,
+      "phase": "reading"
+    },
+    {
+      "name": "06-body",
+      "seconds": 30.127,
+      "phase": "reading"
+    },
+    {
+      "name": "07-lamvi",
+      "seconds": 30.343,
+      "phase": "reading"
+    },
+    {
+      "name": "08-lamvi-next",
+      "seconds": 30.558,
+      "phase": "reading"
+    },
+    {
+      "name": "09a-paper-return",
+      "seconds": 31.796,
+      "phase": "surpriseEntering"
+    },
+    {
+      "name": "09-cake",
+      "seconds": 34.6,
+      "phase": "surprise"
+    },
+    {
+      "name": "10-final",
+      "seconds": 39.15,
+      "phase": "celebrated"
+    }
+  ],
+  "errors": [],
+  "video": "flow.webm"
+}

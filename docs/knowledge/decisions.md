@@ -523,3 +523,14 @@ Bổ sung D-137: game frame 16:9 letterbox, OrientationGate dùng viewport resiz
 
 ### Phòng thư — cập nhật D-136 (2026-11-13)
 Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác chủ động. Tách CameraRig/LetterReader/PaperSurprise; reducer khóa bước chuyển và kéo 40%. Bì vẫn trên bàn, giấy mới nâng lên; reader mở rộng. Dùng camera-controls MIT và bàn KayKit CC0 qua GLTFLoader, giữ stack/brand/ánh sáng. Không tích hợp bộ surfaceMaterials bị từ chối. Chi tiết triển khai/nguồn/QA: `docs/phong-thu.md`, `docs/art/model-sources.md`, `docs/qa/phong-thu/README.md`. Ghi chú này thay mô tả tự mở thư trước đó, không thay API QR/backend.
+
+
+### Phòng thư — yêu cầu PO 2026-11-14, vòng title/Đông Hồ/review (D-136, T-105)
+
+`TitleInk.jsx` dùng các đường nét SVG tự vẽ cho “Gửi Linh,”: viết chậm ở giữa giấy, giữ một nhịp, dock góc trái rồi mới gọi ready để hiện body/video. Chờ cả clock tối thiểu và CSS transition kết thúc thực tế; pause khi quay dọc, reduced motion hoàn tất ngay. Tên động khác Linh dùng font Itim + mask reveal, chưa có stroke vector cho mọi tên. Không dùng font/mã Apple.
+
+Thân thư hiện theo từ với alpha đồng đều, không cắt qua dấu tiếng Việt; có hiện toàn bộ. Đốm sáng DOM thưa hai bên giấy, không nhận pointer và ẩn khi giảm chuyển động. Gợi ý cuộn nằm dưới mặt giấy; dock compact thu nhỏ để đọc được nhiều dòng. `LamviWishes.jsx` + `wishes.css`: 21 câu nguyên bản do dự án biên tập, chia bảy dịp; người đọc tự bấm câu tiếp, không gán nhầm tác giả nổi tiếng.
+
+Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt cùng thư mục; runtime WebP alpha 1024×550 được compositing lên UV giấy trụ và emissive. Là minh họa lấy cảm hứng Đông Hồ, không phải scan tranh cổ hoặc artwork chính thức của LAMVI. Nâng/rút giấy theo trục local 0,9 đơn vị, bì trở về bàn trong lúc nâng thư; reader giữ nền đục. Góc bánh và cụm giấy được dọn sau review. API `letter/onExit/preview/afterLetter` giữ nguyên.
+
+Đã có năm vòng reviewer UI khó tính dựa trên ảnh thực tế và sửa giữa các vòng. Xem `docs/qa/phong-thu/v5/README.md`, báo cáo từng vòng, frame có timestamp, clip và proof timing để phân biệt phần đã kiểm với giới hạn SwiftShader.

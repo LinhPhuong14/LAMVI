@@ -1769,3 +1769,44 @@
   .lr-reader .lr-body-ink-glyph { animation: none; opacity: 1; clip-path: none; }
   .lr-reader .lr-body-ink-skip { display: none; }
 }
+.lr-fireflies {position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden;}
+.lr-fireflies i {position:absolute;left:calc(2% + var(--fly-i)*8.5%);bottom:-8%;width:3px;height:3px;border-radius:50%;background:#ffe6a6;box-shadow:0 0 9px 3px #ffd99366;opacity:0;animation:lr-fly-rise calc(8s + var(--fly-i)*.27s) linear calc(var(--fly-i)*-.9s) infinite;}
+.lr-fireflies i:nth-child(n+3):nth-child(-n+10){left:calc(2% + var(--fly-i)*.35%);}
+@keyframes lr-fly-rise {0%{opacity:0;transform:translate(0,0);}15%,70%{opacity:.65;}100%{opacity:0;transform:translate(15px,-400px);}}
+@media(prefers-reduced-motion:reduce){.lr-fireflies{display:none;}}
+.lr-reader .lr-body-ink-skip {float:right;min-height:32px;font-size:11px;opacity:.65;border:0;}
+/* Complete words emerge in ink, retaining accents instead of fragmented glyphs. */
+.lr-reader .lr-body-ink-glyph {animation:none;opacity:1;clip-path:none;}
+.lr-reader .lr-body-ink-word {opacity:0;clip-path:inset(0 100% 0 0);animation:lr-body-word-write .22s ease-out var(--word-delay,0s) both;}
+.lr-reader .lr-letter-content:not(.visible) .lr-body-ink-word {animation-play-state:paused!important;}
+.lr-reader .lr-body-ink.is-complete .lr-body-ink-word {animation:none;opacity:1;clip-path:none;}
+.lr-reader .lr-body-ink-skip {float:none;display:block;margin:12px 0 16px auto;}
+@keyframes lr-body-word-write {from{opacity:0;clip-path:inset(0 100% 0 0);}to{opacity:1;clip-path:inset(0);}}
+@media(prefers-reduced-motion:reduce){.lr-reader .lr-body-ink-word{animation:none;opacity:1;clip-path:none;}}
+.lr-final-brand {display:block;border-top:1px solid #8b5e3c33;padding-top:10px;margin-top:12px;font-size:10px;letter-spacing:.03em;color:#8b5e3c;}
+.lr-final-note {max-height:min(180px,45%);color:#3f200b;background:#f4e8cf;}
+@media(max-width:450px){.lr-final-note{max-height:65%;font-size:16px;}.lr-final-brand{font-size:9px;}}
+.lr-reader-scroll-cue {position:sticky;bottom:0;display:block;width:max-content;max-width:100%;margin:12px auto 0;padding:4px 12px;background:#f4e8cfed;border:1px solid #8b5e3c33;border-radius:20px;color:#765234;font:10px/1.5 "Be Vietnam Pro",sans-serif;pointer-events:none;z-index:3;}
+.lr-reader:has(.lr-title-ink) {padding-bottom:32px!important;}
+.lr-reader .lr-signature {margin-bottom:30px;}
+.lr-reader .lr-surprise-trigger {margin-bottom:18px;}
+/* Scroll cue lives below the paper, never over glyphs or action buttons. */
+.lr-reader-scroll-cue {position:fixed;left:50%;bottom:2%;transform:translateX(-50%);margin:0;padding:2px 10px;font-size:9px;background:#f4e8cfeb;}
+@media(max-height:300px){
+ .lr-reader .lr-title-ink.is-docked {top:8px;left:16px;width:105px;}
+ .lr-reader .lr-letter-meta {display:none;}
+ .lr-reader:has(.lr-title-ink) .lr-letter-content {margin-top:42px!important;}
+ .lr-game .lr-reader {padding:8px 16px 20px!important;}
+ .lr-game .lr-letter-content>p {font-size:16px!important;line-height:24px!important;}
+ .lr-reader-scroll-cue {bottom:1%;font-size:8px;line-height:1.2;padding:1px 8px;}
+ .lr-reader .lr-wishes {margin-block:12px;padding:8px 10px;border-radius:6px;}
+ .lr-reader .lr-wishes-heading {font-size:12px;line-height:1.2;margin-bottom:4px;}
+ .lr-reader .lr-wishes-quote {font-size:16px;line-height:1.35;margin-bottom:4px;}
+ .lr-reader .lr-wishes-count {font-size:10px;line-height:1.2;margin-bottom:4px;}
+ .lr-reader .lr-wishes-next {min-height:44px;font-size:12px;padding:6px 10px;}
+ .lr-reader .lr-title-dynamic {font-size:20px;}
+}
+/* Final audit: reveal complete words with even ink opacity, never slice accents. */
+.lr-reader .lr-body-ink-word {clip-path:none;animation:lr-body-word-fade .22s ease-out var(--word-delay,0s) both;}
+@keyframes lr-body-word-fade {from{opacity:0;}to{opacity:1;}}
+@media(prefers-reduced-motion:reduce){.lr-reader .lr-body-ink-word{animation:none;opacity:1;}}

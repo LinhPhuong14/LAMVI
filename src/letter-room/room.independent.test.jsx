@@ -119,7 +119,7 @@ describe('independent DOM manual interaction contracts', () => {
   async function openLetter(query='') {
     const view=await reachPaper(query)
     fireEvent.keyDown(screen.getByRole('button',{name:'Kéo mép giấy lên'}),{key:'Enter'})
-    await advance(500);await advance(1200);await advance(1200)
+    await advance(500);await advance(1200);await advance(5600)
     expect(screen.getByRole('article',{name:'Lời chúc gửi Linh'})).toHaveFocus()
     return view
   }
@@ -196,7 +196,7 @@ describe('independent DOM manual interaction contracts', () => {
     const {container}=await openLetter()
     expect(screen.getAllByRole('heading',{name:'Gửi Linh,'})).toHaveLength(1)
     expect(screen.queryByText('Gửi bạn,')).not.toBeInTheDocument()
-    expect(container.querySelector('.lr-dedication svg path')).toBeInTheDocument()
+    expect(container.querySelector('.lr-title-ink svg path')).toBeInTheDocument()
     const content=container.querySelector('.lr-letter-content')
     expect(content).toHaveAttribute('aria-hidden','false');expect(content).not.toHaveAttribute('inert')
     expect(content.querySelector('.lr-glyph')).toBeNull()
@@ -209,7 +209,7 @@ describe('independent DOM manual interaction contracts', () => {
     const video=container.querySelector('video')
     expect(video).toHaveAttribute('controls');expect(video).toHaveAttribute('playsinline');expect(video).not.toHaveAttribute('muted')
     expect(video.querySelector('track')).toHaveAttribute('src',demos.longDistance.captionsUrl)
-    fireEvent.error(video);expect(screen.getByRole('status')).toHaveTextContent('Video chưa tải được')
+    fireEvent.error(video);expect(screen.getByText(/Video chưa tải được/)).toBeInTheDocument()
     expect(screen.getByRole('button',{name:'Mở hai ô cửa'})).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'Thử lại'}));expect(container.querySelector('video')).toBeNull()
     fireEvent.click(screen.getByRole('button',{name:'Xem lời nhắn'}));fireEvent.ended(container.querySelector('video'))

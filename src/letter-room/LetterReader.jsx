@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import TitleInk from "./TitleInk";
+import LamviWishes from "./LamviWishes";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function LetterReader({
   letter,
@@ -11,6 +13,8 @@ export default function LetterReader({
     video = useRef(null);
   const reduced = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const [revealAll, setRevealAll] = useState(reduced);
+  const [scrollHint, setScrollHint] = useState(false);
+  const [hintReady, setHintReady] = useState(reduced);
   const paragraphs = useMemo(() => {
     if (letter.kind !== "text") return [];
     const segmenter = typeof Intl.Segmenter === "function" ? new Intl.Segmenter("vi", { granularity: "grapheme" }) : null;
@@ -28,6 +32,12 @@ export default function LetterReader({
     [playing, setPlaying] = useState(false),
     [error, setError] = useState(false),
     [ended, setEnded] = useState(false);
+  const markWritten = useCallback(() => setWritten(true), []);
+  useEffect(() => {
+    if (!written || !active) return;
+    const timer = setTimeout(() => setHintReady(true), 550);
+    return () => clearTimeout(timer);
+  }, [written, active]);
   useEffect(() => {
     if (!active) video.current?.pause();
   }, [active]);
@@ -35,6 +45,7 @@ export default function LetterReader({
     const el = ref.current;
     el?.focus({ preventScroll: true });
     function grid() {
+      requestAnimationFrame(() => {if(el) setScrollHint(el.scrollHeight > el.clientHeight + 32 && el.scrollTop + el.clientHeight < el.scrollHeight - 32);});
       el?.style.setProperty(
         "--paper-grid",
         `${el.getBoundingClientRect().width / 32}px`,
@@ -54,7 +65,7 @@ export default function LetterReader({
           {
             transform: `translate(${origin.left - bounds.left}px,${origin.top - bounds.top}px) scale(${scale})`,
             height: `${origin.height / Math.max(0.01, scale)}px`,
-            opacity: 0.7,
+            opacity: 1,
           },
           {
             transform: "translate(0,0) scale(1)",
@@ -69,9 +80,8 @@ export default function LetterReader({
         },
       );
     }
-    const timer = setTimeout(() => setWritten(true), reduced ? 0 : 1100);
+
     return () => {
-      clearTimeout(timer);
       observer?.disconnect();
     };
   }, [getPaperRect]);
@@ -93,21 +103,14 @@ export default function LetterReader({
     <article
       className="lr-reader"
       ref={ref}
+      onScroll={e => {const el=e.currentTarget;setScrollHint(el.scrollTop + el.clientHeight < el.scrollHeight - 32);}}
       tabIndex={-1}
       aria-label={`Lời chúc gửi ${letter.recipientName}`}
     >
       <div className="lr-letter-meta">
         MỘT LỜI THƯƠNG ĐƯỢC GIỮ LẠI<span aria-hidden="true">✧</span>
       </div>
-      <h2 className="lr-dedication">
-        Gửi {letter.recipientName},
-        <svg viewBox="0 0 210 24" aria-hidden="true">
-          <path
-            d="M5 16C43 5 119 6 181 13M170 17Q192 12 204 15"
-            pathLength="1"
-          />
-        </svg>
-      </h2>
+      <TitleInk name={letter.recipientName} active={active} reduced={reduced} onReady={markWritten} />
       <div
         className={`lr-letter-content ${written ? "visible" : ""}`}
         inert={!written}
@@ -115,11 +118,10 @@ export default function LetterReader({
       >
         {letter.kind === "text" ? (
           <>
-            {!revealAll && !reduced && <button className="lr-body-ink-skip" onClick={() => setRevealAll(true)}>Hiện toàn bộ lá thư</button>}
             {paragraphs.map((paragraph, i) => <p key={i} className={`lr-body-ink ${revealAll || reduced ? "is-complete" : ""}`} style={{animationPlayState: active ? "running" : "paused"}}>
               <span className="lr-sr-only">{paragraph.text}</span>
               <span aria-hidden="true" className="lr-body-ink-visual">
-                {paragraph.words.map((word, w) => word.space ? word.text : <span className="lr-body-ink-word" key={w}>
+                {paragraph.words.map((word, w) => word.space ? word.text : <span className="lr-body-ink-word" key={w} style={{"--word-delay": `${word.glyphs[0]?.index * inkStep}s`, animationPlayState: active ? "running" : "paused"}}>
                   {word.glyphs.map(glyph => <span className="lr-body-ink-glyph" key={glyph.index} style={{"--body-ink-delay": `${glyph.index * inkStep}s`, animationPlayState: active ? "running" : "paused"}}>{glyph.text}</span>)}
                 </span>)}
               </span>
@@ -181,6 +183,8 @@ export default function LetterReader({
           <span>Thương mến,</span>
           <strong>{letter.senderName}</strong>
         </div>
+        {!revealAll && !reduced && letter.kind === "text" && <button className="lr-body-ink-skip" onClick={() => setRevealAll(true)}>Hiện toàn bộ lá thư</button>}
+        <LamviWishes occasion={letter.occasion} />
         {(Object.keys(letter.occasionData).length > 0 || letter.postscript) && (
           <button
             className={`lr-surprise-trigger ${ended ? "is-highlighted" : ""}`}
@@ -193,6 +197,7 @@ export default function LetterReader({
         )}
         {afterLetter}
       </div>
+      {written && hintReady && scrollHint && <span className="lr-reader-scroll-cue" aria-hidden="true">Cuộn để đọc tiếp ↓</span>}
     </article>
   );
 }

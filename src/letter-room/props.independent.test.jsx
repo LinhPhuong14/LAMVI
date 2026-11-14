@@ -23,7 +23,7 @@ async function open() {
   fireEvent.click(screen.getByRole('button',{name:'Chạm vào phong bì để mở thư'}))
   await tick()
   fireEvent.click(screen.getByRole('button',{name:'Kéo mép giấy lên'}),{detail:0})
-  await tick();await tick();await tick()
+  await tick();await tick();await act(async()=>{await vi.advanceTimersByTimeAsync(5600)})
 }
 
 describe('independent embedded LetterRoom props', () => {

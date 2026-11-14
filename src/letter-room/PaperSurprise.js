@@ -39,15 +39,15 @@ export function createPaperSurprise({ THREE, colors = {}, occasion = 'birthday' 
   };
   const sheet = (parent, width, depth, surface, position) =>
     mesh(parent, new THREE.BoxGeometry(width, 0.005, depth), surface, position);
-  const base = sheet(group, 0.88, 0.66, paper, [0, 0.008, 0]);
+  const base = sheet(group, 0.72, 0.48, paper, [0, 0.008, 0]);
   base.name = 'closed-card';
   // The cover really rotates about its rear crease; no scale-based unfolding.
   const cover = new THREE.Group();
-  cover.position.set(0, 0.016, -0.33);
+  cover.position.set(0, 0.016, -0.24);
   group.add(cover);
-  sheet(cover, 0.88, 0.66, sage, [0, 0, 0.33]);
-  sheet(group, 0.88, 0.012, crease, [0, 0.014, -0.326]);
-  const tab = sheet(group, 0.14, 0.09, coral, [0.26, 0.014, 0.354]);
+  sheet(cover, 0.72, 0.48, sage, [0, 0, 0.24]);
+  sheet(group, 0.72, 0.012, crease, [0, 0.014, -0.236]);
+  const tab = sheet(group, 0.14, 0.09, coral, [0.26, 0.014, 0.264]);
   tab.name = 'surprise-tab';
 
   // Original rice sprig printed on transparent paper, never an external asset.
@@ -72,7 +72,7 @@ export function createPaperSurprise({ THREE, colors = {}, occasion = 'birthday' 
       ornamentMap.colorSpace = THREE.SRGBColorSpace;
       textures.add(ornamentMap);
       const art = mesh(cover, new THREE.PlaneGeometry(0.25, 0.25),
-        material('#ffffff', { map: ornamentMap, transparent: true, depthWrite: false }), [0.25, 0.004, 0.39]);
+        material('#ffffff', { map: ornamentMap, transparent: true, depthWrite: false }), [0.18, 0.004, 0.27]);
       art.rotation.x = -Math.PI / 2;
       art.castShadow = false;
     }
@@ -111,7 +111,7 @@ export function createPaperSurprise({ THREE, colors = {}, occasion = 'birthday' 
     tiers.push(result);
     return result;
   }
-  const bottom = makeTier(0.39, 0.16, sage, cake);
+  const bottom = makeTier(0.39, 0.12, paper, cake);
   const upper = makeTier(0.26, 0.13, paper, cake);
   const candle = new THREE.Group();
   cake.add(candle);
@@ -163,6 +163,7 @@ export function createPaperSurprise({ THREE, colors = {}, occasion = 'birthday' 
     const p = active ? (entering && !reduced ? clamp(progress) : 1) : 0;
     const done = phase === 'celebrating' || phase === 'celebrated';
     const time = Number.isFinite(elapsed) ? Math.max(0, elapsed) : 0;
+    tab.visible = p < .4;
     cover.rotation.x = -Math.PI * 0.95 * ease(p / 0.5);
     cake.visible = birthday && p > 0.28;
     alternative.visible = !birthday && p > 0.28;
@@ -190,7 +191,7 @@ export function createPaperSurprise({ THREE, colors = {}, occasion = 'birthday' 
       puff.material.opacity = (1 - t) * 0.15;
     });
     ribbon.visible = birthday && done;
-    ribbon.position.z = 0.16 + 0.28 * ease(phase === 'celebrated' || reduced ? 1 : time / 0.65);
+    ribbon.position.z = 0.16 + 0.12 * ease(phase === 'celebrated' || reduced ? 1 : time / 0.65);
     alternative.position.z = -0.16 * ease((p - 0.3) / 0.7);
     alternative.rotation.x = -0.22 * ease((p - 0.3) / 0.7);
     // Hosts may inspect this flag before raycasting; hidden parents are also gated below.

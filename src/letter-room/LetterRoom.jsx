@@ -125,8 +125,8 @@ function FinalNote({ letter, point, width, height }) {
       className="lr-final-note"
       role="status"
       style={{
-        left: Math.max(16, Math.min(width - 286, point.x - 135)),
-        top: Math.max(20, Math.min(height - 115, point.y + 35)),
+        left: width > 600 ? width - 286 : Math.max(16, Math.min(width - 286, point.x - 135)),
+        top: Math.max(20, Math.min(height - 170, point.y + 35)),
       }}
     >
       {letter.occasion === "anniversary" && (
@@ -156,6 +156,7 @@ function FinalNote({ letter, point, width, height }) {
           letter.postscript ||
           "Một chút thương, dành riêng cho bạn."}
       </p>
+      <small className="lr-final-brand">Giữ lại một khoảng sáng. — LAMVI</small>
     </section>
   );
 }
@@ -333,7 +334,7 @@ function Room({
     const p = scene.current?.project(e.clientX, e.clientY);
     dispatch({
       type: "DRAG",
-      value: p && d.point ? (d.point.z - p.z) / 1.35 : (d.y - e.clientY) / 120,
+      value: p && d.point ? (d.point.z - p.z) / .9 : (d.y - e.clientY) / 120,
     });
   }
   function finish(e, cancel = false) {
@@ -509,6 +510,7 @@ function Room({
             }}
           />
         )}
+        {state.phase === "reading" && <div className="lr-fireflies" aria-hidden="true">{Array.from({length:12},(_,i)=><i key={i} style={{"--fly-i":i,animationPlayState:active?"running":"paused"}} />)}</div>}
         {state.phase === "reading" && (
           <LetterReader
             letter={letter}

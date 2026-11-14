@@ -16,3 +16,5 @@ Hồi quy cuối: 265 tệp, 4052 đạt, 1 ca routing ngôn ngữ không ổn �
 Lượt kiểm tra độc lập trên build cuối (5185) xác nhận kéo native ngắn/cancel trở về ready, kéo dài tới reading; không lỗi console/JS/HTTP. Ảnh so sánh `comparison/` dùng cùng camera/lighting cho bàn cũ và KayKit. Xem README ở đó để tránh nhầm tên `room-lit` với góc phòng mở đầu.
 
 Kiểm tra xác nhận sau chỉnh geometry cuối: `npm test -- src/letter-room src/components/Brand.extra.test.jsx src/pages/Routing.extra.test.jsx --maxWorkers=2` đạt **6 tệp / 136 ca** (gồm routing và brand).
+
+Bản cập nhật title/Đông Hồ/quotes và review 5 vòng ngày 2026-11-14: xem `v5/README.md`. Ảnh v4/current ở trên là lịch sử, không mô tả title mới.

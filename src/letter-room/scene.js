@@ -264,20 +264,6 @@ export function createRoom(
     ctx.lineTo(x + rand() * 8 - 4, y + rand() * 18);
     ctx.stroke();
   }
-  function rooster(x, flip) {
-    ctx.save(); ctx.translate(x, 280); ctx.scale(flip, 1);
-    ctx.strokeStyle = "#693c24"; ctx.fillStyle = "#9a6037"; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.ellipse(0, 0, 27, 35, -.4, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = "#b88b4e"; ctx.beginPath(); ctx.ellipse(-3, -1, 15, 23, -.55, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(10,-19); ctx.bezierCurveTo(20,-45,5,-56,17,-65); ctx.bezierCurveTo(40,-70,43,-42,27,-24); ctx.closePath(); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = "#9c4e32"; for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(17+i*6,-67,5,0,Math.PI*2);ctx.fill();}
-    ctx.fillStyle = "#3f200b"; ctx.beginPath();ctx.arc(28,-55,2,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.moveTo(36,-54);ctx.lineTo(47,-49);ctx.lineTo(35,-46);ctx.fill();
-    for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-20,4);ctx.bezierCurveTo(-72,-55+i*9,-70,37,-25,20);ctx.stroke();}
-    for(const a of [-10,11]){ctx.beginPath();ctx.moveTo(a,28);ctx.lineTo(a,48);ctx.lineTo(a+10,52);ctx.moveTo(a,48);ctx.lineTo(a-8,53);ctx.stroke();}
-    ctx.restore();
-  }
-  rooster(208, 1); rooster(302, -1);
   const texture = new T.CanvasTexture(canvas);
   texture.colorSpace = T.SRGBColorSpace;
   textures.push(texture);
@@ -530,6 +516,7 @@ export function createRoom(
   lc.strokeStyle = "#8B5E3C";
   lc.strokeRect(8, 8, 496, 112);
   const labelTexture = new T.CanvasTexture(labelCanvas);
+  labelTexture.colorSpace = T.SRGBColorSpace;
   textures.push(labelTexture);
   const label = mesh(
     new T.PlaneGeometry(1.1, 0.25),
@@ -544,6 +531,11 @@ export function createRoom(
     envelope,
   );
   materials.push(label.material);
+  label.position.y = .082;
+  label.renderOrder = 4;
+  label.material.polygonOffset = true;
+  label.material.polygonOffsetFactor = -1;
+  label.material.polygonOffsetUnits = -1;
   label.rotation.x = -Math.PI / 2;
   // Ceramic cup and a small book stay on the same desk through every camera move.
   mesh(
@@ -627,9 +619,10 @@ export function createRoom(
   box(5.9, 0.15, 0.08, wood, 0.15, 0.08, -2.45, architecture);
   box(0.08, 0.15, 6.1, wood, -2.7, 0.08, 0.4, architecture);
   let backgroundSettled = false,
-    modelSettled = legacyAssets;
+    modelSettled = legacyAssets,
+    artworkSettled = false;
   const ready = () => {
-    if (backgroundSettled && modelSettled && !disposed) onReady?.();
+    if (backgroundSettled && modelSettled && artworkSettled && !disposed) onReady?.();
   };
   if (!legacyAssets)
     new GLTFLoader().load(
@@ -804,8 +797,20 @@ export function createRoom(
   );
   textures.push(backdrop);
   const paperSurprise = createPaperSurprise({ THREE: T, colors: C, occasion });
+  paperSurprise.group.scale.setScalar(1.45);
+  paperSurprise.group.position.set(.2,1.75,.55);
   scene.add(paperSurprise.group);
-  const basePaper = ctx.getImageData(0, 0, 512, 512);
+  let basePaper = ctx.getImageData(0, 0, 512, 512);
+  const artworkImage = new Image();
+  artworkImage.onload = () => {
+    if (disposed) return;
+    ctx.drawImage(artworkImage, 144, 175, 224, 150);
+    basePaper = ctx.getImageData(0,0,512,512);
+    texture.needsUpdate = true;
+    artworkSettled = true; ready(); invalidate();
+  };
+  artworkImage.onerror = () => { artworkSettled=true; ready(); };
+  artworkImage.src = "/letter-room/textures/dong-ho-roosters-v5.webp";
   let state = { phase: "dark", progress: 0 },
     frame = 0,
     disposed = false,
@@ -821,6 +826,7 @@ export function createRoom(
   const letterFlat = new T.Quaternion();
   const liftStart = new T.Vector3(),
     liftQuaternion = new T.Quaternion();
+  const envelopeReturn = new T.Vector3(), envelopeReturnQ = new T.Quaternion();
   let suppressClick = false;
   function coordinates(x, y) {
     const r = renderer.domElement.getBoundingClientRect();
@@ -964,7 +970,7 @@ export function createRoom(
     sun.intensity = 0.13 + lit * 0.35;
     bounce.intensity = 0.08 + lit * 0.8;
     light.intensity = lit * 12;
-    shadeMat.emissiveIntensity = lit * 1.1;
+    shadeMat.emissiveIntensity = lit * .72;
     scene.backgroundIntensity = 0.22 + lit * 0.78;
     roomPaint.uniforms.level.value = 0.22 + lit * 0.78;
     rocker.position.y =
@@ -973,18 +979,29 @@ export function createRoom(
         ? 0.022 * Math.sin(clamp((elapsed - 650) / 450) * Math.PI)
         : 0);
     // The camera stays seated; the envelope itself comes to the player.
-    const floatPhases = ["approaching", "ready", "returning", "extracting", "lifting", "reading"];
+    const floatPhases = ["approaching", "ready", "returning", "extracting"];
     const floating = floatPhases.includes(phase);
     const fly = phase === "approaching" ? ease(clamp(elapsed / (reduced ? 1 : 1000))) : floating ? 1 : 0;
-    const front = camera.localToWorld(new T.Vector3(0, -.04, -1.7));
+    const front = camera.localToWorld(new T.Vector3(0, -.42, -2.45));
     const facing = camera.quaternion.clone().multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0), Math.PI/2));
     if (floating) {
       envelope.position.set(.8, 1.75, .35).lerp(front, fly);
       envelope.quaternion.identity().slerp(facing, fly);
+    } else if (["lifting","reading"].includes(phase)) {
+      const back = phase === "reading" ? 1 : ease(clamp(elapsed/(reduced?1:1100)));
+      envelope.position.copy(envelopeReturn).lerp(new T.Vector3(.8,1.75,.35),back);
+      envelope.quaternion.copy(envelopeReturnQ).slerp(new T.Quaternion(),back);
+    } else if (phase === "surpriseEntering") {
+      const back = ease(clamp(elapsed / (reduced ? 1 : 1100)));
+      envelope.position.copy(envelopeReturn).lerp(new T.Vector3(1.15,1.75,-.2),back);
+      envelope.quaternion.copy(envelopeReturnQ).slerp(new T.Quaternion(),back);
+    } else if (["surprise","celebrating","celebrated"].includes(phase)) {
+      envelope.position.set(1.15,1.75,-.2); envelope.quaternion.identity();
     } else {
-      envelope.position.set(.8, 1.75, .35);
-      envelope.quaternion.identity();
+      envelope.position.set(.8, 1.75, .35); envelope.quaternion.identity();
     }
+    const packed = ["surpriseEntering","surprise","celebrating","celebrated"].includes(phase) ? (phase === "surpriseEntering" ? ease(clamp(elapsed/(reduced?1:1100))) : 1) : 0;
+    envelope.scale.setScalar(1-packed*.26);
     envelope.updateMatrixWorld(true);
     dragPlane.setFromNormalAndCoplanarPoint(new T.Vector3(0,1,0).applyQuaternion(envelope.quaternion), envelope.localToWorld(new T.Vector3(0,.034,0)));
     const opening = [
@@ -1005,7 +1022,10 @@ export function createRoom(
         : opening
           ? 1
           : 0;
-    flap.rotation.x = -flapOpen * Math.PI * 0.92;
+    // Fold away from the reader so the extracted sheet passes in front of the lid.
+    // Settle the lid flat when the envelope returns to the tabletop.
+    const restingLid = phase === "lifting" ? ease(clamp(elapsed/(reduced?1:1100))) : ["reading","surpriseEntering","surprise","celebrating","celebrated"].includes(phase) ? 1 : 0;
+    flap.rotation.x = flapOpen * Math.PI * (.92 + restingLid*.08);
     if (phase === "ready") renderedProgress = state.progress;
     else if (phase === "returning")
       renderedProgress = T.MathUtils.lerp(
@@ -1024,7 +1044,7 @@ export function createRoom(
         phase === "ready" && state.progress === 0 && !reduced
           ? Math.sin(clamp(elapsed / 700) * Math.PI) * 0.025
           : 0;
-      letter.position.z = -0.04 - renderedProgress * 1.35 - nudge;
+      letter.position.z = -0.04 - renderedProgress * .9 - nudge;
       const bend = Math.sin(renderedProgress * Math.PI) * 0.065;
       const positions = letter.geometry.attributes.position;
       for (let i = 0; i < positions.count; i++) {
@@ -1058,8 +1078,9 @@ export function createRoom(
         phase === "surpriseEntering"
           ? ease(clamp(elapsed / (reduced ? 1 : 1100)))
           : 1;
-      letter.position.copy(liftStart).lerp(new T.Vector3(0.2, 1.8, 0.7), k);
+      letter.position.copy(liftStart).lerp(new T.Vector3(1.15, 1.79, .1), k);
       letter.quaternion.copy(liftQuaternion).slerp(letterFlat, k);
+      letter.scale.setScalar(1 - k*.28);
       paperSurprise.update({
         phase,
         progress: k,
@@ -1172,6 +1193,7 @@ export function createRoom(
         settleFrom = renderedProgress;
         phaseStart = now;
         if (next.phase === "lifting") {
+          envelopeReturn.copy(envelope.position); envelopeReturnQ.copy(envelope.quaternion);
           envelope.updateMatrixWorld(true);
           scene.attach(letter);
           letterDetached = true;
@@ -1179,6 +1201,7 @@ export function createRoom(
           letter.getWorldQuaternion(liftQuaternion);
         }
         if (next.phase === "surpriseEntering") {
+          envelopeReturn.copy(envelope.position); envelopeReturnQ.copy(envelope.quaternion);
           liftStart.copy(letter.position);
           liftQuaternion.copy(letter.quaternion);
         }
