@@ -894,3 +894,9 @@ Cập nhật PO 2026-11-14 (điều chỉnh D-136): camera POV gần bàn hơn; 
 Kiểm thử độc lập (T-11): 30 test (`src/letters/room-integration.independent.test.jsx`), phát hiện 4 lỗi đã sửa — tái bút không tới người nhận khi có lời nhắn bất ngờ, dialog xem thử không chuyển/trả focus, tên chỉ có khoảng trắng vẫn mở được xem thử; thêm: đổi mẫu hỏi xác nhận khi có bất kỳ dữ liệu bất ngờ, ẩn nút bất ngờ khi chỉ có `photos: []`. Full suite 274 tệp / 4195 đạt, lint + build xanh.
 
 **Còn lại / cần người dùng**: QA trên điện thoại thật (xoay ngang, WebGL, hiệu ứng viết tay); tải video/ảnh trong admin (G-123).
+
+## 2026-11-14 — Phong thư web 2D (D-140, T-107)
+
+**Đã làm**: `src/letter-web/` — trang 2D sạch: bật đèn (ảnh thật 5 mẫu đèn), quầng/chùm/bụi sáng, phong bì vintage theo dịp (viền thư máy bay, tem Đông Hồ, dấu bưu điện, xi chữ cái đầu) trồi lên và mở, thư trồi ra; tiêu đề viết tay + thân thư hiện từng chữ; điều bất ngờ 7 dịp với canvas-confetti, bánh thổi nến. Server thêm `template`/`lamp`; admin chọn kiểu + đèn, xem thử đúng kiểu; `/thu` chọn theo `template`. Demo `/phong-thu/web`. QA bằng Chromium headless ở 1280×800 và 390×844 (ảnh trong scratchpad, không commit). Kiểm thử độc lập (T-11): 30 test (`src/letter-web/web.independent.test.jsx`), sửa 3 lỗi — Esc ở khung bất ngờ đóng luôn khung xem thử admin, focus rơi về `<body>` sau "Xem lại từ đầu"/bật đèn/thổi nến, `themeOf` đọc khoá prototype.
+
+**Còn lại / cần người dùng**: mở proxy cho ui.aceternity.com nếu muốn đối chiếu sát component gốc; QA trên điện thoại thật.

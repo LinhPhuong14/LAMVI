@@ -8944,6 +8944,7 @@ h1 {
   position: fixed;
   inset: 0;
   z-index: 150;
+  overflow: auto;
   background: rgb(0 0 0 / 92%);
 }
 .letter-room-preview-close {

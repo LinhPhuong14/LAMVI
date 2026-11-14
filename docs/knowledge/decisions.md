@@ -550,3 +550,11 @@ Bổ sung D-137: game frame 16:9 letterbox, OrientationGate dùng viewport resiz
 
 ### Phòng thư — cập nhật D-136 (2026-11-13)
 Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác chủ động. Tách CameraRig/LetterReader/PaperSurprise; reducer khóa bước chuyển và kéo 40%. Bì vẫn trên bàn, giấy mới nâng lên; reader mở rộng. Dùng camera-controls MIT và bàn KayKit CC0 qua GLTFLoader, giữ stack/brand/ánh sáng. Không tích hợp bộ surfaceMaterials bị từ chối. Chi tiết triển khai/nguồn/QA: `docs/phong-thu.md`, `docs/art/model-sources.md`, `docs/qa/phong-thu/README.md`. Ghi chú này thay mô tả tự mở thư trước đó, không thay API QR/backend.
+
+### T-107 — Phong thư web 2D (2026-11-14, D-140)
+
+- **Cấu trúc**: `src/letter-web/` độc lập với `src/letter-room/` (Codex đang sửa), cùng API `letter`/`afterLetter`/`preview`/`onExit`. `LetterPage` và `LetterRoomPreview` chọn theo `letter.template` (lazy cả hai). Server `validateLetterContent` thêm `template` (`room`|`web`, mặc định `room`) và `lamp` (5 slug đèn hoặc null) — không cần migration vì `content` là jsonb.
+- **Không thêm framework UI**: Aceternity UI là component copy-paste (Tailwind + framer-motion); repo không dùng Tailwind và trang chặn truy cập từ máy dev, nên tái hiện các ý tưởng (lamp beam, sparkles, text generate) bằng CSS thuần, máy trạng thái bằng `setTimeout` theo phase.
+- **Hiệu ứng dịp**: `canvas-confetti@1.9.4` (ISC, ~4 KB gzip, chunk riêng, `import()` chỉ khi mở điều bất ngờ); mỗi hiệu ứng trả `stop()` (huỷ rAF/interval + `confetti.reset()`) khi đóng khung/rời trang; `disableForReducedMotion` + kiểm `prefers-reduced-motion` trước khi tải.
+- **Phong bì**: CSS thuần (clip-path cho túi/nắp, `repeating-linear-gradient` + mask cho viền thư máy bay, noise SVG cho thớ giấy, nền chấm tròn cho răng cưa tem). Không dùng ảnh phong bì bên ngoài (không lo bản quyền, đổi màu theo dịp bằng biến CSS).
+- **Ảnh đèn**: dùng lại `public/images/lamps/*-cutout.webp` — cùng tệp đang phục vụ trên www.lamvi.com.vn (đã đối chiếu danh sách ảnh của trang chủ), không cần tải lại.

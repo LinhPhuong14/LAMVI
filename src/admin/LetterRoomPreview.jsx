@@ -6,9 +6,10 @@ import { S } from './strings.js'
 const L = S.letters
 // Phòng thư 3D (letter-room) — chỉ tải three.js khi admin bấm xem thử
 const LetterRoom = lazy(() => import('../letter-room/LetterRoom.jsx'))
+const LetterWeb = lazy(() => import('../letter-web/LetterWeb.jsx'))
 
 /**
- * Xem thử phong thư trong đúng template Phòng thư mà người nhận sẽ thấy (bỏ hai video mở đầu).
+ * Xem thử phong thư đúng kiểu trải nghiệm người nhận sẽ thấy — Phòng thư 3D hoặc web 2D (D-140), bỏ hai video mở đầu.
  * Toàn màn hình, gắn vào <body>; Esc / nút × / nút ↻ của phòng đều đóng.
  */
 export default function LetterRoomPreview({ letter, onClose }) {
@@ -16,8 +17,8 @@ export default function LetterRoomPreview({ letter, onClose }) {
   // Mở: đưa focus vào trong dialog (aria-modal)
   useEffect(() => closeRef.current?.focus(), [])
   useEffect(() => {
-    // Esc trong khung video cuối thư chỉ đóng khung video đó
-    const onKey = (e) => e.key === 'Escape' && !document.querySelector('.lt-overlay') && onClose()
+    // Esc trong khung video cuối thư / điều bất ngờ (web 2D) chỉ đóng khung đó
+    const onKey = (e) => e.key === 'Escape' && !document.querySelector('.lt-overlay, .lw-surprise') && onClose()
     window.addEventListener('keydown', onKey)
     const overflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -32,7 +33,11 @@ export default function LetterRoomPreview({ letter, onClose }) {
         ×
       </button>
       <Suspense fallback={<p role="status">…</p>}>
-        <LetterRoom letter={letter} preview onExit={onClose} afterLetter={<LetterExtras />} />
+        {letter.template === 'web' ? (
+          <LetterWeb letter={letter} preview onExit={onClose} afterLetter={<LetterExtras />} />
+        ) : (
+          <LetterRoom letter={letter} preview onExit={onClose} afterLetter={<LetterExtras />} />
+        )}
       </Suspense>
     </div>,
     document.body,

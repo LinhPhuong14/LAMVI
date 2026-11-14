@@ -6,6 +6,7 @@ import PageHead from './PageHead.jsx'
 import QrImage, { CopyLink } from './QrImage.jsx'
 import LetterRoomPreview from './LetterRoomPreview.jsx'
 import { demos, validateLetter } from '../letter-room/data.js'
+import { LAMPS } from '../letter-web/themes.js'
 import { OCCASIONS, OCCASION_LABELS, paragraphsOf } from '../letters/occasions.js'
 import { S } from './strings.js'
 
@@ -14,6 +15,8 @@ const EMPTY = {
   recipientName: '',
   senderName: '',
   occasion: 'justBecause',
+  template: 'room',
+  lamp: '',
   kind: 'text',
   message: '',
   videoUrl: '',
@@ -33,6 +36,8 @@ function toForm(c) {
     recipientName: c.recipientName ?? '',
     senderName: c.senderName ?? '',
     occasion: c.occasion ?? 'justBecause',
+    template: c.template === 'web' ? 'web' : 'room',
+    lamp: c.lamp ?? '',
     kind: c.kind ?? 'text',
     message: paragraphsOf(c.message).join('\n\n'),
     videoUrl: c.videoUrl ?? '',
@@ -60,6 +65,8 @@ function toContent(f) {
     recipientName: f.recipientName,
     senderName: f.senderName,
     occasion: f.occasion,
+    template: f.template,
+    lamp: f.template === 'web' && f.lamp ? f.lamp : null,
     kind: f.kind,
     message: f.message,
     postscript: f.postscript,
@@ -133,7 +140,7 @@ export default function LetterEditorPage() {
     const hasContent = form.message.trim() || Object.values(form.od).some((v) => v.trim())
     if (hasContent && !window.confirm(L.templateConfirm)) return
     setForm((f) => ({
-      ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName }),
+      ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName, template: f.template, lamp: f.lamp }),
       videoUrl: f.videoUrl,
       posterUrl: f.posterUrl,
       captionsUrl: f.captionsUrl,
@@ -218,6 +225,20 @@ export default function LetterEditorPage() {
               {L.status}: <strong>{L.statuses[letter?.status ?? 'none']}</strong>
               {published && ` · ${letter.openedAt ? L.opened : L.notOpened}`}
             </p>
+            <Field label={L.experience} as="select" value={form.template} onChange={set('template')} hint={L.experienceHint}>
+              <option value="room">{L.experiences.room}</option>
+              <option value="web">{L.experiences.web}</option>
+            </Field>
+            {form.template === 'web' && (
+              <Field label={L.lamp} as="select" value={form.lamp} onChange={set('lamp')}>
+                <option value="">{L.lampDefault}</option>
+                {Object.entries(LAMPS).map(([slug, name]) => (
+                  <option key={slug} value={slug}>
+                    {name}
+                  </option>
+                ))}
+              </Field>
+            )}
             <Field label={L.template} as="select" value="" onChange={applyTemplate} hint={L.templateHint}>
               <option value="">{L.templatePick}</option>
               {OCCASIONS.map((o) => (

@@ -16,6 +16,7 @@ import ContactPage from './pages/ContactPage'
 import CollectionPage from './pages/CollectionPage'
 import ShopPage from './pages/ShopPage'
 import LetterRoomRoute from './letter-room/LetterRoomRoute'
+import LetterWebRoute from './letter-web/LetterWebRoute.jsx'
 const WelcomePage = lazy(() => import('./pages/WelcomePage'))
 const CartPage = lazy(() => import('./pages/CartPage'))
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
@@ -80,6 +81,8 @@ export default function AppRoutes() {
       <Route path="/thu/:slug" element={<LocaleProvider lang="vi"><RouteLoader><LetterPage /></RouteLoader></LocaleProvider>} />
       {/* D-136: Phòng thư LAMVI (letter-room) — bản demo bảy lời chúc mẫu */}
       <Route path="/phong-thu" element={<LetterRoomRoute />} />
+      {/* D-140: phong thư bản web 2D — demo bảy lời chúc mẫu */}
+      <Route path="/phong-thu/web" element={<LetterWebRoute />} />
       {/* D-51: dashboard IT */}
       <Route path="/it" element={<ProtectedRoute><RouteLoader><ItDashboard /></RouteLoader></ProtectedRoute>} />
       {/* D-48: admin chỉ tiếng Việt */}

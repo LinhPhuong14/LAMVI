@@ -1,5 +1,15 @@
 # Tiến độ tính năng
 
+## 2026-11-14 — Phong thư web 2D (feat/phong-thu-web, D-140, T-107)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Bản web 2D: bật đèn → phong bì vintage trồi lên → thư trồi ra → đọc | ✅ | `src/letter-web/LetterWeb.jsx`, `Envelope.jsx`, `web.css` | Đối chiếu Aceternity UI khi có proxy |
+| Hiệu ứng 7 dịp (canvas-confetti) + bánh thổi nến | ✅ | `src/letter-web/effects.js`, `Surprise.jsx` | QA trên điện thoại thật |
+| Admin chọn kiểu + đèn, xem thử đúng kiểu; `/thu` chọn theo `template` | ✅ | `src/admin/LetterEditorPage.jsx`, `src/pages/LetterPage.jsx`, `server/domain/letter.js` | — |
+| Demo `/phong-thu/web` | ✅ | `src/letter-web/LetterWebRoute.jsx` | — |
+| Test | ✅ | `src/letter-web/LetterWeb.test.jsx` + kiểm thử độc lập (T-11) | — |
+
 ## 2026-11-14 — Phòng thư 3D vào web + mẫu/xem thử admin (feat/phong-thu-room, D-139)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |

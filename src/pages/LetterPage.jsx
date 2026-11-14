@@ -9,6 +9,8 @@ import { useI18n } from '../i18n/index.js'
 
 // Phòng thư 3D (letter-room, D-136/D-137) — chỉ tải three.js sau khi xem xong hai video mở đầu
 const LetterRoom = lazy(() => import('../letter-room/LetterRoom.jsx'))
+// Bản web 2D (D-140) — chọn theo `template` admin đặt cho từng thư; thư cũ không có trường này dùng Phòng thư 3D
+const LetterWeb = lazy(() => import('../letter-web/LetterWeb.jsx'))
 
 // D-138: trang phong thư của người nhận (/thu/<slug> trên domain chính). Token nằm sau dấu # (không
 // vào log server/Referer) và chỉ gửi trong body POST. Sai/không có token → cùng một màn "không tìm thấy".
@@ -60,7 +62,11 @@ export default function LetterPage() {
           }
         >
           {/* Căn phòng: bật đèn → phong bì → thư (tiêu đề viết tay) → hai nút xem lại cuối thư */}
-          <LetterRoom letter={state.letter} afterLetter={<LetterExtras />} />
+          {state.letter.template === 'web' ? (
+            <LetterWeb letter={state.letter} afterLetter={<LetterExtras />} />
+          ) : (
+            <LetterRoom letter={state.letter} afterLetter={<LetterExtras />} />
+          )}
         </Suspense>
       ) : (
         <main className="lt-status" role={state.status === 'loading' ? 'status' : undefined} aria-busy={state.status === 'loading'}>

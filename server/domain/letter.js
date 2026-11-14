@@ -6,6 +6,10 @@ import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 export const OCCASIONS = ['birthday', 'anniversary', 'thankYou', 'milestone', 'encouragement', 'longDistance', 'justBecause']
 export const LETTER_KINDS = ['text', 'video']
 export const LETTER_STATUSES = ['draft', 'published']
+// D-140: hai kiểu trải nghiệm — Phòng thư 3D (`room`, mặc định) hoặc web 2D (`web`)
+export const LETTER_TEMPLATES = ['room', 'web']
+// Ảnh đèn trong bản web 2D: 5 mẫu đèn LAMVI (public/images/lamps/<slug>-cutout.webp)
+export const LETTER_LAMPS = ['tu-linh', 'thu-hoach', 'phuc-loc-song-toan', 'tam-duong-khai-thai', 'lon-dan']
 
 // Giới hạn độ dài [ASSUMPTION] — đủ cho một lá thư tay, chặn dữ liệu rác làm nặng trang
 export const LIMITS = { name: 60, paragraph: 1200, paragraphs: 12, message: 6000, postscript: 400, short: 300, label: 60, places: 4, photos: 2 }
@@ -59,6 +63,9 @@ export function validateLetterContent(input) {
 
   value.occasion = OCCASIONS.includes(src.occasion) ? src.occasion : null
   if (!value.occasion) errors.occasion = 'INVALID'
+  // Thiếu/lạ → mặc định (thư soạn trước D-140 vẫn mở bằng Phòng thư 3D)
+  value.template = LETTER_TEMPLATES.includes(src.template) ? src.template : 'room'
+  value.lamp = LETTER_LAMPS.includes(src.lamp) ? src.lamp : null
   value.kind = LETTER_KINDS.includes(src.kind) ? src.kind : null
   if (!value.kind) errors.kind = 'INVALID'
 
