@@ -29,7 +29,10 @@ describe('independent orientation lifecycle', () => {
     vi.useFakeTimers()
     dimensions(360, 800)
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener() {}, removeEventListener() {} })))
-    scene.createRoom.mockReset().mockImplementation(() => ({ setState: scene.setState, dispose: scene.dispose, paperRect: () => null }))
+    scene.createRoom.mockReset().mockImplementation((_host, options) => {
+      options.onReady()
+      return { setState: scene.setState, dispose: scene.dispose, paperRect: () => null }
+    })
     scene.setState.mockClear()
     scene.dispose.mockClear()
   })
@@ -51,7 +54,7 @@ describe('independent orientation lifecycle', () => {
     expect(screen.queryByRole('button', { name: /Chạm để bật đèn/ })).not.toBeInTheDocument()
     expect(phase(container)).toBe('dark')
     await rotate(true)
-    await vi.dynamicImportSettled()
+    await act(async () => { await vi.dynamicImportSettled() })
     expect(scene.imports).toBe(1)
     expect(scene.createRoom).toHaveBeenCalledTimes(1)
     expect(viewport).not.toHaveAttribute('inert')
@@ -71,7 +74,7 @@ describe('independent orientation lifecycle', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: reduced, addEventListener() {}, removeEventListener() {} })))
     const { container } = mount()
     await rotate(true)
-    await vi.dynamicImportSettled()
+    await act(async () => { await vi.dynamicImportSettled() })
     fireEvent.click(screen.getByRole('button', { name: /Chạm để bật đèn/ }))
     const duration = reduced ? 25 : 1800
     await advance(reduced ? 10 : 400)

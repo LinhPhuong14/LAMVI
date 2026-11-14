@@ -873,3 +873,6 @@ Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt 
 Đã có năm vòng reviewer UI khó tính dựa trên ảnh thực tế và sửa giữa các vòng. Xem `docs/qa/phong-thu/v5/README.md`, báo cáo từng vòng, frame có timestamp, clip và proof timing để phân biệt phần đã kiểm với giới hạn SwiftShader.
 
 Bàn giao vòng này: 5 báo cáo UI review có ảnh thật; sau audit cuối đã xử lý P1 về biên/độ đục giấy và glyph, bổ sung clip decode + trace CSS. Full suite 4084 pass/2 skip; focused cuối 126 pass; lint/build đạt. Source/title/timingproof trong docs/qa/phong-thu/v5. Phiên khác đã ghép c5316e5 vào master ef4539d trong lúc làm; bản title trung tâm mới ở feat/phong-thu, chưa giải quyết conflict master trong phiên này.
+
+
+Cập nhật PO 2026-11-14 (font title và khởi động): title mọi tên chuyển sang font Dancing Script 400 self-host (Latin + Vietnamese, OFL), reveal bằng mask CSS, giữ center → dock → body và transition guard; bỏ đường nét SVG riêng Linh. Chặn toàn bộ scene/controls bằng visibility + inert + aria-busy khi chưa sẵn sàng; placeholder SSR và loader cùng nền đen. Chờ nền, model, artwork, sáu PBR maps và font; engine chỉ báo ready sau render frame hoàn chỉnh đầu tiên. Đã bỏ opacity !important khiến canvas hiện sớm. QA cố tình giữ request nền: sân khấu vẫn hidden/inert tới lúc tải xong; ảnh và result.json tại docs/qa/phong-thu/font-loading/.

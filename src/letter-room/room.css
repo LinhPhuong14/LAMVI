@@ -454,7 +454,7 @@
 }
 .lr-pov .lr-stage {
   inset: 0;
-  opacity: 1 !important;
+  opacity: 1;
   animation: lr-room-in 1.4s ease both;
 }
 .lr-pov .lr-stage canvas {
@@ -1793,7 +1793,7 @@
 /* Scroll cue lives below the paper, never over glyphs or action buttons. */
 .lr-reader-scroll-cue {position:fixed;left:50%;bottom:2%;transform:translateX(-50%);margin:0;padding:2px 10px;font-size:9px;background:#f4e8cfeb;}
 @media(max-height:300px){
- .lr-reader .lr-title-ink.is-docked {top:8px;left:16px;width:105px;}
+ .lr-reader .lr-title-ink.is-docked {top:8px;left:16px;width:max-content;font-size:24px;}
  .lr-reader .lr-letter-meta {display:none;}
  .lr-reader:has(.lr-title-ink) .lr-letter-content {margin-top:42px!important;}
  .lr-game .lr-reader {padding:8px 16px 20px!important;}
@@ -1804,9 +1804,14 @@
  .lr-reader .lr-wishes-quote {font-size:16px;line-height:1.35;margin-bottom:4px;}
  .lr-reader .lr-wishes-count {font-size:10px;line-height:1.2;margin-bottom:4px;}
  .lr-reader .lr-wishes-next {min-height:44px;font-size:12px;padding:6px 10px;}
- .lr-reader .lr-title-dynamic {font-size:20px;}
+ .lr-reader .lr-title-dynamic {font-size:inherit;}
 }
 /* Final audit: reveal complete words with even ink opacity, never slice accents. */
 .lr-reader .lr-body-ink-word {clip-path:none;animation:lr-body-word-fade .22s ease-out var(--word-delay,0s) both;}
 @keyframes lr-body-word-fade {from{opacity:0;}to{opacity:1;}}
 @media(prefers-reduced-motion:reduce){.lr-reader .lr-body-ink-word{animation:none;opacity:1;}}
+
+/* No scene, object cues, or old backdrop may paint before the final frame. */
+.lr-page.lr-pov:not(.lr-scene-ready) {background:#000;}
+.lr-page:not(.lr-scene-ready) .lr-stage-wrap {visibility:hidden;opacity:0;pointer-events:none;}
+.lr-loading-screen {position:absolute;inset:0;z-index:100;display:grid;place-items:center;background:#000;color:#f4e8cf;font:12px/1.6 "Be Vietnam Pro",sans-serif;}

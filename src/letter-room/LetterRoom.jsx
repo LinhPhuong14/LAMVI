@@ -173,6 +173,7 @@ function Room({
   const [state, dispatch] = useReducer(roomReducer, initialState),
     [failed, setFailed] = useState(fallback),
     [sceneReady, setSceneReady] = useState(fallback),
+    [fontsReady, setFontsReady] = useState(() => typeof document === "undefined" || !document.fonts?.load),
     [view, setView] = useState({ stable: true, anchors: {} }),
     [size, setSize] = useState({ width: 960, height: 540 }),
     [idlePhase, setIdlePhase] = useState(null),
@@ -229,6 +230,12 @@ function Room({
       typeof ResizeObserver === "function" ? new ResizeObserver(resize) : null;
     if (host.current) ro?.observe(host.current);
     return () => ro?.disconnect();
+  }, []);
+  useEffect(() => {
+    if (!document.fonts?.load) return;
+    let mounted = true;
+    document.fonts.load('400 48px "Dancing Script"', 'Gửi Linh Ánh').catch(() => []).then(() => {if (mounted) setFontsReady(true);});
+    return () => { mounted = false; };
   }, []);
   useEffect(() => {
     reduced.current = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -381,10 +388,11 @@ function Room({
         }[name],
     };
   const idle = active && idlePhase === state.phase;
+  const visibleReady = sceneReady && fontsReady;
   const cueProps = {
     width: size.width,
     height: size.height,
-    disabled: !failed && !view.stable,
+    disabled: !visibleReady || (!failed && !view.stable),
     idle,
   };
   const cue =
@@ -436,12 +444,14 @@ function Room({
   }
   return (
     <main
-      className={`lr-page lr-pov lr-game ${sceneReady ? "lr-scene-ready" : ""} ${state.phase === "dark" ? "lr-dark" : "lr-lit"} ${state.phase === "reading" ? "lr-reading" : ""} lr-phase-${state.phase}`}
+      className={`lr-page lr-pov lr-game ${visibleReady ? "lr-scene-ready" : ""} ${state.phase === "dark" ? "lr-dark" : "lr-lit"} ${state.phase === "reading" ? "lr-reading" : ""} lr-phase-${state.phase}`}
+      aria-busy={!visibleReady}
       data-phase={state.phase}
       data-camera={shotForPhase(state.phase, letter.occasion)}
     >
       <h1 className="lr-sr-only">Phòng thư LAMVI</h1>
-      <div className="lr-stage-wrap">
+      {!visibleReady && <div className="lr-loading-screen" role="status">Đang chuẩn bị phòng thư…</div>}
+      <div className="lr-stage-wrap" inert={!visibleReady} aria-hidden={!visibleReady}>
         <div
           className="lr-stage"
           ref={host}

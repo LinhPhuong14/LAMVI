@@ -620,9 +620,12 @@ export function createRoom(
   box(0.08, 0.15, 6.1, wood, -2.7, 0.08, 0.4, architecture);
   let backgroundSettled = false,
     modelSettled = legacyAssets,
-    artworkSettled = false;
+    artworkSettled = false,
+    pendingMaps = 0,
+    assetsReady = false,
+    readyNotified = false;
   const ready = () => {
-    if (backgroundSettled && modelSettled && artworkSettled && !disposed) onReady?.();
+    if (backgroundSettled && modelSettled && artworkSettled && pendingMaps === 0 && !disposed) { assetsReady = true; invalidate(); }
   };
   if (!legacyAssets)
     new GLTFLoader().load(
@@ -681,6 +684,8 @@ export function createRoom(
     );
   const loader = new T.TextureLoader();
   function loadMap(file, apply, color = false) {
+    pendingMaps++;
+    const settled = () => {pendingMaps--;ready();};
     const map = loader.load(
       `/letter-room/textures/${file}.webp`,
       (loaded) => {
@@ -694,10 +699,11 @@ export function createRoom(
           renderer.capabilities.getMaxAnisotropy(),
         );
         apply(loaded);
+        settled();
         invalidate();
       },
       undefined,
-      () => {},
+      settled,
     );
     textures.push(map);
   }
@@ -1118,6 +1124,7 @@ export function createRoom(
     )
       renderer.shadowMap.needsUpdate = true;
     renderer.render(scene, camera);
+    if (assetsReady && !readyNotified) {readyNotified = true;onReady?.();}
     const view = {
       shot: rig.shot,
       stable: rig.settled(now),
