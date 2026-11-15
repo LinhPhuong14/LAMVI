@@ -985,3 +985,5 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 **Đã làm**: bỏ màn giới thiệu (mở QR vào đèn luôn); tuỳ chọn thư doanh nghiệp: admin bật, nhập tên + tải logo; người nhận thấy LAMVI × logo, logo trên xi phong bì, đầu tờ thư, chữ ký doanh nghiệp. Demo `/phong-thu?business=1`. Gộp master có ảnh đèn catalog (T-111, D-151/T-112 của phiên cloud) — mã của nhánh đổi thành D-153, D-154, T-113.
 
 **Còn lại / cần người dùng**: thử tải logo thật trên Production (bucket `product-images`); Phòng thư 3D chưa hiện logo.
+
+**Cập nhật 2026-11-15 (D-155)**: tờ thư tự cuộn theo dòng chữ đang hiện (đo `scrollTop` tăng dần ở 667×375, 390×700; tự cuộn dừng khi người dùng cuộn tay).

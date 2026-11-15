@@ -125,6 +125,51 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
     return () => clearTimeout(t)
   }, [titleDone, revealAll, total])
 
+  // D-155: tờ thư tự cuộn theo dòng chữ đang hiện ra (handwriting reveal) để người nhận không phải tự kéo.
+  // Người nhận tự cuộn/chạm/bấm phím trong tờ thư → dừng tự cuộn (tôn trọng thao tác của họ).
+  useEffect(() => {
+    if (!titleDone || revealAll || reduced || letter.kind !== 'text') return
+    const box = readerRef.current
+    if (!box) return
+    let manual = false
+    const stop = () => {
+      manual = true
+    }
+    box.addEventListener('wheel', stop, { passive: true })
+    box.addEventListener('touchmove', stop, { passive: true })
+    box.addEventListener('keydown', stop)
+    const start = performance.now()
+    const id = setInterval(() => {
+      if (manual) return
+      const elapsed = (performance.now() - start) / 1000
+      // chữ cuối cùng đã bắt đầu viết
+      let lo = 0
+      let hi = timing.length - 1
+      let idx = -1
+      while (lo <= hi) {
+        const mid = (lo + hi) >> 1
+        if (timing[mid].delay <= elapsed) {
+          idx = mid
+          lo = mid + 1
+        } else hi = mid - 1
+      }
+      if (idx < 0) return
+      const word = box.querySelector(`.lw-word[data-i="${idx}"]`)
+      if (!word) return
+      const wr = word.getBoundingClientRect()
+      const br = box.getBoundingClientRect()
+      // Giữ dòng đang viết ở khoảng 60% chiều cao khung; chỉ cuộn xuống
+      const target = box.scrollTop + (wr.bottom - br.top) - box.clientHeight * 0.6
+      if (target > box.scrollTop + 4) box.scrollTo({ top: target, behavior: 'smooth' })
+    }, 250)
+    return () => {
+      clearInterval(id)
+      box.removeEventListener('wheel', stop)
+      box.removeEventListener('touchmove', stop)
+      box.removeEventListener('keydown', stop)
+    }
+  }, [titleDone, revealAll, reduced, letter.kind, timing])
+
   // Nút bị gỡ sau khi bấm → đưa focus tới chỗ hợp lý để người dùng bàn phím không bị rơi về <body>
   const light = () => {
     if (phase !== 'dark') return
@@ -277,7 +322,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
                       <span className="lw-sr-only">{p.text}</span>
                       <span aria-hidden="true">
                         {p.words.map(({ w, i }) => (
-                          <span key={i} className="lw-word" style={{ animationDelay: `${timing[i].delay.toFixed(2)}s`, animationDuration: `${timing[i].dur.toFixed(2)}s` }}>
+                          <span key={i} data-i={i} className="lw-word" style={{ animationDelay: `${timing[i].delay.toFixed(2)}s`, animationDuration: `${timing[i].dur.toFixed(2)}s` }}>
                             {w}{' '}
                           </span>
                         ))}

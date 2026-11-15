@@ -615,3 +615,7 @@ Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt 
 - **Tải logo**: `POST /admin/letters/logo-upload` (signed upload URL, bucket công khai `product-images`, tiền tố `letter-logos/`, PNG/JPG/WebP ≤ 2 MB — không SVG) → `POST /admin/letters/logo` kiểm object thật (tồn tại, kích thước, kiểu) rồi trả URL công khai. `lettersRouter` nhận thêm `storage`.
 - **Hiển thị (web 2D)**: `.lw-cobrand` (LAMVI × logo), `Envelope` prop `business` (logo trên xi `.has-logo`, tên `.lw-env-from`), `.lw-letterhead`, chữ ký. CSP `img-src` chỉ có `'self'` + Supabase nên logo ngoài domain có thể bị chặn — UI khuyên tải lên. Logo là ảnh doanh nghiệp, không phải đèn — quy tắc ảnh đèn catalog (D-151, T-112) giữ nguyên.
 - Test: `src/letters/business.test.jsx`, `server/letters.logo.test.js`.
+
+### T-114 — Tờ thư tự cuộn theo chữ đang hiện (2026-11-15, D-155)
+
+- `LetterWeb`: trong lúc handwriting reveal (sau tiêu đề, trước `revealAll`, không giảm chuyển động), mỗi 250 ms tìm chữ cuối đã tới giờ viết (tìm nhị phân trên `timing[].delay`, chữ có `data-i`), nếu chữ nằm dưới 60% khung thì `scrollTo({ behavior: 'smooth' })` chỉ theo chiều xuống. `wheel`/`touchmove`/`keydown` trong tờ thư → dừng (không giành quyền cuộn với người nhận). Test `src/letter-web/autoscroll.test.jsx`.

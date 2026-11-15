@@ -8,6 +8,7 @@
 | Lời mời "Hãy cùng thắp sáng chiếc đèn của bạn" | ✅ | `src/letter-web/LetterWeb.jsx`, `web.css` | — |
 | Đồng bộ font, sửa tiêu đề video vô hình | ✅ | `src/letters/letters.css` | — |
 | Màn "Cùng xem cách chiếc đèn được làm ra nhé", video toàn màn hình tự phát + nối tiếp (D-145) | ✅ | `src/letters/IntroFilms.jsx` | QA iPhone/Android thật |
+| Tờ thư tự cuộn theo chữ đang hiện (D-155) | ✅ | `src/letter-web/LetterWeb.jsx` | QA máy thật |
 | Vào đèn luôn (D-153); thư doanh nghiệp có logo (D-154) | ✅ | `src/letter-web/*`, `src/admin/LetterEditorPage.jsx`, `server/routes/letters.js` | Thử tải logo trên Production |
 | Tắt video mở đầu + nút video cuối thư, cho xem dọc (D-150) | ✅ | `src/letters/films.js` (`LETTER_FLOW`), `src/pages/LetterPage.jsx` | — |
 | Mọi pha vừa một màn hình, tờ thư cuộn trong khung (D-149) | ✅ | `src/letter-web/web.css`, `LetterWeb.jsx`, `src/letters/letters.css` | QA máy thật |
