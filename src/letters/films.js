@@ -24,3 +24,21 @@ export function markIntroSeen(slug) {
     /* chế độ riêng tư/chặn storage: bỏ qua */
   }
 }
+
+// D-148: đánh dấu THIẾT BỊ đã từng quét QR phong thư LAMVI (bất kỳ thư nào) → các lần quét sau được
+// "Bỏ qua" video giới thiệu ngay từ đầu. Đặt ngay khi mở thư thành công (không cần xem hết video).
+const DEVICE_KEY = 'lv.letter.device'
+export function deviceScanned() {
+  try {
+    return localStorage.getItem(DEVICE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+export function markDeviceScanned() {
+  try {
+    localStorage.setItem(DEVICE_KEY, '1')
+  } catch {
+    /* chế độ riêng tư/chặn storage: bỏ qua */
+  }
+}

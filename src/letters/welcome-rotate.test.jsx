@@ -35,6 +35,8 @@ describe('D-145: màn chào trước video', () => {
     const onDone = vi.fn()
     render(<IntroFilms onDone={onDone} />)
     fireEvent.click(screen.getByRole('button', { name: /Bắt đầu xem/ }))
+    // Video đầu không có dòng gợi ý
+    expect(document.querySelector('.lt-intro-hint')).toBeNull()
     expect(fs).toHaveBeenCalledTimes(1)
     expect(play).toHaveBeenCalledTimes(1)
     expect(document.querySelector('.lt-intro').classList.contains('is-playing')).toBe(true)

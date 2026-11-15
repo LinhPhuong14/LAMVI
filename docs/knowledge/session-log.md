@@ -960,3 +960,6 @@ Kiểm thử độc lập (T-11) cho D-144: `src/letters/interlude.independent.t
 **Cập nhật cùng ngày (D-147)**: tên người nhận/người gửi tuỳ chọn — server chỉ còn giới hạn độ dài; web 2D hiện "Gửi bạn," / chữ ký "Thương mến,"; Phòng thư 3D nhận chữ thay thế; test `src/letters/names.test.jsx`. Merge master (minh hoạ dịp của Codex, D-143) vào nhánh, đổi mã quyết định của nhánh thành D-144…D-147.
 
 Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an toàn); đã hợp nhất thêm D-144…D-147, không force push. Bản mới nhất lint/build đạt và 453 kiểm thử vùng bị ảnh hưởng đạt; test độc lập tên rỗng D147 đạt. Hồi quy đầy đủ 4370 pass/2 skip là trên head trước a33, không báo sai là full trên head cuối. Giữ nguyên mọi màn chào/video/RotateGate/names fallback.
+**Cập nhật 2026-11-15 (D-145)**: bỏ dòng gợi ý "Hết video này sẽ tự chuyển sang video tiếp theo." ở video đầu (người dùng yêu cầu); video cuối vẫn nhắc "Xem hết video để bước vào căn phòng…", video lỗi vẫn báo lỗi.
+
+**Cập nhật 2026-11-15 (D-148)**: dấu "thiết bị đã quét" → lần quét sau có "Bỏ qua" video; bố cục ngang hai cột cho web 2D (kiểm ảnh 844×390, 667×375: tối, phong bì, đọc thư — cột đèn sticky, thẻ bất ngờ); test `src/letters/device-skip.test.jsx`. Theo yêu cầu người dùng không chờ full suite: chạy lint, build và các test phong thư/admin.
