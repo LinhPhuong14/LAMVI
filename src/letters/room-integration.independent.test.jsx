@@ -109,7 +109,7 @@ describe('Trang /thu/:slug → video mở đầu → Phòng thư', () => {
     expect(v.hasAttribute('poster')).toBe(false)
     expect(v.querySelector('track')).toBeNull()
     fireEvent.error(v)
-    expect(within(article).getByRole('status').textContent).toMatch(/Video chưa tải được/)
+    expect(within(article).getByText(/Video chưa tải được/)).toHaveAttribute('role', 'status')
   })
 
   it('tên chứa HTML hiển thị dạng chữ (không XSS)', async () => {
@@ -182,38 +182,49 @@ describe('LetterReader: tiêu đề viết tay giữ nội dung đến khi viế
   const letter = validateLetter({ recipientName: 'Linh', senderName: 'An', occasion: 'birthday', kind: 'text', message: ['Thân.'], occasionData: null })
   beforeEach(() => stubReduced(false))
 
-  it('ẩn (inert + aria-hidden) tới animationend "lt-hw-fill"; animation khác không mở', () => {
+  const advanceTitle = async ms => {
+    for (let remaining = ms; remaining > 0; remaining -= 80)
+      await act(async () => { await vi.advanceTimersByTimeAsync(Math.min(80, remaining)) })
+  }
+  it('font title keeps body inert until the real docking transition finishes', async () => {
     vi.useFakeTimers()
+    vi.spyOn(performance, 'now').mockImplementation(() => Date.now())
     const { container } = render(<LetterReader letter={letter} />)
     const body = container.querySelector('.lr-letter-content')
-    expect(body.getAttribute('aria-hidden')).toBe('true')
+    const title = screen.getByRole('heading', { name: 'Gửi Linh,' })
+    expect(title.querySelector('svg')).toBeNull()
+    expect(title.querySelector('.lr-title-dynamic')).toBeTruthy()
+    class CSSTransition { constructor() { this.playState = 'running' } }
+    const transition = new CSSTransition()
+    title.getAnimations = () => [transition]
+    fireEvent.transitionEnd(title, { propertyName: 'transform' })
     expect(body.hasAttribute('inert')).toBe(true)
-    const text = container.querySelector('.lt-hw-text')
-    act(() => text.dispatchEvent(Object.assign(new Event('animationend'), { animationName: 'lt-hw-stroke' })))
+    await advanceTitle(5600)
     expect(body.getAttribute('aria-hidden')).toBe('true')
-    act(() => text.dispatchEvent(Object.assign(new Event('animationend'), { animationName: 'lt-hw-fill' })))
+    transition.playState = 'finished'
+    fireEvent.transitionEnd(title, { propertyName: 'transform' })
     expect(body.getAttribute('aria-hidden')).toBe('false')
     expect(body.hasAttribute('inert')).toBe(false)
     expect(body.className).toContain('visible')
   })
-
-  it('không có animationend → tự hiện sau duration + 0,8 s (không kẹt mãi)', () => {
+  it('without a running transition the title clock opens body at 5600ms', async () => {
     vi.useFakeTimers()
+    vi.spyOn(performance, 'now').mockImplementation(() => Date.now())
     const { container } = render(<LetterReader letter={letter} />)
     const body = container.querySelector('.lr-letter-content')
-    // "Gửi Linh," = 9 ký tự → duration 1,4 s → hạn chót 2,2 s
-    act(() => vi.advanceTimersByTime(2100))
+    await advanceTitle(5440)
     expect(body.getAttribute('aria-hidden')).toBe('true')
-    act(() => vi.advanceTimersByTime(200))
+    await advanceTitle(160)
     expect(body.getAttribute('aria-hidden')).toBe('false')
   })
-
-  it('tên rất dài → hạn chót tối đa 4,8 s', () => {
+  it('long font names retain the same bounded title clock', async () => {
     vi.useFakeTimers()
+    vi.spyOn(performance, 'now').mockImplementation(() => Date.now())
     const { container } = render(<LetterReader letter={{ ...letter, recipientName: 'N'.repeat(60) }} />)
-    act(() => vi.advanceTimersByTime(4850))
+    await advanceTitle(5600)
     expect(container.querySelector('.lr-letter-content').getAttribute('aria-hidden')).toBe('false')
   })
+
 })
 
 describe('Admin: mẫu lời chúc Phòng thư + xem thử', () => {

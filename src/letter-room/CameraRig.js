@@ -43,8 +43,8 @@ export const CAMERA_SHOTS = Object.freeze({
     fov: 47,
   },
   reverse: {
-    eye: [1.45, 2.65, -1.15],
-    target: [0.05, 1.9, 0.02],
+    eye: [1.5, 3, 3],
+    target: [0, 2.25, -.05],
     up: [0, 1, 0],
     ortho: 0,
     fov: 52,
