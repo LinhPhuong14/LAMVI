@@ -113,6 +113,19 @@
   font-size: 0.8em;
 }
 
+/* D-149: màn chào vừa đúng một màn hình (video nạp sẵn phía dưới không làm trang cuộn) */
+.lt-intro:not(.is-playing) {
+  height: 100svh;
+  min-height: 0;
+  overflow: hidden;
+}
+.lt-interlude,
+.lt-rotate {
+  height: 100svh;
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* Đang phát: phủ kín màn hình (kể cả khi trình duyệt không cho Fullscreen API, vd iPhone) */
 .lt-intro.is-playing {
   position: fixed;

@@ -60,7 +60,7 @@ export default function RotateGate({ children }) {
             Vui lòng xoay ngang điện thoại
             <span className="lt-rotate-hand">để trải nghiệm phong thư tốt nhất</span>
           </h1>
-          <p className="lt-rotate-sub">Phong thư chỉ mở khi điện thoại nằm ngang. Nếu màn hình không xoay, hãy tắt khoá xoay màn hình.</p>
+          <p className="lt-rotate-sub">Nếu màn hình không xoay, hãy tắt khoá xoay màn hình.</p>
         </section>
       )}
     </>
