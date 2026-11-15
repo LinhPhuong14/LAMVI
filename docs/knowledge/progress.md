@@ -336,3 +336,7 @@ Cập nhật PO 2026-11-14 (font title và khởi động): title mọi tên chu
 
 ## 2026-11-15 — Hợp nhất Phòng thư theo xác nhận PO
 PO cho phép xử lý conflict và merge `feat/phong-thu` vào master. Giữ title font Dancing Script, ready gate/black loading, artwork gen và LAMVI quotes mới; giữ postscript ở reader/cảnh cuối, điều kiện dữ liệu bất ngờ thật từ master. Không đổi mặc định web 2D hoặc `/phong-thu/3d`, API/template/lamp, intro films, afterLetter và phong thư lẻ. Cập nhật dependency giữ Patrick Hand và canvas-confetti; không đổi deploy/schema. Xác minh tại docs/qa/phong-thu/merge-master/.
+
+### Minh hoạ theo dịp — D-143 (2026-11-15)
+
+Đã ghép bộ 7 tranh gốc AI chất giấy dó/gouache vào thiệp bất ngờ web 2D. Bánh kem hoa mơ với nến CSS thổi tắt được; các dịp còn lại có hình riêng, giữ nội dung cá nhân. WebP 480/960, ảnh 15–21 KB ở bản nhỏ, chỉ tải khi mở thiệp, có alt và khung cố định. Nguồn/prompt: `public/images/occasions/`. QA: 21 lượt reduced motion trên desktop/360/320 + sinh nhật motion mặc định 390 px; T-11 12/12, bộ phong thư cũ 91/91. Lint + client/SSR build đạt. Full regression: 4.330 đạt, 2 skipped; 1 ca đổi ngôn ngữ lỗi do assertion đọc DOM trong lúc chuyển trang. Đã sửa test chờ đúng nội dung (không đổi routing sản phẩm), review độc lập xác nhận giữ nguyên kỳ vọng; rerun toàn tệp Routing.extra đạt 26/26, không còn ca lỗi chưa xử lý.
