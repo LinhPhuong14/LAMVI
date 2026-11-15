@@ -9,6 +9,10 @@ import LetterReader from '../letter-room/LetterReader.jsx'
 import { validateLetter, demos, occasions } from '../letter-room/data.js'
 import { validateLetterContent, OCCASIONS } from '../../server/domain/letter.js'
 
+// D-150 tắt video mở đầu/nút video cuối thư/yêu cầu xoay ngang theo mặc định; test này kiểm luồng cũ (D-138…D-148)
+// nên bật lại cờ để giữ độ phủ khi cần mở lại
+vi.mock('./films.js', async (importOriginal) => ({ ...(await importOriginal()), LETTER_FLOW: { introFilms: true, extras: true, requireLandscape: true } }))
+
 const TOKEN = 'B'.repeat(43)
 const SLUG = 'abcdefghij'
 const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'admin@lamvi.test' } }

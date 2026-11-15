@@ -6,6 +6,11 @@ export const INTRO_FILMS = [
   { key: 'culture', film: CRAFT_FILMS.dongho, kicker: 'Giới thiệu đèn LAMVI', title: 'Tranh Đông Hồ trên đèn giấy dó' },
   { key: 'craft', film: CRAFT_FILMS.paper, kicker: 'Cách làm đèn', title: 'Từ làng giấy dó đến chiếc đèn' },
 ]
+// D-150 (người dùng: "tắt 2 video trong phong thư, chỉ để lời chúc thôi, và cho phép xem dọc màn hình cũng được"):
+// tắt hai video mở đầu + hai nút video cuối thư, bỏ yêu cầu xoay ngang. Giữ mã (D-138, D-145, D-146, D-148)
+// để bật lại bằng cờ khi cần.
+export const LETTER_FLOW = Object.freeze({ introFilms: false, extras: false, requireLandscape: false })
+
 export const filmByKey = (key) => INTRO_FILMS.find((f) => f.key === key)
 
 // Nhớ người nhận đã xem hết phần mở đầu của thư này → lần sau cho "Bỏ qua". Lỗi storage thì coi như chưa xem.
