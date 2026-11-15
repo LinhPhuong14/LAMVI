@@ -965,3 +965,5 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 **Cập nhật 2026-11-15 (D-148)**: dấu "thiết bị đã quét" → lần quét sau có "Bỏ qua" video; bố cục ngang hai cột cho web 2D (kiểm ảnh 844×390, 667×375: tối, phong bì, đọc thư — cột đèn sticky, thẻ bất ngờ); test `src/letters/device-skip.test.jsx`. Theo yêu cầu người dùng không chờ full suite: chạy lint, build và các test phong thư/admin.
 
 **Cập nhật 2026-11-15 (D-149)**: phong thư vừa một màn hình ở mọi pha (đo `scrollHeight === innerHeight` tại 5 kích thước), tờ thư cuộn trong khung, đọc thư hai cột ở màn ngang; bỏ câu "Phong thư chỉ mở khi điện thoại nằm ngang".
+
+**Cập nhật 2026-11-15 (D-150)**: tắt hai video mở đầu + hai nút video cuối thư, cho xem dọc (bỏ lời nhắc xoay ngang) — sau cờ `LETTER_FLOW`; kiểm một màn hình ở dọc 390×844, 360×740.

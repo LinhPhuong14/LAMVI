@@ -16,6 +16,10 @@ import { lettersRouter } from '../../server/routes/letters.js'
 import { classifyPath } from '../seo/routes.js'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
 
+// D-150 tắt video mở đầu/nút video cuối thư/yêu cầu xoay ngang theo mặc định; test này kiểm luồng cũ (D-138…D-148)
+// nên bật lại cờ để giữ độ phủ khi cần mở lại
+vi.mock('../letters/films.js', async (importOriginal) => ({ ...(await importOriginal()), LETTER_FLOW: { introFilms: true, extras: true, requireLandscape: true } }))
+
 const confetti = vi.hoisted(() => Object.assign(vi.fn(), { reset: vi.fn(), shapeFromPath: vi.fn(() => 'heart'), shapeFromText: vi.fn(() => 'text') }))
 vi.mock('canvas-confetti', () => ({ default: confetti }))
 // Phòng thư 3D cần WebGL — thay bằng dấu hiệu để biết nhánh nào được chọn

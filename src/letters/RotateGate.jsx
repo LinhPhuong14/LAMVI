@@ -24,8 +24,9 @@ function subscribe(listener) {
  * Nội dung vẫn được giữ (không mất vị trí video/pha), chỉ bị khoá + che; video đang phát thì tạm dừng
  * và thoát toàn màn hình (lớp toàn màn hình sẽ che mất lời nhắc).
  */
-export default function RotateGate({ children }) {
-  const rotate = useSyncExternalStore(subscribe, needsRotate, () => false)
+export default function RotateGate({ children, enabled = true }) {
+  const needs = useSyncExternalStore(subscribe, needsRotate, () => false)
+  const rotate = enabled && needs
   const boxRef = useRef(null)
 
   useEffect(() => {

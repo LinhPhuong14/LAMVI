@@ -9,6 +9,10 @@ import LetterExtras from './LetterExtras.jsx'
 import { INTRO_FILMS, filmByKey, introSeen, markIntroSeen } from './films.js'
 import { pickFilmSrc } from '../lib/filmSrc.js'
 
+// D-150 tắt video mở đầu/nút video cuối thư/yêu cầu xoay ngang theo mặc định; test này kiểm luồng cũ (D-138…D-148)
+// nên bật lại cờ để giữ độ phủ khi cần mở lại
+vi.mock('./films.js', async (importOriginal) => ({ ...(await importOriginal()), LETTER_FLOW: { introFilms: true, extras: true, requireLandscape: true } }))
+
 const TOKEN = 'A'.repeat(43)
 const SLUG = 'abcdefghij'
 const FLAG = `lv.letter.intro.${SLUG}`

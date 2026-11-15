@@ -7,7 +7,7 @@ import Interlude from '../letters/Interlude.jsx'
 import RotateGate from '../letters/RotateGate.jsx'
 import LetterExtras from '../letters/LetterExtras.jsx'
 import { withNameFallbacks } from '../letters/names.js'
-import { deviceScanned, introSeen, markDeviceScanned, markIntroSeen } from '../letters/films.js'
+import { LETTER_FLOW, deviceScanned, introSeen, markDeviceScanned, markIntroSeen } from '../letters/films.js'
 import { useI18n } from '../i18n/index.js'
 
 // Phòng thư 3D (letter-room, D-136/D-137) — chỉ tải three.js sau khi xem xong hai video mở đầu
@@ -37,7 +37,8 @@ export default function LetterPage() {
         // D-148: thiết bị đã quét QR trước đây (hoặc đã xem hết video của thư này) → cho bỏ qua video giới thiệu
         const canSkip = introSeen(slug) || deviceScanned()
         markDeviceScanned()
-        setState({ status: 'ok', letter: r.item, intro: true, canSkip })
+        // D-150: tắt video mở đầu → vào thẳng màn giới thiệu LAMVI rồi tới lá thư
+        setState({ status: 'ok', letter: r.item, intro: LETTER_FLOW.introFilms, interlude: !LETTER_FLOW.introFilms, canSkip })
       } catch (err) {
         if (alive) setState({ status: 'error', code: err instanceof ApiError ? err.status : 0 })
       }
@@ -58,11 +59,12 @@ export default function LetterPage() {
     <>
       <Seo title={t('letter.title')} noindex />
       {/* D-146: mọi bước của thư (video, giới thiệu, bật đèn, đọc) cần điện thoại nằm ngang */}
-      {state.status === 'ok' ? <RotateGate>{experience()}</RotateGate> : status()}
+      {state.status !== 'ok' ? status() : LETTER_FLOW.requireLandscape ? <RotateGate>{experience()}</RotateGate> : experience()}
     </>
   )
 
   function experience() {
+    const extras = LETTER_FLOW.extras ? <LetterExtras /> : null
     return state.intro ? (
       <main>
         <IntroFilms
@@ -88,9 +90,9 @@ export default function LetterPage() {
       >
         {/* Căn phòng: bật đèn → phong bì → thư (tiêu đề viết tay) → hai nút xem lại cuối thư */}
         {state.letter.template === 'room' ? (
-          <LetterRoom letter={withNameFallbacks(state.letter)} afterLetter={<LetterExtras />} />
+          <LetterRoom letter={withNameFallbacks(state.letter)} afterLetter={extras} />
         ) : (
-          <LetterWeb letter={state.letter} afterLetter={<LetterExtras />} />
+          <LetterWeb letter={state.letter} afterLetter={extras} />
         )}
       </Suspense>
     )

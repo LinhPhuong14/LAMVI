@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import LetterExtras from '../letters/LetterExtras.jsx'
+import { LETTER_FLOW } from '../letters/films.js'
 import { withNameFallbacks } from '../letters/names.js'
 import { S } from './strings.js'
 
@@ -28,6 +29,8 @@ export default function LetterRoomPreview({ letter, onClose }) {
       document.body.style.overflow = overflow
     }
   }, [onClose])
+  const extras = LETTER_FLOW.extras ? <LetterExtras /> : null
+
   return createPortal(
     <div className="letter-room-preview" role="dialog" aria-modal="true" aria-label={L.roomPreview}>
       <button ref={closeRef} type="button" className="letter-room-preview-close" onClick={onClose} aria-label={L.closePreview}>
@@ -35,9 +38,9 @@ export default function LetterRoomPreview({ letter, onClose }) {
       </button>
       <Suspense fallback={<p role="status">…</p>}>
         {letter.template === 'room' ? (
-          <LetterRoom letter={withNameFallbacks(letter)} preview onExit={onClose} afterLetter={<LetterExtras />} />
+          <LetterRoom letter={withNameFallbacks(letter)} preview onExit={onClose} afterLetter={extras} />
         ) : (
-          <LetterWeb letter={letter} preview onExit={onClose} afterLetter={<LetterExtras />} />
+          <LetterWeb letter={letter} preview onExit={onClose} afterLetter={extras} />
         )}
       </Suspense>
     </div>,

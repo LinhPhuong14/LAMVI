@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { demos } from '../letter-room/data.js'
 import { LAMPS, OCCASION_THEMES } from './themes.js'
 import RotateGate from '../letters/RotateGate.jsx'
+import { LETTER_FLOW } from '../letters/films.js'
 
 const LetterWeb = lazy(() => import('./LetterWeb.jsx'))
 const subscribe = () => () => {}
@@ -26,7 +27,7 @@ export default function LetterWebRoute() {
   if (!mounted) return placeholder
   return (
     // D-146: bản demo cũng bắt buộc xoay ngang trên điện thoại
-    <RotateGate>
+    <RotateGate enabled={LETTER_FLOW.requireLandscape}>
       <Suspense fallback={placeholder}>
         <LetterWeb key={`${occasion}-${lamp}`} letter={letter}>
           <details className="lw-demo">

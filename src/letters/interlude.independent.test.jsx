@@ -9,6 +9,10 @@ import { mockApi, renderAt } from '../test/renderApp.jsx'
 import Interlude from './Interlude.jsx'
 import LetterWeb from '../letter-web/LetterWeb.jsx'
 
+// D-150 tắt video mở đầu/nút video cuối thư/yêu cầu xoay ngang theo mặc định; test này kiểm luồng cũ (D-138…D-148)
+// nên bật lại cờ để giữ độ phủ khi cần mở lại
+vi.mock('./films.js', async (importOriginal) => ({ ...(await importOriginal()), LETTER_FLOW: { introFilms: true, extras: true, requireLandscape: true } }))
+
 // Phòng thư 3D cần WebGL — thay bằng dấu hiệu để biết nhánh nào được chọn
 vi.mock('../letter-room/LetterRoom.jsx', () => ({ default: () => <div data-testid="letter-room-3d" /> }))
 vi.mock('canvas-confetti', () => ({ default: Object.assign(vi.fn(), { reset: vi.fn(), shapeFromPath: vi.fn(), shapeFromText: vi.fn() }) }))
