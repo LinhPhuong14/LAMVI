@@ -152,10 +152,10 @@ function FinalNote({ letter, point, width, height }) {
         <strong>{d.places?.join(" • ")}</strong>
       )}
       <p>
-        {d.message ||
-          letter.postscript ||
-          "Một chút thương, dành riêng cho bạn."}
+        {d.message || "Một chút thương, dành riêng cho bạn."}
       </p>
+      {/* Lá thư đã cất đi ở cảnh này — nhắc lại tái bút để không mất (§21.9 cảnh D) */}
+      {letter.postscript && <p className="lr-final-ps">{letter.postscript}</p>}
       <small className="lr-final-brand">Giữ lại một khoảng sáng. — LAMVI</small>
     </section>
   );

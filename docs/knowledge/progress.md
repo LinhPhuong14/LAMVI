@@ -1,5 +1,75 @@
 # Tiến độ tính năng
 
+## 2026-11-15 — Phong thư lẻ không cần đơn (feat/letter-standalone, D-142, T-109)
+
+| Việc | Trạng thái | Ở đâu | Còn lại |
+| --- | --- | --- | --- |
+| Migration `order_id` tuỳ chọn + `label` | ✅ | `supabase/migrations/20261115000026_standalone_letters.sql` | **Người dùng chạy trên Supabase** |
+| API thư lẻ (`POST /admin/letters`, `/admin/letters/:id/*`) | ✅ | `server/routes/letters.js`, repo memory/supabase | — |
+| Admin: nút tạo, trang soạn thư lẻ, thư viện liệt kê thư lẻ | ✅ | `LetterEditorPage.jsx`, `LettersGalleryPage.jsx` | — |
+
+## 2026-11-14 — Web 2D là bản chính (feat/phong-thu-web-main, D-141, T-108)
+
+| Việc | Trạng thái | Ở đâu | Còn lại |
+| --- | --- | --- | --- |
+| Mặc định `template: 'web'`; `/phong-thu` = web 2D, 3D ở `/phong-thu/3d` | ✅ | `server/domain/letter.js`, `src/routes.jsx`, `LetterPage.jsx`, `LetterRoomPreview.jsx` | — |
+| Đốm sáng + sparkle khi đọc, handwriting reveal thân thư | ✅ | `src/letter-web/LetterWeb.jsx`, `web.css` | QA điện thoại thật |
+| Font viết tay có dấu tiếng Việt (Dancing Script, Patrick Hand) | ✅ | `@fontsource/*`, `web.css` | — |
+| Admin: mặc định web 2D, ảnh đèn + link xem mẫu, thư viện QR hiện kiểu/đèn | ✅ | `LetterEditorPage.jsx`, `LettersGalleryPage.jsx`, `server/routes/letters.js` | — |
+
+## 2026-11-14 — Phong thư web 2D (feat/phong-thu-web, D-140, T-107)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Bản web 2D: bật đèn → phong bì vintage trồi lên → thư trồi ra → đọc | ✅ | `src/letter-web/LetterWeb.jsx`, `Envelope.jsx`, `web.css` | Đối chiếu Aceternity UI khi có proxy |
+| Hiệu ứng 7 dịp (canvas-confetti) + bánh thổi nến | ✅ | `src/letter-web/effects.js`, `Surprise.jsx` | QA trên điện thoại thật |
+| Admin chọn kiểu + đèn, xem thử đúng kiểu; `/thu` chọn theo `template` | ✅ | `src/admin/LetterEditorPage.jsx`, `src/pages/LetterPage.jsx`, `server/domain/letter.js` | — |
+| Demo `/phong-thu/web` | ✅ | `src/letter-web/LetterWebRoute.jsx` | — |
+| Test | ✅ | `src/letter-web/LetterWeb.test.jsx` + kiểm thử độc lập (T-11) | — |
+
+## 2026-11-14 — Phòng thư 3D vào web + mẫu/xem thử admin (feat/phong-thu-room, D-139)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Merge `letter-room` bản mới nhất (c5316e5), gỡ `wishroom` | ✅ | `src/letter-room/*`, `src/routes.jsx` | — |
+| `/thu/<slug>`: 2 video → Phòng thư 3D → tiêu đề viết tay → nút xem lại | ✅ | `src/pages/LetterPage.jsx`, `src/letter-room/LetterReader.jsx` | QA trên điện thoại thật (xoay ngang, WebGL) |
+| Admin: mẫu lời chúc theo dịp + xem thử trong Phòng thư | ✅ | `src/admin/LetterEditorPage.jsx`, `src/admin/LetterRoomPreview.jsx` | — |
+| Test | ✅ | `src/admin/Letters.test.jsx`, `src/letters/*.test.jsx`, `src/letter-room/*.test.*` + kiểm thử độc lập (T-11) | — |
+
+## 2026-11-13 — Phong thư: video mở đầu, phòng bật đèn, bỏ subdomain (feat/phong-thu-intro, D-138)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Bỏ subdomain, QR `{PUBLIC_SITE_URL}/thu/<slug>#<token>` | ✅ | `server/domain/letter.js` (gỡ `letterHost`, `LETTER_BASE_DOMAIN`) | — |
+| Hai video LAMVI mở đầu, xem hết mới vào phòng | ✅ | `src/letters/IntroFilms.jsx`, `src/letters/films.js` | Marketing duyệt thứ tự/tiêu đề video |
+| Căn phòng tối → bật đèn → phong bì | ✅ 3D (D-139) | `src/letter-room/LetterRoom.jsx` | — |
+| Nút cuối thư: xem lại cách làm đèn, lịch sử văn hoá | ✅ | `src/letters/LetterExtras.jsx` | — |
+| Tiêu đề thư viết tay (stroke write-on), nội dung fade in sau | ✅ | `src/letters/HandwrittenTitle.jsx`, `HandwrittenTitle.test.jsx` | Xem thử trên iOS thật |
+| Test | ✅ | `src/admin/Letters.test.jsx`, `src/letters/letters.independent.test.jsx`, `server/letters*.test.js` | — |
+
+## 2026-11-13 — Phong thư riêng từng đơn + QR subdomain (feat/phong-thu-qr, D-134, D-135, T-106)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Admin soạn phong thư (nháp/xuất bản/gỡ/tạo QR mới), xem trước | ✅ | `src/admin/LetterEditorPage.jsx`, `server/routes/letters.js`, `server/domain/letter.js` | Tải video/ảnh lên (G-123) |
+| QR subdomain ngẫu nhiên + token sau `#`, chặn site chính dưới subdomain | ✅ code | `server/middleware/letterHost.js`, `config.letterBaseDomain` | Wildcard domain Vercel + `LETTER_BASE_DOMAIN` (G-122) |
+| Thư viện QR (in lại đúng QR cũ) | ✅ | `src/admin/LettersGalleryPage.jsx`, `GET /api/admin/letters` | — |
+| Trang người nhận `/thu/:slug` | ✅ 3D (D-139) | `src/pages/LetterPage.jsx`, `src/letter-room/LetterRoom.jsx` | — |
+| Bảng `order_letters` | ✅ migration | `supabase/migrations/20261113000025_order_letters.sql` | Chạy migration trên Supabase |
+| Test | ✅ | `server/letters.test.js`, `src/admin/Letters.test.jsx` + kiểm thử độc lập (T-11) | — |
+
+## 2026-11-13 — Prototype "Phòng thư LAMVI" (feat/phong-thu-lamvi, D-133, T-104)
+
+| Mục | Trạng thái | Code / kiểm tra | Còn lại |
+|---|---|---|---|
+| Phòng isometric 3D, bật đèn, camera áp sát phong bì, kéo thư, nét mực, đọc chữ/video, tái bút | ✅ prototype, dữ liệu mẫu | `src/wishroom/*`, route `/phong-thu` (`routes.jsx`, `IMMERSIVE_PAGES` ở `LocaleLayout.jsx`) | Nối vào `/qr/:token` thật (G-121, Q-44); texture ảnh thật (giấy/gỗ/giấy dó) |
+| Lối 2D khi không có WebGL (cùng máy trạng thái) | ✅ | `src/wishroom/Fallback2D.jsx` | — |
+| Cảnh E — bất ngờ theo dịp: sinh nhật, kỷ niệm, tặng bất chợt (hình bóng qua giấy đèn) | ✅ 3/7 dịp (đợt 1 theo PO) | `src/wishroom/OccasionSurprise.jsx`, bake silhouette ở `sceneEngine.js` | 4 dịp còn lại (thankYou, milestone, encouragement, longDistance) |
+| Test: máy trạng thái, toán kéo/easing, luồng 2D đầy đủ (bật đèn→đọc→P.S./Cảnh E), mẫu video | ✅ 28 test mới | `src/wishroom/*.test.{js,jsx}` | — |
+| Kiểm thử độc lập (T-11) | ✅ | agent fork tự chạy `npm test`/`npm run lint`, không có finding ảnh hưởng tới nghiệp vụ hiện có | — |
+
+Toàn bộ 264 file / 3988 test (+1 skip) xanh; `npm run lint` sạch; `npm run build` xanh. Không đổi hành vi trang `/qr/:token` thật hay dữ liệu lời chúc trong DB.
+
 ## 2026-10-23 — Video khung điện thoại + motion chậm (feat/qr-video-slow-motion, D-120)
 
 | Mục | Trạng thái | Code / kiểm tra | Còn lại |
@@ -262,3 +332,7 @@ Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt 
 
 
 Cập nhật PO 2026-11-14 (font title và khởi động): title mọi tên chuyển sang font Dancing Script 400 self-host (Latin + Vietnamese, OFL), reveal bằng mask CSS, giữ center → dock → body và transition guard; bỏ đường nét SVG riêng Linh. Chặn toàn bộ scene/controls bằng visibility + inert + aria-busy khi chưa sẵn sàng; placeholder SSR và loader cùng nền đen. Chờ nền, model, artwork, sáu PBR maps và font; engine chỉ báo ready sau render frame hoàn chỉnh đầu tiên. Đã bỏ opacity !important khiến canvas hiện sớm. QA cố tình giữ request nền: sân khấu vẫn hidden/inert tới lúc tải xong; ảnh và result.json tại docs/qa/phong-thu/font-loading/.
+
+
+## 2026-11-15 — Hợp nhất Phòng thư theo xác nhận PO
+PO cho phép xử lý conflict và merge `feat/phong-thu` vào master. Giữ title font Dancing Script, ready gate/black loading, artwork gen và LAMVI quotes mới; giữ postscript ở reader/cảnh cuối, điều kiện dữ liệu bất ngờ thật từ master. Không đổi mặc định web 2D hoặc `/phong-thu/3d`, API/template/lamp, intro films, afterLetter và phong thư lẻ. Cập nhật dependency giữ Patrick Hand và canvas-confetti; không đổi deploy/schema. Xác minh tại docs/qa/phong-thu/merge-master/.

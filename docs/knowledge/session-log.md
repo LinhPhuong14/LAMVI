@@ -1,5 +1,19 @@
 # Nhật ký phiên
 
+## 2026-11-13 — Prototype "Phòng thư LAMVI" (nhánh `feat/phong-thu-lamvi`, D-133, T-104)
+
+Người dùng đưa đặc tả chi tiết (không phải từ ba-spec.md có sẵn — tự dán trực tiếp vào hội thoại) cho một microsite 3D isometric ở trang nhận lời chúc: bật đèn → chạm phong bì → kéo thư → nét mực → đọc chữ/video → P.S., sau đó mở rộng thêm "Cảnh E" (bất ngờ theo dịp tặng quà, 7 dịp, PO chọn dựng trước 3 dịp: sinh nhật, kỷ niệm, tặng bất chợt). Vì chưa có trong `ba-spec.md`, đã ghi nhận là D-133 (§21.9) thay vì tự quyết định phạm vi nghiệp vụ — giữ đúng scope người dùng nói rõ là **prototype + dữ liệu mẫu cục bộ**, không nối API thật.
+
+Đã dựng: `src/wishroom/*` (engine Three.js thuần, máy trạng thái 6 bước, lớp đọc HTML, lối 2D dự phòng), route `/phong-thu` toàn màn hình (`IMMERSIVE_PAGES` mới ở `LocaleLayout.jsx`, bỏ hết header/footer/May/banner cookie — khác hẳn các route khác của site). 5 dữ liệu mẫu (`?mau=chu|video|sinhnhat|kyniem|batchot`).
+
+**Bài học/bug đáng nhớ** (chi tiết ở `decisions.md` T-104): (1) trộn hai trục local sau khi xoay phong bì nằm phẳng (Y=trục kéo thư, Z=trục chồng lớp) làm vỡ hình học hoàn toàn — soát lại bằng tay từng phép quay; (2) đơn vị `zoom` của `OrthographicCamera` không phải pixel, đặt nhầm làm khung nhìn còn 0,004 đơn vị (đen toàn bộ); (3) `request()` của máy trạng thái đọc `state` qua closure — an toàn khi gọi trực tiếp từ sự kiện nhưng SAI khi gọi nối tiếp trong một callback đã lưu lại (onDone của tween bất đồng bộ), phải tách riêng `advance()` không qua cổng closure cho đúng trường hợp đó; (4) `aria-hidden="true"` đặt nhầm lên cả khối chứa một nút bấm thật (nến sinh nhật) làm nút biến mất khỏi cây hỗ trợ tiếp cận lẫn test — bài học: `aria-hidden` chỉ đặt trên phần tử THUẦN trang trí, không bọc lên bất cứ gì có thể focus; (5) thử `ACESFilmicToneMapping` + `HemisphereLight` + `Fog` để "đẹp hơn, giống game" theo yêu cầu người dùng nhưng làm phẳng/nhạt đúng tương phản ấm/lạnh mà bảng màu đặc tả cố tình giữ — bỏ, chỉ giữ lại rim light tĩnh + hình học rèm có nếp gấp thật (không tốn thêm chi phí render).
+
+Quy trình: chạy Playwright thật (desktop + 390/420px) để tự chụp và soát từng cảnh thay vì chỉ tin test — phát hiện mọi bug hình học/ánh sáng ở trên qua ảnh chụp, không phải qua đọc code. Subagent kiểm thử độc lập (T-11) chạy sau khi code xong, trước khi commit — xem báo cáo ở cuối phiên này trong code review hoặc hỏi lại nếu cần.
+
+Toàn bộ 264 file / 3988 test xanh, lint sạch, build (client + SSR) qua. Không đổi hành vi `/qr/:token` thật. Còn mở (G-121, Q-44): có đưa trải nghiệm này vào luồng QR thật không, và theo cách nào; texture ảnh thật (giấy/gỗ/giấy dó) — nguồn CC0 đã ghi chú ngay trong `sceneEngine.js`.
+
+---
+
 ## 2026-10-27 (phiên 3) — Admin còn lại + sửa layout thẻ sản phẩm (nhánh `ccr-f7654e08-wqcdp4`, D-128)
 
 PO báo lỗi layout thẻ sản phẩm trong carousel (chân thẻ co lại) và yêu cầu carousel 2 giây: đã sửa và merge. Admin: B4 (mã giảm giá), B5 (sản phẩm), B6 (bộ sưu tập, chưa kéo thả), B7 (lô đèn), B9 (người dùng) theo bố cục `Split`. Chưa làm: B8 (Hỏi đáp, Mây), B10 (Analytics), kéo thả bộ sưu tập, xuất CSV và in phiếu. Lưu ý: lần merge sửa layout chỉ chạy test component, chưa chạy cả bộ.
@@ -839,6 +853,18 @@ Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE
 
 **Còn lại / cần người dùng**: đo tải thật bằng 4G; G-120 (QR, tem, đo lượt quét).
 
+## 2026-11-13 — Phong thư riêng từng đơn + QR subdomain (D-134, D-135, T-106)
+
+**Đã làm**: admin soạn toàn bộ phong thư mỗi đơn (`/admin/orders/:code/letter`, xem trước), xuất bản sinh subdomain ngẫu nhiên + token 256 bit (`https://<slug>.<LETTER_BASE_DOMAIN>/#<token>`), gỡ xuất bản/xuất bản lại giữ nguyên QR, "Tạo QR mới" khi lộ link; thư viện QR `/admin/letters` để in lại đúng QR cũ; trang người nhận `/thu/:slug` (2D, noindex, không GA); middleware chặn site chính dưới subdomain; bảng `order_letters`. Phối hợp với Codex qua bảng tin (`AGENTS.md`): bản 3D chọn `letter-room`, T-105 thuộc Codex.
+
+**Còn lại / cần người dùng**: chọn domain + cấu hình wildcard trên Vercel rồi đặt `LETTER_BASE_DOMAIN` (G-122); chạy migration `…0025`; tải video/ảnh trong admin (G-123); ghép cảnh 3D khi `feat/phong-thu` merge (G-124).
+
+## 2026-11-13 — Phong thư: video mở đầu, phòng bật đèn, bỏ subdomain (D-138)
+
+**Đã làm**: bỏ subdomain (gỡ middleware `letterHost`, biến `LETTER_BASE_DOMAIN`) — QR là `{PUBLIC_SITE_URL}/thu/<slug>#<token>`; trang phong thư mở đầu bằng 2 video LAMVI (tranh Đông Hồ, làng giấy dó) phải xem hết, rồi căn phòng tối chạm bật đèn → phong bì → thư; cuối thư có nút "Xem lại cách làm đèn" và "Lịch sử văn hoá". Đã báo Codex qua bảng tin để giữ luồng này khi ghép `letter-room`.
+
+**Còn lại / cần người dùng**: duyệt thứ tự/tiêu đề hai video; ghép cảnh 3D (G-124); tải video/ảnh trong admin (G-123); chạy migration `…0025`.
+
 
 ## 2026-11-13 — Phòng thư lamvi (`feat/phong-thu`)
 
@@ -876,3 +902,39 @@ Bàn giao vòng này: 5 báo cáo UI review có ảnh thật; sau audit cuối �
 
 
 Cập nhật PO 2026-11-14 (font title và khởi động): title mọi tên chuyển sang font Dancing Script 400 self-host (Latin + Vietnamese, OFL), reveal bằng mask CSS, giữ center → dock → body và transition guard; bỏ đường nét SVG riêng Linh. Chặn toàn bộ scene/controls bằng visibility + inert + aria-busy khi chưa sẵn sàng; placeholder SSR và loader cùng nền đen. Chờ nền, model, artwork, sáu PBR maps và font; engine chỉ báo ready sau render frame hoàn chỉnh đầu tiên. Đã bỏ opacity !important khiến canvas hiện sớm. QA cố tình giữ request nền: sân khấu vẫn hidden/inert tới lúc tải xong; ảnh và result.json tại docs/qa/phong-thu/font-loading/.
+
+## 2026-11-14 — Phòng thư 3D vào web, mẫu + xem thử admin (D-139)
+
+**Đã làm**: merge `feat/phong-thu` (letter-room c5316e5) vào nhánh `feat/phong-thu-room`, giải conflict (package/lock theo letter-room, docs gộp hai phía, routes giữ `/thu/:slug` + `/phong-thu`); gỡ `src/wishroom` + Spectral. `/thu/<slug>`: hai video → `LetterRoom` (lazy, three.js chỉ tải sau video) → tiêu đề viết tay (`HandwrittenTitle` trong `LetterReader`) → thân thư → hai nút xem lại (overlay qua portal). Admin: chọn mẫu lời chúc theo dịp, "Xem thử trong Phòng thư" toàn màn hình. Xoá `LetterPaper` 2D + CSS chết. Migration `…0025` người dùng đã chạy.
+
+Kiểm thử độc lập (T-11): 30 test (`src/letters/room-integration.independent.test.jsx`), phát hiện 4 lỗi đã sửa — tái bút không tới người nhận khi có lời nhắn bất ngờ, dialog xem thử không chuyển/trả focus, tên chỉ có khoảng trắng vẫn mở được xem thử; thêm: đổi mẫu hỏi xác nhận khi có bất kỳ dữ liệu bất ngờ, ẩn nút bất ngờ khi chỉ có `photos: []`. Full suite 274 tệp / 4195 đạt, lint + build xanh.
+
+**Còn lại / cần người dùng**: QA trên điện thoại thật (xoay ngang, WebGL, hiệu ứng viết tay); tải video/ảnh trong admin (G-123).
+
+## 2026-11-14 — Phong thư web 2D (D-140, T-107)
+
+**Đã làm**: `src/letter-web/` — trang 2D sạch: bật đèn (ảnh thật 5 mẫu đèn), quầng/chùm/bụi sáng, phong bì vintage theo dịp (viền thư máy bay, tem Đông Hồ, dấu bưu điện, xi chữ cái đầu) trồi lên và mở, thư trồi ra; tiêu đề viết tay + thân thư hiện từng chữ; điều bất ngờ 7 dịp với canvas-confetti, bánh thổi nến. Server thêm `template`/`lamp`; admin chọn kiểu + đèn, xem thử đúng kiểu; `/thu` chọn theo `template`. Demo `/phong-thu/web`. QA bằng Chromium headless ở 1280×800 và 390×844 (ảnh trong scratchpad, không commit). Kiểm thử độc lập (T-11): 30 test (`src/letter-web/web.independent.test.jsx`), sửa 3 lỗi — Esc ở khung bất ngờ đóng luôn khung xem thử admin, focus rơi về `<body>` sau "Xem lại từ đầu"/bật đèn/thổi nến, `themeOf` đọc khoá prototype.
+
+**Còn lại / cần người dùng**: mở proxy cho ui.aceternity.com nếu muốn đối chiếu sát component gốc; QA trên điện thoại thật.
+
+**Cập nhật cùng ngày**: người dùng mở proxy → đối chiếu registry Aceternity UI (`lamp`, `spotlight-new`, `text-generate-effect`) và chuyển thể sang CSS ánh vàng (nhánh `fix/phong-thu-web-aceternity`); đọc giấy phép Aceternity (cho phép dùng/chỉnh sửa trong website). Demo trực tiếp: `https://www.lamvi.com.vn/phong-thu/web`, `https://www.lamvi.com.vn/phong-thu`.
+
+## 2026-11-14 — Web 2D là bản chính (D-141, T-108)
+
+**Đã làm**: `template` mặc định `web` (server, trang người nhận, xem thử admin — chỉ `room` mới mở 3D); `/phong-thu` = demo web 2D, 3D chuyển `/phong-thu/3d`. Pha đọc: đốm sáng bay + sparkle quanh tờ thư; thân thư handwriting reveal (mask gradient theo nhịp ký tự, ≤ 7 s). Font Dancing Script + Patrick Hand (có subset tiếng Việt; Playwrite VN bị loại vì Fontsource chỉ có Latin). Admin: mặc định Web 2D, ảnh đèn + link xem mẫu; thư viện QR hiện kiểu + đèn.
+
+Kiểm thử độc lập (T-11): `src/letter-web/main.independent.test.jsx` (46 test), phát hiện 2 lỗi đã sửa — chữ cuối thư dài nhất viết xong ở ~7,19 s (vượt ngân sách 7 s), thư viện QR sập khi `template` là khoá prototype. Full suite 277 tệp / 4285 đạt (Routing.extra chập chờn, chạy riêng đạt); lint + build xanh.
+
+**Còn lại / cần người dùng**: QA điện thoại thật; thư đã lưu rõ "Phòng thư 3D" trước v0.86 giữ 3D — đổi tay nếu muốn.
+
+## 2026-11-15 — Phong thư lẻ không cần đơn (D-142, T-109)
+
+**Đã làm**: migration `20261115000026` (`order_letters.order_id` tuỳ chọn + `label`); repo `getLetterById`/`createLetter`/`saveLetterById`; `POST /admin/letters` + `/admin/letters/:id/*` dùng chung handler với thư của đơn; admin có nút "Tạo phong thư mới", trang soạn `/admin/letters/new` → `/admin/letters/<id>`, ghi chú nội bộ; thư viện QR liệt kê thư lẻ (kể cả nháp).
+
+Kiểm thử độc lập (T-11): `server/letters.standalone.independent.test.js` + `src/admin/LettersStandalone.independent.test.jsx` (33 test), phát hiện 4 lỗi đã sửa — người nhận mở thư lẻ trên Supabase lỗi 500 (`getOrderById(null)`), xuất bản thư mới có thể hiện "nháp"/mất thông báo lỗi do điều hướng trước khi xuất bản xong, thẻ thư lẻ trùng key trong thư viện. Full suite 279 tệp / 4318 đạt (Routing.extra chập chờn); lint + build xanh.
+
+**Còn lại / cần người dùng**: chạy migration `20261115000026_standalone_letters.sql` trên Supabase.
+
+
+## 2026-11-15 — Hợp nhất Phòng thư theo xác nhận PO
+PO cho phép xử lý conflict và merge `feat/phong-thu` vào master. Giữ title font Dancing Script, ready gate/black loading, artwork gen và LAMVI quotes mới; giữ postscript ở reader/cảnh cuối, điều kiện dữ liệu bất ngờ thật từ master. Không đổi mặc định web 2D hoặc `/phong-thu/3d`, API/template/lamp, intro films, afterLetter và phong thư lẻ. Cập nhật dependency giữ Patrick Hand và canvas-confetti; không đổi deploy/schema. Xác minh tại docs/qa/phong-thu/merge-master/.

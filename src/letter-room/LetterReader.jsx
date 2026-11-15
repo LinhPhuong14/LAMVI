@@ -183,9 +183,10 @@ export default function LetterReader({
           <span>Thương mến,</span>
           <strong>{letter.senderName}</strong>
         </div>
+        {letter.postscript && <p className="lr-postscript">{letter.postscript}</p>}
         {!revealAll && !reduced && letter.kind === "text" && <button className="lr-body-ink-skip" onClick={() => setRevealAll(true)}>Hiện toàn bộ lá thư</button>}
         <LamviWishes occasion={letter.occasion} />
-        {(Object.keys(letter.occasionData).length > 0 || letter.postscript) && (
+        {(Object.values(letter.occasionData).some(v => Array.isArray(v) ? v.length > 0 : Boolean(v)) || letter.postscript) && (
           <button
             className={`lr-surprise-trigger ${ended ? "is-highlighted" : ""}`}
             onClick={onSurprise}

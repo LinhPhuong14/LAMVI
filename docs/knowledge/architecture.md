@@ -40,7 +40,7 @@ server/
   security/pwned.js        kiểm mật khẩu đã lộ (HIBP k-anonymity, fail-open) (T-49)
   middleware/security.js   Security headers + CSP hash (T-37)
   middleware/rateLimit.js  Chống dò/spam, đếm trong DB (T-38, G-20)
-  routes/                  catalog.js, auth.js, admin.js, adminUsers.js, it.js, may.js, cart.js, orders.js, qr.js, seo.js (sitemap, robots)
+  routes/                  catalog.js, auth.js, admin.js, adminUsers.js, it.js, may.js, cart.js, orders.js, qr.js, letters.js, seo.js (sitemap, robots)
   adapters/openai.js       Chat Completions qua fetch (T-29)
   adapters/payos.js        Cổng thanh toán: ký/xác minh HMAC, tạo & huỷ link (NFR-SEC-002)
   domain/admin.js          Kiểm tra dữ liệu admin (sản phẩm, FAQ, lô, video)
@@ -106,6 +106,7 @@ Thêm phương thức → thêm ở **cả** `memory` và `supabase` + test.
 |---|---|
 | `getOrderByQrToken(token)` | Đơn theo token QR (64 hex) |
 | `getGiftMessage(orderId)`, `upsertGiftMessage(orderId, patch)` | Mỗi đơn tối đa một dòng `gift_messages` |
+| `getOrderLetter(orderId)`, `getLetterBySlug(slug)`, `saveOrderLetter(orderId, patch)`, `listOrderLetters()`, `markLetterOpened(id, at)` | Phong thư mỗi đơn (D-134) |
 | `confirmGiftMessage(orderId, at)` | Ghi `confirmed_at` đúng một lần (tạo dòng nếu chưa có) |
 | `listGiftMediaCandidates()` | Các dòng còn media chưa xoá, kèm đơn — để cron xoá quá hạn |
 | `listProfiles({ q, role, locked, limit, offset })`, `countOrdersByUsers(ids)` | Admin: danh sách người dùng |
@@ -186,6 +187,7 @@ Lỗi chung: `RATE_LIMITED`.
 | `coupon_redemptions` | `coupon_id`, `user_id`, `order_id` unique | Đếm lượt theo khách (C-5); xoá khi huỷ đơn (C-8) |
 | `audit_log` | `at`, `actor_id`, `actor_role`, `entity`, `entity_id`, `action`, `old_value`/`new_value` jsonb | NFR-AUD-001: đơn, coupon, hoàn tiền, người dùng (khoá, mở khoá, đổi vai trò) |
 | `gift_messages` | `order_id` unique, `text` (≤300 ký tự do server kiểm), `text_lang`, `voice_path/type`, `video_path/type`, `confirmed_at`, `media_deleted_at`, `translations` jsonb | FR-MSG-001, D-12, D-26, D-75; bucket riêng tư `gift-media` |
+| `order_letters` | `order_id` unique, `status` draft/published, `content` jsonb (server kiểm), `slug` unique `[a-z][a-z0-9]{9}`, `token` (43 ký tự), `published_at`, `opened_at`, `updated_by` | D-134, D-135, T-106; chỉ service role |
 | `orders` (thêm) | `qr_token` unique NOT NULL (256 bit hex), `delivered_at` | BR-QR-001, D-75 |
 | `profiles` (thêm) | `email`, `locked_at`, `locked_reason` | G-19, D-90 |
 
@@ -253,6 +255,10 @@ RLS bật, không có policy (chỉ service role của server truy cập).
 | GET | `/api/qr/:token` | – (token) | Trang người nhận: `preparing` \| `greeting` \| `active` (chữ, media signed URL, đếm ngược, `batch` lô công khai mới nhất, `lamps[]` câu chuyện các mẫu đèn trong đơn — D-104/D-105). Token sai/đơn huỷ → 404 chung |
 | POST | `/api/qr/:token/confirm` | – (token) | "Tôi đã nhận được quà": ghi `confirmed_at` lần đầu; 409 `GIFT_NOT_READY` nếu chưa SHIPPED |
 | POST | `/api/qr/:token/translate` | – (token) | `{ lang }` → `{ lang, text, cached }`; 503 `TRANSLATE_UNAVAILABLE` |
+| POST | `/api/letters/open` | – (slug + token trong body) | Phong thư người nhận (D-135): `{ slug, token }` → nội dung thư; sai/chưa xuất bản/đơn huỷ → 404 chung; ghi `opened_at` lần đầu |
+| GET/PUT | `/api/admin/orders/:code/letter` | admin | Đọc/lưu phong thư của đơn (D-134); `item.url` là link QR khi đã xuất bản |
+| POST | `/api/admin/orders/:code/letter/publish` · `/unpublish` · `/rotate` | admin | Xuất bản (lần đầu sinh slug+token, sau đó giữ nguyên) · gỡ · tạo QR mới (QR cũ hết hiệu lực) |
+| GET | `/api/admin/letters` | admin | Thư viện QR: mọi phong thư đã có QR, mới nhất trước |
 | GET | `/api/admin/users?q=&role=&status=&page=` | Admin, IT | Danh sách 20 người/trang kèm số đơn (D-90) |
 | GET | `/api/admin/users/:id` | Admin, IT | Hồ sơ + 20 đơn gần nhất + nhật ký |
 | POST | `/api/admin/users/:id/lock` · `/unlock` | Admin (khách), IT (mọi người) | `{ reason? }`; không tự khoá mình (409 `CANNOT_MANAGE_SELF`) |
@@ -308,9 +314,25 @@ Cần cấu hình trong Supabase Dashboard → Authentication → URL Configurat
 - Công khai: `/shop` (bộ sưu tập + đèn lẻ), `/collections/:slug`, `/privacy`, `/returns`; tài khoản: `/account?tab=gallery` (gallery + chăn Đông Hồ).
 - Admin: `/admin/{orders,users,products,faq,batches,coupons,analytics,may}` — chỉ tiếng Việt, ngoài `LocaleLayout` (D-48).
 - IT: `/it` — chỉ tiếng Việt (D-51).
-- Trang con: `/` · `/products/:slug` · `/lo/:code` · `/qr/:token` (riêng tư, noindex) · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
+- Trang con: `/` · `/products/:slug` · `/lo/:code` · `/qr/:token` (riêng tư, noindex) · `/thu/:slug` (phong thư, riêng tư, không tiền tố ngôn ngữ; QR `{PUBLIC_SITE_URL}/thu/<slug>#<token>` — D-138; video mở đầu → phòng bật đèn → thư) · `/login` · `/register` · `/forgot-password` · `/reset-password` · `/account` · `*` (404), mỗi trang có thêm biến thể `/en/…`, `/zh/…`.
 - `AuthProvider`: access token + user trong `localStorage` (`moc.session`, không có refresh token — T-49), `authedApi` tự gọi `/auth/refresh` (cookie) một lần khi gặp 401.
 
+
+## Phòng thư LAMVI — prototype trải nghiệm nhận lời chúc 3D (T-104, D-133)
+
+> **Đã gỡ (D-139, 2026-11-14)**: `src/wishroom` không còn trong code; Phòng thư dùng `src/letter-room` (mục bên dưới). Phong thư thật: `src/pages/LetterPage.jsx` (`/thu/<slug>`) = `IntroFilms` → `LetterRoom` (lazy) với `afterLetter={<LetterExtras/>}`; admin xem thử qua `src/admin/LetterRoomPreview.jsx`.
+
+Prototype trang `/phong-thu` (noindex, không SSR — `IMMERSIVE_PAGES` trong `LocaleLayout.jsx` bỏ
+hết header/footer/tabbar/May/banner cookie, khác `/qr/:token` thật). Dữ liệu mẫu cục bộ (`src/wishroom/data.js`),
+**không gọi API thật** — xem §21.9 `ba-spec.md` trước khi nối vào luồng QR thật ở `GiftPage.jsx`.
+
+- `dragProgress.js`: toán học thuần (easing, chiếu trục kéo lên màn hình, tiến độ kéo, ngưỡng thả tay 40%, `tween` rAF) — test được không cần DOM/WebGL.
+- `useWishRoomMachine.js`: máy trạng thái 6 trạng thái (`roomDark→roomLit→envelopeFocus→letterReady→letterOpen→postscriptOpen`) bằng `useReducer`; `request()` có cổng đồng bộ (busy/cạnh hợp lệ) cho thao tác trực tiếp từ sự kiện, `advance()` bỏ qua cổng đó cho bước nối tiếp gọi từ callback đã lưu (`onDone` của tween) — tránh bug closure cũ (state đọc được trong callback có thể lệch so với state thật, xem decisions.md T-104).
+- `sceneEngine.js`: engine Three.js thuần (không R3F) dựng phòng/đèn/phong bì/lá thư/tái bút, camera `OrthographicCamera` với hai "khung hình" (rộng/áp sát phong bì) nội suy vị trí+điểm nhìn+zoom, raycast hit-test, bóng tiếp xúc giả (sprite gradient, không shadow map), bóng hình Cảnh E qua `emissiveMap`. Chỉ import động (code-splitting) sau khi `WishRoomPage.jsx` xác nhận WebGL khởi tạo được — không import trong test chạy jsdom.
+- `WishRoomScene.jsx`: bọc canvas, Pointer Events + `setPointerCapture`, phân biệt chạm/kéo bằng ngưỡng px, gọi `dragProgress.js` để quy đổi delta con trỏ → tiến độ.
+- `InkGreeting.jsx` / `LetterReader.jsx` / `OccasionSurprise.jsx`: lớp HTML thay lá thư 3D (Cảnh D), căn theo `getLetterScreenRect()`; `OccasionSurprise` là Cảnh E (bất ngờ theo dịp) — chỉ 3 dịp có giao diện (`IMPLEMENTED_OCCASIONS`), dịp khác rơi về P.S. thường.
+- `Fallback2D.jsx`: lối không WebGL, dùng lại `useWishRoomMachine` + `LetterReader`, không có canvas.
+- Font riêng trang này (nạp trong `WishRoomPage.jsx`, không ảnh hưởng LCP các trang khác): Spectral (thân thư), Itim (chữ viết tay — có bộ `vietnamese`, thay cho Caveat/Instrument Sans không có, xem T-104); Be Vietnam Pro (hướng dẫn/UI) dùng lại font đã nạp sẵn ở `main.jsx`.
 
 ## Checkout transaction (T-59)
 
@@ -356,3 +378,9 @@ Thân thư hiện theo từ với alpha đồng đều, không cắt qua dấu t
 Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt cùng thư mục; runtime WebP alpha 1024×550 được compositing lên UV giấy trụ và emissive. Là minh họa lấy cảm hứng Đông Hồ, không phải scan tranh cổ hoặc artwork chính thức của LAMVI. Nâng/rút giấy theo trục local 0,9 đơn vị, bì trở về bàn trong lúc nâng thư; reader giữ nền đục. Góc bánh và cụm giấy được dọn sau review. API `letter/onExit/preview/afterLetter` giữ nguyên.
 
 Đã có năm vòng reviewer UI khó tính dựa trên ảnh thực tế và sửa giữa các vòng. Xem `docs/qa/phong-thu/v5/README.md`, báo cáo từng vòng, frame có timestamp, clip và proof timing để phân biệt phần đã kiểm với giới hạn SwiftShader.
+
+## Phong thư web 2D (T-107, D-140)
+
+`src/letter-web/`: `LetterWeb.jsx` (phase `dark → lighting → rising → unfolding → reading`, hẹn giờ theo phase, giảm chuyển động = 0 ms), `Envelope.jsx` (phong bì CSS, trang trí `aria-hidden`), `Surprise.jsx` (dialog điều bất ngờ), `effects.js` (canvas-confetti theo dịp, `playOccasion()` trả `stop()`), `themes.js` (màu/tem theo dịp, 5 đèn). `/thu/<slug>` và xem thử admin chọn giữa `LetterRoom` (3D) và `LetterWeb` theo `content.template`. Demo `/phong-thu/web` (`LetterWebRoute.jsx`, private/noindex).
+
+D-141 (T-108): web 2D là bản chính — `template` mặc định `web`, chỉ `room` mới dựng `LetterRoom`; `/phong-thu` + `/phong-thu/web` → `LetterWebRoute`, `/phong-thu/3d` → `LetterRoomRoute`. Pha đọc có `.lw-motes` (fixed, sau tờ thư) và `.lw-letter-sparkles`; thân thư handwriting reveal bằng mask gradient theo nhịp ký tự; font Dancing Script + Patrick Hand (subset latin + vietnamese).

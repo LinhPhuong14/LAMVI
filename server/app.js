@@ -15,6 +15,7 @@ import { cartRouter } from './routes/cart.js'
 import { ordersRouter } from './routes/orders.js'
 import { adminUsersRouter } from './routes/adminUsers.js'
 import { qrRouter } from './routes/qr.js'
+import { lettersRouter } from './routes/letters.js'
 import { createMessageService } from './messages/service.js'
 import { withAccountLock } from './security/lockedAccounts.js'
 import { createOrderService } from './orders/service.js'
@@ -130,6 +131,8 @@ export function createApp({
   if (auth && repo.createOrder && repo.listCollections) api.use(galleryRouter({ repo, auth }))
   // Trang QR lời chúc: người nhận, không đăng nhập (US-004)
   if (messages && repo.getOrderByQrToken) api.use(qrRouter({ repo, messages, config }))
+  // D-134, D-138: phong thư admin soạn + trang người nhận mở bằng QR
+  if (repo.saveOrderLetter) api.use(lettersRouter({ repo, auth, config }))
   // Storage bộ nhớ (dev/test) tự phục vụ tải lên/đọc file
   if (storage?.router) api.use(storage.router)
   api.use(() => {

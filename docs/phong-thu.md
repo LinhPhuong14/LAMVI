@@ -1,6 +1,6 @@
 # Phòng thư LAMVI — prototype POV
 
-Nhánh `feat/phong-thu`, worktree `LAMVI-phong-thu`. React/Vite + Three.js trực tiếp, giữ Express SSR và cấu hình Vercel. Phiên bản POV theo feedback D-136; không nối dữ liệu người nhận thật và không đổi `/qr/:token`.
+Nhánh `feat/phong-thu`, worktree `LAMVI-phong-thu`. React/Vite + Three.js trực tiếp, giữ Express SSR và cấu hình Vercel. Phiên bản POV theo feedback D-136. Demo 3D ở `/phong-thu/3d`; `/phong-thu` là bản web 2D mặc định (D-141). Trang `/thu/<slug>` nhúng bản 3D khi thư chọn `template: "room"`, qua props `letter` và `afterLetter`.
 
 ## Chạy
 
@@ -10,7 +10,7 @@ npm install
 npm run dev
 ```
 
-Mở `/phong-thu` ở URL server in ra. Nếu đang có server của nhánh khác, dùng `PORT=5175 npm run dev`. Chọn mẫu ở nút “Lời chúc mẫu”, hoặc `?occasion=birthday`, `anniversary`, `thankYou`, `milestone`, `encouragement`, `longDistance`, `justBecause`. `longDistance` là video; thêm `&kind=video` để thử video ở dịp khác. `&fallback=1` ép cảnh CSS 2D; `&empty=1` thử thiếu dữ liệu bất ngờ/P.S.
+Mở `/phong-thu/3d` ở URL server in ra. Nếu đang có server của nhánh khác, dùng `PORT=5175 npm run dev`. Chọn mẫu ở nút “Lời chúc mẫu”, hoặc `?occasion=birthday`, `anniversary`, `thankYou`, `milestone`, `encouragement`, `longDistance`, `justBecause`. `longDistance` là video; thêm `&kind=video` để thử video ở dịp khác. `&fallback=1` ép cảnh CSS 2D; `&empty=1` thử thiếu dữ liệu bất ngờ/P.S.
 
 ## Khung ngang và xoay máy (D-137)
 
