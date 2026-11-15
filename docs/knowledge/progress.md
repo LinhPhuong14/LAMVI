@@ -1,5 +1,16 @@
 # Tiến độ tính năng
 
+## 2026-11-15 — Màn giới thiệu LAMVI + font phong thư (feat/letter-interlude, D-144, T-110)
+
+| Việc | Trạng thái | Ở đâu | Còn lại |
+| --- | --- | --- | --- |
+| Hai video → màn "LAMVI đem đến cho bạn chiếc đèn giấy dó…" → bật đèn | ✅ | `src/letters/Interlude.jsx`, `src/pages/LetterPage.jsx` | QA điện thoại thật |
+| Lời mời "Hãy cùng thắp sáng chiếc đèn của bạn" | ✅ | `src/letter-web/LetterWeb.jsx`, `web.css` | — |
+| Đồng bộ font, sửa tiêu đề video vô hình | ✅ | `src/letters/letters.css` | — |
+| Màn "Cùng xem cách chiếc đèn được làm ra nhé", video toàn màn hình tự phát + nối tiếp (D-145) | ✅ | `src/letters/IntroFilms.jsx` | QA iPhone/Android thật |
+| Tên người nhận/người gửi tuỳ chọn (D-147) | ✅ | `server/domain/letter.js`, `src/letters/names.js` | — |
+| Luôn yêu cầu xoay ngang điện thoại (D-146) | ✅ | `src/letters/RotateGate.jsx` | QA khoá xoay |
+
 ## 2026-11-15 — Phong thư lẻ không cần đơn (feat/letter-standalone, D-142, T-109)
 
 | Việc | Trạng thái | Ở đâu | Còn lại |

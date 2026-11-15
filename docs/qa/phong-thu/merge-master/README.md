@@ -18,3 +18,9 @@ Không đổi cấu hình deploy, không chạy migration/ghi dữ liệu thật
 Kết quả cuối: **284 tệp / 4370 ca đạt / 2 bỏ qua**, `npm test -- --maxWorkers=6 --retry=1`. Lượt đầu tìm đúng ba kiểm thử Reader còn kỳ vọng SVG/2300 ms; đã cập nhật chỉ ba ca đó theo title font/5600 ms/transition guard, giữ nguyên bốn ca HandwrittenTitle 2D (tệp 7/7 đạt). Lint sạch và build client/SSR đạt. Không có ca lỗi còn bỏ ngỏ.
 
 Đẩy master qua worktree tích hợp riêng; so sánh Git tree với nhánh đã kiểm tra trước push. Worktree master chính chỉ fast-forward; không stash/reset hay đưa `.mcp.json` vào commit.
+
+## Đồng bộ master phát sinh trong lúc xuất bản
+
+Push lần đầu bị từ chối non-fast-forward do master vừa có `a33fb2a` (D-144…D-147). Không force push. Đã merge tiếp head này, giữ màn chào/video/interlude/RotateGate và tên tuỳ chọn; conflict duy nhất ở nhật ký được giữ cả hai phần.
+
+Trên bản ghép mới nhất: lint/build đạt; **26 tệp / 453 tests** vùng thư 3D+web+intro/QR+server+admin đạt. Kiểm thử độc lập bổ sung D147 tên rỗng → “Gửi bạn,”/“Một người thương bạn” và afterLetter, đạt 1/1. Các vùng ngoài thay đổi đã qua hồi quy đầy đủ 4370/4370 (2 skip) ở lượt trước đó; không khẳng định đã chạy lại toàn suite sau a33fb2a. Git tree nhánh tích hợp được đối chiếu với chính bản này trước push.

@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import LetterExtras from '../letters/LetterExtras.jsx'
+import { withNameFallbacks } from '../letters/names.js'
 import { S } from './strings.js'
 
 const L = S.letters
@@ -34,7 +35,7 @@ export default function LetterRoomPreview({ letter, onClose }) {
       </button>
       <Suspense fallback={<p role="status">…</p>}>
         {letter.template === 'room' ? (
-          <LetterRoom letter={letter} preview onExit={onClose} afterLetter={<LetterExtras />} />
+          <LetterRoom letter={withNameFallbacks(letter)} preview onExit={onClose} afterLetter={<LetterExtras />} />
         ) : (
           <LetterWeb letter={letter} preview onExit={onClose} afterLetter={<LetterExtras />} />
         )}

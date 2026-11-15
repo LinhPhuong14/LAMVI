@@ -26,23 +26,276 @@
   justify-items: center;
   gap: 12px;
   padding: 24px 16px;
-  background: #1e140c;
+  background:
+    radial-gradient(70% 50% at 50% 0%, rgb(217 176 122 / 14%), transparent 70%),
+    #1e140c;
   color: #f6ead2;
+  font-family: var(--sans, 'Be Vietnam Pro', sans-serif);
   text-align: center;
   box-sizing: border-box;
 }
 .lt-intro-step {
   margin: 0;
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
+  font: 600 0.72rem/1.4 var(--sans, 'Be Vietnam Pro', sans-serif);
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: #d9b07a;
 }
+/* D-144: tiêu đề video sáng màu kem (trước đây ăn màu h1 nâu của trang → gần như không đọc được trên nền tối) */
 .lt-intro-title {
-  margin: 0;
+  margin: 0 0 4px;
+  color: #f6ead2;
   font-family: var(--serif, Georgia, serif);
+  font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  line-height: 1.2;
+  text-shadow: 0 0 24px rgb(217 176 122 / 25%);
+}
+
+/* D-145: màn "Cùng xem cách chiếc đèn được làm ra nhé" phủ lên video đầu (video đã nạp sẵn phía dưới) */
+.lt-intro {
+  position: relative;
+}
+.lt-intro-player {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: 100%;
+}
+.lt-intro-head,
+.lt-intro-foot {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+.lt-intro-welcome {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 16px;
+  padding: 32px 16px;
+  background:
+    radial-gradient(55% 40% at 50% 46%, rgb(214 156 82 / 20%), transparent 72%),
+    radial-gradient(120% 90% at 50% 100%, #2a1a0e, #140d07 70%);
+  text-align: center;
+  animation: lt-rise 0.8s ease both;
+}
+.lt-intro-welcome-title {
+  display: grid;
+  margin: 0;
+  color: #f6ead2;
+  font: italic 500 clamp(1.6rem, 5.4vw, 2.5rem) / 1.25 var(--serif, Georgia, serif);
+}
+.lt-intro-welcome-hand {
+  font: normal 700 clamp(2.4rem, 9vw, 4.2rem) / 1.15 'Dancing Script', cursive;
+  color: #e8b874;
+  text-shadow:
+    0 0 18px rgb(255 190 110 / 45%),
+    0 0 48px rgb(214 140 60 / 30%);
+}
+.lt-intro-welcome-sub {
+  max-width: 36ch;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgb(246 234 210 / 72%);
+}
+.lt-intro-start {
+  min-width: 180px;
+  box-shadow: 0 0 28px rgb(217 176 122 / 35%);
+}
+.lt-intro-start span {
+  margin-right: 6px;
+  font-size: 0.8em;
+}
+
+/* Đang phát: phủ kín màn hình (kể cả khi trình duyệt không cho Fullscreen API, vd iPhone) */
+.lt-intro.is-playing {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  padding: 0;
+  background: #000;
+  align-content: stretch;
+}
+.lt-intro.is-playing .lt-intro-player {
+  position: relative;
+  height: 100%;
+  display: block;
+}
+.lt-intro.is-playing .lt-intro-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border-radius: 0;
+  object-fit: contain;
+}
+.lt-intro.is-playing .lt-intro-head {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  padding: max(16px, env(safe-area-inset-top)) 16px 40px;
+  background: linear-gradient(rgb(0 0 0 / 65%), transparent);
+  pointer-events: none;
+  /* tên video hiện vài giây rồi mờ đi để không che hình */
+  animation: lt-head-fade 5s ease forwards;
+}
+.lt-intro.is-playing .lt-intro-foot {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  padding: 24px 16px max(64px, calc(env(safe-area-inset-bottom) + 56px));
+  pointer-events: none;
+}
+.lt-intro.is-playing .lt-intro-foot > * {
+  pointer-events: auto;
+}
+.lt-intro.is-playing .lt-intro-hint {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 45%);
+  animation: lt-head-fade 6s ease forwards;
+}
+.lt-intro:fullscreen {
+  width: 100%;
+  height: 100%;
+}
+@keyframes lt-head-fade {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* D-144: màn "LAMVI đem đến cho bạn chiếc đèn giấy dó với trải nghiệm độc nhất" */
+.lt-interlude {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 18px;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background:
+    radial-gradient(55% 40% at 50% 46%, rgb(214 156 82 / 22%), transparent 72%),
+    radial-gradient(120% 90% at 50% 100%, #2a1a0e, #140d07 70%);
+  color: #f6ead2;
+  text-align: center;
+  outline: none;
+  isolation: isolate;
+}
+.lt-interlude-glow {
+  position: absolute;
+  inset: auto 0 18%;
+  height: 40vh;
+  z-index: -1;
+  background: radial-gradient(40% 50% at 50% 50%, rgb(255 200 120 / 18%), transparent 70%);
+  animation: lt-breathe 5s ease-in-out infinite;
+}
+.lt-interlude-logo {
+  width: 120px;
+  height: auto;
+  /* logotype nâu → kem trên nền tối */
+  filter: brightness(0) invert(0.92) sepia(0.35);
+  opacity: 0;
+  animation: lt-rise 1s ease 0.1s forwards;
+}
+.lt-interlude-title {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  color: inherit;
+  font-weight: 400;
+}
+.lt-interlude-line {
+  font: italic 500 clamp(1.35rem, 4.6vw, 2rem) / 1.3 var(--serif, Georgia, serif);
+  letter-spacing: 0.01em;
+  opacity: 0;
+  animation: lt-rise 1s ease 0.5s forwards;
+}
+.lt-interlude-hand {
+  font: 700 clamp(2.6rem, 10vw, 4.6rem) / 1.15 'Dancing Script', cursive;
+  color: #e8b874;
+  text-shadow:
+    0 0 18px rgb(255 190 110 / 45%),
+    0 0 48px rgb(214 140 60 / 30%);
+  /* nét viết tay hiện dần trái → phải */
+  clip-path: inset(-20% 100% -20% 0);
+  animation: lt-write 1.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) 1s forwards;
+}
+.lt-interlude-line-2 {
+  animation-delay: 2s;
+}
+.lt-interlude-sub {
+  max-width: 34ch;
+  margin: 4px 0 0;
+  font: 400 0.95rem/1.6 var(--sans, 'Be Vietnam Pro', sans-serif);
+  color: rgb(246 234 210 / 72%);
+  opacity: 0;
+  animation: lt-rise 1s ease 2.3s forwards;
+}
+.lt-interlude-go {
+  min-width: 160px;
+  margin-top: 6px;
+  font: 600 0.95rem/1 var(--sans, 'Be Vietnam Pro', sans-serif);
+  letter-spacing: 0.06em;
+  box-shadow: 0 0 28px rgb(217 176 122 / 35%);
+  /* bấm được ngay nên không ẩn hẳn — mờ rồi rõ dần khi chữ chạy xong */
+  opacity: 0.35;
+  transform: translateY(8px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+.lt-interlude-go.is-ready {
+  opacity: 1;
+  transform: none;
+}
+.lt-interlude.is-instant * {
+  animation: none !important;
+  opacity: 1 !important;
+  clip-path: none !important;
+  transform: none !important;
+}
+@keyframes lt-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes lt-write {
+  to {
+    clip-path: inset(-20% -5% -20% 0);
+  }
+}
+@keyframes lt-breathe {
+  50% {
+    opacity: 0.6;
+    transform: scale(1.06);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lt-interlude * {
+    animation: none !important;
+    opacity: 1 !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
 }
 .lt-intro-video {
   width: min(960px, 100%);
@@ -52,8 +305,9 @@
 }
 .lt-intro-hint {
   margin: 0;
-  font-size: 0.9rem;
-  opacity: 0.85;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
 }
 .lt-intro-actions {
   display: flex;
@@ -68,7 +322,8 @@
   border-radius: 999px;
   background: #d9b07a;
   color: #2b1a0e;
-  font: inherit;
+  font: 600 0.92rem/1.2 var(--sans, 'Be Vietnam Pro', sans-serif);
+  letter-spacing: 0.03em;
   cursor: pointer;
 }
 .lt-btn-ghost {
@@ -184,4 +439,96 @@
   fill-opacity: 1;
   stroke-width: 0.3;
   stroke-dashoffset: 0;
+}
+
+/* D-146: yêu cầu xoay ngang điện thoại */
+.lt-rotate {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 32px 24px;
+  background:
+    radial-gradient(55% 40% at 50% 46%, rgb(214 156 82 / 20%), transparent 72%),
+    radial-gradient(120% 90% at 50% 100%, #2a1a0e, #140d07 70%);
+  color: #f6ead2;
+  text-align: center;
+  font-family: var(--sans, 'Be Vietnam Pro', sans-serif);
+}
+.lt-rotate-icon {
+  color: #e8b874;
+  filter: drop-shadow(0 0 12px rgb(255 190 110 / 40%));
+  animation: lt-rotate-phone 2.4s ease-in-out infinite;
+}
+.lt-rotate-title {
+  display: grid;
+  margin: 0;
+  color: #f6ead2;
+  font: italic 500 clamp(1.5rem, 6vw, 2.2rem) / 1.25 var(--serif, Georgia, serif);
+}
+.lt-rotate-hand {
+  font: normal 700 clamp(2.2rem, 10vw, 3.4rem) / 1.15 'Dancing Script', cursive;
+  color: #e8b874;
+  text-shadow: 0 0 18px rgb(255 190 110 / 45%);
+}
+.lt-rotate-sub {
+  max-width: 32ch;
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: rgb(246 234 210 / 72%);
+}
+@keyframes lt-rotate-phone {
+  0%,
+  20% {
+    transform: rotate(0deg);
+  }
+  50%,
+  80% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lt-rotate-icon {
+    animation: none;
+  }
+}
+
+/* D-146: điện thoại xoay ngang (màn thấp) — màn chào/giới thiệu vừa một màn hình */
+@media (orientation: landscape) and (max-height: 520px) {
+  .lt-interlude,
+  .lt-intro-welcome {
+    gap: 8px;
+    padding: 16px;
+  }
+  .lt-interlude-logo {
+    width: 84px;
+  }
+  .lt-interlude-line {
+    font-size: clamp(1.1rem, 6svh, 1.5rem);
+  }
+  .lt-interlude-hand,
+  .lt-intro-welcome-hand {
+    font-size: clamp(2rem, 13svh, 3rem);
+  }
+  .lt-intro-welcome-title {
+    font-size: clamp(1.2rem, 6.5svh, 1.7rem);
+  }
+  .lt-interlude-sub,
+  .lt-intro-welcome-sub {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    max-width: 56ch;
+  }
+  .lt-interlude-go,
+  .lt-intro-start {
+    margin-top: 2px;
+    min-height: 40px;
+  }
 }

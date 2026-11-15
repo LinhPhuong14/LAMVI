@@ -948,3 +948,15 @@ Kiểm thử độc lập T-11: 12/12; bộ test phong thư hiện có 91/91. Br
 Còn lại: chưa kiểm trên điện thoại vật lý. Không có migration hay biến môi trường mới.
 
 Xác nhận merge 2026-11-15: cập nhật đến e3565ff (D-143), giữ ảnh minh họa và Routing.extra async fix; xử lý thêm ba assertions 3D cũ trong HandwrittenTitle.test, giữ bốn ca 2D. Full cuối 284 tệp/4370 đạt/2 skip; focused 169 đạt; lint/build và browser web mặc định + 3D font title đều đạt. Master được cập nhật qua merge commit có cùng Git tree với bản đã kiểm; `.mcp.json` ngoài phạm vi merge được bảo toàn.
+
+## 2026-11-15 — Luồng QR: màn chào, video tự phát, giới thiệu LAMVI, xoay ngang (D-144…D-146, T-110)
+
+**Đã làm**: `/thu/<slug>` = (xoay ngang) → màn "Cùng xem cách chiếc đèn được làm ra nhé" → hai video toàn màn hình tự phát nối tiếp → màn "LAMVI đem đến cho bạn chiếc đèn giấy dó với trải nghiệm độc nhất" → bật đèn (lời mời "Hãy cùng thắp sáng chiếc đèn của bạn") → phong thư. Font: Cormorant Garamond nghiêng (tiêu đề), Dancing Script (chữ viết tay), Be Vietnam Pro (giao diện); sửa tiêu đề video bị ăn màu nâu. CSS riêng cho điện thoại nằm ngang (màn thấp). Ảnh chụp kiểm ở 1280×800, 390×844 (dọc → lời nhắc xoay), 844×390, 667×375.
+
+Kiểm thử độc lập (T-11) cho D-144: `src/letters/interlude.independent.test.jsx` (30 test), không phát hiện lỗi; ghi chú UX đã sửa (nút "Bước vào" không còn vô hình trước khi hiện rõ, không cướp focus nếu người dùng đã Tab đi). Test D-145/D-146: `src/letters/welcome-rotate.test.jsx`.
+
+**Còn lại / cần người dùng**: QA trên iPhone/Android thật (tự phát có tiếng, toàn màn hình, khoá xoay).
+
+**Cập nhật cùng ngày (D-147)**: tên người nhận/người gửi tuỳ chọn — server chỉ còn giới hạn độ dài; web 2D hiện "Gửi bạn," / chữ ký "Thương mến,"; Phòng thư 3D nhận chữ thay thế; test `src/letters/names.test.jsx`. Merge master (minh hoạ dịp của Codex, D-143) vào nhánh, đổi mã quyết định của nhánh thành D-144…D-147.
+
+Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an toàn); đã hợp nhất thêm D-144…D-147, không force push. Bản mới nhất lint/build đạt và 453 kiểm thử vùng bị ảnh hưởng đạt; test độc lập tên rỗng D147 đạt. Hồi quy đầy đủ 4370 pass/2 skip là trên head trước a33, không báo sai là full trên head cuối. Giữ nguyên mọi màn chào/video/RotateGate/names fallback.

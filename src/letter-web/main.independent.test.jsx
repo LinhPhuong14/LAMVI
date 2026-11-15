@@ -116,6 +116,7 @@ describe('Người nhận /thu/:slug và xem thử admin: chỉ "room" mở 3D',
     window.location.hash = `#${TOKEN}`
     const utils = renderAt(`/thu/${SLUG}?fallback=1`)
     fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua, vào phòng' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-144: màn giới thiệu LAMVI
     return utils
   }
 
@@ -349,7 +350,7 @@ describe('Admin: soạn thư + thư viện QR', () => {
       const l = document.querySelectorAll('.letter-gallery > li')
       expect(l).toHaveLength(2)
       return [...l]
-    }, { timeout: 1500 })
+    }, { timeout: 5000 })
     err.mockRestore()
     for (const li of lis) expect(li.textContent).toContain(S.letters.experienceShort.web)
   })

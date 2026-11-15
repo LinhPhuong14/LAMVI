@@ -101,8 +101,8 @@ describe('Tạo thư lẻ', () => {
     [{ label: 123 }, 'label', 'INVALID'],
     [{ label: ['a'] }, 'label', 'INVALID'],
     [{ label: 'x'.repeat(121) }, 'label', 'TOO_LONG'],
-    [{ content: { recipientName: '', senderName: 'An', message: 'x' } }, 'recipientName', 'REQUIRED'],
-    [{ content: 'chuỗi' }, 'recipientName', 'REQUIRED'],
+    [{ content: { recipientName: '', senderName: 'An', message: 'x' } }, 'occasion', 'INVALID'],
+    [{ content: 'chuỗi' }, 'kind', 'INVALID'],
     [{ content: { ...CONTENT, recipientName: 'x'.repeat(500) } }, 'recipientName', 'TOO_LONG'],
   ])('400 với dữ liệu sai %j', async (body, field, code) => {
     const r = await api('post', '/admin/letters').send(body)

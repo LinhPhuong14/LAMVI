@@ -3,6 +3,7 @@ import HandwrittenTitle from '../letters/HandwrittenTitle.jsx'
 import Envelope from './Envelope.jsx'
 import Surprise from './Surprise.jsx'
 import { reducedMotion } from './effects.js'
+import { recipientOf, senderOf } from '../letters/names.js'
 import { LAMPS, DEFAULT_LAMP, lampSrc, themeOf } from './themes.js'
 // Font viết tay có bộ dấu tiếng Việt (OFL-1.1): Dancing Script cho lời đề tặng/chữ ký, Patrick Hand cho thân thư
 import '@fontsource/dancing-script/latin-700.css'
@@ -15,7 +16,7 @@ import './web.css'
 const NEXT = { lighting: 'rising', rising: 'unfolding', unfolding: 'reading' }
 const TIMING = { lighting: 1000, rising: 1900, unfolding: 1200 }
 const STATUS = {
-  dark: 'Căn phòng còn tối. Bấm bật đèn để bắt đầu.',
+  dark: 'Căn phòng còn tối. Hãy cùng thắp sáng chiếc đèn của bạn: bấm Bật đèn.',
   lighting: 'Đèn đang sáng dần.',
   rising: 'Một phong thư đang trồi lên.',
   unfolding: 'Lá thư đang mở ra.',
@@ -72,6 +73,9 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
   const theme = themeOf(letter.occasion)
   const lamp = Object.hasOwn(LAMPS, letter.lamp) ? letter.lamp : DEFAULT_LAMP
   const d = letter.occasionData ?? {}
+  // D-147: bỏ trống tên → "Gửi bạn,", chữ ký chỉ còn "Thương mến,"
+  const recipient = recipientOf(letter)
+  const sender = senderOf(letter)
 
   const paragraphs = useMemo(() => {
     if (letter.kind !== 'text') return []
@@ -196,6 +200,12 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         <p className="lw-lamp-name">Đèn {LAMPS[lamp]}</p>
 
         {phase === 'dark' && (
+          // D-144: lời mời bật đèn (chữ viết tay, sáng nhẹ)
+          <p className="lw-invite" aria-hidden="true">
+            Hãy cùng thắp sáng chiếc đèn của bạn
+          </p>
+        )}
+        {phase === 'dark' && (
           <button ref={switchRef} type="button" className="lw-switch" onClick={light}>
             <span className="lw-switch-track" aria-hidden="true">
               <span className="lw-switch-knob" />
@@ -225,7 +235,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
       )}
 
       {phase === 'reading' && (
-        <article className="lw-letter" ref={readerRef} tabIndex={-1} aria-label={`Lời chúc gửi ${letter.recipientName}`}>
+        <article className="lw-letter" ref={readerRef} tabIndex={-1} aria-label={`Lời chúc gửi ${recipient}`}>
           {!reduced && (
             <div className="lw-letter-sparkles" aria-hidden="true">
               {SPARKLES.map((s, i) => (
@@ -234,7 +244,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
             </div>
           )}
           <img className="lw-letter-stamp" src={theme.stamp} alt="" aria-hidden="true" />
-          <HandwrittenTitle as="h2" className="lw-dedication" text={`Gửi ${letter.recipientName},`} instant={reduced} onDone={() => setTitleDone(true)} />
+          <HandwrittenTitle as="h2" className="lw-dedication" text={`Gửi ${recipient},`} instant={reduced} onDone={() => setTitleDone(true)} />
           <div className={`lw-content${titleDone ? ' is-shown' : ''}`} inert={!titleDone} aria-hidden={!titleDone}>
             {letter.kind === 'text' ? (
               <>
@@ -276,7 +286,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
             )}
             <div className="lw-signature">
               <span>Thương mến,</span>
-              <strong>{letter.senderName}</strong>
+              {sender && <strong>{sender}</strong>}
             </div>
             {letter.postscript && <p className="lw-ps">{letter.postscript}</p>}
             {hasSurprise && (

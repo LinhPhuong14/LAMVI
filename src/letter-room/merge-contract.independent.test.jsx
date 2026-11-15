@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import LetterRoom from './LetterRoom'
 import LetterReader from './LetterReader'
 import { validateLetter } from './data'
+import { withNameFallbacks } from '../letters/names.js'
 import { mockApi, renderAt } from '../test/renderApp.jsx'
 import { letterUrl, presentLetterForRecipient, validateLetterContent } from '../../server/domain/letter.js'
 
@@ -19,6 +20,17 @@ beforeEach(()=>{
 afterEach(()=>{cleanup();vi.useRealTimers();vi.restoreAllMocks();vi.unstubAllGlobals();localStorage.clear();window.location.hash=''})
 
 describe('independent merged reader contracts',()=>{
+  it('D147 empty names render accessible room fallbacks and afterLetter immediately with reduced motion', () => {
+    const supplied={...base,recipientName:'',senderName:''}
+    const letter=validateLetter(withNameFallbacks(supplied))
+    const {container}=render(<LetterReader letter={letter} afterLetter={<button>Xem lại cách làm đèn</button>}/>)
+    expect(screen.getByRole('heading',{level:2,name:'Gửi bạn,'})).toBeVisible()
+    expect(screen.getByText('Một người thương bạn',{selector:'.lr-signature strong'})).toBeVisible()
+    expect(container.querySelector('.lr-letter-content')).not.toHaveAttribute('inert')
+    expect(screen.getByRole('button',{name:'Xem lại cách làm đèn'})).toBeEnabled()
+    expect(supplied.recipientName).toBe('')
+    expect(supplied.senderName).toBe('')
+  })
   it('font title for Vietnamese names has no SVG and gates body until actual docking completes',async()=>{
     vi.useFakeTimers();vi.spyOn(performance,'now').mockImplementation(()=>Date.now());vi.stubGlobal('matchMedia',media(false))
     const {container}=render(<LetterReader letter={validateLetter(base)}/>)
