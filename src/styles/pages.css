@@ -8977,3 +8977,10 @@ h1 {
   line-height: 1;
   cursor: pointer;
 }
+
+/* Đèn catalog trong dashboard khách (T-111) */
+.dash-lamp {
+  display: block;
+  width: auto;
+  max-width: none;
+}

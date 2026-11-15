@@ -967,3 +967,9 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 **Cập nhật 2026-11-15 (D-149)**: phong thư vừa một màn hình ở mọi pha (đo `scrollHeight === innerHeight` tại 5 kích thước), tờ thư cuộn trong khung, đọc thư hai cột ở màn ngang; bỏ câu "Phong thư chỉ mở khi điện thoại nằm ngang".
 
 **Cập nhật 2026-11-15 (D-150)**: tắt hai video mở đầu + hai nút video cuối thư, cho xem dọc (bỏ lời nhắc xoay ngang) — sau cờ `LETTER_FLOW`; kiểm một màn hình ở dọc 390×844, 360×740.
+
+## 2026-11-15 — Ảnh đèn catalog ở thư và dashboard (T-111)
+
+**Đã làm**: dựng lại banner thư bằng năm ảnh đèn catalog (nét, đúng màu), đúng bảng màu thương hiệu; thay ba hình đèn vẽ ở dashboard khách bằng ảnh đèn catalog. Test: `server/mailBanner.independent.test.js`.
+
+**Còn lại / cần người dùng**: xem thư thật ở Gmail/Outlook (ảnh banner chỉ hiện khi có `PUBLIC_SITE_URL` công khai).
