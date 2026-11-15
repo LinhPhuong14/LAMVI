@@ -72,7 +72,7 @@ describe('D-146: xoay ngang điện thoại', () => {
         <button type="button">Bên trong</button>
       </RotateGate>,
     )
-    expect(screen.getByRole('dialog', { name: /Xoay ngang điện thoại/ })).toBeTruthy()
+    expect(screen.getByRole('dialog', { name: /xoay ngang điện thoại/i })).toBeTruthy()
     const box = document.querySelector('.lt-rotate-content')
     expect(box.hasAttribute('inert')).toBe(true)
     expect(box.getAttribute('aria-hidden')).toBe('true')

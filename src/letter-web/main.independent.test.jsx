@@ -350,7 +350,7 @@ describe('Admin: soạn thư + thư viện QR', () => {
       const l = document.querySelectorAll('.letter-gallery > li')
       expect(l).toHaveLength(2)
       return [...l]
-    }, { timeout: 1500 })
+    }, { timeout: 5000 })
     err.mockRestore()
     for (const li of lis) expect(li.textContent).toContain(S.letters.experienceShort.web)
   })

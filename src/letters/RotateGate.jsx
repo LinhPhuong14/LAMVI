@@ -19,7 +19,8 @@ function subscribe(listener) {
 }
 
 /**
- * D-146: trang phong thư luôn yêu cầu xoay ngang điện thoại trước khi bắt đầu (và mỗi khi quay lại dọc).
+ * D-146: trang phong thư BẮT BUỘC xoay ngang điện thoại để trải nghiệm tốt nhất — trước khi bắt đầu và mỗi khi
+ * quay lại dọc (cả trang thư thật /thu/<slug> lẫn bản demo /phong-thu).
  * Nội dung vẫn được giữ (không mất vị trí video/pha), chỉ bị khoá + che; video đang phát thì tạm dừng
  * và thoát toàn màn hình (lớp toàn màn hình sẽ che mất lời nhắc).
  */
@@ -56,10 +57,10 @@ export default function RotateGate({ children }) {
           </svg>
           <p className="lt-intro-step">Phong thư LAMVI</p>
           <h1 id="lt-rotate-title" className="lt-rotate-title">
-            Xoay ngang điện thoại
-            <span className="lt-rotate-hand">để bắt đầu nhé</span>
+            Vui lòng xoay ngang điện thoại
+            <span className="lt-rotate-hand">để trải nghiệm phong thư tốt nhất</span>
           </h1>
-          <p className="lt-rotate-sub">Trải nghiệm được làm cho màn hình nằm ngang. Nếu màn hình không xoay, hãy tắt khoá xoay màn hình.</p>
+          <p className="lt-rotate-sub">Phong thư chỉ mở khi điện thoại nằm ngang. Nếu màn hình không xoay, hãy tắt khoá xoay màn hình.</p>
         </section>
       )}
     </>
