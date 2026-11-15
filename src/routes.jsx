@@ -93,6 +93,8 @@ export default function AppRoutes() {
         <Route path="orders/:code" element={<RouteLoader><AdminOrdersPage /></RouteLoader>} />
         <Route path="orders/:code/letter" element={<RouteLoader><LetterEditorPage /></RouteLoader>} />
         <Route path="letters" element={<RouteLoader><LettersGalleryPage /></RouteLoader>} />
+        {/* D-142: phong thư lẻ không gắn đơn (`new` = tạo mới) */}
+        <Route path="letters/:id" element={<RouteLoader><LetterEditorPage /></RouteLoader>} />
         <Route path="users" element={<RouteLoader><UsersPage /></RouteLoader>} />
         <Route path="users/:id" element={<RouteLoader><UsersPage /></RouteLoader>} />
         <Route path="coupons" element={<RouteLoader><CouponsPage /></RouteLoader>} />

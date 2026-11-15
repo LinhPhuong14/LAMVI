@@ -212,7 +212,7 @@ describe('Thư viện QR — trạng thái', () => {
   it('rỗng → thông báo chưa có phong thư', async () => {
     mockApi({ 'GET /me': me, 'GET /admin/letters': () => ({ body: { items: [] } }) })
     renderAt('/admin/letters')
-    expect(await screen.findByText('Chưa có phong thư nào được xuất bản.')).toBeTruthy()
+    expect(await screen.findByText('Chưa có phong thư nào.')).toBeTruthy()
   })
 
   it('mục không có url → không có nút sao chép link; đơn null → không có link sửa', async () => {

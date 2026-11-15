@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Field from '../components/Field'
 import { useAuth } from '../auth/context.js'
 import PageHead from './PageHead.jsx'
@@ -83,30 +83,44 @@ function previewOf(f) {
   return { ...c, message: paragraphsOf(c.message), occasionData: Object.keys(od).length ? od : null, postscript: c.postscript || null }
 }
 
-/** D-134: admin soạn toàn bộ phong thư của một đơn, xem trước, xuất bản ra QR (D-138). */
+/**
+ * D-134: admin soạn toàn bộ phong thư của một đơn, xem trước, xuất bản ra QR (D-138).
+ * D-142: cùng trang cho thư lẻ không gắn đơn — `/admin/letters/new` (tạo khi lưu lần đầu) và `/admin/letters/:id`.
+ */
 export default function LetterEditorPage() {
-  const { code } = useParams()
+  const { code, id } = useParams()
+  const navigate = useNavigate()
+  // Đổi địa chỉ new → id làm cả trang admin dựng lại (RouteLoader theo pathname): thông báo đi kèm state điều hướng
+  const flash = useLocation().state?.flash ?? null
+  const isNew = !code && id === 'new'
   const { authedApi } = useAuth()
+  const [label, setLabel] = useState('')
   const [letter, setLetter] = useState(null)
   const [loaded, setLoaded] = useState(false)
   const [form, setForm] = useState(EMPTY)
   const [dirty, setDirty] = useState(false)
   const [errors, setErrors] = useState({})
-  const [message, setMessage] = useState(null)
+  const [message, setMessage] = useState(flash)
   const [busy, setBusy] = useState(false)
-  const path = `/admin/orders/${encodeURIComponent(code)}/letter`
+  const path = code ? `/admin/orders/${encodeURIComponent(code)}/letter` : isNew ? null : `/admin/letters/${encodeURIComponent(id)}`
 
   const load = useCallback(async () => {
+    if (!path) {
+      await Promise.resolve()
+      setLoaded(true)
+      return
+    }
     try {
       const r = await authedApi(path)
       setLetter(r.item)
       setForm(toForm(r.item?.content))
+      setLabel(r.item?.label ?? '')
       setLoaded(true)
     } catch (err) {
-      setMessage(err.status === 404 ? L.orderNotFound : L.errors.default)
+      setMessage(err.status === 404 ? (code ? L.orderNotFound : L.letterNotFound) : L.errors.default)
       setLoaded(true)
     }
-  }, [authedApi, path])
+  }, [authedApi, path, code])
 
   useEffect(() => {
     // Đồng bộ với hệ thống ngoài (API); mọi setState trong load đều nằm sau `await`.
@@ -170,19 +184,45 @@ export default function LetterEditorPage() {
     }
   }
 
+  // Thư lẻ gửi kèm ghi chú nội bộ; thư của đơn chỉ gửi nội dung
+  const payload = () => (code ? { content: toContent(form) } : { content: toContent(form), label })
+  // Thư lẻ mới: lưu lần đầu = tạo (POST), rồi chuyển sang địa chỉ có id để các thao tác sau dùng chung
+  async function persist() {
+    if (isNew) {
+      const r = await authedApi('/admin/letters', { method: 'POST', body: payload() })
+      return { item: r.item, base: `/admin/letters/${encodeURIComponent(r.item.id)}` }
+    }
+    const r = await authedApi(path, { method: 'PUT', body: payload() })
+    return { item: r.item, base: path }
+  }
+
   const save = () =>
     run(async () => {
-      const r = await authedApi(path, { method: 'PUT', body: { content: toContent(form) } })
-      setLetter(r.item)
+      const { item, base } = await persist()
+      setLetter(item)
       setErrors({})
       setDirty(false)
       setMessage(L.saved)
+      if (isNew) navigate(base, { replace: true, state: { flash: L.saved } })
     })
 
   const publish = () =>
     run(async () => {
+      if (isNew) {
+        // Tạo thư rồi xuất bản; dù xuất bản lỗi vẫn sang địa chỉ có id (không tạo thư trùng ở lần sau),
+        // lỗi đi kèm state điều hướng; trang mới nạp lại trạng thái từ server sau khi xuất bản xong
+        const { base } = await persist()
+        let flashMsg = null
+        try {
+          await authedApi(`${base}/publish`, { method: 'POST' })
+        } catch (err) {
+          flashMsg = L.errors[err.code] ?? L.errors.default
+        }
+        navigate(base, { replace: true, state: { flash: flashMsg } })
+        return
+      }
       if (dirty) {
-        const s = await authedApi(path, { method: 'PUT', body: { content: toContent(form) } })
+        const s = await persist()
         setLetter(s.item)
         setDirty(false)
       }
@@ -205,10 +245,16 @@ export default function LetterEditorPage() {
 
   return (
     <div className="admin-page letter-editor">
-      <PageHead eyebrow={L.editorEyebrow} title={code}>
-        <Link className="btn btn-small" to={`/admin/orders/${encodeURIComponent(code)}`}>
-          {L.toOrder}
-        </Link>
+      <PageHead eyebrow={code ? L.editorEyebrow : L.standalone} title={code ?? (label.trim() || form.recipientName.trim() || L.standaloneNew)}>
+        {code ? (
+          <Link className="btn btn-small" to={`/admin/orders/${encodeURIComponent(code)}`}>
+            {L.toOrder}
+          </Link>
+        ) : (
+          <Link className="btn btn-small" to="/admin/letters">
+            {L.toGallery}
+          </Link>
+        )}
       </PageHead>
       {!loaded ? (
         <p role="status">…</p>
@@ -225,6 +271,19 @@ export default function LetterEditorPage() {
               {L.status}: <strong>{L.statuses[letter?.status ?? 'none']}</strong>
               {published && ` · ${letter.openedAt ? L.opened : L.notOpened}`}
             </p>
+            {!code && (
+              <Field
+                label={L.label}
+                value={label}
+                onChange={(e) => {
+                  setLabel(e.target.value)
+                  setDirty(true)
+                }}
+                maxLength={120}
+                hint={L.labelHint}
+              />
+            )}
+            {err('label') && <span className="field-error">{err('label')}</span>}
             <Field label={L.experience} as="select" value={form.template} onChange={set('template')} hint={L.experienceHint}>
               <option value="web">{L.experiences.web}</option>
               <option value="room">{L.experiences.room}</option>

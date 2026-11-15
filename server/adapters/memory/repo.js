@@ -614,16 +614,33 @@ export function createMemoryRepo(data = {}) {
       if (patch.slug && state.orderLetters.some((x) => x.slug === patch.slug && x.orderId !== orderId)) throw new RepoError('CONFLICT', 'slug')
       let l = state.orderLetters.find((x) => x.orderId === orderId)
       if (!l) {
-        l = { id: randomUUID(), orderId, status: 'draft', content: null, slug: null, token: null, publishedAt: null, openedAt: null, updatedBy: null, createdAt: now() }
+        l = { id: randomUUID(), orderId, label: null, status: 'draft', content: null, slug: null, token: null, publishedAt: null, openedAt: null, updatedBy: null, createdAt: now() }
         state.orderLetters.push(l)
       }
       Object.assign(l, clone(patch), { updatedAt: now() })
       return clone(l)
     },
-    // Thư viện QR: mọi thư đã từng có QR (slug), mới nhất trước, kèm mã đơn
+    // D-142: thư lẻ (không gắn đơn), khoá theo id
+    async getLetterById(id) {
+      const l = state.orderLetters.find((x) => x.id === id)
+      return l ? clone(l) : null
+    },
+    async createLetter(data) {
+      const l = { id: randomUUID(), orderId: null, label: null, status: 'draft', content: null, slug: null, token: null, publishedAt: null, openedAt: null, updatedBy: null, createdAt: now(), ...clone(data), updatedAt: now() }
+      state.orderLetters.push(l)
+      return clone(l)
+    },
+    async saveLetterById(id, patch) {
+      const l = state.orderLetters.find((x) => x.id === id)
+      if (!l) return null
+      if (patch.slug && state.orderLetters.some((x) => x.slug === patch.slug && x.id !== id)) throw new RepoError('CONFLICT', 'slug')
+      Object.assign(l, clone(patch), { updatedAt: now() })
+      return clone(l)
+    },
+    // Thư viện QR: mọi thư đã từng có QR (slug) + mọi thư lẻ (kể cả nháp), mới nhất trước, kèm mã đơn
     async listOrderLetters({ limit = 500 } = {}) {
       return state.orderLetters
-        .filter((l) => l.slug)
+        .filter((l) => l.slug || !l.orderId)
         .map((l) => ({ ...clone(l), orderCode: byId(state.orders, l.orderId)?.code ?? null, orderStatus: byId(state.orders, l.orderId)?.status ?? null }))
         // Cùng thứ tự với Supabase: published_at giảm dần (chưa xuất bản xếp cuối), rồi updated_at
         .sort((a, b) => (a.publishedAt ? 0 : 1) - (b.publishedAt ? 0 : 1) || String(b.publishedAt ?? '').localeCompare(String(a.publishedAt ?? '')) || String(b.updatedAt).localeCompare(String(a.updatedAt)))

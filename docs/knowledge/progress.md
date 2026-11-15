@@ -1,5 +1,13 @@
 # Tiến độ tính năng
 
+## 2026-11-15 — Phong thư lẻ không cần đơn (feat/letter-standalone, D-142, T-109)
+
+| Việc | Trạng thái | Ở đâu | Còn lại |
+| --- | --- | --- | --- |
+| Migration `order_id` tuỳ chọn + `label` | ✅ | `supabase/migrations/20261115000026_standalone_letters.sql` | **Người dùng chạy trên Supabase** |
+| API thư lẻ (`POST /admin/letters`, `/admin/letters/:id/*`) | ✅ | `server/routes/letters.js`, repo memory/supabase | — |
+| Admin: nút tạo, trang soạn thư lẻ, thư viện liệt kê thư lẻ | ✅ | `LetterEditorPage.jsx`, `LettersGalleryPage.jsx` | — |
+
 ## 2026-11-14 — Web 2D là bản chính (feat/phong-thu-web-main, D-141, T-108)
 
 | Việc | Trạng thái | Ở đâu | Còn lại |

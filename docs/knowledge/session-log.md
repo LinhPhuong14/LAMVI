@@ -910,3 +910,11 @@ Kiểm thử độc lập (T-11): 30 test (`src/letters/room-integration.indepen
 Kiểm thử độc lập (T-11): `src/letter-web/main.independent.test.jsx` (46 test), phát hiện 2 lỗi đã sửa — chữ cuối thư dài nhất viết xong ở ~7,19 s (vượt ngân sách 7 s), thư viện QR sập khi `template` là khoá prototype. Full suite 277 tệp / 4285 đạt (Routing.extra chập chờn, chạy riêng đạt); lint + build xanh.
 
 **Còn lại / cần người dùng**: QA điện thoại thật; thư đã lưu rõ "Phòng thư 3D" trước v0.86 giữ 3D — đổi tay nếu muốn.
+
+## 2026-11-15 — Phong thư lẻ không cần đơn (D-142, T-109)
+
+**Đã làm**: migration `20261115000026` (`order_letters.order_id` tuỳ chọn + `label`); repo `getLetterById`/`createLetter`/`saveLetterById`; `POST /admin/letters` + `/admin/letters/:id/*` dùng chung handler với thư của đơn; admin có nút "Tạo phong thư mới", trang soạn `/admin/letters/new` → `/admin/letters/<id>`, ghi chú nội bộ; thư viện QR liệt kê thư lẻ (kể cả nháp).
+
+Kiểm thử độc lập (T-11): `server/letters.standalone.independent.test.js` + `src/admin/LettersStandalone.independent.test.jsx` (33 test), phát hiện 4 lỗi đã sửa — người nhận mở thư lẻ trên Supabase lỗi 500 (`getOrderById(null)`), xuất bản thư mới có thể hiện "nháp"/mất thông báo lỗi do điều hướng trước khi xuất bản xong, thẻ thư lẻ trùng key trong thư viện. Full suite 279 tệp / 4318 đạt (Routing.extra chập chờn); lint + build xanh.
+
+**Còn lại / cần người dùng**: chạy migration `20261115000026_standalone_letters.sql` trên Supabase.
