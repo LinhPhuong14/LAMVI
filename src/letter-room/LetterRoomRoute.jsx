@@ -18,11 +18,12 @@ export default function LetterRoomRoute() {
         minHeight: "100svh",
         display: "grid",
         placeItems: "center",
-        background: "#f5f1e8",
-        color: "#30433e",
+        background: "#000",
+        color: "#f4e8cf",
+        font: '12px/1.6 "Be Vietnam Pro", sans-serif',
       }}
     >
-      Đang chuẩn bị một góc sáng…
+      Đang chuẩn bị phòng thư…
     </main>
   );
   return mounted ? (

@@ -1610,3 +1610,17 @@ PO đã xác nhận luồng sáu cảnh và yêu cầu trả nền gen, đổi r
 
 
 Cập nhật PO 2026-11-14 (điều chỉnh D-136): camera POV gần bàn hơn; cảnh bật đèn giữ nguyên camera, không cận công tắc. Sau đèn sáng, chạm vùng cảnh đưa bì từ bàn lên chính diện lơ lửng (vật thể di chuyển, camera đứng); kéo dùng mặt phẳng và trục local của bì. Nền gen modern-v4 thay bản rustic v3: cửa gỗ gọn, rèm sáng, tường kem, bàn sát góc phòng. Chụp đèn có đôi gà minh họa tự vẽ cảm hứng Đông Hồ; cần thay artwork thật. Nội dung thư reveal theo grapheme tiếng Việt, có hiện toàn bộ ngay và reduced motion; không tuyên bố thứ tự stroke của font là nét viết thật. Nguồn/prompt: docs/art/room-modern-v4.prompt.md.
+
+
+### Phòng thư — yêu cầu PO 2026-11-14, vòng title/Đông Hồ/review (D-136, T-105)
+
+`TitleInk.jsx` dùng các đường nét SVG tự vẽ cho “Gửi Linh,”: viết chậm ở giữa giấy, giữ một nhịp, dock góc trái rồi mới gọi ready để hiện body/video. Chờ cả clock tối thiểu và CSS transition kết thúc thực tế; pause khi quay dọc, reduced motion hoàn tất ngay. Tên động khác Linh dùng font Itim + mask reveal, chưa có stroke vector cho mọi tên. Không dùng font/mã Apple.
+
+Thân thư hiện theo từ với alpha đồng đều, không cắt qua dấu tiếng Việt; có hiện toàn bộ. Đốm sáng DOM thưa hai bên giấy, không nhận pointer và ẩn khi giảm chuyển động. Gợi ý cuộn nằm dưới mặt giấy; dock compact thu nhỏ để đọc được nhiều dòng. `LamviWishes.jsx` + `wishes.css`: 21 câu nguyên bản do dự án biên tập, chia bảy dịp; người đọc tự bấm câu tiếp, không gán nhầm tác giả nổi tiếng.
+
+Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt cùng thư mục; runtime WebP alpha 1024×550 được compositing lên UV giấy trụ và emissive. Là minh họa lấy cảm hứng Đông Hồ, không phải scan tranh cổ hoặc artwork chính thức của LAMVI. Nâng/rút giấy theo trục local 0,9 đơn vị, bì trở về bàn trong lúc nâng thư; reader giữ nền đục. Góc bánh và cụm giấy được dọn sau review. API `letter/onExit/preview/afterLetter` giữ nguyên.
+
+Đã có năm vòng reviewer UI khó tính dựa trên ảnh thực tế và sửa giữa các vòng. Xem `docs/qa/phong-thu/v5/README.md`, báo cáo từng vòng, frame có timestamp, clip và proof timing để phân biệt phần đã kiểm với giới hạn SwiftShader.
+
+
+Cập nhật PO 2026-11-14 (font title và khởi động): title mọi tên chuyển sang font Dancing Script 400 self-host (Latin + Vietnamese, OFL), reveal bằng mask CSS, giữ center → dock → body và transition guard; bỏ đường nét SVG riêng Linh. Chặn toàn bộ scene/controls bằng visibility + inert + aria-busy khi chưa sẵn sàng; placeholder SSR và loader cùng nền đen. Chờ nền, model, artwork, sáu PBR maps và font; engine chỉ báo ready sau render frame hoàn chỉnh đầu tiên. Đã bỏ opacity !important khiến canvas hiện sớm. QA cố tình giữ request nền: sân khấu vẫn hidden/inert tới lúc tải xong; ảnh và result.json tại docs/qa/phong-thu/font-loading/.

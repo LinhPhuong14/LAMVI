@@ -887,6 +887,22 @@ Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác ch
 
 Cập nhật PO 2026-11-14 (điều chỉnh D-136): camera POV gần bàn hơn; cảnh bật đèn giữ nguyên camera, không cận công tắc. Sau đèn sáng, chạm vùng cảnh đưa bì từ bàn lên chính diện lơ lửng (vật thể di chuyển, camera đứng); kéo dùng mặt phẳng và trục local của bì. Nền gen modern-v4 thay bản rustic v3: cửa gỗ gọn, rèm sáng, tường kem, bàn sát góc phòng. Chụp đèn có đôi gà minh họa tự vẽ cảm hứng Đông Hồ; cần thay artwork thật. Nội dung thư reveal theo grapheme tiếng Việt, có hiện toàn bộ ngay và reduced motion; không tuyên bố thứ tự stroke của font là nét viết thật. Nguồn/prompt: docs/art/room-modern-v4.prompt.md.
 
+
+### Phòng thư — yêu cầu PO 2026-11-14, vòng title/Đông Hồ/review (D-136, T-105)
+
+`TitleInk.jsx` dùng các đường nét SVG tự vẽ cho “Gửi Linh,”: viết chậm ở giữa giấy, giữ một nhịp, dock góc trái rồi mới gọi ready để hiện body/video. Chờ cả clock tối thiểu và CSS transition kết thúc thực tế; pause khi quay dọc, reduced motion hoàn tất ngay. Tên động khác Linh dùng font Itim + mask reveal, chưa có stroke vector cho mọi tên. Không dùng font/mã Apple.
+
+Thân thư hiện theo từ với alpha đồng đều, không cắt qua dấu tiếng Việt; có hiện toàn bộ. Đốm sáng DOM thưa hai bên giấy, không nhận pointer và ẩn khi giảm chuyển động. Gợi ý cuộn nằm dưới mặt giấy; dock compact thu nhỏ để đọc được nhiều dòng. `LamviWishes.jsx` + `wishes.css`: 21 câu nguyên bản do dự án biên tập, chia bảy dịp; người đọc tự bấm câu tiếp, không gán nhầm tác giả nổi tiếng.
+
+Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt cùng thư mục; runtime WebP alpha 1024×550 được compositing lên UV giấy trụ và emissive. Là minh họa lấy cảm hứng Đông Hồ, không phải scan tranh cổ hoặc artwork chính thức của LAMVI. Nâng/rút giấy theo trục local 0,9 đơn vị, bì trở về bàn trong lúc nâng thư; reader giữ nền đục. Góc bánh và cụm giấy được dọn sau review. API `letter/onExit/preview/afterLetter` giữ nguyên.
+
+Đã có năm vòng reviewer UI khó tính dựa trên ảnh thực tế và sửa giữa các vòng. Xem `docs/qa/phong-thu/v5/README.md`, báo cáo từng vòng, frame có timestamp, clip và proof timing để phân biệt phần đã kiểm với giới hạn SwiftShader.
+
+Bàn giao vòng này: 5 báo cáo UI review có ảnh thật; sau audit cuối đã xử lý P1 về biên/độ đục giấy và glyph, bổ sung clip decode + trace CSS. Full suite 4084 pass/2 skip; focused cuối 126 pass; lint/build đạt. Source/title/timingproof trong docs/qa/phong-thu/v5. Phiên khác đã ghép c5316e5 vào master ef4539d trong lúc làm; bản title trung tâm mới ở feat/phong-thu, chưa giải quyết conflict master trong phiên này.
+
+
+Cập nhật PO 2026-11-14 (font title và khởi động): title mọi tên chuyển sang font Dancing Script 400 self-host (Latin + Vietnamese, OFL), reveal bằng mask CSS, giữ center → dock → body và transition guard; bỏ đường nét SVG riêng Linh. Chặn toàn bộ scene/controls bằng visibility + inert + aria-busy khi chưa sẵn sàng; placeholder SSR và loader cùng nền đen. Chờ nền, model, artwork, sáu PBR maps và font; engine chỉ báo ready sau render frame hoàn chỉnh đầu tiên. Đã bỏ opacity !important khiến canvas hiện sớm. QA cố tình giữ request nền: sân khấu vẫn hidden/inert tới lúc tải xong; ảnh và result.json tại docs/qa/phong-thu/font-loading/.
+
 ## 2026-11-14 — Phòng thư 3D vào web, mẫu + xem thử admin (D-139)
 
 **Đã làm**: merge `feat/phong-thu` (letter-room c5316e5) vào nhánh `feat/phong-thu-room`, giải conflict (package/lock theo letter-room, docs gộp hai phía, routes giữ `/thu/:slug` + `/phong-thu`); gỡ `src/wishroom` + Spectral. `/thu/<slug>`: hai video → `LetterRoom` (lazy, three.js chỉ tải sau video) → tiêu đề viết tay (`HandwrittenTitle` trong `LetterReader`) → thân thư → hai nút xem lại (overlay qua portal). Admin: chọn mẫu lời chúc theo dịp, "Xem thử trong Phòng thư" toàn màn hình. Xoá `LetterPaper` 2D + CSS chết. Migration `…0025` người dùng đã chạy.
@@ -920,6 +936,9 @@ Kiểm thử độc lập (T-11): `server/letters.standalone.independent.test.js
 **Còn lại / cần người dùng**: chạy migration `20261115000026_standalone_letters.sql` trên Supabase.
 
 
+## 2026-11-15 — Hợp nhất Phòng thư theo xác nhận PO
+PO cho phép xử lý conflict và merge `feat/phong-thu` vào master. Giữ title font Dancing Script, ready gate/black loading, artwork gen và LAMVI quotes mới; giữ postscript ở reader/cảnh cuối, điều kiện dữ liệu bất ngờ thật từ master. Không đổi mặc định web 2D hoặc `/phong-thu/3d`, API/template/lamp, intro films, afterLetter và phong thư lẻ. Cập nhật dependency giữ Patrick Hand và canvas-confetti; không đổi deploy/schema. Xác minh tại docs/qa/phong-thu/merge-master/.
+
 ## 2026-11-15 — Làm đẹp minh hoạ theo dịp (D-143)
 
 Người dùng yêu cầu ảnh minh hoạ cho các dịp đẹp hơn và cho phép tự generate. Tạo 7 tranh gốc bằng `image_gen`, chất giấy dó/gouache tông kem–nâu và điểm lá/hồng dịu. Ghép vào `Surprise.jsx` thay tem nhỏ ở thiệp bất ngờ; tem phong bì/tờ thư vẫn giữ bộ tư liệu. Bánh sinh nhật không vẽ sẵn nến; nến CSS tách lớp giữ thao tác thổi, thời điểm hiện lời chúc và focus. Xuất WebP 480/960, khung 3:2, alt tiếng Việt; nguồn/prompt đi cùng asset, không dùng ảnh tham chiếu ngoài, không thêm dependency/schema/cấu hình deploy.
@@ -927,6 +946,9 @@ Người dùng yêu cầu ảnh minh hoạ cho các dịp đẹp hơn và cho ph
 Kiểm thử độc lập T-11: 12/12; bộ test phong thư hiện có 91/91. Browser trên build SSR thật: 21 lượt 7 dịp × 1440/360/320, giảm chuyển động; thêm sinh nhật mặc định 390 px: nến tắt, hiện lời chúc, Escape/nút quay lại hoạt động, không tràn ngang, không lỗi JavaScript. Ảnh QA và số đo: `docs/qa/occasion-illustrations/`. Lint/build đạt. Full regression: 4.330 đạt, 2 skipped; 1 ca đổi ngôn ngữ lỗi do assertion đọc DOM trong lúc chuyển trang. Đã sửa test chờ đúng nội dung (không đổi routing sản phẩm), review độc lập xác nhận giữ nguyên kỳ vọng; rerun toàn tệp Routing.extra đạt 26/26, không còn ca lỗi chưa xử lý.
 
 Còn lại: chưa kiểm trên điện thoại vật lý. Không có migration hay biến môi trường mới.
+
+Xác nhận merge 2026-11-15: cập nhật đến e3565ff (D-143), giữ ảnh minh họa và Routing.extra async fix; xử lý thêm ba assertions 3D cũ trong HandwrittenTitle.test, giữ bốn ca 2D. Full cuối 284 tệp/4370 đạt/2 skip; focused 169 đạt; lint/build và browser web mặc định + 3D font title đều đạt. Master được cập nhật qua merge commit có cùng Git tree với bản đã kiểm; `.mcp.json` ngoài phạm vi merge được bảo toàn.
+
 ## 2026-11-15 — Luồng QR: màn chào, video tự phát, giới thiệu LAMVI, xoay ngang (D-144…D-146, T-110)
 
 **Đã làm**: `/thu/<slug>` = (xoay ngang) → màn "Cùng xem cách chiếc đèn được làm ra nhé" → hai video toàn màn hình tự phát nối tiếp → màn "LAMVI đem đến cho bạn chiếc đèn giấy dó với trải nghiệm độc nhất" → bật đèn (lời mời "Hãy cùng thắp sáng chiếc đèn của bạn") → phong thư. Font: Cormorant Garamond nghiêng (tiêu đề), Dancing Script (chữ viết tay), Be Vietnam Pro (giao diện); sửa tiêu đề video bị ăn màu nâu. CSS riêng cho điện thoại nằm ngang (màn thấp). Ảnh chụp kiểm ở 1280×800, 390×844 (dọc → lời nhắc xoay), 844×390, 667×375.
@@ -937,4 +959,5 @@ Kiểm thử độc lập (T-11) cho D-144: `src/letters/interlude.independent.t
 
 **Cập nhật cùng ngày (D-147)**: tên người nhận/người gửi tuỳ chọn — server chỉ còn giới hạn độ dài; web 2D hiện "Gửi bạn," / chữ ký "Thương mến,"; Phòng thư 3D nhận chữ thay thế; test `src/letters/names.test.jsx`. Merge master (minh hoạ dịp của Codex, D-143) vào nhánh, đổi mã quyết định của nhánh thành D-144…D-147.
 
+Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an toàn); đã hợp nhất thêm D-144…D-147, không force push. Bản mới nhất lint/build đạt và 453 kiểm thử vùng bị ảnh hưởng đạt; test độc lập tên rỗng D147 đạt. Hồi quy đầy đủ 4370 pass/2 skip là trên head trước a33, không báo sai là full trên head cuối. Giữ nguyên mọi màn chào/video/RotateGate/names fallback.
 **Cập nhật 2026-11-15 (D-145)**: bỏ dòng gợi ý "Hết video này sẽ tự chuyển sang video tiếp theo." ở video đầu (người dùng yêu cầu); video cuối vẫn nhắc "Xem hết video để bước vào căn phòng…", video lỗi vẫn báo lỗi.

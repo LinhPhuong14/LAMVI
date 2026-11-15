@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import HandwrittenTitle from "../letters/HandwrittenTitle.jsx";
+import TitleInk from "./TitleInk";
+import LamviWishes from "./LamviWishes";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function LetterReader({
   letter,
@@ -12,6 +13,8 @@ export default function LetterReader({
     video = useRef(null);
   const reduced = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const [revealAll, setRevealAll] = useState(reduced);
+  const [scrollHint, setScrollHint] = useState(false);
+  const [hintReady, setHintReady] = useState(reduced);
   const paragraphs = useMemo(() => {
     if (letter.kind !== "text") return [];
     const segmenter = typeof Intl.Segmenter === "function" ? new Intl.Segmenter("vi", { granularity: "grapheme" }) : null;
@@ -29,6 +32,12 @@ export default function LetterReader({
     [playing, setPlaying] = useState(false),
     [error, setError] = useState(false),
     [ended, setEnded] = useState(false);
+  const markWritten = useCallback(() => setWritten(true), []);
+  useEffect(() => {
+    if (!written || !active) return;
+    const timer = setTimeout(() => setHintReady(true), 550);
+    return () => clearTimeout(timer);
+  }, [written, active]);
   useEffect(() => {
     if (!active) video.current?.pause();
   }, [active]);
@@ -36,6 +45,7 @@ export default function LetterReader({
     const el = ref.current;
     el?.focus({ preventScroll: true });
     function grid() {
+      requestAnimationFrame(() => {if(el) setScrollHint(el.scrollHeight > el.clientHeight + 32 && el.scrollTop + el.clientHeight < el.scrollHeight - 32);});
       el?.style.setProperty(
         "--paper-grid",
         `${el.getBoundingClientRect().width / 32}px`,
@@ -55,7 +65,7 @@ export default function LetterReader({
           {
             transform: `translate(${origin.left - bounds.left}px,${origin.top - bounds.top}px) scale(${scale})`,
             height: `${origin.height / Math.max(0.01, scale)}px`,
-            opacity: 0.7,
+            opacity: 1,
           },
           {
             transform: "translate(0,0) scale(1)",
@@ -70,7 +80,10 @@ export default function LetterReader({
         },
       );
     }
-    return () => observer?.disconnect();
+
+    return () => {
+      observer?.disconnect();
+    };
   }, [getPaperRect]);
   useEffect(() => {
     if (reduced || !written || revealAll || !active) return;
@@ -90,27 +103,14 @@ export default function LetterReader({
     <article
       className="lr-reader"
       ref={ref}
+      onScroll={e => {const el=e.currentTarget;setScrollHint(el.scrollTop + el.clientHeight < el.scrollHeight - 32);}}
       tabIndex={-1}
       aria-label={`Lời chúc gửi ${letter.recipientName}`}
     >
       <div className="lr-letter-meta">
         MỘT LỜI THƯƠNG ĐƯỢC GIỮ LẠI<span aria-hidden="true">✧</span>
       </div>
-      {/* Tiêu đề viết tay stroke-by-stroke (D-138); viết xong thì nội dung chính mới hiện */}
-      <HandwrittenTitle
-        as="h2"
-        className="lr-dedication"
-        text={`Gửi ${letter.recipientName},`}
-        instant={reduced}
-        onDone={() => setWritten(true)}
-      >
-        <svg viewBox="0 0 210 24" aria-hidden="true">
-          <path
-            d="M5 16C43 5 119 6 181 13M170 17Q192 12 204 15"
-            pathLength="1"
-          />
-        </svg>
-      </HandwrittenTitle>
+      <TitleInk name={letter.recipientName} active={active} reduced={reduced} onReady={markWritten} />
       <div
         className={`lr-letter-content ${written ? "visible" : ""}`}
         inert={!written}
@@ -118,11 +118,10 @@ export default function LetterReader({
       >
         {letter.kind === "text" ? (
           <>
-            {!revealAll && !reduced && <button className="lr-body-ink-skip" onClick={() => setRevealAll(true)}>Hiện toàn bộ lá thư</button>}
             {paragraphs.map((paragraph, i) => <p key={i} className={`lr-body-ink ${revealAll || reduced ? "is-complete" : ""}`} style={{animationPlayState: active ? "running" : "paused"}}>
               <span className="lr-sr-only">{paragraph.text}</span>
               <span aria-hidden="true" className="lr-body-ink-visual">
-                {paragraph.words.map((word, w) => word.space ? word.text : <span className="lr-body-ink-word" key={w}>
+                {paragraph.words.map((word, w) => word.space ? word.text : <span className="lr-body-ink-word" key={w} style={{"--word-delay": `${word.glyphs[0]?.index * inkStep}s`, animationPlayState: active ? "running" : "paused"}}>
                   {word.glyphs.map(glyph => <span className="lr-body-ink-glyph" key={glyph.index} style={{"--body-ink-delay": `${glyph.index * inkStep}s`, animationPlayState: active ? "running" : "paused"}}>{glyph.text}</span>)}
                 </span>)}
               </span>
@@ -184,10 +183,10 @@ export default function LetterReader({
           <span>Thương mến,</span>
           <strong>{letter.senderName}</strong>
         </div>
-        {/* Tái bút hiện ngay sau thư chính (§21.9 cảnh D), không phụ thuộc điều bất ngờ */}
         {letter.postscript && <p className="lr-postscript">{letter.postscript}</p>}
-        {/* Có nội dung bất ngờ thật (server luôn trả photos: [] cho dịp kỷ niệm) */}
-        {(Object.values(letter.occasionData).some((v) => (Array.isArray(v) ? v.length > 0 : Boolean(v))) || letter.postscript) && (
+        {!revealAll && !reduced && letter.kind === "text" && <button className="lr-body-ink-skip" onClick={() => setRevealAll(true)}>Hiện toàn bộ lá thư</button>}
+        <LamviWishes occasion={letter.occasion} />
+        {(Object.values(letter.occasionData).some(v => Array.isArray(v) ? v.length > 0 : Boolean(v)) || letter.postscript) && (
           <button
             className={`lr-surprise-trigger ${ended ? "is-highlighted" : ""}`}
             onClick={onSurprise}
@@ -199,6 +198,7 @@ export default function LetterReader({
         )}
         {afterLetter}
       </div>
+      {written && hintReady && scrollHint && <span className="lr-reader-scroll-cue" aria-hidden="true">Cuộn để đọc tiếp ↓</span>}
     </article>
   );
 }
