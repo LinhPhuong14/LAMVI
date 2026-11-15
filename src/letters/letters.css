@@ -41,7 +41,7 @@
   text-transform: uppercase;
   color: #d9b07a;
 }
-/* D-143: tiêu đề video sáng màu kem (trước đây ăn màu h1 nâu của trang → gần như không đọc được trên nền tối) */
+/* D-144: tiêu đề video sáng màu kem (trước đây ăn màu h1 nâu của trang → gần như không đọc được trên nền tối) */
 .lt-intro-title {
   margin: 0 0 4px;
   color: #f6ead2;
@@ -53,7 +53,7 @@
   text-shadow: 0 0 24px rgb(217 176 122 / 25%);
 }
 
-/* D-144: màn "Cùng xem cách chiếc đèn được làm ra nhé" phủ lên video đầu (video đã nạp sẵn phía dưới) */
+/* D-145: màn "Cùng xem cách chiếc đèn được làm ra nhé" phủ lên video đầu (video đã nạp sẵn phía dưới) */
 .lt-intro {
   position: relative;
 }
@@ -176,7 +176,7 @@
   }
 }
 
-/* D-143: màn "LAMVI đem đến cho bạn chiếc đèn giấy dó với trải nghiệm độc nhất" */
+/* D-144: màn "LAMVI đem đến cho bạn chiếc đèn giấy dó với trải nghiệm độc nhất" */
 .lt-interlude {
   position: relative;
   min-height: 100svh;
@@ -441,7 +441,7 @@
   stroke-dashoffset: 0;
 }
 
-/* D-145: yêu cầu xoay ngang điện thoại */
+/* D-146: yêu cầu xoay ngang điện thoại */
 .lt-rotate {
   position: fixed;
   inset: 0;
@@ -500,7 +500,7 @@
   }
 }
 
-/* D-145: điện thoại xoay ngang (màn thấp) — màn chào/giới thiệu vừa một màn hình */
+/* D-146: điện thoại xoay ngang (màn thấp) — màn chào/giới thiệu vừa một màn hình */
 @media (orientation: landscape) and (max-height: 520px) {
   .lt-interlude,
   .lt-intro-welcome {

@@ -1,14 +1,14 @@
 # Tiến độ tính năng
 
-## 2026-11-15 — Màn giới thiệu LAMVI + font phong thư (feat/letter-interlude, D-143, T-110)
+## 2026-11-15 — Màn giới thiệu LAMVI + font phong thư (feat/letter-interlude, D-144, T-110)
 
 | Việc | Trạng thái | Ở đâu | Còn lại |
 | --- | --- | --- | --- |
 | Hai video → màn "LAMVI đem đến cho bạn chiếc đèn giấy dó…" → bật đèn | ✅ | `src/letters/Interlude.jsx`, `src/pages/LetterPage.jsx` | QA điện thoại thật |
 | Lời mời "Hãy cùng thắp sáng chiếc đèn của bạn" | ✅ | `src/letter-web/LetterWeb.jsx`, `web.css` | — |
 | Đồng bộ font, sửa tiêu đề video vô hình | ✅ | `src/letters/letters.css` | — |
-| Màn "Cùng xem cách chiếc đèn được làm ra nhé", video toàn màn hình tự phát + nối tiếp (D-144) | ✅ | `src/letters/IntroFilms.jsx` | QA iPhone/Android thật |
-| Luôn yêu cầu xoay ngang điện thoại (D-145) | ✅ | `src/letters/RotateGate.jsx` | QA khoá xoay |
+| Màn "Cùng xem cách chiếc đèn được làm ra nhé", video toàn màn hình tự phát + nối tiếp (D-145) | ✅ | `src/letters/IntroFilms.jsx` | QA iPhone/Android thật |
+| Luôn yêu cầu xoay ngang điện thoại (D-146) | ✅ | `src/letters/RotateGate.jsx` | QA khoá xoay |
 
 ## 2026-11-15 — Phong thư lẻ không cần đơn (feat/letter-standalone, D-142, T-109)
 
@@ -328,3 +328,8 @@ Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác ch
 
 
 Cập nhật PO 2026-11-14 (điều chỉnh D-136): camera POV gần bàn hơn; cảnh bật đèn giữ nguyên camera, không cận công tắc. Sau đèn sáng, chạm vùng cảnh đưa bì từ bàn lên chính diện lơ lửng (vật thể di chuyển, camera đứng); kéo dùng mặt phẳng và trục local của bì. Nền gen modern-v4 thay bản rustic v3: cửa gỗ gọn, rèm sáng, tường kem, bàn sát góc phòng. Chụp đèn có đôi gà minh họa tự vẽ cảm hứng Đông Hồ; cần thay artwork thật. Nội dung thư reveal theo grapheme tiếng Việt, có hiện toàn bộ ngay và reduced motion; không tuyên bố thứ tự stroke của font là nét viết thật. Nguồn/prompt: docs/art/room-modern-v4.prompt.md.
+
+
+### Minh hoạ theo dịp — D-143 (2026-11-15)
+
+Đã ghép bộ 7 tranh gốc AI chất giấy dó/gouache vào thiệp bất ngờ web 2D. Bánh kem hoa mơ với nến CSS thổi tắt được; các dịp còn lại có hình riêng, giữ nội dung cá nhân. WebP 480/960, ảnh 15–21 KB ở bản nhỏ, chỉ tải khi mở thiệp, có alt và khung cố định. Nguồn/prompt: `public/images/occasions/`. QA: 21 lượt reduced motion trên desktop/360/320 + sinh nhật motion mặc định 390 px; T-11 12/12, bộ phong thư cũ 91/91. Lint + client/SSR build đạt. Full regression: 4.330 đạt, 2 skipped; 1 ca đổi ngôn ngữ lỗi do assertion đọc DOM trong lúc chuyển trang. Đã sửa test chờ đúng nội dung (không đổi routing sản phẩm), review độc lập xác nhận giữ nguyên kỳ vọng; rerun toàn tệp Routing.extra đạt 26/26, không còn ca lỗi chưa xử lý.

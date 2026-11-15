@@ -59,7 +59,8 @@ describe('US-012 AC-001 — bộ chọn ngôn ngữ', () => {
     expect(document.documentElement.lang).toBe('vi')
     // <Seo> đặt title trong effect → chờ
     await waitFor(() => expect(document.title).toBe(viMsg.meta.productTitle.replace('{name}', 'Đèn Nguyệt')))
-    expect(screen.getByText(viMsg.products.backToCollection)).toBeInTheDocument()
+    // Title effect không báo toàn bộ DOM đã qua AnimatePresence; chờ nội dung dịch hiện thật.
+    expect(await screen.findByText(viMsg.products.backToCollection)).toBeInTheDocument()
 
     fireEvent.click(within(switcher()).getByRole('link', { name: 'EN' }))
     expect(loc()).toBe('/en/products/den-nguyet')
@@ -67,8 +68,8 @@ describe('US-012 AC-001 — bộ chọn ngôn ngữ', () => {
     expect(document.documentElement.lang).toBe('en')
     // <Seo> đặt title trong effect → chờ
     await waitFor(() => expect(document.title).toBe(enMsg.meta.productTitle.replace('{name}', 'Đèn Nguyệt EN')))
-    expect(screen.getByText(enMsg.products.backToCollection)).toBeInTheDocument()
-    expect(screen.queryByText(viMsg.products.backToCollection)).toBeNull()
+    expect(await screen.findByText(enMsg.products.backToCollection)).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByText(viMsg.products.backToCollection)).toBeNull())
     expect(f.mock.calls.some(([u]) => String(u) === '/api/products/den-nguyet?lang=en')).toBe(true)
 
     fireEvent.click(within(switcher()).getByRole('link', { name: 'ZH' }))
@@ -77,7 +78,7 @@ describe('US-012 AC-001 — bộ chọn ngôn ngữ', () => {
     expect(document.documentElement.lang).toBe('zh-Hans')
     // <Seo> đặt title trong effect → chờ
     await waitFor(() => expect(document.title).toBe(zhMsg.meta.productTitle.replace('{name}', 'Đèn Nguyệt ZH')))
-    expect(screen.getByText(zhMsg.products.backToCollection)).toBeInTheDocument()
+    expect(await screen.findByText(zhMsg.products.backToCollection)).toBeInTheDocument()
 
     fireEvent.click(within(switcher()).getByRole('link', { name: 'VI' }))
     expect(loc()).toBe('/products/den-nguyet')

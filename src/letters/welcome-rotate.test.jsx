@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// D-144 (màn "Cùng xem cách chiếc đèn được làm ra nhé" + video tự phát nối tiếp) và D-145 (yêu cầu xoay ngang)
+// D-145 (màn "Cùng xem cách chiếc đèn được làm ra nhé" + video tự phát nối tiếp) và D-146 (yêu cầu xoay ngang)
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import IntroFilms from './IntroFilms.jsx'
@@ -18,7 +18,7 @@ afterEach(() => {
   setSize(1024, 768)
 })
 
-describe('D-144: màn chào trước video', () => {
+describe('D-145: màn chào trước video', () => {
   it('hiện lời mời xem cách làm đèn, video đầu đã nạp sẵn phía dưới nhưng chưa tự phát', () => {
     render(<IntroFilms onDone={() => {}} />)
     expect(screen.getByRole('heading', { level: 2, name: /Cùng xem cách chiếc đèn\s*được làm ra nhé/ })).toBeTruthy()
@@ -63,7 +63,7 @@ describe('D-144: màn chào trước video', () => {
   })
 })
 
-describe('D-145: xoay ngang điện thoại', () => {
+describe('D-146: xoay ngang điện thoại', () => {
   it('điện thoại cầm dọc → che nội dung + lời nhắc; xoay ngang → mở khoá, giữ nguyên nội dung', () => {
     touch(true)
     setSize(390, 844)

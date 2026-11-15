@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// Kiểm thử độc lập (T-11) cho D-143: màn giới thiệu LAMVI giữa hai video mở đầu và trải nghiệm thư
+// Kiểm thử độc lập (T-11) cho D-144: màn giới thiệu LAMVI giữa hai video mở đầu và trải nghiệm thư
 // (/thu/:slug), lời mời "Hãy cùng thắp sáng chiếc đèn của bạn" ở pha tối của LetterWeb, màu tiêu đề video.
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -54,7 +54,7 @@ afterEach(() => {
   window.location.hash = ''
 })
 
-describe('D-143: thứ tự video → màn giới thiệu → trải nghiệm thư', () => {
+describe('D-144: thứ tự video → màn giới thiệu → trải nghiệm thư', () => {
   it('chỉ hiện màn giới thiệu sau khi video cuối kết thúc; không có đèn/công tắc trước đó', async () => {
     openLetter()
     await screen.findByText(T1)

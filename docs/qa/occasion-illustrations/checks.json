@@ -1,0 +1,191 @@
+[
+  {
+    "key": "birthday",
+    "viewport": 1440,
+    "cardWidth": 520,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/birthday-480.webp",
+    "loaded": 456,
+    "bodyWidth": 1440
+  },
+  {
+    "key": "anniversary",
+    "viewport": 1440,
+    "cardWidth": 520,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/anniversary-480.webp",
+    "loaded": 456,
+    "bodyWidth": 1440
+  },
+  {
+    "key": "thankYou",
+    "viewport": 1440,
+    "cardWidth": 520,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/thankYou-480.webp",
+    "loaded": 456,
+    "bodyWidth": 1440
+  },
+  {
+    "key": "milestone",
+    "viewport": 1440,
+    "cardWidth": 520,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/milestone-480.webp",
+    "loaded": 456,
+    "bodyWidth": 1440
+  },
+  {
+    "key": "encouragement",
+    "viewport": 1440,
+    "cardWidth": 520,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/encouragement-480.webp",
+    "loaded": 456,
+    "bodyWidth": 1440
+  },
+  {
+    "key": "longDistance",
+    "viewport": 1440,
+    "cardWidth": 520,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/longDistance-480.webp",
+    "loaded": 456,
+    "bodyWidth": 1440
+  },
+  {
+    "key": "justBecause",
+    "viewport": 1440,
+    "cardWidth": 520,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/justBecause-480.webp",
+    "loaded": 456,
+    "bodyWidth": 1440
+  },
+  {
+    "key": "birthday",
+    "viewport": 360,
+    "cardWidth": 328,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/birthday-480.webp",
+    "loaded": 280,
+    "bodyWidth": 360
+  },
+  {
+    "key": "anniversary",
+    "viewport": 360,
+    "cardWidth": 328,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/anniversary-480.webp",
+    "loaded": 280,
+    "bodyWidth": 360
+  },
+  {
+    "key": "thankYou",
+    "viewport": 360,
+    "cardWidth": 328,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/thankYou-480.webp",
+    "loaded": 280,
+    "bodyWidth": 360
+  },
+  {
+    "key": "milestone",
+    "viewport": 360,
+    "cardWidth": 328,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/milestone-480.webp",
+    "loaded": 280,
+    "bodyWidth": 360
+  },
+  {
+    "key": "encouragement",
+    "viewport": 360,
+    "cardWidth": 328,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/encouragement-480.webp",
+    "loaded": 280,
+    "bodyWidth": 360
+  },
+  {
+    "key": "longDistance",
+    "viewport": 360,
+    "cardWidth": 328,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/longDistance-480.webp",
+    "loaded": 280,
+    "bodyWidth": 360
+  },
+  {
+    "key": "justBecause",
+    "viewport": 360,
+    "cardWidth": 328,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/justBecause-480.webp",
+    "loaded": 280,
+    "bodyWidth": 360
+  },
+  {
+    "key": "birthday",
+    "viewport": 320,
+    "cardWidth": 288,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/birthday-480.webp",
+    "loaded": 240,
+    "bodyWidth": 320
+  },
+  {
+    "key": "anniversary",
+    "viewport": 320,
+    "cardWidth": 288,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/anniversary-480.webp",
+    "loaded": 240,
+    "bodyWidth": 320
+  },
+  {
+    "key": "thankYou",
+    "viewport": 320,
+    "cardWidth": 288,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/thankYou-480.webp",
+    "loaded": 240,
+    "bodyWidth": 320
+  },
+  {
+    "key": "milestone",
+    "viewport": 320,
+    "cardWidth": 288,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/milestone-480.webp",
+    "loaded": 240,
+    "bodyWidth": 320
+  },
+  {
+    "key": "encouragement",
+    "viewport": 320,
+    "cardWidth": 288,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/encouragement-480.webp",
+    "loaded": 240,
+    "bodyWidth": 320
+  },
+  {
+    "key": "longDistance",
+    "viewport": 320,
+    "cardWidth": 288,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/longDistance-480.webp",
+    "loaded": 240,
+    "bodyWidth": 320
+  },
+  {
+    "key": "justBecause",
+    "viewport": 320,
+    "cardWidth": 288,
+    "overflows": false,
+    "image": "http://127.0.0.1:5299/images/occasions/justBecause-480.webp",
+    "loaded": 240,
+    "bodyWidth": 320
+  }
+]

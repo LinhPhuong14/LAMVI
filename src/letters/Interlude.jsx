@@ -7,7 +7,7 @@ import './letters.css'
 const reducedMotion = () => typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
 
 /**
- * D-143: màn chuyển giữa hai video mở đầu và căn phòng bật đèn — "LAMVI đem đến cho bạn chiếc đèn giấy dó
+ * D-144: màn chuyển giữa hai video mở đầu và căn phòng bật đèn — "LAMVI đem đến cho bạn chiếc đèn giấy dó
  * với trải nghiệm độc nhất". Chữ hiện dần (Cormorant Garamond nghiêng + "chiếc đèn giấy dó" viết tay Dancing Script),
  * nút đi tiếp hiện rõ sau khi chữ chạy xong (bấm được ngay từ đầu, cho người đã quen); người nhận tự bấm,
  * không tự chuyển. Giảm chuyển động: hiện ngay.

@@ -3,6 +3,8 @@
 
 export const OCCASION_THEMES = {
   birthday: {
+    artwork: '/images/occasions/birthday',
+    artworkAlt: 'Bánh kem hoa mơ trên chân đế gốm, ruy băng vàng ấm',
     label: 'Sinh nhật',
     paper: '#f1dfb8',
     accent: '#c48a3a',
@@ -13,6 +15,8 @@ export const OCCASION_THEMES = {
     surprise: 'Mở tấm thiệp sinh nhật',
   },
   anniversary: {
+    artwork: '/images/occasions/anniversary',
+    artworkAlt: 'Hai tách trà bên nhành hoa và dải lụa quấn bên nhau',
     label: 'Kỷ niệm',
     paper: '#f0d9cf',
     accent: '#b5655a',
@@ -23,6 +27,8 @@ export const OCCASION_THEMES = {
     surprise: 'Mở kỷ niệm của chúng mình',
   },
   thankYou: {
+    artwork: '/images/occasions/thankYou',
+    artworkAlt: 'Bó sen trắng gói giấy cùng một phong thư nhỏ',
     label: 'Cảm ơn',
     paper: '#e7e3cc',
     accent: '#7f8f5c',
@@ -33,6 +39,8 @@ export const OCCASION_THEMES = {
     surprise: 'Một lời cảm ơn nữa',
   },
   milestone: {
+    artwork: '/images/occasions/milestone',
+    artworkAlt: 'Hạc giấy vàng bay lên từ những bậc giấy và nhành nguyệt quế',
     label: 'Cột mốc',
     paper: '#efe2c4',
     accent: '#b8923e',
@@ -43,6 +51,8 @@ export const OCCASION_THEMES = {
     surprise: 'Đóng dấu cột mốc',
   },
   encouragement: {
+    artwork: '/images/occasions/encouragement',
+    artworkAlt: 'Mầm xanh vươn lên từ chậu đất dưới ánh mặt trời',
     label: 'Động viên',
     paper: '#f2dcc2',
     accent: '#c26f43',
@@ -53,6 +63,8 @@ export const OCCASION_THEMES = {
     surprise: 'Mở khi cần',
   },
   longDistance: {
+    artwork: '/images/occasions/longDistance',
+    artworkAlt: 'Hai ô cửa sáng đèn nối nhau bằng một chiếc máy bay giấy',
     label: 'Gửi từ xa',
     paper: '#e3e1d4',
     accent: '#5d7c7a',
@@ -63,6 +75,8 @@ export const OCCASION_THEMES = {
     surprise: 'Mở hai ô cửa',
   },
   justBecause: {
+    artwork: '/images/occasions/justBecause',
+    artworkAlt: 'Phong thư nhỏ mở ra một bông hoa và ngôi sao vàng',
     label: 'Tặng bất chợt',
     paper: '#e9dccf',
     accent: '#7c5b70',

@@ -196,7 +196,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         <p className="lw-lamp-name">Đèn {LAMPS[lamp]}</p>
 
         {phase === 'dark' && (
-          // D-143: lời mời bật đèn (chữ viết tay, sáng nhẹ)
+          // D-144: lời mời bật đèn (chữ viết tay, sáng nhẹ)
           <p className="lw-invite" aria-hidden="true">
             Hãy cùng thắp sáng chiếc đèn của bạn
           </p>

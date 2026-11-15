@@ -52,7 +52,7 @@ export default function LetterPage() {
   return (
     <>
       <Seo title={t('letter.title')} noindex />
-      {/* D-145: mọi bước của thư (video, giới thiệu, bật đèn, đọc) cần điện thoại nằm ngang */}
+      {/* D-146: mọi bước của thư (video, giới thiệu, bật đèn, đọc) cần điện thoại nằm ngang */}
       {state.status === 'ok' ? <RotateGate>{experience()}</RotateGate> : status()}
     </>
   )
@@ -64,7 +64,7 @@ export default function LetterPage() {
           canSkip={state.canSkip}
           onDone={(watchedAll) => {
             if (watchedAll) markIntroSeen(slug)
-            // D-143: sau hai video là màn giới thiệu LAMVI, rồi mới tới căn phòng bật đèn
+            // D-144: sau hai video là màn giới thiệu LAMVI, rồi mới tới căn phòng bật đèn
             setState((s) => ({ ...s, intro: false, interlude: true }))
           }}
         />

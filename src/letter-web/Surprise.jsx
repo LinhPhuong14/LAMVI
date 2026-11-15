@@ -1,20 +1,38 @@
 import { useEffect, useRef, useState } from 'react'
 import { playOccasion } from './effects.js'
 
-/** Bánh sinh nhật giấy 2D: chạm để thổi nến. */
-function Cake({ blown, onBlow }) {
+/** Minh hoạ gốc, hai cỡ WebP; nến tương tác là lớp riêng trên bánh. */
+function OccasionArtwork({ theme, children }) {
+  return (
+    <div className="lw-occasion-art">
+      <img
+        src={`${theme.artwork}-960.webp`}
+        srcSet={`${theme.artwork}-480.webp 480w, ${theme.artwork}-960.webp 960w`}
+        sizes="(max-width: 480px) calc(100vw - 80px), 456px"
+        alt={theme.artworkAlt}
+        width={960}
+        height={640}
+        decoding="async"
+      />
+      {children}
+    </div>
+  )
+}
+
+/** Bánh minh hoạ giấy dó và nến có thể thổi tắt. */
+function Cake({ theme, blown, onBlow }) {
   return (
     <div className={`lw-cake${blown ? ' is-blown' : ''}`}>
-      <div className="lw-cake-candles" aria-hidden="true">
-        {[0, 1, 2].map((i) => (
-          <span key={i} className="lw-candle">
-            <i className="lw-flame" />
-            <i className="lw-smoke" />
-          </span>
-        ))}
-      </div>
-      <div className="lw-cake-top" aria-hidden="true" />
-      <div className="lw-cake-body" aria-hidden="true" />
+      <OccasionArtwork theme={theme}>
+        <div className="lw-cake-candles" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <span key={i} className="lw-candle">
+              <i className="lw-flame" />
+              <i className="lw-smoke" />
+            </span>
+          ))}
+        </div>
+      </OccasionArtwork>
       {!blown && (
         <button type="button" className="lw-btn lw-btn-primary" onClick={onBlow}>
           Ước một điều rồi thổi nến
@@ -47,10 +65,11 @@ export default function Surprise({ letter, theme, onClose }) {
   return (
     <div className="lw-surprise" role="dialog" aria-modal="true" aria-label={theme.surprise}>
       <div ref={cardRef} className={`lw-surprise-card lw-surprise-${letter.occasion}`}>
-        <img className="lw-surprise-stamp" src={theme.stamp} alt={theme.stampAlt} />
         <p className="lw-kicker">{theme.label}</p>
+        {!birthday && <OccasionArtwork theme={theme} />}
         {birthday && (
           <Cake
+            theme={theme}
             blown={blown}
             onBlow={() => {
               setBlown(true)

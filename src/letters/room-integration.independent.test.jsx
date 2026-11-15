@@ -35,7 +35,7 @@ async function openRecipient(item, { skipIntro = true } = {}) {
   const utils = renderAt(`/thu/${SLUG}?fallback=1`)
   if (skipIntro) {
     fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua, vào phòng' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-143: màn giới thiệu LAMVI
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-144: màn giới thiệu LAMVI
   }
   return { f, ...utils }
 }
@@ -70,7 +70,7 @@ describe('Trang /thu/:slug → video mở đầu → Phòng thư', () => {
       await screen.findByText(`${i + 1}/2`, { exact: false })
       fireEvent.ended(document.querySelector('video.lt-intro-video'))
     }
-    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-143: màn giới thiệu LAMVI
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-144: màn giới thiệu LAMVI
     const article = await walkToLetter()
     expect(within(article).getByRole('heading', { level: 2, name: 'Gửi Linh,' })).toBeTruthy()
     expect(within(article).getByText('Đoạn một.')).toBeTruthy()

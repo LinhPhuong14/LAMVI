@@ -8,7 +8,7 @@ import './letters.css'
 
 /**
  * D-138: phát lần lượt hai video LAMVI; xem hết video cuối mới gọi onDone (vào phòng bật đèn).
- * D-144: mở đầu bằng màn "Cùng xem cách chiếc đèn được làm ra nhé" — bấm "Bắt đầu xem" (cử chỉ người dùng
+ * D-145: mở đầu bằng màn "Cùng xem cách chiếc đèn được làm ra nhé" — bấm "Bắt đầu xem" (cử chỉ người dùng
  * cho phép phát có tiếng + toàn màn hình) → video toàn màn hình tự phát, hết video tự nối sang video sau,
  * hết video cuối thì thoát toàn màn hình rồi gọi onDone. Trình duyệt chặn tự phát → còn nút điều khiển để bấm.
  * Video lỗi không phát được → cho "Tiếp tục" để người nhận không bị kẹt ngoài lá thư.
@@ -45,7 +45,7 @@ export default function IntroFilms({ onDone, canSkip = false }) {
     // khung vẫn phủ kín màn hình bằng CSS
     try {
       const p = rootRef.current?.requestFullscreen?.({ navigationUI: 'hide' })
-      // Android: đã toàn màn hình thì khoá hướng ngang (D-145); iPhone không hỗ trợ — bỏ qua
+      // Android: đã toàn màn hình thì khoá hướng ngang (D-146); iPhone không hỗ trợ — bỏ qua
       p?.then?.(() => screen.orientation?.lock?.('landscape')?.catch?.(() => {}))?.catch?.(() => {})
     } catch {
       /* trình duyệt không cho toàn màn hình */

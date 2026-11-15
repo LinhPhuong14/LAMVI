@@ -19,7 +19,7 @@ function subscribe(listener) {
 }
 
 /**
- * D-145: trang phong thư luôn yêu cầu xoay ngang điện thoại trước khi bắt đầu (và mỗi khi quay lại dọc).
+ * D-146: trang phong thư luôn yêu cầu xoay ngang điện thoại trước khi bắt đầu (và mỗi khi quay lại dọc).
  * Nội dung vẫn được giữ (không mất vị trí video/pha), chỉ bị khoá + che; video đang phát thì tạm dừng
  * và thoát toàn màn hình (lớp toàn màn hình sẽ che mất lời nhắc).
  */
