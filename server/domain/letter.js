@@ -123,6 +123,22 @@ export function validateLetterContent(input) {
   }
   value.occasionData = Object.keys(data).length ? data : null
 
+  // D-154: thư doanh nghiệp gửi tặng khách hàng — tên + logo (ảnh tải lên trong admin hoặc https/đường dẫn nội bộ)
+  value.business = null
+  if (src.business != null) {
+    const b = src.business && typeof src.business === 'object' && !Array.isArray(src.business) ? src.business : null
+    if (!b) errors.business = 'INVALID'
+    else {
+      const name = str(b.name)
+      if (name.length > LIMITS.name) errors['business.name'] = 'TOO_LONG'
+      const logo = typeof b.logoUrl === 'string' ? b.logoUrl.trim() : ''
+      if (logo && !isMediaUrl(logo)) errors['business.logoUrl'] = 'INVALID'
+      if (b.logoUrl != null && typeof b.logoUrl !== 'string') errors['business.logoUrl'] = 'INVALID'
+      const logoUrl = logo && isMediaUrl(logo) ? logo : null
+      if (name || logoUrl) value.business = { name: name.slice(0, LIMITS.name) || null, logoUrl }
+    }
+  }
+
   return { value, errors }
 }
 

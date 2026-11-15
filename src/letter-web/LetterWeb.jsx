@@ -76,6 +76,8 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
   // D-147: bỏ trống tên → "Gửi bạn,", chữ ký chỉ còn "Thương mến,"
   const recipient = recipientOf(letter)
   const sender = senderOf(letter)
+  // D-154: thư doanh nghiệp — logo + tên (đồng thương hiệu với LAMVI)
+  const biz = letter.business && (letter.business.logoUrl || letter.business.name) ? letter.business : null
 
   const paragraphs = useMemo(() => {
     if (letter.kind !== 'text') return []
@@ -159,7 +161,15 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         <i />
       </div>
       <header className="lw-top">
-        <span className="lw-brand">LAMVI</span>
+        <span className="lw-brands">
+          <span className="lw-brand">LAMVI</span>
+          {biz && (
+            <span className="lw-cobrand">
+              <span aria-hidden="true">×</span>
+              {biz.logoUrl ? <img src={biz.logoUrl} alt={biz.name || 'Logo doanh nghiệp'} /> : <b>{biz.name}</b>}
+            </span>
+          )}
+        </span>
         <div className="lw-top-actions">
           {lit && (
             <button type="button" className="lw-chip" onClick={restart}>
@@ -219,6 +229,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
             theme={theme}
             recipientName={letter.recipientName}
             senderName={letter.senderName}
+            business={biz}
             occasionLabel={theme.label}
             open={phase === 'unfolding'}
             out={phase === 'unfolding'}
@@ -246,6 +257,12 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
           )}
           <article className="lw-letter" ref={readerRef} tabIndex={-1} aria-label={`Lời chúc gửi ${recipient}`}>
             <img className="lw-letter-stamp" src={theme.stamp} alt="" aria-hidden="true" />
+            {biz && (
+              <header className="lw-letterhead">
+                {biz.logoUrl && <img src={biz.logoUrl} alt={biz.name || 'Logo doanh nghiệp'} />}
+                {biz.name && !biz.logoUrl && <span>{biz.name}</span>}
+              </header>
+            )}
             <HandwrittenTitle as="h2" className="lw-dedication" text={`Gửi ${recipient},`} instant={reduced} onDone={() => setTitleDone(true)} />
             <div className={`lw-content${titleDone ? ' is-shown' : ''}`} inert={!titleDone} aria-hidden={!titleDone}>
               {letter.kind === 'text' ? (
@@ -289,6 +306,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
               <div className="lw-signature">
                 <span>Thương mến,</span>
                 {sender && <strong>{sender}</strong>}
+                {biz?.name && (sender ? <em className="lw-signature-org">{biz.name}</em> : <strong>{biz.name}</strong>)}
               </div>
               {letter.postscript && <p className="lw-ps">{letter.postscript}</p>}
               {hasSurprise && (

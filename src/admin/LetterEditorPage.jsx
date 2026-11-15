@@ -9,6 +9,7 @@ import { demos, validateLetter } from '../letter-room/data.js'
 import { LAMPS, DEFAULT_LAMP, lampSrc } from '../letter-web/themes.js'
 import { OCCASIONS, OCCASION_LABELS, paragraphsOf } from '../letters/occasions.js'
 import { S } from './strings.js'
+import { uploadFile } from './uploadFile.js'
 
 const L = S.letters
 const EMPTY = {
@@ -24,6 +25,8 @@ const EMPTY = {
   captionsUrl: '',
   postscript: '',
   od: { message: '', date: '', photos: '', label: '', places: '', icon: '' },
+  // D-154: thư doanh nghiệp có logo
+  business: { on: false, name: '', logoUrl: '' },
 }
 
 const lines = (s) => s.split('\n').map((x) => x.trim()).filter(Boolean)
@@ -52,6 +55,7 @@ function toForm(c) {
       places: (od.places ?? []).join('\n'),
       icon: od.icon ?? '',
     },
+    business: { on: Boolean(c.business), name: c.business?.name ?? '', logoUrl: c.business?.logoUrl ?? '' },
   }
 }
 
@@ -71,6 +75,7 @@ function toContent(f) {
     message: f.message,
     postscript: f.postscript,
     occasionData: od,
+    business: f.business.on && (f.business.name.trim() || f.business.logoUrl.trim()) ? { name: f.business.name.trim() || null, logoUrl: f.business.logoUrl.trim() || null } : null,
   }
   if (f.kind === 'video') Object.assign(c, { videoUrl: f.videoUrl, posterUrl: f.posterUrl || null, captionsUrl: f.captionsUrl || null })
   return c
@@ -160,11 +165,16 @@ export default function LetterEditorPage() {
       posterUrl: f.posterUrl,
       captionsUrl: f.captionsUrl,
       postscript: f.postscript,
+      business: f.business,
     }))
     setDirty(true)
   }
   const set = (k) => (e) => {
     setForm((f) => ({ ...f, [k]: e.target.value }))
+    setDirty(true)
+  }
+  const setBusiness = (patch) => {
+    setForm((f) => ({ ...f, business: { ...f.business, ...patch } }))
     setDirty(true)
   }
   const setOd = (k) => (e) => {
@@ -339,6 +349,7 @@ export default function LetterEditorPage() {
             <Field label={L.message} as="textarea" rows={9} value={form.message} onChange={set('message')} hint={L.messageHint} />
             {err('message') && <span className="field-error">{err('message')}</span>}
             <Field label={L.postscript} value={form.postscript} onChange={set('postscript')} maxLength={400} />
+            <BusinessFields business={form.business} onChange={setBusiness} authedApi={authedApi} error={err('business.logoUrl') || err('business.name')} />
             <fieldset className="letter-surprise">
               <legend>{L.surprise}</legend>
               <Field label={L.surpriseMessage} value={form.od.message} onChange={setOd('message')} maxLength={300} />
@@ -403,5 +414,64 @@ export default function LetterEditorPage() {
         </div>
       )}
     </div>
+  )
+}
+
+const MAX_LOGO_MB = 2
+/** D-154: thư doanh nghiệp — bật lên thì nhập tên doanh nghiệp + logo (tải ảnh lên hoặc dán đường dẫn). */
+function BusinessFields({ business, onChange, authedApi, error }) {
+  const [progress, setProgress] = useState(null)
+  const [upError, setUpError] = useState(null)
+
+  async function onFile(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setUpError(null)
+    if (file.size > MAX_LOGO_MB * 1024 * 1024) return setUpError(L.logoErrors.IMAGE_TOO_LARGE)
+    setProgress(0)
+    try {
+      const up = await authedApi('/admin/letters/logo-upload', { method: 'POST', body: { contentType: file.type, size: file.size } })
+      await uploadFile(up.uploadUrl, file, up.headers, setProgress)
+      const r = await authedApi('/admin/letters/logo', { method: 'POST', body: { path: up.path } })
+      onChange({ logoUrl: r.url })
+    } catch (err) {
+      const code = err.fields ? Object.values(err.fields)[0] : err.code
+      setUpError(L.logoErrors[code] ?? L.errors.default)
+    } finally {
+      setProgress(null)
+    }
+  }
+
+  return (
+    <fieldset className="letter-surprise letter-business">
+      <legend>{L.business}</legend>
+      <label className="letter-check">
+        <input type="checkbox" checked={business.on} onChange={(e) => onChange({ on: e.target.checked })} />
+        {L.businessOn}
+      </label>
+      <p className="field-hint">{L.businessHint}</p>
+      {business.on && (
+        <>
+          <Field label={L.businessName} value={business.name} onChange={(e) => onChange({ name: e.target.value })} maxLength={60} />
+          <div className="letter-logo-pick">
+            {business.logoUrl ? <img src={business.logoUrl} alt={L.businessLogoAlt} /> : <span className="letter-logo-empty">{L.businessNoLogo}</span>}
+            <div>
+              <label className="btn btn-small">
+                {progress === null ? L.businessUpload : `${progress}%`}
+                <input type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={onFile} disabled={progress !== null} aria-label={L.businessUpload} />
+              </label>
+              {business.logoUrl && (
+                <button type="button" className="btn btn-small" onClick={() => onChange({ logoUrl: '' })}>
+                  {L.businessRemoveLogo}
+                </button>
+              )}
+            </div>
+          </div>
+          <Field label={L.businessLogoUrl} value={business.logoUrl} onChange={(e) => onChange({ logoUrl: e.target.value })} maxLength={500} hint={L.businessLogoHint} />
+          {(upError || error) && <span className="field-error">{upError || error}</span>}
+        </>
+      )}
+    </fieldset>
   )
 }

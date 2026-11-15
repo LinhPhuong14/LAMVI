@@ -1076,6 +1076,81 @@
   }
 }
 
+/* D-154: thư doanh nghiệp — logo đồng thương hiệu */
+.lw-brands {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.lw-cobrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 500 0.8rem/1 'Be Vietnam Pro', sans-serif;
+  opacity: 0.9;
+}
+.lw-cobrand img {
+  height: 26px;
+  max-width: 120px;
+  object-fit: contain;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: rgb(255 250 240 / 92%);
+}
+.lw-cobrand b {
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.lw-letterhead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -4px 72px 14px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgb(120 80 40 / 18%);
+}
+.lw-letterhead img {
+  max-height: 48px;
+  max-width: 160px;
+  object-fit: contain;
+}
+.lw-letterhead span {
+  font: 600 0.78rem/1.3 'Be Vietnam Pro', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(63 32 11 / 75%);
+}
+.lw-signature-org {
+  font: 600 0.78rem/1.3 'Be Vietnam Pro', sans-serif;
+  font-style: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.lw-env-seal.has-logo {
+  overflow: hidden;
+  background: radial-gradient(circle at 35% 30%, #fffaf0, #f3e6c8 70%);
+  box-shadow:
+    0 2px 6px rgb(0 0 0 / 35%),
+    inset 0 0 0 3px color-mix(in srgb, var(--lw-seal) 70%, transparent);
+}
+.lw-env-seal.has-logo img {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+}
+.lw-env-from {
+  position: absolute;
+  bottom: 27%;
+  left: 9%;
+  z-index: 4;
+  max-width: 50%;
+  font: 600 0.62rem/1.2 'Be Vietnam Pro', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(63 32 11 / 70%);
+}
+
 /* D-149: toàn bộ trải nghiệm nằm gọn trong một chiều cao màn hình — trang không cuộn; chỉ tờ thư
    cuộn bên trong khung của nó */
 .lw-page {

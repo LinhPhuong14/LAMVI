@@ -8984,3 +8984,36 @@ h1 {
   width: auto;
   max-width: none;
 }
+
+/* D-154: thư doanh nghiệp có logo */
+.letter-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-weight: 600;
+}
+.letter-logo-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.letter-logo-pick img,
+.letter-logo-empty {
+  width: 96px;
+  height: 64px;
+  object-fit: contain;
+  border: 1px dashed var(--hair, rgb(0 0 0 / 20%));
+  border-radius: 8px;
+  background: var(--white, rgb(255 250 240));
+}
+.letter-logo-empty {
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  color: var(--ink-soft, rgb(107 91 75));
+}
+.letter-logo-pick > div {
+  display: flex;
+  gap: 8px;
+}
