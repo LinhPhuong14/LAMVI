@@ -2,6 +2,7 @@ import { lazy, Suspense, useSyncExternalStore } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { demos } from '../letter-room/data.js'
 import { LAMPS, OCCASION_THEMES } from './themes.js'
+import RotateGate from '../letters/RotateGate.jsx'
 
 const LetterWeb = lazy(() => import('./LetterWeb.jsx'))
 const subscribe = () => () => {}
@@ -24,26 +25,29 @@ export default function LetterWebRoute() {
   )
   if (!mounted) return placeholder
   return (
-    <Suspense fallback={placeholder}>
-      <LetterWeb key={`${occasion}-${lamp}`} letter={letter}>
-        <details className="lw-demo">
-          <summary>Lời chúc mẫu</summary>
-          <div>
-            {Object.entries(OCCASION_THEMES).map(([k, t]) => (
-              <button key={k} type="button" aria-pressed={k === occasion} onClick={() => setParams({ occasion: k, ...(lamp ? { lamp } : {}) })}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-          <div>
-            {Object.entries(LAMPS).map(([k, name]) => (
-              <button key={k} type="button" aria-pressed={k === (lamp ?? 'tu-linh')} onClick={() => setParams({ occasion, lamp: k })}>
-                {name}
-              </button>
-            ))}
-          </div>
-        </details>
-      </LetterWeb>
-    </Suspense>
+    // D-146: bản demo cũng bắt buộc xoay ngang trên điện thoại
+    <RotateGate>
+      <Suspense fallback={placeholder}>
+        <LetterWeb key={`${occasion}-${lamp}`} letter={letter}>
+          <details className="lw-demo">
+            <summary>Lời chúc mẫu</summary>
+            <div>
+              {Object.entries(OCCASION_THEMES).map(([k, t]) => (
+                <button key={k} type="button" aria-pressed={k === occasion} onClick={() => setParams({ occasion: k, ...(lamp ? { lamp } : {}) })}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <div>
+              {Object.entries(LAMPS).map(([k, name]) => (
+                <button key={k} type="button" aria-pressed={k === (lamp ?? 'tu-linh')} onClick={() => setParams({ occasion, lamp: k })}>
+                  {name}
+                </button>
+              ))}
+            </div>
+          </details>
+        </LetterWeb>
+      </Suspense>
+    </RotateGate>
   )
 }

@@ -927,3 +927,12 @@ Người dùng yêu cầu ảnh minh hoạ cho các dịp đẹp hơn và cho ph
 Kiểm thử độc lập T-11: 12/12; bộ test phong thư hiện có 91/91. Browser trên build SSR thật: 21 lượt 7 dịp × 1440/360/320, giảm chuyển động; thêm sinh nhật mặc định 390 px: nến tắt, hiện lời chúc, Escape/nút quay lại hoạt động, không tràn ngang, không lỗi JavaScript. Ảnh QA và số đo: `docs/qa/occasion-illustrations/`. Lint/build đạt. Full regression: 4.330 đạt, 2 skipped; 1 ca đổi ngôn ngữ lỗi do assertion đọc DOM trong lúc chuyển trang. Đã sửa test chờ đúng nội dung (không đổi routing sản phẩm), review độc lập xác nhận giữ nguyên kỳ vọng; rerun toàn tệp Routing.extra đạt 26/26, không còn ca lỗi chưa xử lý.
 
 Còn lại: chưa kiểm trên điện thoại vật lý. Không có migration hay biến môi trường mới.
+## 2026-11-15 — Luồng QR: màn chào, video tự phát, giới thiệu LAMVI, xoay ngang (D-144…D-146, T-110)
+
+**Đã làm**: `/thu/<slug>` = (xoay ngang) → màn "Cùng xem cách chiếc đèn được làm ra nhé" → hai video toàn màn hình tự phát nối tiếp → màn "LAMVI đem đến cho bạn chiếc đèn giấy dó với trải nghiệm độc nhất" → bật đèn (lời mời "Hãy cùng thắp sáng chiếc đèn của bạn") → phong thư. Font: Cormorant Garamond nghiêng (tiêu đề), Dancing Script (chữ viết tay), Be Vietnam Pro (giao diện); sửa tiêu đề video bị ăn màu nâu. CSS riêng cho điện thoại nằm ngang (màn thấp). Ảnh chụp kiểm ở 1280×800, 390×844 (dọc → lời nhắc xoay), 844×390, 667×375.
+
+Kiểm thử độc lập (T-11) cho D-144: `src/letters/interlude.independent.test.jsx` (30 test), không phát hiện lỗi; ghi chú UX đã sửa (nút "Bước vào" không còn vô hình trước khi hiện rõ, không cướp focus nếu người dùng đã Tab đi). Test D-145/D-146: `src/letters/welcome-rotate.test.jsx`.
+
+**Còn lại / cần người dùng**: QA trên iPhone/Android thật (tự phát có tiếng, toàn màn hình, khoá xoay).
+
+**Cập nhật cùng ngày (D-147)**: tên người nhận/người gửi tuỳ chọn — server chỉ còn giới hạn độ dài; web 2D hiện "Gửi bạn," / chữ ký "Thương mến,"; Phòng thư 3D nhận chữ thay thế; test `src/letters/names.test.jsx`. Merge master (minh hoạ dịp của Codex, D-143) vào nhánh, đổi mã quyết định của nhánh thành D-144…D-147.

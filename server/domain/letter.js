@@ -54,10 +54,10 @@ export function validateLetterContent(input) {
   const src = input && typeof input === 'object' && !Array.isArray(input) ? input : {}
   const value = {}
 
+  // D-147: hai tên có thể bỏ trống (người nhận thấy "Gửi bạn,"); chỉ giới hạn độ dài
   for (const key of ['recipientName', 'senderName']) {
     const v = str(src[key])
-    if (!v) errors[key] = 'REQUIRED'
-    else if (v.length > LIMITS.name) errors[key] = 'TOO_LONG'
+    if (v.length > LIMITS.name) errors[key] = 'TOO_LONG'
     value[key] = v.slice(0, LIMITS.name)
   }
 

@@ -3,7 +3,10 @@ import { useParams } from 'react-router-dom'
 import { api, ApiError } from '../api/client.js'
 import Seo from '../seo/Seo.jsx'
 import IntroFilms from '../letters/IntroFilms.jsx'
+import Interlude from '../letters/Interlude.jsx'
+import RotateGate from '../letters/RotateGate.jsx'
 import LetterExtras from '../letters/LetterExtras.jsx'
+import { withNameFallbacks } from '../letters/names.js'
 import { introSeen, markIntroSeen } from '../letters/films.js'
 import { useI18n } from '../i18n/index.js'
 
@@ -40,51 +43,72 @@ export default function LetterPage() {
     }
   }, [slug])
 
+  // Trong lúc xem màn giới thiệu, tải trước trải nghiệm thư để bấm "Bước vào" là hiện ngay
+  const preloadTemplate = state.status === 'ok' && state.interlude ? state.letter.template : null
+  useEffect(() => {
+    if (preloadTemplate === null) return
+    ;(preloadTemplate === 'room' ? import('../letter-room/LetterRoom.jsx') : import('../letter-web/LetterWeb.jsx')).catch(() => {})
+  }, [preloadTemplate])
+
   return (
     <>
       <Seo title={t('letter.title')} noindex />
-      {state.status === 'ok' && state.intro ? (
-        <main>
-          <IntroFilms
-            canSkip={state.canSkip}
-            onDone={(watchedAll) => {
-              if (watchedAll) markIntroSeen(slug)
-              setState((s) => ({ ...s, intro: false }))
-            }}
-          />
-        </main>
-      ) : state.status === 'ok' ? (
-        <Suspense
-          fallback={
-            <main className="lt-status" role="status" aria-busy="true">
-              <p>{t('letter.loading')}</p>
-            </main>
-          }
-        >
-          {/* Căn phòng: bật đèn → phong bì → thư (tiêu đề viết tay) → hai nút xem lại cuối thư */}
-          {state.letter.template === 'room' ? (
-            <LetterRoom letter={state.letter} afterLetter={<LetterExtras />} />
-          ) : (
-            <LetterWeb letter={state.letter} afterLetter={<LetterExtras />} />
-          )}
-        </Suspense>
-      ) : (
-        <main className="lt-status" role={state.status === 'loading' ? 'status' : undefined} aria-busy={state.status === 'loading'}>
-          {state.status === 'loading' ? (
-            <p>{t('letter.loading')}</p>
-          ) : state.code === 404 ? (
-            <div>
-              <h1>{t('letter.notFound')}</h1>
-              <p>{t('letter.notFoundHint')}</p>
-            </div>
-          ) : (
-            <div>
-              <h1>{t('letter.error')}</h1>
-              <p>{t('letter.errorHint')}</p>
-            </div>
-          )}
-        </main>
-      )}
+      {/* D-146: mọi bước của thư (video, giới thiệu, bật đèn, đọc) cần điện thoại nằm ngang */}
+      {state.status === 'ok' ? <RotateGate>{experience()}</RotateGate> : status()}
     </>
   )
+
+  function experience() {
+    return state.intro ? (
+      <main>
+        <IntroFilms
+          canSkip={state.canSkip}
+          onDone={(watchedAll) => {
+            if (watchedAll) markIntroSeen(slug)
+            // D-144: sau hai video là màn giới thiệu LAMVI, rồi mới tới căn phòng bật đèn
+            setState((s) => ({ ...s, intro: false, interlude: true }))
+          }}
+        />
+      </main>
+    ) : state.interlude ? (
+      <main>
+        <Interlude onDone={() => setState((s) => ({ ...s, interlude: false }))} />
+      </main>
+    ) : (
+      <Suspense
+        fallback={
+          <main className="lt-status" role="status" aria-busy="true">
+            <p>{t('letter.loading')}</p>
+          </main>
+        }
+      >
+        {/* Căn phòng: bật đèn → phong bì → thư (tiêu đề viết tay) → hai nút xem lại cuối thư */}
+        {state.letter.template === 'room' ? (
+          <LetterRoom letter={withNameFallbacks(state.letter)} afterLetter={<LetterExtras />} />
+        ) : (
+          <LetterWeb letter={state.letter} afterLetter={<LetterExtras />} />
+        )}
+      </Suspense>
+    )
+  }
+
+  function status() {
+    return (
+      <main className="lt-status" role={state.status === 'loading' ? 'status' : undefined} aria-busy={state.status === 'loading'}>
+        {state.status === 'loading' ? (
+          <p>{t('letter.loading')}</p>
+        ) : state.code === 404 ? (
+          <div>
+            <h1>{t('letter.notFound')}</h1>
+            <p>{t('letter.notFoundHint')}</p>
+          </div>
+        ) : (
+          <div>
+            <h1>{t('letter.error')}</h1>
+            <p>{t('letter.errorHint')}</p>
+          </div>
+        )}
+      </main>
+    )
+  }
 }
