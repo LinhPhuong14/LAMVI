@@ -1,3 +1,4 @@
+import { RECIPIENT_FALLBACK } from '../letters/names.js'
 /**
  * Phong bì vintage 2D (D-140): giấy theo dịp, viền thư máy bay, tem tranh Đông Hồ, dấu bưu điện,
  * xi niêm phong khắc chữ cái đầu tên người gửi. Thuần trang trí (aria-hidden) — trạng thái do LetterWeb báo.
@@ -11,7 +12,7 @@ export default function Envelope({ theme, recipientName, senderName, occasionLab
     <div className={`lw-env${open ? ' is-open' : ''}${out ? ' is-out' : ''}`} aria-hidden="true">
       <div className="lw-env-back" />
       <div className="lw-env-sheet">
-        <span className="lw-env-sheet-title">Gửi {recipientName},</span>
+        <span className="lw-env-sheet-title">Gửi {recipientName || RECIPIENT_FALLBACK},</span>
         <i />
         <i />
         <i />
@@ -19,7 +20,7 @@ export default function Envelope({ theme, recipientName, senderName, occasionLab
       <div className="lw-env-front">
         <div className="lw-env-stripes" />
         <span className="lw-env-to">
-          Gửi <b>{recipientName}</b>
+          Gửi <b>{recipientName || RECIPIENT_FALLBACK}</b>
         </span>
       </div>
       <div className="lw-env-flap" />

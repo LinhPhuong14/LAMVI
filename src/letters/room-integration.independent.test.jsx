@@ -331,11 +331,10 @@ describe('Admin: mẫu lời chúc Phòng thư + xem thử', () => {
     expect(screen.getByText('Thiếu đường dẫn video hợp lệ')).toBeTruthy()
   })
 
-  it('tên chỉ có khoảng trắng → không cho xem thử (server sẽ báo REQUIRED)', async () => {
+  it('D-147: bỏ trống / chỉ khoảng trắng ở tên vẫn xem thử được (server chấp nhận)', async () => {
     fireEvent.change(await mount(), { target: { value: '   ' } })
-    fireEvent.change(screen.getByLabelText('Tên người gửi'), { target: { value: 'Minh' } })
     fireEvent.change(screen.getByLabelText('Nội dung thư'), { target: { value: 'Thân.' } })
-    expect(validateLetterContent({ recipientName: '   ', senderName: 'Minh', occasion: 'justBecause', kind: 'text', message: 'Thân.' }).errors.recipientName).toBe('REQUIRED')
-    expect(screen.getByRole('button', { name: 'Xem thử trong Phòng thư' }).disabled).toBe(true)
+    expect(validateLetterContent({ recipientName: '   ', senderName: '', occasion: 'justBecause', kind: 'text', message: 'Thân.' }).errors).toEqual({})
+    expect(screen.getByRole('button', { name: 'Xem thử trong Phòng thư' }).disabled).toBe(false)
   })
 })

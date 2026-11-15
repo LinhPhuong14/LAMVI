@@ -934,3 +934,5 @@ Còn lại: chưa kiểm trên điện thoại vật lý. Không có migration h
 Kiểm thử độc lập (T-11) cho D-144: `src/letters/interlude.independent.test.jsx` (30 test), không phát hiện lỗi; ghi chú UX đã sửa (nút "Bước vào" không còn vô hình trước khi hiện rõ, không cướp focus nếu người dùng đã Tab đi). Test D-145/D-146: `src/letters/welcome-rotate.test.jsx`.
 
 **Còn lại / cần người dùng**: QA trên iPhone/Android thật (tự phát có tiếng, toàn màn hình, khoá xoay).
+
+**Cập nhật cùng ngày (D-147)**: tên người nhận/người gửi tuỳ chọn — server chỉ còn giới hạn độ dài; web 2D hiện "Gửi bạn," / chữ ký "Thương mến,"; Phòng thư 3D nhận chữ thay thế; test `src/letters/names.test.jsx`. Merge master (minh hoạ dịp của Codex, D-143) vào nhánh, đổi mã quyết định của nhánh thành D-144…D-147.

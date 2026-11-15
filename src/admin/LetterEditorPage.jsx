@@ -133,7 +133,8 @@ export default function LetterEditorPage() {
   const previewError = useMemo(() => {
     try {
       validateLetter(preview)
-      return preview.recipientName.trim() && preview.senderName.trim() ? null : L.previewNeedsNames
+      // D-147: tên tuỳ chọn; thư chữ vẫn cần nội dung
+      return preview.kind === 'text' && !preview.message.length ? L.previewNeedsMessage : null
     } catch (e) {
       return e.message
     }
@@ -312,9 +313,9 @@ export default function LetterEditorPage() {
                 </option>
               ))}
             </Field>
-            <Field label={L.recipientName} value={form.recipientName} onChange={set('recipientName')} maxLength={60} required />
+            <Field label={L.recipientName} value={form.recipientName} onChange={set('recipientName')} maxLength={60} hint={L.recipientNameHint} />
             {err('recipientName') && <span className="field-error">{err('recipientName')}</span>}
-            <Field label={L.senderName} value={form.senderName} onChange={set('senderName')} maxLength={60} required />
+            <Field label={L.senderName} value={form.senderName} onChange={set('senderName')} maxLength={60} hint={L.senderNameHint} />
             {err('senderName') && <span className="field-error">{err('senderName')}</span>}
             <Field label={L.occasion} as="select" value={form.occasion} onChange={set('occasion')}>
               {OCCASIONS.map((o) => (

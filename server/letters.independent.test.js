@@ -360,7 +360,9 @@ describe('validateLetterContent — biên và dữ liệu xấu', () => {
   it('content không phải object → lỗi bắt buộc, không ném', () => {
     for (const bad of [null, undefined, 'chuỗi', 42, [CONTENT], true]) {
       const r = validateLetterContent(bad)
-      expect(r.errors).toMatchObject({ recipientName: 'REQUIRED', senderName: 'REQUIRED', occasion: 'INVALID', kind: 'INVALID' })
+      // D-147: tên không còn bắt buộc
+      expect(r.errors).toMatchObject({ occasion: 'INVALID', kind: 'INVALID' })
+      expect(r.errors.recipientName).toBeUndefined()
     }
   })
 

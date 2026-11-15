@@ -6,6 +6,7 @@ import IntroFilms from '../letters/IntroFilms.jsx'
 import Interlude from '../letters/Interlude.jsx'
 import RotateGate from '../letters/RotateGate.jsx'
 import LetterExtras from '../letters/LetterExtras.jsx'
+import { withNameFallbacks } from '../letters/names.js'
 import { introSeen, markIntroSeen } from '../letters/films.js'
 import { useI18n } from '../i18n/index.js'
 
@@ -83,7 +84,7 @@ export default function LetterPage() {
       >
         {/* Căn phòng: bật đèn → phong bì → thư (tiêu đề viết tay) → hai nút xem lại cuối thư */}
         {state.letter.template === 'room' ? (
-          <LetterRoom letter={state.letter} afterLetter={<LetterExtras />} />
+          <LetterRoom letter={withNameFallbacks(state.letter)} afterLetter={<LetterExtras />} />
         ) : (
           <LetterWeb letter={state.letter} afterLetter={<LetterExtras />} />
         )}

@@ -62,7 +62,9 @@ describe('validateLetterContent', () => {
     expect(value).not.toHaveProperty('evil')
   })
   it('báo lỗi trường bắt buộc, dịp sai, video thiếu đường dẫn hợp lệ', () => {
-    expect(validateLetterContent({}).errors).toMatchObject({ recipientName: 'REQUIRED', senderName: 'REQUIRED', occasion: 'INVALID', kind: 'INVALID' })
+    expect(validateLetterContent({}).errors).toMatchObject({ occasion: 'INVALID', kind: 'INVALID' })
+    // D-147: tên người nhận/người gửi có thể bỏ trống
+    expect(validateLetterContent({ ...CONTENT, recipientName: '', senderName: '  ' })).toMatchObject({ errors: {}, value: { recipientName: '', senderName: '' } })
     const v = validateLetterContent({ ...CONTENT, kind: 'video', videoUrl: 'javascript:alert(1)' })
     expect(v.errors.videoUrl).toBe('INVALID')
     expect(validateLetterContent({ ...CONTENT, kind: 'video', videoUrl: '//evil.test/x.mp4' }).errors.videoUrl).toBe('INVALID')
@@ -168,9 +170,9 @@ describe('Admin soạn, xuất bản, thư viện QR', () => {
 
   it('nội dung không hợp lệ → 400 kèm trường', async () => {
     const code = await makeOrder()
-    const r = await adminApi('put', `/admin/orders/${code}/letter`).send({ content: { ...CONTENT, recipientName: '' } })
+    const r = await adminApi('put', `/admin/orders/${code}/letter`).send({ content: { ...CONTENT, occasion: 'x' } })
     expect(r.status).toBe(400)
-    expect(r.body.error.fields.recipientName).toBe('REQUIRED')
+    expect(r.body.error.fields.occasion).toBe('INVALID')
   })
 })
 
