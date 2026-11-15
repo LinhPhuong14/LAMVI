@@ -737,7 +737,7 @@
   display: grid;
   justify-items: center;
   gap: 14px;
-  width: min(420px, 100%);
+  width: min(520px, 100%);
   max-height: calc(100svh - 32px);
   overflow: auto;
   padding: 34px 24px 24px;
@@ -748,14 +748,19 @@
   box-shadow: 0 30px 60px rgb(0 0 0 / 45%);
   animation: lw-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
-.lw-surprise-stamp {
-  width: 84px;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  padding: 4px;
-  background: #fbf6ea;
-  transform: rotate(-4deg);
-  box-shadow: 0 2px 6px rgb(0 0 0 / 25%);
+.lw-occasion-art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f4e8cf;
+}
+.lw-occasion-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 .lw-kicker {
   margin: 0;
@@ -820,11 +825,16 @@
 .lw-cake {
   display: grid;
   justify-items: center;
+  gap: 16px;
+  width: 100%;
 }
 .lw-cake-candles {
+  position: absolute;
+  bottom: 69%;
+  left: 50%;
   display: flex;
-  gap: 18px;
-  margin-bottom: -2px;
+  gap: clamp(12px, 4vw, 22px);
+  transform: translateX(-50%);
 }
 .lw-candle {
   position: relative;
@@ -860,26 +870,6 @@
 .lw-cake.is-blown .lw-smoke {
   animation: lw-smoke 1.4s ease-out 0.2s forwards;
 }
-.lw-cake-top {
-  width: 170px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff6e8;
-  box-shadow: inset 0 -4px 0 rgb(0 0 0 / 6%);
-  position: relative;
-  z-index: 1;
-}
-.lw-cake-body {
-  width: 170px;
-  height: 64px;
-  margin-top: -9px;
-  margin-bottom: 14px;
-  border-radius: 0 0 12px 12px;
-  background:
-    radial-gradient(circle at 10px 0, #fff6e8 9px, transparent 10px) 0 0 / 20px 14px repeat-x,
-    linear-gradient(var(--lw-accent), color-mix(in srgb, var(--lw-accent) 75%, #000 25%));
-}
-
 /* Màn hình nhỏ */
 @media (max-width: 480px) {
   .lw-dedication {

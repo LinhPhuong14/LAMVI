@@ -918,3 +918,12 @@ Kiểm thử độc lập (T-11): `src/letter-web/main.independent.test.jsx` (46
 Kiểm thử độc lập (T-11): `server/letters.standalone.independent.test.js` + `src/admin/LettersStandalone.independent.test.jsx` (33 test), phát hiện 4 lỗi đã sửa — người nhận mở thư lẻ trên Supabase lỗi 500 (`getOrderById(null)`), xuất bản thư mới có thể hiện "nháp"/mất thông báo lỗi do điều hướng trước khi xuất bản xong, thẻ thư lẻ trùng key trong thư viện. Full suite 279 tệp / 4318 đạt (Routing.extra chập chờn); lint + build xanh.
 
 **Còn lại / cần người dùng**: chạy migration `20261115000026_standalone_letters.sql` trên Supabase.
+
+
+## 2026-11-15 — Làm đẹp minh hoạ theo dịp (D-143)
+
+Người dùng yêu cầu ảnh minh hoạ cho các dịp đẹp hơn và cho phép tự generate. Tạo 7 tranh gốc bằng `image_gen`, chất giấy dó/gouache tông kem–nâu và điểm lá/hồng dịu. Ghép vào `Surprise.jsx` thay tem nhỏ ở thiệp bất ngờ; tem phong bì/tờ thư vẫn giữ bộ tư liệu. Bánh sinh nhật không vẽ sẵn nến; nến CSS tách lớp giữ thao tác thổi, thời điểm hiện lời chúc và focus. Xuất WebP 480/960, khung 3:2, alt tiếng Việt; nguồn/prompt đi cùng asset, không dùng ảnh tham chiếu ngoài, không thêm dependency/schema/cấu hình deploy.
+
+Kiểm thử độc lập T-11: 12/12; bộ test phong thư hiện có 91/91. Browser trên build SSR thật: 21 lượt 7 dịp × 1440/360/320, giảm chuyển động; thêm sinh nhật mặc định 390 px: nến tắt, hiện lời chúc, Escape/nút quay lại hoạt động, không tràn ngang, không lỗi JavaScript. Ảnh QA và số đo: `docs/qa/occasion-illustrations/`. Lint/build đạt. Full regression: 4.330 đạt, 2 skipped; 1 ca đổi ngôn ngữ lỗi do assertion đọc DOM trong lúc chuyển trang. Đã sửa test chờ đúng nội dung (không đổi routing sản phẩm), review độc lập xác nhận giữ nguyên kỳ vọng; rerun toàn tệp Routing.extra đạt 26/26, không còn ca lỗi chưa xử lý.
+
+Còn lại: chưa kiểm trên điện thoại vật lý. Không có migration hay biến môi trường mới.

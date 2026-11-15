@@ -318,3 +318,8 @@ Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác ch
 
 
 Cập nhật PO 2026-11-14 (điều chỉnh D-136): camera POV gần bàn hơn; cảnh bật đèn giữ nguyên camera, không cận công tắc. Sau đèn sáng, chạm vùng cảnh đưa bì từ bàn lên chính diện lơ lửng (vật thể di chuyển, camera đứng); kéo dùng mặt phẳng và trục local của bì. Nền gen modern-v4 thay bản rustic v3: cửa gỗ gọn, rèm sáng, tường kem, bàn sát góc phòng. Chụp đèn có đôi gà minh họa tự vẽ cảm hứng Đông Hồ; cần thay artwork thật. Nội dung thư reveal theo grapheme tiếng Việt, có hiện toàn bộ ngay và reduced motion; không tuyên bố thứ tự stroke của font là nét viết thật. Nguồn/prompt: docs/art/room-modern-v4.prompt.md.
+
+
+### Minh hoạ theo dịp — D-143 (2026-11-15)
+
+Đã ghép bộ 7 tranh gốc AI chất giấy dó/gouache vào thiệp bất ngờ web 2D. Bánh kem hoa mơ với nến CSS thổi tắt được; các dịp còn lại có hình riêng, giữ nội dung cá nhân. WebP 480/960, ảnh 15–21 KB ở bản nhỏ, chỉ tải khi mở thiệp, có alt và khung cố định. Nguồn/prompt: `public/images/occasions/`. QA: 21 lượt reduced motion trên desktop/360/320 + sinh nhật motion mặc định 390 px; T-11 12/12, bộ phong thư cũ 91/91. Lint + client/SSR build đạt. Full regression: 4.330 đạt, 2 skipped; 1 ca đổi ngôn ngữ lỗi do assertion đọc DOM trong lúc chuyển trang. Đã sửa test chờ đúng nội dung (không đổi routing sản phẩm), review độc lập xác nhận giữ nguyên kỳ vọng; rerun toàn tệp Routing.extra đạt 26/26, không còn ca lỗi chưa xử lý.

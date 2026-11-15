@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-15",
+  "method": "Built-in image_gen",
+  "promptBase": "Use case: illustration-story. Asset type: original illustration for a Vietnamese gift letter website, LAMVI. Create one refined editorial gouache and cut-paper illustration on warm ivory do-paper with visible fine fibres. Hand-painted, tactile layered paper, delicate botanical details, elegant adult sensibility, generous breathing room, no heavy outlines, no photorealism, no people, no text, no lettering, no watermark. Palette cream ivory #F4E8CF, beige #EAD6B7, caramel #C89A63, warm brown #8B5E3C with muted sage and dusty rose accents. Landscape 3:2 composition; subject centered in middle 75% with unobstructed margins. ",
+  "subjects": {
+    "birthday": "birthday wish. A beautiful small round ivory-frosted cake on a scalloped ceramic pedestal, decorated with tiny apricot blossoms and caramel ribbons, a few paper stars and petals nearby. IMPORTANT cake has NO candles, NO flames, NO candle sticks: the website overlays interactive candles above its center. Cake top is centered at approximately 46 percent of canvas height. Quiet joyful warm daylight.",
+    "anniversary": "An intimate still life of two small ceramic teacups nestled together on a warm wooden tray, two intertwined dusty-rose silk ribbons and a branch of apricot blossoms, a few pressed petals. A tender visual metaphor for shared memories.",
+    "thankYou": "A lovingly wrapped bouquet of white lotus flowers and muted sage leaves, tied with a caramel silk ribbon, resting beside a small closed unmarked envelope. A graceful gesture of gratitude.",
+    "milestone": "A golden paper crane taking flight over a small stepped stack of folded ivory papers, a delicate laurel sprig curving around the composition, a few tiny gold stars. An uplifting celebration of achievement.",
+    "encouragement": "A small green seedling growing resiliently from a cracked handmade terracotta bowl, a soft painted golden sun appearing above distant rolling hills, warm light touching fresh leaves. A reassuring poetic image of growing through difficulty.",
+    "longDistance": "Two small warmly lit Vietnamese windows facing one another across softly layered dusky hills and a winding river, one tiny ivory paper airplane traveling between them, shared crescent moon above. Muted sage, warm amber light, quiet closeness across distance.",
+    "justBecause": "A little unmarked ivory envelope opened to reveal a small dusty-rose blossom and a tiny golden star, placed beside a tangerine and one delicate flowering branch. A poetic unexpected gift, gentle spontaneous affection."
+  }
+}
