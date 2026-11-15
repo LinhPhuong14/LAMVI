@@ -1076,36 +1076,122 @@
   }
 }
 
-/* D-146: điện thoại xoay ngang (màn thấp) — đèn, lời mời, công tắc, phong bì vừa một màn hình */
+/* D-146/D-148: điện thoại xoay ngang (màn thấp) — bố cục hai cột: đèn bên trái, lời mời/công tắc,
+   phong bì hoặc lá thư bên phải; mọi bước vừa một màn hình, chỉ lá thư cuộn */
 @media (orientation: landscape) and (max-height: 520px) {
+  .lw-page {
+    padding: 0 max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left));
+  }
   .lw-top {
     padding: 6px 0;
   }
   .lw-stage {
+    grid-template-columns: auto auto;
+    justify-content: center;
+    grid-template-rows: 1fr auto;
+    column-gap: clamp(20px, 5vw, 56px);
+    align-items: center;
+    min-height: calc(100svh - 52px);
     padding-top: 0;
   }
   .lw-lamp-wrap {
-    --lh: min(46svh, 240px);
-  }
-  .lw-rising .lw-lamp-wrap,
-  .lw-unfolding .lw-lamp-wrap {
-    --lh: min(24svh, 130px);
+    --lh: min(62svh, 260px);
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
   }
   .lw-lamp-name {
-    margin-top: 4px;
+    grid-column: 1;
+    grid-row: 2;
+    margin: 4px 0 0;
     font-size: 0.85rem;
   }
   .lw-invite {
-    margin-top: 4px;
-    max-width: none;
-    font-size: clamp(1.3rem, 6svh, 1.7rem);
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    justify-self: start;
+    margin: 0;
+    max-width: 16ch;
+    text-align: left;
+    font-size: clamp(1.6rem, 9svh, 2.4rem);
   }
   .lw-switch {
-    margin-top: 8px;
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    justify-self: start;
+    margin-top: 12px;
+  }
+  .lw-rising .lw-lamp-wrap,
+  .lw-unfolding .lw-lamp-wrap {
+    --lh: min(52svh, 220px);
   }
   .lw-env {
-    --w: min(300px, 84vw, 88svh);
-    margin-top: 10px;
+    --w: min(420px, 56vw, 112svh);
+    grid-column: 2;
+    grid-row: 1 / 3;
+    justify-self: center;
+    margin-top: 0;
+  }
+
+  /* Đọc thư: đèn đứng yên cột trái, lá thư cột phải cuộn */
+  .lw-page.lw-reading {
+    /* clip (không phải hidden) để .lw-page không thành khung cuộn — sticky của cột đèn mới chạy */
+    overflow-x: clip;
+    display: grid;
+    grid-template-columns: minmax(150px, 28%) minmax(0, 1fr);
+    column-gap: clamp(16px, 3vw, 32px);
+    align-items: start;
+  }
+  .lw-reading .lw-top {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+  }
+  .lw-reading .lw-stage {
+    position: sticky;
+    top: 52px;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    min-height: 0;
+    padding-top: 8px;
+  }
+  .lw-reading .lw-lamp-wrap {
+    --lh: min(58svh, 210px);
+    grid-column: 1;
+  }
+  .lw-reading .lw-lamp-name {
+    grid-row: 2;
+  }
+  .lw-reading .lw-letter {
+    grid-column: 2;
+    width: 100%;
+    max-width: 720px;
+    margin: 4px 0 0;
+    padding: 24px clamp(18px, 4vw, 40px) 28px;
+  }
+  .lw-reading .lw-dedication {
+    font-size: 1.9rem;
+  }
+  .lw-letter-stamp {
+    width: 52px;
+    top: 14px;
+    right: 14px;
+  }
+
+  /* Điều bất ngờ: thẻ ngang, ảnh minh hoạ bên trái */
+  .lw-surprise {
+    padding: 8px;
+  }
+  .lw-surprise-card {
+    width: min(760px, 100%);
+    max-height: calc(100svh - 16px);
+    padding: 20px 20px 16px;
+    gap: 10px;
+  }  .lw-occasion-art {
+    width: min(100%, 60svh);
   }
 }
 

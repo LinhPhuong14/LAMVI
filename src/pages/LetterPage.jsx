@@ -7,7 +7,7 @@ import Interlude from '../letters/Interlude.jsx'
 import RotateGate from '../letters/RotateGate.jsx'
 import LetterExtras from '../letters/LetterExtras.jsx'
 import { withNameFallbacks } from '../letters/names.js'
-import { introSeen, markIntroSeen } from '../letters/films.js'
+import { deviceScanned, introSeen, markDeviceScanned, markIntroSeen } from '../letters/films.js'
 import { useI18n } from '../i18n/index.js'
 
 // Phòng thư 3D (letter-room, D-136/D-137) — chỉ tải three.js sau khi xem xong hai video mở đầu
@@ -33,7 +33,11 @@ export default function LetterPage() {
         const r = await api('/letters/open', { method: 'POST', body: { slug, token } })
         if (!r?.item || typeof r.item !== 'object') throw new ApiError(0, 'INTERNAL_ERROR')
         // D-138: hai video LAMVI trước, xem hết mới vào phòng bật đèn
-        if (alive) setState({ status: 'ok', letter: r.item, intro: true, canSkip: introSeen(slug) })
+        if (!alive) return
+        // D-148: thiết bị đã quét QR trước đây (hoặc đã xem hết video của thư này) → cho bỏ qua video giới thiệu
+        const canSkip = introSeen(slug) || deviceScanned()
+        markDeviceScanned()
+        setState({ status: 'ok', letter: r.item, intro: true, canSkip })
       } catch (err) {
         if (alive) setState({ status: 'error', code: err instanceof ApiError ? err.status : 0 })
       }
