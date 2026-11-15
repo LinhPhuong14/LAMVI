@@ -18,7 +18,7 @@ export default function LetterWebRoute() {
   const [params, setParams] = useSearchParams()
   const occasion = Object.hasOwn(demos, params.get('occasion')) ? params.get('occasion') : 'birthday'
   const lamp = Object.hasOwn(LAMPS, params.get('lamp')) ? params.get('lamp') : undefined
-  // D-152: ?business=1 — xem mẫu thư doanh nghiệp gửi tặng khách hàng (logo mẫu, không phải doanh nghiệp thật)
+  // D-154: ?business=1 — xem mẫu thư doanh nghiệp gửi tặng khách hàng (logo mẫu, không phải doanh nghiệp thật)
   const business = params.get('business') === '1'
   const letter = {
     ...demos[occasion],

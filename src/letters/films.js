@@ -9,7 +9,7 @@ export const INTRO_FILMS = [
 // D-150 (người dùng: "tắt 2 video trong phong thư, chỉ để lời chúc thôi, và cho phép xem dọc màn hình cũng được"):
 // tắt hai video mở đầu + hai nút video cuối thư, bỏ yêu cầu xoay ngang. Giữ mã (D-138, D-145, D-146, D-148)
 // để bật lại bằng cờ khi cần.
-// D-151 ("bỏ màn giới thiệu vào đèn luôn"): tắt cả màn "LAMVI đem đến cho bạn…" (D-144) — mở QR là tới đèn.
+// D-153 ("bỏ màn giới thiệu vào đèn luôn"): tắt cả màn "LAMVI đem đến cho bạn…" (D-144) — mở QR là tới đèn.
 export const LETTER_FLOW = Object.freeze({ introFilms: false, interlude: false, extras: false, requireLandscape: false })
 
 export const filmByKey = (key) => INTRO_FILMS.find((f) => f.key === key)

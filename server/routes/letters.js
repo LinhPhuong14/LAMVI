@@ -177,7 +177,7 @@ export function lettersRouter({ repo, auth, config, storage = null }) {
     })
   }
 
-  // D-152: logo doanh nghiệp cho thư — bước 1 xin URL tải lên (ảnh PNG/JPG/WebP, không SVG), bước 2 xác nhận lấy URL công khai
+  // D-154: logo doanh nghiệp cho thư — bước 1 xin URL tải lên (ảnh PNG/JPG/WebP, không SVG), bước 2 xác nhận lấy URL công khai
   const LOGO_PREFIX = 'letter-logos/'
   const maxLogoBytes = Math.min(2, config.maxImageMb ?? 5) * 1024 * 1024
   r.post('/admin/letters/logo-upload', async (req, res) => {

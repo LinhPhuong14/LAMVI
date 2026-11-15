@@ -24,7 +24,7 @@ export default function Envelope({ theme, recipientName, senderName, business = 
         </span>
       </div>
       <div className="lw-env-flap" />
-      {/* D-152: thư doanh nghiệp — logo trên con dấu niêm phong, tên ở góc trên trái như thư công ty */}
+      {/* D-154: thư doanh nghiệp — logo trên con dấu niêm phong, tên ở góc trên trái như thư công ty */}
       <div className={`lw-env-seal${business?.logoUrl ? ' has-logo' : ''}`}>{business?.logoUrl ? <img src={business.logoUrl} alt="" /> : <span>{initial}</span>}</div>
       {business?.name && <span className="lw-env-from">{business.name}</span>}
       <figure className="lw-env-stamp">

@@ -25,7 +25,7 @@ const EMPTY = {
   captionsUrl: '',
   postscript: '',
   od: { message: '', date: '', photos: '', label: '', places: '', icon: '' },
-  // D-152: thư doanh nghiệp có logo
+  // D-154: thư doanh nghiệp có logo
   business: { on: false, name: '', logoUrl: '' },
 }
 
@@ -418,7 +418,7 @@ export default function LetterEditorPage() {
 }
 
 const MAX_LOGO_MB = 2
-/** D-152: thư doanh nghiệp — bật lên thì nhập tên doanh nghiệp + logo (tải ảnh lên hoặc dán đường dẫn). */
+/** D-154: thư doanh nghiệp — bật lên thì nhập tên doanh nghiệp + logo (tải ảnh lên hoặc dán đường dẫn). */
 function BusinessFields({ business, onChange, authedApi, error }) {
   const [progress, setProgress] = useState(null)
   const [upError, setUpError] = useState(null)

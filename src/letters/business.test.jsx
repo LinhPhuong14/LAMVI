@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// D-152: thư doanh nghiệp có logo gửi tặng khách hàng
+// D-154: thư doanh nghiệp có logo gửi tặng khách hàng
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import LetterWeb from '../letter-web/LetterWeb.jsx'
@@ -17,7 +17,7 @@ afterEach(() => {
 const base = { occasion: 'thankYou', kind: 'text', message: ['Cảm ơn quý khách.'], template: 'web', recipientName: 'Chị Lan', senderName: '', occasionData: null, postscript: null }
 const LOGO = 'https://cdn.example.com/logo.png'
 
-describe('D-152: server', () => {
+describe('D-154: server', () => {
   it('nhận tên + logo; bỏ trống cả hai → null; không gửi → null', () => {
     expect(validateLetterContent({ ...base, business: { name: ' An Phát ', logoUrl: LOGO } })).toMatchObject({ errors: {}, value: { business: { name: 'An Phát', logoUrl: LOGO } } })
     expect(validateLetterContent({ ...base, business: { name: '', logoUrl: '' } }).value.business).toBeNull()
@@ -36,7 +36,7 @@ describe('D-152: server', () => {
   })
 })
 
-describe('D-152: hiển thị', () => {
+describe('D-154: hiển thị', () => {
   it('đầu trang LAMVI × logo; tờ thư có logo; chữ ký là tên doanh nghiệp khi không có tên người gửi', async () => {
     reduced()
     const { container } = render(<LetterWeb letter={{ ...base, business: { name: 'An Phát', logoUrl: LOGO } }} />)
@@ -68,7 +68,7 @@ describe('D-152: hiển thị', () => {
   })
 })
 
-describe('D-152: admin', () => {
+describe('D-154: admin', () => {
   const session = { accessToken: 'a1', refreshToken: 'r1', expiresAt: 9999999999, user: { id: 'u1', email: 'admin@lamvi.test' } }
   const me = () => ({ body: { profile: { id: 'u1', email: 'admin@lamvi.test', role: 'admin', preferredLocale: 'vi', fullName: 'A' } } })
   it('bật "Thư gửi từ doanh nghiệp", nhập tên + đường dẫn logo → lưu gửi business; tắt → business null', async () => {

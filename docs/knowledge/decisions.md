@@ -598,14 +598,20 @@ Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt 
 
 ### T-111 — Ảnh đèn catalog thay đèn mờ/đèn vẽ ở thư và dashboard (2026-11-15)
 
-- Banner thư (`scripts/gen_mail_banner.py`, `npm run gen:mail-banner`): năm ảnh đèn tách nền `public/images/lamps/*-cutout.webp` xếp một hàng bên phải, chữ LAMVI bên trái; nền Deep Brown, viền caramel, thanh ấn nâu be. Bỏ ảnh đèn trời CC0 phủ chàm đêm.
+- Banner thư (`scripts/gen_mail_banner.py`, `npm run gen:mail-banner`): năm ảnh đèn tách nền `public/images/lamps/*-cutout.webp` xếp một hàng bên phải, chữ LAMVI bên trái; nền Deep Brown, viền caramel, thanh ấn nâu be. Bỏ ảnh đèn trời CC0 phủ chàm đêm và thanh đỏ son (trái bảng màu thương hiệu D-121, D-112). Kích thước 1200×400, ~71 KB.
 - Dashboard khách (`AccountPage.jsx`): ba hình `Lantern` vẽ (đơn hàng trống, việc cần làm trống, ô tiếp tục mua) thay bằng `LampPhoto` (ảnh cutout catalog). Hình phong thư (`LetterArt`) giữ nguyên.
-- Test: `server/mailBanner.independent.test.js`. (Làm ở nhánh `ccr-f7654e08-wqcdp4`, đưa vào master qua nhánh `feat/letter-business`; mã T-104 ở nhánh đó trùng nên đổi thành T-111.)
+- Test: `server/mailBanner.independent.test.js`.
 
-### T-112 — Thư doanh nghiệp có logo, vào đèn luôn (2026-11-15, D-151, D-152)
+### T-112 — Mọi đèn trong thư và phong thư dùng ảnh catalog (2026-11-15, D-151)
 
-- **D-151**: `LETTER_FLOW.interlude = false` — `LetterPage` vào thẳng `LetterWeb`/`LetterRoom`; mã `Interlude` giữ sau cờ.
-- **D-152 dữ liệu**: `content.business = { name ≤ 60, logoUrl }` hoặc `null` (`validateLetterContent`; `logoUrl` qua `isMediaUrl`: `/…` hoặc `https://`, không `data:`/`javascript:`). Không cần migration (jsonb).
+- **Quy tắc cho mọi session sau**: khi thêm hoặc sửa bất kỳ chỗ nào hiển thị đèn trong phong thư/thư, lấy ảnh qua `lampSrc(slug)` (`src/letter-web/themes.js`) hoặc `/images/lamps/<slug>-cutout.webp`; không vẽ SVG/CSS/3D đèn riêng, không dùng ảnh AI thay đèn. Chỉ năm slug trong `LAMPS` (`tu-linh` mặc định); đèn mới phải có ảnh catalog trước.
+- **Kiểm toàn bộ (đối chiếu `origin/master` v0.93)**: đạt ở `letter-web/LetterWeb.jsx` (đèn `.lw-lamp img`), `admin/LetterEditorPage.jsx` (ô chọn đèn), `admin/LettersGalleryPage.jsx` (tên đèn), `server/mail/layout.js` (banner, T-111), `AccountPage.jsx` (T-111). Chưa đạt: `letter-room/scene.js` (nhóm `lamp` dựng bằng `roundedCylinder` + canvas giấy dán `dong-ho-roosters-v5.webp`, chữ ký "artwork đôi gà gen riêng" ở `docs/phong-thu.md`) và `.lr-lamp` ở `letter-room/room.css`: chưa sửa vì đây là cảnh Three.js của phiên khác, cần chọn hướng (dán texture thân đèn catalog lên chụp, hay billboard cutout); xem G-125.
+- Khi sửa phòng 3D: giữ vị trí chân đèn và nguồn sáng (`docs/phong-thu.md`), đèn lấy theo `letter.lamp`; thêm test kiểm không còn tham chiếu `dong-ho-roosters-v5` và `.lr-lamp` không dùng gradient.
+
+### T-113 — Thư doanh nghiệp có logo, vào đèn luôn (2026-11-15, D-153, D-154)
+
+- **D-153**: `LETTER_FLOW.interlude = false` — `LetterPage` vào thẳng `LetterWeb`/`LetterRoom`; mã `Interlude` giữ sau cờ.
+- **D-154 dữ liệu**: `content.business = { name ≤ 60, logoUrl }` hoặc `null` (`validateLetterContent`; `logoUrl` qua `isMediaUrl`: `/…` hoặc `https://`, không `data:`/`javascript:`). Không cần migration (jsonb).
 - **Tải logo**: `POST /admin/letters/logo-upload` (signed upload URL, bucket công khai `product-images`, tiền tố `letter-logos/`, PNG/JPG/WebP ≤ 2 MB — không SVG) → `POST /admin/letters/logo` kiểm object thật (tồn tại, kích thước, kiểu) rồi trả URL công khai. `lettersRouter` nhận thêm `storage`.
-- **Hiển thị (web 2D)**: `.lw-cobrand` (LAMVI × logo), `Envelope` prop `business` (logo trên xi `.has-logo`, tên `.lw-env-from`), `.lw-letterhead`, chữ ký. CSP `img-src` chỉ có `'self'` + Supabase nên logo ngoài domain có thể bị chặn — UI khuyên tải lên.
+- **Hiển thị (web 2D)**: `.lw-cobrand` (LAMVI × logo), `Envelope` prop `business` (logo trên xi `.has-logo`, tên `.lw-env-from`), `.lw-letterhead`, chữ ký. CSP `img-src` chỉ có `'self'` + Supabase nên logo ngoài domain có thể bị chặn — UI khuyên tải lên. Logo là ảnh doanh nghiệp, không phải đèn — quy tắc ảnh đèn catalog (D-151, T-112) giữ nguyên.
 - Test: `src/letters/business.test.jsx`, `server/letters.logo.test.js`.

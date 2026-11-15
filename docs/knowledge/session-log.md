@@ -970,12 +970,18 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 
 ## 2026-11-15 — Ảnh đèn catalog ở thư và dashboard (T-111)
 
-**Đã làm**: dựng lại banner thư bằng năm ảnh đèn catalog (nét, đúng màu), đúng bảng màu thương hiệu; thay ba hình đèn vẽ ở dashboard khách bằng ảnh đèn catalog. Test: `server/mailBanner.independent.test.js`.
+**Đã làm**: dựng lại banner thư bằng năm ảnh đèn catalog (nét, đúng màu), đúng bảng màu thương hiệu; thay ba hình đèn vẽ ở dashboard khách bằng ảnh đèn catalog. Test: `server/mailBanner.independent.test.js` (subagent).
 
-**Còn lại / cần người dùng**: xem thư thật ở Gmail/Outlook (ảnh banner chỉ hiện khi có `PUBLIC_SITE_URL` công khai).
+**Còn lại / cần người dùng**: xác nhận "phong thư" là hình `LetterArt` (phong thư đóng ấn ở Hồ sơ) hay khung thư; xem thư thật ở Gmail/Outlook (ảnh banner chỉ hiện khi có `PUBLIC_SITE_URL` công khai).
 
-## 2026-11-15 — Vào đèn luôn, thư doanh nghiệp có logo (D-151, D-152, T-112)
+## 2026-11-15 — Kiểm đèn trong phong thư, ghi quy tắc ảnh catalog (D-151, T-112)
 
-**Đã làm**: đưa nhánh `ccr-f7654e08-wqcdp4` (ảnh đèn catalog ở banner thư + dashboard, đổi mã thành T-111, commit lại dưới tên LinhPhuong14) vào nhánh; bỏ màn giới thiệu (mở QR vào đèn luôn); tuỳ chọn thư doanh nghiệp: admin bật, nhập tên + tải logo; người nhận thấy LAMVI × logo, logo trên xi phong bì, đầu tờ thư, chữ ký doanh nghiệp. Demo `/phong-thu?business=1`.
+**Đã làm**: kiểm toàn bộ chỗ hiển thị đèn trong thư và phong thư trên `master`; phong thư web 2D, admin và email đã dùng ảnh catalog; phòng 3D và `.lr-lamp` chưa. Ghi quy tắc vào D-151/T-112 và khoảng trống G-125. Gộp `master` (v0.93) vào nhánh; đổi mã T-104 của mình thành T-111 vì trùng T-104 "Phòng thư LAMVI".
+
+**Còn lại / cần người dùng**: chọn hướng thay đèn trong phòng 3D (G-125).
+
+## 2026-11-15 — Vào đèn luôn, thư doanh nghiệp có logo (D-153, D-154, T-113)
+
+**Đã làm**: bỏ màn giới thiệu (mở QR vào đèn luôn); tuỳ chọn thư doanh nghiệp: admin bật, nhập tên + tải logo; người nhận thấy LAMVI × logo, logo trên xi phong bì, đầu tờ thư, chữ ký doanh nghiệp. Demo `/phong-thu?business=1`. Gộp master có ảnh đèn catalog (T-111, D-151/T-112 của phiên cloud) — mã của nhánh đổi thành D-153, D-154, T-113.
 
 **Còn lại / cần người dùng**: thử tải logo thật trên Production (bucket `product-images`); Phòng thư 3D chưa hiện logo.

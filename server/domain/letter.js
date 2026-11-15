@@ -123,7 +123,7 @@ export function validateLetterContent(input) {
   }
   value.occasionData = Object.keys(data).length ? data : null
 
-  // D-152: thư doanh nghiệp gửi tặng khách hàng — tên + logo (ảnh tải lên trong admin hoặc https/đường dẫn nội bộ)
+  // D-154: thư doanh nghiệp gửi tặng khách hàng — tên + logo (ảnh tải lên trong admin hoặc https/đường dẫn nội bộ)
   value.business = null
   if (src.business != null) {
     const b = src.business && typeof src.business === 'object' && !Array.isArray(src.business) ? src.business : null

@@ -1,4 +1,4 @@
-// D-152: tải logo doanh nghiệp cho phong thư
+// D-154: tải logo doanh nghiệp cho phong thư
 import { beforeEach, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { createApp } from './app.js'
@@ -31,7 +31,7 @@ async function upload(type = 'image/png', size = 64, putType = type) {
   return { up, done }
 }
 
-describe('D-152: logo doanh nghiệp', () => {
+describe('D-154: logo doanh nghiệp', () => {
   it('tải PNG → URL công khai dùng được trong nội dung thư', async () => {
     const { up, done } = await upload()
     expect(up.status).toBe(201)

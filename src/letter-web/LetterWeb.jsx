@@ -76,7 +76,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
   // D-147: bỏ trống tên → "Gửi bạn,", chữ ký chỉ còn "Thương mến,"
   const recipient = recipientOf(letter)
   const sender = senderOf(letter)
-  // D-152: thư doanh nghiệp — logo + tên (đồng thương hiệu với LAMVI)
+  // D-154: thư doanh nghiệp — logo + tên (đồng thương hiệu với LAMVI)
   const biz = letter.business && (letter.business.logoUrl || letter.business.name) ? letter.business : null
 
   const paragraphs = useMemo(() => {

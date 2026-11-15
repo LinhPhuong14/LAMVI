@@ -27,7 +27,7 @@ describe('D-150: chỉ còn lời chúc', () => {
     expect(LETTER_FLOW).toEqual({ introFilms: false, interlude: false, extras: false, requireLandscape: false })
   })
 
-  it('/thu: không video, không màn giới thiệu (D-151) — vào thẳng đèn → lá thư; cuối thư không có nút video; điện thoại dọc không bị chặn', async () => {
+  it('/thu: không video, không màn giới thiệu (D-153) — vào thẳng đèn → lá thư; cuối thư không có nút video; điện thoại dọc không bị chặn', async () => {
     reduced()
     portrait()
     mockApi({ 'POST /letters/open': () => ({ body: { item: content } }) })
