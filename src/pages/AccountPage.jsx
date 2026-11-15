@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Field from '../components/Field'
-import Lantern from '../components/Lantern'
 import { HeroScene, LetterArt } from '../components/DashArt'
 import DashSky from '../components/DashSky'
 import { Lotus } from '../components/Motifs'
@@ -18,6 +17,11 @@ import GalleryPanel from '../gallery/GalleryPanel.jsx'
 import { useGallery } from '../gallery/useGallery.js'
 import OrderProgress, { StatusBadge } from '../orders/OrderStatus.jsx'
 import { formatVnd } from '../lib/money.js'
+
+// Đèn trong dashboard dùng ảnh đèn thật của catalog (tách nền, cùng ảnh ở thẻ sản phẩm), không dùng hình vẽ (T-111)
+function LampPhoto({ slug, height }) {
+  return <img className="dash-lamp" src={`/images/lamps/${slug}-cutout.webp`} alt="" height={height} style={{ height }} loading="lazy" decoding="async" />
+}
 
 // Ngày giờ theo giờ Việt Nam (như tháng ngân sách Mây) — [ASSUMPTION] ghi ở spec §5.2
 const TZ = 'Asia/Ho_Chi_Minh'
@@ -310,7 +314,7 @@ function OrdersPanel({ status, items, error }) {
       {status === 'ok' && items.length === 0 && (
         <div className="dash-orders">
           <div className="dash-orders-art" aria-hidden="true">
-            <Lantern size={88} tone="dusk" swing />
+            <LampPhoto slug="tu-linh" height={120} />
           </div>
           <div>
             <p>{t('orders.empty')}</p>
@@ -426,7 +430,7 @@ function Overview({ cart, mayItems, orders, go }) {
           <p className="dash-muted">{t('account.loading')}</p>
         ) : todo.length === 0 ? (
           <div className="dash-todo-empty">
-            <Lantern size={64} tone="amber" swing />
+            <LampPhoto slug="thu-hoach" height={92} />
             <div>
               <p>{t('account.todo.none')}</p>
               <Link to={path('/shop')} className="btn btn-primary">
@@ -695,7 +699,7 @@ export default function AccountPage() {
 
         <Link to={path('/shop')} className="dash-promo">
           <span className="dash-promo-art" aria-hidden="true">
-            <Lantern size={60} tone="dusk" swing flicker />
+            <LampPhoto slug="lon-dan" height={80} />
           </span>
           <span className="dash-promo-text">{t('cart.continue')}</span>
         </Link>

@@ -967,3 +967,16 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 **Cập nhật 2026-11-15 (D-149)**: phong thư vừa một màn hình ở mọi pha (đo `scrollHeight === innerHeight` tại 5 kích thước), tờ thư cuộn trong khung, đọc thư hai cột ở màn ngang; bỏ câu "Phong thư chỉ mở khi điện thoại nằm ngang".
 
 **Cập nhật 2026-11-15 (D-150)**: tắt hai video mở đầu + hai nút video cuối thư, cho xem dọc (bỏ lời nhắc xoay ngang) — sau cờ `LETTER_FLOW`; kiểm một màn hình ở dọc 390×844, 360×740.
+
+## 2026-11-15 — Ảnh đèn catalog ở thư và dashboard (T-111)
+
+**Đã làm**: dựng lại banner thư bằng năm ảnh đèn catalog (nét, đúng màu), đúng bảng màu thương hiệu; thay ba hình đèn vẽ ở dashboard khách bằng ảnh đèn catalog. Test: `server/mailBanner.independent.test.js` (subagent).
+
+**Còn lại / cần người dùng**: xác nhận "phong thư" là hình `LetterArt` (phong thư đóng ấn ở Hồ sơ) hay khung thư; xem thư thật ở Gmail/Outlook (ảnh banner chỉ hiện khi có `PUBLIC_SITE_URL` công khai).
+
+## 2026-11-15 — Kiểm đèn trong phong thư, ghi quy tắc ảnh catalog (D-151, T-112)
+
+**Đã làm**: kiểm toàn bộ chỗ hiển thị đèn trong thư và phong thư trên `master`; phong thư web 2D, admin và email đã dùng ảnh catalog; phòng 3D và `.lr-lamp` chưa. Ghi quy tắc vào D-151/T-112 và khoảng trống G-125. Gộp `master` (v0.93) vào nhánh; đổi mã T-104 của mình thành T-111 vì trùng T-104 "Phòng thư LAMVI".
+
+**Còn lại / cần người dùng**: chọn hướng thay đèn trong phòng 3D (G-125).
+
