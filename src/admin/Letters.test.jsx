@@ -99,7 +99,7 @@ describe('Thư viện QR', () => {
     renderAt('/admin/letters')
     expect(await screen.findByText('LV-AAA')).toBeTruthy()
     expect(screen.getByText('LV-BBB')).toBeTruthy()
-    fireEvent.change(screen.getByLabelText('Tìm theo mã đơn hoặc tên người nhận'), { target: { value: 'minh' } })
+    fireEvent.change(screen.getByLabelText('Tìm theo mã đơn, ghi chú hoặc tên người nhận'), { target: { value: 'minh' } })
     expect(screen.queryByText('LV-AAA')).toBeNull()
     expect(screen.getByRole('link', { name: 'Sửa thư' }).getAttribute('href')).toBe('/admin/orders/LV-BBB/letter')
   })

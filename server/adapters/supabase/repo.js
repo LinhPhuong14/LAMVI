@@ -146,7 +146,8 @@ const toProfile = (r) => ({
 // D-134: phong thư admin soạn cho từng đơn
 const toOrderLetter = (r) => ({
   id: r.id,
-  orderId: r.order_id,
+  orderId: r.order_id ?? null,
+  label: r.label ?? null,
   status: r.status,
   content: r.content ?? null,
   slug: r.slug,
@@ -157,7 +158,7 @@ const toOrderLetter = (r) => ({
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 })
-const LETTER_COLS = { status: 'status', content: 'content', slug: 'slug', token: 'token', publishedAt: 'published_at', updatedBy: 'updated_by' }
+const LETTER_COLS = { label: 'label', status: 'status', content: 'content', slug: 'slug', token: 'token', publishedAt: 'published_at', updatedBy: 'updated_by' }
 
 const toGiftMessage = (r) => ({
   id: r.id,
@@ -686,10 +687,20 @@ export function createSupabaseRepo(client) {
       const row = { order_id: orderId, ...toRow(patch, LETTER_COLS) }
       return toOrderLetter(unwrap(await client.from('order_letters').upsert(row, { onConflict: 'order_id' }).select('*').single()))
     },
-    // Thư viện QR: mọi thư đã từng có QR (slug), mới nhất trước, kèm mã đơn
+    // D-142: thư lẻ (không gắn đơn), khoá theo id
+    async getLetterById(id) {
+      return one('order_letters', id, toOrderLetter)
+    },
+    async createLetter(data) {
+      return insert('order_letters', { order_id: null, ...toRow(data, LETTER_COLS) }, toOrderLetter)
+    },
+    async saveLetterById(id, data) {
+      return patch('order_letters', id, toRow(data, LETTER_COLS), toOrderLetter)
+    },
+    // Thư viện QR: mọi thư đã từng có QR (slug) + mọi thư lẻ (kể cả nháp), mới nhất trước, kèm mã đơn
     async listOrderLetters({ limit = 500 } = {}) {
       const rows = unwrap(
-        await client.from('order_letters').select('*, orders(code, status)').not('slug', 'is', null).order('published_at', { ascending: false, nullsFirst: false }).order('updated_at', { ascending: false }).limit(limit),
+        await client.from('order_letters').select('*, orders(code, status)').or('slug.not.is.null,order_id.is.null').order('published_at', { ascending: false, nullsFirst: false }).order('updated_at', { ascending: false }).limit(limit),
       )
       return rows.map((r) => ({ ...toOrderLetter(r), orderCode: r.orders?.code ?? null, orderStatus: r.orders?.status ?? null }))
     },

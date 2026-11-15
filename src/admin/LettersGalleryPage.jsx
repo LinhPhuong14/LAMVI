@@ -34,7 +34,7 @@ export default function LettersGalleryPage() {
   const items = useMemo(() => {
     const needle = q.trim().toLowerCase()
     if (!needle) return state.items
-    return state.items.filter((l) => `${l.orderCode ?? ''} ${l.recipientName ?? ''}`.toLowerCase().includes(needle))
+    return state.items.filter((l) => `${l.orderCode ?? ''} ${l.label ?? ''} ${l.recipientName ?? ''}`.toLowerCase().includes(needle))
   }, [q, state.items])
 
   return (
@@ -43,15 +43,22 @@ export default function LettersGalleryPage() {
         <input type="search" className="admin-search" placeholder={L.search} aria-label={L.search} value={q} onChange={(e) => setQ(e.target.value)} />
       </PageHead>
       <p className="field-hint">{L.galleryHint}</p>
+      <p className="letter-actions">
+        <Link className="btn btn-primary btn-small" to="/admin/letters/new">
+          {L.createStandalone}
+        </Link>
+        <span className="field-hint">{L.createStandaloneHint}</span>
+      </p>
       {state.status === 'loading' && <p role="status">…</p>}
       {state.status === 'error' && <p role="alert">{L.errors.default}</p>}
       {state.status === 'ok' && !items.length && <p>{L.galleryEmpty}</p>}
       <ul className="letter-gallery">
         {items.map((l) => (
-          <li key={l.slug} className="account-card letter-card">
+          <li key={l.id ?? l.slug} className="account-card letter-card">
             {l.url && <QrImage url={l.url} size={140} fileName={`phong-thu-${l.orderCode ?? l.slug}`} />}
             <div className="letter-card-info">
-              <strong>{l.orderCode ?? '—'}</strong>
+              <strong>{l.orderCode ?? (l.label || L.standalone)}</strong>
+              {!l.orderCode && l.label && <span>{L.standalone}</span>}
               <span>
                 {l.recipientName ?? '—'} · {OCCASION_LABELS[l.occasion] ?? ''}
               </span>
@@ -67,10 +74,16 @@ export default function LettersGalleryPage() {
               </span>
               <div className="letter-actions">
                 {l.url && <CopyLink url={l.url} />}
-                {l.orderCode && (
+                {l.orderCode ? (
                   <Link className="btn btn-small" to={`/admin/orders/${encodeURIComponent(l.orderCode)}/letter`}>
                     {L.edit}
                   </Link>
+                ) : (
+                  l.id && (
+                    <Link className="btn btn-small" to={`/admin/letters/${encodeURIComponent(l.id)}`}>
+                      {L.edit}
+                    </Link>
+                  )
                 )}
               </div>
             </div>

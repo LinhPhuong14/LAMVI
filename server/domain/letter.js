@@ -133,6 +133,9 @@ export const presentLetterForRecipient = (letter) => ({ ...letter.content })
 export function presentLetterForAdmin(letter, config) {
   if (!letter) return null
   return {
+    id: letter.id ?? null,
+    orderId: letter.orderId ?? null,
+    label: letter.label ?? null,
     status: letter.status,
     content: letter.content,
     slug: letter.slug,
