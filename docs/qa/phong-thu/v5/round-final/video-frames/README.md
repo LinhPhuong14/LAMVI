@@ -1,0 +1,1 @@
+Frames decoded from final flow.webm, starting at 20.643s, output sampling 5 fps, 1.6-second interval. Captures are from the video, not separately re-rendered scene states. CPU/SwiftShader frame cadence is not a real-device FPS benchmark.

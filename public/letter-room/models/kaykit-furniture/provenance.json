@@ -1,0 +1,49 @@
+{
+  "repository": "https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0",
+  "commit": "96d5930a8dbdb363409bbc2d3341718b00e17c9c",
+  "license": "CC0-1.0",
+  "inputs": [
+    {
+      "path": "addons/kaykit_furniture_bits/Assets/gltf/table_medium_long.gltf",
+      "bytes": 2987,
+      "sha256": "e3ba8f08ce5964d602cde13ecba2b837f90b3ed22d092e28fa489f3c216e2488"
+    },
+    {
+      "path": "addons/kaykit_furniture_bits/Assets/gltf/table_medium_long.bin",
+      "bytes": 9328,
+      "sha256": "b436c4b982a7defac5310f6ca17bf387f24c8c9b843e035c09d23094ace9b788"
+    },
+    {
+      "path": "addons/kaykit_furniture_bits/Assets/gltf/furniturebits_texture.png",
+      "bytes": 15605,
+      "sha256": "de62db37a80d1801c3d9eb674890ae04b04469e0c149481a51fa250562c628dc"
+    }
+  ],
+  "output": {
+    "file": "table-medium-long.glb",
+    "bytes": 26252,
+    "sha256": "d8d554b3636390c2f4adc5b63a3bf516af8dae346b00f70b329bf1bd74c5d4b6"
+  },
+  "conversion": "JSON/BIN/PNG lossless GLB 2.0 embedding only; geometry, UVs, normals, palette, atlas resolution and material unchanged.",
+  "derivatives": [
+    {
+      "file": "table-medium-long-geometry.glb",
+      "bytes": 26052,
+      "sha256": "3180914a3012610cf7535e7a93d600f51ccc780c1e2ad770a9de96ba276d72a4",
+      "license": "CC0-1.0",
+      "derivedFrom": {
+        "file": "table-medium-long.glb",
+        "bytes": 26252,
+        "sha256": "d8d554b3636390c2f4adc5b63a3bf516af8dae346b00f70b329bf1bd74c5d4b6"
+      },
+      "conversion": "Created by main integrating session: removed top-level images, textures and samplers and material baseColorTexture reference. Geometry, UVs, normals, scene nodes, accessors, bufferViews and entire BIN chunk retained unchanged, including now-unreferenced PNG bytes. Original GLB preserved.",
+      "purpose": "Avoid GLTFLoader embedded-image blob fetch blocked by deployed connect-src self CSP. Engine applies existing LAMVI wood material/tint; authored KayKit atlas shading is not used by this derivative.",
+      "verification": {
+        "originalHashMatches": true,
+        "binaryChunkUnchanged": true,
+        "geometryMetadataUnchanged": true,
+        "imageTextureSamplerReferencesAbsent": true
+      }
+    }
+  ]
+}

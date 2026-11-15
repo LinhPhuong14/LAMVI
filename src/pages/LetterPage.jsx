@@ -1,0 +1,120 @@
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { api, ApiError } from '../api/client.js'
+import Seo from '../seo/Seo.jsx'
+import IntroFilms from '../letters/IntroFilms.jsx'
+import Interlude from '../letters/Interlude.jsx'
+import RotateGate from '../letters/RotateGate.jsx'
+import LetterExtras from '../letters/LetterExtras.jsx'
+import { withNameFallbacks } from '../letters/names.js'
+import { LETTER_FLOW, deviceScanned, introSeen, markDeviceScanned, markIntroSeen } from '../letters/films.js'
+import { useI18n } from '../i18n/index.js'
+
+// Phòng thư 3D (letter-room, D-136/D-137) — chỉ tải three.js sau khi xem xong hai video mở đầu
+const LetterRoom = lazy(() => import('../letter-room/LetterRoom.jsx'))
+// Bản web 2D (D-140) là bản chính (D-141): mọi thư mở bằng LetterWeb trừ khi admin chọn rõ Phòng thư 3D (`template: 'room'`)
+const LetterWeb = lazy(() => import('../letter-web/LetterWeb.jsx'))
+
+// D-138: trang phong thư của người nhận (/thu/<slug> trên domain chính). Token nằm sau dấu # (không
+// vào log server/Referer) và chỉ gửi trong body POST. Sai/không có token → cùng một màn "không tìm thấy".
+export default function LetterPage() {
+  const { slug } = useParams()
+  const [state, setState] = useState({ status: 'loading' })
+  const { t } = useI18n()
+
+  useEffect(() => {
+    let alive = true
+    // Token base64url không chứa ký tự cần giải mã — không decodeURIComponent (# hỏng sẽ ném lỗi)
+    const token = typeof window === 'undefined' ? '' : window.location.hash.replace(/^#/, '')
+    ;(async () => {
+      try {
+        // Token sai định dạng (thiếu, cắt cụt, mã hoá hỏng) → không gọi API
+        if (!/^[A-Za-z0-9_-]{43}$/.test(token)) throw new ApiError(404, 'NOT_FOUND')
+        const r = await api('/letters/open', { method: 'POST', body: { slug, token } })
+        if (!r?.item || typeof r.item !== 'object') throw new ApiError(0, 'INTERNAL_ERROR')
+        // D-138: hai video LAMVI trước, xem hết mới vào phòng bật đèn
+        if (!alive) return
+        // D-148: thiết bị đã quét QR trước đây (hoặc đã xem hết video của thư này) → cho bỏ qua video giới thiệu
+        const canSkip = introSeen(slug) || deviceScanned()
+        markDeviceScanned()
+        // D-150: tắt video mở đầu → vào thẳng màn giới thiệu LAMVI rồi tới lá thư
+        setState({ status: 'ok', letter: r.item, intro: LETTER_FLOW.introFilms, interlude: !LETTER_FLOW.introFilms, canSkip })
+      } catch (err) {
+        if (alive) setState({ status: 'error', code: err instanceof ApiError ? err.status : 0 })
+      }
+    })()
+    return () => {
+      alive = false
+    }
+  }, [slug])
+
+  // Trong lúc xem màn giới thiệu, tải trước trải nghiệm thư để bấm "Bước vào" là hiện ngay
+  const preloadTemplate = state.status === 'ok' && state.interlude ? state.letter.template : null
+  useEffect(() => {
+    if (preloadTemplate === null) return
+    ;(preloadTemplate === 'room' ? import('../letter-room/LetterRoom.jsx') : import('../letter-web/LetterWeb.jsx')).catch(() => {})
+  }, [preloadTemplate])
+
+  return (
+    <>
+      <Seo title={t('letter.title')} noindex />
+      {/* D-146: mọi bước của thư (video, giới thiệu, bật đèn, đọc) cần điện thoại nằm ngang */}
+      {state.status !== 'ok' ? status() : LETTER_FLOW.requireLandscape ? <RotateGate>{experience()}</RotateGate> : experience()}
+    </>
+  )
+
+  function experience() {
+    const extras = LETTER_FLOW.extras ? <LetterExtras /> : null
+    return state.intro ? (
+      <main>
+        <IntroFilms
+          canSkip={state.canSkip}
+          onDone={(watchedAll) => {
+            if (watchedAll) markIntroSeen(slug)
+            // D-144: sau hai video là màn giới thiệu LAMVI, rồi mới tới căn phòng bật đèn
+            setState((s) => ({ ...s, intro: false, interlude: true }))
+          }}
+        />
+      </main>
+    ) : state.interlude ? (
+      <main>
+        <Interlude onDone={() => setState((s) => ({ ...s, interlude: false }))} />
+      </main>
+    ) : (
+      <Suspense
+        fallback={
+          <main className="lt-status" role="status" aria-busy="true">
+            <p>{t('letter.loading')}</p>
+          </main>
+        }
+      >
+        {/* Căn phòng: bật đèn → phong bì → thư (tiêu đề viết tay) → hai nút xem lại cuối thư */}
+        {state.letter.template === 'room' ? (
+          <LetterRoom letter={withNameFallbacks(state.letter)} afterLetter={extras} />
+        ) : (
+          <LetterWeb letter={state.letter} afterLetter={extras} />
+        )}
+      </Suspense>
+    )
+  }
+
+  function status() {
+    return (
+      <main className="lt-status" role={state.status === 'loading' ? 'status' : undefined} aria-busy={state.status === 'loading'}>
+        {state.status === 'loading' ? (
+          <p>{t('letter.loading')}</p>
+        ) : state.code === 404 ? (
+          <div>
+            <h1>{t('letter.notFound')}</h1>
+            <p>{t('letter.notFoundHint')}</p>
+          </div>
+        ) : (
+          <div>
+            <h1>{t('letter.error')}</h1>
+            <p>{t('letter.errorHint')}</p>
+          </div>
+        )}
+      </main>
+    )
+  }
+}

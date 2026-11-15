@@ -1,0 +1,31 @@
+[
+  {
+    "mode": "video",
+    "phase": "celebrated",
+    "overflow": false,
+    "media": {
+      "duration": 5.949199,
+      "ended": true,
+      "audioBytes": 92080,
+      "controls": true
+    },
+    "errors": [],
+    "video": "/tmp/lamvi-variant-videos/page@581960bdf5a8dcb88939a445b867ad9f.webm"
+  },
+  {
+    "mode": "reduced",
+    "phase": "celebrated",
+    "overflow": false,
+    "media": null,
+    "errors": [],
+    "video": "/tmp/lamvi-variant-videos/page@b0ab0cdc0697432c0e2887f9930b10e2.webm"
+  },
+  {
+    "mode": "fallback",
+    "phase": "celebrated",
+    "overflow": false,
+    "media": null,
+    "errors": [],
+    "video": "/tmp/lamvi-variant-videos/page@51c24023fb676170084c0410a6e6f55d.webm"
+  }
+]

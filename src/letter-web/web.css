@@ -1,0 +1,1308 @@
+/* D-140: phong thư bản web 2D — trang sạch, tối ấm; bật đèn → nền giấy dó sáng dần, phong bì vintage trồi lên.
+   Cảm hứng bố cục từ các hiệu ứng "lamp", "sparkles", "text generate" kiểu Aceternity UI, viết lại bằng CSS thuần. */
+
+.lw-page {
+  --lw-ink: #3f200b;
+  --lw-cream: #f6efe2;
+  --lw-night: #140d07;
+  position: relative;
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: var(--lw-night);
+  color: var(--lw-cream);
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  padding: 0 16px 64px;
+  isolation: isolate;
+}
+.lw-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background:
+    radial-gradient(60% 45% at 50% 22%, rgb(255 214 150 / 55%), transparent 70%),
+    radial-gradient(120% 90% at 50% 0%, #6b4426 0%, #2a1a0e 55%, var(--lw-night) 100%);
+  transition: opacity 1.2s ease;
+}
+.lw-page.is-lit .lw-bg {
+  opacity: 1;
+}
+.lw-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Thanh trên cùng */
+.lw-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 14px 0;
+}
+.lw-brand {
+  font: 600 0.8rem/1 'Be Vietnam Pro', sans-serif;
+  letter-spacing: 0.32em;
+  opacity: 0.8;
+}
+.lw-top-actions {
+  display: flex;
+  gap: 8px;
+}
+.lw-chip {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgb(246 239 226 / 30%);
+  border-radius: 999px;
+  background: rgb(20 13 7 / 40%);
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+/* Sân khấu: đèn + phong bì */
+.lw-stage:focus {
+  outline: none;
+}
+.lw-stage {
+  display: grid;
+  justify-items: center;
+  max-width: 960px;
+  margin: 0 auto;
+  padding-top: clamp(8px, 4vh, 40px);
+  transition: padding 0.6s ease;
+}
+.lw-lamp-wrap {
+  position: relative;
+  z-index: 1;
+  --lh: min(52svh, 440px, 100vw);
+  height: var(--lh);
+  width: calc(var(--lh) * 0.75);
+  display: grid;
+  place-items: end center;
+  transition:
+    height 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+    width 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+/* Phong bì/thư xuất hiện → đèn lùi lên trên nhường chỗ */
+.lw-rising .lw-lamp-wrap,
+.lw-unfolding .lw-lamp-wrap {
+  --lh: min(32svh, 270px);
+}
+.lw-lamp {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.lw-lamp:disabled {
+  cursor: default;
+}
+.lw-lamp img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  filter: brightness(0.24) saturate(0.35) contrast(1.1);
+  transition: filter 1s ease;
+}
+.lw-page.is-lit .lw-lamp img {
+  filter: brightness(1.08) saturate(1.05) drop-shadow(0 0 28px rgb(255 190 110 / 65%));
+  animation: lw-flicker 5s ease-in-out 1.2s infinite;
+}
+.lw-halo {
+  position: absolute;
+  inset: -30% -60% -10%;
+  z-index: 1;
+  background: radial-gradient(closest-side, rgb(255 205 130 / 70%), rgb(255 170 80 / 18%) 55%, transparent 75%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 1s ease,
+    transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.lw-page.is-lit .lw-halo {
+  opacity: 1;
+  transform: scale(1);
+}
+/* "Lamp" (theo Aceternity UI, viết lại bằng CSS, ánh vàng thay xanh cyan): từ vạch sáng dưới chân đèn,
+   hai cánh ánh sáng hình nón đổ xuống và loang ra hai bên; bề rộng nở từ 15rem → 30rem khi bật */
+.lw-beam {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  z-index: 0;
+  width: 0;
+  height: min(24rem, 48svh);
+  pointer-events: none;
+}
+.lw-beam i {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: min(15rem, 40vw);
+  opacity: 0;
+  transition:
+    width 0.8s ease-in-out 0.3s,
+    opacity 0.8s ease-in-out 0.3s;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+.lw-beam-r {
+  left: 0;
+  background: conic-gradient(from 70deg at 0 0, rgb(255 205 130 / 70%), transparent 110deg);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 88%), linear-gradient(to left, transparent, #000 45%);
+  mask-image: linear-gradient(to bottom, #000, transparent 88%), linear-gradient(to left, transparent, #000 45%);
+}
+.lw-beam-l {
+  right: 0;
+  background: conic-gradient(from 180deg at 100% 0, transparent 0deg, rgb(255 205 130 / 70%) 110deg);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 88%), linear-gradient(to right, transparent, #000 45%);
+  mask-image: linear-gradient(to bottom, #000, transparent 88%), linear-gradient(to right, transparent, #000 45%);
+}
+.lw-page.is-lit .lw-beam i {
+  width: min(30rem, 48vw);
+  opacity: 1;
+}
+/* Quầng mờ ngay trên vạch sáng */
+.lw-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 2;
+  width: 8rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: #ffc978;
+  filter: blur(34px);
+  opacity: 0;
+  transform: translate(-50%, 50%);
+  transition:
+    width 0.8s ease-in-out 0.3s,
+    opacity 0.8s ease 0.2s;
+  pointer-events: none;
+}
+.lw-page.is-lit .lw-glow {
+  width: 16rem;
+  opacity: 0.5;
+}
+/* Vạch sáng dưới chân đèn, nở rộng khi bật */
+.lw-line {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  z-index: 3;
+  width: min(15rem, 60vw);
+  height: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, #ffd796 18%, #fff1d2 50%, #ffd796 82%, transparent);
+  box-shadow: 0 0 18px 2px rgb(255 200 120 / 70%);
+  opacity: 0;
+  transition:
+    width 0.8s ease-in-out 0.3s,
+    opacity 0.6s ease;
+}
+.lw-page.is-lit .lw-line {
+  width: min(30rem, 92vw);
+  opacity: 1;
+}
+/* Spotlight chéo (theo Aceternity UI "Spotlight"), chỉ hiện khi đèn sáng */
+.lw-spotlight {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+.lw-page.is-lit .lw-spotlight {
+  opacity: 1;
+}
+.lw-spotlight i {
+  position: absolute;
+  top: 0;
+  width: 560px;
+  height: 1380px;
+  background: radial-gradient(68.54% 68.72% at 55.02% 31.46%, hsl(38deg 100% 85% / 12%) 0, hsl(36deg 100% 60% / 4%) 50%, transparent 80%);
+}
+.lw-spotlight i:first-child {
+  left: 0;
+  transform: translateY(-350px) rotate(-45deg);
+  animation: lw-drift 7s ease-in-out infinite alternate;
+}
+.lw-spotlight i:last-child {
+  right: 0;
+  transform: translateY(-350px) rotate(45deg);
+  animation: lw-drift 7s ease-in-out infinite alternate-reverse;
+}
+.lw-sparks {
+  position: absolute;
+  inset: -40% -70%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s ease 0.4s;
+}
+.lw-page.is-lit .lw-sparks {
+  opacity: 1;
+}
+.lw-sparks i {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffe2a8;
+  box-shadow: 0 0 6px 1px rgb(255 214 150 / 80%);
+  animation: lw-twinkle 3.2s ease-in-out infinite;
+}
+.lw-lamp-name {
+  margin: 14px 0 0;
+  font: italic 500 1rem/1.3 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+  transition: opacity 0.8s ease;
+}
+.lw-page.is-lit .lw-lamp-name {
+  opacity: 0.9;
+}
+
+/* D-144: lời mời bật đèn */
+.lw-invite {
+  margin: 18px 0 0;
+  max-width: 22ch;
+  font: 700 clamp(1.7rem, 6vw, 2.4rem) / 1.2 'Dancing Script', cursive;
+  color: #f3dcb1;
+  text-align: center;
+  text-shadow: 0 0 22px rgb(255 196 120 / 35%);
+  animation: lw-invite 1.4s ease 0.3s both, lw-invite-glow 3.2s ease-in-out 1.7s infinite;
+}
+@keyframes lw-invite {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(6px);
+  }
+}
+@keyframes lw-invite-glow {
+  50% {
+    text-shadow: 0 0 30px rgb(255 196 120 / 60%);
+  }
+}
+
+/* Công tắc bật đèn */
+.lw-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  margin-top: 18px;
+  padding: 0 22px 0 10px;
+  border: 1px solid rgb(246 239 226 / 25%);
+  border-radius: 999px;
+  background: rgb(246 239 226 / 6%);
+  color: var(--lw-cream);
+  font: 500 1rem/1 'Be Vietnam Pro', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 0 0 0 rgb(255 214 150 / 40%);
+  animation: lw-pulse 2.4s ease-out infinite;
+}
+.lw-switch:focus-visible,
+.lw-chip:focus-visible,
+.lw-btn:focus-visible,
+.lw-skip:focus-visible {
+  outline: 2px solid #ffd796;
+  outline-offset: 3px;
+}
+.lw-switch-track {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgb(246 239 226 / 18%);
+}
+.lw-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--lw-cream);
+}
+
+/* Phong bì vintage */
+.lw-env {
+  --w: min(360px, 84vw);
+  position: relative;
+  z-index: 5;
+  width: var(--w);
+  aspect-ratio: 1.6;
+  margin-top: 26px;
+  perspective: 900px;
+  filter: drop-shadow(0 18px 30px rgb(0 0 0 / 45%));
+  animation: lw-rise 0.95s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.lw-env.is-out {
+  animation: lw-env-sink 0.35s ease-in 0.85s forwards;
+}
+.lw-env-back,
+.lw-env-front,
+.lw-env-flap {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background-color: var(--lw-paper);
+  /* Thớ giấy cũ: hạt mịn + vệt ố nhẹ ở mép */
+  background-image:
+    radial-gradient(120% 90% at 50% 40%, transparent 60%, rgb(120 80 40 / 18%) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.lw-env-back {
+  z-index: 0;
+  filter: brightness(0.86);
+}
+.lw-env-sheet {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 6%;
+  height: 88%;
+  z-index: 2;
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  padding: 14px 16px;
+  border-radius: 4px;
+  background:
+    linear-gradient(transparent 23px, rgb(120 80 40 / 14%) 24px) 0 0 / 100% 24px,
+    #fbf6ea;
+  color: var(--lw-ink);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+  transition: transform 1s cubic-bezier(0.2, 0.75, 0.2, 1) 0.1s;
+}
+.lw-env-sheet-title {
+  font: 700 1.3rem/1.2 'Dancing Script', cursive;
+}
+.lw-env-sheet i {
+  display: block;
+  height: 6px;
+  width: 80%;
+  border-radius: 3px;
+  background: rgb(63 32 11 / 18%);
+}
+.lw-env-sheet i:nth-of-type(2) {
+  width: 64%;
+}
+.lw-env-sheet i:nth-of-type(3) {
+  width: 72%;
+}
+.lw-env.is-open .lw-env-sheet {
+  transform: translateY(-78%);
+}
+/* Túi trước: hai vạt bên + vạt dưới gấp chéo */
+.lw-env-front {
+  z-index: 3;
+  clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+  background-image:
+    linear-gradient(to top right, transparent calc(50% - 1px), rgb(90 55 25 / 18%) 50%, transparent calc(50% + 1px)),
+    linear-gradient(to top left, transparent calc(50% - 1px), rgb(90 55 25 / 18%) 50%, transparent calc(50% + 1px)),
+    radial-gradient(120% 90% at 50% 40%, transparent 60%, rgb(120 80 40 / 18%) 100%);
+}
+/* Viền thư máy bay theo màu dịp */
+.lw-env-stripes {
+  position: absolute;
+  inset: 0;
+  padding: 7px;
+  border-radius: 6px;
+  background: repeating-linear-gradient(-45deg, var(--lw-accent) 0 10px, transparent 10px 18px, var(--lw-accent2) 18px 28px, transparent 28px 36px);
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box xor,
+    linear-gradient(#000 0 0);
+  opacity: 0.85;
+}
+.lw-env-to {
+  position: absolute;
+  left: 9%;
+  bottom: 13%;
+  color: var(--lw-ink);
+  font: 700 1.15rem/1.2 'Dancing Script', cursive;
+  opacity: 0.85;
+}
+.lw-env-to b {
+  font-weight: 400;
+  font-size: 1.25rem;
+}
+.lw-env-flap {
+  z-index: 4;
+  clip-path: polygon(0 0, 100% 0, 50% 58%);
+  transform-origin: 50% 0;
+  filter: brightness(0.95);
+  background-image:
+    linear-gradient(to bottom, rgb(0 0 0 / 6%), transparent 40%),
+    radial-gradient(120% 90% at 50% 40%, transparent 60%, rgb(120 80 40 / 18%) 100%);
+}
+.lw-env.is-open .lw-env-flap,
+.lw-rising .lw-env-flap {
+  animation: lw-flap-open 0.7s ease-in-out 1.15s forwards;
+}
+.lw-env.is-open .lw-env-flap {
+  animation-delay: 0s;
+  animation-duration: 0.01s;
+}
+/* Xi niêm phong khắc chữ cái đầu tên người gửi */
+.lw-env-seal {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin: -27px 0 0 -27px;
+  border-radius: 47% 53% 50% 50% / 52% 48% 52% 48%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--lw-seal) 60%, #fff 40%), var(--lw-seal) 55%, color-mix(in srgb, var(--lw-seal) 70%, #000 30%));
+  box-shadow:
+    0 2px 6px rgb(0 0 0 / 35%),
+    inset 0 0 0 5px color-mix(in srgb, var(--lw-seal) 85%, #000 15%);
+  color: rgb(255 240 220 / 85%);
+  font: 600 1.35rem/1 'Cormorant Garamond', Georgia, serif;
+}
+.lw-rising .lw-env-seal {
+  animation: lw-seal-pop 0.5s ease-in 0.8s forwards;
+}
+.lw-env.is-open .lw-env-seal {
+  opacity: 0;
+}
+/* Tem tranh Đông Hồ răng cưa */
+.lw-env-stamp {
+  position: absolute;
+  right: 6%;
+  bottom: 10%;
+  z-index: 5;
+  width: 21%;
+  aspect-ratio: 4 / 5;
+  margin: 0;
+  padding: 6px;
+  /* Răng cưa tem: lỗ tròn trong suốt quanh mép, ảnh phủ phần giữa */
+  background: radial-gradient(circle at 4px 4px, transparent 2.4px, #fbf6ea 2.8px) -4px -4px / 8px 8px;
+  transform: rotate(4deg);
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 20%));
+}
+.lw-env-stamp img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.25) saturate(0.9);
+}
+.lw-env-postmark {
+  position: absolute;
+  right: 18%;
+  bottom: 22%;
+  z-index: 6;
+  width: 25%;
+  fill: none;
+  stroke: rgb(63 32 11 / 55%);
+  stroke-width: 1.4;
+  transform: rotate(-14deg);
+  mix-blend-mode: multiply;
+}
+.lw-env-postmark text {
+  fill: rgb(63 32 11 / 60%);
+  stroke: none;
+  font: 600 7.5px/1 'Be Vietnam Pro', sans-serif;
+  letter-spacing: 0.08em;
+}
+.lw-env-postmark .lw-env-pm-year {
+  font-size: 13px;
+}
+
+/* Lá thư khi đọc */
+.lw-reading .lw-stage {
+  padding-top: 0;
+}
+.lw-reading .lw-lamp-wrap {
+  --lh: min(26svh, 200px);
+}
+.lw-reading .lw-lamp-name {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+.lw-letter {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 28px auto 0;
+  padding: clamp(28px, 6vw, 56px) clamp(20px, 6vw, 56px) 40px;
+  border-radius: 10px;
+  background:
+    linear-gradient(transparent 31px, rgb(120 80 40 / 10%) 32px) 0 18px / 100% 32px,
+    radial-gradient(120% 80% at 50% 0%, #fffaf0, #f7eedb 70%, #efe1c4);
+  color: var(--lw-ink);
+  box-shadow:
+    0 30px 60px -20px rgb(0 0 0 / 55%),
+    0 0 0 1px rgb(120 80 40 / 15%);
+  animation: lw-unfold 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  outline: none;
+}
+.lw-letter::before {
+  /* dải màu dịp ở mép trên tờ thư */
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  border-radius: 10px 10px 0 0;
+  background: repeating-linear-gradient(-45deg, var(--lw-accent) 0 10px, transparent 10px 18px, var(--lw-accent2) 18px 28px, transparent 28px 36px);
+  opacity: 0.8;
+}
+.lw-letter-stamp {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 64px;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  padding: 3px;
+  background: #fbf6ea;
+  transform: rotate(5deg);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+  filter: sepia(0.25);
+}
+.lw-dedication {
+  margin: 0 72px 18px 0;
+  color: var(--lw-ink);
+  font: 700 2.2rem/1.3 'Dancing Script', cursive;
+}
+.lw-dedication .lt-hw {
+  height: 1.55em;
+}
+/* Handwriting reveal của tiêu đề: nét mực chạy theo viền chữ Dancing Script (có dấu tiếng Việt) */
+.lw-dedication .lt-hw-text {
+  font:
+    700 52px 'Dancing Script',
+    cursive;
+  fill: currentColor;
+  stroke: currentColor;
+}
+.lw-content {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.lw-content.is-shown {
+  opacity: 1;
+}
+.lw-para {
+  margin: 0 0 18px;
+  font: 1.35rem/2rem 'Patrick Hand', 'Itim', cursive;
+}
+/* Handwriting reveal: mực chảy trái → phải trong từng chữ (mask gradient trượt), chữ sau nối chữ trước
+   như ngòi bút đang viết; mép mực hơi nhoè rồi rõ (giữ chút "text generate" của Aceternity UI). */
+.lw-word {
+  display: inline-block;
+  white-space: pre;
+  opacity: 0;
+  -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  -webkit-mask-size: 240% 100%;
+  mask-size: 240% 100%;
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  filter: blur(1.5px);
+}
+.lw-content.is-shown .lw-word {
+  animation: lw-word 0.4s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+.lw-para.is-complete .lw-word {
+  animation: none;
+  opacity: 1;
+  -webkit-mask-image: none;
+  mask-image: none;
+  filter: none;
+}
+/* Đốm sáng bay lên khi đọc thư */
+.lw-motes {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  animation: lw-fade 2s ease both;
+}
+.lw-motes i {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3d6 0%, rgb(255 210 140 / 85%) 40%, rgb(255 190 110 / 0%) 72%);
+  box-shadow: 0 0 10px 2px rgb(255 200 120 / 35%);
+  opacity: 0;
+  animation: lw-mote 12s linear infinite;
+}
+/* Sparkle bốn cánh lấp lánh quanh viền tờ thư */
+.lw-letter-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.lw-letter-sparkles i {
+  position: absolute;
+  background: radial-gradient(circle, #fffaf0 0 20%, #ffd98f 45%, #e8a94a 80%);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  filter: drop-shadow(0 0 4px rgb(255 214 150 / 90%));
+  transform: scale(0);
+  animation: lw-sparkle 2.6s ease-in-out infinite;
+}
+.lw-skip {
+  display: block;
+  margin: 0 0 12px auto;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: rgb(63 32 11 / 65%);
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.lw-signature {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  margin: 26px 0 8px;
+  font-family: 'Patrick Hand', 'Itim', cursive;
+}
+.lw-signature span {
+  font-size: 0.95rem;
+  opacity: 0.75;
+}
+.lw-signature strong {
+  font: 700 2rem/1.2 'Dancing Script', cursive;
+}
+.lw-ps {
+  margin: 14px 0 0;
+  font: 1.2rem/1.6 'Patrick Hand', 'Itim', cursive;
+  color: #6b4426;
+  white-space: pre-line;
+}
+.lw-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid rgb(63 32 11 / 25%);
+  border-radius: 999px;
+  background: #fffaf0;
+  color: var(--lw-ink);
+  font: 500 0.95rem/1 'Be Vietnam Pro', sans-serif;
+  cursor: pointer;
+}
+.lw-btn-primary {
+  border-color: transparent;
+  background: var(--lw-seal);
+  color: #fff6e8;
+  box-shadow: 0 8px 20px -8px var(--lw-seal);
+}
+.lw-surprise-trigger {
+  margin-top: 22px;
+}
+.lw-after {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px dashed rgb(63 32 11 / 25%);
+}
+.lw-video video,
+.lw-video-poster {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  background: #2a1a0e center / cover;
+}
+.lw-video-poster {
+  border: 0;
+  color: #fff6e8;
+  font: 500 1rem/1 'Be Vietnam Pro', sans-serif;
+  cursor: pointer;
+}
+
+/* Điều bất ngờ */
+.lw-surprise {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(20 13 7 / 70%);
+  backdrop-filter: blur(4px);
+  animation: lw-fade 0.3s ease both;
+}
+.lw-surprise-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: min(520px, 100%);
+  max-height: calc(100svh - 32px);
+  overflow: auto;
+  padding: 34px 24px 24px;
+  border-radius: 14px;
+  background: var(--lw-paper);
+  color: var(--lw-ink);
+  text-align: center;
+  box-shadow: 0 30px 60px rgb(0 0 0 / 45%);
+  animation: lw-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.lw-occasion-art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f4e8cf;
+}
+.lw-occasion-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.lw-kicker {
+  margin: 0;
+  font: 600 0.72rem/1 'Be Vietnam Pro', sans-serif;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--lw-accent2);
+}
+.lw-surprise-big {
+  font: 700 1.8rem/1.2 'Dancing Script', cursive;
+}
+.lw-badge {
+  padding: 8px 18px;
+  border: 2px dashed var(--lw-accent);
+  border-radius: 999px;
+  transform: rotate(-3deg);
+}
+.lw-surprise-icon {
+  font-size: 3.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 16px rgb(255 214 150 / 90%));
+  animation: lw-float 3s ease-in-out infinite;
+}
+.lw-places {
+  margin: 0;
+  font: 1.35rem/1.4 'Patrick Hand', 'Itim', cursive;
+}
+.lw-plane {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  margin: 0 0.4em;
+  vertical-align: -0.15em;
+  fill: var(--lw-accent);
+  rotate: 90deg;
+  animation: lw-float 2.4s ease-in-out infinite;
+}
+.lw-photos {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 10px;
+}
+.lw-photos img {
+  width: 120px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  padding: 5px 5px 18px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 25%);
+}
+.lw-photos img:nth-child(1) {
+  transform: rotate(-4deg);
+}
+.lw-photos img:nth-child(2) {
+  transform: rotate(3deg);
+}
+.lw-surprise-text p {
+  margin: 0;
+  font: 1.3rem/1.6 'Patrick Hand', 'Itim', cursive;
+}
+/* Bánh sinh nhật giấy */
+.lw-cake {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  width: 100%;
+}
+.lw-cake-candles {
+  position: absolute;
+  bottom: 69%;
+  left: 50%;
+  display: flex;
+  gap: clamp(12px, 4vw, 22px);
+  transform: translateX(-50%);
+}
+.lw-candle {
+  position: relative;
+  width: 8px;
+  height: 34px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(-45deg, #fff6e8 0 4px, var(--lw-accent) 4px 8px);
+}
+.lw-flame {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 12px;
+  height: 18px;
+  margin-left: -6px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 50% 70%, #fff3c4, #f6b44a 55%, transparent 70%);
+  animation: lw-flame 0.9s ease-in-out infinite alternate;
+}
+.lw-smoke {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(120 110 100 / 50%);
+  opacity: 0;
+}
+.lw-cake.is-blown .lw-flame {
+  animation: lw-out 0.35s ease forwards;
+}
+.lw-cake.is-blown .lw-smoke {
+  animation: lw-smoke 1.4s ease-out 0.2s forwards;
+}
+/* Màn hình nhỏ */
+@media (max-width: 480px) {
+  .lw-dedication {
+    font-size: 1.6rem;
+    margin-right: 56px;
+  }
+  .lw-letter-stamp {
+    width: 48px;
+    top: 16px;
+    right: 16px;
+  }
+  .lw-para {
+    font-size: 1.22rem;
+    line-height: 1.9rem;
+  }
+}
+
+@keyframes lw-flicker {
+  0%,
+  100% {
+    filter: brightness(1.08) saturate(1.05) drop-shadow(0 0 28px rgb(255 190 110 / 65%));
+  }
+  50% {
+    filter: brightness(1.02) saturate(1) drop-shadow(0 0 20px rgb(255 190 110 / 50%));
+  }
+}
+@keyframes lw-drift {
+  to {
+    translate: 100px 0;
+  }
+}
+@keyframes lw-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: translateY(0) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.15);
+  }
+}
+@keyframes lw-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 214 150 / 40%);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgb(255 214 150 / 0%);
+  }
+}
+@keyframes lw-rise {
+  from {
+    opacity: 0;
+    transform: translateY(70%) rotate(-3deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes lw-env-sink {
+  to {
+    opacity: 0;
+    transform: translateY(30%);
+  }
+}
+@keyframes lw-flap-open {
+  0% {
+    transform: rotateX(0);
+    z-index: 4;
+  }
+  49% {
+    z-index: 4;
+  }
+  50% {
+    z-index: 1;
+  }
+  100% {
+    transform: rotateX(180deg);
+    z-index: 1;
+  }
+}
+@keyframes lw-seal-pop {
+  40% {
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6) translateY(-10px);
+  }
+}
+@keyframes lw-unfold {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes lw-word {
+  0% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+    filter: none;
+  }
+}
+@keyframes lw-mote {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  12% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(var(--sway, 0), -55vh) scale(1);
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--sway, 0) * -0.6), -110vh) scale(0.8);
+  }
+}
+@keyframes lw-sparkle {
+  0%,
+  100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(1) rotate(45deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.4) rotate(90deg);
+    opacity: 0.6;
+  }
+}
+@keyframes lw-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes lw-pop {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+}
+@keyframes lw-float {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes lw-flame {
+  to {
+    transform: scaleY(1.15) translateY(-1px);
+  }
+}
+@keyframes lw-out {
+  to {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+@keyframes lw-smoke {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-36px) scale(3);
+  }
+}
+
+/* D-149: toàn bộ trải nghiệm nằm gọn trong một chiều cao màn hình — trang không cuộn; chỉ tờ thư
+   cuộn bên trong khung của nó */
+.lw-page {
+  height: 100svh;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+.lw-top {
+  position: relative;
+  flex: none;
+  width: 100%;
+}
+.lw-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  align-content: center;
+  padding-top: 0;
+}
+.lw-reading .lw-stage {
+  flex: none;
+}
+.lw-env {
+  --w: min(360px, 84vw, 80svh);
+}
+.lw-letter-frame {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  width: 100%;
+  max-width: 720px;
+  margin: 10px auto 0;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+}
+.lw-letter-frame .lw-letter {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(120 80 40 / 35%) transparent;
+}
+.lw-letter-sparkles {
+  z-index: 2;
+}
+
+/* Màn ngang (máy tính, máy tính bảng, điện thoại xoay ngang): đọc thư hai cột — đèn trái, thư phải */
+@media (orientation: landscape) {
+  .lw-page.lw-reading {
+    display: grid;
+    grid-template-columns: minmax(150px, 30%) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: clamp(16px, 3vw, 40px);
+  }
+  .lw-reading .lw-top {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+  .lw-reading .lw-stage {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+  }
+  .lw-reading .lw-lamp-wrap {
+    --lh: min(60svh, 380px);
+  }
+  .lw-reading .lw-letter-frame {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 4px 0 0;
+  }
+}
+
+/* Điện thoại xoay ngang (màn thấp) — tối/phong bì cũng hai cột: đèn trái, lời mời/công tắc hoặc phong bì phải */
+@media (orientation: landscape) and (max-height: 520px) {
+  .lw-page {
+    padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+  }
+  .lw-top {
+    padding: 6px 0;
+  }
+  .lw-stage {
+    grid-template-columns: auto auto;
+    justify-content: center;
+    grid-template-rows: 1fr auto;
+    column-gap: clamp(20px, 5vw, 56px);
+    align-items: center;
+    padding-bottom: 10px;
+  }
+  .lw-lamp-wrap {
+    --lh: min(62svh, 260px);
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+  }
+  .lw-lamp-name {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+  }
+  .lw-invite {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    justify-self: start;
+    margin: 0;
+    max-width: 16ch;
+    text-align: left;
+    font-size: clamp(1.6rem, 9svh, 2.4rem);
+  }
+  .lw-switch {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    justify-self: start;
+    margin-top: 12px;
+  }
+  .lw-rising .lw-lamp-wrap,
+  .lw-unfolding .lw-lamp-wrap {
+    --lh: min(52svh, 220px);
+  }
+  .lw-env {
+    --w: min(420px, 56vw, 112svh);
+    grid-column: 2;
+    grid-row: 1 / 3;
+    justify-self: center;
+    margin-top: 0;
+  }
+  .lw-reading .lw-stage {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding-bottom: 0;
+  }
+  .lw-reading .lw-lamp-wrap {
+    --lh: min(58svh, 210px);
+  }
+  .lw-reading .lw-lamp-name {
+    grid-row: 2;
+  }
+  .lw-reading .lw-letter {
+    padding: 22px clamp(18px, 4vw, 40px) 24px;
+  }
+  .lw-reading .lw-dedication {
+    font-size: 1.9rem;
+  }
+  .lw-letter-stamp {
+    width: 52px;
+    top: 14px;
+    right: 14px;
+  }
+  .lw-surprise {
+    padding: 8px;
+  }
+  .lw-surprise-card {
+    width: min(760px, 100%);
+    max-height: calc(100svh - 16px);
+    padding: 20px 20px 16px;
+    gap: 10px;
+  }
+  .lw-occasion-art {
+    width: min(100%, 60svh);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lw-page *,
+  .lw-page *::before {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .lw-word {
+    opacity: 1;
+    -webkit-mask-image: none;
+    mask-image: none;
+    filter: none;
+  }
+  .lw-motes,
+  .lw-letter-sparkles {
+    display: none;
+  }
+}
+
+/* Menu lời chúc mẫu (chỉ bản demo /phong-thu/web) */
+.lw-demo {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 30;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border: 1px solid rgb(246 239 226 / 25%);
+  border-radius: 14px;
+  background: rgb(20 13 7 / 75%);
+  backdrop-filter: blur(10px);
+  font-size: 0.85rem;
+}
+.lw-demo summary {
+  cursor: pointer;
+}
+.lw-demo div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.lw-demo button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgb(246 239 226 / 25%);
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.lw-demo button[aria-pressed='true'] {
+  background: var(--lw-cream);
+  color: var(--lw-night);
+}

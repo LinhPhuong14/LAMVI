@@ -318,3 +318,15 @@ Quy tắc bắt buộc:
 3. Chuỗi hiển thị qua `t()` (vi/en/zh), kể cả `alt`.
 4. Motion: `Reveal` + biến thể có sẵn; kiểm tra với giảm chuyển động.
 5. Ảnh mới: ghi nguồn, giấy phép vào `CREDITS.md` + `folkArt.js`.
+
+## Phòng thư POV — ngoại lệ chữ viết tay D-136
+
+Prototype `feat/phong-thu` tuân bảng màu D-121, tiêu đề Cormorant Garamond và điều khiển Be Vietnam Pro. Theo yêu cầu mới, nội dung giấy caro dùng Itim Vietnamese tự host với fade/clip từng grapheme; ngoại lệ có chủ đích cho thư, không áp dụng cho các trang khác. Phong bì kraft vintage, seal Warm Brown, ánh đèn mật ong; không đưa lại bảng xanh/son cũ. Xem T-105 và `docs/phong-thu.md`.
+
+
+### Phòng thư — cập nhật D-136 (2026-11-13)
+Mở đầu POV Perspective, giữ nền Việt gen; sáu góc theo thao tác chủ động. Tách CameraRig/LetterReader/PaperSurprise; reducer khóa bước chuyển và kéo 40%. Bì vẫn trên bàn, giấy mới nâng lên; reader mở rộng. Dùng camera-controls MIT và bàn KayKit CC0 qua GLTFLoader, giữ stack/brand/ánh sáng. Không tích hợp bộ surfaceMaterials bị từ chối. Chi tiết triển khai/nguồn/QA: `docs/phong-thu.md`, `docs/art/model-sources.md`, `docs/qa/phong-thu/README.md`. Ghi chú này thay mô tả tự mở thư trước đó, không thay API QR/backend.
+
+### Minh hoạ theo dịp (2026-11-15, D-143)
+
+Thiệp bất ngờ phong thư web 2D dùng tranh gốc AI gợi giấy dó/gouache tông kem–nâu, nhấn lá/hồng dịu. Đây là minh hoạ, không thay ảnh sản phẩm hoặc tranh Đông Hồ tư liệu. Bảy chủ đề, nguồn và prompt ở `public/images/occasions/CREDITS.md` + `prompts.json`. Hai cỡ WebP 480/960, khung 3:2 không cắt, alt tiếng Việt; chỉ tải khi mở thiệp. Nến CSS tách lớp trên bánh sinh nhật để vẫn thổi tắt được.

@@ -1,4 +1,4 @@
-"""Dựng banner đầu thư 1200x400 (hiển thị 600x200 trên thư) cho LAMVI (T-56, T-104).
+"""Dựng banner đầu thư 1200x400 (hiển thị 600x200 trên thư) cho LAMVI (T-56, T-111).
 
 Bên phải: năm chiếc đèn của catalog (ảnh tách nền public/images/lamps/*-cutout.webp, cùng ảnh thẻ sản phẩm) xếp một hàng,
 nét và đúng màu thật. Bên trái: chữ LAMVI. Nền Deep Brown, viền caramel theo docs/knowledge/design-rules.md §2.1

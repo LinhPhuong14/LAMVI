@@ -1,0 +1,23 @@
+{
+  "portrait": {
+    "canvas": 0,
+    "overlay": true
+  },
+  "compact": {
+    "overflow": false,
+    "reader": {
+      "x": 21.59375,
+      "y": 12.390625,
+      "width": 316.796875,
+      "height": 176.1875
+    }
+  },
+  "desktop": {
+    "frame": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    }
+  }
+}

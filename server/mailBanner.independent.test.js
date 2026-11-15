@@ -1,4 +1,4 @@
-// Kiểm thử độc lập: banner thư (T-104) và LampPhoto trong AccountPage
+// Kiểm thử độc lập: banner thư (T-111) và LampPhoto trong AccountPage
 import { describe, it, expect } from 'vitest'
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, statSync } from 'node:fs'

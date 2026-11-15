@@ -1,0 +1,14 @@
+{
+  "pending": {
+    "busy": "true",
+    "visibility": "hidden",
+    "inert": true,
+    "ready": false
+  },
+  "title": {
+    "font": "\"Dancing Script\", cursive",
+    "text": "Gửi Linh,",
+    "svg": 0
+  },
+  "errors": []
+}

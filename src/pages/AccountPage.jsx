@@ -18,7 +18,7 @@ import { useGallery } from '../gallery/useGallery.js'
 import OrderProgress, { StatusBadge } from '../orders/OrderStatus.jsx'
 import { formatVnd } from '../lib/money.js'
 
-// Đèn trong dashboard dùng ảnh đèn thật của catalog (tách nền, cùng ảnh ở thẻ sản phẩm), không dùng hình vẽ (T-104)
+// Đèn trong dashboard dùng ảnh đèn thật của catalog (tách nền, cùng ảnh ở thẻ sản phẩm), không dùng hình vẽ (T-111)
 function LampPhoto({ slug, height }) {
   return <img className="dash-lamp" src={`/images/lamps/${slug}-cutout.webp`} alt="" height={height} style={{ height }} loading="lazy" decoding="async" />
 }
