@@ -839,3 +839,9 @@ Kết nối DB: `server/config.js` nhận tên khoá mới `SUPABASE_PUBLISHABLE
 
 **Còn lại / cần người dùng**: đo tải thật bằng 4G; G-120 (QR, tem, đo lượt quét).
 
+## 2026-11-15 — Ảnh đèn catalog ở thư và dashboard (T-104)
+
+**Đã làm**: dựng lại banner thư bằng năm ảnh đèn catalog (nét, đúng màu), đúng bảng màu thương hiệu; thay ba hình đèn vẽ ở dashboard khách bằng ảnh đèn catalog. Test: `server/mailBanner.independent.test.js` (subagent).
+
+**Còn lại / cần người dùng**: xác nhận "phong thư" là hình `LetterArt` (phong thư đóng ấn ở Hồ sơ) hay khung thư; xem thư thật ở Gmail/Outlook (ảnh banner chỉ hiện khi có `PUBLIC_SITE_URL` công khai).
+

@@ -8874,3 +8874,10 @@ h1 {
   .scene-tale .welcome-print { width: fit-content; max-width: 90%; }
   .scene-tale .welcome-print img { max-height: calc(100dvh - 130px); }
 }
+
+/* Đèn catalog trong dashboard khách (T-104) */
+.dash-lamp {
+  display: block;
+  width: auto;
+  max-width: none;
+}

@@ -513,3 +513,9 @@ Các quyết định trên là kỹ thuật, không thay D-xx. Theo T-59, chưa 
 - `CRAFT_FILMS.*.srcLite`; `src/lib/filmSrc.js` (`pickFilmSrc`): bản nhẹ khi `max-width: 800px`, `navigator.connection.saveData` hoặc `effectiveType` ≤ 3g; clip `journey` đã nhẹ (0,9 MB) nên không có `srcLite`.
 - `/welcome` chỉ dựng ở client nên chọn nguồn ngay lần render đầu (video đang phát và video tải trước dùng cùng bản). `CraftVideo` được SSR nên giữ bản 720p lúc hydrate rồi đổi sau khi mount và gọi `load()` (preload="none", chưa tải byte nào).
 
+### T-104 — Ảnh đèn catalog thay đèn mờ/đèn vẽ ở thư và dashboard (2026-11-15)
+
+- Banner thư (`scripts/gen_mail_banner.py`, `npm run gen:mail-banner`): năm ảnh đèn tách nền `public/images/lamps/*-cutout.webp` xếp một hàng bên phải, chữ LAMVI bên trái; nền Deep Brown, viền caramel, thanh ấn nâu be. Bỏ ảnh đèn trời CC0 phủ chàm đêm và thanh đỏ son (trái bảng màu thương hiệu D-121, D-112). Kích thước 1200×400, ~71 KB.
+- Dashboard khách (`AccountPage.jsx`): ba hình `Lantern` vẽ (đơn hàng trống, việc cần làm trống, ô tiếp tục mua) thay bằng `LampPhoto` (ảnh cutout catalog). Hình phong thư (`LetterArt`) giữ nguyên.
+- Test: `server/mailBanner.independent.test.js`.
+
