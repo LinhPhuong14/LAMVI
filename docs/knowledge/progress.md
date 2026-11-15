@@ -8,6 +8,7 @@
 | Lời mời "Hãy cùng thắp sáng chiếc đèn của bạn" | ✅ | `src/letter-web/LetterWeb.jsx`, `web.css` | — |
 | Đồng bộ font, sửa tiêu đề video vô hình | ✅ | `src/letters/letters.css` | — |
 | Màn "Cùng xem cách chiếc đèn được làm ra nhé", video toàn màn hình tự phát + nối tiếp (D-145) | ✅ | `src/letters/IntroFilms.jsx` | QA iPhone/Android thật |
+| Mọi pha vừa một màn hình, tờ thư cuộn trong khung (D-149) | ✅ | `src/letter-web/web.css`, `LetterWeb.jsx`, `src/letters/letters.css` | QA máy thật |
 | Thiết bị đã quét → bỏ qua video; bố cục điện thoại nằm ngang (D-148) | ✅ | `src/letters/films.js`, `src/pages/LetterPage.jsx`, `src/letter-web/web.css` | QA máy thật |
 | Tên người nhận/người gửi tuỳ chọn (D-147) | ✅ | `server/domain/letter.js`, `src/letters/names.js` | — |
 | Luôn yêu cầu xoay ngang điện thoại (D-146) | ✅ | `src/letters/RotateGate.jsx` | QA khoá xoay |

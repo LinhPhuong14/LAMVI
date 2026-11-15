@@ -1076,11 +1076,91 @@
   }
 }
 
-/* D-146/D-148: điện thoại xoay ngang (màn thấp) — bố cục hai cột: đèn bên trái, lời mời/công tắc,
-   phong bì hoặc lá thư bên phải; mọi bước vừa một màn hình, chỉ lá thư cuộn */
+/* D-149: toàn bộ trải nghiệm nằm gọn trong một chiều cao màn hình — trang không cuộn; chỉ tờ thư
+   cuộn bên trong khung của nó */
+.lw-page {
+  height: 100svh;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+.lw-top {
+  position: relative;
+  flex: none;
+  width: 100%;
+}
+.lw-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  align-content: center;
+  padding-top: 0;
+}
+.lw-reading .lw-stage {
+  flex: none;
+}
+.lw-env {
+  --w: min(360px, 84vw, 80svh);
+}
+.lw-letter-frame {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  width: 100%;
+  max-width: 720px;
+  margin: 10px auto 0;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+}
+.lw-letter-frame .lw-letter {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(120 80 40 / 35%) transparent;
+}
+.lw-letter-sparkles {
+  z-index: 2;
+}
+
+/* Màn ngang (máy tính, máy tính bảng, điện thoại xoay ngang): đọc thư hai cột — đèn trái, thư phải */
+@media (orientation: landscape) {
+  .lw-page.lw-reading {
+    display: grid;
+    grid-template-columns: minmax(150px, 30%) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: clamp(16px, 3vw, 40px);
+  }
+  .lw-reading .lw-top {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+  .lw-reading .lw-stage {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: center;
+  }
+  .lw-reading .lw-lamp-wrap {
+    --lh: min(60svh, 380px);
+  }
+  .lw-reading .lw-letter-frame {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 4px 0 0;
+  }
+}
+
+/* Điện thoại xoay ngang (màn thấp) — tối/phong bì cũng hai cột: đèn trái, lời mời/công tắc hoặc phong bì phải */
 @media (orientation: landscape) and (max-height: 520px) {
   .lw-page {
-    padding: 0 max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left));
+    padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
   }
   .lw-top {
     padding: 6px 0;
@@ -1091,8 +1171,7 @@
     grid-template-rows: 1fr auto;
     column-gap: clamp(20px, 5vw, 56px);
     align-items: center;
-    min-height: calc(100svh - 52px);
-    padding-top: 0;
+    padding-bottom: 10px;
   }
   .lw-lamp-wrap {
     --lh: min(62svh, 260px);
@@ -1134,43 +1213,19 @@
     justify-self: center;
     margin-top: 0;
   }
-
-  /* Đọc thư: đèn đứng yên cột trái, lá thư cột phải cuộn */
-  .lw-page.lw-reading {
-    /* clip (không phải hidden) để .lw-page không thành khung cuộn — sticky của cột đèn mới chạy */
-    overflow-x: clip;
-    display: grid;
-    grid-template-columns: minmax(150px, 28%) minmax(0, 1fr);
-    column-gap: clamp(16px, 3vw, 32px);
-    align-items: start;
-  }
-  .lw-reading .lw-top {
-    grid-column: 1 / -1;
-    width: 100%;
-    max-width: none;
-  }
   .lw-reading .lw-stage {
-    position: sticky;
-    top: 52px;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    min-height: 0;
-    padding-top: 8px;
+    padding-bottom: 0;
   }
   .lw-reading .lw-lamp-wrap {
     --lh: min(58svh, 210px);
-    grid-column: 1;
   }
   .lw-reading .lw-lamp-name {
     grid-row: 2;
   }
   .lw-reading .lw-letter {
-    grid-column: 2;
-    width: 100%;
-    max-width: 720px;
-    margin: 4px 0 0;
-    padding: 24px clamp(18px, 4vw, 40px) 28px;
+    padding: 22px clamp(18px, 4vw, 40px) 24px;
   }
   .lw-reading .lw-dedication {
     font-size: 1.9rem;
@@ -1180,8 +1235,6 @@
     top: 14px;
     right: 14px;
   }
-
-  /* Điều bất ngờ: thẻ ngang, ảnh minh hoạ bên trái */
   .lw-surprise {
     padding: 8px;
   }
@@ -1190,7 +1243,8 @@
     max-height: calc(100svh - 16px);
     padding: 20px 20px 16px;
     gap: 10px;
-  }  .lw-occasion-art {
+  }
+  .lw-occasion-art {
     width: min(100%, 60svh);
   }
 }

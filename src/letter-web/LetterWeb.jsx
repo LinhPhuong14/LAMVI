@@ -235,7 +235,8 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
       )}
 
       {phase === 'reading' && (
-        <article className="lw-letter" ref={readerRef} tabIndex={-1} aria-label={`Lời chúc gửi ${recipient}`}>
+        // D-149: khung giữ tờ thư vừa một màn hình — tờ thư cuộn bên trong, sparkle nằm ở khung (không bị cắt)
+        <div className="lw-letter-frame">
           {!reduced && (
             <div className="lw-letter-sparkles" aria-hidden="true">
               {SPARKLES.map((s, i) => (
@@ -243,60 +244,62 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
               ))}
             </div>
           )}
-          <img className="lw-letter-stamp" src={theme.stamp} alt="" aria-hidden="true" />
-          <HandwrittenTitle as="h2" className="lw-dedication" text={`Gửi ${recipient},`} instant={reduced} onDone={() => setTitleDone(true)} />
-          <div className={`lw-content${titleDone ? ' is-shown' : ''}`} inert={!titleDone} aria-hidden={!titleDone}>
-            {letter.kind === 'text' ? (
-              <>
-                {titleDone && !revealAll && (
-                  <button type="button" className="lw-skip" onClick={() => setRevealAll(true)}>
-                    Hiện toàn bộ lá thư
-                  </button>
-                )}
-                {paragraphs.map((p, pi) => (
-                  <p key={pi} className={`lw-para${revealAll ? ' is-complete' : ''}`}>
-                    <span className="lw-sr-only">{p.text}</span>
-                    <span aria-hidden="true">
-                      {p.words.map(({ w, i }) => (
-                        <span key={i} className="lw-word" style={{ animationDelay: `${timing[i].delay.toFixed(2)}s`, animationDuration: `${timing[i].dur.toFixed(2)}s` }}>
-                          {w}{' '}
-                        </span>
-                      ))}
-                    </span>
-                  </p>
-                ))}
-              </>
-            ) : (
-              <div className="lw-video">
-                {playing ? (
-                  <video src={letter.videoUrl} poster={letter.posterUrl || undefined} controls autoPlay playsInline preload="metadata">
-                    {letter.captionsUrl && <track kind="captions" src={letter.captionsUrl} srcLang="vi" label="Tiếng Việt" default />}
-                  </video>
-                ) : (
-                  <button
-                    type="button"
-                    className="lw-video-poster"
-                    onClick={() => setPlaying(true)}
-                    style={letter.posterUrl ? { backgroundImage: `url(${letter.posterUrl})` } : undefined}
-                  >
-                    <span aria-hidden="true">▷</span> Xem lời nhắn
-                  </button>
-                )}
+          <article className="lw-letter" ref={readerRef} tabIndex={-1} aria-label={`Lời chúc gửi ${recipient}`}>
+            <img className="lw-letter-stamp" src={theme.stamp} alt="" aria-hidden="true" />
+            <HandwrittenTitle as="h2" className="lw-dedication" text={`Gửi ${recipient},`} instant={reduced} onDone={() => setTitleDone(true)} />
+            <div className={`lw-content${titleDone ? ' is-shown' : ''}`} inert={!titleDone} aria-hidden={!titleDone}>
+              {letter.kind === 'text' ? (
+                <>
+                  {titleDone && !revealAll && (
+                    <button type="button" className="lw-skip" onClick={() => setRevealAll(true)}>
+                      Hiện toàn bộ lá thư
+                    </button>
+                  )}
+                  {paragraphs.map((p, pi) => (
+                    <p key={pi} className={`lw-para${revealAll ? ' is-complete' : ''}`}>
+                      <span className="lw-sr-only">{p.text}</span>
+                      <span aria-hidden="true">
+                        {p.words.map(({ w, i }) => (
+                          <span key={i} className="lw-word" style={{ animationDelay: `${timing[i].delay.toFixed(2)}s`, animationDuration: `${timing[i].dur.toFixed(2)}s` }}>
+                            {w}{' '}
+                          </span>
+                        ))}
+                      </span>
+                    </p>
+                  ))}
+                </>
+              ) : (
+                <div className="lw-video">
+                  {playing ? (
+                    <video src={letter.videoUrl} poster={letter.posterUrl || undefined} controls autoPlay playsInline preload="metadata">
+                      {letter.captionsUrl && <track kind="captions" src={letter.captionsUrl} srcLang="vi" label="Tiếng Việt" default />}
+                    </video>
+                  ) : (
+                    <button
+                      type="button"
+                      className="lw-video-poster"
+                      onClick={() => setPlaying(true)}
+                      style={letter.posterUrl ? { backgroundImage: `url(${letter.posterUrl})` } : undefined}
+                    >
+                      <span aria-hidden="true">▷</span> Xem lời nhắn
+                    </button>
+                  )}
+                </div>
+              )}
+              <div className="lw-signature">
+                <span>Thương mến,</span>
+                {sender && <strong>{sender}</strong>}
               </div>
-            )}
-            <div className="lw-signature">
-              <span>Thương mến,</span>
-              {sender && <strong>{sender}</strong>}
+              {letter.postscript && <p className="lw-ps">{letter.postscript}</p>}
+              {hasSurprise && (
+                <button ref={surpriseBtn} type="button" className="lw-btn lw-btn-primary lw-surprise-trigger" onClick={() => setSurprise(true)}>
+                  <span aria-hidden="true">✧</span> {theme.surprise}
+                </button>
+              )}
+              {afterLetter && <div className="lw-after">{afterLetter}</div>}
             </div>
-            {letter.postscript && <p className="lw-ps">{letter.postscript}</p>}
-            {hasSurprise && (
-              <button ref={surpriseBtn} type="button" className="lw-btn lw-btn-primary lw-surprise-trigger" onClick={() => setSurprise(true)}>
-                <span aria-hidden="true">✧</span> {theme.surprise}
-              </button>
-            )}
-            {afterLetter && <div className="lw-after">{afterLetter}</div>}
-          </div>
-        </article>
+          </article>
+        </div>
       )}
 
       {surprise && <Surprise letter={letter} theme={theme} onClose={closeSurprise} />}
