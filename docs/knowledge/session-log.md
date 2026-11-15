@@ -936,3 +936,5 @@ Kiểm thử độc lập (T-11) cho D-144: `src/letters/interlude.independent.t
 **Còn lại / cần người dùng**: QA trên iPhone/Android thật (tự phát có tiếng, toàn màn hình, khoá xoay).
 
 **Cập nhật cùng ngày (D-147)**: tên người nhận/người gửi tuỳ chọn — server chỉ còn giới hạn độ dài; web 2D hiện "Gửi bạn," / chữ ký "Thương mến,"; Phòng thư 3D nhận chữ thay thế; test `src/letters/names.test.jsx`. Merge master (minh hoạ dịp của Codex, D-143) vào nhánh, đổi mã quyết định của nhánh thành D-144…D-147.
+
+**Cập nhật 2026-11-15 (D-145)**: bỏ dòng gợi ý "Hết video này sẽ tự chuyển sang video tiếp theo." ở video đầu (người dùng yêu cầu); video cuối vẫn nhắc "Xem hết video để bước vào căn phòng…", video lỗi vẫn báo lỗi.

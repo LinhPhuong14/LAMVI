@@ -120,13 +120,12 @@ export default function IntroFilms({ onDone, canSkip = false }) {
           />
         )}
         <footer className="lt-intro-foot">
-          <p key={item.key} className="lt-intro-hint" aria-live="polite">
-            {failed
-              ? 'Video chưa phát được trên thiết bị này.'
-              : index + 1 < INTRO_FILMS.length
-                ? 'Hết video này sẽ tự chuyển sang video tiếp theo.'
-                : 'Xem hết video để bước vào căn phòng có lá thư dành cho bạn.'}
-          </p>
+          {/* Video đầu không có dòng gợi ý (người dùng yêu cầu) — chỉ báo lỗi, và nhắc ở video cuối */}
+          {(failed || index + 1 === INTRO_FILMS.length) && (
+            <p key={item.key} className="lt-intro-hint" aria-live="polite">
+              {failed ? 'Video chưa phát được trên thiết bị này.' : 'Xem hết video để bước vào căn phòng có lá thư dành cho bạn.'}
+            </p>
+          )}
           <div className="lt-intro-actions">
             {failed && (
               <button type="button" className="lt-btn" onClick={() => next(false)}>
