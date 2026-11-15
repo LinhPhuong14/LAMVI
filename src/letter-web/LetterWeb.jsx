@@ -15,7 +15,7 @@ import './web.css'
 const NEXT = { lighting: 'rising', rising: 'unfolding', unfolding: 'reading' }
 const TIMING = { lighting: 1000, rising: 1900, unfolding: 1200 }
 const STATUS = {
-  dark: 'Căn phòng còn tối. Bấm bật đèn để bắt đầu.',
+  dark: 'Căn phòng còn tối. Hãy cùng thắp sáng chiếc đèn của bạn: bấm Bật đèn.',
   lighting: 'Đèn đang sáng dần.',
   rising: 'Một phong thư đang trồi lên.',
   unfolding: 'Lá thư đang mở ra.',
@@ -195,6 +195,12 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         </div>
         <p className="lw-lamp-name">Đèn {LAMPS[lamp]}</p>
 
+        {phase === 'dark' && (
+          // D-143: lời mời bật đèn (chữ viết tay, sáng nhẹ)
+          <p className="lw-invite" aria-hidden="true">
+            Hãy cùng thắp sáng chiếc đèn của bạn
+          </p>
+        )}
         {phase === 'dark' && (
           <button ref={switchRef} type="button" className="lw-switch" onClick={light}>
             <span className="lw-switch-track" aria-hidden="true">

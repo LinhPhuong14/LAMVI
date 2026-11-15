@@ -135,6 +135,7 @@ describe('Nút "Bỏ qua" và cờ đã xem (localStorage)', () => {
     fireEvent.ended(video())
     await screen.findByText(T2)
     fireEvent.click(screen.getByRole('button', { name: 'Bỏ qua, vào phòng' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-143: màn giới thiệu LAMVI
     expect(await screen.findByRole('button', { name: 'Chạm để bật đèn' })).toBeTruthy()
   })
 
@@ -158,6 +159,7 @@ describe('Nút "Bỏ qua" và cờ đã xem (localStorage)', () => {
     fireEvent.ended(video())
     await screen.findByText(T2)
     fireEvent.ended(video())
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-143: màn giới thiệu LAMVI
     expect(await screen.findByRole('button', { name: 'Chạm để bật đèn' })).toBeTruthy()
   })
 
@@ -166,6 +168,7 @@ describe('Nút "Bỏ qua" và cờ đã xem (localStorage)', () => {
     openLetterApi()
     renderAt(`/thu/${SLUG}`)
     fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua, vào phòng' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-143: màn giới thiệu LAMVI
     await screen.findByRole('button', { name: 'Chạm để bật đèn' })
     expect(localStorage.getItem(FLAG)).toBe('1')
   })
@@ -185,6 +188,7 @@ describe('Video lỗi → "Tiếp tục"', () => {
     expect(lamp()).toBeNull()
     fireEvent.error(video())
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-143: màn giới thiệu LAMVI
     expect(await screen.findByRole('button', { name: 'Chạm để bật đèn' })).toBeTruthy()
   })
 
@@ -217,6 +221,7 @@ describe('Video lỗi → "Tiếp tục"', () => {
     await screen.findByText(T2)
     fireEvent.error(video())
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-143: màn giới thiệu LAMVI
     await screen.findByRole('button', { name: 'Chạm để bật đèn' })
     expect(localStorage.getItem(FLAG)).toBeNull()
   })

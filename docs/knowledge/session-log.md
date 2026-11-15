@@ -918,3 +918,11 @@ Kiểm thử độc lập (T-11): `src/letter-web/main.independent.test.jsx` (46
 Kiểm thử độc lập (T-11): `server/letters.standalone.independent.test.js` + `src/admin/LettersStandalone.independent.test.jsx` (33 test), phát hiện 4 lỗi đã sửa — người nhận mở thư lẻ trên Supabase lỗi 500 (`getOrderById(null)`), xuất bản thư mới có thể hiện "nháp"/mất thông báo lỗi do điều hướng trước khi xuất bản xong, thẻ thư lẻ trùng key trong thư viện. Full suite 279 tệp / 4318 đạt (Routing.extra chập chờn); lint + build xanh.
 
 **Còn lại / cần người dùng**: chạy migration `20261115000026_standalone_letters.sql` trên Supabase.
+
+## 2026-11-15 — Luồng QR: màn chào, video tự phát, giới thiệu LAMVI, xoay ngang (D-143…D-145, T-110)
+
+**Đã làm**: `/thu/<slug>` = (xoay ngang) → màn "Cùng xem cách chiếc đèn được làm ra nhé" → hai video toàn màn hình tự phát nối tiếp → màn "LAMVI đem đến cho bạn chiếc đèn giấy dó với trải nghiệm độc nhất" → bật đèn (lời mời "Hãy cùng thắp sáng chiếc đèn của bạn") → phong thư. Font: Cormorant Garamond nghiêng (tiêu đề), Dancing Script (chữ viết tay), Be Vietnam Pro (giao diện); sửa tiêu đề video bị ăn màu nâu. CSS riêng cho điện thoại nằm ngang (màn thấp). Ảnh chụp kiểm ở 1280×800, 390×844 (dọc → lời nhắc xoay), 844×390, 667×375.
+
+Kiểm thử độc lập (T-11) cho D-143: `src/letters/interlude.independent.test.jsx` (30 test), không phát hiện lỗi; ghi chú UX đã sửa (nút "Bước vào" không còn vô hình trước khi hiện rõ, không cướp focus nếu người dùng đã Tab đi). Test D-144/D-145: `src/letters/welcome-rotate.test.jsx`.
+
+**Còn lại / cần người dùng**: QA trên iPhone/Android thật (tự phát có tiếng, toàn màn hình, khoá xoay).

@@ -242,6 +242,7 @@ describe('Trang người nhận + admin chọn kiểu web 2D', () => {
     window.location.hash = '#' + 'A'.repeat(43)
     renderAt('/thu/abcdefghij')
     fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua, vào phòng' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-143: màn giới thiệu LAMVI
     expect(await screen.findByText('Đèn Thu Hoạch', {}, { timeout: 5000 })).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Chạm để bật đèn' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Bật đèn' }))

@@ -116,6 +116,7 @@ describe('Người nhận /thu/:slug và xem thử admin: chỉ "room" mở 3D',
     window.location.hash = `#${TOKEN}`
     const utils = renderAt(`/thu/${SLUG}?fallback=1`)
     fireEvent.click(await screen.findByRole('button', { name: 'Bỏ qua, vào phòng' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' })) // D-143: màn giới thiệu LAMVI
     return utils
   }
 
