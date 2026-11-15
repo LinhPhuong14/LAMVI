@@ -1,4 +1,7 @@
+import { randomBytes } from 'node:crypto'
 import { Router } from 'express'
+import { IMAGE_TYPES, isImageType, validateImageUpload } from '../domain/admin.js'
+import { PRODUCT_IMAGE_BUCKET } from '../adapters/supabase/storage.js'
 import { HttpError, notFound } from '../errors.js'
 import { RepoError } from '../adapters/repoErrors.js'
 import { requireAdmin } from '../middleware/auth.js'
@@ -23,7 +26,7 @@ const body = (req) => (req.body && typeof req.body === 'object' && !Array.isArra
  * D-142: admin tạo được thư lẻ không cần đơn (`POST /admin/letters`, thao tác theo `/admin/letters/:id`).
  * D-138: người nhận mở /thu/<slug>#<token> trên domain chính; ai có link là xem được.
  */
-export function lettersRouter({ repo, auth, config }) {
+export function lettersRouter({ repo, auth, config, storage = null }) {
   const r = Router()
   const limit = (name, max, windowSec) =>
     rateLimit({
@@ -173,6 +176,31 @@ export function lettersRouter({ repo, auth, config }) {
       res.json({ item: presentLetterForAdmin(saved, config) })
     })
   }
+
+  // D-152: logo doanh nghiệp cho thư — bước 1 xin URL tải lên (ảnh PNG/JPG/WebP, không SVG), bước 2 xác nhận lấy URL công khai
+  const LOGO_PREFIX = 'letter-logos/'
+  const maxLogoBytes = Math.min(2, config.maxImageMb ?? 5) * 1024 * 1024
+  r.post('/admin/letters/logo-upload', async (req, res) => {
+    if (!storage) throw notFound()
+    const b = body(req)
+    const errors = validateImageUpload(b, maxLogoBytes)
+    if (Object.keys(errors).length) throw new HttpError(400, 'VALIDATION_ERROR', 'Dữ liệu không hợp lệ', errors)
+    const path = `${LOGO_PREFIX}${Date.now()}-${randomBytes(6).toString('hex')}.${IMAGE_TYPES[b.contentType]}`
+    const upload = await storage.createUpload({ path, contentType: b.contentType, bucket: PRODUCT_IMAGE_BUCKET })
+    res.status(201).json({ path, ...upload })
+  })
+  r.post('/admin/letters/logo', async (req, res) => {
+    if (!storage) throw notFound()
+    const { path } = body(req)
+    if (typeof path !== 'string' || !path.startsWith(LOGO_PREFIX) || path.includes('..') || path.length > 200) {
+      throw new HttpError(400, 'VALIDATION_ERROR', 'Đường dẫn không hợp lệ', { path: 'INVALID' })
+    }
+    const obj = await storage.statObject(path, PRODUCT_IMAGE_BUCKET)
+    if (!obj) throw new HttpError(400, 'VALIDATION_ERROR', 'Chưa có file', { path: 'IMAGE_NOT_UPLOADED' })
+    if (obj.size > maxLogoBytes) throw new HttpError(400, 'VALIDATION_ERROR', 'File quá lớn', { size: 'IMAGE_TOO_LARGE' })
+    if (!isImageType(obj.contentType)) throw new HttpError(400, 'VALIDATION_ERROR', 'Không phải ảnh', { contentType: 'INVALID_IMAGE_TYPE' })
+    res.json({ url: storage.publicUrl(path, PRODUCT_IMAGE_BUCKET) })
+  })
 
   // D-142: tạo thư lẻ — không cần đơn hàng. Có thể gửi kèm nội dung (lưu nháp ngay) hoặc chỉ ghi chú.
   r.post('/admin/letters', async (req, res) => {

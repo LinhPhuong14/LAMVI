@@ -132,7 +132,7 @@ export function createApp({
   // Trang QR lời chúc: người nhận, không đăng nhập (US-004)
   if (messages && repo.getOrderByQrToken) api.use(qrRouter({ repo, messages, config }))
   // D-134, D-138: phong thư admin soạn + trang người nhận mở bằng QR
-  if (repo.saveOrderLetter) api.use(lettersRouter({ repo, auth, config }))
+  if (repo.saveOrderLetter) api.use(lettersRouter({ repo, auth, config, storage }))
   // Storage bộ nhớ (dev/test) tự phục vụ tải lên/đọc file
   if (storage?.router) api.use(storage.router)
   api.use(() => {

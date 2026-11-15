@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64" role="img" aria-label="Logo mẫu doanh nghiệp">
+  <rect x="2" y="8" width="48" height="48" rx="12" fill="#1f4e5f"/>
+  <path d="M14 44 L26 18 L38 44 M19 34 H33" stroke="#f4e3c1" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="62" y="30" font-family="Georgia, serif" font-size="20" font-weight="700" fill="#1f4e5f">An Phát</text>
+  <text x="62" y="50" font-family="Arial, sans-serif" font-size="11" letter-spacing="3" fill="#5b7d88">HOLDINGS</text>
+</svg>

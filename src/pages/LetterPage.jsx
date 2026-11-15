@@ -38,7 +38,7 @@ export default function LetterPage() {
         const canSkip = introSeen(slug) || deviceScanned()
         markDeviceScanned()
         // D-150: tắt video mở đầu → vào thẳng màn giới thiệu LAMVI rồi tới lá thư
-        setState({ status: 'ok', letter: r.item, intro: LETTER_FLOW.introFilms, interlude: !LETTER_FLOW.introFilms, canSkip })
+        setState({ status: 'ok', letter: r.item, intro: LETTER_FLOW.introFilms, interlude: !LETTER_FLOW.introFilms && LETTER_FLOW.interlude, canSkip })
       } catch (err) {
         if (alive) setState({ status: 'error', code: err instanceof ApiError ? err.status : 0 })
       }
@@ -72,7 +72,7 @@ export default function LetterPage() {
           onDone={(watchedAll) => {
             if (watchedAll) markIntroSeen(slug)
             // D-144: sau hai video là màn giới thiệu LAMVI, rồi mới tới căn phòng bật đèn
-            setState((s) => ({ ...s, intro: false, interlude: true }))
+            setState((s) => ({ ...s, intro: false, interlude: LETTER_FLOW.interlude }))
           }}
         />
       </main>

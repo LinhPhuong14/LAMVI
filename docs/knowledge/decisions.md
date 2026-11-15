@@ -601,3 +601,11 @@ Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt 
 - Banner thư (`scripts/gen_mail_banner.py`, `npm run gen:mail-banner`): năm ảnh đèn tách nền `public/images/lamps/*-cutout.webp` xếp một hàng bên phải, chữ LAMVI bên trái; nền Deep Brown, viền caramel, thanh ấn nâu be. Bỏ ảnh đèn trời CC0 phủ chàm đêm.
 - Dashboard khách (`AccountPage.jsx`): ba hình `Lantern` vẽ (đơn hàng trống, việc cần làm trống, ô tiếp tục mua) thay bằng `LampPhoto` (ảnh cutout catalog). Hình phong thư (`LetterArt`) giữ nguyên.
 - Test: `server/mailBanner.independent.test.js`. (Làm ở nhánh `ccr-f7654e08-wqcdp4`, đưa vào master qua nhánh `feat/letter-business`; mã T-104 ở nhánh đó trùng nên đổi thành T-111.)
+
+### T-112 — Thư doanh nghiệp có logo, vào đèn luôn (2026-11-15, D-151, D-152)
+
+- **D-151**: `LETTER_FLOW.interlude = false` — `LetterPage` vào thẳng `LetterWeb`/`LetterRoom`; mã `Interlude` giữ sau cờ.
+- **D-152 dữ liệu**: `content.business = { name ≤ 60, logoUrl }` hoặc `null` (`validateLetterContent`; `logoUrl` qua `isMediaUrl`: `/…` hoặc `https://`, không `data:`/`javascript:`). Không cần migration (jsonb).
+- **Tải logo**: `POST /admin/letters/logo-upload` (signed upload URL, bucket công khai `product-images`, tiền tố `letter-logos/`, PNG/JPG/WebP ≤ 2 MB — không SVG) → `POST /admin/letters/logo` kiểm object thật (tồn tại, kích thước, kiểu) rồi trả URL công khai. `lettersRouter` nhận thêm `storage`.
+- **Hiển thị (web 2D)**: `.lw-cobrand` (LAMVI × logo), `Envelope` prop `business` (logo trên xi `.has-logo`, tên `.lw-env-from`), `.lw-letterhead`, chữ ký. CSP `img-src` chỉ có `'self'` + Supabase nên logo ngoài domain có thể bị chặn — UI khuyên tải lên.
+- Test: `src/letters/business.test.jsx`, `server/letters.logo.test.js`.

@@ -7,7 +7,7 @@ import { deviceScanned, markDeviceScanned } from './films.js'
 
 // D-150 tắt video mở đầu/nút video cuối thư/yêu cầu xoay ngang theo mặc định; test này kiểm luồng cũ (D-138…D-148)
 // nên bật lại cờ để giữ độ phủ khi cần mở lại
-vi.mock('./films.js', async (importOriginal) => ({ ...(await importOriginal()), LETTER_FLOW: { introFilms: true, extras: true, requireLandscape: true } }))
+vi.mock('./films.js', async (importOriginal) => ({ ...(await importOriginal()), LETTER_FLOW: { introFilms: true, interlude: true, extras: true, requireLandscape: true } }))
 
 const content = { template: 'web', recipientName: 'Linh', senderName: 'An', occasion: 'birthday', kind: 'text', message: ['Đoạn một.'], postscript: null, occasionData: null }
 const open = (slug) => {

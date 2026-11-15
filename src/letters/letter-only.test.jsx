@@ -24,16 +24,17 @@ afterEach(() => {
 
 describe('D-150: chỉ còn lời chúc', () => {
   it('cờ mặc định: tắt video mở đầu, tắt nút video cuối thư, không bắt xoay ngang', () => {
-    expect(LETTER_FLOW).toEqual({ introFilms: false, extras: false, requireLandscape: false })
+    expect(LETTER_FLOW).toEqual({ introFilms: false, interlude: false, extras: false, requireLandscape: false })
   })
 
-  it('/thu: không có video, vào thẳng màn giới thiệu → lá thư; cuối thư không có nút video; điện thoại dọc không bị chặn', async () => {
+  it('/thu: không video, không màn giới thiệu (D-151) — vào thẳng đèn → lá thư; cuối thư không có nút video; điện thoại dọc không bị chặn', async () => {
     reduced()
     portrait()
     mockApi({ 'POST /letters/open': () => ({ body: { item: content } }) })
     window.location.hash = '#' + 'A'.repeat(43)
     renderAt('/thu/abcdefghij')
-    fireEvent.click(await screen.findByRole('button', { name: 'Bước vào' }))
+    expect(await screen.findByRole('button', { name: 'Bật đèn' }, { timeout: 5000 })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Bước vào' })).toBeNull()
     expect(document.querySelector('video')).toBeNull()
     expect(screen.queryByRole('dialog', { name: /xoay ngang/i })).toBeNull()
     fireEvent.click(await screen.findByRole('button', { name: 'Bật đèn' }, { timeout: 5000 }))

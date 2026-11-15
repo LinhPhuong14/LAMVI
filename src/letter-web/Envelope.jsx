@@ -4,9 +4,9 @@ import { RECIPIENT_FALLBACK } from '../letters/names.js'
  * xi niêm phong khắc chữ cái đầu tên người gửi. Thuần trang trí (aria-hidden) — trạng thái do LetterWeb báo.
  * Thứ tự lớp: mặt sau → nắp (khi đã mở) → tờ thư → túi trước → nắp (khi đóng) → xi, tem.
  *
- * @param {{ theme: object, recipientName: string, senderName: string, occasionLabel: string, open: boolean, out: boolean }} p
+ * @param {{ theme: object, recipientName: string, senderName: string, business?: { name?: string, logoUrl?: string } | null, occasionLabel: string, open: boolean, out: boolean }} p
  */
-export default function Envelope({ theme, recipientName, senderName, occasionLabel, open, out }) {
+export default function Envelope({ theme, recipientName, senderName, business = null, occasionLabel, open, out }) {
   const initial = [...(senderName || 'L').trim()][0]?.toUpperCase() || 'L'
   return (
     <div className={`lw-env${open ? ' is-open' : ''}${out ? ' is-out' : ''}`} aria-hidden="true">
@@ -24,9 +24,9 @@ export default function Envelope({ theme, recipientName, senderName, occasionLab
         </span>
       </div>
       <div className="lw-env-flap" />
-      <div className="lw-env-seal">
-        <span>{initial}</span>
-      </div>
+      {/* D-152: thư doanh nghiệp — logo trên con dấu niêm phong, tên ở góc trên trái như thư công ty */}
+      <div className={`lw-env-seal${business?.logoUrl ? ' has-logo' : ''}`}>{business?.logoUrl ? <img src={business.logoUrl} alt="" /> : <span>{initial}</span>}</div>
+      {business?.name && <span className="lw-env-from">{business.name}</span>}
       <figure className="lw-env-stamp">
         <img src={theme.stamp} alt="" loading="eager" decoding="async" />
       </figure>

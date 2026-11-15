@@ -973,3 +973,9 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 **Đã làm**: dựng lại banner thư bằng năm ảnh đèn catalog (nét, đúng màu), đúng bảng màu thương hiệu; thay ba hình đèn vẽ ở dashboard khách bằng ảnh đèn catalog. Test: `server/mailBanner.independent.test.js`.
 
 **Còn lại / cần người dùng**: xem thư thật ở Gmail/Outlook (ảnh banner chỉ hiện khi có `PUBLIC_SITE_URL` công khai).
+
+## 2026-11-15 — Vào đèn luôn, thư doanh nghiệp có logo (D-151, D-152, T-112)
+
+**Đã làm**: đưa nhánh `ccr-f7654e08-wqcdp4` (ảnh đèn catalog ở banner thư + dashboard, đổi mã thành T-111, commit lại dưới tên LinhPhuong14) vào nhánh; bỏ màn giới thiệu (mở QR vào đèn luôn); tuỳ chọn thư doanh nghiệp: admin bật, nhập tên + tải logo; người nhận thấy LAMVI × logo, logo trên xi phong bì, đầu tờ thư, chữ ký doanh nghiệp. Demo `/phong-thu?business=1`.
+
+**Còn lại / cần người dùng**: thử tải logo thật trên Production (bucket `product-images`); Phòng thư 3D chưa hiện logo.
