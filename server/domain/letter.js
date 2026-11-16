@@ -11,6 +11,8 @@ export const LETTER_TEMPLATES = ['web', 'room']
 // Ảnh đèn trong bản web 2D: 5 mẫu đèn LAMVI (public/images/lamps/<slug>-cutout.webp)
 // D-157: ngôn ngữ chữ giao diện của phong thư (người nhận thấy), khớp src/letter-web/i18n.js
 export const LETTER_LANGS = ['vi', 'en', 'zh']
+// D-163: lời kết dưới thư — 'warm' (Thương mến, mặc định) hoặc 'formal' (Trân trọng)
+export const LETTER_CLOSINGS = ['warm', 'formal']
 export const LETTER_LAMPS = ['tu-linh', 'thu-hoach', 'phuc-loc-song-toan', 'tam-duong-khai-thai', 'lon-dan']
 
 // Giới hạn độ dài [ASSUMPTION] — đủ cho một lá thư tay, chặn dữ liệu rác làm nặng trang
@@ -74,6 +76,7 @@ export function validateLetterContent(input) {
   if (value.lamps) value.lamp = value.lamps[0]
   // Thiếu/lạ → tiếng Việt (thư cũ chưa có trường này)
   value.lang = LETTER_LANGS.includes(src.lang) ? src.lang : 'vi'
+  value.closing = LETTER_CLOSINGS.includes(src.closing) ? src.closing : 'warm'
   value.kind = LETTER_KINDS.includes(src.kind) ? src.kind : null
   if (!value.kind) errors.kind = 'INVALID'
 
