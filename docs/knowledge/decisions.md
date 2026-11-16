@@ -636,3 +636,8 @@ Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt 
 ### T-118 — Video LAMVI toàn màn hình ngang (2026-11-16, D-160)
 
 - `LetterFilms.play`: `flushSync` gắn `<video>` ngay trong sự kiện bấm rồi `play()` và (chỉ khi `(pointer: coarse)`) `video.requestFullscreen()` → `screen.orientation.lock('landscape')`; không có `requestFullscreen` (iPhone) → `webkitEnterFullscreen()`. Mọi lỗi bị nuốt, video vẫn phát trong thẻ. `fullscreenchange` thoát → `orientation.unlock()`; hết video/rời thẻ → thoát toàn màn hình. Kiểm headless (Chromium mobile, cảm ứng): `document.fullscreenElement` là VIDEO, video đang phát. Test `src/letter-web/films-end.test.jsx`.
+
+### T-119 — Outro câu chuyện LAMVI (2026-11-16, D-161)
+
+- `LetterFilms.jsx` chỉ còn là thẻ mời (`onOpen`/`onClose`); `LetterOutro.jsx` là dialog `position: fixed` z-index 60 với `step`: `lead` → `play` → `end`. Danh sách phim chung ở `outroFilms.js`.
+- Phát trên **một** thẻ `<video>` (đổi `src` khi sang phần 2) để iOS cho `play()` tiếp mà không cần cử chỉ mới; phần 1 gắn bằng `flushSync` trong sự kiện bấm "Bắt đầu xem" rồi `play()`. Thiết bị cảm ứng: `requestFullscreen` trên cả khung outro (giữ thanh tiến độ/nút của mình, khác D-160 vốn fullscreen thẻ video) rồi `screen.orientation.lock('landscape')`; sang màn kết/đóng → thoát toàn màn hình, mở khoá. Nền mờ đặt ở khung gốc (không trong vùng cuộn) để không sinh tràn. Kiểm headless 1280×800, 390×844, 844×390: màn lời dẫn và màn kết `scrollHeight === clientHeight`; điện thoại → `fullscreenElement` là khung outro, video đang phát. Test `src/letter-web/films-end.test.jsx`.

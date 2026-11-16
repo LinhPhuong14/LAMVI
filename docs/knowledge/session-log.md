@@ -995,3 +995,5 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 **Cập nhật 2026-11-16 (D-159)**: video LAMVI chuyển sang thẻ nổi hiện 5 giây sau khi thư viết xong (headless: chưa có lúc 4 s, có lúc 5,8 s; 1280×800 và 390×844 vẫn một màn hình).
 
 **Cập nhật 2026-11-16 (D-160)**: video LAMVI phát toàn màn hình ngang trên thiết bị cảm ứng.
+
+**Cập nhật 2026-11-16 (D-161)**: outro câu chuyện LAMVI (màn lời dẫn → hai phim liền toàn màn hình → màn kết), kiểm headless ba cỡ màn hình.
