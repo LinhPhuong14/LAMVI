@@ -3,6 +3,7 @@ import HandwrittenTitle from '../letters/HandwrittenTitle.jsx'
 import Envelope from './Envelope.jsx'
 import Surprise from './Surprise.jsx'
 import LetterFilms from './LetterFilms.jsx'
+import LetterOutro from './LetterOutro.jsx'
 import { reducedMotion } from './effects.js'
 import { senderOf } from '../letters/names.js'
 import { LAMPS, DEFAULT_LAMP, lampSrc, occasionKey, themeOf } from './themes.js'
@@ -64,6 +65,8 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
   const [playing, setPlaying] = useState(false)
   // D-159: thẻ video LAMVI — 'wait' (chưa tới lúc) → 'shown' → 'closed'
   const [films, setFilms] = useState('wait')
+  // D-161: outro câu chuyện LAMVI (màn lời dẫn → hai phim → màn kết)
+  const [outro, setOutro] = useState(false)
   const readerRef = useRef(null)
   const surpriseBtn = useRef(null)
   const stageRef = useRef(null)
@@ -195,6 +198,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
     setRevealAll(reduced)
     setPlaying(false)
     setFilms('wait')
+    setOutro(false)
     setPhase('dark')
     requestAnimationFrame(() => switchRef.current?.focus())
   }
@@ -375,7 +379,27 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         </div>
       )}
 
-      {films === 'shown' && !surprise && <LetterFilms T={T} onClose={() => setFilms('closed')} />}
+      {films === 'shown' && !surprise && !outro && (
+        <LetterFilms
+          T={T}
+          onOpen={() => {
+            setFilms('closed')
+            setOutro(true)
+          }}
+          onClose={() => setFilms('closed')}
+        />
+      )}
+      {outro && (
+        <LetterOutro
+          T={T}
+          lang={lang}
+          lamp={lamp}
+          onClose={() => {
+            setOutro(false)
+            requestAnimationFrame(() => readerRef.current?.focus({ preventScroll: true }))
+          }}
+        />
+      )}
       {surprise && <Surprise letter={letter} theme={theme} T={T} onClose={closeSurprise} />}
       {children}
     </main>
