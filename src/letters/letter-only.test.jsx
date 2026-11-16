@@ -41,7 +41,8 @@ describe('D-150: chỉ còn lời chúc', () => {
     expect(await screen.findByRole('heading', { level: 2, name: 'Gửi Linh,' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Xem lại cách làm đèn' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Lịch sử văn hoá' })).toBeNull()
-    expect(screen.queryByText('Tranh Đông Hồ trên đèn giấy dó')).toBeNull()
+    // D-158: cuối thư có hai video LAMVI (thẻ poster, bấm mới tải video)
+    expect(await screen.findByText('Tranh Đông Hồ trên đèn giấy dó')).toBeTruthy()
   })
 
   it('demo /phong-thu xem dọc được', async () => {
