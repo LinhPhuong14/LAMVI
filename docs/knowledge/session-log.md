@@ -999,3 +999,5 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 **Cập nhật 2026-11-16 (D-161)**: outro câu chuyện LAMVI (màn lời dẫn → hai phim liền toàn màn hình → màn kết), kiểm headless ba cỡ màn hình.
 
 **Cập nhật 2026-11-16 (T-11 cho D-157…D-161)**: subagent kiểm thử độc lập viết 21 test, 3 lỗi thật (video thư không dừng khi mở outro, thoát toàn màn hình có thể bị bỏ qua, mất focus khi đóng thẻ mời) — đã sửa, thêm `inert` cho trang phía sau outro.
+
+**Cập nhật 2026-11-16 (D-162)**: tuỳ chọn thắp 2–5 đèn xếp cung parabol, admin chọn đèn theo thứ tự (đèn đầu ở giữa).

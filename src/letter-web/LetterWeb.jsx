@@ -6,7 +6,7 @@ import LetterFilms from './LetterFilms.jsx'
 import LetterOutro from './LetterOutro.jsx'
 import { reducedMotion } from './effects.js'
 import { senderOf } from '../letters/names.js'
-import { LAMPS, DEFAULT_LAMP, lampSrc, occasionKey, themeOf } from './themes.js'
+import { LAMPS, arcLayout, lampSrc, lampsOf, occasionKey, themeOf } from './themes.js'
 import { LETTER_HTML_LANG, letterLang, letterText, localizeTheme } from './i18n.js'
 // Font viết tay có bộ dấu tiếng Việt (OFL-1.1): Dancing Script cho lời đề tặng/chữ ký, Patrick Hand cho thân thư
 import '@fontsource/dancing-script/latin-700.css'
@@ -19,6 +19,8 @@ import './web.css'
 const NEXT = { lighting: 'rising', rising: 'unfolding', unfolding: 'reading' }
 const TIMING = { lighting: 1000, rising: 1900, unfolding: 1200 }
 const FILMS_DELAY = 5000
+// D-162: bề rộng cụm đèn (bội số chiều cao) theo số đèn — các đèn chồng mép nhẹ lên nhau
+const ARC_WIDTH = { 2: 1.0, 3: 1.3, 4: 1.65, 5: 2.05 }
 // Đom đóm/bụi sáng quanh đèn — vị trí cố định theo chỉ số (không random để SSR/test ổn định)
 const SPARKS = Array.from({ length: 22 }, (_, i) => ({
   left: `${(i * 37 + 11) % 100}%`,
@@ -75,7 +77,11 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
   const lang = letterLang(letter.lang)
   const T = letterText(lang)
   const theme = localizeTheme(themeOf(letter.occasion), occasionKey(letter.occasion), lang)
-  const lamp = Object.hasOwn(LAMPS, letter.lamp) ? letter.lamp : DEFAULT_LAMP
+  // D-162: một đèn hoặc nhiều đèn xếp trên cung parabol (đèn đầu tiên ở giữa)
+  const lamps = lampsOf(letter)
+  const lamp = lamps[0]
+  const multi = lamps.length > 1
+  const layout = arcLayout(lamps)
   const d = letter.occasionData ?? {}
   // D-147: bỏ trống tên → "Gửi bạn,", chữ ký chỉ còn "Thương mến,"
   const sender = senderOf(letter)
@@ -247,7 +253,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
       </p>
 
       <section className="lw-stage" ref={stageRef} tabIndex={-1} aria-label={T.stage} inert={outro || undefined}>
-        <div className="lw-lamp-wrap">
+        <div className={`lw-lamp-wrap${multi ? ' is-multi' : ''}`} style={multi ? { '--wf': ARC_WIDTH[lamps.length] } : undefined}>
           {/* Hiệu ứng "Lamp" (Aceternity UI): vạch sáng nở rộng, hai cánh ánh sáng hình nón đổ xuống, quầng mờ */}
           <div className="lw-beam" aria-hidden="true">
             <i className="lw-beam-l" />
@@ -260,13 +266,25 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
             ))}
           </div>
           {/* Chạm vào đèn cũng bật được (chuột/cảm ứng); bàn phím dùng công tắc bên dưới */}
-          <button type="button" className="lw-lamp" onClick={light} tabIndex={-1} aria-hidden="true" disabled={lit}>
-            <img src={lampSrc(lamp)} alt="" decoding="async" />
-          </button>
+          {layout.map(({ slug, t, depth }) => (
+            <button
+              key={slug}
+              type="button"
+              className="lw-lamp"
+              onClick={light}
+              tabIndex={-1}
+              aria-hidden="true"
+              disabled={lit}
+              // Nhiều đèn: vị trí trên cung (t), đèn giữa đứng trước, thắp lần lượt từ giữa ra hai bên
+              style={multi ? { '--t': t, '--t2': t * t, '--d': `${depth * 0.35}s`, zIndex: 10 - depth } : undefined}
+            >
+              <img src={lampSrc(slug)} alt="" decoding="async" />
+            </button>
+          ))}
           <div className="lw-glow" aria-hidden="true" />
           <div className="lw-line" aria-hidden="true" />
         </div>
-        <p className="lw-lamp-name">{T.lampName(LAMPS[lamp])}</p>
+        <p className="lw-lamp-name">{multi ? lamps.map((l) => LAMPS[l]).join(' · ') : T.lampName(LAMPS[lamp])}</p>
 
         {phase === 'dark' && (
           // D-144: lời mời bật đèn (chữ viết tay, sáng nhẹ)

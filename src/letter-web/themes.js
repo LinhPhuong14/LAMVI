@@ -101,3 +101,31 @@ export const LAMPS = {
 }
 export const DEFAULT_LAMP = 'tu-linh'
 export const lampSrc = (slug) => `/images/lamps/${Object.hasOwn(LAMPS, slug) ? slug : DEFAULT_LAMP}-cutout.webp`
+
+// D-162: thắp nhiều đèn (2–5 mẫu, không trùng). Đèn đầu tiên admin chọn đứng giữa, các đèn sau xen kẽ phải/trái.
+export const MAX_LAMPS = 5
+/** Danh sách đèn hợp lệ của thư: `lamps` (≥ 2 mẫu) hoặc một đèn `lamp`. */
+export function lampsOf(letter) {
+  const list = Array.isArray(letter?.lamps) ? [...new Set(letter.lamps.filter((l) => typeof l === 'string' && Object.hasOwn(LAMPS, l)))].slice(0, MAX_LAMPS) : []
+  if (list.length >= 2) return list
+  return [typeof letter?.lamp === 'string' && Object.hasOwn(LAMPS, letter.lamp) ? letter.lamp : DEFAULT_LAMP]
+}
+/**
+ * Xếp n đèn trên một cung parabol y = t² (t ∈ [-1, 1]): đèn giữa thấp nhất, to nhất, đứng trước;
+ * càng ra hai bên càng nâng lên, nhỏ lại và lùi sau — như một hàng đèn cong ôm lấy người xem, nên các ảnh
+ * chụp lệch góc nhau không lộ chênh lệch như khi xếp thẳng hàng.
+ * Trả về theo thứ tự trái → phải: { slug, t, depth } (depth 0 = giữa, lần lượt thắp từ giữa ra).
+ */
+export function arcLayout(slugs) {
+  const n = slugs.length
+  if (n < 2) return slugs.map((slug) => ({ slug, t: 0, depth: 0 }))
+  // vị trí trái → phải, gán đèn theo thứ tự giữa, phải, trái, phải, trái…
+  const mid = (n - 1) / 2
+  const order = [...Array(n).keys()].sort((a, b) => Math.abs(a - mid) - Math.abs(b - mid) || b - a)
+  const slots = Array(n)
+  order.forEach((pos, i) => {
+    slots[pos] = { slug: slugs[i], t: (pos - mid) / mid, depth: Math.ceil(Math.abs(pos - mid)) }
+  })
+  return slots
+}
+

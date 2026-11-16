@@ -19,6 +19,9 @@ const EMPTY = {
   template: 'web',
   lang: 'vi',
   lamp: '',
+  // D-162: thắp nhiều đèn (thứ tự chọn; đèn đầu ở giữa)
+  lampsOn: false,
+  lamps: [],
   kind: 'text',
   message: '',
   videoUrl: '',
@@ -29,6 +32,9 @@ const EMPTY = {
   // D-154: thư doanh nghiệp có logo
   business: { on: false, name: '', logoUrl: '' },
 }
+
+// D-162: bật "nhiều đèn" và đã chọn từ 2 mẫu
+const multiLamps = (f) => f.lampsOn && f.lamps.length >= 2
 
 const lines = (s) => s.split('\n').map((x) => x.trim()).filter(Boolean)
 
@@ -43,6 +49,8 @@ function toForm(c) {
     template: c.template === 'room' ? 'room' : 'web',
     lang: ['en', 'zh'].includes(c.lang) ? c.lang : 'vi',
     lamp: c.lamp ?? '',
+    lampsOn: Array.isArray(c.lamps) && c.lamps.length >= 2,
+    lamps: Array.isArray(c.lamps) ? c.lamps.filter((l) => Object.hasOwn(LAMPS, l)) : [],
     kind: c.kind ?? 'text',
     message: paragraphsOf(c.message).join('\n\n'),
     videoUrl: c.videoUrl ?? '',
@@ -73,7 +81,8 @@ function toContent(f) {
     occasion: f.occasion,
     template: f.template,
     lang: f.lang,
-    lamp: f.template === 'web' && f.lamp ? f.lamp : null,
+    lamp: f.template !== 'web' ? null : multiLamps(f) ? f.lamps[0] : f.lamp || null,
+    lamps: f.template === 'web' && multiLamps(f) ? f.lamps : null,
     kind: f.kind,
     message: f.message,
     postscript: f.postscript,
@@ -164,6 +173,8 @@ export default function LetterEditorPage() {
     if (hasContent && !window.confirm(L.templateConfirm)) return
     setForm((f) => ({
       ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName, template: f.template, lang: f.lang, lamp: f.lamp }),
+      lampsOn: f.lampsOn,
+      lamps: f.lamps,
       videoUrl: f.videoUrl,
       posterUrl: f.posterUrl,
       captionsUrl: f.captionsUrl,
@@ -311,16 +322,64 @@ export default function LetterEditorPage() {
             </Field>
             {form.template === 'web' && (
               <div className="letter-lamp-pick">
-                <img src={lampSrc(form.lamp || DEFAULT_LAMP)} alt="" width="56" height="56" decoding="async" />
-                <Field label={L.lamp} as="select" value={form.lamp} onChange={set('lamp')}>
-                  <option value="">{L.lampDefault}</option>
-                  {Object.entries(LAMPS).map(([slug, name]) => (
-                    <option key={slug} value={slug}>
-                      {name}
-                    </option>
-                  ))}
-                </Field>
-                <a className="field-hint" href={`/phong-thu?occasion=${form.occasion}&lamp=${form.lamp || DEFAULT_LAMP}${form.lang === 'vi' ? '' : `&lang=${form.lang}`}`} target="_blank" rel="noreferrer">
+                {!form.lampsOn && (
+                  <>
+                    <img src={lampSrc(form.lamp || DEFAULT_LAMP)} alt="" width="56" height="56" decoding="async" />
+                    <Field label={L.lamp} as="select" value={form.lamp} onChange={set('lamp')}>
+                      <option value="">{L.lampDefault}</option>
+                      {Object.entries(LAMPS).map(([slug, name]) => (
+                        <option key={slug} value={slug}>
+                          {name}
+                        </option>
+                      ))}
+                    </Field>
+                  </>
+                )}
+                <label className="letter-check">
+                  <input
+                    type="checkbox"
+                    checked={form.lampsOn}
+                    onChange={(e) => {
+                      const on = e.target.checked
+                      setForm((f) => ({ ...f, lampsOn: on, lamps: on && !f.lamps.length ? [f.lamp || DEFAULT_LAMP] : f.lamps }))
+                      setDirty(true)
+                    }}
+                  />
+                  {L.multiLamps}
+                </label>
+                {form.lampsOn && (
+                  <div className="letter-lamps" role="group" aria-label={L.multiLamps}>
+                    <p className="field-hint">{L.multiLampsHint}</p>
+                    <div className="letter-lamps-list">
+                      {Object.entries(LAMPS).map(([slug, name]) => {
+                        const at = form.lamps.indexOf(slug)
+                        return (
+                          <button
+                            key={slug}
+                            type="button"
+                            className="letter-lamp-chip"
+                            aria-pressed={at >= 0}
+                            onClick={() => {
+                              setForm((f) => ({ ...f, lamps: f.lamps.includes(slug) ? f.lamps.filter((l) => l !== slug) : [...f.lamps, slug] }))
+                              setDirty(true)
+                            }}
+                          >
+                            <img src={lampSrc(slug)} alt="" width="40" height="40" decoding="async" />
+                            <span>{name}</span>
+                            {at >= 0 && <b aria-label={at === 0 ? L.multiLampsCenter : `${L.multiLampsOrder} ${at + 1}`}>{at === 0 ? '★' : at + 1}</b>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    {form.lamps.length < 2 && <span className="field-error">{L.multiLampsMin}</span>}
+                  </div>
+                )}
+                <a
+                  className="field-hint"
+                  href={`/phong-thu?occasion=${form.occasion}&lamp=${form.lamp || DEFAULT_LAMP}${multiLamps(form) ? `&lamps=${form.lamps.join(',')}` : ''}${form.lang === 'vi' ? '' : `&lang=${form.lang}`}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {L.sampleDemo} ↗
                 </a>
               </div>
