@@ -224,7 +224,8 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         <i />
         <i />
       </div>
-      <header className="lw-top">
+      {/* D-161: outro mở → phần trang phía sau inert (không Tab ra ngoài hộp thoại) */}
+      <header className="lw-top" inert={outro || undefined}>
         <span className="lw-brands">
           <span className="lw-brand">LAMVI</span>
         </span>
@@ -245,7 +246,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         {T.status[phase]}
       </p>
 
-      <section className="lw-stage" ref={stageRef} tabIndex={-1} aria-label={T.stage}>
+      <section className="lw-stage" ref={stageRef} tabIndex={-1} aria-label={T.stage} inert={outro || undefined}>
         <div className="lw-lamp-wrap">
           {/* Hiệu ứng "Lamp" (Aceternity UI): vạch sáng nở rộng, hai cánh ánh sáng hình nón đổ xuống, quầng mờ */}
           <div className="lw-beam" aria-hidden="true">
@@ -306,7 +307,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
 
       {phase === 'reading' && (
         // D-149: khung giữ tờ thư vừa một màn hình — tờ thư cuộn bên trong, sparkle nằm ở khung (không bị cắt)
-        <div className="lw-letter-frame">
+        <div className="lw-letter-frame" inert={outro || undefined}>
           {!reduced && (
             <div className="lw-letter-sparkles" aria-hidden="true">
               {SPARKLES.map((s, i) => (
@@ -383,10 +384,15 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         <LetterFilms
           T={T}
           onOpen={() => {
+            // Thư video đang phát → tạm dừng, tránh hai tiếng chồng nhau
+            readerRef.current?.querySelector('.lw-video video')?.pause?.()
             setFilms('closed')
             setOutro(true)
           }}
-          onClose={() => setFilms('closed')}
+          onClose={() => {
+            setFilms('closed')
+            requestAnimationFrame(() => readerRef.current?.focus({ preventScroll: true }))
+          }}
         />
       )}
       {outro && (

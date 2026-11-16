@@ -12,6 +12,7 @@ import {
   generateSlug,
   generateToken,
   letterUrl,
+  LETTER_LANGS,
   presentLetterForAdmin,
   presentLetterForRecipient,
   tokenMatches,
@@ -76,7 +77,7 @@ export function lettersRouter({ repo, auth, config, storage = null }) {
         // D-141: web 2D là bản chính — thư không ghi template coi là 'web'
         template: l.content?.template === 'room' ? 'room' : 'web',
         lamp: l.content?.lamp ?? null,
-        lang: l.content?.lang ?? 'vi',
+        lang: LETTER_LANGS.includes(l.content?.lang) ? l.content.lang : 'vi',
         slug: l.slug,
         publishedAt: l.publishedAt ?? null,
         openedAt: l.openedAt ?? null,

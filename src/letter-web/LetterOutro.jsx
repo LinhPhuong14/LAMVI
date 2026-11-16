@@ -21,8 +21,13 @@ function enterFullscreen(el) {
   }
 }
 function leaveFullscreen() {
+  // Hai lệnh tách riêng: unlock() lỗi (trình duyệt không hỗ trợ) không được chặn việc thoát toàn màn hình
   try {
     screen.orientation?.unlock?.()
+  } catch {
+    /* bỏ qua */
+  }
+  try {
     if (typeof document !== 'undefined' && document.fullscreenElement) document.exitFullscreen?.()?.catch?.(() => {})
   } catch {
     /* bỏ qua */
