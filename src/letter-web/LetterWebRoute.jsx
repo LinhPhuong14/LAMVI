@@ -2,6 +2,7 @@ import { lazy, Suspense, useSyncExternalStore } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { demos } from '../letter-room/data.js'
 import { LAMPS, OCCASION_THEMES } from './themes.js'
+import { LETTER_LANGS, localizeTheme } from './i18n.js'
 import RotateGate from '../letters/RotateGate.jsx'
 import { LETTER_FLOW } from '../letters/films.js'
 
@@ -20,14 +21,18 @@ export default function LetterWebRoute() {
   const lamp = Object.hasOwn(LAMPS, params.get('lamp')) ? params.get('lamp') : undefined
   // D-154: ?business=1 — xem mẫu thư doanh nghiệp gửi tặng khách hàng (logo mẫu, không phải doanh nghiệp thật)
   const business = params.get('business') === '1'
+  // D-157: ?lang=en|zh — chữ giao diện theo ngôn ngữ (lời chúc mẫu vẫn tiếng Việt)
+  const lang = LETTER_LANGS.includes(params.get('lang')) ? params.get('lang') : 'vi'
   const letter = {
     ...demos[occasion],
     kind: 'text',
     lamp,
+    lang,
     postscript: occasion === 'thankYou' ? 'P.S. Nhớ uống đủ nước nhé.' : undefined,
     business: business ? { name: 'An Phát Holdings', logoUrl: '/images/brand/demo-business-logo.svg' } : null,
   }
-  const keep = (extra) => setParams({ occasion, ...(lamp ? { lamp } : {}), ...(business ? { business: '1' } : {}), ...extra })
+  const base = { occasion, ...(lamp ? { lamp } : {}), ...(business ? { business: '1' } : {}), ...(lang === 'vi' ? {} : { lang }) }
+  const keep = (extra) => setParams({ ...base, ...extra })
   const placeholder = (
     <main role="status" aria-busy="true" style={{ minHeight: '100svh', display: 'grid', placeItems: 'center', background: '#140d07', color: '#f6efe2' }}>
       Đang thắp đèn…
@@ -38,13 +43,13 @@ export default function LetterWebRoute() {
     // D-146: bản demo cũng bắt buộc xoay ngang trên điện thoại
     <RotateGate enabled={LETTER_FLOW.requireLandscape}>
       <Suspense fallback={placeholder}>
-        <LetterWeb key={`${occasion}-${lamp}-${business}`} letter={letter}>
+        <LetterWeb key={`${occasion}-${lamp}-${business}-${lang}`} letter={letter}>
           <details className="lw-demo">
             <summary>Lời chúc mẫu</summary>
             <div>
               {Object.entries(OCCASION_THEMES).map(([k, t]) => (
                 <button key={k} type="button" aria-pressed={k === occasion} onClick={() => keep({ occasion: k })}>
-                  {t.label}
+                  {localizeTheme(t, k, lang).label}
                 </button>
               ))}
             </div>
@@ -56,9 +61,16 @@ export default function LetterWebRoute() {
               ))}
             </div>
             <div>
-              <button type="button" aria-pressed={business} onClick={() => setParams({ occasion, ...(lamp ? { lamp } : {}), ...(business ? {} : { business: '1' }) })}>
+              <button type="button" aria-pressed={business} onClick={() => { const { business: _b, ...rest } = base; setParams(business ? rest : { ...rest, business: '1' }) }}>
                 Thư doanh nghiệp (logo)
               </button>
+            </div>
+            <div>
+              {[['vi', 'Tiếng Việt'], ['en', 'English'], ['zh', '中文']].map(([k, label]) => (
+                <button key={k} type="button" aria-pressed={k === lang} onClick={() => { const { lang: _l, ...rest } = base; setParams(k === 'vi' ? rest : { ...rest, lang: k }) }}>
+                  {label}
+                </button>
+              ))}
             </div>
           </details>
         </LetterWeb>

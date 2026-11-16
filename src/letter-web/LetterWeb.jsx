@@ -3,8 +3,9 @@ import HandwrittenTitle from '../letters/HandwrittenTitle.jsx'
 import Envelope from './Envelope.jsx'
 import Surprise from './Surprise.jsx'
 import { reducedMotion } from './effects.js'
-import { recipientOf, senderOf } from '../letters/names.js'
-import { LAMPS, DEFAULT_LAMP, lampSrc, themeOf } from './themes.js'
+import { senderOf } from '../letters/names.js'
+import { LAMPS, DEFAULT_LAMP, lampSrc, occasionKey, themeOf } from './themes.js'
+import { LETTER_HTML_LANG, letterLang, letterText, localizeTheme } from './i18n.js'
 // Font viết tay có bộ dấu tiếng Việt (OFL-1.1): Dancing Script cho lời đề tặng/chữ ký, Patrick Hand cho thân thư
 import '@fontsource/dancing-script/latin-700.css'
 import '@fontsource/dancing-script/vietnamese-700.css'
@@ -15,13 +16,6 @@ import './web.css'
 // dark → (bấm bật đèn) lighting → rising (phong bì trồi lên, xi bung, nắp mở) → unfolding (thư trồi khỏi phong bì) → reading
 const NEXT = { lighting: 'rising', rising: 'unfolding', unfolding: 'reading' }
 const TIMING = { lighting: 1000, rising: 1900, unfolding: 1200 }
-const STATUS = {
-  dark: 'Căn phòng còn tối. Hãy cùng thắp sáng chiếc đèn của bạn: bấm Bật đèn.',
-  lighting: 'Đèn đang sáng dần.',
-  rising: 'Một phong thư đang trồi lên.',
-  unfolding: 'Lá thư đang mở ra.',
-  reading: '',
-}
 // Đom đóm/bụi sáng quanh đèn — vị trí cố định theo chỉ số (không random để SSR/test ổn định)
 const SPARKS = Array.from({ length: 22 }, (_, i) => ({
   left: `${(i * 37 + 11) % 100}%`,
@@ -70,11 +64,13 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
   const surpriseBtn = useRef(null)
   const stageRef = useRef(null)
   const switchRef = useRef(null)
-  const theme = themeOf(letter.occasion)
+  // D-157: ngôn ngữ của thư (vi/en/zh) — chữ giao diện theo ngôn ngữ admin chọn
+  const lang = letterLang(letter.lang)
+  const T = letterText(lang)
+  const theme = localizeTheme(themeOf(letter.occasion), occasionKey(letter.occasion), lang)
   const lamp = Object.hasOwn(LAMPS, letter.lamp) ? letter.lamp : DEFAULT_LAMP
   const d = letter.occasionData ?? {}
   // D-147: bỏ trống tên → "Gửi bạn,", chữ ký chỉ còn "Thương mến,"
-  const recipient = recipientOf(letter)
   const sender = senderOf(letter)
   // D-154: thư doanh nghiệp — logo + tên (đồng thương hiệu với LAMVI)
   const biz = letter.business && (letter.business.logoUrl || letter.business.name) ? letter.business : null
@@ -104,6 +100,11 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
     }
     return { timing, total: at }
   }, [paragraphs])
+
+  // Chữ Trung viết tay: chỉ tải font Ma Shan Zheng (OFL-1.1, chia nhỏ theo unicode-range) cho thư tiếng Trung
+  useEffect(() => {
+    if (lang === 'zh') import('@fontsource/ma-shan-zheng/400.css').catch(() => {})
+  }, [lang])
 
   useEffect(() => {
     const next = NEXT[phase]
@@ -197,6 +198,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
     <main
       className={`lw-page lw-${phase}${lit ? ' is-lit' : ''}${preview ? ' is-preview' : ''}`}
       data-phase={phase}
+      lang={LETTER_HTML_LANG[lang]}
       style={{ '--lw-paper': theme.paper, '--lw-accent': theme.accent, '--lw-accent2': theme.accent2, '--lw-seal': theme.seal }}
     >
       <div className="lw-bg" aria-hidden="true" />
@@ -212,21 +214,21 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         <div className="lw-top-actions">
           {lit && (
             <button type="button" className="lw-chip" onClick={restart}>
-              Xem lại từ đầu
+              {T.replay}
             </button>
           )}
           {onExit && (
             <button type="button" className="lw-chip" onClick={onExit}>
-              Đóng xem trước
+              {T.closePreview}
             </button>
           )}
         </div>
       </header>
       <p className="lw-sr-only" role="status" aria-live="polite">
-        {STATUS[phase]}
+        {T.status[phase]}
       </p>
 
-      <section className="lw-stage" ref={stageRef} tabIndex={-1} aria-label="Đèn LAMVI và phong thư">
+      <section className="lw-stage" ref={stageRef} tabIndex={-1} aria-label={T.stage}>
         <div className="lw-lamp-wrap">
           {/* Hiệu ứng "Lamp" (Aceternity UI): vạch sáng nở rộng, hai cánh ánh sáng hình nón đổ xuống, quầng mờ */}
           <div className="lw-beam" aria-hidden="true">
@@ -246,12 +248,12 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
           <div className="lw-glow" aria-hidden="true" />
           <div className="lw-line" aria-hidden="true" />
         </div>
-        <p className="lw-lamp-name">Đèn {LAMPS[lamp]}</p>
+        <p className="lw-lamp-name">{T.lampName(LAMPS[lamp])}</p>
 
         {phase === 'dark' && (
           // D-144: lời mời bật đèn (chữ viết tay, sáng nhẹ)
           <p className="lw-invite" aria-hidden="true">
-            Hãy cùng thắp sáng chiếc đèn của bạn
+            {T.invite}
           </p>
         )}
         {phase === 'dark' && (
@@ -259,7 +261,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
             <span className="lw-switch-track" aria-hidden="true">
               <span className="lw-switch-knob" />
             </span>
-            Bật đèn
+            {T.lightOn}
           </button>
         )}
 
@@ -269,6 +271,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
             recipientName={letter.recipientName}
             senderName={letter.senderName}
             business={biz}
+            T={T}
             occasionLabel={theme.label}
             open={phase === 'unfolding'}
             out={phase === 'unfolding'}
@@ -294,21 +297,21 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
               ))}
             </div>
           )}
-          <article className="lw-letter" ref={readerRef} tabIndex={-1} aria-label={`Lời chúc gửi ${recipient}`}>
+          <article className="lw-letter" ref={readerRef} tabIndex={-1} aria-label={T.letterLabel(letter.recipientName)}>
             <img className="lw-letter-stamp" src={theme.stamp} alt="" aria-hidden="true" />
             {biz && (
               <header className="lw-letterhead">
-                {biz.logoUrl && <img src={biz.logoUrl} alt={biz.name || 'Logo doanh nghiệp'} />}
+                {biz.logoUrl && <img src={biz.logoUrl} alt={biz.name || T.logoAlt} />}
                 {biz.name && !biz.logoUrl && <span>{biz.name}</span>}
               </header>
             )}
-            <HandwrittenTitle as="h2" className="lw-dedication" text={`Gửi ${recipient},`} instant={reduced} onDone={() => setTitleDone(true)} />
+            <HandwrittenTitle as="h2" className="lw-dedication" text={T.dedication(letter.recipientName)} instant={reduced} onDone={() => setTitleDone(true)} />
             <div className={`lw-content${titleDone ? ' is-shown' : ''}`} inert={!titleDone} aria-hidden={!titleDone}>
               {letter.kind === 'text' ? (
                 <>
                   {titleDone && !revealAll && (
                     <button type="button" className="lw-skip" onClick={() => setRevealAll(true)}>
-                      Hiện toàn bộ lá thư
+                      {T.revealAll}
                     </button>
                   )}
                   {paragraphs.map((p, pi) => (
@@ -328,7 +331,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
                 <div className="lw-video">
                   {playing ? (
                     <video src={letter.videoUrl} poster={letter.posterUrl || undefined} controls autoPlay playsInline preload="metadata">
-                      {letter.captionsUrl && <track kind="captions" src={letter.captionsUrl} srcLang="vi" label="Tiếng Việt" default />}
+                      {letter.captionsUrl && <track kind="captions" src={letter.captionsUrl} srcLang={lang} label={T.captions} default />}
                     </video>
                   ) : (
                     <button
@@ -337,13 +340,13 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
                       onClick={() => setPlaying(true)}
                       style={letter.posterUrl ? { backgroundImage: `url(${letter.posterUrl})` } : undefined}
                     >
-                      <span aria-hidden="true">▷</span> Xem lời nhắn
+                      <span aria-hidden="true">▷</span> {T.watch}
                     </button>
                   )}
                 </div>
               )}
               <div className="lw-signature">
-                <span>Thương mến,</span>
+                <span>{T.regards}</span>
                 {sender && <strong>{sender}</strong>}
                 {biz?.name && (sender ? <em className="lw-signature-org">{biz.name}</em> : <strong>{biz.name}</strong>)}
               </div>
@@ -359,7 +362,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
         </div>
       )}
 
-      {surprise && <Surprise letter={letter} theme={theme} onClose={closeSurprise} />}
+      {surprise && <Surprise letter={letter} theme={theme} T={T} onClose={closeSurprise} />}
       {children}
     </main>
   )

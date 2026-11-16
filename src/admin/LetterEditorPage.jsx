@@ -17,6 +17,7 @@ const EMPTY = {
   senderName: '',
   occasion: 'justBecause',
   template: 'web',
+  lang: 'vi',
   lamp: '',
   kind: 'text',
   message: '',
@@ -40,6 +41,7 @@ function toForm(c) {
     senderName: c.senderName ?? '',
     occasion: c.occasion ?? 'justBecause',
     template: c.template === 'room' ? 'room' : 'web',
+    lang: ['en', 'zh'].includes(c.lang) ? c.lang : 'vi',
     lamp: c.lamp ?? '',
     kind: c.kind ?? 'text',
     message: paragraphsOf(c.message).join('\n\n'),
@@ -70,6 +72,7 @@ function toContent(f) {
     senderName: f.senderName,
     occasion: f.occasion,
     template: f.template,
+    lang: f.lang,
     lamp: f.template === 'web' && f.lamp ? f.lamp : null,
     kind: f.kind,
     message: f.message,
@@ -160,7 +163,7 @@ export default function LetterEditorPage() {
     const hasContent = form.message.trim() || Object.values(form.od).some((v) => v.trim())
     if (hasContent && !window.confirm(L.templateConfirm)) return
     setForm((f) => ({
-      ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName, template: f.template, lamp: f.lamp }),
+      ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName, template: f.template, lang: f.lang, lamp: f.lamp }),
       videoUrl: f.videoUrl,
       posterUrl: f.posterUrl,
       captionsUrl: f.captionsUrl,
@@ -295,6 +298,13 @@ export default function LetterEditorPage() {
               />
             )}
             {err('label') && <span className="field-error">{err('label')}</span>}
+            <Field label={L.lang} as="select" value={form.lang} onChange={set('lang')} hint={L.langHint}>
+              {Object.entries(L.langs).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
+              ))}
+            </Field>
             <Field label={L.experience} as="select" value={form.template} onChange={set('template')} hint={L.experienceHint}>
               <option value="web">{L.experiences.web}</option>
               <option value="room">{L.experiences.room}</option>
@@ -310,7 +320,7 @@ export default function LetterEditorPage() {
                     </option>
                   ))}
                 </Field>
-                <a className="field-hint" href={`/phong-thu?occasion=${form.occasion}&lamp=${form.lamp || DEFAULT_LAMP}`} target="_blank" rel="noreferrer">
+                <a className="field-hint" href={`/phong-thu?occasion=${form.occasion}&lamp=${form.lamp || DEFAULT_LAMP}${form.lang === 'vi' ? '' : `&lang=${form.lang}`}`} target="_blank" rel="noreferrer">
                   {L.sampleDemo} ↗
                 </a>
               </div>

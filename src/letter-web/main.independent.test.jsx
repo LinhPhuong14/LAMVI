@@ -96,7 +96,7 @@ describe('Server: GET /admin/letters có template + lamp', () => {
   it('đúng tập khoá; thiếu template → web; content null không sập', async () => {
     const r = await request(app()).get('/api/admin/letters').set('Authorization', 'Bearer ok')
     expect(r.status).toBe(200)
-    const keys = ['id', 'label', 'lamp', 'occasion', 'openedAt', 'orderCode', 'orderStatus', 'publishedAt', 'recipientName', 'senderName', 'slug', 'status', 'template', 'updatedAt', 'url']
+    const keys = ['id', 'label', 'lamp', 'lang', 'occasion', 'openedAt', 'orderCode', 'orderStatus', 'publishedAt', 'recipientName', 'senderName', 'slug', 'status', 'template', 'updatedAt', 'url']
     for (const i of r.body.items) expect(Object.keys(i).sort()).toEqual(keys)
     expect(r.body.items.map((i) => [i.template, i.lamp])).toEqual([
       ['room', 'lon-dan'],

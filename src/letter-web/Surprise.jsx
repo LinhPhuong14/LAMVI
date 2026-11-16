@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { playOccasion } from './effects.js'
+import { letterText } from './i18n.js'
 
 /** Minh hoạ gốc, hai cỡ WebP; nến tương tác là lớp riêng trên bánh. */
 function OccasionArtwork({ theme, children }) {
@@ -20,7 +21,7 @@ function OccasionArtwork({ theme, children }) {
 }
 
 /** Bánh minh hoạ giấy dó và nến có thể thổi tắt. */
-function Cake({ theme, blown, onBlow }) {
+function Cake({ T, theme, blown, onBlow }) {
   return (
     <div className={`lw-cake${blown ? ' is-blown' : ''}`}>
       <OccasionArtwork theme={theme}>
@@ -35,7 +36,7 @@ function Cake({ theme, blown, onBlow }) {
       </OccasionArtwork>
       {!blown && (
         <button type="button" className="lw-btn lw-btn-primary" onClick={onBlow}>
-          Ước một điều rồi thổi nến
+          {T.blow}
         </button>
       )}
     </div>
@@ -46,7 +47,7 @@ function Cake({ theme, blown, onBlow }) {
  * Điều bất ngờ theo dịp (D-140): khung giữa màn hình + hiệu ứng canvas-confetti của dịp.
  * Sinh nhật phải thổi nến mới hiện lời chúc; dịp khác hiện ngay. Esc / nút đóng quay lại lá thư.
  */
-export default function Surprise({ letter, theme, onClose }) {
+export default function Surprise({ letter, theme, T = letterText('vi'), onClose }) {
   const d = letter.occasionData ?? {}
   const birthday = letter.occasion === 'birthday'
   const [blown, setBlown] = useState(!birthday)
@@ -69,6 +70,7 @@ export default function Surprise({ letter, theme, onClose }) {
         {!birthday && <OccasionArtwork theme={theme} />}
         {birthday && (
           <Cake
+            T={T}
             theme={theme}
             blown={blown}
             onBlow={() => {
@@ -88,7 +90,7 @@ export default function Surprise({ letter, theme, onClose }) {
             {d.photos?.length > 0 && (
               <div className="lw-photos">
                 {d.photos.map((src, i) => (
-                  <img key={src} src={src} alt={`Kỷ niệm ${i + 1}`} />
+                  <img key={src} src={src} alt={T.photoAlt(i + 1)} />
                 ))}
               </div>
             )}
@@ -112,12 +114,12 @@ export default function Surprise({ letter, theme, onClose }) {
         )}
         {blown && (
           <div className="lw-surprise-text" role="status">
-            <p>{d.message || 'Một chút thương, dành riêng cho bạn.'}</p>
+            <p>{d.message || T.surpriseFallback}</p>
             {letter.postscript && <p className="lw-ps">{letter.postscript}</p>}
           </div>
         )}
         <button type="button" className="lw-btn lw-surprise-back" onClick={onClose}>
-          Quay lại lá thư
+          {T.back}
         </button>
       </div>
     </div>

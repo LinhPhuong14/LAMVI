@@ -65,6 +65,7 @@ export default function LettersGalleryPage() {
               <span>
                 {L.experienceShort[Object.hasOwn(L.experienceShort, l.template ?? '') ? l.template : 'web']}
                 {l.template !== 'room' && Object.hasOwn(LAMPS, l.lamp ?? "") ? ` · ${L.lampPrefix} ${LAMPS[l.lamp]}` : ''}
+                {l.lang && l.lang !== 'vi' && Object.hasOwn(L.langShort, l.lang) ? ` · ${L.langShort[l.lang]}` : ''}
               </span>
               <span>
                 {L.statuses[l.status] ?? l.status} · {l.openedAt ? L.opened : L.notOpened}

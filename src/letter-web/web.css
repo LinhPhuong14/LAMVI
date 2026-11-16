@@ -283,7 +283,7 @@
 .lw-invite {
   margin: 18px 0 0;
   max-width: 22ch;
-  font: 700 clamp(1.7rem, 6vw, 2.4rem) / 1.2 'Dancing Script', cursive;
+  font: 700 clamp(1.7rem, 6vw, 2.4rem) / 1.2 'Dancing Script', 'Ma Shan Zheng', cursive;
   color: #f3dcb1;
   text-align: center;
   text-shadow: 0 0 22px rgb(255 196 120 / 35%);
@@ -394,7 +394,7 @@
   transition: transform 1s cubic-bezier(0.2, 0.75, 0.2, 1) 0.1s;
 }
 .lw-env-sheet-title {
-  font: 700 1.3rem/1.2 'Dancing Script', cursive;
+  font: 700 1.3rem/1.2 'Dancing Script', 'Ma Shan Zheng', cursive;
 }
 .lw-env-sheet i {
   display: block;
@@ -441,7 +441,7 @@
   left: 9%;
   bottom: 13%;
   color: var(--lw-ink);
-  font: 700 1.15rem/1.2 'Dancing Script', cursive;
+  font: 700 1.15rem/1.2 'Dancing Script', 'Ma Shan Zheng', cursive;
   opacity: 0.85;
 }
 .lw-env-to b {
@@ -587,7 +587,7 @@
 .lw-dedication {
   margin: 0 72px 18px 0;
   color: var(--lw-ink);
-  font: 700 2.2rem/1.3 'Dancing Script', cursive;
+  font: 700 2.2rem/1.3 'Dancing Script', 'Ma Shan Zheng', cursive;
 }
 .lw-dedication .lt-hw {
   height: 1.55em;
@@ -609,7 +609,7 @@
 }
 .lw-para {
   margin: 0 0 18px;
-  font: 1.35rem/2rem 'Patrick Hand', 'Itim', cursive;
+  font: 1.35rem/2rem 'Patrick Hand', 'Itim', 'Ma Shan Zheng', cursive;
 }
 /* Handwriting reveal: mực chảy trái → phải trong từng chữ (mask gradient trượt), chữ sau nối chữ trước
    như ngòi bút đang viết; mép mực hơi nhoè rồi rõ (giữ chút "text generate" của Aceternity UI). */
@@ -686,18 +686,18 @@
   justify-items: end;
   gap: 2px;
   margin: 26px 0 8px;
-  font-family: 'Patrick Hand', 'Itim', cursive;
+  font-family: 'Patrick Hand', 'Itim', 'Ma Shan Zheng', cursive;
 }
 .lw-signature span {
   font-size: 0.95rem;
   opacity: 0.75;
 }
 .lw-signature strong {
-  font: 700 2rem/1.2 'Dancing Script', cursive;
+  font: 700 2rem/1.2 'Dancing Script', 'Ma Shan Zheng', cursive;
 }
 .lw-ps {
   margin: 14px 0 0;
-  font: 1.2rem/1.6 'Patrick Hand', 'Itim', cursive;
+  font: 1.2rem/1.6 'Patrick Hand', 'Itim', 'Ma Shan Zheng', cursive;
   color: #6b4426;
   white-space: pre-line;
 }
@@ -793,7 +793,7 @@
   color: var(--lw-accent2);
 }
 .lw-surprise-big {
-  font: 700 1.8rem/1.2 'Dancing Script', cursive;
+  font: 700 1.8rem/1.2 'Dancing Script', 'Ma Shan Zheng', cursive;
 }
 .lw-badge {
   padding: 8px 18px;
@@ -809,7 +809,7 @@
 }
 .lw-places {
   margin: 0;
-  font: 1.35rem/1.4 'Patrick Hand', 'Itim', cursive;
+  font: 1.35rem/1.4 'Patrick Hand', 'Itim', 'Ma Shan Zheng', cursive;
 }
 .lw-plane {
   display: inline-block;
@@ -842,7 +842,7 @@
 }
 .lw-surprise-text p {
   margin: 0;
-  font: 1.3rem/1.6 'Patrick Hand', 'Itim', cursive;
+  font: 1.3rem/1.6 'Patrick Hand', 'Itim', 'Ma Shan Zheng', cursive;
 }
 /* Bánh sinh nhật giấy */
 .lw-cake {
