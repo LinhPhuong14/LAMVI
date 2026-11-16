@@ -18,6 +18,7 @@ const EMPTY = {
   occasion: 'justBecause',
   template: 'web',
   lang: 'vi',
+  closing: 'warm',
   lamp: '',
   // D-162: thắp nhiều đèn (thứ tự chọn; đèn đầu ở giữa)
   lampsOn: false,
@@ -48,6 +49,7 @@ function toForm(c) {
     occasion: c.occasion ?? 'justBecause',
     template: c.template === 'room' ? 'room' : 'web',
     lang: ['en', 'zh'].includes(c.lang) ? c.lang : 'vi',
+    closing: c.closing === 'formal' ? 'formal' : 'warm',
     lamp: c.lamp ?? '',
     lampsOn: Array.isArray(c.lamps) && c.lamps.length >= 2,
     lamps: Array.isArray(c.lamps) ? c.lamps.filter((l) => Object.hasOwn(LAMPS, l)) : [],
@@ -81,6 +83,7 @@ function toContent(f) {
     occasion: f.occasion,
     template: f.template,
     lang: f.lang,
+    closing: f.closing,
     lamp: f.template !== 'web' ? null : multiLamps(f) ? f.lamps[0] : f.lamp || null,
     lamps: f.template === 'web' && multiLamps(f) ? f.lamps : null,
     kind: f.kind,
@@ -172,7 +175,7 @@ export default function LetterEditorPage() {
     const hasContent = form.message.trim() || Object.values(form.od).some((v) => v.trim())
     if (hasContent && !window.confirm(L.templateConfirm)) return
     setForm((f) => ({
-      ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName, template: f.template, lang: f.lang, lamp: f.lamp }),
+      ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName, template: f.template, lang: f.lang, closing: f.closing, lamp: f.lamp }),
       lampsOn: f.lampsOn,
       lamps: f.lamps,
       videoUrl: f.videoUrl,
@@ -395,6 +398,10 @@ export default function LetterEditorPage() {
             <Field label={L.recipientName} value={form.recipientName} onChange={set('recipientName')} maxLength={60} hint={L.recipientNameHint} />
             {err('recipientName') && <span className="field-error">{err('recipientName')}</span>}
             <Field label={L.senderName} value={form.senderName} onChange={set('senderName')} maxLength={60} hint={L.senderNameHint} />
+            <Field label={L.closing} as="select" value={form.closing} onChange={set('closing')} hint={L.closingHint}>
+              <option value="warm">{L.closings.warm}</option>
+              <option value="formal">{L.closings.formal}</option>
+            </Field>
             {err('senderName') && <span className="field-error">{err('senderName')}</span>}
             <Field label={L.occasion} as="select" value={form.occasion} onChange={set('occasion')}>
               {OCCASIONS.map((o) => (

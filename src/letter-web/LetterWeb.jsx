@@ -382,7 +382,8 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
                 </div>
               )}
               <div className="lw-signature">
-                <span>{T.regards}</span>
+                {/* D-163: lời kết thân mật (mặc định) hoặc trang trọng */}
+                <span>{letter.closing === 'formal' ? T.regardsFormal : T.regards}</span>
                 {sender && <strong>{sender}</strong>}
                 {biz?.name && (sender ? <em className="lw-signature-org">{biz.name}</em> : <strong>{biz.name}</strong>)}
               </div>
