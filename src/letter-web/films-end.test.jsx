@@ -67,3 +67,57 @@ describe('D-159: thẻ video LAMVI', () => {
     expect(screen.getByRole('button', { name: 'Close' })).toBeTruthy()
   })
 })
+
+describe('D-160: video toàn màn hình nằm ngang trên điện thoại', () => {
+  const setup = (coarse) => {
+    vi.stubGlobal('matchMedia', (q) => ({ matches: q.includes('reduce') || (coarse && q.includes('coarse')), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }))
+    const lock = vi.fn(() => Promise.resolve())
+    const unlock = vi.fn()
+    vi.stubGlobal('screen', { orientation: { lock, unlock } })
+    const fs = vi.fn(function () {
+      return Promise.resolve()
+    })
+    const play = vi.fn(() => Promise.resolve())
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(play)
+    HTMLElement.prototype.requestFullscreen = fs
+    vi.useFakeTimers()
+    render(<LetterWeb letter={base} />)
+    openLetter()
+    act(() => vi.advanceTimersByTime(5000))
+    return { lock, unlock, fs, play }
+  }
+  afterEach(() => {
+    delete HTMLElement.prototype.requestFullscreen
+    vi.restoreAllMocks()
+  })
+  it('điện thoại: bấm video → phát, toàn màn hình ngay trên thẻ video, khoá hướng ngang', async () => {
+    const { lock, fs, play } = setup(true)
+    fireEvent.click(screen.getByRole('button', { name: 'Xem video: Tranh Đông Hồ trên đèn giấy dó' }))
+    expect(play).toHaveBeenCalledTimes(1)
+    expect(fs).toHaveBeenCalledTimes(1)
+    expect(fs.mock.contexts[0].tagName).toBe('VIDEO')
+    await act(async () => {})
+    expect(lock).toHaveBeenCalledWith('landscape')
+  })
+  it('máy tính (chuột): phát trong thẻ, không ép toàn màn hình', () => {
+    const { lock, fs, play } = setup(false)
+    fireEvent.click(screen.getByRole('button', { name: 'Xem video: Tranh Đông Hồ trên đèn giấy dó' }))
+    expect(play).toHaveBeenCalledTimes(1)
+    expect(fs).not.toHaveBeenCalled()
+    expect(lock).not.toHaveBeenCalled()
+  })
+  it('iPhone (không có requestFullscreen): dùng trình phát toàn màn hình của iOS', () => {
+    const { fs } = setup(true)
+    delete HTMLElement.prototype.requestFullscreen
+    const ios = vi.fn()
+    HTMLVideoElement.prototype.webkitEnterFullscreen = ios
+    try {
+      fireEvent.click(screen.getByRole('button', { name: 'Xem video: Từ làng giấy dó đến chiếc đèn' }))
+      expect(ios).toHaveBeenCalledTimes(1)
+      expect(fs).not.toHaveBeenCalled()
+    } finally {
+      delete HTMLVideoElement.prototype.webkitEnterFullscreen
+    }
+  })
+})
+

@@ -632,3 +632,7 @@ Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt 
 ### T-117 — Thẻ nổi video LAMVI sau 5 giây (2026-11-16, D-159)
 
 - `LetterWeb` giữ trạng thái `films`: `wait` → `shown` → `closed`. `letterDone = reading && titleDone && (revealAll || kind !== 'text')`; khi `letterDone` thì hẹn 5000 ms (`FILMS_DELAY`) rồi hiện `<LetterFilms>` dạng `<aside>` `position: fixed` (z-index trên menu demo), không phải dialog nên không chặn đọc thư. "Xem lại từ đầu" đặt lại `wait`. Video đang phát chiếm cả hàng và thẻ nới rộng (`.is-playing`). Test `src/letter-web/films-end.test.jsx`.
+
+### T-118 — Video LAMVI toàn màn hình ngang (2026-11-16, D-160)
+
+- `LetterFilms.play`: `flushSync` gắn `<video>` ngay trong sự kiện bấm rồi `play()` và (chỉ khi `(pointer: coarse)`) `video.requestFullscreen()` → `screen.orientation.lock('landscape')`; không có `requestFullscreen` (iPhone) → `webkitEnterFullscreen()`. Mọi lỗi bị nuốt, video vẫn phát trong thẻ. `fullscreenchange` thoát → `orientation.unlock()`; hết video/rời thẻ → thoát toàn màn hình. Kiểm headless (Chromium mobile, cảm ứng): `document.fullscreenElement` là VIDEO, video đang phát. Test `src/letter-web/films-end.test.jsx`.
