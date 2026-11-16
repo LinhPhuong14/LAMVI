@@ -9,6 +9,8 @@ export const LETTER_STATUSES = ['draft', 'published']
 // D-140: hai kiểu trải nghiệm — Phòng thư 3D (`room`, mặc định) hoặc web 2D (`web`)
 export const LETTER_TEMPLATES = ['web', 'room']
 // Ảnh đèn trong bản web 2D: 5 mẫu đèn LAMVI (public/images/lamps/<slug>-cutout.webp)
+// D-157: ngôn ngữ chữ giao diện của phong thư (người nhận thấy), khớp src/letter-web/i18n.js
+export const LETTER_LANGS = ['vi', 'en', 'zh']
 export const LETTER_LAMPS = ['tu-linh', 'thu-hoach', 'phuc-loc-song-toan', 'tam-duong-khai-thai', 'lon-dan']
 
 // Giới hạn độ dài [ASSUMPTION] — đủ cho một lá thư tay, chặn dữ liệu rác làm nặng trang
@@ -66,6 +68,8 @@ export function validateLetterContent(input) {
   // D-141: web 2D là bản chính — thiếu/lạ → 'web'; chỉ thư đã chọn rõ 'room' mới mở Phòng thư 3D
   value.template = LETTER_TEMPLATES.includes(src.template) ? src.template : 'web'
   value.lamp = LETTER_LAMPS.includes(src.lamp) ? src.lamp : null
+  // Thiếu/lạ → tiếng Việt (thư cũ chưa có trường này)
+  value.lang = LETTER_LANGS.includes(src.lang) ? src.lang : 'vi'
   value.kind = LETTER_KINDS.includes(src.kind) ? src.kind : null
   if (!value.kind) errors.kind = 'INVALID'
 

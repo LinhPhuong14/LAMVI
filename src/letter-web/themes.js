@@ -88,7 +88,8 @@ export const OCCASION_THEMES = {
   },
 }
 
-export const themeOf = (occasion) => (Object.hasOwn(OCCASION_THEMES, occasion) ? OCCASION_THEMES[occasion] : OCCASION_THEMES.justBecause)
+export const occasionKey = (occasion) => (Object.hasOwn(OCCASION_THEMES, occasion) ? occasion : 'justBecause')
+export const themeOf = (occasion) => OCCASION_THEMES[occasionKey(occasion)]
 
 /** 5 mẫu đèn LAMVI (ảnh tách nền ở public/images/lamps, cùng bộ ảnh trên trang chủ LAMVI). */
 export const LAMPS = {

@@ -619,3 +619,8 @@ Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt 
 ### T-114 — Tờ thư tự cuộn theo chữ đang hiện (2026-11-15, D-155)
 
 - `LetterWeb`: trong lúc handwriting reveal (sau tiêu đề, trước `revealAll`, không giảm chuyển động), mỗi 250 ms tìm chữ cuối đã tới giờ viết (tìm nhị phân trên `timing[].delay`, chữ có `data-i`), nếu chữ nằm dưới 60% khung thì `scrollTo({ behavior: 'smooth' })` chỉ theo chiều xuống. `wheel`/`touchmove`/`keydown` trong tờ thư → dừng (không giành quyền cuộn với người nhận). Test `src/letter-web/autoscroll.test.jsx`.
+
+### T-115 — Ngôn ngữ phong thư vi/en/zh (2026-11-16, D-157)
+
+- `content.lang` trong JSONB `order_letters.content` (không cần migration); server chuẩn hoá về `vi|en|zh`, lạ/thiếu → `vi`. Bộ chữ riêng của phong thư ở `src/letter-web/i18n.js` (`letterText`, `localizeTheme`), không dùng i18n của web vì ngôn ngữ thư do admin chọn chứ không theo người xem. `LetterWeb` đặt `lang` trên `<main>` (zh → `zh-Hans`) và truyền bộ chữ cho `Envelope`/`Surprise`.
+- Font: thêm `Ma Shan Zheng` vào cuối các stack chữ viết tay; `@fontsource/ma-shan-zheng/400.css` chỉ được import động khi thư là tiếng Trung (chia nhỏ theo unicode-range nên chỉ tải phần chữ dùng tới). Font tự host nên hợp CSP `font-src 'self'`. Phòng thư 3D (`src/letter-room`, khu vực của phiên Codex) chưa đa ngôn ngữ. Test `src/letters/language.test.jsx`.
