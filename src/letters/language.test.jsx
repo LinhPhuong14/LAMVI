@@ -34,7 +34,7 @@ describe('D-157: hiển thị', () => {
     expect(screen.getByText('Tứ Linh lamp')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Turn on the lamp' }))
     await screen.findByRole('heading', { level: 2, name: 'Dear Lan,' })
-    expect(container.querySelector('.lw-signature span').textContent).toBe('Warmly,')
+    expect(container.querySelector('.lw-signature span').textContent).toBe('Best regards,')
     await screen.findByRole('button', { name: /Open the birthday card/ })
     fireEvent.click(screen.getByRole('button', { name: /Open the birthday card/ }))
     expect(screen.getByRole('dialog', { name: 'Open the birthday card' }).textContent).toContain('Birthday')

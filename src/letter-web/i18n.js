@@ -61,7 +61,7 @@ const DICT = {
     revealAll: 'Show the whole letter',
     watch: 'Watch the message',
     captions: 'English',
-    regards: 'Warmly,',
+    regards: 'Best regards,',
     logoAlt: 'Company logo',
     postmark: 'DÓ PAPER',
     blow: 'Make a wish, then blow out the candles',
