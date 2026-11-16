@@ -801,6 +801,11 @@
   background: #2a1a0e center / cover;
   box-shadow: 0 6px 18px rgb(63 32 11 / 22%);
 }
+.lw-film video:fullscreen {
+  border-radius: 0;
+  background: #000;
+  object-fit: contain;
+}
 .lw-film-poster {
   position: relative;
   padding: 0;
