@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import HandwrittenTitle from '../letters/HandwrittenTitle.jsx'
 import Envelope from './Envelope.jsx'
 import Surprise from './Surprise.jsx'
+import LetterFilms from './LetterFilms.jsx'
 import { reducedMotion } from './effects.js'
 import { senderOf } from '../letters/names.js'
 import { LAMPS, DEFAULT_LAMP, lampSrc, occasionKey, themeOf } from './themes.js'
@@ -356,6 +357,8 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
                   <span aria-hidden="true">✧</span> {theme.surprise}
                 </button>
               )}
+              {/* D-158: hai video LAMVI ở cuối, hiện khi chữ đã viết xong (thư video: hiện luôn) */}
+              {(revealAll || letter.kind !== 'text') && <LetterFilms T={T} />}
               {afterLetter && <div className="lw-after">{afterLetter}</div>}
             </div>
           </article>
