@@ -628,3 +628,7 @@ Artwork đôi gà gen riêng: `docs/art/dong-ho-roosters-v5-source.png`, prompt 
 ### T-116 — Hai video LAMVI cuối lá thư (2026-11-16, D-158)
 
 - `src/letter-web/LetterFilms.jsx` render trong `LetterWeb` sau nút điều bất ngờ, điều kiện `revealAll || kind !== 'text'`. Poster là `<button>`; chỉ khi bấm mới gắn `<video autoPlay>` (không tải video trước), nguồn qua `pickFilmSrc` (360p cho màn hẹp/mạng chậm). Không dùng lại `LetterExtras`/`FilmOverlay` (overlay toàn màn hình) để giữ bố cục một màn hình D-149 và chạy trong tờ thư đang cuộn. Cờ `LETTER_FLOW.extras` giữ nguyên `false` (chỉ áp cho Phòng thư 3D). Test `src/letter-web/films-end.test.jsx`.
+
+### T-117 — Thẻ nổi video LAMVI sau 5 giây (2026-11-16, D-159)
+
+- `LetterWeb` giữ trạng thái `films`: `wait` → `shown` → `closed`. `letterDone = reading && titleDone && (revealAll || kind !== 'text')`; khi `letterDone` thì hẹn 5000 ms (`FILMS_DELAY`) rồi hiện `<LetterFilms>` dạng `<aside>` `position: fixed` (z-index trên menu demo), không phải dialog nên không chặn đọc thư. "Xem lại từ đầu" đặt lại `wait`. Video đang phát chiếm cả hàng và thẻ nới rộng (`.is-playing`). Test `src/letter-web/films-end.test.jsx`.

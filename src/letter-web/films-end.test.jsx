@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// D-158: hai video LAMVI ở cuối lá thư, sau khi đọc xong
+// D-158, D-159: thư viết xong → đợi 5 giây → thẻ nổi "Xem tiếp câu chuyện của LAMVI" với hai video
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import LetterWeb from './LetterWeb.jsx'
@@ -11,18 +11,27 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 const base = { occasion: 'thankYou', kind: 'text', message: ['Cảm ơn bạn rất nhiều.'], template: 'web', recipientName: 'Lan', senderName: 'An', occasionData: null, postscript: null }
+const card = () => screen.queryByRole('complementary', { name: 'Xem tiếp câu chuyện của LAMVI' })
 
-describe('D-158: video cuối thư', () => {
-  it('chưa viết xong thì chưa có video; viết xong → hai thẻ video; bấm thẻ mới tải video, mỗi lúc một video', async () => {
+function openLetter() {
+  fireEvent.click(screen.getByRole('button', { name: 'Bật đèn' }))
+  for (const ms of [1000, 1900, 1200]) act(() => vi.advanceTimersByTime(ms))
+}
+
+describe('D-159: thẻ video LAMVI', () => {
+  it('không nằm cuối thư; chỉ hiện 5 giây sau khi thư viết xong; bấm thẻ mới tải video, mỗi lúc một video', () => {
     mm(false)
     vi.useFakeTimers()
     const { container } = render(<LetterWeb letter={base} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Bật đèn' }))
-    for (const ms of [1000, 1900, 1200]) act(() => vi.advanceTimersByTime(ms))
-    expect(container.querySelector('.lw-films')).toBeNull()
-    // tiêu đề viết tay xong (hẹn giờ dự phòng) → thân thư → hết thời gian viết
-    act(() => vi.advanceTimersByTime(6000))
-    act(() => vi.advanceTimersByTime(10000))
+    openLetter()
+    act(() => vi.advanceTimersByTime(6000)) // tiêu đề viết tay xong (hẹn giờ dự phòng)
+    expect(card()).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Hiện toàn bộ lá thư' }))
+    act(() => vi.advanceTimersByTime(4900))
+    expect(card()).toBeNull()
+    act(() => vi.advanceTimersByTime(200))
+    expect(card()).toBeTruthy()
+    expect(container.querySelector('.lw-letter .lw-films')).toBeNull()
     expect(container.querySelectorAll('.lw-film')).toHaveLength(2)
     expect(container.querySelector('video')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Xem video: Tranh Đông Hồ trên đèn giấy dó' }))
@@ -32,11 +41,29 @@ describe('D-158: video cuối thư', () => {
     expect(container.querySelectorAll('video')).toHaveLength(1)
     expect(container.querySelector('video').getAttribute('src')).toMatch(/lang-giay-do/)
   })
-  it('bấm "Hiện toàn bộ" hoặc giảm chuyển động → hiện ngay; chữ theo ngôn ngữ thư', async () => {
+  it('đóng thẻ → không hiện lại; "Xem lại từ đầu" → hiện lại sau khi đọc xong lần nữa', () => {
     mm(true)
+    vi.useFakeTimers()
+    render(<LetterWeb letter={base} />)
+    openLetter()
+    act(() => vi.advanceTimersByTime(5000))
+    fireEvent.click(screen.getByRole('button', { name: 'Đóng' }))
+    expect(card()).toBeNull()
+    act(() => vi.advanceTimersByTime(20000))
+    expect(card()).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Xem lại từ đầu' }))
+    openLetter()
+    act(() => vi.advanceTimersByTime(5000))
+    expect(card()).toBeTruthy()
+  })
+  it('chữ theo ngôn ngữ thư', () => {
+    mm(true)
+    vi.useFakeTimers()
     render(<LetterWeb letter={{ ...base, lang: 'en' }} />)
     fireEvent.click(screen.getByRole('button', { name: 'Turn on the lamp' }))
-    expect(await screen.findByText('The story behind your lamp')).toBeTruthy()
-    expect(await screen.findByRole('button', { name: 'Play video: From the dó-paper village to your lamp' })).toBeTruthy()
+    for (const ms of [1000, 1900, 1200, 5000]) act(() => vi.advanceTimersByTime(ms))
+    expect(screen.getByRole('complementary', { name: 'Continue the LAMVI story' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Play video: From the dó-paper village to your lamp' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Close' })).toBeTruthy()
   })
 })

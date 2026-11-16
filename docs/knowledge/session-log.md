@@ -991,3 +991,5 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 **Cập nhật 2026-11-16 (D-156, D-157)**: bỏ logo doanh nghiệp ở đầu trang; thêm chọn ngôn ngữ phong thư vi/en/zh (kiểm headless 1280×800 en/zh, 390×844 zh vừa một màn hình, font Ma Shan Zheng chỉ tải với thư tiếng Trung).
 
 **Cập nhật 2026-11-16 (D-158)**: hai video LAMVI cuối lá thư web 2D (kiểm headless 1280×800 và 390×844, vẫn vừa một màn hình).
+
+**Cập nhật 2026-11-16 (D-159)**: video LAMVI chuyển sang thẻ nổi hiện 5 giây sau khi thư viết xong (headless: chưa có lúc 4 s, có lúc 5,8 s; 1280×800 và 390×844 vẫn một màn hình).
