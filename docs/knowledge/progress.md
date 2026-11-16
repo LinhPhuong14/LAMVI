@@ -11,6 +11,7 @@
 | Tờ thư tự cuộn theo chữ đang hiện (D-155) | ✅ | `src/letter-web/LetterWeb.jsx` | QA máy thật |
 | Ngôn ngữ phong thư vi/en/zh (D-157) | ✅ | `src/letter-web/i18n.js`, admin soạn thư | Phòng thư 3D, mẫu lời chúc chưa dịch |
 | Outro "Câu chuyện của LAMVI": thẻ mời sau 5 giây → lời dẫn → phim → màn kết (D-158…D-161) | ✅ | `src/letter-web/LetterFilms.jsx` | QA máy thật |
+| Thắp nhiều đèn xếp cung parabol (D-162) | ✅ | `src/letter-web/themes.js`, `LetterWeb.jsx`, admin soạn thư | QA máy thật |
 | Vào đèn luôn (D-153); thư doanh nghiệp có logo (D-154) | ✅ | `src/letter-web/*`, `src/admin/LetterEditorPage.jsx`, `server/routes/letters.js` | Thử tải logo trên Production |
 | Tắt video mở đầu + nút video cuối thư, cho xem dọc (D-150) | ✅ | `src/letters/films.js` (`LETTER_FLOW`), `src/pages/LetterPage.jsx` | — |
 | Mọi pha vừa một màn hình, tờ thư cuộn trong khung (D-149) | ✅ | `src/letter-web/web.css`, `LetterWeb.jsx`, `src/letters/letters.css` | QA máy thật |

@@ -14,7 +14,7 @@ export const LETTER_LANGS = ['vi', 'en', 'zh']
 export const LETTER_LAMPS = ['tu-linh', 'thu-hoach', 'phuc-loc-song-toan', 'tam-duong-khai-thai', 'lon-dan']
 
 // Giới hạn độ dài [ASSUMPTION] — đủ cho một lá thư tay, chặn dữ liệu rác làm nặng trang
-export const LIMITS = { name: 60, paragraph: 1200, paragraphs: 12, message: 6000, postscript: 400, short: 300, label: 60, places: 4, photos: 2 }
+export const LIMITS = { name: 60, paragraph: 1200, paragraphs: 12, message: 6000, postscript: 400, short: 300, label: 60, places: 4, photos: 2, lamps: 5 }
 
 // Mã thư ngẫu nhiên trên đường dẫn /thu/<slug>: 10 ký tự a-z0-9 bắt đầu bằng chữ — không lộ mã đơn.
 // Không phải bí mật: quyền xem nằm ở token (D-138).
@@ -68,6 +68,10 @@ export function validateLetterContent(input) {
   // D-141: web 2D là bản chính — thiếu/lạ → 'web'; chỉ thư đã chọn rõ 'room' mới mở Phòng thư 3D
   value.template = LETTER_TEMPLATES.includes(src.template) ? src.template : 'web'
   value.lamp = LETTER_LAMPS.includes(src.lamp) ? src.lamp : null
+  // D-162: thắp nhiều đèn — 2 đến 5 mẫu khác nhau (bỏ mẫu lạ/trùng); dưới 2 mẫu → null (một đèn như cũ)
+  const lamps = Array.isArray(src.lamps) ? [...new Set(src.lamps.filter((l) => LETTER_LAMPS.includes(l)))].slice(0, LIMITS.lamps) : []
+  value.lamps = lamps.length >= 2 ? lamps : null
+  if (value.lamps) value.lamp = value.lamps[0]
   // Thiếu/lạ → tiếng Việt (thư cũ chưa có trường này)
   value.lang = LETTER_LANGS.includes(src.lang) ? src.lang : 'vi'
   value.kind = LETTER_KINDS.includes(src.kind) ? src.kind : null

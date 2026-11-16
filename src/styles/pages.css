@@ -8986,6 +8986,55 @@ h1 {
 }
 
 /* D-154: thư doanh nghiệp có logo */
+.letter-lamp-pick > .letter-check,
+.letter-lamps {
+  grid-column: 1 / -1;
+}
+.letter-lamps {
+  display: grid;
+  gap: 8px;
+}
+.letter-lamps .field-hint {
+  margin: 0;
+}
+.letter-lamps-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.letter-lamp-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 12px 4px 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.letter-lamp-chip img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+.letter-lamp-chip[aria-pressed='true'] {
+  border-color: var(--nau-be);
+  background: rgb(139 94 60 / 12%);
+}
+.letter-lamp-chip b {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--nau-be);
+  color: var(--white);
+  font-size: 0.75rem;
+}
 .letter-check {
   display: flex;
   gap: 8px;
