@@ -17,6 +17,7 @@ import './web.css'
 // dark → (bấm bật đèn) lighting → rising (phong bì trồi lên, xi bung, nắp mở) → unfolding (thư trồi khỏi phong bì) → reading
 const NEXT = { lighting: 'rising', rising: 'unfolding', unfolding: 'reading' }
 const TIMING = { lighting: 1000, rising: 1900, unfolding: 1200 }
+const FILMS_DELAY = 5000
 // Đom đóm/bụi sáng quanh đèn — vị trí cố định theo chỉ số (không random để SSR/test ổn định)
 const SPARKS = Array.from({ length: 22 }, (_, i) => ({
   left: `${(i * 37 + 11) % 100}%`,
@@ -61,6 +62,8 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
   const [revealAll, setRevealAll] = useState(reduced)
   const [surprise, setSurprise] = useState(false)
   const [playing, setPlaying] = useState(false)
+  // D-159: thẻ video LAMVI — 'wait' (chưa tới lúc) → 'shown' → 'closed'
+  const [films, setFilms] = useState('wait')
   const readerRef = useRef(null)
   const surpriseBtn = useRef(null)
   const stageRef = useRef(null)
@@ -127,6 +130,14 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
     return () => clearTimeout(t)
   }, [titleDone, revealAll, total])
 
+  // D-159: thư viết xong (thư video: vừa mở ra) → đợi 5 giây rồi mới hiện thẻ "Xem tiếp câu chuyện của LAMVI"
+  const letterDone = phase === 'reading' && titleDone && (revealAll || letter.kind !== 'text')
+  useEffect(() => {
+    if (!letterDone || films !== 'wait') return
+    const t = setTimeout(() => setFilms('shown'), FILMS_DELAY)
+    return () => clearTimeout(t)
+  }, [letterDone, films])
+
   // D-155: tờ thư tự cuộn theo dòng chữ đang hiện ra (handwriting reveal) để người nhận không phải tự kéo.
   // Người nhận tự cuộn/chạm/bấm phím trong tờ thư → dừng tự cuộn (tôn trọng thao tác của họ).
   useEffect(() => {
@@ -183,6 +194,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
     setTitleDone(false)
     setRevealAll(reduced)
     setPlaying(false)
+    setFilms('wait')
     setPhase('dark')
     requestAnimationFrame(() => switchRef.current?.focus())
   }
@@ -357,14 +369,13 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
                   <span aria-hidden="true">✧</span> {theme.surprise}
                 </button>
               )}
-              {/* D-158: hai video LAMVI ở cuối, hiện khi chữ đã viết xong (thư video: hiện luôn) */}
-              {(revealAll || letter.kind !== 'text') && <LetterFilms T={T} />}
               {afterLetter && <div className="lw-after">{afterLetter}</div>}
             </div>
           </article>
         </div>
       )}
 
+      {films === 'shown' && !surprise && <LetterFilms T={T} onClose={() => setFilms('closed')} />}
       {surprise && <Surprise letter={letter} theme={theme} T={T} onClose={closeSurprise} />}
       {children}
     </main>

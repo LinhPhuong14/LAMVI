@@ -39,7 +39,8 @@ const DICT = {
     surpriseFallback: 'Một chút thương, dành riêng cho bạn.',
     photoAlt: (i) => `Kỷ niệm ${i}`,
     films: {
-      heading: 'Câu chuyện phía sau chiếc đèn',
+      heading: 'Xem tiếp câu chuyện của LAMVI',
+      close: 'Đóng',
       play: 'Xem video',
       culture: { kicker: 'Giới thiệu đèn LAMVI', title: 'Tranh Đông Hồ trên đèn giấy dó' },
       craft: { kicker: 'Cách làm đèn', title: 'Từ làng giấy dó đến chiếc đèn' },
@@ -75,7 +76,8 @@ const DICT = {
     surpriseFallback: 'A little love, just for you.',
     photoAlt: (i) => `Memory ${i}`,
     films: {
-      heading: 'The story behind your lamp',
+      heading: 'Continue the LAMVI story',
+      close: 'Close',
       play: 'Play video',
       culture: { kicker: 'About LAMVI lamps', title: 'Đông Hồ folk paintings on dó-paper lamps' },
       craft: { kicker: 'How the lamp is made', title: 'From the dó-paper village to your lamp' },
@@ -119,7 +121,8 @@ const DICT = {
     surpriseFallback: '一点心意，只为你。',
     photoAlt: (i) => `回忆 ${i}`,
     films: {
-      heading: '灯背后的故事',
+      heading: '继续了解 LAMVI 的故事',
+      close: '关闭',
       play: '播放视频',
       culture: { kicker: '认识 LAMVI 灯', title: '越南东湖民间画上的 dó 纸灯' },
       craft: { kicker: '灯的制作', title: '从 dó 纸村到你的灯' },

@@ -10,7 +10,7 @@
 | Màn "Cùng xem cách chiếc đèn được làm ra nhé", video toàn màn hình tự phát + nối tiếp (D-145) | ✅ | `src/letters/IntroFilms.jsx` | QA iPhone/Android thật |
 | Tờ thư tự cuộn theo chữ đang hiện (D-155) | ✅ | `src/letter-web/LetterWeb.jsx` | QA máy thật |
 | Ngôn ngữ phong thư vi/en/zh (D-157) | ✅ | `src/letter-web/i18n.js`, admin soạn thư | Phòng thư 3D, mẫu lời chúc chưa dịch |
-| Hai video LAMVI cuối lá thư (D-158) | ✅ | `src/letter-web/LetterFilms.jsx` | QA máy thật |
+| Thẻ nổi "Xem tiếp câu chuyện của LAMVI" sau 5 giây (D-158, D-159) | ✅ | `src/letter-web/LetterFilms.jsx` | QA máy thật |
 | Vào đèn luôn (D-153); thư doanh nghiệp có logo (D-154) | ✅ | `src/letter-web/*`, `src/admin/LetterEditorPage.jsx`, `server/routes/letters.js` | Thử tải logo trên Production |
 | Tắt video mở đầu + nút video cuối thư, cho xem dọc (D-150) | ✅ | `src/letters/films.js` (`LETTER_FLOW`), `src/pages/LetterPage.jsx` | — |
 | Mọi pha vừa một màn hình, tờ thư cuộn trong khung (D-149) | ✅ | `src/letter-web/web.css`, `LetterWeb.jsx`, `src/letters/letters.css` | QA máy thật |
