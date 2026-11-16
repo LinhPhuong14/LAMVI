@@ -37,19 +37,19 @@ describe('D-154: server', () => {
 })
 
 describe('D-154: hiển thị', () => {
-  it('đầu trang LAMVI × logo; tờ thư có logo; chữ ký là tên doanh nghiệp khi không có tên người gửi', async () => {
+  it('đầu trang chỉ có LAMVI (không logo); tờ thư có logo; chữ ký là tên doanh nghiệp khi không có tên người gửi', async () => {
     reduced()
     const { container } = render(<LetterWeb letter={{ ...base, business: { name: 'An Phát', logoUrl: LOGO } }} />)
-    expect(container.querySelector('.lw-cobrand img').getAttribute('src')).toBe(LOGO)
+    expect(container.querySelector('.lw-top img')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Bật đèn' }))
     await screen.findByRole('heading', { level: 2, name: 'Gửi Chị Lan,' })
     expect(container.querySelector('.lw-letterhead img').getAttribute('alt')).toBe('An Phát')
     expect(container.querySelector('.lw-signature strong').textContent).toBe('An Phát')
   })
-  it('có tên người gửi → ký tên người gửi, tên doanh nghiệp bên dưới; không logo → chữ tên ở đầu trang', async () => {
+  it('có tên người gửi → ký tên người gửi, tên doanh nghiệp bên dưới; không logo → chữ tên ở đầu tờ thư', async () => {
     reduced()
     const { container } = render(<LetterWeb letter={{ ...base, senderName: 'Minh', business: { name: 'An Phát', logoUrl: null } }} />)
-    expect(container.querySelector('.lw-cobrand b').textContent).toBe('An Phát')
+    expect(container.querySelector('.lw-top').textContent).not.toContain('An Phát')
     fireEvent.click(screen.getByRole('button', { name: 'Bật đèn' }))
     await screen.findByRole('heading', { level: 2 })
     expect(container.querySelector('.lw-signature strong').textContent).toBe('Minh')
@@ -59,7 +59,7 @@ describe('D-154: hiển thị', () => {
   it('thư thường không có gì của doanh nghiệp', () => {
     reduced()
     const { container } = render(<LetterWeb letter={base} />)
-    expect(container.querySelector('.lw-cobrand, .lw-letterhead')).toBeNull()
+    expect(container.querySelector('.lw-letterhead')).toBeNull()
   })
   it('phong bì: logo trên con dấu niêm phong, tên doanh nghiệp trên mặt phong bì', () => {
     const { container } = render(<Envelope theme={themeOf('thankYou')} recipientName="Lan" senderName="" business={{ name: 'An Phát', logoUrl: LOGO }} occasionLabel="Cảm ơn" open={false} out={false} />)

@@ -208,12 +208,6 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
       <header className="lw-top">
         <span className="lw-brands">
           <span className="lw-brand">LAMVI</span>
-          {biz && (
-            <span className="lw-cobrand">
-              <span aria-hidden="true">×</span>
-              {biz.logoUrl ? <img src={biz.logoUrl} alt={biz.name || 'Logo doanh nghiệp'} /> : <b>{biz.name}</b>}
-            </span>
-          )}
         </span>
         <div className="lw-top-actions">
           {lit && (
