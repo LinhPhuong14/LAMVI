@@ -377,6 +377,8 @@ export const S = {
     logoErrors: { IMAGE_TOO_LARGE: 'Logo quá lớn (tối đa 2 MB).', INVALID_IMAGE_TYPE: 'Chỉ nhận PNG, JPG hoặc WebP.', IMAGE_NOT_UPLOADED: 'Tải lên chưa xong, thử lại.', UPLOAD_FAILED: 'Tải lên lỗi, thử lại.' },
     previewNeedsMessage: 'Nhập nội dung thư để xem thử.',
     senderNameHint: 'Tuỳ chọn — bỏ trống thì chữ ký chỉ còn lời kết (vd "Thương mến,").',
+    showDedication: 'Hiện dòng "Gửi …" ở đầu thư',
+    showSignature: 'Hiện lời kết và tên người ký ở cuối thư',
     closing: 'Lời kết',
     closingHint: 'Dòng trên tên người gửi. Thư tiếng Anh: Best regards / Sincerely; tiếng Trung: 祝好 / 此致敬礼. Phòng thư 3D chưa áp dụng.',
     closings: { warm: 'Thương mến, (thân mật)', formal: 'Trân trọng, (trang trọng)' },

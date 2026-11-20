@@ -19,6 +19,9 @@ const EMPTY = {
   template: 'web',
   lang: 'vi',
   closing: 'warm',
+  // D-164: bật/tắt dòng "Gửi …" và khối lời kết + ký tên
+  showDedication: true,
+  showSignature: true,
   lamp: '',
   // D-162: thắp nhiều đèn (thứ tự chọn; đèn đầu ở giữa)
   lampsOn: false,
@@ -50,6 +53,8 @@ function toForm(c) {
     template: c.template === 'room' ? 'room' : 'web',
     lang: ['en', 'zh'].includes(c.lang) ? c.lang : 'vi',
     closing: c.closing === 'formal' ? 'formal' : 'warm',
+    showDedication: c.showDedication !== false,
+    showSignature: c.showSignature !== false,
     lamp: c.lamp ?? '',
     lampsOn: Array.isArray(c.lamps) && c.lamps.length >= 2,
     lamps: Array.isArray(c.lamps) ? c.lamps.filter((l) => Object.hasOwn(LAMPS, l)) : [],
@@ -84,6 +89,8 @@ function toContent(f) {
     template: f.template,
     lang: f.lang,
     closing: f.closing,
+    showDedication: f.showDedication,
+    showSignature: f.showSignature,
     lamp: f.template !== 'web' ? null : multiLamps(f) ? f.lamps[0] : f.lamp || null,
     lamps: f.template === 'web' && multiLamps(f) ? f.lamps : null,
     kind: f.kind,
@@ -175,7 +182,7 @@ export default function LetterEditorPage() {
     const hasContent = form.message.trim() || Object.values(form.od).some((v) => v.trim())
     if (hasContent && !window.confirm(L.templateConfirm)) return
     setForm((f) => ({
-      ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName, template: f.template, lang: f.lang, closing: f.closing, lamp: f.lamp }),
+      ...toForm({ ...demo, kind: 'text', recipientName: f.recipientName, senderName: f.senderName, template: f.template, lang: f.lang, closing: f.closing, showDedication: f.showDedication, showSignature: f.showSignature, lamp: f.lamp }),
       lampsOn: f.lampsOn,
       lamps: f.lamps,
       videoUrl: f.videoUrl,
@@ -188,6 +195,10 @@ export default function LetterEditorPage() {
   }
   const set = (k) => (e) => {
     setForm((f) => ({ ...f, [k]: e.target.value }))
+    setDirty(true)
+  }
+  const check = (k) => (e) => {
+    setForm((f) => ({ ...f, [k]: e.target.checked }))
     setDirty(true)
   }
   const setBusiness = (patch) => {
@@ -397,12 +408,22 @@ export default function LetterEditorPage() {
             </Field>
             <Field label={L.recipientName} value={form.recipientName} onChange={set('recipientName')} maxLength={60} hint={L.recipientNameHint} />
             {err('recipientName') && <span className="field-error">{err('recipientName')}</span>}
+            <label className="letter-check">
+              <input type="checkbox" checked={form.showDedication} onChange={check('showDedication')} />
+              {L.showDedication}
+            </label>
             <Field label={L.senderName} value={form.senderName} onChange={set('senderName')} maxLength={60} hint={L.senderNameHint} />
-            <Field label={L.closing} as="select" value={form.closing} onChange={set('closing')} hint={L.closingHint}>
-              <option value="warm">{L.closings.warm}</option>
-              <option value="formal">{L.closings.formal}</option>
-            </Field>
             {err('senderName') && <span className="field-error">{err('senderName')}</span>}
+            <label className="letter-check">
+              <input type="checkbox" checked={form.showSignature} onChange={check('showSignature')} />
+              {L.showSignature}
+            </label>
+            {form.showSignature && (
+              <Field label={L.closing} as="select" value={form.closing} onChange={set('closing')} hint={L.closingHint}>
+                <option value="warm">{L.closings.warm}</option>
+                <option value="formal">{L.closings.formal}</option>
+              </Field>
+            )}
             <Field label={L.occasion} as="select" value={form.occasion} onChange={set('occasion')}>
               {OCCASIONS.map((o) => (
                 <option key={o} value={o}>

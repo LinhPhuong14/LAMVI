@@ -4,15 +4,15 @@ import { letterText } from './i18n.js'
  * xi niêm phong khắc chữ cái đầu tên người gửi. Thuần trang trí (aria-hidden) — trạng thái do LetterWeb báo.
  * Thứ tự lớp: mặt sau → nắp (khi đã mở) → tờ thư → túi trước → nắp (khi đóng) → xi, tem.
  *
- * @param {{ T?: object, theme: object, recipientName: string, senderName: string, business?: { name?: string, logoUrl?: string } | null, occasionLabel: string, open: boolean, out: boolean }} p
+ * @param {{ T?: object, theme: object, recipientName: string, senderName: string, business?: { name?: string, logoUrl?: string } | null, showTitle?: boolean, occasionLabel: string, open: boolean, out: boolean }} p
  */
-export default function Envelope({ T = letterText('vi'), theme, recipientName, senderName, business = null, occasionLabel, open, out }) {
+export default function Envelope({ T = letterText('vi'), theme, recipientName, senderName, business = null, showTitle = true, occasionLabel, open, out }) {
   const initial = [...(senderName || 'L').trim()][0]?.toUpperCase() || 'L'
   return (
     <div className={`lw-env${open ? ' is-open' : ''}${out ? ' is-out' : ''}`} aria-hidden="true">
       <div className="lw-env-back" />
       <div className="lw-env-sheet">
-        <span className="lw-env-sheet-title">{T.dedication(recipientName)}</span>
+        {showTitle && <span className="lw-env-sheet-title">{T.dedication(recipientName)}</span>}
         <i />
         <i />
         <i />
