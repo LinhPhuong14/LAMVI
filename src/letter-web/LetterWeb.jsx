@@ -61,7 +61,12 @@ const hasValue = (v) => (Array.isArray(v) ? v.length > 0 : Boolean(v))
 export default function LetterWeb({ letter, afterLetter, preview = false, onExit, children }) {
   const [reduced] = useState(reducedMotion)
   const [phase, setPhase] = useState('dark')
-  const [titleDone, setTitleDone] = useState(false)
+  // D-164: tắt dòng "Gửi …" → thân thư bắt đầu viết ngay, không chờ tiêu đề
+  const showDedication = letter.showDedication !== false
+  const showSignature = letter.showSignature !== false
+  const [titleShown, setTitleDone] = useState(false)
+  // Không có tiêu đề: coi như xong tiêu đề khi bắt đầu đọc (hẹn giờ viết, tự cuộn chạy đúng lúc; xem lại thì viết lại)
+  const titleDone = showDedication ? titleShown : phase === 'reading'
   const [revealAll, setRevealAll] = useState(reduced)
   const [surprise, setSurprise] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -307,6 +312,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
             recipientName={letter.recipientName}
             senderName={letter.senderName}
             business={biz}
+            showTitle={showDedication}
             T={T}
             occasionLabel={theme.label}
             open={phase === 'unfolding'}
@@ -341,7 +347,7 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
                 {biz.name && !biz.logoUrl && <span>{biz.name}</span>}
               </header>
             )}
-            <HandwrittenTitle as="h2" className="lw-dedication" text={T.dedication(letter.recipientName)} instant={reduced} onDone={() => setTitleDone(true)} />
+            {showDedication && <HandwrittenTitle as="h2" className="lw-dedication" text={T.dedication(letter.recipientName)} instant={reduced} onDone={() => setTitleDone(true)} />}
             <div className={`lw-content${titleDone ? ' is-shown' : ''}`} inert={!titleDone} aria-hidden={!titleDone}>
               {letter.kind === 'text' ? (
                 <>
@@ -381,12 +387,14 @@ export default function LetterWeb({ letter, afterLetter, preview = false, onExit
                   )}
                 </div>
               )}
-              <div className="lw-signature">
-                {/* D-163: lời kết thân mật (mặc định) hoặc trang trọng */}
-                <span>{letter.closing === 'formal' ? T.regardsFormal : T.regards}</span>
-                {sender && <strong>{sender}</strong>}
-                {biz?.name && (sender ? <em className="lw-signature-org">{biz.name}</em> : <strong>{biz.name}</strong>)}
-              </div>
+              {showSignature && (
+                <div className="lw-signature">
+                  {/* D-163: lời kết thân mật (mặc định) hoặc trang trọng; D-164: có thể tắt cả khối */}
+                  <span>{letter.closing === 'formal' ? T.regardsFormal : T.regards}</span>
+                  {sender && <strong>{sender}</strong>}
+                  {biz?.name && (sender ? <em className="lw-signature-org">{biz.name}</em> : <strong>{biz.name}</strong>)}
+                </div>
+              )}
               {letter.postscript && <p className="lw-ps">{letter.postscript}</p>}
               {hasSurprise && (
                 <button ref={surpriseBtn} type="button" className="lw-btn lw-btn-primary lw-surprise-trigger" onClick={() => setSurprise(true)}>

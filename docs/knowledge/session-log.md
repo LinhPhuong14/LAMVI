@@ -1003,3 +1003,5 @@ Master tiếp tục lên a33fb2a trong lúc push (đã bị Git từ chối an t
 **Cập nhật 2026-11-16 (D-162)**: tuỳ chọn thắp 2–5 đèn xếp cung parabol, admin chọn đèn theo thứ tự (đèn đầu ở giữa).
 
 **Cập nhật 2026-11-16 (D-163)**: ô chọn lời kết Thương mến/Trân trọng (`content.closing`, không cần migration).
+
+- 2026-11-20 (claude-master, `feat/letter-toggle-lines`): D-164 — admin bật/tắt dòng "Gửi …" đầu thư và khối lời kết + ký tên; tắt dòng mở đầu thì thân thư viết ngay; test `src/letters/toggle-lines.test.jsx` + kiểm thử độc lập (T-11).

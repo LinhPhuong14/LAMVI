@@ -77,6 +77,9 @@ export function validateLetterContent(input) {
   // Thiếu/lạ → tiếng Việt (thư cũ chưa có trường này)
   value.lang = LETTER_LANGS.includes(src.lang) ? src.lang : 'vi'
   value.closing = LETTER_CLOSINGS.includes(src.closing) ? src.closing : 'warm'
+  // D-164: bật/tắt dòng "Gửi …" đầu thư và khối lời kết + ký tên — chỉ false mới tắt (thư cũ vẫn hiện)
+  value.showDedication = src.showDedication !== false
+  value.showSignature = src.showSignature !== false
   value.kind = LETTER_KINDS.includes(src.kind) ? src.kind : null
   if (!value.kind) errors.kind = 'INVALID'
 
